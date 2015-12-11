@@ -1,0 +1,3 @@
+<launch>
+	<node name="node_bc" pkg="brain" type="BaseController.py" output="screen"/>
+</launch>

@@ -49,7 +49,7 @@ class BaseController(object):
         self.pubLLDebug = rospy.Publisher('/ll_debug', String, queue_size=1)
 
         self.usbCmd = serial.Serial()
-        self.usbCmd.port = '/dev/ttyUSB1'
+        self.usbCmd.port = '/dev/malg'
         self.usbCmd.baudrate = 115200
         self.usbCmd.parity = 'N'
         self.usbCmd.rtscts = False
@@ -61,7 +61,7 @@ class BaseController(object):
     ##############################################################################
     def cbCmdLL(self, message):
         
-        rospy.loginfo(message.data)
+        rospy.loginfo("Received command: [%s]" % message.data)
 
         # Split the message in separate commands
         commands = message.data.split(';')
@@ -104,11 +104,43 @@ class BaseController(object):
                     success = self.sendCmdVersion()
     
                 if success:
-                    rospy.loginfo("Command \"%s\" accepted." % portion)
+                    rospy.loginfo('Command accepted')
                 else:
-                    rospy.logerr("Command \"%s\" failed." % portion)
+                    rospy.logerr('Command rejected')
 
         return
+
+    ##############################################################################
+    # Connect to the USB
+    def connectUSB(self):
+
+        self.usbCmd.close()
+
+        retryRate = rospy.Rate(1)
+        connected = False
+
+        counter = 120
+        while not connected and not rospy.is_shutdown():
+            try:
+                self.usbCmd.open()
+                connected = True
+                rospy.loginfo("Connected to USB [%s]" % self.usbCmd.port)
+                
+            except serial.SerialException as e:
+                rospy.logerr("Could not open USB [%s]" % self.usbCmd.port)
+                rospy.logerr(e)
+                retryRate.sleep()
+
+                counter -= 1
+                if not counter:
+                    return False
+
+                pass
+            
+            except rospy.exceptions.ROSInterrutException:
+                pass
+
+        return True
 
     ##############################################################################
     # Publish the LL event
@@ -128,7 +160,7 @@ class BaseController(object):
             event = 'ui action'
 
         if self.latestEvent != event:
-            rospy.loginfo("Publishing LL event: \"%s\"" % event)
+            rospy.loginfo("Publishing LL event: [%s]" % event)
             self.pubLLEvent.publish(event)
             self.latestEvent = event
 
@@ -138,12 +170,8 @@ class BaseController(object):
 
         rospy.loginfo('Base Controller Node - video version')
 
-        try:
-            self.usbCmd.open()
-        except serial.SerialException, e:
-            sys.stderr.write("Could not open serial port %s: %s\n" % (self.usbCmd.port, e))
-            sys.exit(1)
-
+        if not self.connectUSB():
+            exit(1)
         self.setupReadThread()
 
         try:
@@ -165,19 +193,19 @@ class BaseController(object):
         message = command
         if arg1 != None and arg2 == None:
             message = "%s%c" % (message, chr(int(arg1)))
-            rospy.loginfo("Sending command: \"%s %s 00\"" % (message,
+            rospy.loginfo("Sending to controller: [%s %s]" % (format(ord(command), '02x'),
                                                              format(int(arg1), '02x')))
 
         elif arg1 != None and arg2 != None:
             message = "%s%c%c" % (message, chr(int(arg1)), chr(int(arg2)))
-            rospy.loginfo("Sending command: \"%s %s %s\"" % (message,
+            rospy.loginfo("Sending to controller: [%s %s %s]" % (format(ord(command), '02x'),
                                                              format(int(arg1), '02x'),
                                                              format(int(arg2), '02x')))
 
         else:
-            rospy.loginfo("Sending command: \"%s\"" % message)
+            rospy.loginfo("Sending to controller: [%s]" % format(ord(command), '02x'))
 
-        self.writeUsb(0, message)
+        self.writeUsb(message)
 
     ##############################################################################
     def sendCommandUI(self, entity, mode):
@@ -220,12 +248,15 @@ class BaseController(object):
         return True
 
     ##############################################################################
-    def writeUsb(self, usb, message):
+    def writeUsb(self, message):
 
         self._write_lock.acquire()
         try:
-            if usb == 0:
-                self.usbCmd.write("%s\r\n" % message)
+            self.usbCmd.write("%s\r\n" % message)
+        except serial.SerialException, e:
+            rospy.logerr('USB disconnected. Attempting to re-connect')
+            if not self.connectUSB():
+                exit(1)
 
         finally:
             self._write_lock.release()
@@ -249,20 +280,29 @@ class BaseController(object):
             endMessage = False
             message = ''
 
-            while not endMessage:
-                c = self.usbCmd.read(1)
-                if c != '\n':
-                    message = message + c
-                else:
-                    endMessage = True
+            try:
+                while not endMessage:
+                    c = self.usbCmd.read(1)
+                    if c != '\n':
+                        message = message + c
+                    else:
+                        endMessage = True
 
-            if message:
-                message = message.rstrip()
-                if message[0] == '<':
-                    rospy.loginfo("Publishing debug message: \"%s\"" % message)
-                    self.pubLLDebug.publish(message)
-                else:
-                    self.publishLLEvent(message)
+                if message:
+                    message = message.rstrip()
+                    if message:
+                        if message[0] == '<':
+                            rospy.loginfo("Publishing debug message: \"%s\"" % message)
+                            self.pubLLDebug.publish(message)
+                        else:
+                            self.publishLLEvent(message)
+                    else:
+                        rospy.loginfo('Received empty message')
+
+            except serial.SerialException, e:
+                rospy.logerr('USB disconnected. Attempting to re-connect')
+                if not self.connectUSB():
+                    exit(1)
 
         self.alive = False
 

@@ -1,0 +1,4 @@
+<launch>
+	<node name="driver_joy" pkg="joy" type="joy_node" output="screen"/>
+	<node name="node_j2c" pkg="brain" type="Joy2Commands.py" output="screen"/>
+</launch>

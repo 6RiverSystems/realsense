@@ -20,10 +20,10 @@ class Joy2Commands(object):
             self.sendStop()
         else:
             if abs(horizontal) > self.JOYSTICK_THRESHOLD:
-                self.sendRotate(1)
+                self.sendRotate(10)
     
             if abs(vertical) > self.JOYSTICK_THRESHOLD:
-                self.sendForward(10)
+                self.sendForward(100)
 
     ##############################################################################
     # Initialize the node properties
@@ -56,7 +56,6 @@ Button 2          STOP
     def run(self):
 
         try:
-            self.init()
             self.printUsage()
 
             while not rospy.is_shutdown():
@@ -77,7 +76,7 @@ Button 2          STOP
     def sendForward(self, distance):
 
         commands = [];
-        commands.append("distance %.3f" % distance)
+        commands.append("distance %.0f" % distance)
         self.sendCommands(commands)
 
     ##############################################################################
@@ -85,7 +84,15 @@ Button 2          STOP
     def sendRotate(self, angle):
 
         commands = [];
-        commands.append("rotate %.3f" % angle)
+        commands.append("rotate %.0f" % angle)
+        self.sendCommands(commands)
+
+    ##############################################################################
+    # Publish the stop command
+    def sendStop(self):
+
+        commands = [];
+        commands.append('stop')
         self.sendCommands(commands)
 
 if __name__ == '__main__':

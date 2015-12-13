@@ -201,21 +201,18 @@ class BaseController(object):
     ##############################################################################
     def sendCommand(self, command, arg1=None, arg2=None):
 
-        message = command
-        if arg1 != None and arg2 == None:
-            message = "%s%c" % (message, chr(int(arg1)))
-            rospy.loginfo("Sending to controller: [%s %s]" % (format(ord(command), '02x'),
-                                                             format(int(arg1), '02x')))
+        marg1 = chr(0)
+        marg2 = chr(0)
+        if arg1 != None:
+            marg1 = chr(arg1)
+        if arg2 != None:
+            marg2 = chr(arg2)
 
-        elif arg1 != None and arg2 != None:
-            message = "%s%c%c" % (message, chr(int(arg1)), chr(int(arg2)))
-            rospy.loginfo("Sending to controller: [%s %s %s]" % (format(ord(command), '02x'),
-                                                             format(int(arg1), '02x'),
-                                                             format(int(arg2), '02x')))
-
-        else:
-            rospy.loginfo("Sending to controller: [%s]" % format(ord(command), '02x'))
-
+        message = "%c%c%c" % (command, marg1, marg2)
+        rospy.loginfo("Sending to controller: [%s %s %s]" % (
+                                                             format(ord(command), '02x'),
+                                                             format(ord(marg1), '02x'),
+                                                             format(ord(marg2), '02x')))
         self.writeUsb(message)
 
     ##############################################################################

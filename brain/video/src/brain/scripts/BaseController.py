@@ -313,12 +313,15 @@ class BaseController(object):
                     message = message.rstrip()
                     if message:
                         rospy.loginfo("Received message: [%s]" % message)
-                        if message[0] == '<':
-                            rospy.loginfo("Publishing debug message: [%s]" % message)
-                            self.pubLLDebug.publish(message)
-                        elif message[0:9] == '<MSG Error':
+                        
+                        if message[0:5] == '<MSG E':
                             self.controllerFault = True
                             rospy.logerr('Disabling controller')
+                            
+                        elif message[0] == '<':
+                            rospy.loginfo("Publishing debug message: [%s]" % message)
+                            self.pubLLDebug.publish(message)
+                            
                         else:
                             self.publishLLEvent(message)
                     else:

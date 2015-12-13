@@ -71,7 +71,8 @@ class BaseController(object):
         self.usbCmd.xonxoff = False
         self.usbCmd.timeout = 1
 
-        self.latestEvent = ''
+        self.latestCommand = ''
+        self.controllerFault = False
 
     ##############################################################################
     def cbCmdLL(self, message):
@@ -90,6 +91,11 @@ class BaseController(object):
             # Interpret the command
             if command:
                 success = False
+
+                # renable
+                if command[0] == 'REENABLE':
+                    self.controllerFault = False
+                    success = True
 
                 # stop
                 if command[0] == 'STOP':
@@ -208,11 +214,15 @@ class BaseController(object):
         if arg2 != None:
             marg2 = chr(arg2)
 
-        message = "%c%c%c" % (command, marg1, marg2)
-        rospy.loginfo("Sending to controller: [%s %s %s]" % (
+        crc = chr((ord(command) + ord(marg1) + ord(marg2)) % 255)
+
+        message = "%c%c%c%c" % (command, marg1, marg2, crc)
+        rospy.loginfo("Sending to controller: [%s %s %s %s]" % (
                                                              format(ord(command), '02x'),
                                                              format(ord(marg1), '02x'),
-                                                             format(ord(marg2), '02x')))
+                                                             format(ord(marg2), '02x'),
+                                                             format(ord(crc), '02x')))
+        self.latestCommand = message
         self.writeUsb(message)
 
     ##############################################################################
@@ -258,16 +268,19 @@ class BaseController(object):
     ##############################################################################
     def writeUsb(self, message):
 
-        self._write_lock.acquire()
-        try:
-            self.usbCmd.write("%s\r\n" % message)
-        except serial.SerialException, e:
-            rospy.logerr('USB disconnected. Attempting to re-connect')
-            if not self.connectUSB():
-                exit(1)
-
-        finally:
-            self._write_lock.release()
+        if not self.controllerFault:
+            self._write_lock.acquire()
+            try:
+                self.usbCmd.write("%s\r\n" % message)
+            except serial.SerialException, e:
+                rospy.logerr('USB disconnected. Attempting to re-connect')
+                if not self.connectUSB():
+                    exit(1)
+    
+            finally:
+                self._write_lock.release()
+        else:
+            rospy.logerr('Controller disabled')
 
     ##############################################################################
     def setupReadThread(self):
@@ -303,6 +316,9 @@ class BaseController(object):
                         if message[0] == '<':
                             rospy.loginfo("Publishing debug message: [%s]" % message)
                             self.pubLLDebug.publish(message)
+                        elif message[0:9] == '<MSG Error':
+                            self.controllerFault = True
+                            rospy.logerr('Disabling controller')
                         else:
                             self.publishLLEvent(message)
                     else:

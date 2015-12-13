@@ -11,32 +11,47 @@ from geometry_msgs.msg import Twist
 class BaseController(object):
 
     ENTITIES = {
-        'tote0':        0,
-        'tote1':        1,
-        'tote2':        2,
-        'tote3':        3,
-        'tote4':        4,
-        'tote5':        5,
-        'tote6':        6,
-        'tote7':        7,
+        'TOTE0':        0,
+        'TOTE1':        1,
+        'TOTE2':        2,
+        'TOTE3':        3,
+        'TOTE4':        4,
+        'TOTE5':        5,
+        'TOTE6':        6,
+        'TOTE7':        7,
 
-        'action':     100,
-        'pause':      101,
+        'ACTION':     100,
+        'PAUSE':      101,
 
-        'tail_left':  201,
-        'tail_right': 202,
+        'TAIL_LEFT':  201,
+        'TAIL_RIGHT': 202
+    }
+
+    REV_ENTITIES = {
+        0:        "TOTE0",
+        1:        "TOTE1",
+        2:        "TOTE2",
+        3:        "TOTE3",
+        4:        "TOTE4",
+        5:        "TOTE5",
+        6:        "TOTE6",
+        7:        "TOTE7",
+        100:     "ACTION",
+        101:      "PAUSE",
+        201:  "TAIL_LEFT",
+        202: "TAIL_RIGHT"
     }
     
     MODES = {
-        'off':          0,
-        'on':           1,
+        'OFF':          0,
+        'ON':           1,
         
-        'take':        10,
-        'put':         11,
+        'TAKE':        10,
+        'PUT':         11,
         
-        'brake':      100,
-        'turn':       101,
-        'select':     102,
+        'BRAKE':      100,
+        'TURN':       101,
+        'SELECT':     102,
     }
     
     ##############################################################################
@@ -77,11 +92,11 @@ class BaseController(object):
                 success = False
 
                 # stop
-                if command[0] == 'stop':
+                if command[0] == 'STOP':
                     success = self.sendCommandStop()
                 
                 # distance <distance [mm]>
-                elif command[0] == 'distance':
+                elif command[0] == 'DISTANCE':
                     d = int(command[1])
                     if d == 0:
                         success = self.sendCommandStop()
@@ -89,18 +104,18 @@ class BaseController(object):
                         success = self.sendCommandDistance(d)
                 
                 # rotate <angle [1/10deg]>
-                elif command[0] == 'rotate':
+                elif command[0] == 'ROTATE':
                     angle = int(command[1])
                     success = self.sendCommandRotate(angle)
                 
                 # ui <entity> <mode>
-                elif command[0] == 'ui':
+                elif command[0] == 'UI':
                     entity = command[1]
                     mode = command[2]
                     success = self.sendCommandUI(entity, mode)
                 
                 # version
-                elif command[0] == 'version':
+                elif command[0] == 'VERSION':
                     success = self.sendCmdVersion()
     
                 if success:
@@ -150,19 +165,15 @@ class BaseController(object):
         event = ''
 
         # STOP event
-        if message[0] == 's':
-            event = 'status stopped'
+        if message[0] == 'S':
+            event = 'ARRIVED'
  
-        elif message[0] == 'a':
-            event = 'move completed'
+        elif message[0] == 'B':
+            entityName = self.REV_ENTITIES[ord(message[1])];
+            event = "UI %s" % entityName
 
-        elif message[0] == 'b':
-            event = 'ui action'
-
-        if self.latestEvent != event:
-            rospy.loginfo("Publishing LL event: [%s]" % event)
-            self.pubLLEvent.publish(event)
-            self.latestEvent = event
+        rospy.loginfo("Publishing LL event: [%s]" % event)
+        self.pubLLEvent.publish(event)
 
     ##############################################################################
     # Run the node
@@ -291,8 +302,9 @@ class BaseController(object):
                 if message:
                     message = message.rstrip()
                     if message:
+                        rospy.loginfo("Received message: [%s]" % message)
                         if message[0] == '<':
-                            rospy.loginfo("Publishing debug message: \"%s\"" % message)
+                            rospy.loginfo("Publishing debug message: [%s]" % message)
                             self.pubLLDebug.publish(message)
                         else:
                             self.publishLLEvent(message)

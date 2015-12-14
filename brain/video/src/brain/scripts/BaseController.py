@@ -314,9 +314,9 @@ class BaseController(object):
                     if message:
                         rospy.loginfo("Received message: [%s]" % message)
                         
-                        if message[0:5] == '<MSG E':
+                        if message[0:6] == '<MSG E':
                             self.controllerFault = True
-                            rospy.logerr('Disabling controller')
+                            rospy.logerr('Controller disabled')
                             
                         elif message[0] == '<':
                             rospy.loginfo("Publishing debug message: [%s]" % message)

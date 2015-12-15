@@ -103,11 +103,11 @@ class BaseController(object):
                 
                 # distance <distance [mm]>
                 elif command[0] == 'DISTANCE':
-                    d = int(command[1])
-                    if d == 0:
+                    distance = int(command[1])
+                    if distance == 0:
                         success = self.sendCommandStop()
                     else:
-                        success = self.sendCommandDistance(d)
+                        success = self.sendCommandDistance(distance)
                 
                 # rotate <angle [1/10deg]>
                 elif command[0] == 'ROTATE':
@@ -119,6 +119,12 @@ class BaseController(object):
                     entity = command[1]
                     mode = command[2]
                     success = self.sendCommandUI(entity, mode)
+                
+                # turn <L|R> <distance [mm]>
+                elif command[0] == 'TURN':
+                    direction = command[1]
+                    distance = int(command[2])
+                    success = self.sendCommandTurn(direction, distance)
                 
                 # version
                 elif command[0] == 'VERSION':
@@ -257,6 +263,18 @@ class BaseController(object):
     def sendCommandStop(self):
 
         self.sendCommand('s')
+        return True
+
+    ##############################################################################
+    def sendCommandTurn(self, direction, distance):
+
+        if direction == 'R':
+            self.sendCommandWithInteger('6', distance)
+        elif direction == 'L':
+            self.sendCommandWithInteger('4', distance)
+        else:
+            return False
+
         return True
 
     ##############################################################################

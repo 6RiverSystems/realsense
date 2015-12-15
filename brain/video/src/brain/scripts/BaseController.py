@@ -126,6 +126,10 @@ class BaseController(object):
                     distance = int(command[2])
                     success = self.sendCommandTurn(direction, distance)
                 
+                # startup: startup sequence
+                elif command[0] == 'STARTUP':
+                    success = self.sendCommandStartup()
+
                 # version
                 elif command[0] == 'VERSION':
                     success = self.sendCmdVersion()
@@ -245,6 +249,12 @@ class BaseController(object):
             return False
         
         self.sendCommand('7', entityCode, modeCode)
+        return True
+
+    ##############################################################################
+    def sendCommandStartup(self):
+
+        self.sendCommand('8')
         return True
 
     ##############################################################################

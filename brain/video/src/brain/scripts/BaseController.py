@@ -59,7 +59,7 @@ class BaseController(object):
     def __init__(self):
 
         self.rate = rospy.Rate(100)
-        self.subCmdLL = rospy.Subscriber('/cmd_ll', String, self.cbCmdLL, queue_size=1)
+        self.subCmdLL = rospy.Subscriber('/cmd_ll', String, self.cbCmdLL, queue_size=50)
         self.pubLLEvent = rospy.Publisher('/ll_event', String, queue_size=1)
         self.pubLLDebug = rospy.Publisher('/ll_debug', String, queue_size=1)
 
@@ -224,7 +224,7 @@ class BaseController(object):
         if arg2 != None:
             marg2 = chr(arg2)
 
-        crc = chr((ord(command) + ord(marg1) + ord(marg2)) % 255)
+        crc = chr((ord(command) + ord(marg1) + ord(marg2)) % 256)
 
         message = "%c%c%c%c" % (command, marg1, marg2, crc)
         rospy.loginfo("Sending to controller: [%s %s %s %s]" % (

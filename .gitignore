@@ -2,3 +2,4 @@ brain/video/build
 .catkin_workspace
 brain/video/devel
 .DS_Store
+.idea

@@ -47,6 +47,8 @@ class BaseController(object):
         'ON':           1,
         
         'TAKE':        10,
+        'PICK':        10,
+        'GRAB':        10,
         'PUT':         11,
         
         'BRAKE':      100,

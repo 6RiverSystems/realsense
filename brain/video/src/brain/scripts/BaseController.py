@@ -123,7 +123,12 @@ class BaseController(object):
                 # version
                 elif command[0] == 'VERSION':
                     success = self.sendCmdVersion()
-    
+                # empty command - probably last semi colon
+                elif command[0] == '':
+                    success = True;
+                else:
+                    rospy.logerr('Unknown Command[%s]' % command[0])
+       
                 if success:
                     rospy.loginfo('Command accepted')
                 else:

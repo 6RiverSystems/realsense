@@ -26,21 +26,6 @@ class BaseController(object):
         'TAIL_LEFT':  201,
         'TAIL_RIGHT': 202
     }
-
-    REV_ENTITIES = {
-        0:        "TOTE0",
-        1:        "TOTE1",
-        2:        "TOTE2",
-        3:        "TOTE3",
-        4:        "TOTE4",
-        5:        "TOTE5",
-        6:        "TOTE6",
-        7:        "TOTE7",
-        100:     "ACTION",
-        101:      "PAUSE",
-        201:  "TAIL_LEFT",
-        202: "TAIL_RIGHT"
-    }
     
     MODES = {
         'OFF':          0,
@@ -65,6 +50,9 @@ class BaseController(object):
         self.pubLLEvent = rospy.Publisher('/ll_event', String, queue_size=1)
         self.pubLLDebug = rospy.Publisher('/ll_debug', String, queue_size=1)
 
+        # generate a reverse lookup table
+        self.REV_ENTITIES = {v:k for k, v in self.ENTITIES.iteritems()}        
+        
         self.usbCmd = serial.Serial()
         self.usbCmd.port = '/dev/malg'
         self.usbCmd.baudrate = 115200

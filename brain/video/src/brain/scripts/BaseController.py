@@ -240,6 +240,10 @@ class BaseController(object):
                     # startup: startup sequence
                     elif command[0] == 'STARTUP':
                         self.sendCommandStartup()
+                        
+                    # startup: startup sequence
+                    elif command[0] == 'PAUSE':
+                        self.sendCommandPause(command[1:])
 
                     # version
                     elif command[0] == 'VERSION':
@@ -384,6 +388,19 @@ class BaseController(object):
     def sendCmdVersion(self):
         cp = CommandPacketizer(self.CMD_GET_VERSION)
         self.sendCommand(cp)
+        
+     ##############################################################################
+    def sendCmdPause(self, commandPayload):
+        cp = CommandPacketizer(self.CMD_SUSPEND_UPDATE_STATE)
+        pauseState = commandPayload[0]
+        if pauseState == 'ON':
+            cp.append(1,1)
+        elif pauseState == 'OFF':
+            cp.append(0,1)
+        else:
+            raise IllegalValue('Pause requires either ON or OFF but was given %s' % pauseState)
+            
+        self.sendCommand(cp)        
 
     ##############################################################################
     def writeUsb(self, message):

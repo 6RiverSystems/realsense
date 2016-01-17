@@ -247,7 +247,7 @@ class BaseController(object):
 
                     # version
                     elif command[0] == 'VERSION':
-                        self.sendCmdVersion()
+                        self.sendCommandVersion()
                     # empty command - probably last semi colon
                     elif command[0] == '':    
                         pass # this is just a parsing issue with the trailing semicolon
@@ -385,12 +385,12 @@ class BaseController(object):
         self.sendCommand(cp)
 
     ##############################################################################
-    def sendCmdVersion(self):
+    def sendCommandVersion(self):
         cp = CommandPacketizer(self.CMD_GET_VERSION)
         self.sendCommand(cp)
         
      ##############################################################################
-    def sendCmdPause(self, commandPayload):
+    def sendCommandPause(self, commandPayload):
         cp = CommandPacketizer(self.CMD_SUSPEND_UPDATE_STATE)
         pauseState = commandPayload[0]
         if pauseState == 'ON':

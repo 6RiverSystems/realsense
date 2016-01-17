@@ -8,6 +8,99 @@ import serial
 from std_msgs.msg import Float32, String
 from geometry_msgs.msg import Twist
 
+class TooManyBytes(Exception):
+    def __init__(self, value):
+         self.value = value
+    def __str__(self):
+        return repr(self.value)    
+
+class TooFewBytes(Exception):
+    def __init__(self, value):
+         self.value = value
+    def __str__(self):
+        return repr(self.value)    
+            
+class IllegalValue(Exception):
+    def __init__(self, value):
+         self.value = value
+    def __str__(self):
+        return repr(self.value)       
+    
+class IllegalCommand(Exception):
+    def __init__(self, value):
+         self.value = value
+    def __str__(self):
+        return repr(self.value)       
+        
+class CommandPacketizer:
+    def __init__(self, command, maxPayloadSize = 2):
+        self.command = command
+        self.maxPayloadSize = maxPayloadSize
+        self.currPayloadSize = 0
+        self.payloadElementList = []
+    
+    def append(self, payloadElement, numBytes = None):
+        if (isinstance(payloadElement, tuple) and len(payloadElement) == 2):
+            (value, numBytes) = payloadElement
+        elif (not isinstance(payloadElement, tuple) and (numBytes != None)):
+            value = payloadElement
+            payloadElement = (value, numBytes)
+        else:
+            raise ValueError('append either needs one two-element tuple or two values')
+            
+        self.currPayloadSize += numBytes
+        if(self.currPayloadSize > self.maxPayloadSize):
+            raise TooManyBytes('more bytes added than payload can hold')
+        self.payloadElementList.append(payloadElement)
+        
+    def generateBytes(self, generateCRC = True, includeLength = True, padWithZeros = False, teminatingStr = None):
+        #if we need to pad bytes, then do it now
+        if padWithZeros:
+            self.append(0, self.maxPayloadSize - self.currPayloadSize)
+        
+        #add the tuple for the header
+        self.payloadElementList.insert(0,(self.command, 1))
+        
+        #add the length
+        if(includeLength == True):
+            self.payloadElementList.insert(1,(self.currPayloadSize, 1))
+        
+        #generate the bytes for the message
+        self.bytesArray = bytearray('')
+        crc = 0;
+        for (value, bytes) in self.payloadElementList:
+            for i in range(0,bytes):
+                if(type(value) is str):
+                    value = ord(value)
+                onebyte = value & 0xFF
+                crc += onebyte
+                self.bytesArray.append(chr(onebyte))
+                value = value >> 8
+            if value != 0:
+                raise TooFewBytes('can not fit value in bytes provided')
+
+        #Add the CRC
+        if generateCRC:
+            self.bytesArray.append(chr(crc&0xFF)) 
+        
+        if teminatingStr is not None:
+            for c in teminatingStr:
+                self.bytesArray.append(ord(c))
+        
+        return self.bytesArray
+        
+    def __str__(self):
+        mystr = ''
+        if  hasattr(self, 'bytesArray'):
+            first = True;
+            for byte in self.bytesArray:
+                if first:
+                    first = False
+                    mystr = '%s0x%02X' % (mystr, byte)
+                else:    
+                    mystr = '%s 0x%02X' % (mystr, byte)
+        return mystr
+        
 class BaseController(object):
 
     ENTITIES = {
@@ -40,6 +133,36 @@ class BaseController(object):
         'TURN':       101,
         'SELECT':     102,
     }
+    
+    CMD_FORWARD = 'f'
+    CMD_BACKWARD = 'b'
+    CMD_RIGHT = 'r'
+    CMD_LEFT = 'l'
+    CMD_FORWARD_TIMED = 't'
+    CMD_BACKWARD_TIMED = 'u'
+    CMD_LEFT_TIMED = 'z'
+    CMD_RIGHT_TIMED = 'e'
+    CMD_CAM = 'v'
+    CMD_CAM_RELEASE = 'w'
+    CMD_CAM_HORIZ_SET = 'm'
+    CMD_STOP = 's'
+    CMD_HARD_STOP = 'h'
+    CMD_GET_VERSION = 'y'
+    CMD_GET_FIRMWARE = 'x'
+    CMD_FWD_FLOOD_LIGHT = 'q'
+    CMD_REAR_FLOOD_LIGHT = 'o'
+    CMD_SPOT_LIGHT = 'p'
+    CMD_ODOMETRY_START = 'i'
+    CMD_ODOMETRY_STOP = 'j'
+    CMD_ODOMETRY_REPORT = 'k'
+    CMD_PING = 'c'
+    CMD_DISTANCE = 'd'
+    CMD_LIGHT_UPDATE = '7'
+    CMD_ROTATE = '0'
+    CMD_STARTUP = '8'
+    CMD_SLINGSHOT_RIGHT = '6'
+    CMD_SLINGSHOT_LEFT = '5'
+    CMD_SUSPEND_UPDATE_STATE = '4'
     
     ##############################################################################
     # Initialize the node properties
@@ -80,60 +203,58 @@ class BaseController(object):
             
             # Interpret the command
             if command:
-                success = False
+                try:
+                    # renable
+                    if command[0] == 'REENABLE':
+                        self.controllerFault = False
 
-                # renable
-                if command[0] == 'REENABLE':
-                    self.controllerFault = False
-                    success = True
+                    # stop
+                    if command[0] == 'STOP':
+                        self.sendCommandStop()
+                    
+                    # distance <distance [mm]>
+                    elif command[0] == 'DISTANCE':
+                        distance = int(command[1])
+                        if distance == 0:
+                            self.sendCommandStop()
+                        else:
+                            self.sendCommandDistance(distance)
+                    
+                    # rotate <angle [1/10deg]>
+                    elif command[0] == 'ROTATE':
+                        angle = int(command[1])
+                        self.sendCommandRotate(angle)
+                    
+                    # ui <entity> <mode>
+                    elif command[0] == 'UI':
+                        entity = command[1]
+                        mode = command[2]
+                        self.sendCommandUI(entity, mode)
+                    
+                    # turn <L|R> <distance [mm]>
+                    elif command[0] == 'TURN':
+                        direction = command[1]
+                        distance = int(command[2])
+                        self.sendCommandTurn(direction, distance)
+                    
+                    # startup: startup sequence
+                    elif command[0] == 'STARTUP':
+                        self.sendCommandStartup()
 
-                # stop
-                if command[0] == 'STOP':
-                    success = self.sendCommandStop()
-                
-                # distance <distance [mm]>
-                elif command[0] == 'DISTANCE':
-                    distance = int(command[1])
-                    if distance == 0:
-                        success = self.sendCommandStop()
+                    # version
+                    elif command[0] == 'VERSION':
+                        self.sendCmdVersion()
+                    # empty command - probably last semi colon
+                    elif command[0] == '':    
+                        pass # this is just a parsing issue with the trailing semicolon
                     else:
-                        success = self.sendCommandDistance(distance)
-                
-                # rotate <angle [1/10deg]>
-                elif command[0] == 'ROTATE':
-                    angle = int(command[1])
-                    success = self.sendCommandRotate(angle)
-                
-                # ui <entity> <mode>
-                elif command[0] == 'UI':
-                    entity = command[1]
-                    mode = command[2]
-                    success = self.sendCommandUI(entity, mode)
-                
-                # turn <L|R> <distance [mm]>
-                elif command[0] == 'TURN':
-                    direction = command[1]
-                    distance = int(command[2])
-                    success = self.sendCommandTurn(direction, distance)
-                
-                # startup: startup sequence
-                elif command[0] == 'STARTUP':
-                    success = self.sendCommandStartup()
-
-                # version
-                elif command[0] == 'VERSION':
-                    success = self.sendCmdVersion()
-                # empty command - probably last semi colon
-                elif command[0] == '':
-                    success = True;
-                else:
-                    rospy.logerr('Unknown Command[%s]' % command[0])
+                        raise IllegalCommand('Unknown Command[%s]' % command[0])
        
-                if success:
-                    rospy.loginfo('Command accepted')
-                else:
-                    rospy.logerr('Command rejected')
+                except (TooManyBytes, TooFewBytes, IllegalValue, IllegalCommand) as e:
+                    rospy.logerr('%s: %s for command %s' % (e.__class__.__name__, e.value, command))
 
+                    
+                    
         return
 
     ##############################################################################
@@ -203,90 +324,66 @@ class BaseController(object):
             pass
 
     ##############################################################################
-    def sendCommandWithInteger(self, command, arg):
+    def sendCommand(self, commandPacketizer):
+        message = commandPacketizer.generateBytes(True, False, True, '\r\n')
+        rospy.loginfo("Sending to controller: [%s]" % commandPacketizer)
 
-        low = arg & 0x00ff
-        high = (arg >> 8) & 0x00ff
-        self.sendCommand(command, low, high)
-
-    ##############################################################################
-    def sendCommand(self, command, arg1=None, arg2=None):
-
-        marg1 = chr(0)
-        marg2 = chr(0)
-        if arg1 != None:
-            marg1 = chr(arg1)
-        if arg2 != None:
-            marg2 = chr(arg2)
-
-        crc = chr((ord(command) + ord(marg1) + ord(marg2)) % 256)
-
-        message = "%c%c%c%c" % (command, marg1, marg2, crc)
-        rospy.loginfo("Sending to controller: [%s %s %s %s]" % (
-                                                             format(ord(command), '02x'),
-                                                             format(ord(marg1), '02x'),
-                                                             format(ord(marg2), '02x'),
-                                                             format(ord(crc), '02x')))
         self.latestCommand = message
         self.writeUsb(message)
 
     ##############################################################################
     def sendCommandUI(self, entity, mode):
 
-        if entity in self.ENTITIES:
-            entityCode = self.ENTITIES[entity];
-        else:
-            return False
-        
-        if mode in self.MODES:
-            modeCode = self.MODES[mode]
-        else:
-            return False
-        
-        self.sendCommand('7', entityCode, modeCode)
-        return True
+        if entity not in self.ENTITIES:
+            raise IllegalValue('The entity %i is not valid' % entity);
+            
+        if mode not in self.MODES:
+            raise IllegalValue('The mode %i is not valid' % mode);
+               
+        cp = CommandPacketizer(self.CMD_LIGHT_UPDATE)
+        cp.append(self.ENTITIES[entity],1)
+        cp.append(self.MODES[mode],1)
+        self.sendCommand(cp)
 
     ##############################################################################
     def sendCommandStartup(self):
-
-        self.sendCommand('8')
-        return True
+        cp = CommandPacketizer(self.CMD_STARTUP)
+        self.sendCommand(cp)
 
     ##############################################################################
     def sendCommandDistance(self, distance):
-
-        self.sendCommandWithInteger('d', distance)
-        return True
-
+        cp = CommandPacketizer(self.CMD_DISTANCE)
+        cp.append(distance, 2)
+        self.sendCommand(cp)
+        
     ##############################################################################
     def sendCommandRotate(self, angle):
-        
-        self.sendCommandWithInteger('0', angle)
-        return True
+        cp = CommandPacketizer(self.CMD_ROTATE)
+        cp.append(angle, 2)
+        self.sendCommand(cp)
 
     ##############################################################################
     def sendCommandStop(self):
-
-        self.sendCommand('s')
-        return True
+        cp = CommandPacketizer(self.CMD_STOP)
+        self.sendCommand(cp)
 
     ##############################################################################
     def sendCommandTurn(self, direction, distance):
 
         if direction == 'R':
-            self.sendCommandWithInteger('6', distance)
+            cp = CommandPacketizer(self.CMD_SLINGSHOT_RIGHT)
         elif direction == 'L':
-            self.sendCommandWithInteger('4', distance)
+            cp = CommandPacketizer(self.CMD_SLINGSHOT_LEFT)
         else:
-            return False
+            raise IllegalValue('Invalid turn direction %c', direction)
 
-        return True
+        cp.append(distance, 2)
+        self.sendCommand(cp)
 
     ##############################################################################
     def sendCmdVersion(self):
-
-        self.sendCommand('y')
-        return True
+        cp = CommandPacketizer(self.CMD_GET_VERSION)
+        self.sendCommand(cp)
 
     ##############################################################################
     def writeUsb(self, message):
@@ -342,7 +439,6 @@ class BaseController(object):
                             rospy.logerr('Controller disabled')
                             
                         elif message[0] == '<':
-                            rospy.loginfo("Publishing debug message: [%s]" % message)
                             self.pubLLDebug.publish(message)
                             
                         else:

@@ -214,11 +214,7 @@ class BaseController(object):
                     
                     # distance <distance [mm]>
                     elif command[0] == 'DISTANCE':
-                        distance = int(command[1])
-                        if distance == 0:
-                            self.sendCommandStop()
-                        else:
-                            self.sendCommandDistance(distance)
+                        self.sendCommandDistance(command[1:])
                     
                     # rotate <angle [1/10deg]>
                     elif command[0] == 'ROTATE':
@@ -355,7 +351,8 @@ class BaseController(object):
         self.sendCommand(cp)
 
     ##############################################################################
-    def sendCommandDistance(self, distance):
+    def sendCommandDistance(self, commandPayload):
+        distance = int(commandPayload[0])
         cp = CommandPacketizer(self.CMD_DISTANCE)
         cp.append(distance, 2)
         self.sendCommand(cp)

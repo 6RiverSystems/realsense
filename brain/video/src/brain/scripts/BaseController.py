@@ -389,15 +389,20 @@ class BaseController(object):
      ##############################################################################
     def sendCommandPause(self, commandPayload):
         cp = CommandPacketizer(self.CMD_SUSPEND_UPDATE_STATE)
+        cplight = CommandPacketizer(self.CMD_LIGHT_UPDATE)
+        cplight.append(self.ENTITIES['PAUSE'],1)
         pauseState = commandPayload[0]
         if pauseState == 'ON':
             cp.append(1,1)
+            cplight.append(self.MODES['ON'],1)
         elif pauseState == 'OFF':
             cp.append(0,1)
+            cplight.append(self.MODES['OFF'],1)
         else:
             raise IllegalValue('Pause requires either ON or OFF but was given %s' % pauseState)
             
-        self.sendCommand(cp)        
+        self.sendCommand(cp)   
+        self.sendCommand(cplight)       
 
     ##############################################################################
     def writeUsb(self, message):

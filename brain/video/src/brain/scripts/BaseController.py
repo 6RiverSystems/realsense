@@ -24,13 +24,7 @@ class IllegalValue(Exception):
     def __init__(self, value):
          self.value = value
     def __str__(self):
-        return repr(self.value)       
-    
-class IllegalCommand(Exception):
-    def __init__(self, value):
-         self.value = value
-    def __str__(self):
-        return repr(self.value)       
+        return repr(self.value)          
         
 class CommandPacketizer:
     def __init__(self, command, maxPayloadSize = 2):
@@ -189,7 +183,6 @@ class BaseController(object):
 
     ##############################################################################
     def cbCmdLL(self, message):
-        
         rospy.loginfo("Received command: [%s]" % message.data)
 
         # Split the message in separate commands
@@ -202,59 +195,19 @@ class BaseController(object):
             command = portion.split(' ')
             
             # Interpret the command
-            if command:
+            # look for a function called "processCommandFOO" where FOO is the command that was specified
+            # then pass that function the rest of the command arguements
+            if command[0] != '': 
                 try:
-                    # renable
-                    if command[0] == 'REENABLE':
-                        self.controllerFault = False
+                    methodToCall = getattr(self, 'processCommand' + command[0])
+                    methodToCall(command[1:])  
 
-                    # stop
-                    if command[0] == 'STOP':
-                        self.sendCommandStop()
-                    
-                    # distance <distance [mm]>
-                    elif command[0] == 'DISTANCE':
-                        self.sendCommandDistance(command[1:])
-                    
-                    # rotate <angle [1/10deg]>
-                    elif command[0] == 'ROTATE':
-                        angle = int(command[1])
-                        self.sendCommandRotate(angle)
-                    
-                    # ui <entity> <mode>
-                    elif command[0] == 'UI':
-                        entity = command[1]
-                        mode = command[2]
-                        self.sendCommandUI(entity, mode)
-                    
-                    # turn <L|R> <distance [mm]>
-                    elif command[0] == 'TURN':
-                        direction = command[1]
-                        distance = int(command[2])
-                        self.sendCommandTurn(direction, distance)
-                    
-                    # startup: startup sequence
-                    elif command[0] == 'STARTUP':
-                        self.sendCommandStartup()
-                        
-                    # startup: startup sequence
-                    elif command[0] == 'PAUSE':
-                        self.sendCommandPause(command[1:])
-
-                    # version
-                    elif command[0] == 'VERSION':
-                        self.sendCommandVersion()
-                    # empty command - probably last semi colon
-                    elif command[0] == '':    
-                        pass # this is just a parsing issue with the trailing semicolon
-                    else:
-                        raise IllegalCommand('Unknown Command[%s]' % command[0])
-       
-                except (TooManyBytes, TooFewBytes, IllegalValue, IllegalCommand) as e:
+                except (AttributeError):
+                    rospy.logerr('No function named "sendCommand' + command[0] + '"')
+ #                   print ('No function named "processCommand' + command[0] + '"')
+                except (TooManyBytes, TooFewBytes, IllegalValue) as e:
                     rospy.logerr('%s: %s for command %s' % (e.__class__.__name__, e.value, command))
-
-                    
-                    
+ #                    print '%s: %s for command %s' % (e.__class__.__name__, e.value, command)
         return
 
     ##############################################################################
@@ -332,7 +285,9 @@ class BaseController(object):
         self.writeUsb(message)
 
     ##############################################################################
-    def sendCommandUI(self, entity, mode):
+    def processCommandUI(self, commandPayload):
+        entity = commandPayload[0]
+        mode = commandPayload[1]
 
         if entity not in self.ENTITIES:
             raise IllegalValue('The entity %i is not valid' % entity);
@@ -346,31 +301,33 @@ class BaseController(object):
         self.sendCommand(cp)
 
     ##############################################################################
-    def sendCommandStartup(self):
+    def processCommandSTARTUP(self, commandPayload):
         cp = CommandPacketizer(self.CMD_STARTUP)
         self.sendCommand(cp)
 
     ##############################################################################
-    def sendCommandDistance(self, commandPayload):
+    def processCommandDISTANCE(self, commandPayload):
         distance = int(commandPayload[0])
         cp = CommandPacketizer(self.CMD_DISTANCE)
         cp.append(distance, 2)
         self.sendCommand(cp)
         
     ##############################################################################
-    def sendCommandRotate(self, angle):
+    def processCommandROTATE(self, commandPayload):
+        angle = int(commandPayload[0])
         cp = CommandPacketizer(self.CMD_ROTATE)
         cp.append(angle, 2)
         self.sendCommand(cp)
 
     ##############################################################################
-    def sendCommandStop(self):
+    def processCommandSTOP(self, commandPayload):
         cp = CommandPacketizer(self.CMD_STOP)
         self.sendCommand(cp)
 
     ##############################################################################
-    def sendCommandTurn(self, direction, distance):
-
+    def processCommandTURN(self, commandPayload):
+        direction = commandPayload[0]
+        distance = int(commandPayload[1])
         if direction == 'R':
             cp = CommandPacketizer(self.CMD_SLINGSHOT_RIGHT)
         elif direction == 'L':
@@ -382,27 +339,25 @@ class BaseController(object):
         self.sendCommand(cp)
 
     ##############################################################################
-    def sendCommandVersion(self):
+    def processCommandVERSION(self, commandPayload):
         cp = CommandPacketizer(self.CMD_GET_VERSION)
         self.sendCommand(cp)
-        
-     ##############################################################################
-    def sendCommandPause(self, commandPayload):
+
+    ##############################################################################
+    def processCommandPAUSE(self, commandPayload):
         cp = CommandPacketizer(self.CMD_SUSPEND_UPDATE_STATE)
-        cplight = CommandPacketizer(self.CMD_LIGHT_UPDATE)
-        cplight.append(self.ENTITIES['PAUSE'],1)
-        pauseState = commandPayload[0]
-        if pauseState == 'ON':
+        if commandPayload[0] == 'ON':
             cp.append(1,1)
-            cplight.append(self.MODES['ON'],1)
-        elif pauseState == 'OFF':
+        elif commandPayload[0] == 'OFF':
             cp.append(0,1)
-            cplight.append(self.MODES['OFF'],1)
         else:
-            raise IllegalValue('Pause requires either ON or OFF but was given %s' % pauseState)
+            raise IllegalValue('Pause requires either ON or OFF but was given %s' % commandPayload[0])
             
-        self.sendCommand(cp)   
-        self.sendCommand(cplight)       
+        self.sendCommand(cp)        
+        
+    ##############################################################################
+    def processCommandREENABLE(self, commandPayload):
+        self.controllerFault = False
 
     ##############################################################################
     def writeUsb(self, message):

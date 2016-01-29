@@ -47,7 +47,7 @@ class CommandPacketizer:
             raise TooManyBytes('more bytes added than payload can hold')
         self.payloadElementList.append(payloadElement)
         
-    def generateBytes(self, generateCRC = True, includeLength = True, padWithZeros = False, teminatingStr = None):
+    def generateBytes(self, generateCRC = None, includeLength = True, padWithZeros = False, teminatingStr = None, escapeChar = None, charsToEscape = []):
         #if we need to pad bytes, then do it now
         if padWithZeros:
             self.append(0, self.maxPayloadSize - self.currPayloadSize)
@@ -67,16 +67,33 @@ class CommandPacketizer:
                 if(type(value) is str):
                     value = ord(value)
                 onebyte = value & 0xFF
+                onebytechar = chr(onebyte);
                 crc += onebyte
-                self.bytesArray.append(chr(onebyte))
+                if onebytechar in charsToEscape:
+                    #NOTE: Escape characters are NOT in the CRC calculation
+                    self.bytesArray.append(escapeChar)
+                self.bytesArray.append(onebytechar)
                 value = value >> 8
             if value != 0:
                 raise TooFewBytes('can not fit value in bytes provided')
+                #rospy.logerr('values in message have been truncated for transmitted packet')
+                return None
 
         #Add the CRC
-        if generateCRC:
-            self.bytesArray.append(chr(crc&0xFF)) 
-        
+        if (generateCRC):
+            # sum all of the bytes and put sum at 
+            if (generateCRC is "POSITIVE"):
+                crcChar = chr(crc&0xFF)
+            
+            elif (generateCRC is "NEGATIVE"):
+                crcChar = chr((-crc)&0xFF)) 
+            
+            # Add escape character if necessary for the CRC
+            # We do NOT includde esacape characters in our CRC calculation
+            if crcChar in charsToEscape
+                self.bytearray.append(escapeChar)
+            self.bytesArray.append(crcChar) 
+            
         if teminatingStr is not None:
             for c in teminatingStr:
                 self.bytesArray.append(ord(c))
@@ -278,7 +295,7 @@ class BaseController(object):
 
     ##############################################################################
     def sendCommand(self, commandPacketizer):
-        message = commandPacketizer.generateBytes(True, False, True, '\r\n')
+        message = commandPacketizer.generateBytes(generateCRC = "NEGATIVE", includeLength = False, padWithZeros = False, teminatingStr = '\n', escapeChar = '\\', charsToEscape = ['\\','\n'])
         rospy.loginfo("Sending to controller: [%s]" % commandPacketizer)
 
         self.latestCommand = message
@@ -365,7 +382,7 @@ class BaseController(object):
         if not self.controllerFault:
             self._write_lock.acquire()
             try:
-                self.usbCmd.write("%s\r\n" % message)
+                self.usbCmd.write("%s" % message)
             except serial.SerialException, e:
                 rospy.logerr('USB disconnected. Attempting to re-connect')
                 if not self.connectUSB():

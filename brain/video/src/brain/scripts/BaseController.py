@@ -81,16 +81,18 @@ class CommandPacketizer:
 
         #Add the CRC
         if (generateCRC):
+            crcChar = 0
+            
             # sum all of the bytes and put sum at 
             if (generateCRC is "POSITIVE"):
                 crcChar = chr(crc&0xFF)
             
             elif (generateCRC is "NEGATIVE"):
-                crcChar = chr((-crc)&0xFF)) 
+                crcChar = chr((-crc)&0xFF) 
             
             # Add escape character if necessary for the CRC
             # We do NOT includde esacape characters in our CRC calculation
-            if crcChar in charsToEscape
+            if crcChar in charsToEscape:
                 self.bytearray.append(escapeChar)
             self.bytesArray.append(crcChar) 
             

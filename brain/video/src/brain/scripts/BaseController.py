@@ -4,6 +4,7 @@ import math
 import sys, os, time
 import threading
 import serial
+import time
 
 from std_msgs.msg import Float32, String
 from geometry_msgs.msg import Twist
@@ -185,6 +186,7 @@ class BaseController(object):
         self.subCmdLL = rospy.Subscriber('/cmd_ll', String, self.cbCmdLL, queue_size=50)
         self.pubLLEvent = rospy.Publisher('/ll_event', String, queue_size=1)
         self.pubLLDebug = rospy.Publisher('/ll_debug', String, queue_size=1)
+        self.pubLLSensors = rospy.Publisher('/ll_sensors', String, queue_size=1)
 
         # generate a reverse lookup table
         self.REV_ENTITIES = {v:k for k, v in self.ENTITIES.iteritems()}        
@@ -259,25 +261,60 @@ class BaseController(object):
             except rospy.exceptions.ROSInterrutException:
                 pass
 
-        return True
-
+        return True     
+        
     ##############################################################################
-    # Publish the LL event
-    def publishLLEvent(self, message):
+    # Process the packets coming from the MFP
+    def processMFPCommand(self, message):
+        try:
+            event = ''
+            publisher = None
 
-        publishEvent = True
-        event = ''
-
-        # STOP event
-        if message[0] == 'S':
-            event = 'ARRIVED'
+            #rospy.loginfo("Received message: [%s]" % message)
+            
+            # Look for a dangerous error - shut things down - is this a good idea?
+            if message[0:10] == '<MSG Error':
+                self.controllerFault = True
+                rospy.logerr('Controller disabled')
  
-        elif message[0] == 'B':
-            entityName = self.REV_ENTITIES[ord(message[1])];
-            event = "UI %s" % entityName
+            # Debug Message
+            if message[0] == '<':
+                publisher = self.pubLLDebug
+                event = message[1:-1]
+                
+            # STOP event
+            elif message[0] == 'S':
+                publisher = self.pubLLEvent
+                event = 'ARRIVED'
+     
+            #BUTTON event
+            elif message[0] == 'B':
+                publisher = self.pubLLEvent
+                entityName = self.REV_ENTITIES[ord(message[1])];
+                event = "UI %s" % entityName
+            
+            #ODOMETRY event
+            elif message[0] == 'O':
+                Rord = ord(message[1]) + ord(message[2])*256 + ord(message[3])*256*256 + ord(message[4])*256*256*256
+                Lord = ord(message[5]) + ord(message[6])*256 + ord(message[7])*256*256 + ord(message[8])*256*256*256
+                
+                event = "O %i,%i @ %s" % (Rord, Lord, time.time())
+                publisher = self.pubLLSensors
+                
+            #unknown event
+            else:
+                rospy.logwarn('Unknown MFP command: %s' % message)
 
-        rospy.loginfo("Publishing LL event: [%s]" % event)
-        self.pubLLEvent.publish(event)
+            if publisher:
+                #dont spam the log with sensor data
+                if publisher != self.pubLLSensors:
+                    rospy.loginfo("[%s]: [%s]" %  (publisher.name, event))
+                publisher.publish(event)
+        except IndexError:
+            if(len(message) == 0):
+                rospy.logwarn("Call to processMFPCommand with zero length message [%s] - ignoring" % message)
+            else:
+                rospy.logwarn("Call to processMFPCommand of command %c with length of only %i - ignoring" %  (message[0], len(message)))
 
     ##############################################################################
     # Run the node
@@ -407,37 +444,36 @@ class BaseController(object):
         self.readThread.start()
 
     ##############################################################################
+    # Read a complete message from serial
+    def readSerialMessage(self):
+        endMessage = False
+        message = ''
+        escapeState = False
+        while not endMessage:
+            c = self.usbCmd.read(1)
+            if c == '\\':
+                if escapeState:
+                    message = message + c
+                    escapeState = False
+                else:
+                    escapeState = True
+            elif escapeState or c != '\n':
+                message = message + c
+                escapeState = False
+            else:
+                endMessage = True
+                    
+        return message
+
+    
+    ##############################################################################
     # Run the thread for the serial connection reader
     def usbReader(self):
 
         while self.alive:
-            endMessage = False
-            message = ''
-
             try:
-                while not endMessage:
-                    c = self.usbCmd.read(1)
-                    if c != '\n':
-                        message = message + c
-                    else:
-                        endMessage = True
-
-                if message:
-                    message = message.rstrip()
-                    if message:
-                        rospy.loginfo("Received message: [%s]" % message)
-                        
-                        if message[0:10] == '<MSG Error':
-                            self.controllerFault = True
-                            rospy.logerr('Controller disabled')
-                            
-                        elif message[0] == '<':
-                            self.pubLLDebug.publish(message)
-                            
-                        else:
-                            self.publishLLEvent(message)
-                    else:
-                        rospy.loginfo('Received empty message')
+                message = self.readSerialMessage()
+                self.processMFPCommand(message)
 
             except serial.SerialException, e:
                 rospy.logerr('USB disconnected. Attempting to re-connect')

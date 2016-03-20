@@ -1,5 +1,6 @@
-brain/video/build
 .catkin_workspace
+brain/video/build
 brain/video/devel
+brain/video/install
 .DS_Store
 .idea

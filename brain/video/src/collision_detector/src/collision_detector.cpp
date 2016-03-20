@@ -43,17 +43,22 @@ void setObjectDetected( ros::Publisher& publisher, bool bObjectDetected )
         {
             printf("Object detected\n");
 
-            strMessage += "T";
+            strMessage += " T;";
         }
         else
         {
             printf("Object removed\n");
 
-            strMessage += "F";
+            strMessage += " F;";
         }
 
+
         std_msgs::String msg;
+
         msg.data = strMessage;
+
+        ROS_INFO("%s", msg.data.c_str());
+
         publisher.publish(msg);
     }
 }
@@ -99,7 +104,7 @@ int main(int argc, char **argv)
 
     ros::NodeHandle n;
 
-    ros::Publisher cmd_ll = n.advertise<std_msgs::String>("/cmd_ll", 1000);
+    ros::Publisher cmd_ll = n.advertise<std_msgs::String>("/ll_event", 1000);
 
     ros::Rate loop_rate(10);
 
@@ -171,7 +176,7 @@ int main(int argc, char **argv)
                     }
                     *out++ = 0;
 
-                    printf("\n%s", buffer);
+//                    printf("\n%s", buffer);
 
                     setObjectDetected( cmd_ll, bObjectDetected );
 

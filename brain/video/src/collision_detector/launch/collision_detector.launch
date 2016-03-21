@@ -1,0 +1,4 @@
+<launch>
+	<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+    <node name="collision_detector" pkg="collision_detector" type="collision_detector" output="screen"/>
+</launch>

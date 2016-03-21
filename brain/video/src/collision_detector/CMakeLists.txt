@@ -9,6 +9,11 @@ catkin_package()
 
 find_package(OpenCV)
 
+install(FILES
+  launch/collision_detector.launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
 include_directories(include ${OpenCV_INCLUDE_DIRS})
 
 # add the collision detector

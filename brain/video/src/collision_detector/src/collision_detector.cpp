@@ -43,13 +43,13 @@ void setObjectDetected( ros::Publisher& publisher, bool bObjectDetected )
         {
             printf("Object detected\n");
 
-            strMessage += " T;";
+            strMessage += " T";
         }
         else
         {
             printf("Object removed\n");
 
-            strMessage += " F;";
+            strMessage += " F";
         }
 
 

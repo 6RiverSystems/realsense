@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.3)
 project(collision_detector)
 
 set(CMAKE_CXX_FLAGS "-fPIE -fPIC -std=c++11 -O2 -D_FORTIFY_SOURCE=2 -fstack-protector -Wformat -Wformat-security -Wall ${CMAKE_CXX_FLAGS}")

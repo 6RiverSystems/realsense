@@ -128,11 +128,11 @@ int main(int argc, char **argv)
                 printf("    Firmware version: %s\n", dev->get_firmware_version());
 
                 // Configure depth to run at VGA resolution at 30 frames per second
-                dev->enable_stream(rs::stream::depth, 640, 480, rs::format::z16, 60);
+                dev->enable_stream(rs::stream::depth, 640, 480, rs::format::z16, 30);
                 dev->start();
 
                 // Determine depth value corresponding to one meter
-                const uint16_t one_meter = static_cast<uint16_t>(.3f / dev->get_depth_scale());
+                const uint16_t one_meter = static_cast<uint16_t>(0.5f / dev->get_depth_scale());
 
                 while( ros::ok( ) )
                 {
@@ -176,7 +176,7 @@ int main(int argc, char **argv)
                     }
                     *out++ = 0;
 
-//                    printf("\n%s", buffer);
+                    printf("\n%s", buffer);
 
                     setObjectDetected( cmd_ll, bObjectDetected );
 

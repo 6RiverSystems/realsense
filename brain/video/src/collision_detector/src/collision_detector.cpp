@@ -1,5 +1,7 @@
 ﻿#include <ros/ros.h>
+#include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/contrib/contrib.hpp>
 #include <std_msgs/String.h>
 
 #include <iostream>
@@ -78,7 +80,7 @@ void SetRealSenseState( REALSENSE_STATE eRealSenseState )
             {
                 if( g_eRealSenseState == REALSENSE_STATE::UNKNOWN )
                 {
-                   printf("Realsense camera not found, will check every 1 second.\n");
+                    printf("Realsense camera not found, will check every 1 second.\n");
                 }
                 else
                 {
@@ -100,107 +102,144 @@ void SetRealSenseState( REALSENSE_STATE eRealSenseState )
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "collision_detector");
+	try
+	{
+		ros::init(argc, argv, "collision_detector");
 
-    ros::NodeHandle n;
+		ros::NodeHandle n;
 
-    ros::Publisher cmd_ll = n.advertise<std_msgs::String>("/ll_event", 1000);
+		ros::Publisher cmd_ll = n.advertise<std_msgs::String>("/ll_event", 1000);
 
-    ros::Rate loop_rate(10);
+		ros::Rate loop_rate(10);
 
-    bool bKeepRunning = true;
+		bool bKeepRunning = true;
 
-    while( bKeepRunning )
-    {
-        // Create a context object. This object owns the handles to all connected realsense devices.
-        rs::context ctx;
+		cv::namedWindow( "Preview" );
+		
+		cv::startWindowThread( );
 
-        if( ctx.get_device_count() != 0 )
-        {
-            try
-            {
-                SetRealSenseState( REALSENSE_STATE::CONNECTED );
+		while( bKeepRunning )
+		{
+			// Create a context object. This object owns the handles to all connected realsense devices.
+			rs::context ctx;
 
-                // This tutorial will access only a single device, but it is trivial to extend to multiple devices
-                rs::device * dev = ctx.get_device(0);
-                printf("\nUsing device 0, an %s\n", dev->get_name());
-                printf("    Serial number: %s\n", dev->get_serial());
-                printf("    Firmware version: %s\n", dev->get_firmware_version());
+			if( ctx.get_device_count() != 0 )
+			{
+				try
+				{
+					SetRealSenseState( REALSENSE_STATE::CONNECTED );
 
-                // Configure depth to run at VGA resolution at 30 frames per second
-                dev->enable_stream(rs::stream::depth, 640, 480, rs::format::z16, 30);
-                dev->start();
+					// This tutorial will access only a single device, but it is trivial to extend to multiple devices
+					rs::device * dev = ctx.get_device(0);
+					printf("\nUsing device 0, an %s\n", dev->get_name());
+					printf("    Serial number: %s\n", dev->get_serial());
+					printf("    Firmware version: %s\n", dev->get_firmware_version());
 
-                // Determine depth value corresponding to one meter
-                const uint16_t one_meter = static_cast<uint16_t>(0.5f / dev->get_depth_scale());
+					// Configure depth to run at VGA resolution at 30 frames per second
+					dev->enable_stream(rs::stream::depth, 640, 480, rs::format::z16, 30);
+					dev->start();
 
-                while( ros::ok( ) )
-                {
-                    // This call waits until a new coherent set of frames is available on a device
-                    // Calls to get_frame_data(...) and get_frame_timestamp(...) on a device will return stable values until wait_for_frames(...) is called
-                    dev->wait_for_frames();
+					// Determine depth value corresponding to one meter
+					const uint16_t one_meter = static_cast<uint16_t>(1.0f / dev->get_depth_scale());
 
-                    // Retrieve depth data, which was previously configured as a 640 x 480 image of 16-bit depth values
-                    const uint16_t * depth_frame = reinterpret_cast<const uint16_t *>(dev->get_frame_data(rs::stream::depth));
-
-                    bool bObjectDetected = false;
-
-                    // Print a simple text-based representation of the image, by breaking it into 10x20 pixel regions and and approximating the coverage of pixels within one meter
                     char buffer[(640/10+1)*(480/20)+1];
-                    char * out = buffer;
+                    uint16_t imageBuffer[640*480];
                     int coverage[64] = {};
-                    for(int y=0; y<480; ++y)
-                    {
-                        for(int x=0; x<640; ++x)
-                        {
-                            int depth = *depth_frame++;
-                            if(depth > 0 && depth < one_meter)
-                            {
-                                ++coverage[x/10];
-                            }
-                        }
 
-                        if(y%20 == 19)
-                        {
-                            for(int & c : coverage)
-                            {
-                                if(c/25 > 2)
+					while( ros::ok( ) )
+					{
+						// This call waits until a new coherent set of frames is available on a device
+						// Calls to get_frame_data(...) and get_frame_timestamp(...) on a device will return stable values until wait_for_frames(...) is called
+						dev->wait_for_frames();
+
+						// Retrieve depth data, which was previously configured as a 640 x 480 image of 16-bit depth values
+						const uint16_t * depth_frame = reinterpret_cast<const uint16_t *>(dev->get_frame_data(rs::stream::depth));
+
+						bool bObjectDetected = false;
+
+						char * out = buffer;
+
+                        int index = 0;
+						for(int y=0; y<480; ++y)
+						{
+							for(int x=0; x<640; ++x)
+							{
+								if(depth_frame[index] > 0 && depth_frame[index] < one_meter)
+								{
+									++coverage[x/10];
+
+                                    imageBuffer[index] = depth_frame[index];
+								}
+                                else
                                 {
-                                    bObjectDetected = true;
+                                    imageBuffer[index] = 0;
                                 }
-                                *out++ = " .:nhBXWW"[c/25];
-                                c = 0;
-                            }
-                            *out++ = '\n';
-                        }
-                    }
-                    *out++ = 0;
 
-                    printf("\n%s", buffer);
+                                index++;
+							}
 
-                    setObjectDetected( cmd_ll, bObjectDetected );
+							if(y%20 == 19)
+							{
+								for(int & c : coverage)
+								{
+									if(c/25 > 2)
+									{
+										bObjectDetected = true;
+									}
+									*out++ = " .:nhBXWW"[c/25];
+									c = 0;
+								}
+								*out++ = '\n';
+							}
+						}
+						*out++ = 0;
 
-                    // run ros event loop
-                    ros::spinOnce();
+						printf("\n%s", buffer);
 
-                    loop_rate.sleep();
-                }
+                        cv::Mat matPreview(480, 640, CV_16UC1, imageBuffer);
 
-                bKeepRunning = false;
-            }
-            catch(...)
-            {
-                // Device disconnected or some other error, wait and retry
-                SetRealSenseState( REALSENSE_STATE::DISCONNECTED );
-            }
-        }
-        else
-        {
-            SetRealSenseState( REALSENSE_STATE::DISCONNECTED );
+                        const float scaleFactor = (float)255/(float)one_meter;
+                        cv::Mat mat8UC1;
+                        matPreview.convertTo(mat8UC1, CV_8UC1, scaleFactor);
 
-            sleep(1);
-        }
-    }
+                        cv::Mat falseColorsMap;
+                        applyColorMap(mat8UC1, falseColorsMap, cv::COLORMAP_JET);
+
+						cv::imshow("Preview", falseColorsMap);
+
+						setObjectDetected( cmd_ll, bObjectDetected );
+
+						// run ros event loop
+						ros::spinOnce();
+
+						loop_rate.sleep();
+						
+						cv::waitKey(1);
+					}
+
+					bKeepRunning = false;
+				}
+				catch( const std::exception& e )
+				{
+					printf("Runtime error in device loop: %s", e.what());
+
+					// Device disconnected or some other error, wait and retry
+					SetRealSenseState( REALSENSE_STATE::DISCONNECTED );
+				}
+			}
+			else
+			{
+				SetRealSenseState( REALSENSE_STATE::DISCONNECTED );
+
+				sleep(1);
+			}
+		}
+	}
+	catch( const std::exception& e )
+	{
+		printf("Runtime error main loop: %s", e.what());
+	}
+
 
     return EXIT_SUCCESS;
 }

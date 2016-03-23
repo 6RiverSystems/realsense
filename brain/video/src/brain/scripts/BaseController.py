@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+
+#
+# (c) Copyright 2015-2016 River Systems, all rights reserved.
+#
+# This is proprietary software, unauthorized distribution is not permitted.
+#
 import rospy
 import math
 import sys, os, time
@@ -8,6 +14,16 @@ import time
 
 from std_msgs.msg import Float32, String
 from geometry_msgs.msg import Twist
+from brain.msg import RawOdometry
+
+#
+# Set to True to remotely debug Python on the specified machine
+#
+# Remote breakpoints do not seem to work at the moment. A workaround is to
+# insert 'pydevd.settrace()' where the breakpoint should be.
+#
+REMOTE_DEBUG_ENABLED = false
+REMOTE_DEBUG_HOSTNAME = 'mystic'
 
 class TooManyBytes(Exception):
     def __init__(self, value):
@@ -186,7 +202,7 @@ class BaseController(object):
         self.subCmdLL = rospy.Subscriber('/cmd_ll', String, self.cbCmdLL, queue_size=50)
         self.pubLLEvent = rospy.Publisher('/ll_event', String, queue_size=1)
         self.pubLLDebug = rospy.Publisher('/ll_debug', String, queue_size=1)
-        self.pubLLSensors = rospy.Publisher('/ll_sensors', String, queue_size=1)
+        self.pubLLSensorsRawOdometry = rospy.Publisher('/sensors/odometry/raw', RawOdometry, queue_size=1)
 
         # generate a reverse lookup table
         self.REV_ENTITIES = {v:k for k, v in self.ENTITIES.iteritems()}        
@@ -225,10 +241,9 @@ class BaseController(object):
 
                 except (AttributeError):
                     rospy.logerr('No function named "sendCommand' + command[0] + '"')
- #                   print ('No function named "processCommand' + command[0] + '"')
+
                 except (TooManyBytes, TooFewBytes, IllegalValue) as e:
                     rospy.logerr('%s: %s for command %s' % (e.__class__.__name__, e.value, command))
- #                    print '%s: %s for command %s' % (e.__class__.__name__, e.value, command)
         return
 
     ##############################################################################
@@ -266,9 +281,11 @@ class BaseController(object):
     ##############################################################################
     # Process the packets coming from the MFP
     def processMFPCommand(self, message):
+        
         try:
             event = ''
             publisher = None
+            sensorPublisher = False
 
             #rospy.loginfo("Received message: [%s]" % message)
             
@@ -287,29 +304,36 @@ class BaseController(object):
                 publisher = self.pubLLEvent
                 event = 'ARRIVED'
      
-            #BUTTON event
+            # BUTTON event
             elif message[0] == 'B':
                 publisher = self.pubLLEvent
                 entityName = self.REV_ENTITIES[ord(message[1])];
                 event = "UI %s" % entityName
             
-            #ODOMETRY event
+            # ODOMETRY event
             elif message[0] == 'O':
                 Rord = ord(message[1]) + ord(message[2])*256 + ord(message[3])*256*256 + ord(message[4])*256*256*256
                 Lord = ord(message[5]) + ord(message[6])*256 + ord(message[7])*256*256 + ord(message[8])*256*256*256
                 
-                event = "O %i,%i @ %s" % (Rord, Lord, time.time())
-                publisher = self.pubLLSensors
+                sensorPublisher = True
+                event = RawOdometry()
+                event.left = Lord
+                event.right = Rord
                 
-            #unknown event
+                publisher = self.pubLLSensorsRawOdometry
+                
+            # Unknown event
             else:
                 rospy.logwarn('Unknown MFP command: %s' % message)
 
             if publisher:
-                #dont spam the log with sensor data
-                if publisher != self.pubLLSensors:
+                
+                # Do not spam the log with sensor data
+                if not sensorPublisher:
                     rospy.loginfo("[%s]: [%s]" %  (publisher.name, event))
+
                 publisher.publish(event)
+
         except IndexError:
             if(len(message) == 0):
                 rospy.logwarn("Call to processMFPCommand with zero length message [%s] - ignoring" % message)
@@ -334,6 +358,7 @@ class BaseController(object):
 
     ##############################################################################
     def sendCommand(self, commandPacketizer):
+        
         message = commandPacketizer.generateBytes(generateCRC = "NEGATIVE", includeLength = False, padWithZeros = False, teminatingStr = '\n', escapeChar = '\\', charsToEscape = ['\\','\n'])
         rospy.loginfo("Sending to controller: [%s]" % commandPacketizer)
 
@@ -342,6 +367,7 @@ class BaseController(object):
 
     ##############################################################################
     def processCommandUI(self, commandPayload):
+        
         entity = commandPayload[0]
         mode = commandPayload[1]
 
@@ -358,11 +384,13 @@ class BaseController(object):
 
     ##############################################################################
     def processCommandSTARTUP(self, commandPayload):
+        
         cp = CommandPacketizer(self.CMD_STARTUP)
         self.sendCommand(cp)
 
     ##############################################################################
     def processCommandDISTANCE(self, commandPayload):
+        
         distance = int(commandPayload[0])
         cp = CommandPacketizer(self.CMD_DISTANCE)
         cp.append(distance, 2)
@@ -370,6 +398,7 @@ class BaseController(object):
         
     ##############################################################################
     def processCommandROTATE(self, commandPayload):
+        
         angle = int(commandPayload[0])
         cp = CommandPacketizer(self.CMD_ROTATE)
         cp.append(angle, 2)
@@ -377,11 +406,13 @@ class BaseController(object):
 
     ##############################################################################
     def processCommandSTOP(self, commandPayload):
+        
         cp = CommandPacketizer(self.CMD_STOP)
         self.sendCommand(cp)
 
     ##############################################################################
     def processCommandTURN(self, commandPayload):
+        
         direction = commandPayload[0]
         distance = int(commandPayload[1])
         if direction == 'R':
@@ -396,11 +427,13 @@ class BaseController(object):
 
     ##############################################################################
     def processCommandVERSION(self, commandPayload):
+        
         cp = CommandPacketizer(self.CMD_GET_VERSION)
         self.sendCommand(cp)
 
     ##############################################################################
     def processCommandPAUSE(self, commandPayload):
+        
         cp = CommandPacketizer(self.CMD_SUSPEND_UPDATE_STATE)
         if commandPayload[0] == 'ON':
             cp.append(1,1)
@@ -413,6 +446,7 @@ class BaseController(object):
         
     ##############################################################################
     def processCommandREENABLE(self, commandPayload):
+        
         self.controllerFault = False
 
     ##############################################################################
@@ -446,11 +480,14 @@ class BaseController(object):
     ##############################################################################
     # Read a complete message from serial
     def readSerialMessage(self):
+
         endMessage = False
         message = ''
         escapeState = False
+
         while not endMessage:
-            c = self.usbCmd.read(1)
+            c = self.usbCmd.read()
+
             if c == '\\':
                 if escapeState:
                     message = message + c
@@ -484,6 +521,17 @@ class BaseController(object):
 
 ##################################################################################
 if __name__ == '__main__':
+    
+    # Enable remote debugging
+    if REMOTE_DEBUG_ENABLED:
+         # This import is to add remote debug features to the script
+        sys.path.append('/opt/pydev')
+        import pydevd
+
+        # Re-direct std out and std err to the server to see the exceptions
+        pydevd.settrace(REMOTE_DEBUG_HOSTNAME, port=5678, stdoutToServer=True, stderrToServer=True)
+    
     rospy.init_node('node_base_controller')
     bc = BaseController()
+    
     bc.run()

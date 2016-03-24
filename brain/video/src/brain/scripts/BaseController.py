@@ -22,7 +22,7 @@ from brain.msg import RawOdometry
 # Remote breakpoints do not seem to work at the moment. A workaround is to
 # insert 'pydevd.settrace()' where the breakpoint should be.
 #
-REMOTE_DEBUG_ENABLED = false
+REMOTE_DEBUG_ENABLED = False
 REMOTE_DEBUG_HOSTNAME = 'mystic'
 
 class TooManyBytes(Exception):
@@ -474,7 +474,7 @@ class BaseController(object):
 
         self.readThread = threading.Thread(target=self.usbReader)
         self.readThread.setDaemon(True)
-        self.readThread.setName('serial->ros')
+        self.readThread.setName('serial2ros')
         self.readThread.start()
 
     ##############################################################################

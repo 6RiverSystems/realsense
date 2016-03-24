@@ -12,3 +12,5 @@ brain/video/workspace/.metadata
 brain/.metadata
 brain/video/.settings
 brain/video/install
+brain/video/src/brain/matlab/brain/matlab_gen
+matlab/brain/matlab_gen

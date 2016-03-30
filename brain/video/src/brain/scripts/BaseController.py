@@ -223,8 +223,8 @@ class BaseController(object):
                     methodToCall = getattr(self, 'processCommand' + command[0])
                     methodToCall(command[1:])  
 
-                except (AttributeError):
-                    rospy.logerr('No function named "sendCommand' + command[0] + '"')
+                except (AttributeError) as e:
+                    rospy.logerr('No function named "processCommand' + command[0] + '" ' + e.value)
  #                   print ('No function named "processCommand' + command[0] + '"')
                 except (TooManyBytes, TooFewBytes, IllegalValue) as e:
                     rospy.logerr('%s: %s for command %s' % (e.__class__.__name__, e.value, command))

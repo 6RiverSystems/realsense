@@ -316,7 +316,7 @@ class BaseController(object):
             if(len(message) == 0):
                 rospy.logwarn("Call to processMFPCommand with zero length message [%s] - ignoring" % message)
             else:
-                rospy.logwarn("Call to processMFPCommand of command %c with length of only %i - ignoring" % (repr(message), len(message)))
+                rospy.logwarn("Call to processMFPCommand of command %s with length of only %i - ignoring" % (repr(message), len(message)))
 
     ##############################################################################
     # Run the node
@@ -435,19 +435,18 @@ class BaseController(object):
         message = ''
         escapedState = False
         for c in self.messageBuffer:
-            if escapedState == False:
-                if c == '\\':
-                    if escapedState:
-                        message += c
-                        escapedState = False
-                    else:
-                        escapedState = True
-                elif escapedState or c != '\n':
+            if c == '\\':
+                if escapedState:
                     message += c
                     escapedState = False
                 else:
-                    self.processMFPCommand(message)
-                    message = ''
+                    escapedState = True
+            elif escapedState or c != '\n':
+                message += c
+                escapedState = False
+            else:
+                self.processMFPCommand(message)
+                message = ''
 
         # remainder of message
         self.messageBuffer = message

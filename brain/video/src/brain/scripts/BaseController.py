@@ -62,15 +62,16 @@ class CommandPacketizer:
         
         #generate the bytes for the message
         self.bytesArray = bytearray('')
-        crc = 0;
+        crc = 0
         for (value, bytes) in self.payloadElementList:
             for i in range(0,bytes):
                 if(type(value) is str):
                     value = ord(value)
                 onebyte = value & 0xFF
-                onebytechar = chr(onebyte);
+                onebytechar = chr(onebyte)
                 crc += onebyte
                 if onebytechar in charsToEscape:
+
                     #NOTE: Escape characters are NOT in the CRC calculation
                     self.bytesArray.append(escapeChar)
                 self.bytesArray.append(onebytechar)
@@ -106,7 +107,7 @@ class CommandPacketizer:
     def __str__(self):
         mystr = ''
         if  hasattr(self, 'bytesArray'):
-            first = True;
+            first = True
             for byte in self.bytesArray:
                 if first:
                     first = False
@@ -197,10 +198,11 @@ class BaseController(object):
         self.usbCmd.parity = 'N'
         self.usbCmd.rtscts = False
         self.usbCmd.xonxoff = False
-        self.usbCmd.timeout = 1
+        self.usbCmd.timeout = 0
 
-        self.latestCommand = ''
         self.controllerFault = False
+
+        self.messageBuffer = []
 
     ##############################################################################
     def cbCmdLL(self, message):
@@ -258,7 +260,7 @@ class BaseController(object):
 
                 pass
             
-            except rospy.exceptions.ROSInterrutException:
+            except rospy.exceptions.ROSInterruptException:
                 pass
 
         return True     
@@ -270,7 +272,7 @@ class BaseController(object):
             event = ''
             publisher = None
 
-            #rospy.loginfo("Received message: [%s]" % message)
+#            rospy.loginfo("Received message: [%s]" % message)
             
             # Look for a dangerous error - shut things down - is this a good idea?
             if message[0:10] == '<MSG Error':
@@ -290,7 +292,7 @@ class BaseController(object):
             #BUTTON event
             elif message[0] == 'B':
                 publisher = self.pubLLEvent
-                entityName = self.REV_ENTITIES[ord(message[1])];
+                entityName = self.REV_ENTITIES[ord(message[1])]
                 event = "UI %s" % entityName
             
             #ODOMETRY event
@@ -314,7 +316,7 @@ class BaseController(object):
             if(len(message) == 0):
                 rospy.logwarn("Call to processMFPCommand with zero length message [%s] - ignoring" % message)
             else:
-                rospy.logwarn("Call to processMFPCommand of command %c with length of only %i - ignoring" %  (message[0], len(message)))
+                rospy.logwarn("Call to processMFPCommand of command %c with length of only %i - ignoring" % (repr(message), len(message)))
 
     ##############################################################################
     # Run the node
@@ -324,12 +326,12 @@ class BaseController(object):
 
         if not self.connectUSB():
             exit(1)
-        self.setupReadThread()
 
         try:
             while not rospy.is_shutdown():
+                self.readSerialPort()
                 self.rate.sleep()
-        except rospy.exceptions.ROSInterrutException:
+        except rospy.exceptions.ROSInterruptException:
             pass
 
     ##############################################################################
@@ -337,8 +339,7 @@ class BaseController(object):
         message = commandPacketizer.generateBytes(generateCRC = "NEGATIVE", includeLength = False, padWithZeros = False, teminatingStr = '\n', escapeChar = '\\', charsToEscape = ['\\','\n'])
         rospy.loginfo("Sending to controller: [%s]" % commandPacketizer)
 
-        self.latestCommand = message
-        self.writeUsb(message)
+        self.writeSerialPort(message)
 
     ##############################################################################
     def processCommandUI(self, commandPayload):
@@ -346,10 +347,10 @@ class BaseController(object):
         mode = commandPayload[1]
 
         if entity not in self.ENTITIES:
-            raise IllegalValue('The entity %i is not valid' % entity);
+            raise IllegalValue('The entity %i is not valid' % entity)
             
         if mode not in self.MODES:
-            raise IllegalValue('The mode %i is not valid' % mode);
+            raise IllegalValue('The mode %i is not valid' % mode)
                
         cp = CommandPacketizer(self.CMD_LIGHT_UPDATE)
         cp.append(self.ENTITIES[entity],1)
@@ -416,71 +417,52 @@ class BaseController(object):
         self.controllerFault = False
 
     ##############################################################################
-    def writeUsb(self, message):
-
+    def writeSerialPort(self, message):
         if not self.controllerFault:
-            self._write_lock.acquire()
             try:
                 self.usbCmd.write("%s" % message)
             except serial.SerialException, e:
                 rospy.logerr('USB disconnected. Attempting to re-connect')
                 if not self.connectUSB():
                     exit(1)
-    
-            finally:
-                self._write_lock.release()
         else:
             rospy.logerr('Controller disabled')
 
     ##############################################################################
-    def setupReadThread(self):
-
-        self.alive = True
-        self._write_lock = threading.Lock()
-
-        self.readThread = threading.Thread(target=self.usbReader)
-        self.readThread.setDaemon(True)
-        self.readThread.setName('serial->ros')
-        self.readThread.start()
-
-    ##############################################################################
-    # Read a complete message from serial
-    def readSerialMessage(self):
-        endMessage = False
+    # Parse the current message buffer for commands
+    def parseMessage(self):
+        result = []
         message = ''
-        escapeState = False
-        while not endMessage:
-            c = self.usbCmd.read(1)
-            if c == '\\':
-                if escapeState:
-                    message = message + c
-                    escapeState = False
+        escapedState = False
+        for c in self.messageBuffer:
+            if escapedState == False:
+                if c == '\\':
+                    if escapedState:
+                        message += c
+                        escapedState = False
+                    else:
+                        escapedState = True
+                elif escapedState or c != '\n':
+                    message += c
+                    escapedState = False
                 else:
-                    escapeState = True
-            elif escapeState or c != '\n':
-                message = message + c
-                escapeState = False
-            else:
-                endMessage = True
-                    
-        return message
+                    self.processMFPCommand(message)
+                    message = ''
 
-    
+        # remainder of message
+        self.messageBuffer = message
+
     ##############################################################################
-    # Run the thread for the serial connection reader
-    def usbReader(self):
+    # see if any data is available on the serial connection
+    def readSerialPort(self):
+        try:
+            self.messageBuffer += self.usbCmd.read(4096)
+            self.parseMessage();
 
-        while self.alive:
-            try:
-                message = self.readSerialMessage()
-                self.processMFPCommand(message)
-
-            except serial.SerialException, e:
-                rospy.logerr('USB disconnected. Attempting to re-connect')
-                if not self.connectUSB():
-                    exit(1)
-
-        self.alive = False
+        except serial.SerialException, e:
+            rospy.logerr('USB disconnected. Attempting to re-connect')
+            if not self.connectUSB():
+                exit(1)
 
 ##################################################################################
 if __name__ == '__main__':

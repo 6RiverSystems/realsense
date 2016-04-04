@@ -5,6 +5,7 @@ import sys, os, time
 import threading
 import serial
 import time
+import struct
 
 from std_msgs.msg import Float32, String
 from geometry_msgs.msg import Twist
@@ -26,60 +27,27 @@ class IllegalValue(Exception):
          self.value = value
     def __str__(self):
         return repr(self.value)          
-        
+
 class CommandPacketizer:
-    def __init__(self, command, maxPayloadSize = 2):
+    def __init__(self, command, payload = bytearray('')):
+        self.bytesArray = bytearray('')
         self.command = command
-        self.maxPayloadSize = maxPayloadSize
-        self.currPayloadSize = 0
-        self.payloadElementList = []
-    
-    def append(self, payloadElement, numBytes = None):
-        if (isinstance(payloadElement, tuple) and len(payloadElement) == 2):
-            (value, numBytes) = payloadElement
-        elif (not isinstance(payloadElement, tuple) and (numBytes != None)):
-            value = payloadElement
-            payloadElement = (value, numBytes)
-        else:
-            raise ValueError('append either needs one two-element tuple or two values')
-            
-        self.currPayloadSize += numBytes
-        if(self.currPayloadSize > self.maxPayloadSize):
-            raise TooManyBytes('more bytes added than payload can hold')
-        self.payloadElementList.append(payloadElement)
+        self.payload = payload
         
-    def generateBytes(self, generateCRC = None, includeLength = True, padWithZeros = False, teminatingStr = None, escapeChar = None, charsToEscape = []):
-        #if we need to pad bytes, then do it now
-        if padWithZeros:
-            self.append(0, self.maxPayloadSize - self.currPayloadSize)
-        
-        #add the tuple for the header
-        self.payloadElementList.insert(0,(self.command, 1))
-        
+    def generateBytes(self, generateCRC = None, includeLength = True, teminatingStr = None, escapeChar = None, charsToEscape = []):
+        #add the tuple for the header        
+        self.bytesArray.append(struct.pack('c', self.command))
+
         #add the length
         if(includeLength == True):
-            self.payloadElementList.insert(1,(self.currPayloadSize, 1))
+            self.bytesArray.append(struct.pack('c', sys.getsizeof(self.payload)))
         
-        #generate the bytes for the message
-        self.bytesArray = bytearray('')
-        crc = 0
-        for (value, bytes) in self.payloadElementList:
-            for i in range(0,bytes):
-                if(type(value) is str):
-                    value = ord(value)
-                onebyte = value & 0xFF
-                onebytechar = chr(onebyte)
-                crc += onebyte
-                if onebytechar in charsToEscape:
+        self.bytesArray += self.payload
 
-                    #NOTE: Escape characters are NOT in the CRC calculation
-                    self.bytesArray.append(escapeChar)
-                self.bytesArray.append(onebytechar)
-                value = value >> 8
-            if value != 0:
-                raise TooFewBytes('can not fit value in bytes provided')
-                #rospy.logerr('values in message have been truncated for transmitted packet')
-                return None
+        # generate the crc
+        crc = 0
+        for onebyte in self.bytesArray:
+            crc += onebyte
 
         #Add the CRC
         if (generateCRC):
@@ -91,13 +59,13 @@ class CommandPacketizer:
             
             elif (generateCRC is "NEGATIVE"):
                 crcChar = chr((-crc)&0xFF) 
-            
-            # Add escape character if necessary for the CRC
-            # We do NOT includde esacape characters in our CRC calculation
-            if crcChar in charsToEscape:
-                self.bytearray.append(escapeChar)
+
             self.bytesArray.append(crcChar) 
-            
+
+        # NOTE: Escape characters are NOT in the CRC calculation
+        for charToEscape in charsToEscape:
+            self.bytesArray = self.bytesArray.replace(charToEscape, escapeChar + charToEscape)
+
         if teminatingStr is not None:
             for c in teminatingStr:
                 self.bytesArray.append(ord(c))
@@ -166,7 +134,8 @@ class BaseController(object):
     CMD_GET_FIRMWARE = 'x'
     CMD_FWD_FLOOD_LIGHT = 'q'
     CMD_REAR_FLOOD_LIGHT = 'o'
-    CMD_SPOT_LIGHT = 'p'
+#     CMD_SPOT_LIGHT = 'p'
+    CMD_SET_PID = 'p'
     CMD_ODOMETRY_START = 'i'
     CMD_ODOMETRY_STOP = 'j'
     CMD_ODOMETRY_REPORT = 'k'
@@ -223,15 +192,198 @@ class BaseController(object):
             if command[0] != '': 
                 try:
                     methodToCall = getattr(self, 'processCommand' + command[0])
-                    methodToCall(command[1:])  
+                    methodToCall(command[1:])
 
                 except (AttributeError) as e:
-                    rospy.logerr('No function named "processCommand' + command[0] + '" ' + e.value)
+                    rospy.logerr('No function named "processCommand' + command[0] + '" ' + repr(e))
  #                   print ('No function named "processCommand' + command[0] + '"')
                 except (TooManyBytes, TooFewBytes, IllegalValue) as e:
                     rospy.logerr('%s: %s for command %s' % (e.__class__.__name__, e.value, command))
  #                    print '%s: %s for command %s' % (e.__class__.__name__, e.value, command)
-        return
+        return 
+        
+    ##############################################################################
+    # Process the packets coming from the MFP
+    def processMFPCommand(self, message):
+        try:
+            event = ''
+            publisher = None
+
+#            rospy.loginfo("Received message: [%s]" % message)
+            
+            # Look for a dangerous error - shut things down - is this a good idea?
+            if message[0:10] == '<MSG Error':
+                self.controllerFault = True
+                rospy.logerr('Controller disabled')
+ 
+            # Debug Message
+            if message[0] == '<':
+                publisher = self.pubLLDebug
+                event = message[1:-1]
+                
+            # STOP event
+            elif message[0] == 'S':
+                publisher = self.pubLLEvent
+                event = 'ARRIVED'
+     
+            # BUTTON event
+            elif message[0] == 'B':
+                publisher = self.pubLLEvent
+                entityName = self.REV_ENTITIES[ord(message[1])]
+                event = "UI %s" % entityName
+            
+            # ODOMETRY event
+            elif message[0] == 'O':
+                Rord = ord(message[1]) + ord(message[2]) * 256 + ord(message[3]) * 256 * 256 + ord(message[4]) * 256 * 256 * 256
+                Lord = ord(message[5]) + ord(message[6]) * 256 + ord(message[7]) * 256 * 256 + ord(message[8]) * 256 * 256 * 256
+                
+                event = "O %i,%i @ %s" % (Rord, Lord, time.time())
+                publisher = self.pubLLSensors
+           
+            # PID event
+            elif message[0] == 'P':
+                pidData = struct.unpack('cfffffffff', message);
+
+                publisher.publish("X_EST %f" % pidData[1])
+                publisher.publish("Y_EST %f" % pidData[2])
+                publisher.publish("V_EST %f" % pidData[3])
+                publisher.publish("THETA_EST %f" % pidData[4])
+                publisher.publish("OMEGA_EST %f" % pidData[5])
+                publisher.publish("V_DES %f" % pidData[6])
+                publisher.publish("OMEGA_DES %f" % pidData[7])
+                publisher.publish("V_LEFT_DES %f" % pidData[8])
+                publisher.publish("V_RIGTH_DES %f" % pidData[9])
+                
+            # unknown event
+            else:
+                rospy.logwarn('Unknown MFP command: %s' % message)
+
+            if publisher:
+                # dont spam the log with sensor data
+                if publisher != self.pubLLSensors:
+                    rospy.loginfo("[%s]: [%s]" % (publisher.name, event))
+                publisher.publish(event)
+        except IndexError:
+            if(len(message) == 0):
+                rospy.logwarn("Call to processMFPCommand with zero length message [%s] - ignoring" % message)
+            else:
+                rospy.logwarn("Call to processMFPCommand of command %s with length of only %i - ignoring" % (repr(message), len(message)))
+
+    ##############################################################################
+    def sendCommand(self, commandPacketizer):
+        message = commandPacketizer.generateBytes(generateCRC = "NEGATIVE", includeLength = False, teminatingStr = '\n', escapeChar = '\\', charsToEscape = ['\\','\n'])
+        rospy.loginfo("Sending to controller: [%s]" % commandPacketizer)
+
+        self.writeSerialPort(message)
+
+    ##############################################################################
+    def processCommandUI(self, commandPayload):
+        if len(commandPayload) != 2:
+            raise IllegalValue('Invalid number of arguments for UI command %s' % repr(commandPayload))
+        
+        entity = commandPayload[0]
+        mode = commandPayload[1]
+
+        if entity not in self.ENTITIES:
+            raise IllegalValue('The entity %i is not valid' % entity)
+            
+        if mode not in self.MODES:
+            raise IllegalValue('The mode %i is not valid' % mode)
+
+        payload = struct.pack('BB', self.ENTITIES[entity], self.MODES[mode])
+        cp = CommandPacketizer(self.CMD_LIGHT_UPDATE, payload)
+        self.sendCommand(cp)
+
+    ##############################################################################
+    def processCommandSTARTUP(self, commandPayload):
+        cp = CommandPacketizer(self.CMD_STARTUP)
+        self.sendCommand(cp)
+
+    ##############################################################################
+    def processCommandDISTANCE(self, commandPayload):
+        if len(commandPayload) != 1:
+            raise IllegalValue('Invalid number of arguments for DISTANCE command %s' % repr(commandPayload))
+
+        distance = int(commandPayload[0])
+        payload = struct.pack('H', distance)
+        cp = CommandPacketizer(self.CMD_DISTANCE, payload)
+        self.sendCommand(cp)
+
+    ##############################################################################
+    def processCommandROTATE(self, commandPayload):
+        if len(commandPayload) != 1:
+            raise IllegalValue('Invalid number of arguments for ROTATE command %s' % repr(commandPayload))
+
+        angle = int(commandPayload[0])
+        payload = struct.pack('H', angle)
+        cp = CommandPacketizer(self.CMD_ROTATE, payload)
+        self.sendCommand(cp)
+
+    ##############################################################################
+    def processCommandSTOP(self, commandPayload):
+        cp = CommandPacketizer(self.CMD_STOP)
+        self.sendCommand(cp)
+
+    ##############################################################################
+    def processCommandTURN(self, commandPayload):
+        if len(commandPayload) != 2:
+            raise IllegalValue('Invalid number of arguments for TURN command %s' % repr(commandPayload))
+
+        direction = commandPayload[0]
+        distance = int(commandPayload[1])
+
+        command = ''
+        if direction == 'R':
+            command = self.CMD_SLINGSHOT_RIGHT
+        elif direction == 'L':
+            command = self.CMD_SLINGSHOT_LEFT
+        else:
+            raise IllegalValue('Invalid turn direction %c', direction)
+
+        payload = struct.pack('H', distance)
+        cp = CommandPacketizer(command, payload)
+        self.sendCommand(cp)
+
+    ##############################################################################
+    def processCommandVERSION(self, commandPayload):
+        cp = CommandPacketizer(self.CMD_GET_VERSION)
+        self.sendCommand(cp)
+
+    ##############################################################################
+    def processCommandPAUSE(self, commandPayload):
+        if len(commandPayload) != 1:
+            raise IllegalValue('Invalid number of arguments for PAUSE command %s' % repr(commandPayload))
+
+        pauseValue = 0
+        if commandPayload[0] == 'ON':
+            pauseValue = 1
+        elif commandPayload[0] == 'OFF':
+            pauseValue = 0
+        else:
+            raise IllegalValue('Pause requires either ON or OFF but was given %s' % commandPayload[0])
+            
+        payload = struct.pack('B', pauseValue)
+        cp = CommandPacketizer(self.CMD_SUSPEND_UPDATE_STATE, payload)
+        self.sendCommand(cp)
+        
+    ##############################################################################
+    def processCommandREENABLE(self, commandPayload):
+        self.controllerFault = False
+        
+    ##############################################################################
+    def processCommandSET_PID(self, commandPayload):
+        if len(commandPayload) != 4:
+            raise IllegalValue('Invalid pid data %s' % repr(commandPayload))
+
+        Kp = float(commandPayload[0])
+        Ki = float(commandPayload[1])
+        Kd = float(commandPayload[2])
+        proj_time = float(commandPayload[3])
+        payload = struct.pack('ffff', Kp, Ki, Kd, proj_time)
+        rospy.logerr('Setting PID from command: Kp: ' + str(Kp) + ', Ki: ' + str(Ki) + ', Kd: ' + str(Kd) + ', time: ' + str(proj_time))
+        cp = CommandPacketizer(self.CMD_SET_PID, payload)
+        self.sendCommand(cp)
+
 
     ##############################################################################
     # Connect to the USB
@@ -263,158 +415,7 @@ class BaseController(object):
             except rospy.exceptions.ROSInterruptException:
                 pass
 
-        return True     
-        
-    ##############################################################################
-    # Process the packets coming from the MFP
-    def processMFPCommand(self, message):
-        try:
-            event = ''
-            publisher = None
-
-#            rospy.loginfo("Received message: [%s]" % message)
-            
-            # Look for a dangerous error - shut things down - is this a good idea?
-            if message[0:10] == '<MSG Error':
-                self.controllerFault = True
-                rospy.logerr('Controller disabled')
- 
-            # Debug Message
-            if message[0] == '<':
-                publisher = self.pubLLDebug
-                event = message[1:-1]
-                
-            # STOP event
-            elif message[0] == 'S':
-                publisher = self.pubLLEvent
-                event = 'ARRIVED'
-     
-            #BUTTON event
-            elif message[0] == 'B':
-                publisher = self.pubLLEvent
-                entityName = self.REV_ENTITIES[ord(message[1])]
-                event = "UI %s" % entityName
-            
-            #ODOMETRY event
-            elif message[0] == 'O':
-                Rord = ord(message[1]) + ord(message[2])*256 + ord(message[3])*256*256 + ord(message[4])*256*256*256
-                Lord = ord(message[5]) + ord(message[6])*256 + ord(message[7])*256*256 + ord(message[8])*256*256*256
-                
-                event = "O %i,%i @ %s" % (Rord, Lord, time.time())
-                publisher = self.pubLLSensors
-                
-            #unknown event
-            else:
-                rospy.logwarn('Unknown MFP command: %s' % message)
-
-            if publisher:
-                #dont spam the log with sensor data
-                if publisher != self.pubLLSensors:
-                    rospy.loginfo("[%s]: [%s]" %  (publisher.name, event))
-                publisher.publish(event)
-        except IndexError:
-            if(len(message) == 0):
-                rospy.logwarn("Call to processMFPCommand with zero length message [%s] - ignoring" % message)
-            else:
-                rospy.logwarn("Call to processMFPCommand of command %s with length of only %i - ignoring" % (repr(message), len(message)))
-
-    ##############################################################################
-    # Run the node
-    def run(self):
-
-        rospy.loginfo('Base Controller Node - video version')
-
-        if not self.connectUSB():
-            exit(1)
-
-        try:
-            while not rospy.is_shutdown():
-                self.readSerialPort()
-                self.rate.sleep()
-        except rospy.exceptions.ROSInterruptException:
-            pass
-
-    ##############################################################################
-    def sendCommand(self, commandPacketizer):
-        message = commandPacketizer.generateBytes(generateCRC = "NEGATIVE", includeLength = False, padWithZeros = False, teminatingStr = '\n', escapeChar = '\\', charsToEscape = ['\\','\n'])
-        rospy.loginfo("Sending to controller: [%s]" % commandPacketizer)
-
-        self.writeSerialPort(message)
-
-    ##############################################################################
-    def processCommandUI(self, commandPayload):
-        entity = commandPayload[0]
-        mode = commandPayload[1]
-
-        if entity not in self.ENTITIES:
-            raise IllegalValue('The entity %i is not valid' % entity)
-            
-        if mode not in self.MODES:
-            raise IllegalValue('The mode %i is not valid' % mode)
-               
-        cp = CommandPacketizer(self.CMD_LIGHT_UPDATE)
-        cp.append(self.ENTITIES[entity],1)
-        cp.append(self.MODES[mode],1)
-        self.sendCommand(cp)
-
-    ##############################################################################
-    def processCommandSTARTUP(self, commandPayload):
-        cp = CommandPacketizer(self.CMD_STARTUP)
-        self.sendCommand(cp)
-
-    ##############################################################################
-    def processCommandDISTANCE(self, commandPayload):
-        distance = int(commandPayload[0])
-        cp = CommandPacketizer(self.CMD_DISTANCE)
-        cp.append(distance, 2)
-        self.sendCommand(cp)
-        
-    ##############################################################################
-    def processCommandROTATE(self, commandPayload):
-        angle = int(commandPayload[0])
-        cp = CommandPacketizer(self.CMD_ROTATE)
-        cp.append(angle, 2)
-        self.sendCommand(cp)
-
-    ##############################################################################
-    def processCommandSTOP(self, commandPayload):
-        cp = CommandPacketizer(self.CMD_STOP)
-        self.sendCommand(cp)
-
-    ##############################################################################
-    def processCommandTURN(self, commandPayload):
-        direction = commandPayload[0]
-        distance = int(commandPayload[1])
-        if direction == 'R':
-            cp = CommandPacketizer(self.CMD_SLINGSHOT_RIGHT)
-        elif direction == 'L':
-            cp = CommandPacketizer(self.CMD_SLINGSHOT_LEFT)
-        else:
-            raise IllegalValue('Invalid turn direction %c', direction)
-
-        cp.append(distance, 2)
-        self.sendCommand(cp)
-
-    ##############################################################################
-    def processCommandVERSION(self, commandPayload):
-        cp = CommandPacketizer(self.CMD_GET_VERSION)
-        self.sendCommand(cp)
-
-    ##############################################################################
-    def processCommandPAUSE(self, commandPayload):
-        cp = CommandPacketizer(self.CMD_SUSPEND_UPDATE_STATE)
-        if commandPayload[0] == 'ON':
-            cp.append(1,1)
-        elif commandPayload[0] == 'OFF':
-            cp.append(0,1)
-        else:
-            raise IllegalValue('Pause requires either ON or OFF but was given %s' % commandPayload[0])
-            
-        self.sendCommand(cp)        
-        
-    ##############################################################################
-    def processCommandREENABLE(self, commandPayload):
-        self.controllerFault = False
+        return True
 
     ##############################################################################
     def writeSerialPort(self, message):
@@ -457,12 +458,28 @@ class BaseController(object):
         try:
             self.messageBuffer += self.usbCmd.read(4096)
             self.parseMessage();
-
+ 
         except serial.SerialException, e:
             rospy.logerr('USB disconnected. Attempting to re-connect')
             if not self.connectUSB():
                 exit(1)
 
+    ##############################################################################
+    # Run the node
+    def run(self):
+
+        rospy.loginfo('Base Controller Node - video version')
+
+        if not self.connectUSB():
+            exit(1)
+
+        try:
+            while not rospy.is_shutdown():
+                self.readSerialPort()
+                self.rate.sleep()
+        except rospy.exceptions.ROSInterruptException:
+            pass
+        
 ##################################################################################
 if __name__ == '__main__':
     rospy.init_node('node_base_controller')

@@ -7,14 +7,15 @@
 #
 import rospy
 import math
-import sys, os, time
+import sys
+import os
 import threading
 import serial
 import time
 
-from std_msgs.msg import Float32, String
+from std_msgs.msg import Float32, String, Header
 from geometry_msgs.msg import Twist
-from brain.msg import RawOdometry
+from brain_msgs.msg import RawOdometry
 
 #
 # Set to True to remotely debug Python on the specified machine
@@ -202,7 +203,7 @@ class BaseController(object):
         self.subCmdLL = rospy.Subscriber('/cmd_ll', String, self.cbCmdLL, queue_size=50)
         self.pubLLEvent = rospy.Publisher('/ll_event', String, queue_size=1)
         self.pubLLDebug = rospy.Publisher('/ll_debug', String, queue_size=1)
-        self.pubLLSensorsRawOdometry = rospy.Publisher('/sensors/odometry/raw', RawOdometry, queue_size=1)
+        self.pubLLSensorsRawOdometry = rospy.Publisher('/sensors/odometry/raw', RawOdometry, queue_size=50)
 
         # generate a reverse lookup table
         self.REV_ENTITIES = {v:k for k, v in self.ENTITIES.iteritems()}        
@@ -316,7 +317,11 @@ class BaseController(object):
                 Lord = ord(message[5]) + ord(message[6])*256 + ord(message[7])*256*256 + ord(message[8])*256*256*256
                 
                 sensorPublisher = True
+                header = Header()
+                header.stamp = rospy.Time.now()
+                
                 event = RawOdometry()
+                event.header = header
                 event.left = Lord
                 event.right = Rord
                 
@@ -531,7 +536,7 @@ if __name__ == '__main__':
         # Re-direct std out and std err to the server to see the exceptions
         pydevd.settrace(REMOTE_DEBUG_HOSTNAME, port=5678, stdoutToServer=True, stderrToServer=True)
     
-    rospy.init_node('node_base_controller')
+    rospy.init_node('node_bc')
     bc = BaseController()
     
     bc.run()

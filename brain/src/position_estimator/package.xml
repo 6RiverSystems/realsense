@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package>
+    <name>position_estimator</name>
+    <version>0.0.1</version>
+    <description>The Position Estimator package</description>
+    <maintainer email="fsantini@6river.com">fsantini</maintainer>
+
+    <license>TODO</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+ 
+    <build_depend>geometry_msgs</build_depend>
+    <run_depend>geometry_msgs</run_depend>
+
+    <build_depend>brain_msgs</build_depend>
+    <run_depend>brain_msgs</run_depend>
+
+<!-- 
+    <build_depend>brain</build_depend>
+    <run_depend>brain</run_depend>
+
+    <build_depend>opencv2</build_depend>
+    <run_depend>opencv2</run_depend>
+-->
+</package>

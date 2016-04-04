@@ -14,3 +14,8 @@ brain/video/.settings
 brain/video/install
 brain/video/src/brain/matlab/brain/matlab_gen
 matlab/brain/matlab_gen
+brain/build
+brain/devel
+ohps/.metadata
+ohps/build
+ohps/devel

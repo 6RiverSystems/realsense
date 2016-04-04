@@ -152,11 +152,21 @@ class BaseController(object):
     # Initialize the node properties
     def __init__(self):
 
-        self.rate = rospy.Rate(100)
+        self.rate = rospy.Rate(100)1
         self.subCmdLL = rospy.Subscriber('/cmd_ll', String, self.cbCmdLL, queue_size=50)
         self.pubLLEvent = rospy.Publisher('/ll_event', String, queue_size=1)
         self.pubLLDebug = rospy.Publisher('/ll_debug', String, queue_size=1)
-        self.pubLLSensors = rospy.Publisher('/ll_sensors', String, queue_size=1)
+        self.pubLLSensors = rospy.Publisher('/ll_sensors', String, queue_size=1000)
+
+        self.pubXEst = rospy.Publisher('/pid/x_est', Float32, queue_size=1000)
+        self.pubYEst = rospy.Publisher('/pid/y_est', Float32, queue_size=1000)
+        self.pubVEst = rospy.Publisher('/pid/v_est', Float32, queue_size=1000)
+        self.pubThetaEst = rospy.Publisher('/pid/theta_est', Float32, queue_size=1000)
+        self.pubOmegaEst = rospy.Publisher('/pid/omega_est', Float32, queue_size=1000)
+        self.pubVDes = rospy.Publisher('/pid/v_des', Float32, queue_size=1000)
+        self.pubOmegaDes = rospy.Publisher('/pid/omega_des', Float32, queue_size=1000)
+        self.pubVLeftDes = rospy.Publisher('/pid/v_left_des', Float32, queue_size=1000)
+        self.pubVRightDes = rospy.Publisher('/pid/v_right_des', Float32, queue_size=1000)
 
         # generate a reverse lookup table
         self.REV_ENTITIES = {v:k for k, v in self.ENTITIES.iteritems()}        
@@ -244,16 +254,16 @@ class BaseController(object):
             elif message[0] == 'P':
                 pidData = struct.unpack('cfffffffff', message);
 
-                publisher.publish("X_EST %f" % pidData[1])
-                publisher.publish("Y_EST %f" % pidData[2])
-                publisher.publish("V_EST %f" % pidData[3])
-                publisher.publish("THETA_EST %f" % pidData[4])
-                publisher.publish("OMEGA_EST %f" % pidData[5])
-                publisher.publish("V_DES %f" % pidData[6])
-                publisher.publish("OMEGA_DES %f" % pidData[7])
-                publisher.publish("V_LEFT_DES %f" % pidData[8])
-                publisher.publish("V_RIGTH_DES %f" % pidData[9])
-                
+                pubXEst.publish("X_EST %f" % pidData[1])
+                pubYEst.publish("Y_EST %f" % pidData[2])
+                pubVEst.publish("V_EST %f" % pidData[3])
+                pubThetaEst.publish("THETA_EST %f" % pidData[4])
+                pubOmegaEst.publish("OMEGA_EST %f" % pidData[5])
+                pubVDes.publish("V_DES %f" % pidData[6])
+                pubOmegaDes.publish("OMEGA_DES %f" % pidData[7])
+                pubVLeftDes.publish("V_LEFT_DES %f" % pidData[8])
+                pubVRightDes.publish("V_RIGTH_DES %f" % pidData[9])
+
             # unknown event
             else:
                 rospy.logwarn('Unknown MFP command: %s' % message)

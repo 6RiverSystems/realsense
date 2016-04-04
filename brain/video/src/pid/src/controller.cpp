@@ -62,7 +62,7 @@ void plant_state_callback(const std_msgs::Float64& state_msg)
   error.at(0) = setpoint - plant_state; // Current error goes to slot 0
 
   // calculate delta_t
-  if (!prev_time.isZero()) // Not first time through the program  
+  if (!prev_time.isZero()) // Not first time through the program
   {
     delta_t = ros::Time::now() - prev_time;
     prev_time = ros::Time::now();
@@ -103,9 +103,9 @@ void plant_state_callback(const std_msgs::Float64& state_msg)
 
     c = 1/tan_filt;
   }
- 
+
   filtered_error.at(2) = filtered_error.at(1);
-  filtered_error.at(1) = filtered_error.at(0); 
+  filtered_error.at(1) = filtered_error.at(0);
   filtered_error.at(0) = (1/(1+c*c+1.414*c))*(error.at(2)+2*error.at(1)+error.at(0)-(c*c-1.414*c+1)*filtered_error.at(2)-(-2*c*c+2)*filtered_error.at(1));
 
   // Take derivative of error
@@ -186,6 +186,17 @@ void reconfigure_callback(pid::PidConfig &config, uint32_t level)
   Kp = config.Kp * config.Kp_scale;
   Ki = config.Ki * config.Ki_scale;
   Kd = config.Kd * config.Kd_scale;
+
+  std_msgs::String msg;
+  std::stringstream ss;
+  ss << "SET_PID ";
+  ss << Kp << " ";
+  ss << Ki << " ";
+  ss << Kd << " ";
+  msg.data = ss.str();
+
+  pid_tune_pub.publish(msg);
+
   ROS_INFO("Pid reconfigure request: Kp: %f, Ki: %f, Kd: %f", Kp, Ki, Kd);
 }
 
@@ -281,6 +292,7 @@ int main(int argc, char **argv)
 
   // instantiate publishers & subscribers
   control_effort_pub = node.advertise<std_msgs::Float64>(topic_from_controller, 1);
+  pid_tune_pub = node.advertise<std_msgs::String>("/cmd_ll", 1);
 
   ros::Subscriber sub = node.subscribe(topic_from_plant, 1, plant_state_callback );
   ros::Subscriber setpoint_sub = node.subscribe(setpoint_topic, 1, setpoint_callback );

@@ -44,6 +44,7 @@
 #include "ros/ros.h"
 #include <std_msgs/Float64.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/String.h>
 
 #include "math.h"
 #include <stdio.h>
@@ -90,7 +91,9 @@ int loop_counter = 0; // Counts # of times through the control loop. Used to sta
 
 // Topic and node names and message objects
 ros::Publisher control_effort_pub;
+ros::Publisher pid_tune_pub;
 
+std::string pid_tune_topic;
 std::string topic_from_controller;
 std::string topic_from_plant;
 std::string setpoint_topic;

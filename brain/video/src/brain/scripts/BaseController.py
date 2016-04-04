@@ -152,7 +152,7 @@ class BaseController(object):
     # Initialize the node properties
     def __init__(self):
 
-        self.rate = rospy.Rate(100)1
+        self.rate = rospy.Rate(100)
         self.subCmdLL = rospy.Subscriber('/cmd_ll', String, self.cbCmdLL, queue_size=50)
         self.pubLLEvent = rospy.Publisher('/ll_event', String, queue_size=1)
         self.pubLLDebug = rospy.Publisher('/ll_debug', String, queue_size=1)

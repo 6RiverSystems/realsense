@@ -1,0 +1,19 @@
+#include <ros/ros.h>
+
+////////////////////////////////////////////////////////////////////////////////////////
+// Main
+////////////////////////////////////////////////////////////////////////////////////////
+
+int main(int argc, char **argv)
+{
+	ROS_INFO("Starting brain stem");
+
+	// Initialize ROS stuff
+	ros::init( argc, argv, "brain_stem" );
+	ros::NodeHandle node;
+
+	// Respond to inputs until shut down
+	ros::spin();
+
+	return 0;
+}

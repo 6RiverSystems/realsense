@@ -16,7 +16,7 @@ public:
 
 	virtual ~IO( ) { };
 
-	virtual void Open( const std::string& strName, std::function<void(std::vector<char>)> readCallback ) = 0;
+	virtual void Open( const char* pszName, std::function<void(std::vector<char>)> readCallback ) = 0;
 
 	virtual bool IsOpen( ) const = 0;
 

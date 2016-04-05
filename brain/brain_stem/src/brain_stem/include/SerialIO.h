@@ -8,6 +8,7 @@
 #include <boost/assert.hpp>
 #include <functional>
 #include <stdexcept>
+#include <thread>
 
 #include "IO.h"
 
@@ -25,7 +26,7 @@ public:
 	SerialIO( );
 	virtual ~SerialIO();
 
-	void Open( const std::string& strName, std::function<void(std::vector<char>)> readCallback );
+	void Open( const char* pszName, std::function<void(std::vector<char>)> readCallback );
 
 	bool IsOpen( ) const;
 
@@ -35,19 +36,29 @@ public:
 
 private:
 
+	void WriteInSerialThread( std::vector<char> buffer );
+
 	void StartAsyncRead( );
+
+	void OnWriteComplete( const boost::system::error_code& error, std::size_t size );
 
 	void OnReadComplete( const boost::system::error_code& error, std::size_t size );
 
 private:
 
+    std::shared_ptr<std::thread>			m_Thread;
+
 	boost::asio::io_service					m_IOService;
+
+	boost::asio::io_service::work			m_oWork;
 
     boost::asio::serial_port				m_SerialPort;
 
-    boost::asio::streambuf					m_ReadBuffer;
+    bool									m_bIsWriting;
 
-    boost::asio::streambuf					m_WriteBuffer;
+    std::vector<char>						m_ReadBuffer;
+
+    std::vector<char>						m_writeData;
 
     std::vector<char>						m_readData;
 

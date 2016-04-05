@@ -107,16 +107,11 @@ catkin_package(
 ## Build ##
 ###########
 
-set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(include)
-
-## Declare a C++ library
-# add_library(brain_stem
-#   src/${PROJECT_NAME}/brain_stem.cpp
-# )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -134,8 +129,9 @@ add_executable(brain_stem_node
 # add_dependencies(brain_stem_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(brain_stem_node
+target_link_libraries( brain_stem_node
 	${catkin_LIBRARIES}
+	boost_system
 )
 
 #############
@@ -176,12 +172,7 @@ target_link_libraries(brain_stem_node
 #############
 ## Testing ##
 #############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_brain_stem.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
+ 
+# Link runTests with what we want to test and the GTest and pthread library
+catkin_add_gtest(serial-io-test test/SerialIO_test.cpp)
+target_link_libraries(serial-io-test ${GTEST_LIBRARIES} pthread boost_system)

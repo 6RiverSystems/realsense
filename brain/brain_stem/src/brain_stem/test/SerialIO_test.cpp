@@ -7,6 +7,25 @@
 
 #include "SerialIO.h"
 
-namespace srs {
+#include "gtest/gtest.h"
 
-} /* namespace srs */
+namespace {
+
+class SerialIOTest : public ::testing::Test {};
+
+TEST( SerialIOTest, Open )
+{
+	EXPECT_EQ(0, 0);
+}
+
+TEST( SerialIOTest, Close )
+{
+	EXPECT_EQ(0, 0);
+}
+
+}  // namespace
+
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

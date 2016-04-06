@@ -9,6 +9,7 @@
 #include <functional>
 #include <stdexcept>
 #include <thread>
+#include <set>
 
 #include "IO.h"
 
@@ -23,8 +24,11 @@ class SerialIO :
 {
 
 public:
-	SerialIO( );
-	virtual ~SerialIO();
+	SerialIO( bool bGenerateCRC = false, bool bIncludeLength = true,
+		char cTerminating = '\n', char cEscape = '\\',
+		std::set<char> vecCharsToEscape = std::set<char>( { '\\', '\n' } ) );
+
+	virtual ~SerialIO( );
 
 	void Open( const char* pszName, std::function<void(std::vector<char>)> readCallback );
 
@@ -32,7 +36,7 @@ public:
 
 	void Close( );
 
-	void Write( std::vector<char> buffer );
+	void Write( const std::vector<char>& buffer );
 
 private:
 
@@ -45,6 +49,16 @@ private:
 	void OnReadComplete( const boost::system::error_code& error, std::size_t size );
 
 private:
+
+	bool									m_bGenerateCRC;
+
+	bool									m_bIncludeLength;
+
+	char									m_cTerminating;
+
+	char									m_cEscape;
+
+	std::set<char>							m_setCharsToEscape;
 
     std::shared_ptr<std::thread>			m_Thread;
 

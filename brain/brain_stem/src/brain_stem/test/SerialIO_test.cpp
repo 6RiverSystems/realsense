@@ -8,19 +8,57 @@
 #include "SerialIO.h"
 #include "gtest/gtest.h"
 #include <cstdlib>
+#include <unistd.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace srs;
 
 namespace {
 
+const std::string g_strPort1 = "/tmp/pty1";
+const std::string g_strPort2 = "/tmp/pty2";
+
 class SerialIOTest : public ::testing::Test
 {
-private:
+public:
+
+	SerialIO	m_Serial1;
+
+	SerialIO	m_Serial2;
 
 public:
 	SerialIOTest( )
 	{
 
+	}
+
+	void OpenSerialPort( SerialIO& serial, void (SerialIOTest::* callback) (std::vector<char>) )
+	{
+	    try
+	    {
+	    	serial.Open( g_strPort1.c_str( ), std::bind( callback, this,
+	    		std::placeholders::_1 ) );
+
+	    	EXPECT_TRUE( serial.IsOpen( ) );
+	    }
+	    catch( const std::exception& e )
+	    {
+	        FAIL( ) << "Open failed: " <<  e.what( );
+	    }
+	    catch( ... )
+	    {
+	        FAIL( ) << "Open failed: unknown exception";
+	    }
+	}
+
+	void OpenSerialPort1( )
+	{
+		OpenSerialPort( m_Serial1, &SerialIOTest::ReadCallback1 );
+	}
+
+	void OpenSerialPort2( )
+	{
+		OpenSerialPort( m_Serial2, &SerialIOTest::ReadCallback2 );
 	}
 
 	void SetUp( )
@@ -33,9 +71,14 @@ public:
 
 	}
 
-	void ReadCallback( std::vector<char> buffer )
+	void ReadCallback1( std::vector<char> buffer )
 	{
+		printf( "ReadCallback1: %s", buffer.data( ) );
+	}
 
+	void ReadCallback2( std::vector<char> buffer )
+	{
+		printf( "ReadCallback2: %s", buffer.data( ) );
 	}
 
 	~SerialIOTest( )
@@ -50,8 +93,7 @@ TEST_F( SerialIOTest, OpenInvalidSerialPort )
 {
     try
     {
-    	SerialIO serial;
-    	serial.Open( "/foobar", std::bind( &SerialIOTest::ReadCallback, this,
+    	m_Serial1.Open( "/foobar", std::bind( &SerialIOTest::ReadCallback1, this,
     		std::placeholders::_1 ) );
 
     	FAIL( ) << "Expected std::exception";
@@ -70,64 +112,59 @@ TEST_F( SerialIOTest, OpenInvalidSerialPort )
 
 TEST_F( SerialIOTest, OpenSuccess )
 {
-    try
-    {
-    	SerialIO serial;
-    	serial.Open( "/tmp/pty1", std::bind( &SerialIOTest::ReadCallback, this,
-    		std::placeholders::_1 ) );
+	OpenSerialPort1( );
 
-    	EXPECT_TRUE( serial.IsOpen( ) );
-    }
-    catch( const std::exception& e )
-    {
-        FAIL( ) << "Open failed: " <<  e.what( );
-    }
-    catch( ... )
-    {
-        FAIL( ) << "Open failed: unknown exception";
-    }
+	OpenSerialPort2( );
 }
 
 TEST_F( SerialIOTest, Close )
 {
-    try
-    {
-    	SerialIO serial;
-    	serial.Open( "/tmp/pty1", std::bind( &SerialIOTest::ReadCallback, this,
-    		std::placeholders::_1 ) );
+	OpenSerialPort1( );
 
-    	EXPECT_TRUE( serial.IsOpen( ) );
+	OpenSerialPort2( );
+}
 
-    	serial.Close( );
 
-    	EXPECT_FALSE( serial.IsOpen( ) );
-    }
-    catch( const std::exception& e )
-    {
-        FAIL( ) << "Open failed: " <<  e.what( );
-    }
-    catch( ... )
-    {
-        FAIL( ) << "Open failed: unknown exception";
-    }}
+TEST_F( SerialIOTest, TestReadWrite )
+{
+	OpenSerialPort1( );
+
+	OpenSerialPort2( );
+
+	std::string data( "Hello" );
+	m_Serial1.Write( std::vector<char>( data.begin( ), data.end( ) ) );
+
+
+	std::string data2( "World" );
+	m_Serial2.Write( std::vector<char>( data2.begin( ), data2.end( ) ) );
+
+	usleep( 50000 );
+}
 
 }  // namespace
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
+	time_t rawtime;
+	struct tm * timeinfo;
 
-	// Open up two pseudo serial ports that communicate with each other
-	// /tmp/pty1 and /tmp/pty2
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+	printf ( "\nCurrent local time and date: %s", asctime (timeinfo) );
+
+	// Open up two linked pseudo serial ports
 	std::string strCommand;
-	strCommand += "touch /tmp/pty1 &&";
-	strCommand += "touch /tmp/pty2 &&";
-	strCommand += "socat -d -d pty,link=/tmp/pty1,raw,echo=0 pty,link=/tmp/pty2,raw,echo=0";
+	strCommand += "touch " + g_strPort1 + " &&";
+	strCommand += "touch " + g_strPort2 + " &&";
+	strCommand += "socat -d -d pty,link=" + g_strPort1 + ",raw,echo=0 pty,link=" + g_strPort2 + ",raw,echo=0";
 	strCommand += " &"; // Don't wait (background)
 
 	std::system( strCommand.c_str( ) );
 
-	sleep( 1 );
+	// Sleep for 200ms to let socat startup
+	usleep( 200000 );
 
-	::testing::InitGoogleTest(&argc, argv);
+	::testing::InitGoogleTest( &argc, argv );
 
 	int success = RUN_ALL_TESTS( );
 

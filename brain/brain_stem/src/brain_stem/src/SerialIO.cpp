@@ -11,8 +11,15 @@
 
 namespace srs {
 
-SerialIO::SerialIO( ) :
-	m_IOService( ),
+
+
+SerialIO::SerialIO( bool bGenerateCRC, bool bIncludeLength, char cTerminating, char cEscape,
+	std::set<char> setCharsToEscape ) :
+	m_bGenerateCRC( bGenerateCRC ),
+	m_bIncludeLength( bIncludeLength ),
+	m_cTerminating( cTerminating ),
+	m_cEscape( cEscape ),
+	m_setCharsToEscape( setCharsToEscape ),
 	m_oWork( m_IOService ),
 	m_SerialPort( m_IOService ),
 	m_bIsWriting( false ),
@@ -56,7 +63,7 @@ void SerialIO::Close( )
 	m_SerialPort.close( );
 }
 
-void SerialIO::Write( std::vector<char> buffer )
+void SerialIO::Write( const std::vector<char>& buffer )
 {
 	if( IsOpen( ) )
 	{
@@ -71,7 +78,45 @@ void SerialIO::Write( std::vector<char> buffer )
 
 void SerialIO::WriteInSerialThread( std::vector<char> buffer )
 {
-	m_writeData.insert( m_writeData.end( ), buffer.begin( ), buffer.end( ) );
+	std::vector<char> payload;
+
+	// Add length
+	if( m_bIncludeLength )
+	{
+		payload.push_back( (uint8_t)buffer.size( ) );
+	}
+
+	// Add payload data
+	payload.insert( payload.end( ), buffer.begin( ), buffer.end( ) );
+
+	uint8_t cCRC = 0;
+
+	// Escape characters and generate CRC
+	std::for_each( payload.begin( ), payload.end( ),
+		[&]( char cChar )
+		{
+			cCRC += cChar;
+
+			// Escape the character
+			if( m_setCharsToEscape.find( cChar ) != m_setCharsToEscape.end( ) )
+			{
+				payload.push_back( m_cEscape );
+			}
+
+			payload.push_back( cChar );
+	});
+
+	// Generate CRC
+	if( m_bGenerateCRC )
+	{
+		m_writeData.push_back( cCRC );
+	}
+
+	// Add terminating character
+	if( m_cTerminating )
+	{
+		m_writeData.push_back( m_cTerminating );
+	}
 
 	// If we are already trying to write, then wait until we recieve the callback
 	if( !m_bIsWriting )
@@ -117,7 +162,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 
         for( char c : m_readData )
         {
-			if( c == '\\' )
+			if( c == m_cEscape )
 			{
 				if( bIsEscaped )
 				{
@@ -130,7 +175,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					bIsEscaped = true;
 				}
 			}
-			else if( bIsEscaped || c != '\n' )
+			else if( bIsEscaped || c != m_cTerminating )
 			{
 				messageData.push_back( c );
 

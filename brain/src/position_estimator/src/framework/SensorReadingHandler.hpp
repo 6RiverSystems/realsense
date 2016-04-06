@@ -3,11 +3,12 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-
 #ifndef SENSORREADINGHANDLER_HPP_
 #define SENSORREADINGHANDLER_HPP_
 
 #include "SensorFrameQueue.hpp"
+
+namespace sixrs {
 
 class SensorReadingHandler
 {
@@ -27,5 +28,7 @@ public:
 private:
     const SensorFrameQueue* queue_;
 };
+
+} // namespace sixrs
 
 #endif // SENSORREADINGHANDLER_HPP_

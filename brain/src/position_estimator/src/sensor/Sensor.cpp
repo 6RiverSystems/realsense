@@ -1,10 +1,13 @@
-#include "SensorFrameQueue.hpp"
+#include "Sensor.hpp"
 
 namespace sixrs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SensorFrameQueue::push(SensorReading* reading)
+// Public methods
+
+std::string Sensor::getName() const
 {
+    return name_;
 }
 
 } // namespace sixrs

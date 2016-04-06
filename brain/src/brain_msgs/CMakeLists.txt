@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 2.8.3)
 set(CMAKE_BUILD_TYPE Debug)
 
-project(brain_msgs)
+set(PROJECT_NAME brain_msgs)
+project(${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp

@@ -3,7 +3,6 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-
 #ifndef THREADSAFEQUEUE_HPP_
 #define THREADSAFEQUEUE_HPP_
 
@@ -11,6 +10,8 @@
 #include <memory>
 #include <mutex>
 #include <condition_variable>
+
+namespace sixrs {
 
 template<typename T>
 class ThreadSafeQueue
@@ -76,5 +77,7 @@ private:
     std::queue<T> dataQueue_;
     std::condition_variable dataCondition_;
 };
+
+} // namespace sixrs
 
 #endif // THREADSAFEQUEUE_HPP_

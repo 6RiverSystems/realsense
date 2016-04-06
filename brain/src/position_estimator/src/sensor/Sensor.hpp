@@ -3,25 +3,32 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-
 #ifndef SENSOR_HPP_
 #define SENSOR_HPP_
 
 #include <framework/SensorReadingHandler.hpp>
 #include <framework/SensorFrameQueue.hpp>
 
+namespace sixrs {
+
 class Sensor :
     public SensorReadingHandler
 {
 public:
-    Sensor(const SensorFrameQueue* queue) :
-        SensorReadingHandler(queue)
+    Sensor(std::string name, const SensorFrameQueue* queue) :
+        SensorReadingHandler(queue),
+        name_(name)
     {}
 
     ~Sensor()
     {}
 
+    std::string getName() const;
+
 private:
+    std::string name_;
 };
+
+} // namespace sixrs
 
 #endif  // SENSOR_HPP_

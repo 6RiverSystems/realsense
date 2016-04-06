@@ -24,7 +24,7 @@ class SerialIO :
 {
 
 public:
-	SerialIO( bool bGenerateCRC = false, bool bIncludeLength = true,
+	SerialIO( bool bGenerateCRC = true, bool bIncludeLength = false,
 		char cTerminating = '\n', char cEscape = '\\',
 		std::set<char> vecCharsToEscape = std::set<char>( { '\\', '\n' } ) );
 
@@ -38,9 +38,11 @@ public:
 
 	void Write( const std::vector<char>& buffer );
 
+	void WriteRaw( const std::vector<char>& buffer );
+
 private:
 
-	void WriteInSerialThread( std::vector<char> buffer );
+	void WriteInSerialThread( std::vector<char> buffer, bool bIsRaw );
 
 	void StartAsyncRead( );
 

@@ -11,8 +11,6 @@
 
 namespace srs {
 
-
-
 SerialIO::SerialIO( bool bGenerateCRC, bool bIncludeLength, char cTerminating, char cEscape,
 	std::set<char> setCharsToEscape ) :
 	m_bGenerateCRC( bGenerateCRC ),
@@ -20,15 +18,20 @@ SerialIO::SerialIO( bool bGenerateCRC, bool bIncludeLength, char cTerminating, c
 	m_cTerminating( cTerminating ),
 	m_cEscape( cEscape ),
 	m_setCharsToEscape( setCharsToEscape ),
+	m_Thread( ),
 	m_oWork( m_IOService ),
 	m_SerialPort( m_IOService ),
 	m_bIsWriting( false ),
 	m_ReadBuffer( 1024 ),
 	m_writeData( ),
-	m_readData( )
+	m_readData( ),
+	m_readCallback( )
 {
 	// Spin up the thread
-	m_Thread.reset( new std::thread( [&](){ m_IOService.run( ); } ) );
+	m_Thread.reset( new std::thread( [&]()
+		{
+			m_IOService.run( );
+		} ) );
 }
 
 SerialIO::~SerialIO( )
@@ -36,11 +39,14 @@ SerialIO::~SerialIO( )
 	// Stop the service (and the thread)
 	m_IOService.stop( );
 
+	// Clean up the thread
 	m_Thread->join( );
 }
 
 void SerialIO::Open( const char* pszName, std::function<void(std::vector<char>)> readCallback )
 {
+	m_readCallback = readCallback;
+
 	m_SerialPort.open( pszName );
 
 	// Setup serial port for 8/N/1 operation @ 115.2kHz
@@ -68,54 +74,74 @@ void SerialIO::Write( const std::vector<char>& buffer )
 	if( IsOpen( ) )
 	{
 		// Do all data operations in serial processing thread
-		m_IOService.post( std::bind( &SerialIO::WriteInSerialThread, this, buffer ) );
+		m_IOService.post( std::bind( &SerialIO::WriteInSerialThread, this, buffer, false ) );
 	}
 	else
 	{
 		// Throw error
+		throw std::runtime_error( "port not open" );
 	}
 }
 
-void SerialIO::WriteInSerialThread( std::vector<char> buffer )
+void SerialIO::WriteRaw( const std::vector<char>& buffer )
 {
-	std::vector<char> payload;
-
-	// Add length
-	if( m_bIncludeLength )
+	if( IsOpen( ) )
 	{
-		payload.push_back( (uint8_t)buffer.size( ) );
+		// Do all data operations in serial processing thread
+		m_IOService.post( std::bind( &SerialIO::WriteInSerialThread, this, buffer, true ) );
+	}
+	else
+	{
+		// Throw error
+		throw std::runtime_error( "port not open" );
+	}
+}
+
+void SerialIO::WriteInSerialThread( std::vector<char> buffer, bool bIsRaw )
+{
+	uint32_t dwIndex = m_writeData.size( );
+
+	if( !bIsRaw )
+	{
+		std::vector<char> payload;
+
+		// Add length
+		if( m_bIncludeLength )
+		{
+			m_writeData.push_back( (uint8_t)buffer.size( ) );
+		}
 	}
 
 	// Add payload data
-	payload.insert( payload.end( ), buffer.begin( ), buffer.end( ) );
+	m_writeData.insert( m_writeData.end( ), buffer.begin( ), buffer.end( ) );
 
-	uint8_t cCRC = 0;
+	if( !bIsRaw )
+	{
+		uint8_t cCRC = 0;
 
-	// Escape characters and generate CRC
-	std::for_each( payload.begin( ), payload.end( ),
-		[&]( char cChar )
+		// Escape characters and generate CRC
+		for( auto iter = m_writeData.begin( ) + dwIndex; iter != m_writeData.end( ); iter++ )
 		{
-			cCRC += cChar;
+			cCRC += *iter;
 
 			// Escape the character
-			if( m_setCharsToEscape.find( cChar ) != m_setCharsToEscape.end( ) )
+			if( m_setCharsToEscape.find( *iter ) != m_setCharsToEscape.end( ) )
 			{
-				payload.push_back( m_cEscape );
+				m_writeData.insert( iter - 1, m_cEscape );
 			}
+		};
 
-			payload.push_back( cChar );
-	});
+		// Generate CRC
+		if( m_bGenerateCRC )
+		{
+			m_writeData.push_back( cCRC );
+		}
 
-	// Generate CRC
-	if( m_bGenerateCRC )
-	{
-		m_writeData.push_back( cCRC );
-	}
-
-	// Add terminating character
-	if( m_cTerminating )
-	{
-		m_writeData.push_back( m_cTerminating );
+		// Add terminating character
+		if( m_cTerminating )
+		{
+			m_writeData.push_back( m_cTerminating );
+		}
 	}
 
 	// If we are already trying to write, then wait until we recieve the callback
@@ -183,9 +209,16 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 			}
 			else
 			{
-				m_readCallback( messageData );
+				if( m_readCallback )
+				{
+					m_readCallback( messageData );
 
-				messageData.clear( );
+					messageData.clear( );
+				}
+				else
+				{
+					printf( "Serial port data read but no callback specified!\n" );
+				}
 			}
         }
 

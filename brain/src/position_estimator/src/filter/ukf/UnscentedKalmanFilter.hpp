@@ -8,7 +8,7 @@
 
 #include <opencv2/opencv.hpp>
 
-namespace sixrs {
+namespace srs {
 
 template<int TYPE>
 class UnscentedKalmanFilter
@@ -35,7 +35,7 @@ private:
     void initializeWeights();
 };
 
-} // namespace sixrs
+} // namespace srs
 
 // This include is to insert the actual template code in the file without
 // specifying all the code in the header file.

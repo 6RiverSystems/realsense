@@ -8,7 +8,7 @@
 
 #include "SensorFrameQueue.hpp"
 
-namespace sixrs {
+namespace srs {
 
 class SensorReadingHandler
 {
@@ -29,6 +29,6 @@ private:
     const SensorFrameQueue* queue_;
 };
 
-} // namespace sixrs
+} // namespace srs
 
 #endif // SENSORREADINGHANDLER_HPP_

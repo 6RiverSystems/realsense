@@ -14,13 +14,13 @@ int main(int argc, char** argv)
     ROS_INFO_STREAM("Node Position Estimator started");
 
     // General queue for the sensor frame
-    sixrs::SensorFrameQueue* sensorFrameQueue = new sixrs::SensorFrameQueue();
+    srs::SensorFrameQueue* sensorFrameQueue = new srs::SensorFrameQueue();
 
     // Create the estimator and all the input sensors
-    sixrs::PositionEstimator positionEstimator(sensorFrameQueue);
+    srs::PositionEstimator positionEstimator(sensorFrameQueue);
 
     // Configure the estimator to accept odometry as input sensor
-    sixrs::OdometrySensor* odometrySensor = new sixrs::OdometrySensor(sensorFrameQueue);
+    srs::OdometrySensor* odometrySensor = new srs::OdometrySensor(sensorFrameQueue);
     positionEstimator.addSensor(odometrySensor);
 
     positionEstimator.run();

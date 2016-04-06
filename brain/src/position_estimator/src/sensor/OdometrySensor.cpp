@@ -1,6 +1,6 @@
 #include "OdometrySensor.hpp"
 
-namespace sixrs {
+namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
@@ -54,4 +54,4 @@ void OdometrySensor::cbMessageReceived(brain_msgs::RawOdometryConstPtr message)
     newData_ = true;
 }
 
-} // namespace sixrs
+} // namespace srs

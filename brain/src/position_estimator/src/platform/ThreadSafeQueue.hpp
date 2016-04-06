@@ -11,7 +11,7 @@
 #include <mutex>
 #include <condition_variable>
 
-namespace sixrs {
+namespace srs {
 
 template<typename T>
 class ThreadSafeQueue
@@ -78,6 +78,6 @@ private:
     std::condition_variable dataCondition_;
 };
 
-} // namespace sixrs
+} // namespace srs
 
 #endif // THREADSAFEQUEUE_HPP_

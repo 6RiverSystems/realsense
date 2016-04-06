@@ -14,7 +14,7 @@
 
 #include <filter/ukf/UnscentedKalmanFilter.hpp>
 
-namespace sixrs {
+namespace srs {
 
 class PositionEstimator :
     public SensorReadingHandler
@@ -37,6 +37,6 @@ private:
     UnscentedKalmanFilter<CV_64F> ukf_;
 };
 
-} // namespace sixrs
+} // namespace srs
 
 #endif  // POSITIONESTIMATOR_HPP_

@@ -9,7 +9,7 @@
 #include <platform/ThreadSafeQueue.hpp>
 #include "SensorReading.hpp"
 
-namespace sixrs {
+namespace srs {
 
 class SensorFrameQueue
 {
@@ -26,6 +26,6 @@ private:
     ThreadSafeQueue<SensorReading*> queue_;
 };
 
-} // namespace sixrs
+} // namespace srs
 
 #endif // SENSORFRAMEQUEUE_HPP_

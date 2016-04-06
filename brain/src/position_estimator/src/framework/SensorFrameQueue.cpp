@@ -1,10 +1,10 @@
 #include "SensorFrameQueue.hpp"
 
-namespace sixrs {
+namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SensorFrameQueue::push(SensorReading* reading)
 {
 }
 
-} // namespace sixrs
+} // namespace srs

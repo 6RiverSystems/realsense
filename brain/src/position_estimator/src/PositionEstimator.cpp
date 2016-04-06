@@ -3,7 +3,7 @@
 #include <ros/ros.h>
 #include <boost/assert.hpp>
 
-namespace sixrs {
+namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Constant initialization
@@ -51,11 +51,10 @@ void PositionEstimator::run()
     {
         for (const Sensor* sensor : sensors_)
         {
-
         }
 
         refreshRate.sleep();
     }
 }
 
-} // namespace sixrs
+} // namespace srs

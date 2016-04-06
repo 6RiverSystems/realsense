@@ -6,7 +6,7 @@
 #ifndef SENSORREADING_HPP_
 #define SENSORREADING_HPP_
 
-namespace sixrs {
+namespace srs {
 
 /**
  * Interface for the sensor frame queue.
@@ -20,6 +20,6 @@ struct SensorReading
     {}
 };
 
-} // namespace sixrs
+} // namespace srs
 
 #endif // SENSORREADING_HPP_

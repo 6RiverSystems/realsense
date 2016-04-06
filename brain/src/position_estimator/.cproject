@@ -55,7 +55,7 @@
 								<option id="nvcc.compiler.def.symbols.1068549511" name="Defined symbols (-D)" superClass="nvcc.compiler.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__cplusplus=201103L"/>
 								</option>
-								<option id="nvcc.compiler.undef.symbol.1695857466" name="Undefined symbols (-U)" superClass="nvcc.compiler.undef.symbol" valueType="undefDefinedSymbols"/>
+								<option id="nvcc.compiler.undef.symbol.1695857466" name="Undefined symbols (-U)" superClass="nvcc.compiler.undef.symbol"/>
 								<inputType id="nvcc.compiler.input.cu.572109905" superClass="nvcc.compiler.input.cu"/>
 								<inputType id="nvcc.compiler.input.cpp.562547619" superClass="nvcc.compiler.input.cpp"/>
 								<inputType id="nvcc.compiler.input.c.1762763058" superClass="nvcc.compiler.input.c"/>

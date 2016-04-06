@@ -1,6 +1,6 @@
 #include <iostream>
 
-namespace sixrs {
+namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
@@ -67,4 +67,4 @@ void UnscentedKalmanFilter<TYPE>::initializeWeights()
     c_ = n_ + lambda_;
 }
 
-} // namespace sixrs
+} // namespace srs

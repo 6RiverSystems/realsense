@@ -1,6 +1,6 @@
 #include "Sensor.hpp"
 
-namespace sixrs {
+namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
@@ -10,4 +10,4 @@ std::string Sensor::getName() const
     return name_;
 }
 
-} // namespace sixrs
+} // namespace srs

@@ -15,7 +15,7 @@
 #include <sensor/Sensor.hpp>
 #include <brain_msgs/RawOdometry.h>
 
-namespace sixrs {
+namespace srs {
 
 struct OdometryReading :
     public SensorReading
@@ -55,6 +55,6 @@ private:
     bool newData_;
 };
 
-} // namespace sixrs
+} // namespace srs
 
 #endif // ODOMETRYSENSOR_HPP_

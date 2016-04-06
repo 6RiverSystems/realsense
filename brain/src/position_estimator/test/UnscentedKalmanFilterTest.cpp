@@ -10,7 +10,7 @@
 // Declare a test
 TEST(TestSuite, CreateFilter)
 {
-    sixrs::UnscentedKalmanFilter<CV_64F> ukf(5, 1.0, 0.0);
+    srs::UnscentedKalmanFilter<CV_64F> ukf(5, 1.0, 0.0);
 }
 
 // Run all the tests that were declared with TEST()

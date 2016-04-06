@@ -9,7 +9,7 @@
 #include <framework/SensorReadingHandler.hpp>
 #include <framework/SensorFrameQueue.hpp>
 
-namespace sixrs {
+namespace srs {
 
 class Sensor :
     public SensorReadingHandler
@@ -29,6 +29,6 @@ private:
     std::string name_;
 };
 
-} // namespace sixrs
+} // namespace srs
 
 #endif  // SENSOR_HPP_

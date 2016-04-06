@@ -111,7 +111,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include)
+include_directories(SYSTEM include)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -174,5 +174,5 @@ target_link_libraries( brain_stem_node
 #############
  
 # Link runTests with what we want to test and the GTest and pthread library
-catkin_add_gtest(serial-io-test test/SerialIO_test.cpp)
+catkin_add_gtest(serial-io-test src/SerialIO.cpp test/SerialIO_test.cpp)
 target_link_libraries(serial-io-test ${GTEST_LIBRARIES} pthread boost_system)

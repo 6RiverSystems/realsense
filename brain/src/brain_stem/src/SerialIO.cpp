@@ -99,7 +99,7 @@ void SerialIO::WriteRaw( const std::vector<char>& buffer )
 
 void SerialIO::WriteInSerialThread( std::vector<char> buffer, bool bIsRaw )
 {
-	uint32_t dwIndex = m_writeData.size( );
+	uint32_t dwStartIndex = m_writeData.size( );
 
 	if( !bIsRaw )
 	{
@@ -120,14 +120,17 @@ void SerialIO::WriteInSerialThread( std::vector<char> buffer, bool bIsRaw )
 		uint8_t cCRC = 0;
 
 		// Escape characters and generate CRC
-		for( auto iter = m_writeData.begin( ) + dwIndex; iter != m_writeData.end( ); iter++ )
+		for( std::size_t dwIndex = dwStartIndex; dwIndex != m_writeData.size( ); dwIndex++ )
 		{
-			cCRC += *iter;
+			cCRC += m_writeData[dwIndex];
 
 			// Escape the character
-			if( m_setCharsToEscape.find( *iter ) != m_setCharsToEscape.end( ) )
+			if( m_setCharsToEscape.find( m_writeData[dwIndex] ) != m_setCharsToEscape.end( ) )
 			{
-				m_writeData.insert( iter - 1, m_cEscape );
+				m_writeData.insert( m_writeData.begin( ) + dwIndex, m_cEscape );
+
+				// Skip the escaped character
+				dwIndex++;
 			}
 		};
 

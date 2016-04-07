@@ -6,13 +6,14 @@
  */
 
 #include <stdint.h>
+#include <limits>
 
 #ifndef _MESSAGES_H_
 #define _MESSAGES_H_
 
 namespace srs {
 
-enum class BRAIN_STEM_MESSAGE
+enum class BRAIN_STEM_MSG
 {
 	MESSAGE		= '<',
 	STOP		= 'S',
@@ -21,33 +22,68 @@ enum class BRAIN_STEM_MESSAGE
 	PID			= 'P'
 };
 
+enum class BRAIN_STEM_CMD
+{
+	FORWARD = 'f',
+	BACKWARD = 'b',
+	RIGHT = 'r',
+	LEFT = 'l',
+	FORWARD_TIMED = 't',
+	BACKWARD_TIMED = 'u',
+	LEFT_TIMED = 'z',
+	RIGHT_TIMED = 'e',
+	CAM = 'v',
+	CAM_RELEASE = 'w',
+	CAM_HORIZ_SET = 'm',
+	STOP = 's',
+	HARD_STOP = 'h',
+	GET_VERSION = 'y',
+	GET_FIRMWARE = 'x',
+	FWD_FLOOD_LIGHT = 'q',
+	REAR_FLOOD_LIGHT = 'o',
+	SET_PID = 'p',
+	ODOMETRY_START = 'i',
+	ODOMETRY_STOP = 'j',
+	ODOMETRY_REPORT = 'k',
+	PING = 'c',
+	DISTANCE = 'd',
+	LIGHT_UPDATE = '7',
+	ROTATE = '0',
+	STARTUP = '8',
+	SLINGSHOT_RIGHT = '6',
+	SLINGSHOT_LEFT = '5',
+	SUSPEND_UPDATE_STATE = '4',
+	UNKNOWN
+};
+
 enum class ENTITIES
 {
-	LIGHT_TOTE0 = 0,
-	LIGHT_TOTE1 = 1,
-	LIGHT_TOTE2 = 2,
-	LIGHT_TOTE3 = 3,
-	LIGHT_TOTE4 = 4,
-	LIGHT_TOTE5 = 5,
-	LIGHT_TOTE6 = 6,
-	LIGHT_TOTE7 = 7,
-	LIGHT_ACTION = 100,
-	LIGHT_PAUSE  = 101,
-	LIGHT_TAIL_LEFT  = 201,
-	LIGHT_TAIL_RIGHT = 202,
-	UNKNOWN_ENTITY = 9999
+	TOTE0 		= 0,
+	TOTE1 		= 1,
+	TOTE2 		= 2,
+	TOTE3 		= 3,
+	TOTE4 		= 4,
+	TOTE5 		= 5,
+	TOTE6 		= 6,
+	TOTE7 		= 7,
+	ACTION 		= 100,
+	PAUSE  		= 101,
+	TAIL_LEFT  	= 201,
+	TAIL_RIGHT 	= 202,
+	UNKNOWN
 };
 
 enum class LED_MODE
 {
-	LIGHT_OFF = 0,
-	LIGHT_ON = 1,
-	LIGHT_BLINK = 2,
-	LIGHT_GRAB = 10,
-	LIGHT_PUT = 11,
-	LIGHT_BRAKE = 100,
-	LIGHT_TURN = 101,
-	LIGHT_SELECT = 102
+	OFF 		= 0,
+	ON 			= 1,
+	BLINK 		= 2,
+	GRAB 		= 10,
+	PUT 		= 11,
+	BRAKE 		= 100,
+	TURN 		= 101,
+	SELECT 		= 102,
+	UNKNOWN
 };
 
 // We need to make sure that these are byte packed

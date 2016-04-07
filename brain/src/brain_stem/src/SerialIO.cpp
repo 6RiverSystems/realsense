@@ -137,7 +137,7 @@ void SerialIO::WriteInSerialThread( std::vector<char> buffer, bool bIsRaw )
 		// Generate CRC
 		if( m_bGenerateCRC )
 		{
-			m_writeData.push_back( cCRC );
+			m_writeData.push_back( -cCRC );
 		}
 
 		// Add terminating character

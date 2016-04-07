@@ -355,7 +355,14 @@ void MessageProcessor::WriteToSerialPort( char* pszData, std::size_t dwSize )
 {
 	if( !m_bControllerFault )
 	{
-		m_pIO->Write( std::vector<char>( pszData, pszData + dwSize ) );
+		if( m_pIO->IsOpen( ) )
+		{
+			m_pIO->Write( std::vector<char>( pszData, pszData + dwSize ) );
+		}
+		else
+		{
+			ROS_DEBUG( "Attempt to write to the brain stem, but the serial port is not open!" );
+		}
 	}
 }
 

@@ -122,6 +122,7 @@ include_directories(SYSTEM include ${catkin_INCLUDE_DIRS})
 add_executable(brain_stem_node
 	src/BrainStem.cpp
 	src/SerialIO.cpp
+	src/MessageProcessor.cpp
 )
 
 ## Add cmake target dependencies of the executable

@@ -8,28 +8,16 @@
 
 #include <ros/ros.h>
 
-#include <framework/SensorReadingHandler.hpp>
-#include <framework/SensorFrameQueue.hpp>
-#include <framework/SensorReading.hpp>
-
-#include <sensor/Sensor.hpp>
 #include <brain_msgs/RawOdometry.h>
 
+#include <sensor/SensorReadingHandler.hpp>
+#include <sensor/SensorFrameQueue.hpp>
+#include <filter/Measurement.hpp>
+
+#include <sensor/Sensor.hpp>
+#include "Odometry.hpp"
+
 namespace srs {
-
-struct OdometryReading :
-    public SensorReading
-{
-    uint32_t arrivalTime;
-    uint16_t left;
-    uint16_t right;
-
-    OdometryReading(uint32_t arrivalTime, uint16_t left, uint16_t right) :
-        arrivalTime(arrivalTime),
-        left(left),
-        right(right)
-    {}
-};
 
 class OdometrySensor :
     public Sensor
@@ -38,12 +26,10 @@ public:
     OdometrySensor(const SensorFrameQueue* queue);
     ~OdometrySensor();
 
-    OdometryReading getCurrentData() const
-    {
-        return OdometryReading(currentData_);
-    }
+    Measurement getCurrentData() const;
 
     bool newDataAvailable() const;
+
     void reset();
 
 private:
@@ -51,7 +37,7 @@ private:
 
     ros::Subscriber rosSubscriber_;
 
-    OdometryReading currentData_;
+    Odometry currentData_;
     bool newData_;
 };
 

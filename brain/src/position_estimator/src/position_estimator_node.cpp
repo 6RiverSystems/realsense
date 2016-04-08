@@ -1,9 +1,9 @@
 #include <ros/ros.h>
 
-#include "framework/SensorFrameQueue.hpp"
-#include "PositionEstimator.hpp"
+#include <sensor/SensorFrameQueue.hpp>
+#include <sensor/odometry/OdometrySensor.hpp>
 
-#include "sensor/OdometrySensor.hpp"
+#include "PositionEstimator.hpp"
 
 int main(int argc, char** argv)
 {

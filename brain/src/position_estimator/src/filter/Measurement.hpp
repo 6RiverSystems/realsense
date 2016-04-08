@@ -3,23 +3,25 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef SENSORREADING_HPP_
-#define SENSORREADING_HPP_
+#ifndef MEASUREMENT_HPP_
+#define MEASUREMENT_HPP_
+
+#include <platform/Object.hpp>
 
 namespace srs {
 
 /**
  * Interface for the sensor frame queue.
  */
-struct SensorReading
+struct Measurement : public Object
 {
-    SensorReading()
+    Measurement()
     {}
 
-    virtual ~SensorReading()
+    virtual ~Measurement()
     {}
 };
 
 } // namespace srs
 
-#endif // SENSORREADING_HPP_
+#endif // MEASUREMENT_HPP_

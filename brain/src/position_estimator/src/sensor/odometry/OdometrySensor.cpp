@@ -26,6 +26,12 @@ OdometrySensor::~OdometrySensor()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+Measurement OdometrySensor::getCurrentData() const
+{
+    return Odometry(currentData_);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 bool OdometrySensor::newDataAvailable() const
 {
     return newData_;
@@ -34,7 +40,7 @@ bool OdometrySensor::newDataAvailable() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OdometrySensor::reset()
 {
-    currentData_ = OdometryReading(0, 0, 0);
+    currentData_ = Odometry(0, 0, 0);
 
     newData_ = false;
 }
@@ -46,7 +52,7 @@ void OdometrySensor::reset()
 void OdometrySensor::cbMessageReceived(brain_msgs::RawOdometryConstPtr message)
 {
     // Store the most updated odometry information
-    currentData_ = OdometryReading(
+    currentData_ = Odometry(
         message->header.stamp.nsec,
         message->left,
         message->right);

@@ -10,6 +10,7 @@
 #include <memory>
 #include <mutex>
 #include <condition_variable>
+using namespace std;
 
 namespace srs {
 
@@ -23,25 +24,25 @@ public:
 
     ThreadSafeQueue(ThreadSafeQueue const& other)
     {
-        std::lock_guard<std::mutex> lock(other.mutex_);
+        lock_guard<mutex> lock(other.mutex_);
         dataQueue_ = other.dataQueue_;
     }
 
     bool empty() const
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        lock_guard<mutex> lock(mutex_);
         return dataQueue_.empty();
     }
 
-    std::shared_ptr<T> pop()
+    shared_ptr<T> pop()
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        lock_guard<mutex> lock(mutex_);
         if (dataQueue_.empty())
         {
-            return std::shared_ptr<T>();
+            return shared_ptr<T>();
         }
 
-        std::shared_ptr<T> result(std::make_shared<T>(dataQueue_.front()));
+        shared_ptr<T> result(make_shared<T>(dataQueue_.front()));
         dataQueue_.pop();
 
         return result;
@@ -49,33 +50,33 @@ public:
 
     void push(T newValue)
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        lock_guard<mutex> lock(mutex_);
         dataQueue_.push(newValue);
         dataCondition_.notify_one();
     }
 
     unsigned int size() const
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        lock_guard<mutex> lock(mutex_);
         return dataQueue_.size();
     }
 
-    std::shared_ptr<T> blockingPop()
+    shared_ptr<T> blockingPop()
     {
-        std::unique_lock<std::mutex> lock(mutex_);
+        unique_lock<mutex> lock(mutex_);
 
         dataCondition_.wait(lock, [this]{return !dataQueue_.empty();});
 
-        std::shared_ptr<T> result(std::make_shared<T>(dataQueue_.front()));
+        shared_ptr<T> result(make_shared<T>(dataQueue_.front()));
         dataQueue_.pop();
 
         return result;
     }
 
 private:
-    mutable std::mutex mutex_;
-    std::queue<T> dataQueue_;
-    std::condition_variable dataCondition_;
+    mutable mutex mutex_;
+    queue<T> dataQueue_;
+    condition_variable dataCondition_;
 };
 
 } // namespace srs

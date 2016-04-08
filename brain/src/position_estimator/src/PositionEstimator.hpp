@@ -7,12 +7,19 @@
 #define POSITIONESTIMATOR_HPP_
 
 #include <vector>
+using namespace std;
 
-#include <framework/SensorReadingHandler.hpp>
-#include <framework/SensorFrameQueue.hpp>
+#include <sensor/SensorReadingHandler.hpp>
+#include <sensor/SensorFrameQueue.hpp>
 #include <sensor/Sensor.hpp>
 
+#include "Robot.hpp"
+
 #include <filter/ukf/UnscentedKalmanFilter.hpp>
+
+// Preprocessor-level definition of the size of the state vector
+// in the estimator
+#define STATIC_STATE_VECTOR_SIZE 5
 
 namespace srs {
 
@@ -24,6 +31,7 @@ public:
     ~PositionEstimator();
 
     void addSensor(const Sensor* newSensor);
+
     void run();
 
 private:
@@ -32,9 +40,12 @@ private:
     const static double ALPHA;
     const static double BETA;
 
-    std::vector<const Sensor*> sensors_;
+    Robot robot_;
+    vector<const Sensor*> sensors_;
 
-    UnscentedKalmanFilter<CV_64F> ukf_;
+    UnscentedKalmanFilter<STATIC_STATE_VECTOR_SIZE> ukf_;
+    FilterState<STATIC_STATE_VECTOR_SIZE> state_;
+    cv::Mat covariance_;
 };
 
 } // namespace srs

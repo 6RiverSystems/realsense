@@ -6,8 +6,13 @@
 #ifndef SENSOR_HPP_
 #define SENSOR_HPP_
 
-#include <framework/SensorReadingHandler.hpp>
-#include <framework/SensorFrameQueue.hpp>
+#include <string>
+using namespace std;
+
+#include <filter/Measurement.hpp>
+
+#include "SensorReadingHandler.hpp"
+#include "SensorFrameQueue.hpp"
 
 namespace srs {
 
@@ -15,18 +20,14 @@ class Sensor :
     public SensorReadingHandler
 {
 public:
-    Sensor(std::string name, const SensorFrameQueue* queue) :
-        SensorReadingHandler(queue),
-        name_(name)
-    {}
+    Sensor(string name, const SensorFrameQueue* queue);
+    virtual ~Sensor();
 
-    ~Sensor()
-    {}
-
-    std::string getName() const;
+    virtual Measurement getCurrentData() const = 0;
+    string getName() const;
 
 private:
-    std::string name_;
+    string name_;
 };
 
 } // namespace srs

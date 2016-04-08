@@ -7,7 +7,7 @@
 #define SENSORFRAMEQUEUE_HPP_
 
 #include <platform/ThreadSafeQueue.hpp>
-#include "SensorReading.hpp"
+#include <filter/Measurement.hpp>
 
 namespace srs {
 
@@ -20,10 +20,10 @@ public:
     ~SensorFrameQueue()
     {}
 
-    void push(SensorReading* reading);
+    void push(Measurement* reading);
 
 private:
-    ThreadSafeQueue<SensorReading*> queue_;
+    ThreadSafeQueue<Measurement*> queue_;
 };
 
 } // namespace srs

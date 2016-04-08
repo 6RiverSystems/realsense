@@ -4,17 +4,25 @@ set(PROJECT_NAME position_estimator)
 set(PROJECT_NODE ${PROJECT_NAME}_node)
 set(${PROJECT_NAME}_SOURCES
     src/platform/ThreadSafeQueue.hpp
+    src/platform/Object.hpp
     
-    src/framework/SensorReading.hpp
-    src/framework/SensorFrameQueue.cpp
-    
-    src/sensor/Sensor.cpp
-    src/sensor/OdometrySensor.cpp
+    src/framework/Math.hpp
+    src/framework/Pose.hpp
 
-    src/filter/ukf/UnscentedKalmanFilter.hpp
+    src/sensor/Sensor.cpp
+    src/sensor/SensorFrameQueue.cpp
     
-    src/position_estimator_node.cpp
+    src/sensor/odometry/Odometry.hpp
+    src/sensor/odometry/OdometrySensor.cpp
+
+    src/filter/FilterState.hpp
+    src/filter/Command.hpp
+    src/filter/ProcessModel.hpp
+    src/filter/Measurement.hpp
+    src/filter/ukf/UnscentedKalmanFilter.hpp
+
     src/PositionEstimator.cpp
+    src/Robot.cpp
 )
 
 project(${PROJECT_NAME})
@@ -45,13 +53,16 @@ include_directories(include
     ${GTEST_INCLUDE_DIRS}
 )
 
-add_executable(${PROJECT_NODE} ${${PROJECT_NAME}_SOURCES})
+add_executable(${PROJECT_NODE} 
+    src/position_estimator_node.cpp
+    ${${PROJECT_NAME}_SOURCES}
+)
 target_link_libraries(${PROJECT_NODE} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
 ####################################################################################################
 # Tests
 
 if (CATKIN_ENABLE_TESTING)
-    catkin_add_gtest(UnscentedKalmanFilterTest test/UnscentedKalmanFilterTest.cpp)
+    catkin_add_gtest(UnscentedKalmanFilterTest test/UnscentedKalmanFilterTest.cpp ${${PROJECT_NAME}_SOURCES})
     target_link_libraries(UnscentedKalmanFilterTest ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 endif()

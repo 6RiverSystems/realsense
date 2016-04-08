@@ -8,19 +8,23 @@
 
 #include <opencv2/opencv.hpp>
 
+#include <filter/Measurement.hpp>
+#include <filter/ProcessModel.hpp>
+#include <filter/FilterState.hpp>
+
 namespace srs {
 
-template<int TYPE>
+template<unsigned int STATE_SIZE = 5>
 class UnscentedKalmanFilter
 {
 public:
-    UnscentedKalmanFilter(unsigned int n, double alpha, double beta);
+    UnscentedKalmanFilter(double alpha, double beta, ProcessModel<>& processModel);
     ~UnscentedKalmanFilter();
 
-    void reset();
+    void reset(FilterState<STATE_SIZE> stateT0, cv::Mat covarianceT0);
+    void run(Command<>* const command, const std::vector<Measurement> measurements);
 
 private:
-    unsigned int n_;
     double alpha_;
     double beta_;
     double kappa_;
@@ -30,15 +34,24 @@ private:
     cv::Mat WM_;
     cv::Mat WC_;
 
+    ProcessModel<>& processModel_;
+    cv::Mat covariance_;
     cv::Mat state_;
 
+    cv::Mat calculateSigmaPoints(cv::Mat M, cv::Mat P);
+
     void initializeWeights();
+
+    void prediction(Command<>* const command);
+
+    void unscentedTransform(
+        const cv::Mat XX, const cv::Mat Y, const cv::Mat chi,
+        cv::Mat& ybar, cv::Mat& S, cv::Mat& C);
+    void update();
 };
 
 } // namespace srs
 
-// This include is to insert the actual template code in the file without
-// specifying all the code in the header file.
 #include "UnscentedKalmanFilter.cpp"
 
 #endif // UNSCENTEDKALMANFILTER_HPP_

@@ -276,7 +276,7 @@ TEST_F( SerialIOTest, TestSimpleReadWrite )
 	std::vector<char> expectedData( data1.begin( ), data1.end( ) );
 
 	// Add the CRC
-	expectedData.push_back( -12 );
+	expectedData.push_back( 12 );
 
 	EXPECT_EQ( m_readData2.front( ), expectedData );
 }
@@ -298,7 +298,7 @@ TEST_F( SerialIOTest, TestEscapeSequence )
 
 	std::vector<char> expectedData( data1.begin( ), data1.end( ) );
 	// Add the CRC
-	expectedData.push_back( -114 );
+	expectedData.push_back( 114 );
 
 	EXPECT_EQ( m_readData2.front( ), expectedData );
 }

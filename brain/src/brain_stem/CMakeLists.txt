@@ -119,7 +119,7 @@ include_directories(SYSTEM include ${catkin_INCLUDE_DIRS})
 # add_dependencies(brain_stem ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # Declare a C++ executable
-add_executable(brain_stem_node
+add_executable(brain_stem
 	src/BrainStem.cpp
 	src/SerialIO.cpp
 	src/MessageProcessor.cpp
@@ -127,10 +127,10 @@ add_executable(brain_stem_node
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(brain_stem_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(brain_stem ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries( brain_stem_node
+target_link_libraries( brain_stem
 	${catkin_LIBRARIES}
 	boost_system
 )
@@ -150,7 +150,7 @@ target_link_libraries( brain_stem_node
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS brain_stem brain_stem_node
+# install(TARGETS brain_stem brain_stem
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

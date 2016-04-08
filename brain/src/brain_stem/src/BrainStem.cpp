@@ -121,7 +121,7 @@ public:
 			if( !m_bIsSerialOpen && bInitialCheck )
 			{
 
-				ROS_ERROR( "Error connecting to serial port: %s (Retry: %.2fs)\n", m_fRetryTimeout, strError.c_str( ) );
+				ROS_ERROR( "Error connecting to serial port: %s (Retry: %.2fs)\n", strError.c_str( ), m_fRetryTimeout );
 			}
 		}
 
@@ -146,20 +146,29 @@ int main(int argc, char **argv)
 	// Initialize ROS stuff
 	ros::init( argc, argv, "brain_stem" );
 
-	// Connect to serial port "/dev/malg" with a retry of 1s
-	BrainStem brainStem ( "/dev/malg", 1.0f );
-
-	ros::Rate rate( 100 );
-
-	// Respond to inputs until shut down
-	while( ros::ok( ) )
+	try
 	{
-		// Handle ROS events
-		ros::spinOnce( );
+		// Connect to serial port "/dev/malg" with a retry of 1s
+		BrainStem brainStem ( "/dev/malg", 1.0f );
 
-		// Event loop rate
-		rate.sleep( );
+		ros::Rate rate( 100 );
+
+		// Respond to inputs until shut down
+		while( ros::ok( ) )
+		{
+			// Handle ROS events
+			ros::spinOnce( );
+
+			// Event loop rate
+			rate.sleep( );
+		}
 	}
+    catch( ... )
+    {
+		ROS_DEBUG( "Error creating Brainstem\n" );
+    }
+
+	ROS_INFO( "Stopping brain stem" );
 
 	return 0;
 }

@@ -19,7 +19,8 @@ enum class BRAIN_STEM_MSG
 	STOP		= 'S',
 	BUTTON		= 'B',
 	ODOMETRY	= 'O',
-	PID			= 'P'
+	PID			= 'P',
+	UNKNOWN
 };
 
 enum class BRAIN_STEM_CMD

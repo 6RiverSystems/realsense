@@ -11,6 +11,7 @@
 
 #include <chrono>
 #include <boost/tokenizer.hpp>
+#include <boost/algorithm/hex.hpp>
 
 #include <ros/ros.h>
 #include <ros/console.h>
@@ -19,6 +20,16 @@
 namespace srs {
 
 using namespace ros;
+
+std::string tohex( const std::vector<char>& data )
+{
+   std::ostringstream result;
+   result << std::setw(2) << std::setfill('0') << std::hex << std::showbase << std::uppercase;
+
+   std::copy( data.begin( ), data.end( ), std::ostream_iterator<unsigned int>(result, " "));
+
+   return result.str( );
+}
 
 MessageProcessor::MessageProcessor( ros::NodeHandle& node, IO* pIO ) :
 	m_bControllerFault( false ),
@@ -93,25 +104,25 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 
 			if( strMessage.find( "<MSG Error" ) != -1 )
 			{
-				ROS_ERROR( "Fatal Error: %s", strMessage.c_str( ) );
+				ROS_ERROR_NAMED( "Brainstem", "Fatal Error: %s", strMessage.c_str( ) );
 
 				m_bControllerFault = true;
-
-				// TODO: Send event
 			}
 			else
 			{
-				ROS_DEBUG( "%s", strMessage.c_str( ) );
+				ROS_DEBUG_NAMED( "Brainstem", "%s", strMessage.c_str( ) );
 			}
 		}
 		break;
 
 		case BRAIN_STEM_MSG::STOP:
 		{
-			std_msgs::String message;
-			message.data = "ARRIVED";
+			std_msgs::String msg;
+			msg.data = "ARRIVED";
 
-			m_llEventPublisher.publish( message );
+			ROS_ERROR_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
+
+			m_llEventPublisher.publish( msg );
 		}
 		break;
 
@@ -131,11 +142,13 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 				ss << "UI " << iter->second;
 				msg.data = ss.str();
 
+				ROS_ERROR_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
+
 				m_llEventPublisher.publish( msg );
 			}
 			else
 			{
-				ROS_ERROR( "Unknown button entity %d", eButtonId );
+				ROS_ERROR_NAMED( "Brainstem", "Unknown button entity %d", eButtonId );
 			}
 		}
 		break;
@@ -153,6 +166,8 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 			ss << "O " << pOdometry->left_encoder << "," << pOdometry->right_encoder << " @ " << fractional_seconds_since_epoch;
 			msg.data = ss.str();
 
+//			ROS_ERROR_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
+
 			m_llEventPublisher.publish( msg );
 		}
 		break;
@@ -163,12 +178,15 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 			PID_DATA* pPid = reinterpret_cast<PID_DATA*>( buffer.data( ) + 1 );
 			// pubXEst.publish("X_DESIRED %f" % pidData[1])
 			// pubXEst.publish("X_CURRENT %f" % pidData[1])
+
+//			ROS_ERROR_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
 		}
 		break;
 
+		case BRAIN_STEM_MSG::UNKNOWN:
 		default:
 		{
-			ROS_DEBUG( "Unknown MFP command: %d", eCommand );
+			ROS_ERROR_NAMED( "Brainstem", "Unknown MFP command: %d", eCommand );
 		}
 		break;
 	}
@@ -182,7 +200,7 @@ void MessageProcessor::OnRosCallback( const std_msgs::String::ConstPtr& msg )
 {
 	const std::string& strMessage = msg->data;
 
-	ROS_DEBUG( "Received command: %s", strMessage.c_str( ) );
+	ROS_DEBUG_NAMED( "Brainstem", "Received command: %s", strMessage.c_str( ) );
 
 	std::vector<std::string> vecParsed;
 	boost::tokenizer<> tok( strMessage );
@@ -205,7 +223,7 @@ void MessageProcessor::OnRosCallback( const std_msgs::String::ConstPtr& msg )
 			}
 			else
 			{
-				ROS_ERROR( "Bridge has invalid number of arguments: %s", strMessage.c_str( ) );
+				ROS_ERROR_NAMED( "Brainstem", "Bridge has invalid number of arguments: %s", strMessage.c_str( ) );
 			}
 		}
 	}
@@ -260,14 +278,14 @@ void MessageProcessor::OnStartup( std::vector<std::string> vecParams )
 {
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::STARTUP );
 
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), sizeof( cMessage ) );
+	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
 }
 
 void MessageProcessor::OnDistance( std::vector<std::string> vecParams )
 {
 	MOVE_DISTANCE_DATA msg = {
 		static_cast<uint8_t>( BRAIN_STEM_CMD::DISTANCE ),
-		static_cast<uint8_t>( boost::lexical_cast<int>( vecParams[0] ) )
+		boost::lexical_cast<int16_t>( vecParams[0] )
 	};
 
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
@@ -277,7 +295,7 @@ void MessageProcessor::OnRotate( std::vector<std::string> vecParams )
 {
 	ROTATE_DATA msg = {
 		static_cast<uint8_t>( BRAIN_STEM_CMD::ROTATE ),
-		static_cast<uint8_t>( boost::lexical_cast<int>( vecParams[0] ) )
+		boost::lexical_cast<int16_t>( vecParams[0] )
 	};
 
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
@@ -285,9 +303,9 @@ void MessageProcessor::OnRotate( std::vector<std::string> vecParams )
 
 void MessageProcessor::OnStop( std::vector<std::string> vecParams )
 {
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::STARTUP );
+	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::STOP );
 
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), sizeof( cMessage ) );
+	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
 }
 
 void MessageProcessor::OnTurn( std::vector<std::string> vecParams )
@@ -306,6 +324,10 @@ void MessageProcessor::OnTurn( std::vector<std::string> vecParams )
 	{
 		cCommand = BRAIN_STEM_CMD::SLINGSHOT_LEFT;
 	}
+	else
+	{
+		ROS_ERROR( "Invalid turn direction: %s", strDirection.c_str( ) );
+	}
 
 	SLINGSHOT_DATA msg = { static_cast<uint8_t>( cCommand ), boost::lexical_cast<uint16_t>( strDistance ) };
 
@@ -316,7 +338,7 @@ void MessageProcessor::OnVersion( std::vector<std::string> vecParams )
 {
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::GET_VERSION );
 
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), sizeof( cMessage ) );
+	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
 }
 
 void MessageProcessor::OnPause( std::vector<std::string> vecParams )
@@ -324,22 +346,24 @@ void MessageProcessor::OnPause( std::vector<std::string> vecParams )
 	std::string& strPaused = vecParams[0];
 
 	SUSPEND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SUSPEND_UPDATE_STATE ),
-		strPaused == "OFF" ? true : false };
+		strPaused == "OFF" ? false : true };
 
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 
 void MessageProcessor::OnReEnable( std::vector<std::string> vecParams )
 {
+	ROS_DEBUG_NAMED( "BrainStem", "ReEnable from fault mode" );
+
 	m_bControllerFault = false;
 }
 
 void MessageProcessor::OnSetPid( std::vector<std::string> vecParams )
 {
-	float fKp = boost::lexical_cast<int>( vecParams[0] );
-	float fKi = boost::lexical_cast<int>( vecParams[1] );
-	float fKd = boost::lexical_cast<int>( vecParams[2] );
-	float proj_time = boost::lexical_cast<int>( vecParams[3] );
+	float fKp = boost::lexical_cast<float>( vecParams[0] );
+	float fKi = boost::lexical_cast<float>( vecParams[1] );
+	float fKd = boost::lexical_cast<float>( vecParams[2] );
+	float proj_time = boost::lexical_cast<float>( vecParams[3] );
 
 	PID_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SET_PID ),
 		fKp, fKi, fKd, proj_time };
@@ -357,11 +381,13 @@ void MessageProcessor::WriteToSerialPort( char* pszData, std::size_t dwSize )
 	{
 		if( m_pIO->IsOpen( ) )
 		{
+			ROS_DEBUG_NAMED( "BrainStem", "%s", tohex( std::vector<char>( pszData, pszData + dwSize ) ).c_str( ) );
+
 			m_pIO->Write( std::vector<char>( pszData, pszData + dwSize ) );
 		}
 		else
 		{
-			ROS_DEBUG( "Attempt to write to the brain stem, but the serial port is not open!" );
+			ROS_DEBUG_NAMED( "BrainStem", "Attempt to write to the brain stem, but the serial port is not open!" );
 		}
 	}
 }

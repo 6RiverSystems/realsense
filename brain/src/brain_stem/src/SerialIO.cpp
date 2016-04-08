@@ -7,7 +7,7 @@
 
 #include "SerialIO.h"
 #include <thread>
-
+#include <ros/ros.h>
 
 namespace srs {
 
@@ -168,6 +168,8 @@ void SerialIO::StartAsyncRead( )
 
 void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::size_t size )
 {
+//	ROS_DEBUG_STREAM( "Wrote String: " << std::string( m_writeData.begin( ), m_writeData.begin( ) + size ) );
+
 	std::vector<char>( m_writeData.begin( ) + size, m_writeData.end( ) ).swap( m_writeData );
 
 	if( m_writeData.begin( ) != m_writeData.end( ) )
@@ -185,6 +187,8 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 {
 	if( !error )
 	{
+//		ROS_DEBUG_STREAM( "Read String: " << std::string( m_ReadBuffer.begin( ), m_ReadBuffer.begin( ) + size ) );
+
         // Combine buffers
         m_readData.insert( m_readData.end( ), m_ReadBuffer.begin( ), m_ReadBuffer.begin( ) + size );
 

@@ -8,7 +8,7 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Constant initialization
 
-const unsigned int PositionEstimator::REFRESH_RATE_HZ = 100;
+const unsigned int PositionEstimator::REFRESH_RATE_HZ = 1;
 const unsigned int PositionEstimator::STATE_VECTOR_SIZE = STATIC_STATE_VECTOR_SIZE;
 const double PositionEstimator::ALPHA = 1.0;
 const double PositionEstimator::BETA = 0.0;
@@ -17,18 +17,12 @@ const double PositionEstimator::BETA = 0.0;
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-PositionEstimator::PositionEstimator(const SensorFrameQueue* queue) :
-    SensorReadingHandler(queue),
-    state_(),
-    ukf_(ALPHA, BETA, robot_)
-
+PositionEstimator::PositionEstimator() :
+    ukf_(ALPHA, BETA, robot_, 1 / REFRESH_RATE_HZ)
 {
     sensors_.clear();
 
-    //state_ = FilterState<STATIC_STATE_VECTOR_SIZE>();
-    covariance_ = cv::Mat::eye(STATE_VECTOR_SIZE, STATE_VECTOR_SIZE, CV_64F);
-
-    ukf_.reset(state_, covariance_);
+    //ukf_.reset(state_, covariance_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +32,7 @@ PositionEstimator::~PositionEstimator()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void PositionEstimator::addSensor(const Sensor* newSensor)
+void PositionEstimator::addSensor(const RosSensor* newSensor)
 {
     BOOST_ASSERT_MSG(newSensor != nullptr, "Expected sensor pointer not null");
 
@@ -52,13 +46,13 @@ void PositionEstimator::run()
 {
     ros::Rate refreshRate(REFRESH_RATE_HZ);
 
-    vector<Measurement> measurements;
+    vector<Measurement<>> measurements;
     while (ros::ok())
     {
         measurements.clear();
-        for (const Sensor* sensor : sensors_)
+        for (auto sensor : sensors_)
         {
-            measurements.push_back(sensor->getCurrentData());
+//            measurements.push_back(sensor->getCurrentData());
         }
 
 

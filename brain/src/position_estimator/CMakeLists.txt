@@ -7,22 +7,25 @@ set(${PROJECT_NAME}_SOURCES
     src/platform/Object.hpp
     
     src/framework/Math.hpp
+    src/framework/Utils.hpp
     src/framework/Pose.hpp
-
-    src/sensor/Sensor.cpp
-    src/sensor/SensorFrameQueue.cpp
-    
-    src/sensor/odometry/Odometry.hpp
-    src/sensor/odometry/OdometrySensor.cpp
 
     src/filter/FilterState.hpp
     src/filter/Command.hpp
-    src/filter/ProcessModel.hpp
+    src/filter/Process.hpp
     src/filter/Measurement.hpp
+    src/filter/Sensor.hpp
     src/filter/ukf/UnscentedKalmanFilter.hpp
 
+#    src/sensor/MeasurementQueue.hpp
+    
+    src/sensor/odometry/Odometry.hpp
+    src/sensor/odometry/Odometer.hpp
+    src/sensor/odometry/RosOdometer.cpp
+
     src/PositionEstimator.cpp
-    src/Robot.cpp
+    src/RobotProfile.hpp
+    src/Robot.hpp
 )
 
 project(${PROJECT_NAME})

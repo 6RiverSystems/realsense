@@ -6,27 +6,27 @@
 #ifndef SENSORREADINGHANDLER_HPP_
 #define SENSORREADINGHANDLER_HPP_
 
-#include "SensorFrameQueue.hpp"
+#include "MeasurementQueue.hpp"
 
 namespace srs {
 
 class SensorReadingHandler
 {
 public:
-    SensorReadingHandler(const SensorFrameQueue* queue) :
+    SensorReadingHandler(const MeasurementQueue<>* queue) :
         queue_(queue)
     {}
 
     ~SensorReadingHandler()
     {}
 
-    const SensorFrameQueue* getQueue() const
+    const MeasurementQueue<>* getQueue() const
     {
         return queue_;
     }
 
 private:
-    const SensorFrameQueue* queue_;
+    const MeasurementQueue<>* queue_;
 };
 
 } // namespace srs

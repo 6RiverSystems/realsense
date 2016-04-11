@@ -8,55 +8,65 @@
 
 #include <cmath>
 
+#include <opencv2/opencv.hpp>
+
+#include "Utils.hpp"
+
 namespace srs {
 
-class Math
+struct Math
 {
-public:
-    template<class TYPE>
-    inline static TYPE inch2mm(TYPE inch)
+    template<typename TYPE = double>
+    static cv::Mat cholesky(const cv::Mat A)
     {
-        return 25.4 * inch;
+        cv::Mat R = A.clone();
+        if (Cholesky(R.ptr<TYPE>(), R.step, R.cols, 0, 0, 0))
+        {
+            cv::Mat diagonal = R.diag();
+            for (unsigned int e = 0; e < diagonal.rows; ++e)
+            {
+                TYPE element = diagonal.at<TYPE>(e);
+                R.row(e) *= element;
+                R.at<TYPE>(e, e) = TYPE(1.0) / element;
+            }
+        }
+
+        return R;
     }
 
-    template<typename TYPE>
-    inline static TYPE mm2inch(TYPE mm)
+    template<typename TYPE = double>
+    constexpr inline static TYPE deg2rad(TYPE deg)
     {
-        return mm / 25.4;
+        return TYPE(M_PI / 180) * deg;
     }
 
-    template<typename TYPE>
-    static TYPE deg2rad(TYPE deg)
+    template<typename TYPE = double>
+    constexpr inline static TYPE inch2m(TYPE inch)
     {
-        return (M_PI / 180) * deg;
+        return TYPE(0.0254) * inch;
     }
 
-    template<typename TYPE>
-    static TYPE rad2deg(TYPE rad)
+    template<typename TYPE = double>
+    constexpr inline static TYPE inch2mm(TYPE inch)
     {
-        return (180 / M_PI) * rad;
+        return TYPE(25.4) * inch;
+    }
+
+    template<typename TYPE = double>
+    constexpr inline static TYPE mm2inch(TYPE mm)
+    {
+        return mm / TYPE(25.4);
+    }
+
+    template<typename TYPE = double>
+    constexpr inline static TYPE rad2deg(TYPE rad)
+    {
+        return TYPE(180 / M_PI) * rad;
     }
 
     static cv::Mat zeros(const cv::Mat original)
     {
         return cv::Mat::zeros(original.rows, original.cols, original.type());
-    }
-
-    static cv::Mat cholesky(const cv::Mat A)
-    {
-        cv::Mat R = A.clone();
-        if (Cholesky(R.ptr<double>(), R.step, R.cols, 0, 0, 0))
-        {
-            cv::Mat diagonal = R.diag();
-            for (unsigned int e = 0; e < diagonal.rows; ++e)
-            {
-                double element = diagonal.at<double>(e);
-                R.row(e) *= element;
-                R.at<double>(e, e) = 1.0f / element;
-            }
-        }
-
-        return R;
     }
 };
 

@@ -6,20 +6,33 @@
 #ifndef MEASUREMENT_HPP_
 #define MEASUREMENT_HPP_
 
+#include <opencv2/opencv.hpp>
+
 #include <platform/Object.hpp>
 
 namespace srs {
 
-/**
- * Interface for the sensor frame queue.
- */
-struct Measurement : public Object
+template<unsigned int STATE_SIZE, int TYPE> class Sensor;
+
+template<unsigned int STATE_SIZE = 5, int TYPE = CV_64F>
+class Measurement : public Object
 {
-    Measurement()
+public:
+    Measurement(Sensor<STATE_SIZE, TYPE>* sensor) :
+            Object(),
+            sensor_(sensor)
     {}
 
     virtual ~Measurement()
     {}
+
+    Sensor<STATE_SIZE, TYPE>* getSensor()
+    {
+        return sensor_;
+    }
+
+private:
+    Sensor<STATE_SIZE, TYPE>* sensor_;
 };
 
 } // namespace srs

@@ -10,14 +10,18 @@ using namespace std;
 
 //#include <geometry_msgs/Twist.h>
 
+#include <framework/Utils.hpp>
 #include <framework/Pose.hpp>
 
 #include <filter/FilterState.hpp>
 #include <filter/Command.hpp>
+#include <filter/Measurement.hpp>
 #include <filter/ukf/UnscentedKalmanFilter.hpp>
 
-#include <sensor/odometry/OdometrySensor.hpp>
+#include <sensor/odometry/Odometry.hpp>
+#include <sensor/odometry/Odometer.hpp>
 
+#include <RobotProfile.hpp>
 #include <Robot.hpp>
 
 const unsigned int UKF_STATE_SIZE = 5;
@@ -27,17 +31,17 @@ const unsigned int UKF_COMMAND_SIZE = 2;
 TEST(UnscentedKalmanFilter, CreateFilter)
 {
     // Create standard robot process model
-    srs::Robot robot;
+    srs::Robot<> robot;
 
-    srs::UnscentedKalmanFilter<UKF_STATE_SIZE> ukf(1.0, 0.0, robot);
+    srs::UnscentedKalmanFilter<UKF_STATE_SIZE> ukf(1.0, 0.0, robot, 1);
 }
 
 TEST(UnscentedKalmanFilter, Run11Steps)
 {
     // Create standard robot process model
-    srs::Robot robot;
-
-    srs::UnscentedKalmanFilter<UKF_STATE_SIZE> ukf(1.0, 0.0, robot);
+    srs::Robot<> robot;
+    srs::Odometer<> odometer(srs::RobotProfile<>::SIZE_WHEEL_DISTANCE);
+    srs::UnscentedKalmanFilter<UKF_STATE_SIZE> ukf(1.0, 0.0, robot, 1);
 
     // Create a sequence of commands
     srs::Command<> COMMAND_1M_S(1, 0);
@@ -57,29 +61,28 @@ TEST(UnscentedKalmanFilter, Run11Steps)
     };
 
     // Prepare a sequence of odometry readings
-    srs::Odometry ODOMETRY_0(0, 0, 0);
-    srs::Odometry ODOMETRY_1M_S(1, 1, 0);
+    srs::Odometry<> ODOMETRY_0(&odometer, 0, 0, 0);
+    srs::Odometry<> ODOMETRY_1M_S(&odometer, 1, 1, 0);
 
-    vector<vector<srs::Measurement>> measurements = {
-        vector<srs::Measurement>() = {ODOMETRY_1M_S},
-        vector<srs::Measurement>() = {ODOMETRY_1M_S},
-        vector<srs::Measurement>() = {ODOMETRY_1M_S},
-        vector<srs::Measurement>() = {ODOMETRY_1M_S},
-        vector<srs::Measurement>() = {ODOMETRY_1M_S},
-        vector<srs::Measurement>() = {ODOMETRY_1M_S},
-        vector<srs::Measurement>() = {ODOMETRY_1M_S},
-        vector<srs::Measurement>() = {ODOMETRY_1M_S},
-        vector<srs::Measurement>() = {ODOMETRY_1M_S},
-        vector<srs::Measurement>() = {ODOMETRY_1M_S},
-        vector<srs::Measurement>() = {ODOMETRY_0}
+    vector<vector<srs::Measurement<>>> measurements = {
+        vector<srs::Measurement<>>() = {ODOMETRY_1M_S},
+        vector<srs::Measurement<>>() = {ODOMETRY_1M_S},
+        vector<srs::Measurement<>>() = {ODOMETRY_1M_S},
+        vector<srs::Measurement<>>() = {ODOMETRY_1M_S},
+        vector<srs::Measurement<>>() = {ODOMETRY_1M_S},
+        vector<srs::Measurement<>>() = {ODOMETRY_1M_S},
+        vector<srs::Measurement<>>() = {ODOMETRY_1M_S},
+        vector<srs::Measurement<>>() = {ODOMETRY_1M_S},
+        vector<srs::Measurement<>>() = {ODOMETRY_1M_S},
+        vector<srs::Measurement<>>() = {ODOMETRY_1M_S},
+        vector<srs::Measurement<>>() = {ODOMETRY_0}
     };
 
     // Prepare the initial state
     srs::Pose<double> pose0;
     pose0.setThetaDegrees(90.0);
-    cout << pose0.toString() << endl;
 
-    srs::FilterState<UKF_STATE_SIZE> stateT0(pose0);
+    srs::FilterState<> stateT0(pose0);
 
     cv::Mat covarianceT0 = cv::Mat::eye(UKF_STATE_SIZE, UKF_STATE_SIZE, CV_64F);
     covarianceT0 = covarianceT0 * 0.0001;
@@ -89,7 +92,6 @@ TEST(UnscentedKalmanFilter, Run11Steps)
     for (unsigned int t = 0; t < measurements.size(); ++t)
     {
         ukf.run(commands.at(t), measurements.at(t));
-        //ukf.run(commands.at(t), measurements.at(t));
     }
 }
 

@@ -1,27 +1,41 @@
-#include "Robot.hpp"
-
 #include <framework/Math.hpp>
+#include <framework/Utils.hpp>
+
+#include <filter/FilterState.hpp>
 
 namespace srs {
+
+template<unsigned int STATE_SIZE, int TYPE>
+const cv::Mat Robot<STATE_SIZE, TYPE>::Q = (
+    cv::Mat_<Robot<STATE_SIZE, TYPE>::BaseType>(1, STATE_SIZE) <<
+        0.0001,
+        0.0001,
+        Math::deg2rad(0.01),
+        0,
+        0
+);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-cv::Mat Robot::transform(const cv::Mat state, Command<>* const command, double DT)
+template<unsigned int STATE_SIZE, int TYPE>
+cv::Mat Robot<STATE_SIZE, TYPE>::transformWithAB(const cv::Mat state,
+    Command<TYPE>* const command,
+    BaseType dT)
 {
     // x = x + v * DT * cos(theta);
     // y = y + v * DT * sin(theta);
     // theta = theta + omega * DT;
-    double x = state.at<double>(FilterState<>::STATE_X);
-    double y = state.at<double>(FilterState<>::STATE_Y);
-    double theta = state.at<double>(FilterState<>::STATE_THETA);
-    double v = state.at<double>(FilterState<>::STATE_V);
-    double omega = state.at<double>(FilterState<>::STATE_OMEGA);
+    BaseType x = state.at<BaseType>(FilterState<TYPE>::STATE_X);
+    BaseType y = state.at<BaseType>(FilterState<TYPE>::STATE_Y);
+    BaseType theta = state.at<BaseType>(FilterState<TYPE>::STATE_THETA);
+    BaseType v = state.at<BaseType>(FilterState<TYPE>::STATE_V);
+    BaseType omega = state.at<BaseType>(FilterState<TYPE>::STATE_OMEGA);
 
-    x = x + v * DT * cos(theta);
-    y = y + v * DT * sin(theta);
-    theta = theta + omega * DT;
+    x = x + v * dT * cos(theta);
+    y = y + v * dT * sin(theta);
+    theta = theta + omega * dT;
 
     // if command.valid
     //     v = command.velocity.linear;
@@ -30,17 +44,16 @@ cv::Mat Robot::transform(const cv::Mat state, Command<>* const command, double D
     if (command)
     {
         v = command->getV();
-        //v = command->getV();
-        //omega = command->getOmega();
+        omega = command->getOmega();
     }
 
     // Update the state to the next step
     cv::Mat result = Math::zeros(state);
-    result.at<double>(FilterState<>::STATE_X) = x;
-    result.at<double>(FilterState<>::STATE_Y) = y;
-    result.at<double>(FilterState<>::STATE_THETA) = theta;
-    result.at<double>(FilterState<>::STATE_V) = v;
-    result.at<double>(FilterState<>::STATE_OMEGA) = omega;
+    result.at<BaseType>(FilterState<TYPE>::STATE_X) = x;
+    result.at<BaseType>(FilterState<TYPE>::STATE_Y) = y;
+    result.at<BaseType>(FilterState<TYPE>::STATE_THETA) = theta;
+    result.at<BaseType>(FilterState<TYPE>::STATE_V) = v;
+    result.at<BaseType>(FilterState<TYPE>::STATE_OMEGA) = omega;
 
     return result;
 }

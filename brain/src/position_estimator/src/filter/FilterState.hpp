@@ -6,14 +6,20 @@
 #ifndef FILTERSTATE_HPP_
 #define FILTERSTATE_HPP_
 
+#include <opencv2/opencv.hpp>
+
 #include <platform/Object.hpp>
+#include <platform/Ocv2Base.hpp>
+
 #include <framework/Pose.hpp>
 
 namespace srs {
 
-template<unsigned int TYPE = CV_64F, typename ETYPE = double>
+template<int TYPE = CV_64F>
 struct FilterState : public Object
 {
+    typedef typename Ocv2Base<TYPE>::BaseType BaseType;
+
     enum {
         STATE_X,
         STATE_Y,
@@ -23,13 +29,13 @@ struct FilterState : public Object
         MAX_ENUM
     };
 
-    FilterState(Pose<ETYPE> pose)
+    FilterState(Pose<BaseType> pose)
     {
-        vector = cv::Mat::zeros(1, MAX_ENUM, TYPE);
+        vector = cv::Mat::zeros(MAX_ENUM, 1, TYPE);
 
-        vector.at<ETYPE>(STATE_X) = pose.x;
-        vector.at<ETYPE>(STATE_Y) = pose.y;
-        vector.at<ETYPE>(STATE_THETA) = pose.theta;
+        vector.at<BaseType>(STATE_X) = pose.x;
+        vector.at<BaseType>(STATE_Y) = pose.y;
+        vector.at<BaseType>(STATE_THETA) = pose.theta;
     }
 
     FilterState(const cv::Mat state)
@@ -45,54 +51,54 @@ struct FilterState : public Object
     ~FilterState()
     {}
 
-    ETYPE getX()
+    BaseType getX()
     {
-        return vector.at<ETYPE>(STATE_X);
+        return vector.at<BaseType>(STATE_X);
     }
 
-    ETYPE getY()
+    BaseType getY()
     {
-        return vector.at<ETYPE>(STATE_Y);
+        return vector.at<BaseType>(STATE_Y);
     }
 
-    ETYPE getTheta()
+    BaseType getTheta()
     {
-        return vector.at<ETYPE>(STATE_THETA);
+        return vector.at<BaseType>(STATE_THETA);
     }
 
-    ETYPE getV()
+    BaseType getV()
     {
-        return vector.at<ETYPE>(STATE_V);
+        return vector.at<BaseType>(STATE_V);
     }
 
-    ETYPE getOmega()
+    BaseType getOmega()
     {
-        return vector.at<ETYPE>(STATE_OMEGA);
+        return vector.at<BaseType>(STATE_OMEGA);
     }
 
-    void setX(ETYPE value)
+    void setX(BaseType value)
     {
-        vector.at<ETYPE>(STATE_X) = value;
+        vector.at<BaseType>(STATE_X) = value;
     }
 
-    void setY(ETYPE value)
+    void setY(BaseType value)
     {
-        vector.at<ETYPE>(STATE_Y) = value;
+        vector.at<BaseType>(STATE_Y) = value;
     }
 
-    void setTheta(ETYPE value)
+    void setTheta(BaseType value)
     {
-        vector.at<ETYPE>(STATE_THETA) = value;
+        vector.at<BaseType>(STATE_THETA) = value;
     }
 
-    void setV(ETYPE value)
+    void setV(BaseType value)
     {
-        vector.at<ETYPE>(STATE_V) = value;
+        vector.at<BaseType>(STATE_V) = value;
     }
 
-    void setOmega(ETYPE value)
+    void setOmega(BaseType value)
     {
-        vector.at<ETYPE>(STATE_OMEGA) = value;
+        vector.at<BaseType>(STATE_OMEGA) = value;
     }
 
     cv::Mat vector;

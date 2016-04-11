@@ -9,6 +9,7 @@
 #include <opencv2/opencv.hpp>
 
 #include <platform/Object.hpp>
+
 #include <framework/Math.hpp>
 
 namespace srs {
@@ -16,7 +17,7 @@ namespace srs {
 template<typename TYPE>
 struct Pose : public Object
 {
-    Pose(TYPE x = 0.0f, TYPE y = 0.0f, TYPE theta = 0.0f) :
+    Pose(TYPE x = TYPE(), TYPE y = TYPE(), TYPE theta = TYPE()) :
         x(x),
         y(y),
         theta(theta)

@@ -6,21 +6,28 @@
 #ifndef COMMAND_HPP_
 #define COMMAND_HPP_
 
+#include <opencv2/opencv.hpp>
+
 #include <platform/Object.hpp>
+#include <platform/Ocv2Base.hpp>
 
 namespace srs {
 
-template<unsigned int TYPE = CV_64F, typename ETYPE = double>
+template<int TYPE = CV_64F>
 struct Command : public Object
 {
+    typedef typename Ocv2Base<TYPE>::BaseType BaseType;
+
     enum {
         COMMAND_V,
         COMMAND_OMEGA,
         MAX_ENUM
     };
 
-    Command(const ETYPE v, const ETYPE omega)
+    Command(const BaseType v, const BaseType omega)
     {
+        vector = cv::Mat::zeros(1, MAX_ENUM, TYPE);
+
         setV(v);
         setOmega(omega);
     }
@@ -38,24 +45,24 @@ struct Command : public Object
     ~Command()
     {}
 
-    ETYPE getV()
+    BaseType getV()
     {
-        return vector.at<ETYPE>(COMMAND_V);
+        return vector.at<BaseType>(COMMAND_V);
     }
 
-    ETYPE getOmega()
+    BaseType getOmega()
     {
-        return vector.at<ETYPE>(COMMAND_OMEGA);
+        return vector.at<BaseType>(COMMAND_OMEGA);
     }
 
-    void setV(ETYPE value)
+    void setV(BaseType value)
     {
-        vector.at<ETYPE>(COMMAND_V) = value;
+        vector.at<BaseType>(COMMAND_V) = value;
     }
 
-    void setOmega(ETYPE value)
+    void setOmega(BaseType value)
     {
-        vector.at<ETYPE>(COMMAND_OMEGA) = value;
+        vector.at<BaseType>(COMMAND_OMEGA) = value;
     }
 
     cv::Mat vector;

@@ -104,7 +104,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 
 			if( strMessage.find( "<MSG Error" ) != -1 )
 			{
-				ROS_ERROR_NAMED( "Brainstem", "Fatal Error: %s", strMessage.c_str( ) );
+				ROS_DEBUG_NAMED( "Brainstem", "Fatal Error: %s", strMessage.c_str( ) );
 
 				m_bControllerFault = true;
 			}
@@ -120,7 +120,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 			std_msgs::String msg;
 			msg.data = "ARRIVED";
 
-			ROS_ERROR_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
+			ROS_DEBUG_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
 
 			m_llEventPublisher.publish( msg );
 		}
@@ -142,7 +142,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 				ss << "UI " << iter->second;
 				msg.data = ss.str();
 
-				ROS_ERROR_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
+				ROS_DEBUG_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
 
 				m_llEventPublisher.publish( msg );
 			}
@@ -166,7 +166,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 			ss << "O " << pOdometry->left_encoder << "," << pOdometry->right_encoder << " @ " << fractional_seconds_since_epoch;
 			msg.data = ss.str();
 
-//			ROS_ERROR_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
+//			ROS_DEBUG_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
 
 			m_llEventPublisher.publish( msg );
 		}
@@ -283,22 +283,36 @@ void MessageProcessor::OnStartup( std::vector<std::string> vecParams )
 
 void MessageProcessor::OnDistance( std::vector<std::string> vecParams )
 {
-	MOVE_DISTANCE_DATA msg = {
-		static_cast<uint8_t>( BRAIN_STEM_CMD::DISTANCE ),
-		boost::lexical_cast<int16_t>( vecParams[0] )
-	};
+	try
+	{
+		MOVE_DISTANCE_DATA msg = {
+			static_cast<uint8_t>( BRAIN_STEM_CMD::DISTANCE ),
+			boost::lexical_cast<int16_t>( vecParams[0] )
+		};
 
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+		WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+	}
+	catch( const boost::bad_lexical_cast& e )
+	{
+		ROS_ERROR( "Invalid distance: %s", vecParams[0].c_str( ) );
+	}
 }
 
 void MessageProcessor::OnRotate( std::vector<std::string> vecParams )
 {
-	ROTATE_DATA msg = {
-		static_cast<uint8_t>( BRAIN_STEM_CMD::ROTATE ),
-		boost::lexical_cast<int16_t>( vecParams[0] )
-	};
+	try
+	{
+		ROTATE_DATA msg = {
+			static_cast<uint8_t>( BRAIN_STEM_CMD::ROTATE ),
+			boost::lexical_cast<int16_t>( vecParams[0] )
+		};
 
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+		WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+	}
+	catch( const boost::bad_lexical_cast& e )
+	{
+		ROS_ERROR( "Invalid rotation: %s", vecParams[0].c_str( ) );
+	}
 }
 
 void MessageProcessor::OnStop( std::vector<std::string> vecParams )
@@ -329,9 +343,16 @@ void MessageProcessor::OnTurn( std::vector<std::string> vecParams )
 		ROS_ERROR( "Invalid turn direction: %s", strDirection.c_str( ) );
 	}
 
-	SLINGSHOT_DATA msg = { static_cast<uint8_t>( cCommand ), boost::lexical_cast<uint16_t>( strDistance ) };
+	try
+	{
+		SLINGSHOT_DATA msg = { static_cast<uint8_t>( cCommand ), boost::lexical_cast<uint16_t>( strDistance ) };
 
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+		WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+	}
+	catch( const boost::bad_lexical_cast& e )
+	{
+		ROS_ERROR( "Invalid distance: %s", vecParams[0].c_str( ) );
+	}
 }
 
 void MessageProcessor::OnVersion( std::vector<std::string> vecParams )
@@ -360,15 +381,23 @@ void MessageProcessor::OnReEnable( std::vector<std::string> vecParams )
 
 void MessageProcessor::OnSetPid( std::vector<std::string> vecParams )
 {
-	float fKp = boost::lexical_cast<float>( vecParams[0] );
-	float fKi = boost::lexical_cast<float>( vecParams[1] );
-	float fKd = boost::lexical_cast<float>( vecParams[2] );
-	float proj_time = boost::lexical_cast<float>( vecParams[3] );
+	try
+	{
+		float fKp = boost::lexical_cast<float>( vecParams[0] );
+		float fKi = boost::lexical_cast<float>( vecParams[1] );
+		float fKd = boost::lexical_cast<float>( vecParams[2] );
+		float proj_time = boost::lexical_cast<float>( vecParams[3] );
 
-	PID_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SET_PID ),
-		fKp, fKi, fKd, proj_time };
+		PID_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SET_PID ),
+			fKp, fKi, fKd, proj_time };
 
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+		WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+	}
+	catch( const boost::bad_lexical_cast& e )
+	{
+		ROS_ERROR( "Invalid pid parameters: Kp: %s, Ki: %s, Kd: %s",
+			vecParams[0].c_str( ), vecParams[1].c_str( ), vecParams[2].c_str( ) );
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

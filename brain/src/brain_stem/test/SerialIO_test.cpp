@@ -29,7 +29,9 @@ public:
 	SocatRunner( ) :
 		m_bIsRunning( false )
 	{
+		Stop( );
 
+		usleep( 1000000 );
 	}
 
 	~SocatRunner( )
@@ -134,7 +136,9 @@ public:
 
 	void TearDown( )
 	{
+		m_serial1.Close( );
 
+		m_serial2.Close( );
 	}
 
 	bool CompareBuffers( const std::vector<char>& buffer1, const std::vector<char>& buffer2 )
@@ -192,10 +196,8 @@ TEST_F( SerialIOTest, OpenInvalidSerialPort )
 
 TEST_F( SerialIOTest, TestSpinUntilOpen )
 {
-	g_socat.Stop( );
-
-	// Try once when it is closed, then spin until it connects
-	for( int i : boost::irange( 0, 10 ) )
+	// Try once when it is closed, then spin until it connects (wait for 3 seconds)
+	for( int i : boost::irange( 0, 300 ) )
 	{
 		try
 		{
@@ -218,14 +220,19 @@ TEST_F( SerialIOTest, TestSpinUntilOpen )
 		{
 			g_socat.Start( );
 		}
+		else
+		{
+			if( m_serial1.IsOpen( ) )
+			{
+				break;
+			}
+		}
 
-		usleep( 500 );
+		// Wait for 10ms
+		usleep( 100000 );
 	}
 
 	EXPECT_TRUE( m_serial1.IsOpen( ) );
-
-	// Make sure socat is started for the rest of the tests
-	g_socat.Start( );
 }
 
 TEST_F( SerialIOTest, TestOpen )
@@ -276,7 +283,7 @@ TEST_F( SerialIOTest, TestSimpleReadWrite )
 	std::vector<char> expectedData( data1.begin( ), data1.end( ) );
 
 	// Add the CRC
-	expectedData.push_back( -12 );
+	expectedData.push_back( 12 );
 
 	EXPECT_EQ( m_readData2.front( ), expectedData );
 }
@@ -298,7 +305,7 @@ TEST_F( SerialIOTest, TestEscapeSequence )
 
 	std::vector<char> expectedData( data1.begin( ), data1.end( ) );
 	// Add the CRC
-	expectedData.push_back( -114 );
+	expectedData.push_back( 114 );
 
 	EXPECT_EQ( m_readData2.front( ), expectedData );
 }
@@ -423,8 +430,6 @@ TEST_F( SerialIOTest, TestCloseWhileReadWrite )
 
 int main(int argc, char **argv)
 {
-	g_socat.Start( );
-
 	::testing::InitGoogleTest( &argc, argv );
 
 	int success = RUN_ALL_TESTS( );
@@ -432,5 +437,4 @@ int main(int argc, char **argv)
 	g_socat.Stop( );
 
 	return success;
-
 }

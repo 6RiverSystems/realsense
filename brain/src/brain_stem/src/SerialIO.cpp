@@ -19,6 +19,7 @@ SerialIO::SerialIO( bool bGenerateCRC, bool bIncludeLength, char cTerminating, c
 	m_cEscape( cEscape ),
 	m_setCharsToEscape( setCharsToEscape ),
 	m_Thread( ),
+
 	m_oWork( m_IOService ),
 	m_SerialPort( m_IOService ),
 	m_bIsWriting( false ),
@@ -36,6 +37,8 @@ SerialIO::SerialIO( bool bGenerateCRC, bool bIncludeLength, char cTerminating, c
 
 SerialIO::~SerialIO( )
 {
+	Close( );
+
 	// Stop the service (and the thread)
 	m_IOService.stop( );
 

@@ -88,4 +88,6 @@
 	<caster fb="front" parent="base_link" translateX="${caster_front_x_offset}" translateY="0" translateZ="${caster_z_offset}" />
 	<caster fb="back" parent="base_link" translateX="${caster_back_x_offset}" translateY="0" translateZ="${caster_z_offset}" />
 
+	<xacro:include filename="$(find chuck_model)/urdf/chuck.gazebo"/>
+
 </robot>

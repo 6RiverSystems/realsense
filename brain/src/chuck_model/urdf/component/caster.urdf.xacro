@@ -7,7 +7,7 @@
 	
 	    <link name="${fb}_caster_body">
             <visual>
-				<origin xyz="0 0 0" rpy="${M_PI/2} 0  0 " /> 
+				<origin xyz="0 0 0" rpy="0 0 0" /> 
                 <geometry>
                     <box size="${caster_x_size} ${caster_y_size} ${caster_z_size}"/>
                 </geometry>
@@ -15,7 +15,7 @@
             </visual>
     
             <collision>
-				<origin xyz="0 0 0" rpy="${M_PI/2} 0  0 " /> 
+				<origin xyz="0 0 0" rpy="0 0 0" /> 
                 <geometry>
                     <box size="${caster_x_size} ${caster_y_size} ${caster_z_size}"/>
                 </geometry>
@@ -28,7 +28,7 @@
             </inertial>
         </link> 
 
-        <joint name="joint_front_caster_body" type="fixed">
+        <joint name="joint_${fb}_caster_body" type="continuous">
             <parent link="${parent}"/>
             <child link="${fb}_caster_body"/>
 			<origin xyz="${translateX} ${translateY} ${translateZ}" rpy="0 0 0"/> 
@@ -37,12 +37,14 @@
 
         <link name="${fb}_caster_wheel">
             <visual>
+				<origin xyz="0 0 0" rpy="${M_PI/2} 0  0 " /> 
                 <geometry>
                     <cylinder length="${caster_thickness}" radius="${caster_radius}"/>
                 </geometry>
                 <material name="black"/>
             </visual>
             <collision>
+				<origin xyz="0 0 0" rpy="${M_PI/2} 0  0 " /> 
                 <geometry>
                     <cylinder length="${caster_thickness}" radius="${caster_radius}"/>
                 </geometry>
@@ -54,10 +56,12 @@
         </link>
     
         <joint name="${fb}_caster_wheel_joint" type="continuous">
-            <axis xyz="0 0 1"/>
             <parent link="${fb}_caster_body"/>
             <child link="${fb}_caster_wheel"/>
-            <origin rpy="-1.5708 0 0" xyz="${side * 0.05} 0 ${caster_offset}"/>
+			<origin xyz="0 0 0" rpy="0 0 0"/> 
+			<axis xyz="0 1 0" rpy="0 0 0"/>
+			<limit effort="100" velocity="100"/>
+			<joint_properties damping="0.0" friction="0.0"/>
         </joint>
  
 		<gazebo reference="${fb}_caster">

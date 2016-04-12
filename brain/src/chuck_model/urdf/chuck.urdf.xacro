@@ -85,11 +85,11 @@
 	</link>
 
 	<!-- Wheels -->
-	<wheel lr="left" parent="base_link" translateX="0" translateY="${-base_x_size/2}" translateZ="0" />
-	<wheel lr="right" parent="base_link" translateX="0"  translateY="${base_x_size/2}" translateZ="0" />
+	<wheel lr="left" parent="base_link" translateX="0" translateY="${-wheel_y_offset}" translateZ="0" />
+	<wheel lr="right" parent="base_link" translateX="0"  translateY="${wheel_y_offset}" translateZ="0" />
 
 	<!-- Castors -->
-	<castor fb="front" parent="base_link" translateX="1" translateY="0" translateZ="0" />
-	<castor fb="back" parent="base_link" translateX="-1" translateY="0" translateZ="0" />
+	<caster fb="front" parent="base_link" translateX="${caster_front_x_offset}" translateY="0" translateZ="${caster_z_offset}" />
+	<caster fb="back" parent="base_link" translateX="${caster_back_x_offset}" translateY="0" translateZ="${caster_z_offset}" />
 
 </robot>

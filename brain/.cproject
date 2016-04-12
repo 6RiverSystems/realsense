@@ -73,12 +73,12 @@
 					<folderInfo id="com.nvidia.cuda.ide.configuration.release.267076198." name="/" resourcePath="">
 						<toolChain id="com.nvidia.cuda.ide.toolchain.exe.release.1004658698" name="CUDA Toolkit 7.0" superClass="com.nvidia.cuda.ide.toolchain.exe.release">
 							<targetPlatform archList="all" binaryParser="com.nvidia.cuda.ide.elf;com.nvidia.cuda.ide.macho;com.nvidia.cuda.ide.cubin" id="com.nvidia.cuda.ide.targetPlatform.2122459026" isAbstract="false" name="Debug Platform" osList="linux,macosx" superClass="com.nvidia.cuda.ide.targetPlatform"/>
-							<builder buildPath="${workspace_loc:/brain}/Release" id="com.nvidia.cuda.ide.builder.1465921203" managedBuildOn="true" name="CUDA Toolkit 7.0 Builder.Release" superClass="com.nvidia.cuda.ide.builder"/>
+							<builder buildPath="${workspace_loc:/brain}/Release" id="com.nvidia.cuda.ide.builder.1465921203" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CUDA Toolkit 7.0 Builder" superClass="com.nvidia.cuda.ide.builder"/>
 							<tool id="nvcc.compiler.base.1676446636" name="NVCC Compiler" superClass="nvcc.compiler.base">
-								<option id="nvcc.compiler.deviceDebug.473274998" superClass="nvcc.compiler.deviceDebug"/>
-								<option id="nvcc.compiler.option.level.1817335385" superClass="nvcc.compiler.option.level"/>
-								<option defaultValue="nvcc.compiler.optimization.level.most" id="nvcc.compiler.optimization.level.2086376996" superClass="nvcc.compiler.optimization.level" valueType="enumerated"/>
-								<option id="nvcc.compiler.pic.1481792907" superClass="nvcc.compiler.pic"/>
+								<option id="nvcc.compiler.deviceDebug.473274998" name="Generate device debug information (-G)" superClass="nvcc.compiler.deviceDebug"/>
+								<option id="nvcc.compiler.option.level.1817335385" name="Generate host debug information (-g)" superClass="nvcc.compiler.option.level"/>
+								<option defaultValue="nvcc.compiler.optimization.level.most" id="nvcc.compiler.optimization.level.2086376996" name="Optimization Level" superClass="nvcc.compiler.optimization.level" valueType="enumerated"/>
+								<option id="nvcc.compiler.pic.1481792907" name="Position Independent Code (-fPIC)" superClass="nvcc.compiler.pic"/>
 								<inputType id="nvcc.compiler.input.cu.258027478" superClass="nvcc.compiler.input.cu"/>
 								<inputType id="nvcc.compiler.input.cpp.1026682643" superClass="nvcc.compiler.input.cpp"/>
 								<inputType id="nvcc.compiler.input.c.139394991" superClass="nvcc.compiler.input.c"/>
@@ -122,26 +122,6 @@
 		</scannerConfigBuildInfo>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
-		<buildTargets>
-			<target name="catkin_make brain_stem" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
-				<buildCommand>catkin_make</buildCommand>
-				<buildArguments>brain_stem -DCMAKE_BUILD_TYPE=Debug</buildArguments>
-				<buildTarget/>
-				<stopOnError>true</stopOnError>
-				<useDefaultCommand>false</useDefaultCommand>
-				<runAllBuilders>true</runAllBuilders>
-			</target>
-			<target name="catkin_make run_tests_brain_stem" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
-				<buildCommand>catkin_make</buildCommand>
-				<buildArguments>run_tests_brain_stem -DCMAKE_BUILD_TYPE=Debug</buildArguments>
-				<buildTarget/>
-				<stopOnError>true</stopOnError>
-				<useDefaultCommand>false</useDefaultCommand>
-				<runAllBuilders>true</runAllBuilders>
-			</target>
-		</buildTargets>
-	</storageModule>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Release">
 			<resource resourceType="PROJECT" workspacePath="/brain"/>
@@ -149,5 +129,31 @@
 		<configuration configurationName="Debug">
 			<resource resourceType="PROJECT" workspacePath="/brain"/>
 		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+		<buildTargets>
+			<target name="catkin_make brain_stem" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>brain_stem -DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="catkin_make run_tests_brain_stem" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>run_tests_brain_stem -DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="build all" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>-DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildTarget/>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+		</buildTargets>
 	</storageModule>
 </cproject>

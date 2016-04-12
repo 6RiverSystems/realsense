@@ -1,0 +1,10 @@
+<launch>
+	<!-- Parsing xacro and setting robot_description parameter -->
+	<param name="robot_description" command="$(find xacro)/xacro.py $(find chuck_model)/urdf/chuck.urdf.xacro" />
+	
+	<!-- Launch map server -->
+	<node name="map_server" pkg="map_server" type="map_server" args=" $(find rhq_map)/maps/rhq.yaml" />
+	
+	<!-- Launch visualization in rviz -->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find chuck_model)/urdf.rviz" required="true" />
+</launch>

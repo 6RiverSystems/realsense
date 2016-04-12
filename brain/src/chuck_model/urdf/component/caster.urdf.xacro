@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<robot name="caster" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:include filename="$(find chuck_model)/urdf/common/inertia.xacro"/>
+
+	<xacro:macro name="caster" params="fb parent side">
+	
+	    <link name="${fb}_caster_body">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${caster_x_size} ${caster_y_size} ${caster_z_size}"/>
+                </geometry>
+                <material name="DarkGray"/>
+            </visual>
+    
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0 " />
+                <geometry>
+                    <box size="${caster_x_size} ${caster_y_size} ${caster_z_size}"/>
+                </geometry>
+            </collision>     
+    
+            <inertial>
+                <mass value="1" />
+                <origin xyz="0 0 0" />
+                <box_inertia m="1" x="${caster_x_size}" y="${caster_y_size}" z="${caster_z_size}"/> 
+            </inertial>
+        </link> 
+
+        <joint name="joint_front_caster_body" type="fixed">
+            <parent link="${parent}"/>
+            <child link="${fb}_caster_body"/>
+            <origin xyz="${side * (base_x_size / 2 + 0.05)} 0 0" rpy="0 0 0"/>
+            <axis xyz="0 1 0" rpy="0 0 0" />
+        </joint>
+
+        <link name="${fb}_caster_wheel">
+            <visual>
+                <geometry>
+                    <cylinder length="${caster_thickness}" radius="${caster_radius}"/>
+                </geometry>
+                <material name="black"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <cylinder length="${caster_thickness}" radius="${caster_radius}"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="1"/>
+                <cylinder_inertia m="${caster_mass}" r="${caster_radius}" h="${caster_thickness}"/>
+            </inertial>
+        </link>
+    
+        <joint name="${fb}_caster_wheel_joint" type="continuous">
+            <axis xyz="0 0 1"/>
+            <parent link="${fb}_caster_body"/>
+            <child link="${fb}_caster_wheel"/>
+            <origin rpy="-1.5708 0 0" xyz="${side * 0.05} 0 ${caster_offset}"/>
+        </joint>
+ 
+		<gazebo reference="${fb}_caster">
+			<mu1 value="1.0"/>
+			<mu2 value="1.0"/>
+			<kp  value="10000000.0"/>
+			<kd  value="1.0"/>
+			<fdir1 value="1 0 0"/>
+			<material>Gazebo/Grey</material>
+			<turnGravityOff>false</turnGravityOff>
+		</gazebo>
+
+	</xacro:macro>
+</robot>

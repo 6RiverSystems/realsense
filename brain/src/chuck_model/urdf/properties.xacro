@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<robot name="chuck" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<!-- All units in m-kg-s-radians unit system -->
+
+	<xacro:property name="M_PI" value="3.1415926535897931"/>
+
+	<!-- Chassis -->
+	<xacro:property name="base_x_size" value="0.787"/> 
+	<xacro:property name="base_y_size" value="0.647"/> 
+	<xacro:property name="base_z_size" value="0.266"/>
+	<xacro:property name="base_offset" value="0.070"/>
+	<xacro:property name="base_mass" value="90."/>
+
+	<!-- Tray support -->
+	<xacro:property name="support_x_size" value="0.050"/>
+	<xacro:property name="support_y_size" value="0.050"/>
+	<xacro:property name="support_z_size" value="0.600"/>
+	<xacro:property name="support_distance" value="0.254"/>
+	
+	<xacro:property name="tray_x_size" value="0.863"/>
+	<xacro:property name="tray_y_size" value="0.635"/>
+	<xacro:property name="tray_z_size" value="0.038"/>
+
+	<xacro:property name="screen_x_size" value="0.020"/>
+	<xacro:property name="screen_y_size" value="0.300"/>
+	<xacro:property name="screen_z_size" value="0.200"/>
+	<xacro:property name="screen_inclination" value="0.200"/>	
+	<xacro:property name="screen_mass" value="0.500"/>
+
+	<xacro:property name="body_zero" value="0"/>
+	<xacro:property name="support_zero" value="${body_zero + base_z_size / 2 + support_z_size / 2}"/>
+	<xacro:property name="tray_zero" value="${support_zero + support_z_size / 2 + tray_z_size / 2}"/>
+
+	<!-- Wheels -->
+	<xacro:property name="wheel_radius" value="0.100"/> 
+	<xacro:property name="wheel_thickness" value="0.050"/>
+	<xacro:property name="wheel_mass" value="2.5"/>
+
+	<xacro:property name="caster_radius" value="0.050"/>
+	<xacro:property name="caster_thickness" value="0.025"/>
+	<xacro:property name="caster_mass" value="3.0"/>
+
+	<xacro:property name="caster_x_size" value="0.1"/>
+	<xacro:property name="caster_y_size" value="0.1"/>
+	<xacro:property name="caster_z_size" value="0.2"/>
+	<xacro:property name="caster_offset" value="-0.111"/>
+</robot>

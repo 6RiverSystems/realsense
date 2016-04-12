@@ -12,7 +12,7 @@
 	<xacro:property name="base_y_size" value="0.619125"/> 
 	<xacro:property name="base_z_size" value="0.3010916"/>
 	<xacro:property name="base_offset" value="0.070"/>
-	<xacro:property name="base_mass" value="4.53592"/>
+	<xacro:property name="base_mass" value="86.1826"/>
 
 	<!-- Tray support -->
 	<xacro:property name="support_x_size" value="0.050"/>
@@ -35,7 +35,7 @@
 	<xacro:property name="tray_zero" value="${support_zero + support_z_size / 2 + tray_z_size / 2}"/>
 
 	<!-- Wheels -->
-	<xacro:property name="wheel_radius" value="0.2032"/> 
+	<xacro:property name="wheel_radius" value="0.2"/> 
 	<xacro:property name="wheel_thickness" value="0.047625"/>
 	<xacro:property name="wheel_mass" value="2.118276"/>
 	<xacro:property name="wheel_y_offset" value="0.2661285"/>
@@ -43,7 +43,7 @@
  
 	<xacro:property name="caster_radius" value="0.100"/>
 	<xacro:property name="caster_thickness" value="0.025"/>
-	<xacro:property name="caster_mass" value="3.0"/>
+	<xacro:property name="caster_mass" value="1.0"/>
 
 	<xacro:property name="caster_x_size" value="0.1"/>
 	<xacro:property name="caster_y_size" value="0.1"/>
@@ -51,6 +51,6 @@
 	
 	<xacro:property name="caster_front_x_offset" value="0.2885948"/>
 	<xacro:property name="caster_back_x_offset" value="-0.3564382"/>
-	<xacro:property name="caster_z_offset" value="${caster_y_size - wheel_radius}"/>
+	<xacro:property name="caster_z_offset" value="${wheel_z_offset - (wheel_radius - caster_radius) + 0.0001 }"/>
 	
 </robot>

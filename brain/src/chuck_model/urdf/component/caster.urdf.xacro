@@ -33,7 +33,7 @@
 		<joint name="caster_${fb}_joint" type="fixed">
 			<parent link="${parent}"/>
 			<child link="${fb}_caster"/>
-			<origin xyz="${translateX} ${translateY} ${translateZ}" rpy="${-M_PI/2} 0 0"/>
+			<origin xyz="${translateX} ${translateY} ${translateZ}" rpy="0 0 0"/>
 		</joint>
 	
 		<gazebo reference="caster_${fb}_link">

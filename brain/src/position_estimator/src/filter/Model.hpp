@@ -11,6 +11,8 @@
 #include <platform/Object.hpp>
 #include <platform/Ocv2Base.hpp>
 
+#include <framework/Utils.hpp>
+
 namespace srs {
 
 template<unsigned int STATE_SIZE, int TYPE = CV_64F>

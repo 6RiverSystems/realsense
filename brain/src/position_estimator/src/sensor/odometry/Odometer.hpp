@@ -23,7 +23,7 @@ class Odometer :
 public:
     typedef typename Sensor<STATE_SIZE, TYPE>::BaseType BaseType;
 
-    Odometer(unsigned int wheelsDistance) :
+    Odometer(BaseType wheelsDistance) :
         Sensor<STATE_SIZE, TYPE>(cv::Mat::diag(R)),
         wheelsRatio_(BaseType(0.5) / BaseType(wheelsDistance)),
         currentData_(this, 0, 0, 0)

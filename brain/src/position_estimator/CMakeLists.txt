@@ -28,6 +28,10 @@ set(${PROJECT_NAME}_SOURCES
     src/Robot.hpp
 )
 
+set(${PROJECT_NAME}_TEST_SOURCES
+    test/framework/Compare.hpp
+)
+
 project(${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
@@ -43,7 +47,7 @@ find_package(OpenCV REQUIRED)
 find_package(GTest REQUIRED)
 
 catkin_package(
-    INCLUDE_DIRS src
+    INCLUDE_DIRS src test
     LIBRARIES ${PROJECT_NAME}
     CATKIN-DEPENDS std_msgs brain_msgs
     DEPENDS opencv
@@ -51,6 +55,7 @@ catkin_package(
 
 include_directories(include 
     src/
+    test/
     ${catkin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS} 
     ${GTEST_INCLUDE_DIRS}
@@ -66,6 +71,12 @@ target_link_libraries(${PROJECT_NODE} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 # Tests
 
 if (CATKIN_ENABLE_TESTING)
-    catkin_add_gtest(UnscentedKalmanFilterTest test/UnscentedKalmanFilterTest.cpp ${${PROJECT_NAME}_SOURCES})
-    target_link_libraries(UnscentedKalmanFilterTest ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+    catkin_add_gtest(UkfTest
+        test/ukf/UkfTest.cpp
+        test/ukf/UkfTest_Basic.cpp
+        test/ukf/UkfTest_11ConstantSteps.cpp 
+        ${${PROJECT_NAME}_SOURCES}
+        ${${PROJECT_NAME}_TEST_SOURCES}
+    )
+    target_link_libraries(UkfTest ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 endif()

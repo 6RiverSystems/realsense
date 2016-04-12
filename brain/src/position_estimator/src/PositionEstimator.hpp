@@ -35,10 +35,10 @@ public:
     void run();
 
 private:
-    const static unsigned int REFRESH_RATE_HZ;
-    const static unsigned int STATE_VECTOR_SIZE;
-    const static double ALPHA;
-    const static double BETA;
+    constexpr static unsigned int REFRESH_RATE_HZ = 1;
+    constexpr static unsigned int STATE_VECTOR_SIZE = STATIC_STATE_VECTOR_SIZE;
+    constexpr static double ALPHA = 1.0;
+    constexpr static double BETA = 0.0;
 
     Robot<STATIC_STATE_VECTOR_SIZE> robot_;
     vector<const RosSensor*> sensors_;

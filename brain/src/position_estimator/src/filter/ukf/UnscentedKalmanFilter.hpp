@@ -31,11 +31,23 @@ public:
         BaseType dT);
     ~UnscentedKalmanFilter();
 
+    FilterState<TYPE> getState()
+    {
+        return FilterState<TYPE>(state_);
+    }
+
+    cv::Mat getCovariance()
+    {
+        return covariance_;
+    }
+
     void reset(FilterState<TYPE> stateT0, cv::Mat covarianceT0);
     void run(Command<TYPE>* const command,
-        const vector<Measurement<STATE_SIZE, TYPE>> measurements);
+        const vector<Measurement<STATE_SIZE, TYPE>*> measurements);
 
 private:
+    constexpr static BaseType UNDERFLOW_THRESHOLD = BaseType(1.0e-5);
+
     BaseType alpha_;
     BaseType beta_;
     BaseType kappa_;
@@ -51,7 +63,7 @@ private:
     cv::Mat state_;
 
     cv::Mat calculateSigmaPoints(cv::Mat M, cv::Mat P);
-    void checkCovarianceUnderflow(cv::Mat& S);
+    void checkDiagonalUnderflow(cv::Mat& S);
 
     void initializeWeights();
 
@@ -60,7 +72,7 @@ private:
     void unscentedTransform(
         const cv::Mat XX, const cv::Mat Y, const cv::Mat CHI,
         cv::Mat& Ybar, cv::Mat& S, cv::Mat& C);
-    void update(const vector<Measurement<STATE_SIZE, TYPE>> measurements);
+    void update(const vector<Measurement<STATE_SIZE, TYPE>*> measurements);
 };
 
 } // namespace srs

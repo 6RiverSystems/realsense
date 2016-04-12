@@ -14,6 +14,9 @@ using namespace std;
 
 #include <opencv2/opencv.hpp>
 
+#include <filter/Measurement.hpp>
+#include <sensor/odometry/Odometry.hpp>
+
 namespace srs {
 
 struct Utils
@@ -33,10 +36,25 @@ struct Utils
             for (unsigned int c = 0; c < matrix.cols; ++c)
             {
                 TYPE value = matrix.at<TYPE>(r, c);
-                value = abs(value) > threshold ? value : 0;
-                cout << setfill(' ') << setw(PRECISION + 5) << scientific << setprecision(PRECISION - 3) << value;
+                if (abs(value) > threshold)
+                {
+                    cout << setfill(' ') << setw(PRECISION + 5) << scientific <<
+                        setprecision(PRECISION - 3) << value;
+                }
+                else
+                {
+                    cout << setfill(' ') << setw(PRECISION + 5) << "0";
+                }
             }
             cout << endl;
+        }
+    }
+
+    static void print(vector<srs::Odometry<>> v)
+    {
+        for (auto element : v)
+        {
+            cout << element.toString() << endl;
         }
     }
 };

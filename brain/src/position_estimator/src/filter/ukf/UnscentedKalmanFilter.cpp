@@ -45,9 +45,8 @@ void UnscentedKalmanFilter<STATE_SIZE, TYPE>::reset(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, int TYPE>
-void UnscentedKalmanFilter<STATE_SIZE, TYPE>::run(
-    Command<TYPE>* const command,
-    const vector<Measurement<STATE_SIZE, TYPE>> measurements)
+void UnscentedKalmanFilter<STATE_SIZE, TYPE>::run(Command<TYPE>* const command,
+    const vector<Measurement<STATE_SIZE, TYPE>*> measurements)
 {
     predict(command);
     update(measurements);
@@ -66,13 +65,13 @@ cv::Mat UnscentedKalmanFilter<STATE_SIZE, TYPE>::calculateSigmaPoints(cv::Mat M,
     // CHI = [zeros(size(M)) A -A];
     cv::Mat CHI;
     cv::Mat zM = Math::zeros(M);
-
     cv::Mat array[] = {zM, A, -A};
     cv::hconcat(array, 3, CHI);
 
     // CHI = o.c * CHI + repmat(M, 1, size(CHI, 2));
     cv::Mat repeatedM;
     cv::repeat(M, 1, CHI.cols, repeatedM);
+
     cv::scaleAdd(CHI, c_, repeatedM, CHI);
 
     return CHI;
@@ -80,8 +79,9 @@ cv::Mat UnscentedKalmanFilter<STATE_SIZE, TYPE>::calculateSigmaPoints(cv::Mat M,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, int TYPE>
-void UnscentedKalmanFilter<STATE_SIZE, TYPE>::checkCovarianceUnderflow(cv::Mat& S)
+void UnscentedKalmanFilter<STATE_SIZE, TYPE>::checkDiagonalUnderflow(cv::Mat& S)
 {
+    Math::checkDiagonal(S, UNDERFLOW_THRESHOLD, UNDERFLOW_THRESHOLD);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,9 +143,6 @@ void UnscentedKalmanFilter<STATE_SIZE, TYPE>::predict(Command<TYPE>* const comma
 
     // S = S + o.robot.getProfile().Q;
     covariance_ += process_.getNoiseMatrix();
-
-    Utils::print(state_, "state_");
-    Utils::print(covariance_, "covariance_");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -190,21 +187,16 @@ void UnscentedKalmanFilter<STATE_SIZE, TYPE>::unscentedTransform(
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, int TYPE>
 void UnscentedKalmanFilter<STATE_SIZE, TYPE>::update(
-    const vector<Measurement<STATE_SIZE, TYPE>> measurements)
+        const vector<Measurement<STATE_SIZE, TYPE>*> measurements)
 {
     for (auto measurement : measurements)
     {
-        Utils::print(state_, "state");
-        Utils::print(covariance_, "covariance");
-
         // Calculate the sigma points
         //
         // CHI = o.calculateSigmaPoints(XX, P);
         cv::Mat CHI = calculateSigmaPoints(state_, covariance_);
 
-        Utils::print(CHI, "CHI");
-
-        Sensor<STATE_SIZE, TYPE>* sensor = measurement.getSensor();
+        Sensor<STATE_SIZE, TYPE>* sensor = measurement->getSensor();
 
         // Pass the sigma points through h()
         //
@@ -216,11 +208,8 @@ void UnscentedKalmanFilter<STATE_SIZE, TYPE>::update(
         for (unsigned int i = 0; i < CHI.cols; ++i)
         {
             cv::Mat T = sensor->transformWithH(CHI.col(i));
-            Utils::print(T, "T");
             T.copyTo(Y.col(i));
         }
-
-        Utils::print(Y, "Y");
 
         // [Ybar, S, C] = o.utTransform(XX, Y, CHI);
         cv::Mat Ybar = Math::zeros(state_);
@@ -228,31 +217,23 @@ void UnscentedKalmanFilter<STATE_SIZE, TYPE>::update(
         cv::Mat C = Math::zeros(covariance_);
         unscentedTransform(state_, Y, CHI, Ybar, S, C);
 
-        Utils::print(Ybar, "Ybar");
-        Utils::print(S, "S");
-        Utils::print(C, "C");
-
         // S = S + sensor.getR();
         S += sensor->getNoiseMatrix();
 
         // S = o.checkUnderflow(S);
-        checkCovarianceUnderflow(S);
+        checkDiagonalUnderflow(S);
 
         // z = sensor.measurement2state(measurement);
-        cv::Mat z = sensor->transform2State(&measurement);
-
-        Utils::print(z, "z");
-
-        Utils::print(S, "S");
-        Utils::print(C, "C");
+        cv::Mat z = sensor->transform2State(measurement);
 
         // K = C / S;
-        cv::Mat K = C / S;
+        cv::Mat K = C * S.inv();
 
-        Utils::print(S, "K");
+        // XX = XX + K * (z - Ybar);
+        state_ += K * (z - Ybar);
 
-//        // XX = XX + K * (z - Ybar);
-//        // P = P - K * S * K';
+        // P = P - K * S * K';
+        covariance_ -= K * S * K.t();
     }
 }
 

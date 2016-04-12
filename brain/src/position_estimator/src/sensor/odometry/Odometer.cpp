@@ -36,8 +36,10 @@ cv::Mat Odometer<STATE_SIZE, TYPE>::transformWithH(const cv::Mat state)
 template<unsigned int STATE_SIZE, int TYPE>
 cv::Mat Odometer<STATE_SIZE, TYPE>::transform2State(Measurement<STATE_SIZE, TYPE>* const measurement)
 {
-    BaseType left = reinterpret_cast<Odometry<STATE_SIZE, TYPE>*>(measurement)->left;
-    BaseType right = reinterpret_cast<Odometry<STATE_SIZE, TYPE>*>(measurement)->right;
+    Odometry<STATE_SIZE, TYPE>* o = reinterpret_cast<Odometry<STATE_SIZE, TYPE>*>(measurement);
+
+    BaseType left = o->left;
+    BaseType right = o->right;
 
     BaseType v = BaseType(0.5) * (left + right);
     BaseType omega = wheelsRatio_ * (right - left);

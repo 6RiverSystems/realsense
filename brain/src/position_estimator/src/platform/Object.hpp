@@ -17,13 +17,13 @@ public:
     Object()
     {}
 
-    ~Object()
+    virtual ~Object()
     {}
 
-    string toString()
+    virtual string toString()
     {
         char buffer[10];
-        sprintf(buffer, "%p", this);
+        sprintf(buffer, "Object %p", this);
 
         return string(buffer);
     }

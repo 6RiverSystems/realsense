@@ -6,6 +6,10 @@
 #ifndef ODOMETRY_HPP_
 #define ODOMETRY_HPP_
 
+#include <string>
+#include <sstream>
+using namespace std;
+
 #include <opencv2/opencv.hpp>
 
 #include <filter/Measurement.hpp>
@@ -27,6 +31,20 @@ struct Odometry :
             left(left),
             right(right)
     {}
+
+    virtual ~Odometry()
+    {}
+
+    string toString()
+    {
+        ostringstream output;
+        output << "Odometry ";
+        output << "arrivalTime: " << arrivalTime << endl;
+        output << "left: " << left << endl;
+        output << "right: " << right << endl;
+
+        return output.str();
+    }
 };
 
 } // namespace srs

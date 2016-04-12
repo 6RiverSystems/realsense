@@ -7,6 +7,8 @@
 #define MATH_HPP_
 
 #include <cmath>
+#include <limits>
+using namespace std;
 
 #include <opencv2/opencv.hpp>
 
@@ -20,18 +22,80 @@ struct Math
     static cv::Mat cholesky(const cv::Mat A)
     {
         cv::Mat R = A.clone();
-        if (Cholesky(R.ptr<TYPE>(), R.step, R.cols, 0, 0, 0))
+        int n = R.cols;
+        for (int i = 0; i < n; ++i)
         {
-            cv::Mat diagonal = R.diag();
-            for (unsigned int e = 0; e < diagonal.rows; ++e)
+            for (int j = i; j < n; ++j)
             {
-                TYPE element = diagonal.at<TYPE>(e);
-                R.row(e) *= element;
-                R.at<TYPE>(e, e) = TYPE(1.0) / element;
+                TYPE sum = R.at<TYPE>(i, j);
+                for (int k = i - 1; k >= 0; --k)
+                {
+                    sum -= R.at<TYPE>(i, k) * R.at<TYPE>(j, k);
+                }
+                if (i == j)
+                {
+                    R.at<TYPE>(i, i) = sqrt(sum);
+                }
+                else
+                {
+                    R.at<TYPE>(j, i) = sum / R.at<TYPE>(i, i);
+                }
+            }
+        }
+        for (int i = 0; i < n; ++i)
+        {
+            for (int j = 0; j < i; ++j)
+            {
+                R.at<TYPE>(j, i) = TYPE();
             }
         }
 
         return R;
+    }
+
+    template<typename TYPE = double>
+    static void checkDiagonal(cv::Mat& A,
+        const TYPE minValue = numeric_limits<TYPE>::min(),
+        const TYPE minReplacement = numeric_limits<TYPE>::min(),
+        const TYPE maxValue = numeric_limits<TYPE>::max(),
+        const TYPE maxReplacement = numeric_limits<TYPE>::max())
+    {
+        for (unsigned int e = 0; e < A.rows; ++e)
+        {
+            TYPE* element = A.ptr<TYPE>(e, e);
+            if (abs(*element) < minValue)
+            {
+                *element = minReplacement;
+            }
+            else if (abs(*element) > maxValue)
+            {
+                *element = maxReplacement;
+            }
+        }
+    }
+
+    template<typename TYPE = double>
+    static void checkRange(cv::Mat& A,
+        const TYPE minValue = numeric_limits<TYPE>::min(),
+        const TYPE minReplacement = numeric_limits<TYPE>::min(),
+        const TYPE maxValue = numeric_limits<TYPE>::max(),
+        const TYPE maxReplacement = numeric_limits<TYPE>::max())
+    {
+        for (int i = 0; i < A.rows; ++i)
+        {
+            for (int j = 0; j < A.cols; ++j)
+            {
+                TYPE* element = A.ptr<TYPE>(i, j);
+                if (abs(*element) < minValue)
+                {
+                    *element = minReplacement;
+                }
+                else if (abs(*element) > maxValue)
+                {
+                    *element = maxReplacement;
+                }
+            }
+        }
     }
 
     template<typename TYPE = double>

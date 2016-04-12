@@ -10,7 +10,25 @@
 	<xacro:include filename="$(find chuck_model)/urdf/component/caster.urdf.xacro"/>
 
 	<!-- Robot footprint -->
-	<link name="base_footprint"/>
+	<link name="base_footprint">
+	    <inertial>
+	      <mass value="0.0001" />
+	      <origin xyz="0 0 0" />
+	      <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
+	          iyy="0.0001" iyz="0.0" 
+	          izz="0.0001" />
+	    </inertial>
+	    <visual>
+	        <origin xyz="0 0 0" rpy="0 0 0" />
+	        <geometry>
+	            <box size="0.001 0.001 0.001" />
+	        </geometry>
+	    </visual>
+    </link>
+
+	<gazebo reference="base_footprint">
+		<turnGravityOff>false</turnGravityOff>
+	</gazebo>
  
 	<joint name="base_footprint_joint" type="fixed">
 		<origin xyz="0 0 0" rpy="0 0 0"/>
@@ -67,11 +85,11 @@
 	</link>
 
 	<!-- Wheels -->
-	<wheel lr="left" parent="base_link" side="1"/>
-	<wheel lr="right" parent="base_link" side="-1"/>
+	<wheel lr="left" parent="base_link" translateX="0" translateY="${-base_x_size/2}" translateZ="0" />
+	<wheel lr="right" parent="base_link" translateX="0"  translateY="${base_x_size/2}" translateZ="0" />
 
 	<!-- Castors -->
-	<castor fb="front" parent="base_link" side="-1"/>
-	<castor fb="back" parent="base_link" side="-1"/>
+	<castor fb="front" parent="base_link" translateX="1" translateY="0" translateZ="0" />
+	<castor fb="back" parent="base_link" translateX="-1" translateY="0" translateZ="0" />
 
 </robot>

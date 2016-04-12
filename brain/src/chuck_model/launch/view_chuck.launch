@@ -5,6 +5,10 @@
 	<!-- Launch map server -->
 	<node name="map_server" pkg="map_server" type="map_server" args=" $(find rhq_map)/maps/rhq.yaml" />
 	
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node>
+	
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+	
 	<!-- Launch visualization in rviz -->
 	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find chuck_model)/urdf.rviz" required="true" />
 </launch>

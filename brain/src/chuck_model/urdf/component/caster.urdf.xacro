@@ -3,11 +3,11 @@
 
 	<xacro:include filename="$(find chuck_model)/urdf/common/inertia.xacro"/>
 
-	<xacro:macro name="caster" params="fb parent side">
+	<xacro:macro name="caster" params="fb parent translateX translateY translateZ">
 	
 	    <link name="${fb}_caster_body">
             <visual>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
+				<origin xyz="0 0 0" rpy="${M_PI/2} 0  0 " /> 
                 <geometry>
                     <box size="${caster_x_size} ${caster_y_size} ${caster_z_size}"/>
                 </geometry>
@@ -15,7 +15,7 @@
             </visual>
     
             <collision>
-                <origin xyz="0 0 0" rpy="0 0 0 " />
+				<origin xyz="0 0 0" rpy="${M_PI/2} 0  0 " /> 
                 <geometry>
                     <box size="${caster_x_size} ${caster_y_size} ${caster_z_size}"/>
                 </geometry>
@@ -31,7 +31,7 @@
         <joint name="joint_front_caster_body" type="fixed">
             <parent link="${parent}"/>
             <child link="${fb}_caster_body"/>
-            <origin xyz="${side * (base_x_size / 2 + 0.05)} 0 0" rpy="0 0 0"/>
+			<origin xyz="${translateX} ${translateY} ${translateZ}" rpy="0 0 0"/> 
             <axis xyz="0 1 0" rpy="0 0 0" />
         </joint>
 

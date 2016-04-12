@@ -1,15 +1,23 @@
 <launch>
 	<!-- Launch map server -->
 	<node name="map_server" pkg="map_server" type="map_server" args=" $(find rhq_map)/maps/rhq.yaml" />
-	
-	<!-- Parsing xacro and setting robot_description parameter -->
-	<param name="robot_description" command="$(find xacro)/xacro.py $(find chuck_model)/urdf/chuck.urdf.xacro" />
-	
+
+  	<!-- start up world -->
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+    	<arg name="world_name" value="$(find chuck_model)/worlds/rhq.world"/>
+	</include>
+  
+  	<arg name="model" default="$(find chuck_model)/urdf/chuck.urdf.xacro" />
+  	<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+  
 	<node pkg="tf" type="static_transform_publisher" name="map_to_chuck" args="0.0 0.0 0.0 0 0 0.0 /map /base_footprint 100"/>
 
 	<!-- Joint and robot state publishers -->
 	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node>
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+	<!-- Spawn a robot into Gazebo -->
+	<node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model chuck" />
 
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 		<rosparam file="$(find chuck_model)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
@@ -18,7 +26,4 @@
 		<rosparam file="$(find chuck_model)/config/global_costmap_params.yaml" command="load" />
 		<rosparam file="$(find chuck_model)/config/base_local_planner_params.yaml" command="load" />
 	</node>
-	
-	<!-- Launch visualization in rviz -->
-	<node name="rviz" pkg="rviz" type="rviz"  />
 </launch>

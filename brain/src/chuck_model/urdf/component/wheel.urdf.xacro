@@ -34,14 +34,15 @@
 			<axis xyz="0 1 0" rpy="0 0 0"/>
 			<limit effort="100" velocity="100"/>
 			<joint_properties damping="0.0" friction="0.0"/>
+			<hardwareInterface>EffortJointInterface</hardwareInterface>
 		</joint>
 
 		<transmission name="${lr}_wheel_joint_trans">
 			<type>transmission_interface/SimpleTransmission</type>
 			<joint name="${lr}_wheel_joint"/>
 			<actuator name="${lr}_wheel_joint_motor">
-			<hardwareInterface>EffortJointInterface</hardwareInterface>
-			<mechanicalReduction>1</mechanicalReduction>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
 			</actuator>
 		</transmission>
 

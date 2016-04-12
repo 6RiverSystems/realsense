@@ -20,5 +20,5 @@
 	</node>
 	
 	<!-- Launch visualization in rviz -->
-	<node name="rviz" pkg="rviz" type="rviz"  />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find chuck_model)/urdf.rviz" required="true" />
 </launch>

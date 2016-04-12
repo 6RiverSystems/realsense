@@ -25,10 +25,6 @@
 	        </geometry>
 	    </visual>
     </link>
-
-	<gazebo reference="base_footprint">
-		<turnGravityOff>false</turnGravityOff>
-	</gazebo>
  
 	<joint name="base_footprint_joint" type="fixed">
 		<origin xyz="0 0 0" rpy="0 0 0"/>

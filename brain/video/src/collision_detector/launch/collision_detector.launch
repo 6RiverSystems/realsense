@@ -1,3 +1,0 @@
-<launch>
-    <node name="collision_detector" pkg="collision_detector" type="collision_detector" output="screen"/>
-</launch>

@@ -16,6 +16,7 @@
 #include <ros/ros.h>
 #include <ros/console.h>
 #include <std_msgs/String.h>
+#include <brain_msgs/RawOdometry.h>
 
 namespace srs {
 
@@ -166,8 +167,11 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 			ss << "O " << pOdometry->left_encoder << "," << pOdometry->right_encoder << " @ " << fractional_seconds_since_epoch;
 			msg.data = ss.str();
 
-//			ROS_DEBUG_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
+//			ROS_DEBUG_NAMED( "Brainstem", "%d, %d", pOdometry->left_encoder, pOdometry->right_encoder );
 
+			brain_msgs::RawOdometry odometry;
+			odometry.left = pOdometry->left_encoder;
+			odometry.right = pOdometry->right_encoder;
 			m_llEventPublisher.publish( msg );
 		}
 		break;

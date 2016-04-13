@@ -3,7 +3,7 @@ project(brain_stem)
 
 find_package(
 	catkin
-	REQUIRED COMPONENTS roscpp rospy std_msgs
+	REQUIRED COMPONENTS roscpp rospy std_msgs brain_msgs
 )
 
 find_package(
@@ -100,8 +100,8 @@ catkin_package(
 #  LIBRARIES brain_stem
 #  CATKIN_DEPENDS other_catkin_pkg
 	DEPENDS system_lib
+    CATKIN-DEPENDS brain_msgs
 )
-
 
 ###########
 ## Build ##

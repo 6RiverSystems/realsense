@@ -7,7 +7,6 @@ project(chuck_model)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
-  tf
   urdf
   xacro
 )
@@ -24,7 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES chuck_model
-#  CATKIN_DEPENDS geometry_msgs roscpp tf urdf xacro
+#  CATKIN_DEPENDS geometry_msgs roscpp urdf xacro
 #  DEPENDS system_lib
 )
 

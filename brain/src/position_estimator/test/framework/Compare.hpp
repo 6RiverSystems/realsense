@@ -14,10 +14,17 @@ namespace test {
 struct Compare
 {
     template<typename TYPE = double>
-    static bool similar(cv::Mat source, cv::Mat expected, TYPE percentage)
+    static bool similar(cv::Mat source, cv::Mat expected, TYPE threshold)
     {
-        if (source.rows != expected.rows || source.cols != expected.cols)
+        if (source.rows != expected.rows)
         {
+            ADD_FAILURE() << "The matrices have a different row count.";
+            return false;
+        }
+
+        if (source.cols != expected.cols)
+        {
+            ADD_FAILURE() << "The matrices have a different column count.";
             return false;
         }
 
@@ -25,9 +32,18 @@ struct Compare
         {
             for (int j = 0; j < source.cols; ++j)
             {
+                if (abs(source.at<TYPE>(i, j) - expected.at<TYPE>(i, j)) > threshold)
+                {
+                    ADD_FAILURE() << "Element (" << i << ", " << j << ") = " <<
+                        source.at<TYPE>(i, j) <<
+                        " is not as expected (" << expected.at<TYPE>(i, j) << ") " <<
+                        " Threshold = " << threshold;
+                    return false;
+                }
             }
         }
-        return false;
+
+        return true;
     }
 };
 

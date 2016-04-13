@@ -78,7 +78,8 @@ TEST(UnscentedKalmanFilter, Run11ConstantSteps)
         vector<Measurement<>*>() = {&ODOMETRY_0}
     };
 
-    vector<cv::Mat> correctCovariance = {
+    vector<cv::Mat> correctCovariances = {
+        COV_STEP_00,
         COV_STEP_01,
         COV_STEP_02,
         COV_STEP_03,
@@ -88,8 +89,21 @@ TEST(UnscentedKalmanFilter, Run11ConstantSteps)
         COV_STEP_07,
         COV_STEP_08,
         COV_STEP_09,
-        COV_STEP_10,
-        COV_STEP_11
+        COV_STEP_10
+    };
+
+    vector<cv::Mat> correctStates = {
+        STATE_STEP_00,
+        STATE_STEP_01,
+        STATE_STEP_02,
+        STATE_STEP_03,
+        STATE_STEP_04,
+        STATE_STEP_05,
+        STATE_STEP_06,
+        STATE_STEP_07,
+        STATE_STEP_08,
+        STATE_STEP_09,
+        STATE_STEP_10
     };
 
     // Prepare the initial state
@@ -107,8 +121,9 @@ TEST(UnscentedKalmanFilter, Run11ConstantSteps)
     {
         ukf.run(commands.at(t), measurements.at(t));
 
-        cv::Mat covariance = ukf.getCovariance();
-        ASSERT_TRUE(test::Compare::similar<>(covariance, correctCovariance.at(t), 0.1)) <<
-            "Covariance at time-step " << t << " is not as expected.";
+        ASSERT_TRUE(test::Compare::similar<>(ukf.getCovariance(), correctCovariances[t], 2e-2)) <<
+            " Covariance matrix at time-step " << t;
+        ASSERT_TRUE(test::Compare::similar<>(ukf.getState().vector, correctStates[t], 1e-1)) <<
+            " State vector at time-step " << t;
     }
 }

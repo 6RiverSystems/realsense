@@ -54,6 +54,7 @@ enum class BRAIN_STEM_CMD
 	SLINGSHOT_RIGHT = '6',
 	SLINGSHOT_LEFT = '5',
 	SUSPEND_UPDATE_STATE = '4',
+	SET_VELOCITY = 'v',
 	UNKNOWN
 };
 
@@ -145,11 +146,18 @@ struct PID_PARAMETERS_DATA
 	float proj_time;
 };
 
+struct VELOCITY_DATA
+{
+	uint8_t		cmd;
+	float		linear_velocity;
+	float		angular_velocity;
+};
+
 struct ODOMETRY_DATA
 {
 	uint8_t		cmd;
-	float		left_encoder;
-	float		right_encoder;
+	float		linear_velocity;
+	float		angular_velocity;
 };
 
 struct PID_DATA

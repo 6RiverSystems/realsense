@@ -8,6 +8,7 @@
 #include <vector>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <geometry_msgs/Twist.h>
 #include "Messages.h"
 
 #ifndef MESSAGEPROCESSOR_H_
@@ -37,6 +38,8 @@ private:
 
 	ros::Subscriber					m_llcmdSubscriber;
 
+	ros::Subscriber					m_VelocitySubscriber;
+
 	ros::Publisher					m_llEventPublisher;
 
 	ros::Publisher					m_OdometryRawPublisher;
@@ -56,6 +59,8 @@ public:
 	virtual ~MessageProcessor( );
 
 	void ProcessMessage( std::vector<char> buffer );
+
+	void OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity );
 
 	void OnRosCallback( const std_msgs::String::ConstPtr& msg );
 

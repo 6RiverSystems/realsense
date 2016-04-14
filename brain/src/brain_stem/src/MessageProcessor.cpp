@@ -16,7 +16,8 @@
 #include <ros/ros.h>
 #include <ros/console.h>
 #include <std_msgs/String.h>
-#include <brain_msgs/RawOdometry.h>
+#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/TwistStamped.h>
 
 namespace srs {
 
@@ -36,10 +37,12 @@ MessageProcessor::MessageProcessor( ros::NodeHandle& node, IO* pIO ) :
 	m_bControllerFault( false ),
 	m_node( node ),
 	m_pIO( pIO ),
+	m_VelocitySubscriber( node.subscribe<geometry_msgs::Twist>( "/cmd_vel", 100,
+		std::bind( &MessageProcessor::OnChangeVelocity, this, std::placeholders::_1 ) ) ),
+	m_OdometryRawPublisher( node.advertise<geometry_msgs::TwistStamped>( "/sensors/odometry/raw", 1000 ) ),
 	m_llcmdSubscriber( node.subscribe<std_msgs::String>( "/cmd_ll", 1000,
-		std::bind( &MessageProcessor::OnRosCallback, this, std::placeholders::_1 ) ) ),
-	m_llEventPublisher( node.advertise<std_msgs::String>( "/ll_event", 50 ) ),
-	m_OdometryRawPublisher( node.advertise<brain_msgs::RawOdometry>( "/sensors/odometry/raw", 1000 ) )
+			std::bind( &MessageProcessor::OnRosCallback, this, std::placeholders::_1 ) ) ),
+	m_llEventPublisher( node.advertise<std_msgs::String>( "/ll_event", 50 ) )
 {
 	m_mapEntityButton[ENTITIES::TOTE0]		= "TOTE0";
 	m_mapEntityButton[ENTITIES::TOTE1]		= "TOTE1";
@@ -158,11 +161,12 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 		{
 			ODOMETRY_DATA* pOdometry = reinterpret_cast<ODOMETRY_DATA*>( buffer.data( ) + 1 );
 
-//			ROS_DEBUG_NAMED( "Brainstem", "%d, %d", pOdometry->left_encoder, pOdometry->right_encoder );
+			ROS_DEBUG_NAMED( "Brainstem", "%f, %f", pOdometry->linear_velocity, pOdometry->angular_velocity );
 
-			brain_msgs::RawOdometry odometry;
-			odometry.left = pOdometry->left_encoder;
-			odometry.right = pOdometry->right_encoder;
+			geometry_msgs::TwistStamped odometry;
+			odometry.header.stamp = ros::Time::now( );
+			odometry.twist.linear.x = pOdometry->linear_velocity;
+			odometry.twist.angular.z = pOdometry->angular_velocity;
 			m_OdometryRawPublisher.publish( odometry );
 		}
 		break;
@@ -185,6 +189,18 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 		}
 		break;
 	}
+}
+
+void MessageProcessor::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity )
+{
+	VELOCITY_DATA msg = {
+		static_cast<uint8_t>( BRAIN_STEM_CMD::DISTANCE ),
+		static_cast<float>( velocity->linear.x ),
+		static_cast<float>( velocity->angular.z )
+	};
+
+	// Send the velocity down to the motors
+	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 
 //////////////////////////////////////////////////////////////////////////

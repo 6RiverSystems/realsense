@@ -158,21 +158,12 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 		{
 			ODOMETRY_DATA* pOdometry = reinterpret_cast<ODOMETRY_DATA*>( buffer.data( ) + 1 );
 
-			std_msgs::String msg;
-
-            double fractional_seconds_since_epoch = std::chrono::duration_cast<std::chrono::duration<double>>(
-            	std::chrono::system_clock::now( ).time_since_epoch( ) ).count( );
-
-			std::stringstream ss;
-			ss << "O " << pOdometry->left_encoder << "," << pOdometry->right_encoder << " @ " << fractional_seconds_since_epoch;
-			msg.data = ss.str();
-
 //			ROS_DEBUG_NAMED( "Brainstem", "%d, %d", pOdometry->left_encoder, pOdometry->right_encoder );
 
 			brain_msgs::RawOdometry odometry;
 			odometry.left = pOdometry->left_encoder;
 			odometry.right = pOdometry->right_encoder;
-			m_llEventPublisher.publish( msg );
+			m_llEventPublisher.publish( odometry );
 		}
 		break;
 

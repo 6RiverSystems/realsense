@@ -123,6 +123,7 @@ add_executable(brain_stem
 	src/BrainStem.cpp
 	src/SerialIO.cpp
 	src/MessageProcessor.cpp
+	src/Helper.cpp
 )
 
 ## Add cmake target dependencies of the executable

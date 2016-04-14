@@ -70,8 +70,6 @@ private:
 
 	void OnUI( std::vector<std::string> vecParams );
 
-	void OnMove( std::vector<std::string> vecParams );
-
 	void OnStartup( std::vector<std::string> vecParams );
 
 	void OnDistance( std::vector<std::string> vecParams );
@@ -91,8 +89,6 @@ private:
 	void OnSetPid( std::vector<std::string> vecParams );
 
 // Helper Methods
-
-	std::string ToHex( const std::vector<char>& data ) const;
 
 	void WriteToSerialPort( char* pszData, std::size_t dwSize );
 

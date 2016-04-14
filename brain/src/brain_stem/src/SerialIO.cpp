@@ -6,6 +6,7 @@
  */
 
 #include "SerialIO.h"
+#include "Helper.h"
 #include <thread>
 #include <ros/ros.h>
 
@@ -168,9 +169,9 @@ void SerialIO::StartAsyncRead( )
 
 void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::size_t size )
 {
-//	ROS_DEBUG_STREAM( "Wrote String: " << std::string( m_writeData.begin( ), m_writeData.begin( ) + size ) );
-
 	std::vector<char>( m_writeData.begin( ) + size, m_writeData.end( ) ).swap( m_writeData );
+
+	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write: " << ToHex( m_writeData ) );
 
 	if( m_writeData.begin( ) != m_writeData.end( ) )
 	{
@@ -187,10 +188,14 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 {
 	if( !error )
 	{
-//		ROS_DEBUG_STREAM( "Read String: " << std::string( m_ReadBuffer.begin( ), m_ReadBuffer.begin( ) + size ) );
-
         // Combine buffers
-        m_readData.insert( m_readData.end( ), m_ReadBuffer.begin( ), m_ReadBuffer.begin( ) + size );
+		m_readData.insert( m_readData.end( ), m_ReadBuffer.begin( ), m_ReadBuffer.begin( ) + size );
+
+		if( std::find( m_readData.begin( ), m_readData.end( ), m_cTerminating ) == m_readData.end( ) )
+		{
+			// Don't bother parsing
+			return;
+		}
 
         std::vector<char> messageData;
 
@@ -221,6 +226,8 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 			{
 				if( m_readCallback )
 				{
+					ROS_DEBUG_STREAM_NAMED( "SerialIO", "Read Message: " << ToHex( messageData ) );
+
 					m_readCallback( messageData );
 
 					messageData.clear( );
@@ -234,6 +241,10 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 
 		// Remainder of message
 		m_readData = messageData;
+
+		char* pszData = m_readData.data( );
+
+		int i = 0;
 	}
 
 	StartAsyncRead( );

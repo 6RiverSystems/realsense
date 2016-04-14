@@ -7,11 +7,11 @@
 
 #include "MessageProcessor.h"
 #include "Messages.h"
+#include "Helper.h"
 #include "IO.h"
 
 #include <chrono>
 #include <boost/tokenizer.hpp>
-#include <boost/algorithm/hex.hpp>
 
 #include <ros/ros.h>
 #include <ros/console.h>
@@ -19,7 +19,7 @@
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <move_base_msgs/MoveBaseAction.h>
+//#include <move_base_msgs/MoveBaseAction.h>
 
 namespace srs {
 
@@ -64,7 +64,6 @@ MessageProcessor::MessageProcessor( ros::NodeHandle& node, IO* pIO ) :
 
 	m_vecBridgeCallbacks["UI"] = { std::bind( &MessageProcessor::OnUI, this, std::placeholders::_1 ), 2 };
 	m_vecBridgeCallbacks["STARTUP"] = { std::bind( &MessageProcessor::OnStartup, this, std::placeholders::_1 ), 0 };
-	m_vecBridgeCallbacks["MOVE"] = { std::bind( &MessageProcessor::OnMove, this, std::placeholders::_1 ), 1 };
 	m_vecBridgeCallbacks["DISTANCE"] = { std::bind( &MessageProcessor::OnDistance, this, std::placeholders::_1 ), 1 };
 	m_vecBridgeCallbacks["ROTATE"] = { std::bind( &MessageProcessor::OnRotate, this, std::placeholders::_1 ), 1 };
 	m_vecBridgeCallbacks["STOP"] = { std::bind( &MessageProcessor::OnStop, this, std::placeholders::_1 ), 0 };
@@ -86,7 +85,11 @@ MessageProcessor::~MessageProcessor( )
 
 void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 {
-	BRAIN_STEM_MSG eCommand;
+	BRAIN_STEM_MSG eCommand = BRAIN_STEM_MSG::UNKNOWN;
+
+	const char* pszData = buffer.data( );
+
+	int size = buffer.size( );
 
 	if( buffer.size( ) > 0 )
 	{
@@ -154,7 +157,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 		{
 			ODOMETRY_DATA* pOdometry = reinterpret_cast<ODOMETRY_DATA*>( buffer.data( ) );
 
-			ROS_DEBUG_NAMED( "Brainstem", "%f, %f", pOdometry->linear_velocity, pOdometry->angular_velocity );
+			ROS_DEBUG_NAMED( "Brainstem", "Velocity: %f, %f", pOdometry->linear_velocity, pOdometry->angular_velocity );
 
 			geometry_msgs::TwistStamped odometry;
 			odometry.header.stamp.nsec = pOdometry->timestamp * 1000;
@@ -272,30 +275,6 @@ void MessageProcessor::OnStartup( std::vector<std::string> vecParams )
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::STARTUP );
 
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
-}
-
-void MessageProcessor::OnMove( std::vector<std::string> vecParams )
-{
-//	MoveBaseClient ac("move_base", true);
-//
-//	while(!ac.waitForServer(ros::Duration(5.0))){
-//		ROS_INFO("Waiting for the move_base action server");
-//	}
-//
-//	move_base_msgs::MoveBaseGoal goal;
-//
-//	goal.target_pose.header.frame_id = "map";
-//	goal.target_pose.header.stamp = ros::Time::now();
-//
-//	goal.target_pose.pose.position.x = vecParams[0];
-//	goal.target_pose.pose.position.y = vecParams[0];
-//	goal.target_pose.pose.orientation.w = vecParams[0];
-//
-//	ac.sendGoal(goal);
-//
-//	boost::lexical_cast<int16_t>(  );
-//
-//	m_llEventPublisher.publish( msg );
 }
 
 void MessageProcessor::OnDistance( std::vector<std::string> vecParams )
@@ -420,17 +399,6 @@ void MessageProcessor::OnSetPid( std::vector<std::string> vecParams )
 //////////////////////////////////////////////////////////////////////////
 // Helper Methods
 //////////////////////////////////////////////////////////////////////////
-
-
-std::string MessageProcessor::ToHex( const std::vector<char>& data ) const
-{
-   std::ostringstream result;
-   result << std::setw(2) << std::setfill('0') << std::hex << std::showbase << std::uppercase;
-
-   std::copy( data.begin( ), data.end( ), std::ostream_iterator<unsigned int>(result, " "));
-
-   return result.str( );
-}
 
 void MessageProcessor::WriteToSerialPort( char* pszData, std::size_t dwSize )
 {

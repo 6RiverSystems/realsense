@@ -39,7 +39,7 @@ MessageProcessor::MessageProcessor( ros::NodeHandle& node, IO* pIO ) :
 	m_llcmdSubscriber( node.subscribe<std_msgs::String>( "/cmd_ll", 1000,
 		std::bind( &MessageProcessor::OnRosCallback, this, std::placeholders::_1 ) ) ),
 	m_llEventPublisher( node.advertise<std_msgs::String>( "/ll_event", 50 ) ),
-	m_llSensorsPublisher( node.advertise<std_msgs::String>( "/ll_sensors", 1000 ) )
+	m_llSensorsPublisher( node.advertise<brain_msgs::RawOdometry>( "/ll_sensors", 1000 ) )
 {
 	m_mapEntityButton[ENTITIES::TOTE0]		= "TOTE0";
 	m_mapEntityButton[ENTITIES::TOTE1]		= "TOTE1";
@@ -163,7 +163,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 			brain_msgs::RawOdometry odometry;
 			odometry.left = pOdometry->left_encoder;
 			odometry.right = pOdometry->right_encoder;
-			m_llEventPublisher.publish( odometry );
+			m_llSensorsPublisher.publish( odometry );
 		}
 		break;
 

@@ -156,6 +156,7 @@ struct VELOCITY_DATA
 struct ODOMETRY_DATA
 {
 	uint8_t		cmd;
+	uint32_t	timestamp;
 	float		linear_velocity;
 	float		angular_velocity;
 };

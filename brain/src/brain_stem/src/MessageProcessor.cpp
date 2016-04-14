@@ -18,20 +18,12 @@
 #include <std_msgs/String.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <move_base_msgs/MoveBaseAction.h>
 
 namespace srs {
 
 using namespace ros;
-
-std::string tohex( const std::vector<char>& data )
-{
-   std::ostringstream result;
-   result << std::setw(2) << std::setfill('0') << std::hex << std::showbase << std::uppercase;
-
-   std::copy( data.begin( ), data.end( ), std::ostream_iterator<unsigned int>(result, " "));
-
-   return result.str( );
-}
 
 MessageProcessor::MessageProcessor( ros::NodeHandle& node, IO* pIO ) :
 	m_bControllerFault( false ),
@@ -72,6 +64,7 @@ MessageProcessor::MessageProcessor( ros::NodeHandle& node, IO* pIO ) :
 
 	m_vecBridgeCallbacks["UI"] = { std::bind( &MessageProcessor::OnUI, this, std::placeholders::_1 ), 2 };
 	m_vecBridgeCallbacks["STARTUP"] = { std::bind( &MessageProcessor::OnStartup, this, std::placeholders::_1 ), 0 };
+	m_vecBridgeCallbacks["MOVE"] = { std::bind( &MessageProcessor::OnMove, this, std::placeholders::_1 ), 1 };
 	m_vecBridgeCallbacks["DISTANCE"] = { std::bind( &MessageProcessor::OnDistance, this, std::placeholders::_1 ), 1 };
 	m_vecBridgeCallbacks["ROTATE"] = { std::bind( &MessageProcessor::OnRotate, this, std::placeholders::_1 ), 1 };
 	m_vecBridgeCallbacks["STOP"] = { std::bind( &MessageProcessor::OnStop, this, std::placeholders::_1 ), 0 };
@@ -164,21 +157,10 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 			ROS_DEBUG_NAMED( "Brainstem", "%f, %f", pOdometry->linear_velocity, pOdometry->angular_velocity );
 
 			geometry_msgs::TwistStamped odometry;
-			odometry.header.stamp = ros::Time::now( );
+			odometry.header.stamp.nsec = pOdometry->timestamp * 1000;
 			odometry.twist.linear.x = pOdometry->linear_velocity;
 			odometry.twist.angular.z = pOdometry->angular_velocity;
 			m_OdometryRawPublisher.publish( odometry );
-		}
-		break;
-
-		case BRAIN_STEM_MSG::PID:
-		{
-			// TODO: Define real pid messages to help with tuning
-			PID_DATA* pPid = reinterpret_cast<PID_DATA*>( buffer.data( ) + 1 );
-			// pubXEst.publish("X_DESIRED %f" % pidData[1])
-			// pubXEst.publish("X_CURRENT %f" % pidData[1])
-
-//			ROS_ERROR_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
 		}
 		break;
 
@@ -290,6 +272,30 @@ void MessageProcessor::OnStartup( std::vector<std::string> vecParams )
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::STARTUP );
 
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
+}
+
+void MessageProcessor::OnMove( std::vector<std::string> vecParams )
+{
+//	MoveBaseClient ac("move_base", true);
+//
+//	while(!ac.waitForServer(ros::Duration(5.0))){
+//		ROS_INFO("Waiting for the move_base action server");
+//	}
+//
+//	move_base_msgs::MoveBaseGoal goal;
+//
+//	goal.target_pose.header.frame_id = "map";
+//	goal.target_pose.header.stamp = ros::Time::now();
+//
+//	goal.target_pose.pose.position.x = vecParams[0];
+//	goal.target_pose.pose.position.y = vecParams[0];
+//	goal.target_pose.pose.orientation.w = vecParams[0];
+//
+//	ac.sendGoal(goal);
+//
+//	boost::lexical_cast<int16_t>(  );
+//
+//	m_llEventPublisher.publish( msg );
 }
 
 void MessageProcessor::OnDistance( std::vector<std::string> vecParams )
@@ -415,13 +421,24 @@ void MessageProcessor::OnSetPid( std::vector<std::string> vecParams )
 // Helper Methods
 //////////////////////////////////////////////////////////////////////////
 
+
+std::string MessageProcessor::ToHex( const std::vector<char>& data ) const
+{
+   std::ostringstream result;
+   result << std::setw(2) << std::setfill('0') << std::hex << std::showbase << std::uppercase;
+
+   std::copy( data.begin( ), data.end( ), std::ostream_iterator<unsigned int>(result, " "));
+
+   return result.str( );
+}
+
 void MessageProcessor::WriteToSerialPort( char* pszData, std::size_t dwSize )
 {
 	if( !m_bControllerFault )
 	{
 		if( m_pIO->IsOpen( ) )
 		{
-			ROS_DEBUG_NAMED( "BrainStem", "%s", tohex( std::vector<char>( pszData, pszData + dwSize ) ).c_str( ) );
+			ROS_DEBUG_NAMED( "BrainStem", "%s", ToHex( std::vector<char>( pszData, pszData + dwSize ) ).c_str( ) );
 
 			m_pIO->Write( std::vector<char>( pszData, pszData + dwSize ) );
 		}

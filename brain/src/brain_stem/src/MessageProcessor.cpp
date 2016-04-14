@@ -152,7 +152,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 
 		case BRAIN_STEM_MSG::ODOMETRY:
 		{
-			ODOMETRY_DATA* pOdometry = reinterpret_cast<ODOMETRY_DATA*>( buffer.data( ) + 1 );
+			ODOMETRY_DATA* pOdometry = reinterpret_cast<ODOMETRY_DATA*>( buffer.data( ) );
 
 			ROS_DEBUG_NAMED( "Brainstem", "%f, %f", pOdometry->linear_velocity, pOdometry->angular_velocity );
 
@@ -167,7 +167,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 		case BRAIN_STEM_MSG::UNKNOWN:
 		default:
 		{
-			ROS_ERROR_NAMED( "Brainstem", "Unknown MFP command: %d", eCommand );
+			ROS_ERROR_NAMED( "Brainstem", "Unknown command from brainstem: %d", eCommand );
 		}
 		break;
 	}

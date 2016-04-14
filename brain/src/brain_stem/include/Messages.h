@@ -148,8 +148,8 @@ struct PID_PARAMETERS_DATA
 struct ODOMETRY_DATA
 {
 	uint8_t		cmd;
-	uint32_t	left_encoder;
-	uint32_t	right_encoder;
+	float		left_encoder;
+	float		right_encoder;
 };
 
 struct PID_DATA

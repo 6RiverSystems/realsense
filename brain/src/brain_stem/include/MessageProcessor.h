@@ -39,7 +39,7 @@ private:
 
 	ros::Publisher					m_llEventPublisher;
 
-	ros::Publisher					m_llSensorsPublisher;
+	ros::Publisher					m_OdometryRawPublisher;
 
 	std::map<ENTITIES, std::string>	m_mapEntityButton;
 

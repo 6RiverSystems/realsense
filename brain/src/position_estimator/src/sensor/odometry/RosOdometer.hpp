@@ -11,7 +11,7 @@ using namespace std;
 
 #include <ros/ros.h>
 
-#include <brain_msgs/RawOdometry.h>
+#include <geometry_msgs/TwistStamped.h>
 
 #include <framework/RosSensor.hpp>
 #include "Odometer.hpp"
@@ -36,7 +36,7 @@ public:
     }
 
 private:
-    void cbMessageReceived(brain_msgs::RawOdometryConstPtr message);
+    void cbMessageReceived(geometry_msgs::TwistStampedConstPtr message);
 
     ros::Subscriber rosSubscriber_;
     Odometer<>* sensor_;

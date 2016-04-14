@@ -26,9 +26,11 @@ RosOdometer::~RosOdometer()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void RosOdometer::cbMessageReceived(brain_msgs::RawOdometryConstPtr message)
+void RosOdometer::cbMessageReceived(geometry_msgs::TwistStampedConstPtr message)
 {
-    sensor_->push_back(message->header.stamp.nsec, message->left, message->right);
+    sensor_->push_back(message->header.stamp.nsec,
+        static_cast<double>(message->twist.linear.x),
+        static_cast<double>(message->twist.angular.z));
 }
 
 } // namespace srs

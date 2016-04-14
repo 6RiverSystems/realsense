@@ -57,22 +57,22 @@ void UnscentedKalmanFilter<STATE_SIZE, TYPE>::run(Command<TYPE>* const command,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, int TYPE>
-cv::Mat UnscentedKalmanFilter<STATE_SIZE, TYPE>::calculateSigmaPoints(cv::Mat M, cv::Mat P)
+cv::Mat UnscentedKalmanFilter<STATE_SIZE, TYPE>::calculateSigmaPoints(cv::Mat X, cv::Mat P)
 {
     // A = chol(P)';
     cv::Mat A = Math::cholesky(P);
 
-    // CHI = [zeros(size(M)) A -A];
+    // CHI = [zeros(size(X)) A -A];
     cv::Mat CHI;
-    cv::Mat zM = Math::zeros(M);
+    cv::Mat zM = Math::zeros(X);
     cv::Mat array[] = {zM, A, -A};
     cv::hconcat(array, 3, CHI);
 
-    // CHI = o.c * CHI + repmat(M, 1, size(CHI, 2));
-    cv::Mat repeatedM;
-    cv::repeat(M, 1, CHI.cols, repeatedM);
+    // CHI = o.c * CHI + repmat(X, 1, size(CHI, 2));
+    cv::Mat repeatedX;
+    cv::repeat(X, 1, CHI.cols, repeatedX);
 
-    cv::scaleAdd(CHI, c_, repeatedM, CHI);
+    cv::scaleAdd(CHI, c_, repeatedX, CHI);
 
     return CHI;
 }

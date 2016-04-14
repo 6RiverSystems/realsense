@@ -20,12 +20,14 @@ template<unsigned int STATE_SIZE = 5, int TYPE = CV_64F>
 struct Odometry :
     public Measurement<STATE_SIZE, TYPE>
 {
+    typedef typename Measurement<STATE_SIZE, TYPE>::BaseType BaseType;
+
     uint32_t arrivalTime;
-    uint16_t left;
-    uint16_t right;
+    BaseType left;
+    BaseType right;
 
     Odometry(Sensor<STATE_SIZE, TYPE>* sensor,
-        uint32_t arrivalTime, uint16_t left, uint16_t right) :
+        uint32_t arrivalTime, BaseType left, BaseType right) :
             Measurement<STATE_SIZE, TYPE>(sensor),
             arrivalTime(arrivalTime),
             left(left),

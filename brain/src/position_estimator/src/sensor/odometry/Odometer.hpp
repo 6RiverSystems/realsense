@@ -39,7 +39,7 @@ public:
         return currentData_;
     }
 
-    void push_back(uint32_t arrivalTime, uint16_t left, uint16_t right)
+    void push_back(uint32_t arrivalTime, BaseType left, BaseType right)
     {
         currentData_ = Odometry<STATE_SIZE, TYPE>(this, arrivalTime, left, right);
         Sensor<STATE_SIZE, TYPE>::setNewData(true);

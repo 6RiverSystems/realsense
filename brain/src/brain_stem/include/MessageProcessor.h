@@ -44,6 +44,8 @@ private:
 
 	ros::Publisher					m_OdometryRawPublisher;
 
+	ros::Publisher					m_CmdVelPublisher;
+
 	std::map<ENTITIES, std::string>	m_mapEntityButton;
 
 	std::map<std::string, ENTITIES>	m_mapButtonEntity;

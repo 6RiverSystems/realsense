@@ -8,17 +8,8 @@
 	<!-- Launch map server -->
 	<node name="map_server" pkg="map_server" type="map_server" args="$(find rhq_map)/maps/rhq.yaml" />
 
-	<!-- Launch fake localization -->
-	<node name="fake_localization" pkg="fake_localization" type="fake_localization">
-		<param name="odom_frame_id" value="/odom"/>
-		<param name="delta_x" value="0"/>
-		<param name="delta_y" value="0"/>
-		<param name="delta_yaw" value="0"/>	
-		<param name="global_frame_id" value="/map"/>
-		<param name="base_frame_id" value="/base_link"/>
-	</node>
-
-	<node pkg="tf" type="static_transform_publisher" name="map_to_chuck" args="0.0 0.0 1.0 0 0 0.0 /odom /base_link 100"/>
+	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="1.0 1.0 0.0 0 0 0.0 /map /odom 100"/>
+	<node pkg="tf" type="static_transform_publisher" name="odom_to_chuck" args="0.0 0.0 0.0 0 0 0.0 /odom /base_footprint 100"/>
 
 	<!-- Robot description -->
   	<param name="robot_description" command="$(find xacro)/xacro.py $(find chuck_model)/urdf/chuck.urdf.xacro" />
@@ -34,7 +25,4 @@
 		<rosparam file="$(find chuck_model)/config/global_costmap_params.yaml" command="load" />
 		<rosparam file="$(find chuck_model)/config/base_local_planner_params.yaml" command="load" />
 	</node>
-
-	<!-- Launch visualization in rviz -->
-	<node name="rviz" pkg="rviz" type="rviz"  />
 </launch>

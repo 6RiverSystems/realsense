@@ -111,7 +111,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 			}
 			else
 			{
-				ROS_INFO_NAMED( "Brainstem", "%s", strMessage.c_str( ) );
+				ROS_DEBUG_NAMED( "Brainstem", "%s", strMessage.c_str( ) );
 			}
 		}
 		break;
@@ -121,7 +121,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 			std_msgs::String msg;
 			msg.data = "ARRIVED";
 
-			ROS_INFO_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
+			ROS_DEBUG_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
 
 			m_llEventPublisher.publish( msg );
 		}
@@ -143,7 +143,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 				ss << "UI " << iter->second;
 				msg.data = ss.str();
 
-				ROS_INFO_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
+				ROS_DEBUG_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
 
 				m_llEventPublisher.publish( msg );
 			}
@@ -158,7 +158,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 		{
 			ODOMETRY_DATA* pOdometry = reinterpret_cast<ODOMETRY_DATA*>( buffer.data( ) );
 
-//			ROS_INFO_NAMED( "Brainstem", "Velocity: %f, %f", pOdometry->linear_velocity, pOdometry->angular_velocity );
+//			ROS_DEBUG_NAMED( "Brainstem", "Velocity: %f, %f", pOdometry->linear_velocity, pOdometry->angular_velocity );
 
 			geometry_msgs::TwistStamped odometry;
 			odometry.header.stamp.nsec = pOdometry->timestamp * 1000;
@@ -201,7 +201,7 @@ void MessageProcessor::OnRosCallback( const std_msgs::String::ConstPtr& msg )
 {
 	const std::string& strMessage = msg->data;
 
-	ROS_INFO_NAMED( "Brainstem", "Received command: %s", strMessage.c_str( ) );
+	ROS_DEBUG_NAMED( "Brainstem", "Received command: %s", strMessage.c_str( ) );
 
 	std::vector<std::string> vecParsed;
 	boost::tokenizer<> tok( strMessage );
@@ -411,8 +411,6 @@ void MessageProcessor::WriteToSerialPort( char* pszData, std::size_t dwSize )
 	{
 		if( m_pIO->IsOpen( ) )
 		{
-			ROS_INFO_NAMED( "BrainStem", "%s", ToHex( std::vector<char>( pszData, pszData + dwSize ) ).c_str( ) );
-
 			m_pIO->Write( std::vector<char>( pszData, pszData + dwSize ) );
 		}
 		else

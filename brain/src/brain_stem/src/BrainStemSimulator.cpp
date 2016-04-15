@@ -29,8 +29,8 @@ int main(int argc, char** argv) {
 	ros::Rate loop_rate(20);
 
 	// initial position
-	double x = 0.0;
-	double y = 0.0;
+	double x = 1.0;
+	double y = 1.0;
 	double th = 0;
 
 	ros::Time current_time;
@@ -59,6 +59,8 @@ int main(int argc, char** argv) {
 		x += delta_x;
 		y += delta_y;
 		th += delta_th;
+
+		th = fmod(fmod(th, 2.0*M_PI) + 2.0*M_PI, 2.0*M_PI);;
 
 		geometry_msgs::Quaternion odom_quat;
 		odom_quat = tf::createQuaternionMsgFromRollPitchYaw(0,0,th);

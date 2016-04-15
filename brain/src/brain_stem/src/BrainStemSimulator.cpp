@@ -47,11 +47,13 @@ int main(int argc, char** argv) {
 
 	while( ros::ok( ) )
 	{
+		ros::spinOnce( );
+
 		current_time = ros::Time::now();
 
 		double dt = (current_time - last_time).toSec();
-		double delta_x = (vel_x * cos(th) - vel_th * sin(th)) * dt;
-		double delta_y = (vel_x * sin(th) + vel_th * cos(th)) * dt;
+		double delta_x = (vel_x * cos(th)) * dt;
+		double delta_y = (vel_x * sin(th)) * dt;
 		double delta_th = vel_th * dt;
 
 		x += delta_x;
@@ -90,11 +92,19 @@ int main(int argc, char** argv) {
 
 		last_time = current_time;
 
+		if( delta_x ||
+			delta_y ||
+			delta_th )
+		{
+			ROS_ERROR( "Moving chuck by: x=%f, y=%f, angle=%f", delta_x, delta_y, delta_th);
+			ROS_ERROR( "Moving chuck: x=%f, y=%f, angle=%f", x, y, th);
+		}
+
 		// publishing the odometry and the new tf
 		broadcaster.sendTransform(odom_trans);
 		odom_pub.publish(odom);
 
-		loop_rate.sleep();
+		loop_rate.sleep( );
 	}
 	return 0;
 }

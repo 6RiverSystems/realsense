@@ -184,7 +184,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 void MessageProcessor::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity )
 {
 	VELOCITY_DATA msg = {
-		static_cast<uint8_t>( BRAIN_STEM_CMD::DISTANCE ),
+		static_cast<uint8_t>( BRAIN_STEM_CMD::SET_VELOCITY ),
 		static_cast<float>( velocity->linear.x ),
 		static_cast<float>( velocity->angular.z )
 	};

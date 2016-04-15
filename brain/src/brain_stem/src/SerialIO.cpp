@@ -171,7 +171,7 @@ void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::siz
 {
 	std::vector<char>( m_writeData.begin( ) + size, m_writeData.end( ) ).swap( m_writeData );
 
-	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write: " << ToHex( m_writeData ) );
+	ROS_INFO_STREAM_NAMED( "SerialIO", "Write: " << ToHex( m_writeData ) );
 
 	if( m_writeData.begin( ) != m_writeData.end( ) )
 	{
@@ -191,21 +191,28 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
         // Combine buffers
 		m_readData.insert( m_readData.end( ), m_ReadBuffer.begin( ), m_ReadBuffer.begin( ) + size );
 
-		if( std::find( m_readData.begin( ), m_readData.end( ), m_cTerminating ) == m_readData.end( ) )
+		if( std::find( m_readData.begin( ), m_readData.end( ), m_cTerminating ) != m_readData.end( ) )
 		{
-			// Don't bother parsing
-			return;
-		}
+			std::vector<char> messageData;
 
-        std::vector<char> messageData;
+			bool bIsEscaped = false;
 
-        bool bIsEscaped = false;
-
-        for( char c : m_readData )
-        {
-			if( c == m_cEscape )
+			for( char c : m_readData )
 			{
-				if( bIsEscaped )
+				if( c == m_cEscape )
+				{
+					if( bIsEscaped )
+					{
+						messageData.push_back( c );
+
+						bIsEscaped = false;
+					}
+					else
+					{
+						bIsEscaped = true;
+					}
+				}
+				else if( bIsEscaped || c != m_cTerminating )
 				{
 					messageData.push_back( c );
 
@@ -213,38 +220,26 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				}
 				else
 				{
-					bIsEscaped = true;
+					if( m_readCallback )
+					{
+						m_readCallback( messageData );
+
+						messageData.clear( );
+					}
+					else
+					{
+						ROS_ERROR_NAMED( "SerialIO", "Serial port data read but no callback specified!\n" );
+					}
 				}
 			}
-			else if( bIsEscaped || c != m_cTerminating )
-			{
-				messageData.push_back( c );
 
-				bIsEscaped = false;
-			}
-			else
-			{
-				if( m_readCallback )
-				{
-					ROS_DEBUG_STREAM_NAMED( "SerialIO", "Read Message: " << ToHex( messageData ) );
-
-					m_readCallback( messageData );
-
-					messageData.clear( );
-				}
-				else
-				{
-					printf( "Serial port data read but no callback specified!\n" );
-				}
-			}
-        }
-
-		// Remainder of message
-		m_readData = messageData;
-
-		char* pszData = m_readData.data( );
-
-		int i = 0;
+			// Remainder of message
+			m_readData = messageData;
+		}
+	}
+	else
+	{
+		ROS_ERROR_NAMED( "SerialIO", "Read Error: %s\n", error.message( ).c_str( ) );
 	}
 
 	StartAsyncRead( );

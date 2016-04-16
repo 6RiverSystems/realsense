@@ -6,5 +6,4 @@
 	<node name="brain_stem_simulator" pkg="brain_stem" type="brain_stem_simulator" output="screen" respawn="true"/>
 
 	<include file="$(find chuck_model)/launch/chuck.launch"/>
-
 </launch>

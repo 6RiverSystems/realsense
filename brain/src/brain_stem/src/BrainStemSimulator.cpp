@@ -7,14 +7,14 @@
 double vel_x = 0.0f;
 double vel_th = 0.0f;
 
-geometry_msgs::Quaternion odom_quat;
-
 void cmd_velCallback(const geometry_msgs::Twist &twist_aux)
 {
 	vel_x = twist_aux.linear.x;
 	vel_th = twist_aux.angular.z;
 
-	ROS_ERROR( "Velocity changed: linear=%f, angular=%f", vel_x, vel_th );
+	ROS_ERROR( "Velocity changed: linear_x=%f, linear_y=%f, linear_x=%f, angular_x=%f, angular_y=%f, angular_z=%f",
+		twist_aux.linear.x, twist_aux.linear.y, twist_aux.linear.z, twist_aux.angular.x,
+		twist_aux.angular.y, twist_aux.angular.z);
 }
 
 int main(int argc, char** argv) {
@@ -22,8 +22,8 @@ int main(int argc, char** argv) {
 	ros::init(argc, argv, "brain_stem_simulator");
 	ros::NodeHandle n;
 
-	ros::Subscriber cmd_vel_sub = n.subscribe("/cmd_vel", 10, cmd_velCallback);
-	ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("/odom", 10);
+	ros::Subscriber cmd_vel_sub = n.subscribe("/cmd_vel", 1000, cmd_velCallback);
+	ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("/odom", 50);
 
 	tf::TransformBroadcaster broadcaster;
 	ros::Rate loop_rate(20);
@@ -31,14 +31,12 @@ int main(int argc, char** argv) {
 	// initial position
 	double x = 1.0;
 	double y = 1.0;
-	double th = 0;
+	double th = 0.0;
 
 	ros::Time current_time;
 	ros::Time last_time;
 	current_time = ros::Time::now();
 	last_time = ros::Time::now();
-
-	const double degree = M_PI/180;
 
 	// message declarations
 	geometry_msgs::TransformStamped odom_trans;
@@ -52,25 +50,24 @@ int main(int argc, char** argv) {
 		current_time = ros::Time::now();
 
 		double dt = (current_time - last_time).toSec();
-		double delta_x = (vel_x * cos(th)) * dt;
-		double delta_y = (vel_x * sin(th)) * dt;
+		double delta_x = vel_x * cos(th) * dt;
+		double delta_y = vel_x * sin(th) * dt;
 		double delta_th = vel_th * dt;
 
 		x += delta_x;
 		y += delta_y;
 		th += delta_th;
 
-		th = fmod(fmod(th, 2.0*M_PI) + 2.0*M_PI, 2.0*M_PI);;
-
-		geometry_msgs::Quaternion odom_quat;
-		odom_quat = tf::createQuaternionMsgFromRollPitchYaw(0,0,th);
+		geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
 
 		// update transform
 		odom_trans.header.stamp = current_time;
 		odom_trans.transform.translation.x = x;
 		odom_trans.transform.translation.y = y;
 		odom_trans.transform.translation.z = 0.0;
-		odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(th);
+		odom_trans.transform.rotation = odom_quat;
+
+		broadcaster.sendTransform(odom_trans);
 
 		//filling the odometry
 		nav_msgs::Odometry odom;
@@ -92,8 +89,6 @@ int main(int argc, char** argv) {
 		odom.twist.twist.angular.y = 0.0;
 		odom.twist.twist.angular.z = vel_th;
 
-		last_time = current_time;
-
 		if( delta_x ||
 			delta_y ||
 			delta_th )
@@ -103,8 +98,9 @@ int main(int argc, char** argv) {
 		}
 
 		// publishing the odometry and the new tf
-		broadcaster.sendTransform(odom_trans);
 		odom_pub.publish(odom);
+
+		last_time = current_time;
 
 		loop_rate.sleep( );
 	}

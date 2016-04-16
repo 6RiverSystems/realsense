@@ -29,10 +29,10 @@ MessageProcessor::MessageProcessor( ros::NodeHandle& node, IO* pIO ) :
 	m_bControllerFault( false ),
 	m_node( node ),
 	m_pIO( pIO ),
-	m_VelocitySubscriber( node.subscribe<geometry_msgs::Twist>( "/cmd_vel", 100,
-		std::bind( &MessageProcessor::OnChangeVelocity, this, std::placeholders::_1 ) ) ),
+//	m_VelocitySubscriber( node.subscribe<geometry_msgs::Twist>( "/cmd_vel", 100,
+//		std::bind( &MessageProcessor::OnChangeVelocity, this, std::placeholders::_1 ) ) ),
 	m_OdometryRawPublisher( node.advertise<geometry_msgs::TwistStamped>( "/sensors/odometry/raw", 1000 ) ),
-	m_CmdVelPublisher( node.advertise<geometry_msgs::Twist>( "/cmd_vel", 1000 ) ),
+//	m_CmdVelPublisher( node.advertise<geometry_msgs::Twist>( "/cmd_vel", 1000 ) ),
 	m_llcmdSubscriber( node.subscribe<std_msgs::String>( "/cmd_ll", 1000,
 			std::bind( &MessageProcessor::OnRosCallback, this, std::placeholders::_1 ) ) ),
 	m_llEventPublisher( node.advertise<std_msgs::String>( "/ll_event", 50 ) )

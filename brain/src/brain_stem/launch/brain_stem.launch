@@ -1,4 +1,7 @@
 <launch>
 	<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
-	<node name="node_bc" pkg="brain_stem" type="brain_stem" output="screen" respawn="true"/>
+
+	<node name="brain_stem" pkg="brain_stem" type="brain_stem" output="screen" respawn="true"/>
+
+	<include file="$(find chuck_model)/launch/chuck.launch"/>
 </launch>

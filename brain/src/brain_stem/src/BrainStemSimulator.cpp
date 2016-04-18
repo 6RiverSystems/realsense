@@ -4,24 +4,46 @@
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
 
-geometry_msgs::Twist g_twist;
+geometry_msgs::Twist g_velocity;
 
-void cmd_velCallback( const geometry_msgs::Twist& twist )
+bool g_bUseEstimatedVelocity = false;
+
+void OnCommandVelocity( const geometry_msgs::Twist& desiredVelocity )
 {
-	g_twist = twist;
+	if( !g_bUseEstimatedVelocity )
+	{
+		g_velocity = desiredVelocity;
 
-	ROS_DEBUG_THROTTLE( 5.0f, "Velocity changed: linear_x=%f, linear_y=%f, linear_x=%f, angular_x=%f, angular_y=%f, angular_z=%f",
-		twist.linear.x, twist.linear.y, twist.linear.z, twist.angular.x,
-		twist.angular.y, twist.angular.z );
+		ROS_DEBUG_THROTTLE( 5.0f, "Simulated Velocity Changed: linear=%f, angular=%f",
+			g_velocity.linear.x, g_velocity.angular.z );
+	}
+}
+
+void RawOdometryVelocity( const geometry_msgs::TwistStamped& estimatedVelocity )
+{
+	if( !g_bUseEstimatedVelocity )
+	{
+		ROS_DEBUG( "Switching to actual estimated velocity: " );
+
+		g_bUseEstimatedVelocity = true;
+	}
+
+	g_velocity = estimatedVelocity.twist;
+
+	ROS_DEBUG_THROTTLE( 5.0f, "Estimated Velocity Changed: linear=%f, angular=%f",
+		g_velocity.linear.x, g_velocity.angular.z );
 }
 
 int main(int argc, char** argv) {
 
 	ros::init(argc, argv, "brain_stem_simulator");
-	ros::NodeHandle n;
+	ros::NodeHandle node;
 
-	ros::Subscriber cmd_vel_sub = n.subscribe("/cmd_vel", 1000, cmd_velCallback);
-	ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("/odom", 50);
+	ros::Subscriber commandVelocitySub = node.subscribe( "/cmd_vel", 1000, OnCommandVelocity );
+
+	ros::Subscriber rawOdometrySub = node.subscribe( "/sensors/odometry/raw", 1000, OnCommandVelocity );
+
+	ros::Publisher odom_pub = node.advertise<nav_msgs::Odometry>("/odom", 50);
 
 	tf::TransformBroadcaster broadcaster;
 	ros::Rate loop_rate(20);
@@ -33,8 +55,8 @@ int main(int argc, char** argv) {
 
 	ros::Time current_time;
 	ros::Time last_time;
-	current_time = ros::Time::now();
-	last_time = ros::Time::now();
+	current_time = ros::Time::now( );
+	last_time = ros::Time::now( );
 
 	// message declarations
 	geometry_msgs::TransformStamped odom_trans;
@@ -48,9 +70,9 @@ int main(int argc, char** argv) {
 		current_time = ros::Time::now();
 
 		double dt = (current_time - last_time).toSec();
-		double delta_x = g_twist.linear.x * cos(th) * dt;
-		double delta_y = g_twist.linear.x * sin(th) * dt;
-		double delta_th = g_twist.angular.z* dt;
+		double delta_x = g_velocity.linear.x * cos(th) * dt;
+		double delta_y = g_velocity.linear.x * sin(th) * dt;
+		double delta_th = g_velocity.angular.z* dt;
 
 		x += delta_x;
 		y += delta_y;
@@ -58,7 +80,7 @@ int main(int argc, char** argv) {
 
 		geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
 
-		// update transform
+		// Publish the TF
 		odom_trans.header.stamp = current_time;
 		odom_trans.transform.translation.x = x;
 		odom_trans.transform.translation.y = y;
@@ -67,35 +89,26 @@ int main(int argc, char** argv) {
 
 		broadcaster.sendTransform(odom_trans);
 
-		//filling the odometry
 		nav_msgs::Odometry odom;
 		odom.header.stamp = current_time;
 		odom.header.frame_id = "odom";
 		odom.child_frame_id = "base_footprint";
 
-		// position
+		// Position
 		odom.pose.pose.position.x = x;
 		odom.pose.pose.position.y = y;
 		odom.pose.pose.position.z = 0.0;
 		odom.pose.pose.orientation = odom_quat;
 
-		//velocity
-		odom.twist.twist.linear.x = g_twist.linear.x;
+		// Velocity
+		odom.twist.twist.linear.x = g_velocity.linear.x;
 		odom.twist.twist.linear.y = 0.0;
 		odom.twist.twist.linear.z = 0.0;
 		odom.twist.twist.angular.x = 0.0;
 		odom.twist.twist.angular.y = 0.0;
-		odom.twist.twist.angular.z = g_twist.angular.z;
+		odom.twist.twist.angular.z = g_velocity.angular.z;
 
-//		if( delta_x ||
-//			delta_y ||
-//			delta_th )
-//		{
-//			ROS_ERROR( "Moving chuck by: x=%f, y=%f, angle=%f", delta_x, delta_y, delta_th);
-//			ROS_ERROR( "Moving chuck: x=%f, y=%f, angle=%f", x, y, th);
-//		}
-
-		// publishing the odometry and the new tf
+		// Publish the Odometry
 		odom_pub.publish(odom);
 
 		last_time = current_time;

@@ -6,7 +6,7 @@
 	<arg name="debug" default="true"/>
 
 	<!-- Launch map server -->
-	<node name="map_server" pkg="map_server" type="map_server" args="$(find rhq_map)/maps/empty.yaml" />
+	<node name="map_server" pkg="map_server" type="map_server" args="$(find rhq_map)/maps/rhq.yaml" />
 
 	<!-- Robot description -->
   	<param name="robot_description" command="$(find xacro)/xacro.py $(find chuck_model)/urdf/chuck.urdf.xacro" />

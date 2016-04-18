@@ -4,17 +4,15 @@
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
 
-double vel_x = 0.0f;
-double vel_th = 0.0f;
+geometry_msgs::Twist g_twist;
 
-void cmd_velCallback(const geometry_msgs::Twist &twist_aux)
+void cmd_velCallback( const geometry_msgs::Twist& twist )
 {
-	vel_x = twist_aux.linear.x;
-	vel_th = twist_aux.angular.z;
+	g_twist = twist;
 
-	ROS_ERROR( "Velocity changed: linear_x=%f, linear_y=%f, linear_x=%f, angular_x=%f, angular_y=%f, angular_z=%f",
-		twist_aux.linear.x, twist_aux.linear.y, twist_aux.linear.z, twist_aux.angular.x,
-		twist_aux.angular.y, twist_aux.angular.z);
+	ROS_DEBUG_THROTTLE( 5.0f, "Velocity changed: linear_x=%f, linear_y=%f, linear_x=%f, angular_x=%f, angular_y=%f, angular_z=%f",
+		twist.linear.x, twist.linear.y, twist.linear.z, twist.angular.x,
+		twist.angular.y, twist.angular.z );
 }
 
 int main(int argc, char** argv) {
@@ -29,8 +27,8 @@ int main(int argc, char** argv) {
 	ros::Rate loop_rate(20);
 
 	// initial position
-	double x = 1.0;
-	double y = 1.0;
+	double x = 2.0;
+	double y = 2.0;
 	double th = 0.0;
 
 	ros::Time current_time;
@@ -50,9 +48,9 @@ int main(int argc, char** argv) {
 		current_time = ros::Time::now();
 
 		double dt = (current_time - last_time).toSec();
-		double delta_x = vel_x * cos(th) * dt;
-		double delta_y = vel_x * sin(th) * dt;
-		double delta_th = vel_th * dt;
+		double delta_x = g_twist.linear.x * cos(th) * dt;
+		double delta_y = g_twist.linear.x * sin(th) * dt;
+		double delta_th = g_twist.angular.z* dt;
 
 		x += delta_x;
 		y += delta_y;
@@ -82,20 +80,20 @@ int main(int argc, char** argv) {
 		odom.pose.pose.orientation = odom_quat;
 
 		//velocity
-		odom.twist.twist.linear.x = vel_x;
+		odom.twist.twist.linear.x = g_twist.linear.x;
 		odom.twist.twist.linear.y = 0.0;
 		odom.twist.twist.linear.z = 0.0;
 		odom.twist.twist.angular.x = 0.0;
 		odom.twist.twist.angular.y = 0.0;
-		odom.twist.twist.angular.z = vel_th;
+		odom.twist.twist.angular.z = g_twist.angular.z;
 
-		if( delta_x ||
-			delta_y ||
-			delta_th )
-		{
-			ROS_ERROR( "Moving chuck by: x=%f, y=%f, angle=%f", delta_x, delta_y, delta_th);
-			ROS_ERROR( "Moving chuck: x=%f, y=%f, angle=%f", x, y, th);
-		}
+//		if( delta_x ||
+//			delta_y ||
+//			delta_th )
+//		{
+//			ROS_ERROR( "Moving chuck by: x=%f, y=%f, angle=%f", delta_x, delta_y, delta_th);
+//			ROS_ERROR( "Moving chuck: x=%f, y=%f, angle=%f", x, y, th);
+//		}
 
 		// publishing the odometry and the new tf
 		odom_pub.publish(odom);

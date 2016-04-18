@@ -159,8 +159,6 @@ struct ODOMETRY_DATA
 	uint32_t	timestamp;
 	float		linear_velocity;
 	float		angular_velocity;
-	float		cmd_linear_velocity;
-	float		cmd_angular_velocity;
 };
 
 struct PID_DATA

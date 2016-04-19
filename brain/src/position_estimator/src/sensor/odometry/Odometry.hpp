@@ -16,19 +16,14 @@ using namespace std;
 
 namespace srs {
 
-template<unsigned int STATE_SIZE = 5, int TYPE = CV_64F>
-struct Odometry :
-    public Measurement<STATE_SIZE, TYPE>
+template<typename TYPE = double>
+struct Odometry : public Measurement
 {
-    typedef typename Measurement<STATE_SIZE, TYPE>::BaseType BaseType;
-
     uint32_t arrivalTime;
-    BaseType left;
-    BaseType right;
+    TYPE left;
+    TYPE right;
 
-    Odometry(Sensor<STATE_SIZE, TYPE>* sensor,
-        uint32_t arrivalTime, BaseType left, BaseType right) :
-            Measurement<STATE_SIZE, TYPE>(sensor),
+    Odometry(uint32_t arrivalTime, TYPE left, TYPE right) :
             arrivalTime(arrivalTime),
             left(left),
             right(right)

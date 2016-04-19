@@ -13,29 +13,15 @@
 
 namespace srs {
 
-template<unsigned int STATE_SIZE, int TYPE> class Sensor;
-
-template<unsigned int STATE_SIZE = 5, int TYPE = CV_64F>
 class Measurement : public Object
 {
 public:
-    typedef typename Ocv2Base<TYPE>::BaseType BaseType;
-
-    Measurement(Sensor<STATE_SIZE, TYPE>* sensor) :
-            Object(),
-            sensor_(sensor)
+    Measurement() :
+            Object()
     {}
 
     virtual ~Measurement()
     {}
-
-    Sensor<STATE_SIZE, TYPE>* getSensor()
-    {
-        return sensor_;
-    }
-
-private:
-    Sensor<STATE_SIZE, TYPE>* sensor_;
 };
 
 } // namespace srs

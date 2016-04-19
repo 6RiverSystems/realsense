@@ -14,7 +14,7 @@
 
 namespace srs {
 
-template<typename TYPE>
+template<typename TYPE = double>
 struct Pose : public Object
 {
     Pose(TYPE x = TYPE(), TYPE y = TYPE(), TYPE theta = TYPE()) :

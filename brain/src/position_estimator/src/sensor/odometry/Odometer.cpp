@@ -1,6 +1,6 @@
 #include <framework/Math.hpp>
 
-#include <filter/FilterState.hpp>
+#include "PEState.hpp"
 
 namespace srs {
 
@@ -19,37 +19,28 @@ const cv::Mat Odometer<STATE_SIZE, TYPE>::R = (
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, int TYPE>
-cv::Mat Odometer<STATE_SIZE, TYPE>::transformWithH(const cv::Mat state)
+cv::Mat Odometer<STATE_SIZE, TYPE>::transformWithH(const cv::Mat stateVector)
 {
-    BaseType v = state.at<BaseType>(FilterState<TYPE>::STATE_V);
-    BaseType omega = state.at<BaseType>(FilterState<TYPE>::STATE_OMEGA);
+    PEState<TYPE> state = PEState<TYPE>(stateVector);
 
     // Transfer the value that the odometer care about to the new state
-    cv::Mat result = Math::zeros(state);
-    result.at<BaseType>(FilterState<TYPE>::STATE_V) = v;
-    result.at<BaseType>(FilterState<TYPE>::STATE_OMEGA) = omega;
+    cv::Mat result = Math::zeros(stateVector);
+    result.at<BaseType>(PEState<TYPE>::STATE_V) = state.v;
+    result.at<BaseType>(PEState<TYPE>::STATE_OMEGA) = state.omega;
 
     return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, int TYPE>
-cv::Mat Odometer<STATE_SIZE, TYPE>::transform2State(Measurement<STATE_SIZE, TYPE>* const measurement)
+cv::Mat Odometer<STATE_SIZE, TYPE>::getCurrentData()
 {
-    Odometry<STATE_SIZE, TYPE>* o = reinterpret_cast<Odometry<STATE_SIZE, TYPE>*>(measurement);
-
-    BaseType left = o->left;
-    BaseType right = o->right;
-
-    BaseType v = BaseType(0.5) * (left + right);
-    BaseType omega = wheelsRatio_ * (right - left);
-
     // Transfer the value that the odometer care about to the new state
-    cv::Mat result = cv::Mat::zeros(STATE_SIZE, 1, TYPE);
-    result.at<BaseType>(FilterState<TYPE>::STATE_V) = v;
-    result.at<BaseType>(FilterState<TYPE>::STATE_OMEGA) = omega;
+    PEState<TYPE> state = PEState<TYPE>();
+    state.v = 0.5 * (currentData_.left + currentData_.right);
+    state.omega = wheelsRatio_ * (currentData_.right - currentData_.left);
 
-    return result;
+    return state.getStateVector();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

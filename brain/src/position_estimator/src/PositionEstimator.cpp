@@ -1,5 +1,7 @@
 #include "PositionEstimator.hpp"
 
+#include <opencv2/opencv.hpp>
+
 #include <ros/ros.h>
 #include <boost/assert.hpp>
 
@@ -10,11 +12,19 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 PositionEstimator::PositionEstimator() :
-    ukf_(ALPHA, BETA, robot_, 1 / REFRESH_RATE_HZ)
+    ukf_(ALPHA, BETA, robot_, 1 / REFRESH_RATE_HZ),
+    rosNodeHandle_(),
+    currentCommand_(nullptr)
 {
     sensors_.clear();
 
-    //ukf_.reset(state_, covariance_);
+    currentState_ = PEState<>(0.0, 0.0, 0.0);
+    currentCovariance_ = cv::Mat::zeros(STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_STATE_VECTOR_SIZE, CV_64F);
+
+    ukf_.reset(currentState_.getStateVector(), currentCovariance_);
+
+    rosSubscriberCmdVel_ = rosNodeHandle_.subscribe("/cmd_vel", 100,
+        &PositionEstimator::cbCmdVelReceived, this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,18 +48,21 @@ void PositionEstimator::run()
 {
     ros::Rate refreshRate(REFRESH_RATE_HZ);
 
-    vector<Measurement<>> measurements;
     while (ros::ok())
     {
-        measurements.clear();
-        for (auto sensor : sensors_)
-        {
-//            measurements.push_back(sensor->getCurrentData());
-        }
-
+        ukf_.run(currentCommand_);
 
         refreshRate.sleep();
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Private methods
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void PositionEstimator::cbCmdVelReceived(geometry_msgs::TwistConstPtr message)
+{
+//    currentCommand_ = Command<>(message->linear.x, message->angular.z);
 }
 
 } // namespace srs

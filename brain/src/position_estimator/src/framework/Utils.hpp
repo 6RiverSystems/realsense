@@ -50,11 +50,11 @@ struct Utils
         }
     }
 
-    static void print(vector<srs::Odometry<>> v)
+    static void print(vector<srs::Odometry<>> odometryVector)
     {
-        for (auto element : v)
+        for (auto odometry : odometryVector)
         {
-            cout << element.toString() << endl;
+            cout << odometry.toString() << endl;
         }
     }
 };

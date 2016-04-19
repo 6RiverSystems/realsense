@@ -44,8 +44,8 @@ public:
         newData_ = newValue;
     }
 
-    virtual cv::Mat transform2State(Measurement<STATE_SIZE, TYPE>* const measurement) = 0;
-    virtual cv::Mat transformWithH(const cv::Mat state) = 0;
+    virtual cv::Mat getCurrentData() = 0;
+    virtual cv::Mat transformWithH(const cv::Mat stateVector) = 0;
 
 private:
     bool newData_;

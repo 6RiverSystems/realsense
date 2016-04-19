@@ -24,6 +24,8 @@ using namespace std;
 
 #include <RobotProfile.hpp>
 #include <Robot.hpp>
+#include <PEState.hpp>
+#include <VelCmd.hpp>
 
 using namespace srs;
 
@@ -40,15 +42,17 @@ TEST(UnscentedKalmanFilter, Run11ConstantSteps)
 {
     // Create standard robot process model
     Robot<> robot;
-    Odometer<> odometer(RobotProfile<>::SIZE_WHEEL_DISTANCE);
+    Odometer<UKF_STATE_SIZE> odometer(RobotProfile<>::SIZE_WHEEL_DISTANCE);
+
     UnscentedKalmanFilter<UKF_STATE_SIZE> ukf(ALPHA, BETA, robot, DT);
+    ukf.addSensor(&odometer);
 
     // Create a sequence of commands
-    Command<> COMMAND_1M_S = Command<>(1, 0);
+    VelCmd<> COMMAND_1M_S = VelCmd<>(1, 0);
 
     // Prepare a sequence of odometry readings
-    Odometry<> ODOMETRY_0 = Odometry<>(&odometer, 0, 0, 0);
-    Odometry<> ODOMETRY_1M_S = Odometry<>(&odometer, 2222, 1, 1);
+    Odometry<> ODOMETRY_0 = Odometry<>(0, 0, 0);
+    Odometry<> ODOMETRY_1M_S = Odometry<>(2222, 1, 1);
 
     vector<Command<>*> commands = {
         &COMMAND_1M_S,
@@ -64,18 +68,18 @@ TEST(UnscentedKalmanFilter, Run11ConstantSteps)
         nullptr
     };
 
-    vector<vector<Measurement<>*>> measurements = {
-        vector<Measurement<>*>() = {&ODOMETRY_1M_S},
-        vector<Measurement<>*>() = {&ODOMETRY_1M_S},
-        vector<Measurement<>*>() = {&ODOMETRY_1M_S},
-        vector<Measurement<>*>() = {&ODOMETRY_1M_S},
-        vector<Measurement<>*>() = {&ODOMETRY_1M_S},
-        vector<Measurement<>*>() = {&ODOMETRY_1M_S},
-        vector<Measurement<>*>() = {&ODOMETRY_1M_S},
-        vector<Measurement<>*>() = {&ODOMETRY_1M_S},
-        vector<Measurement<>*>() = {&ODOMETRY_1M_S},
-        vector<Measurement<>*>() = {&ODOMETRY_1M_S},
-        vector<Measurement<>*>() = {&ODOMETRY_0}
+    vector<vector<Measurement*>> measurements = {
+        vector<Measurement*>() = {&ODOMETRY_1M_S},
+        vector<Measurement*>() = {&ODOMETRY_1M_S},
+        vector<Measurement*>() = {&ODOMETRY_1M_S},
+        vector<Measurement*>() = {&ODOMETRY_1M_S},
+        vector<Measurement*>() = {&ODOMETRY_1M_S},
+        vector<Measurement*>() = {&ODOMETRY_1M_S},
+        vector<Measurement*>() = {&ODOMETRY_1M_S},
+        vector<Measurement*>() = {&ODOMETRY_1M_S},
+        vector<Measurement*>() = {&ODOMETRY_1M_S},
+        vector<Measurement*>() = {&ODOMETRY_1M_S},
+        vector<Measurement*>() = {&ODOMETRY_0}
     };
 
     vector<cv::Mat> correctCovariances = {
@@ -110,20 +114,20 @@ TEST(UnscentedKalmanFilter, Run11ConstantSteps)
     Pose<double> pose0;
     pose0.setThetaDegrees(90.0);
 
-    FilterState<> stateT0(pose0);
+    PEState<> stateT0(pose0);
 
     cv::Mat covarianceT0 = cv::Mat::eye(UKF_STATE_SIZE, UKF_STATE_SIZE, CV_64F);
     covarianceT0 = covarianceT0 * 0.0001;
 
-    ukf.reset(stateT0, covarianceT0);
+    ukf.reset(stateT0.getStateVector(), covarianceT0);
 
     for (unsigned int t = 0; t < measurements.size(); ++t)
     {
-        ukf.run(commands.at(t), measurements.at(t));
+        ukf.run(commands.at(t));
 
         ASSERT_TRUE(test::Compare::similar<>(ukf.getCovariance(), correctCovariances[t], 2e-2)) <<
             " Covariance matrix at time-step " << t;
-        ASSERT_TRUE(test::Compare::similar<>(ukf.getState().vector, correctStates[t], 1e-1)) <<
+        ASSERT_TRUE(test::Compare::similar<>(ukf.getState(), correctStates[t], 1e-1)) <<
             " State vector at time-step " << t;
     }
 }

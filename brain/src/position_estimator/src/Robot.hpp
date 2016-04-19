@@ -12,23 +12,26 @@
 
 #include <filter/Process.hpp>
 
+#include "Configuration.hpp"
+#include "VelCmd.hpp"
+
 namespace srs {
 
-template<unsigned int STATE_SIZE = 5, int TYPE = CV_64F>
-class Robot : public Process<STATE_SIZE, TYPE>
+template<int TYPE = CV_64F>
+class Robot : public Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>
 {
 public:
-    typedef typename Process<STATE_SIZE, TYPE>::BaseType BaseType;
+    typedef typename Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>::BaseType BaseType;
 
     Robot() :
-        Process<STATE_SIZE, TYPE>(cv::Mat::diag(Q))
+        Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>(cv::Mat::diag(Q))
     {}
 
     virtual ~Robot()
     {}
 
-    virtual cv::Mat transformWithAB(const cv::Mat state,
-        Command<TYPE>* const command,
+    virtual cv::Mat transformWithAB(const cv::Mat stateVector,
+        Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>* const command,
         BaseType dT);
 
 private:

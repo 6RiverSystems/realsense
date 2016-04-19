@@ -11,11 +11,12 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-template<unsigned int STATE_SIZE, int TYPE>
-UnscentedKalmanFilter<STATE_SIZE, TYPE>::UnscentedKalmanFilter(
+template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
+UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::UnscentedKalmanFilter(
     BaseType alpha, BaseType beta,
-    Process<STATE_SIZE, TYPE>& process,
+    Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process,
     BaseType dT) :
+        sensors_(),
         alpha_(alpha),
         beta_(beta),
         kappa_(BaseType()),
@@ -27,37 +28,38 @@ UnscentedKalmanFilter<STATE_SIZE, TYPE>::UnscentedKalmanFilter(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-template<unsigned int STATE_SIZE, int TYPE>
-UnscentedKalmanFilter<STATE_SIZE, TYPE>::~UnscentedKalmanFilter()
+template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
+UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::~UnscentedKalmanFilter()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-template<unsigned int STATE_SIZE, int TYPE>
-void UnscentedKalmanFilter<STATE_SIZE, TYPE>::reset(
-    FilterState<TYPE> stateT0, cv::Mat covarianceT0)
+template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
+void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::reset(
+    cv::Mat stateT0, cv::Mat covarianceT0)
 {
     // Initialize the state of the filter with an adapted
     // version of the provided initial state and covariance
-    stateT0.vector.convertTo(state_, TYPE);
+    stateT0.convertTo(state_, TYPE);
     covarianceT0.convertTo(covariance_, TYPE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-template<unsigned int STATE_SIZE, int TYPE>
-void UnscentedKalmanFilter<STATE_SIZE, TYPE>::run(Command<TYPE>* const command,
-    const vector<Measurement<STATE_SIZE, TYPE>*> measurements)
+template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
+void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::run(
+    Command<COMMAND_SIZE, TYPE>* const command)
 {
     predict(command);
-    update(measurements);
+    update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-template<unsigned int STATE_SIZE, int TYPE>
-cv::Mat UnscentedKalmanFilter<STATE_SIZE, TYPE>::calculateSigmaPoints(cv::Mat X, cv::Mat P)
+template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
+cv::Mat UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::calculateSigmaPoints(
+    cv::Mat X, cv::Mat P)
 {
     // A = chol(P)';
     cv::Mat A = Math::cholesky(P);
@@ -78,15 +80,15 @@ cv::Mat UnscentedKalmanFilter<STATE_SIZE, TYPE>::calculateSigmaPoints(cv::Mat X,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-template<unsigned int STATE_SIZE, int TYPE>
-void UnscentedKalmanFilter<STATE_SIZE, TYPE>::checkDiagonalUnderflow(cv::Mat& S)
+template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
+void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::checkDiagonalUnderflow(cv::Mat& S)
 {
     Math::checkDiagonal(S, UNDERFLOW_THRESHOLD, UNDERFLOW_THRESHOLD);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-template<unsigned int STATE_SIZE, int TYPE>
-void UnscentedKalmanFilter<STATE_SIZE, TYPE>::initializeWeights()
+template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
+void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::initializeWeights()
 {
     // o.kappa = 3 - o.n;
     // o.lambda = o.alpha ^ 2 * (o.n + o.kappa) - o.n;
@@ -116,8 +118,9 @@ void UnscentedKalmanFilter<STATE_SIZE, TYPE>::initializeWeights()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-template<unsigned int STATE_SIZE, int TYPE>
-void UnscentedKalmanFilter<STATE_SIZE, TYPE>::predict(Command<TYPE>* const command)
+template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
+void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::predict(
+    Command<COMMAND_SIZE, TYPE>* const command)
 {
     // Calculate the sigma points
     //
@@ -146,9 +149,9 @@ void UnscentedKalmanFilter<STATE_SIZE, TYPE>::predict(Command<TYPE>* const comma
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-template<unsigned int STATE_SIZE, int TYPE>
-void UnscentedKalmanFilter<STATE_SIZE, TYPE>::unscentedTransform(
-        const cv::Mat XX, const cv::Mat Y, const cv::Mat CHI,
+template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
+void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::unscentedTransform(
+        const cv::Mat X, const cv::Mat Y, const cv::Mat CHI,
         cv::Mat& Ybar, cv::Mat& S, cv::Mat& C)
 {
     // Calculate the predicted mean
@@ -157,7 +160,7 @@ void UnscentedKalmanFilter<STATE_SIZE, TYPE>::unscentedTransform(
     // for i = 1 : size(CHI, 2)
     //     Ybar = Ybar + o.WM(i) * Y(:, i);
     // end
-    Ybar = Math::zeros(XX);
+    Ybar = Math::zeros(X);
 
     for (unsigned int i = 0; i < Y.cols; ++i)
     {
@@ -180,60 +183,60 @@ void UnscentedKalmanFilter<STATE_SIZE, TYPE>::unscentedTransform(
     for (unsigned int i = 0; i < Y.cols; ++i)
     {
         S += WC_.at<BaseType>(i) * (Y.col(i) - Ybar) * (Y.col(i) - Ybar).t();
-        C += WC_.at<BaseType>(i) * (CHI.col(i) - XX) * (Y.col(i) - Ybar).t();
+        C += WC_.at<BaseType>(i) * (CHI.col(i) - X) * (Y.col(i) - Ybar).t();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-template<unsigned int STATE_SIZE, int TYPE>
-void UnscentedKalmanFilter<STATE_SIZE, TYPE>::update(
-        const vector<Measurement<STATE_SIZE, TYPE>*> measurements)
+template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
+void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::update()
 {
-    for (auto measurement : measurements)
+    for (auto sensor : sensors_)
     {
-        // Calculate the sigma points
-        //
-        // CHI = o.calculateSigmaPoints(XX, P);
-        cv::Mat CHI = calculateSigmaPoints(state_, covariance_);
-
-        Sensor<STATE_SIZE, TYPE>* sensor = measurement->getSensor();
-
-        // Pass the sigma points through h()
-        //
-        // Y = zeros(size(CHI));
-        // for i = 1:size(CHI, 2);
-        //     Y(:, i) = hFunction(CHI(:, i));
-        // end
-        cv::Mat Y = Math::zeros(CHI);
-        for (unsigned int i = 0; i < CHI.cols; ++i)
+        if (sensor->newDataAvailable())
         {
-            cv::Mat T = sensor->transformWithH(CHI.col(i));
-            T.copyTo(Y.col(i));
+            // Calculate the sigma points
+            //
+            // CHI = o.calculateSigmaPoints(XX, P);
+            cv::Mat CHI = calculateSigmaPoints(state_, covariance_);
+
+            // Pass the sigma points through h()
+            //
+            // Y = zeros(size(CHI));
+            // for i = 1:size(CHI, 2);
+            //     Y(:, i) = hFunction(CHI(:, i));
+            // end
+            cv::Mat Y = Math::zeros(CHI);
+            for (unsigned int i = 0; i < CHI.cols; ++i)
+            {
+                cv::Mat T = sensor->transformWithH(CHI.col(i));
+                T.copyTo(Y.col(i));
+            }
+
+            // [Ybar, S, C] = o.utTransform(XX, Y, CHI);
+            cv::Mat Ybar = Math::zeros(state_);
+            cv::Mat S = Math::zeros(covariance_);
+            cv::Mat C = Math::zeros(covariance_);
+            unscentedTransform(state_, Y, CHI, Ybar, S, C);
+
+            // S = S + sensor.getR();
+            S += sensor->getNoiseMatrix();
+
+            // S = o.checkUnderflow(S);
+            checkDiagonalUnderflow(S);
+
+            // z = sensor.measurement2state(measurement);
+            cv::Mat z = sensor->getCurrentData();
+
+            // K = C / S;
+            cv::Mat K = C * S.inv();
+
+            // XX = XX + K * (z - Ybar);
+            state_ += K * (z - Ybar);
+
+            // P = P - K * S * K';
+            covariance_ -= K * S * K.t();
         }
-
-        // [Ybar, S, C] = o.utTransform(XX, Y, CHI);
-        cv::Mat Ybar = Math::zeros(state_);
-        cv::Mat S = Math::zeros(covariance_);
-        cv::Mat C = Math::zeros(covariance_);
-        unscentedTransform(state_, Y, CHI, Ybar, S, C);
-
-        // S = S + sensor.getR();
-        S += sensor->getNoiseMatrix();
-
-        // S = o.checkUnderflow(S);
-        checkDiagonalUnderflow(S);
-
-        // z = sensor.measurement2state(measurement);
-        cv::Mat z = sensor->transform2State(measurement);
-
-        // K = C / S;
-        cv::Mat K = C * S.inv();
-
-        // XX = XX + K * (z - Ybar);
-        state_ += K * (z - Ybar);
-
-        // P = P - K * S * K';
-        covariance_ -= K * S * K.t();
     }
 }
 

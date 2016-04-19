@@ -13,27 +13,33 @@ using namespace std;
 
 #include <platform/Ocv2Base.hpp>
 
-#include <filter/Measurement.hpp>
+//#include <filter/Measurement.hpp>
 #include <filter/Process.hpp>
 #include <filter/FilterState.hpp>
 #include <filter/Command.hpp>
+#include <filter/sensor.hpp>
 
 namespace srs {
 
-template<unsigned int STATE_SIZE = 5, int TYPE = CV_64F>
+template<unsigned int STATE_SIZE = 5, unsigned int COMMAND_SIZE = 2, int TYPE = CV_64F>
 class UnscentedKalmanFilter
 {
 public:
     typedef typename Ocv2Base<TYPE>::BaseType BaseType;
 
     UnscentedKalmanFilter(BaseType alpha, BaseType beta,
-        Process<STATE_SIZE, TYPE>& process,
+        Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process,
         BaseType dT);
     ~UnscentedKalmanFilter();
 
-    FilterState<TYPE> getState()
+    void addSensor(Sensor<STATE_SIZE, TYPE>* sensor)
     {
-        return FilterState<TYPE>(state_);
+        sensors_.push_back(sensor);
+    }
+
+    cv::Mat getState()
+    {
+        return state_;
     }
 
     cv::Mat getCovariance()
@@ -41,12 +47,13 @@ public:
         return covariance_;
     }
 
-    void reset(FilterState<TYPE> stateT0, cv::Mat covarianceT0);
-    void run(Command<TYPE>* const command,
-        const vector<Measurement<STATE_SIZE, TYPE>*> measurements);
+    void reset(cv::Mat stateT0, cv::Mat covarianceT0);
+    void run(Command<COMMAND_SIZE, TYPE>* const command);
 
 private:
     constexpr static BaseType UNDERFLOW_THRESHOLD = BaseType(1.0e-5);
+
+    vector<Sensor<STATE_SIZE, TYPE>*> sensors_;
 
     BaseType alpha_;
     BaseType beta_;
@@ -58,7 +65,7 @@ private:
     cv::Mat WM_;
     cv::Mat WC_;
 
-    Process<STATE_SIZE, TYPE>& process_;
+    Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process_;
     cv::Mat covariance_;
     cv::Mat state_;
 
@@ -67,12 +74,12 @@ private:
 
     void initializeWeights();
 
-    void predict(Command<TYPE>* const command);
+    void predict(Command<COMMAND_SIZE, TYPE>* const command);
 
     void unscentedTransform(
-        const cv::Mat XX, const cv::Mat Y, const cv::Mat CHI,
+        const cv::Mat X, const cv::Mat Y, const cv::Mat CHI,
         cv::Mat& Ybar, cv::Mat& S, cv::Mat& C);
-    void update(const vector<Measurement<STATE_SIZE, TYPE>*> measurements);
+    void update();
 };
 
 } // namespace srs

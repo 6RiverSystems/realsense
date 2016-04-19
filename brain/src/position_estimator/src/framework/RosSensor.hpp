@@ -11,6 +11,8 @@ using namespace std;
 
 #include <ros/ros.h>
 
+//#include <filter/Measurement.hpp>
+
 namespace srs {
 
 class RosSensor
@@ -23,15 +25,18 @@ public:
     virtual ~RosSensor()
     {}
 
-    virtual void reset() = 0;
-
     string getName() const
     {
         return name_;
     }
 
+    virtual bool newDataAvailable() const = 0;
+
+    virtual void reset() = 0;
+
 protected:
     ros::NodeHandle rosNodeHandle_;
+    ros::Subscriber rosSubscriber_;
 
 private:
     string name_;

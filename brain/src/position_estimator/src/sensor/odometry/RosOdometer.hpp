@@ -14,6 +14,7 @@ using namespace std;
 #include <geometry_msgs/TwistStamped.h>
 
 #include <framework/RosSensor.hpp>
+#include <Configuration.hpp>
 #include "Odometer.hpp"
 
 namespace srs {
@@ -25,21 +26,20 @@ public:
     RosOdometer(string name);
     ~RosOdometer();
 
-    bool newDataAvailable() const
+    virtual bool newDataAvailable() const
     {
-        return sensor_->newDataAvailable();
+        return sensor_.newDataAvailable();
     }
 
-    void reset()
+    virtual void reset()
     {
-        sensor_->reset();
+        sensor_.reset();
     }
 
 private:
-    void cbMessageReceived(geometry_msgs::TwistStampedConstPtr message);
+    void cbOdometryReceived(geometry_msgs::TwistStampedConstPtr message);
 
-    ros::Subscriber rosSubscriber_;
-    Odometer<>* sensor_;
+    Odometer<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE> sensor_;
 };
 
 } // namespace srs

@@ -1,5 +1,7 @@
 #include "RosOdometer.hpp"
 
+#include <RobotProfile.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8,12 +10,10 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 RosOdometer::RosOdometer(string name) :
     RosSensor(name),
-    sensor_()
+    sensor_(RobotProfile<>::SIZE_WHEEL_DISTANCE)
 {
     rosSubscriber_ = rosNodeHandle_.subscribe("/sensors/odometry/raw", 100,
-        &RosOdometer::cbMessageReceived, this);
-
-    reset();
+        &RosOdometer::cbOdometryReceived, this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,9 +26,9 @@ RosOdometer::~RosOdometer()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void RosOdometer::cbMessageReceived(geometry_msgs::TwistStampedConstPtr message)
+void RosOdometer::cbOdometryReceived(geometry_msgs::TwistStampedConstPtr message)
 {
-    sensor_->push_back(message->header.stamp.nsec,
+    sensor_.push_back(message->header.stamp.nsec,
         static_cast<double>(message->twist.linear.x),
         static_cast<double>(message->twist.angular.z));
 }

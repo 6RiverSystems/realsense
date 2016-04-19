@@ -16,7 +16,7 @@
 
 namespace srs {
 
-template<unsigned int STATE_SIZE = 5, int TYPE = CV_64F>
+template<unsigned int STATE_SIZE = 5, unsigned int COMMAND_SIZE = 2, int TYPE = CV_64F>
 class Process : public Model<STATE_SIZE, TYPE>
 {
 public:
@@ -33,8 +33,8 @@ public:
     virtual ~Process()
     {}
 
-    virtual cv::Mat transformWithAB(const cv::Mat state,
-        Command<TYPE>* const command,
+    virtual cv::Mat transformWithAB(const cv::Mat stateVector,
+        Command<COMMAND_SIZE, TYPE>* const command,
         BaseType dT) = 0;
 };
 

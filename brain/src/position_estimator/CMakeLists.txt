@@ -24,7 +24,10 @@ set(${PROJECT_NAME}_SOURCES
     src/sensor/odometry/RosOdometer.cpp
 
     src/PositionEstimator.cpp
+    src/PEState.hpp
+    src/VelCmd.hpp
     src/RobotProfile.hpp
+    src/Configuration.hpp
     src/Robot.hpp
 )
 

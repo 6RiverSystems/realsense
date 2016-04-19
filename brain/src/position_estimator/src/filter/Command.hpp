@@ -13,59 +13,16 @@
 
 namespace srs {
 
-template<int TYPE = CV_64F>
+template<unsigned int COMMAND_SIZE = 2, int TYPE = CV_64F>
 struct Command : public Object
 {
     typedef typename Ocv2Base<TYPE>::BaseType BaseType;
 
-    enum {
-        COMMAND_V,
-        COMMAND_OMEGA,
-        MAX_ENUM
-    };
-
-    Command(const BaseType v, const BaseType omega)
-    {
-        vector = cv::Mat::zeros(1, MAX_ENUM, TYPE);
-
-        setV(v);
-        setOmega(omega);
-    }
-
-    Command(const cv::Mat command)
-    {
-        vector = command;
-    }
-
     Command()
-    {
-        vector = cv::Mat::zeros(1, MAX_ENUM, TYPE);
-    }
+    {}
 
     ~Command()
     {}
-
-    BaseType getV()
-    {
-        return vector.at<BaseType>(COMMAND_V);
-    }
-
-    BaseType getOmega()
-    {
-        return vector.at<BaseType>(COMMAND_OMEGA);
-    }
-
-    void setV(BaseType value)
-    {
-        vector.at<BaseType>(COMMAND_V) = value;
-    }
-
-    void setOmega(BaseType value)
-    {
-        vector.at<BaseType>(COMMAND_OMEGA) = value;
-    }
-
-    cv::Mat vector;
 };
 
 } // namespace srs

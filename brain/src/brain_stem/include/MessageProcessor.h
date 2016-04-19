@@ -86,8 +86,6 @@ private:
 
 	void OnReEnable( std::vector<std::string> vecParams );
 
-	void OnSetPid( std::vector<std::string> vecParams );
-
 // Helper Methods
 
 	void WriteToSerialPort( char* pszData, std::size_t dwSize );

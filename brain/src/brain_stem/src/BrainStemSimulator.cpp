@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 
 	ros::Subscriber commandVelocitySub = node.subscribe( "/cmd_vel", 1000, OnCommandVelocity );
 
-	ros::Subscriber rawOdometrySub = node.subscribe( "/sensors/odometry/raw", 1000, OnCommandVelocity );
+	ros::Subscriber rawOdometrySub = node.subscribe( "/sensors/odometry/raw", 1000, RawOdometryVelocity );
 
 	ros::Publisher odom_pub = node.advertise<nav_msgs::Odometry>("/odom", 50);
 
@@ -49,8 +49,8 @@ int main(int argc, char** argv) {
 	ros::Rate loop_rate(20);
 
 	// initial position
-	double x = 2.0;
-	double y = 2.0;
+	double x = 1.5;
+	double y = 1.5;
 	double th = 0.0;
 
 	ros::Time current_time;
@@ -62,6 +62,9 @@ int main(int argc, char** argv) {
 	geometry_msgs::TransformStamped odom_trans;
 	odom_trans.header.frame_id = "odom";
 	odom_trans.child_frame_id = "base_footprint";
+
+	g_velocity.linear.x = 0;
+	g_velocity.angular.z = 0;
 
 	while( ros::ok( ) )
 	{
@@ -77,6 +80,12 @@ int main(int argc, char** argv) {
 		x += delta_x;
 		y += delta_y;
 		th += delta_th;
+
+		if( delta_x || delta_y || delta_th )
+		{
+			ROS_DEBUG_THROTTLE( 5.0f, "Pose Changed: x=%lf, y=%lf, theta=%lf",
+				x, y, th );
+		}
 
 		geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
 

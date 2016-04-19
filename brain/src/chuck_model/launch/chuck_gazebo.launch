@@ -26,6 +26,7 @@
 		<rosparam file="$(find chuck_model)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
 		<rosparam file="$(find chuck_model)/config/local_costmap_params.yaml" command="load" />
 		<rosparam file="$(find chuck_model)/config/global_costmap_params.yaml" command="load" />
-		<rosparam file="$(find chuck_model)/config/base_local_planner_params.yaml" command="load" />
+		<rosparam file="$(find chuck_model)/config/move_base_params.yaml" command="load" />
+		<rosparam file="$(find chuck_model)/config/dwa_local_planner_params.yaml" command="load" />
 	</node>
 </launch>

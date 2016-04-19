@@ -6,12 +6,12 @@
 	<arg name="debug" default="true"/>
 
 	<!-- Launch map server -->
-	<node name="map_server" pkg="map_server" type="map_server" args="$(find rhq_map)/maps/rhq.yaml" />
-
-	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="1.0 1.0 0.0 0 0 0.0 /map /odom 100"/>
+	<node name="map_server" pkg="map_server" type="map_server" args="$(find rhq_map)/maps/empty.yaml" />
 
 	<!-- Robot description -->
   	<param name="robot_description" command="$(find xacro)/xacro.py $(find chuck_model)/urdf/chuck.urdf.xacro" />
+
+	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100"/>
 
 	<!-- Joint and robot state publishers -->
 	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node>

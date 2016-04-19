@@ -1,5 +1,5 @@
-image: rhq-1.png
-resolution: 0.100
+image: empty.png
+resolution: 0.10000
 origin: [0.000000, 0.000000, 0.000000]
 negate: 0
 occupied_thresh: 0.65

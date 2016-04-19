@@ -169,9 +169,10 @@ void SerialIO::StartAsyncRead( )
 
 void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::size_t size )
 {
-	std::vector<char>( m_writeData.begin( ) + size, m_writeData.end( ) ).swap( m_writeData );
+//	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write: " <<
+//		ToHex( std::vector<char>( m_writeData.begin( ), m_writeData.end( ) + size ) ) );
 
-	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write: " << ToHex( m_writeData ) );
+	std::vector<char>( m_writeData.begin( ) + size, m_writeData.end( ) ).swap( m_writeData );
 
 	if( m_writeData.begin( ) != m_writeData.end( ) )
 	{
@@ -222,7 +223,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				{
 					if( m_readCallback )
 					{
-						ROS_DEBUG_STREAM_NAMED( "SerialIO", "Read Message: " << ToHex( messageData ) );
+//						ROS_DEBUG_STREAM_NAMED( "SerialIO", "Read Message: " << ToHex( messageData ) );
 
 						m_readCallback( messageData );
 

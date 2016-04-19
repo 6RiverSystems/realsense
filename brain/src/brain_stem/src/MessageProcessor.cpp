@@ -32,7 +32,6 @@ MessageProcessor::MessageProcessor( ros::NodeHandle& node, IO* pIO ) :
 	m_VelocitySubscriber( node.subscribe<geometry_msgs::Twist>( "/cmd_vel", 100,
 		std::bind( &MessageProcessor::OnChangeVelocity, this, std::placeholders::_1 ) ) ),
 	m_OdometryRawPublisher( node.advertise<geometry_msgs::TwistStamped>( "/sensors/odometry/raw", 1000 ) ),
-	m_CmdVelPublisher( node.advertise<geometry_msgs::Twist>( "/cmd_vel", 1000 ) ),
 	m_llcmdSubscriber( node.subscribe<std_msgs::String>( "/cmd_ll", 1000,
 			std::bind( &MessageProcessor::OnRosCallback, this, std::placeholders::_1 ) ) ),
 	m_llEventPublisher( node.advertise<std_msgs::String>( "/ll_event", 50 ) )
@@ -65,14 +64,9 @@ MessageProcessor::MessageProcessor( ros::NodeHandle& node, IO* pIO ) :
 
 	m_vecBridgeCallbacks["UI"] = { std::bind( &MessageProcessor::OnUI, this, std::placeholders::_1 ), 2 };
 	m_vecBridgeCallbacks["STARTUP"] = { std::bind( &MessageProcessor::OnStartup, this, std::placeholders::_1 ), 0 };
-	m_vecBridgeCallbacks["DISTANCE"] = { std::bind( &MessageProcessor::OnDistance, this, std::placeholders::_1 ), 1 };
-	m_vecBridgeCallbacks["ROTATE"] = { std::bind( &MessageProcessor::OnRotate, this, std::placeholders::_1 ), 1 };
-	m_vecBridgeCallbacks["STOP"] = { std::bind( &MessageProcessor::OnStop, this, std::placeholders::_1 ), 0 };
-	m_vecBridgeCallbacks["TURN"] = { std::bind( &MessageProcessor::OnTurn, this, std::placeholders::_1 ), 2 };
 	m_vecBridgeCallbacks["VERSION"] = { std::bind( &MessageProcessor::OnVersion, this, std::placeholders::_1 ), 0 };
 	m_vecBridgeCallbacks["PAUSE"] = { std::bind( &MessageProcessor::OnPause, this, std::placeholders::_1 ), 1 };
 	m_vecBridgeCallbacks["REENABLE"] = { std::bind( &MessageProcessor::OnReEnable, this, std::placeholders::_1 ), 0 };
-	m_vecBridgeCallbacks["SET_PID"] = { std::bind( &MessageProcessor::OnSetPid, this, std::placeholders::_1 ), 4 };
 }
 
 MessageProcessor::~MessageProcessor( )
@@ -165,10 +159,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 			odometry.twist.linear.x = pOdometry->linear_velocity;
 			odometry.twist.angular.z = pOdometry->angular_velocity;
 
-			geometry_msgs::Twist cmdVelocity;
-			cmdVelocity.linear.x = pOdometry->cmd_linear_velocity;
-			cmdVelocity.angular.z = pOdometry->cmd_angular_velocity;
-			m_CmdVelPublisher.publish( cmdVelocity );
+			m_OdometryRawPublisher.publish( odometry );
 		}
 		break;
 
@@ -188,6 +179,8 @@ void MessageProcessor::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& v
 		static_cast<float>( velocity->linear.x ),
 		static_cast<float>( velocity->angular.z )
 	};
+
+	ROS_DEBUG_NAMED( "Brainstem", "Set Velocity: linear=%f, angular=%f", velocity->linear.x, velocity->angular.z );
 
 	// Send the velocity down to the motors
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
@@ -282,80 +275,6 @@ void MessageProcessor::OnStartup( std::vector<std::string> vecParams )
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
 }
 
-void MessageProcessor::OnDistance( std::vector<std::string> vecParams )
-{
-	try
-	{
-		MOVE_DISTANCE_DATA msg = {
-			static_cast<uint8_t>( BRAIN_STEM_CMD::DISTANCE ),
-			boost::lexical_cast<int16_t>( vecParams[0] )
-		};
-
-		WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
-	}
-	catch( const boost::bad_lexical_cast& e )
-	{
-		ROS_ERROR( "Invalid distance: %s", vecParams[0].c_str( ) );
-	}
-}
-
-void MessageProcessor::OnRotate( std::vector<std::string> vecParams )
-{
-	try
-	{
-		ROTATE_DATA msg = {
-			static_cast<uint8_t>( BRAIN_STEM_CMD::ROTATE ),
-			boost::lexical_cast<int16_t>( vecParams[0] )
-		};
-
-		WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
-	}
-	catch( const boost::bad_lexical_cast& e )
-	{
-		ROS_ERROR( "Invalid rotation: %s", vecParams[0].c_str( ) );
-	}
-}
-
-void MessageProcessor::OnStop( std::vector<std::string> vecParams )
-{
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::STOP );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
-}
-
-void MessageProcessor::OnTurn( std::vector<std::string> vecParams )
-{
-	std::string& strDirection = vecParams[0];
-
-	std::string& strDistance = vecParams[1];
-
-	BRAIN_STEM_CMD cCommand = BRAIN_STEM_CMD::UNKNOWN;
-
-	if( strDirection == "R" )
-	{
-		cCommand = BRAIN_STEM_CMD::SLINGSHOT_RIGHT;
-	}
-	else if( strDirection == "L" )
-	{
-		cCommand = BRAIN_STEM_CMD::SLINGSHOT_LEFT;
-	}
-	else
-	{
-		ROS_ERROR( "Invalid turn direction: %s", strDirection.c_str( ) );
-	}
-
-	try
-	{
-		SLINGSHOT_DATA msg = { static_cast<uint8_t>( cCommand ), boost::lexical_cast<uint16_t>( strDistance ) };
-
-		WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
-	}
-	catch( const boost::bad_lexical_cast& e )
-	{
-		ROS_ERROR( "Invalid distance: %s", vecParams[0].c_str( ) );
-	}
-}
-
 void MessageProcessor::OnVersion( std::vector<std::string> vecParams )
 {
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::GET_VERSION );
@@ -378,27 +297,6 @@ void MessageProcessor::OnReEnable( std::vector<std::string> vecParams )
 	ROS_INFO_NAMED( "BrainStem", "ReEnable from fault mode" );
 
 	m_bControllerFault = false;
-}
-
-void MessageProcessor::OnSetPid( std::vector<std::string> vecParams )
-{
-	try
-	{
-		float fKp = boost::lexical_cast<float>( vecParams[0] );
-		float fKi = boost::lexical_cast<float>( vecParams[1] );
-		float fKd = boost::lexical_cast<float>( vecParams[2] );
-		float proj_time = boost::lexical_cast<float>( vecParams[3] );
-
-		PID_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SET_PID ),
-			fKp, fKi, fKd, proj_time };
-
-		WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
-	}
-	catch( const boost::bad_lexical_cast& e )
-	{
-		ROS_ERROR( "Invalid pid parameters: Kp: %s, Ki: %s, Kd: %s",
-			vecParams[0].c_str( ), vecParams[1].c_str( ), vecParams[2].c_str( ) );
-	}
 }
 
 //////////////////////////////////////////////////////////////////////////

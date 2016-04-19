@@ -44,8 +44,6 @@ private:
 
 	ros::Publisher					m_OdometryRawPublisher;
 
-	ros::Publisher					m_CmdVelPublisher;
-
 	std::map<ENTITIES, std::string>	m_mapEntityButton;
 
 	std::map<std::string, ENTITIES>	m_mapButtonEntity;
@@ -87,8 +85,6 @@ private:
 	void OnPause( std::vector<std::string> vecParams );
 
 	void OnReEnable( std::vector<std::string> vecParams );
-
-	void OnSetPid( std::vector<std::string> vecParams );
 
 // Helper Methods
 

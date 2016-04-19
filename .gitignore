@@ -20,3 +20,4 @@ brain/src/CMakeLists.txt
 ohps/.metadata
 ohps/build
 ohps/devel
+CMakeLists.txt

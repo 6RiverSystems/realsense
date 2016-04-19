@@ -52,6 +52,12 @@ void PositionEstimator::run()
     {
         ukf_.run(currentCommand_);
 
+        if (currentCommand_)
+        {
+            delete currentCommand_;
+            currentCommand_ = nullptr;
+        }
+
         refreshRate.sleep();
     }
 }
@@ -62,7 +68,7 @@ void PositionEstimator::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void PositionEstimator::cbCmdVelReceived(geometry_msgs::TwistConstPtr message)
 {
-//    currentCommand_ = Command<>(message->linear.x, message->angular.z);
+    currentCommand_ = new VelCmd<>(message->linear.x, message->angular.z);
 }
 
 } // namespace srs

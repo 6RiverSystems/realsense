@@ -13,11 +13,10 @@ using namespace std;
 
 #include <platform/Ocv2Base.hpp>
 
-//#include <filter/Measurement.hpp>
 #include <filter/Process.hpp>
 #include <filter/FilterState.hpp>
 #include <filter/Command.hpp>
-#include <filter/sensor.hpp>
+#include <filter/Sensor.hpp>
 
 namespace srs {
 

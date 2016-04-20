@@ -8,6 +8,7 @@
 #include <vector>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
 #include "Messages.h"
 
@@ -44,6 +45,8 @@ private:
 
 	ros::Publisher					m_OdometryRawPublisher;
 
+	ros::Publisher					m_ConnectedPublisher;
+
 	std::map<ENTITIES, std::string>	m_mapEntityButton;
 
 	std::map<std::string, ENTITIES>	m_mapButtonEntity;
@@ -63,6 +66,8 @@ public:
 	void OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity );
 
 	void OnRosCallback( const std_msgs::String::ConstPtr& msg );
+
+	void SetConnected( bool bIsConnected );
 
 private:
 

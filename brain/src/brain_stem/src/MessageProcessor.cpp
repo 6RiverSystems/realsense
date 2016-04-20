@@ -19,7 +19,6 @@
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/PoseStamped.h>
-//#include <move_base_msgs/MoveBaseAction.h>
 
 namespace srs {
 
@@ -32,6 +31,7 @@ MessageProcessor::MessageProcessor( ros::NodeHandle& node, IO* pIO ) :
 	m_VelocitySubscriber( node.subscribe<geometry_msgs::Twist>( "/cmd_vel", 100,
 		std::bind( &MessageProcessor::OnChangeVelocity, this, std::placeholders::_1 ) ) ),
 	m_OdometryRawPublisher( node.advertise<geometry_msgs::TwistStamped>( "/sensors/odometry/raw", 1000 ) ),
+	m_ConnectedPublisher( node.advertise<std_msgs::Bool>( "/brain_stem/connected", 1 ) ),
 	m_llcmdSubscriber( node.subscribe<std_msgs::String>( "/cmd_ll", 1000,
 			std::bind( &MessageProcessor::OnRosCallback, this, std::placeholders::_1 ) ) ),
 	m_llEventPublisher( node.advertise<std_msgs::String>( "/ll_event", 50 ) )
@@ -221,6 +221,15 @@ void MessageProcessor::OnRosCallback( const std_msgs::String::ConstPtr& msg )
 			}
 		}
 	}
+}
+
+
+void MessageProcessor::SetConnected( bool bIsConnected )
+{
+	std_msgs::Bool msg;
+	msg.data = bIsConnected;
+
+	m_ConnectedPublisher.publish( msg );
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -120,7 +120,6 @@ public:
 
 			if( !m_bIsSerialOpen && bInitialCheck )
 			{
-
 				ROS_ERROR( "Error connecting to serial port: %s (Retry: %.2fs)\n", strError.c_str( ), m_fRetryTimeout );
 			}
 		}
@@ -135,6 +134,9 @@ public:
 			{
 				ROS_ERROR( "Disconnected from serial port: %s (Retry: %.2fs)\n", m_fRetryTimeout, strError.c_str( ) );
 			}
+
+			// Publish the connection updated message
+			m_messageProcessor.SetConnected( m_bIsSerialOpen );
 		}
 	}
 };

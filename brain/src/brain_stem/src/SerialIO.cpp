@@ -243,9 +243,17 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 	else
 	{
 		ROS_ERROR_NAMED( "SerialIO", "Read Error: %s\n", error.message( ).c_str( ) );
+
+		if( error == boost::asio::error::eof )
+		{
+			Close( );
+		}
 	}
 
-	StartAsyncRead( );
+	if( IsOpen( ) )
+	{
+		StartAsyncRead( );
+	}
 }
 
 } /* namespace srs */

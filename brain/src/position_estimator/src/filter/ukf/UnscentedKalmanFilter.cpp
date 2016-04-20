@@ -29,12 +29,6 @@ UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::UnscentedKalmanFilter(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
-UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::~UnscentedKalmanFilter()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
 void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::reset(
     cv::Mat stateT0, cv::Mat covarianceT0)
 {

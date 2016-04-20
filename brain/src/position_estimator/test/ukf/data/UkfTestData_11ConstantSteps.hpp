@@ -3,11 +3,13 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef RUN11STEPSDATA_HPP_
-#define RUN11STEPSDATA_HPP_
+#ifndef UKFTESTDATA_11CONSTANTSTEPS_HPP_
+#define UKFTESTDATA_11CONSTANTSTEPS_HPP_
 
 namespace srs {
 
+const static VelCmd<> COMMAND_STEP_00 = VelCmd<>(1, 0);
+const static Odometry<> ODOMETRY_STEP_00 = Odometry<>(0, 0, 0);
 const static cv::Mat STATE_STEP_00 = (cv::Mat_<double>(UKF_STATE_SIZE, 1) <<
               0,
               0,
@@ -23,6 +25,7 @@ const static cv::Mat COV_STEP_00 = (cv::Mat_<double>(UKF_STATE_SIZE, UKF_STATE_S
               0,             0,             0,             0,   +9.9900e-05
 );
 
+const static Odometry<> ODOMETRY_STEP_01 = Odometry<>(2222, 1, 0);
 const static cv::Mat STATE_STEP_01 = (cv::Mat_<double>(UKF_STATE_SIZE, 1) <<
               0,
     +9.9981e-01,
@@ -175,4 +178,4 @@ const static cv::Mat COV_STEP_10 = (cv::Mat_<double>(UKF_STATE_SIZE, UKF_STATE_S
 
 } // namespace srs
 
-#endif // RUN11STEPSDATA_HPP_
+#endif // UKFTESTDATA_11CONSTANTSTEPS_HPP_

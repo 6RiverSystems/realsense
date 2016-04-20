@@ -6,6 +6,9 @@
 #ifndef VELCMD_HPP_
 #define VELCMD_HPP_
 
+#include <string>
+using namespace std;
+
 #include <opencv2/opencv.hpp>
 
 #include <platform/Object.hpp>
@@ -34,6 +37,17 @@ struct VelCmd : public Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>
 
     ~VelCmd()
     {}
+
+    string toString()
+    {
+        ostringstream output;
+        output << "VelCmd {" << endl;
+        output << "      v: " << v << endl;
+        output << "  omega: " << omega << endl;
+        output << "}" << endl;
+
+        return output.str();
+    }
 
     BaseType v;
     BaseType omega;

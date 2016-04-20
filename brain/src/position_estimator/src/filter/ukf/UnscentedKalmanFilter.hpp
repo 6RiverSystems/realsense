@@ -29,7 +29,8 @@ public:
     UnscentedKalmanFilter(BaseType alpha, BaseType beta,
         Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process,
         BaseType dT);
-    ~UnscentedKalmanFilter();
+    ~UnscentedKalmanFilter()
+    {}
 
     void addSensor(Sensor<STATE_SIZE, TYPE>* sensor)
     {

@@ -24,7 +24,7 @@ struct FilterState : public Object
     ~FilterState()
     {}
 
-    virtual cv::Mat getStateVector() = 0;
+    virtual cv::Mat getVectorForm() = 0;
 };
 
 } // namespace srs

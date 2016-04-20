@@ -33,11 +33,11 @@ constexpr unsigned int UKF_COMMAND_SIZE = 2;
 
 constexpr double ALPHA = 1.0;
 constexpr double BETA = 0.0;
-constexpr double DT = 1.0;
+constexpr double DT = 0.5;
 
-#include "data/UkfTestData_11ConstantSteps.hpp"
+#include "data/UkfTestData_Straight.hpp"
 
-TEST(UnscentedKalmanFilter, Run11ConstantSteps)
+TEST(UnscentedKalmanFilter, Straight)
 {
     // Create standard robot process model
     Robot<> robot;
@@ -46,37 +46,42 @@ TEST(UnscentedKalmanFilter, Run11ConstantSteps)
     UnscentedKalmanFilter<UKF_STATE_SIZE> ukf(ALPHA, BETA, robot, DT);
     ukf.addSensor(&odometer);
 
-    // Prepare a sequence of commands
-    vector<const Command<>*> commands = {
+    // Create a sequence of commands
+    vector<const VelCmd<>*> commands = {
         &COMMAND_STEP_00,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr
+        &COMMAND_STEP_01,
+        &COMMAND_STEP_02,
+        &COMMAND_STEP_03,
+        &COMMAND_STEP_04,
+        &COMMAND_STEP_05,
+        &COMMAND_STEP_06,
+        &COMMAND_STEP_07,
+        &COMMAND_STEP_08,
+        &COMMAND_STEP_09,
+        &COMMAND_STEP_10,
+        &COMMAND_STEP_11,
+        &COMMAND_STEP_12,
+        &COMMAND_STEP_13
     };
 
-    // Prepare a sequence of odometry readings
-    vector<const Measurement*> measurements = {
+    // Create the sequence of measurements
+    vector<const Odometry<>*> measurements = {
+        &ODOMETRY_STEP_00,
         &ODOMETRY_STEP_01,
-        &ODOMETRY_STEP_01,
-        &ODOMETRY_STEP_01,
-        &ODOMETRY_STEP_01,
-        &ODOMETRY_STEP_01,
-        &ODOMETRY_STEP_01,
-        &ODOMETRY_STEP_01,
-        &ODOMETRY_STEP_01,
-        &ODOMETRY_STEP_01,
-        &ODOMETRY_STEP_01,
-        &ODOMETRY_STEP_00
+        &ODOMETRY_STEP_02,
+        &ODOMETRY_STEP_03,
+        &ODOMETRY_STEP_04,
+        &ODOMETRY_STEP_05,
+        &ODOMETRY_STEP_06,
+        &ODOMETRY_STEP_07,
+        &ODOMETRY_STEP_08,
+        &ODOMETRY_STEP_09,
+        &ODOMETRY_STEP_10,
+        &ODOMETRY_STEP_11,
+        &ODOMETRY_STEP_12,
+        &ODOMETRY_STEP_13
     };
 
-    // Prepare a sequence of correct states and covariance matrices
     vector<cv::Mat> correctStates = {
         STATE_STEP_00,
         STATE_STEP_01,
@@ -88,20 +93,10 @@ TEST(UnscentedKalmanFilter, Run11ConstantSteps)
         STATE_STEP_07,
         STATE_STEP_08,
         STATE_STEP_09,
-        STATE_STEP_10
-    };
-    vector<cv::Mat> correctCovariances = {
-        COV_STEP_00,
-        COV_STEP_01,
-        COV_STEP_02,
-        COV_STEP_03,
-        COV_STEP_04,
-        COV_STEP_05,
-        COV_STEP_06,
-        COV_STEP_07,
-        COV_STEP_08,
-        COV_STEP_09,
-        COV_STEP_10
+        STATE_STEP_10,
+        STATE_STEP_11,
+        STATE_STEP_12,
+        STATE_STEP_13
     };
 
     // Prepare the initial state
@@ -113,21 +108,16 @@ TEST(UnscentedKalmanFilter, Run11ConstantSteps)
     cv::Mat covarianceT0 = cv::Mat::eye(UKF_STATE_SIZE, UKF_STATE_SIZE, CV_64F);
     covarianceT0 = covarianceT0 * 0.0001;
 
-    // Reset the Kalman filter
     ukf.reset(stateT0.getVectorForm(), covarianceT0);
 
-    // Go through each step and
     for (unsigned int t = 0; t < measurements.size(); ++t)
     {
         // Push the simulated measurement
         auto odometry = *measurements.at(t);
         odometer.push_back(odometry.arrivalTime, odometry.linear, odometry.angular);
 
-        // Run the step of the UKF
         ukf.run(const_cast<VelCmd<>*>(commands.at(t)));
 
-        ASSERT_TRUE(test::Compare::similar<>(ukf.getCovariance(), correctCovariances[t], 2e-2)) <<
-            " Covariance matrix at time-step " << t;
         ASSERT_TRUE(test::Compare::similar<>(ukf.getState(), correctStates[t], 1e-1)) <<
             " State vector at time-step " << t;
     }

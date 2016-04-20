@@ -152,7 +152,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 		{
 			ODOMETRY_DATA* pOdometry = reinterpret_cast<ODOMETRY_DATA*>( buffer.data( ) );
 
-//			ROS_DEBUG_NAMED( "Brainstem", "Velocity: %f, %f", pOdometry->linear_velocity, pOdometry->angular_velocity );
+			ROS_DEBUG_THROTTLE_NAMED( 2, "Brainstem", "Raw Odometry: %f, %f", pOdometry->linear_velocity, pOdometry->angular_velocity );
 
 			geometry_msgs::TwistStamped odometry;
 			odometry.header.stamp.nsec = pOdometry->timestamp * 1000;

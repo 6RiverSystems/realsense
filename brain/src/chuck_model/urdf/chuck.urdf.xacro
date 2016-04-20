@@ -32,7 +32,7 @@
   	</gazebo>
  
 	<joint name="base_footprint_joint" type="fixed">
-		<origin xyz="0 0 ${wheel_radius}" rpy="0 0 0" />
+		<origin xyz="0 0 ${base_y_offset + base_z_size/2}" rpy="0 0 0" />
 		<parent link="base_footprint"/>
 		<child link="base_link"/>
 	</joint>
@@ -91,8 +91,8 @@
 	</gazebo>
 
 	<!-- Wheels -->
-	<wheel lr="left" parent="base_link" translateX="0" translateY="${-wheel_y_offset}" translateZ="0" />
-	<wheel lr="right" parent="base_link" translateX="0"  translateY="${wheel_y_offset}" translateZ="0" />
+	<wheel lr="left" parent="base_link" translateX="0" translateY="${-wheel_y_offset}" translateZ="${wheel_z_offset}" />
+	<wheel lr="right" parent="base_link" translateX="0"  translateY="${wheel_y_offset}" translateZ="${wheel_z_offset}" />
 
 	<!-- Castors -->
 	<caster fb="front" parent="base_link" translateX="${caster_front_x_offset}" translateY="0" translateZ="${caster_z_offset}" />

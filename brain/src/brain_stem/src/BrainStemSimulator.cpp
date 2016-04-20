@@ -46,12 +46,12 @@ int main(int argc, char** argv) {
 	ros::Publisher odom_pub = node.advertise<nav_msgs::Odometry>("/odom", 50);
 
 	tf::TransformBroadcaster broadcaster;
-	ros::Rate loop_rate(20);
+	ros::Rate loop_rate( 50 );
 
 	// initial position
-	double x = 1.5;
-	double y = 1.5;
-	double th = 0.0;
+	double dfX = 2.5;
+	double dfY = 1.5;
+	double dfTheta = 0.0;
 
 	ros::Time current_time;
 	ros::Time last_time;
@@ -70,33 +70,33 @@ int main(int argc, char** argv) {
 	{
 		ros::spinOnce( );
 
-		current_time = ros::Time::now();
+		current_time = ros::Time::now( );
 
-		double dt = (current_time - last_time).toSec();
-		double delta_x = g_velocity.linear.x * cos(th) * dt;
-		double delta_y = g_velocity.linear.x * sin(th) * dt;
-		double delta_th = g_velocity.angular.z* dt;
+		double dfTimeDelta = (current_time - last_time).toSec( );
+		double dfXDelta = g_velocity.linear.x * cos( dfTheta ) * dfTimeDelta;
+		double dfYDelta = g_velocity.linear.x * sin( dfTheta ) * dfTimeDelta;
+		double dfThetaDelta = g_velocity.angular.z* dfTimeDelta;
 
-		x += delta_x;
-		y += delta_y;
-		th += delta_th;
+		dfX += dfXDelta;
+		dfY += dfYDelta;
+		dfTheta += dfThetaDelta;
 
-		if( delta_x || delta_y || delta_th )
+		if( dfXDelta || dfYDelta || dfThetaDelta )
 		{
 			ROS_DEBUG_THROTTLE( 5.0f, "Pose Changed: x=%lf, y=%lf, theta=%lf",
-				x, y, th );
+				dfX, dfY, dfTheta );
 		}
 
-		geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
+		geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( dfTheta );
 
 		// Publish the TF
 		odom_trans.header.stamp = current_time;
-		odom_trans.transform.translation.x = x;
-		odom_trans.transform.translation.y = y;
+		odom_trans.transform.translation.x = dfX;
+		odom_trans.transform.translation.y = dfY;
 		odom_trans.transform.translation.z = 0.0;
 		odom_trans.transform.rotation = odom_quat;
 
-		broadcaster.sendTransform(odom_trans);
+		broadcaster.sendTransform( odom_trans );
 
 		nav_msgs::Odometry odom;
 		odom.header.stamp = current_time;
@@ -104,8 +104,8 @@ int main(int argc, char** argv) {
 		odom.child_frame_id = "base_footprint";
 
 		// Position
-		odom.pose.pose.position.x = x;
-		odom.pose.pose.position.y = y;
+		odom.pose.pose.position.x = dfX;
+		odom.pose.pose.position.y = dfY;
 		odom.pose.pose.position.z = 0.0;
 		odom.pose.pose.orientation = odom_quat;
 
@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
 		odom.twist.twist.angular.z = g_velocity.angular.z;
 
 		// Publish the Odometry
-		odom_pub.publish(odom);
+		odom_pub.publish( odom );
 
 		last_time = current_time;
 

@@ -313,7 +313,7 @@ void MessageProcessor::WriteToSerialPort( char* pszData, std::size_t dwSize )
 		}
 		else
 		{
-			ROS_ERROR_NAMED( "BrainStem", "Attempt to write to the brain stem, but the serial port is not open!" );
+			ROS_ERROR_THROTTLE_NAMED( 60, "BrainStem", "Attempt to write to the brain stem, but the serial port is not open!" );
 		}
 	}
 }

@@ -30,7 +30,7 @@ void RawOdometryVelocity( const geometry_msgs::TwistStamped& estimatedVelocity )
 
 	g_velocity = estimatedVelocity.twist;
 
-	ROS_DEBUG( "Estimated Velocity Changed: linear=%f, angular=%f",
+	ROS_DEBUG_THROTTLE( 1.0f, "Estimated Velocity Changed: linear=%f, angular=%f",
 		g_velocity.linear.x, g_velocity.angular.z );
 }
 

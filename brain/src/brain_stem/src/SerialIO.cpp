@@ -198,6 +198,8 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 
 			bool bIsEscaped = false;
 
+			uint8_t cCRC = 0;
+
 			for( char c : m_readData )
 			{
 				if( c == m_cEscape )
@@ -217,6 +219,8 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				{
 					messageData.push_back( c );
 
+					cCRC += c;
+
 					bIsEscaped = false;
 				}
 				else
@@ -225,9 +229,18 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					{
 //						ROS_DEBUG_STREAM_NAMED( "SerialIO", "Read Message: " << ToHex( messageData ) );
 
-						m_readCallback( messageData );
+						if( cCRC == 0 )
+						{
+							m_readCallback( messageData );
+						}
+						else
+						{
+							ROS_DEBUG_STREAM_NAMED( "SerialIO", "Invalid CRC: " << ToHex( messageData ) );
+						}
 
 						messageData.clear( );
+
+						cCRC = 0;
 					}
 					else
 					{

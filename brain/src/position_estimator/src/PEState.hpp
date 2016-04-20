@@ -86,7 +86,7 @@ struct PEState : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
         return Pose<BaseType>(x, y, theta);
     }
 
-    cv::Mat getStateVector()
+    cv::Mat getVectorForm()
     {
         cv::Mat state = cv::Mat(STATIC_UKF_STATE_VECTOR_SIZE, 1, TYPE);
 

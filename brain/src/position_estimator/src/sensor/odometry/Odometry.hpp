@@ -19,14 +19,10 @@ namespace srs {
 template<typename TYPE = double>
 struct Odometry : public Measurement
 {
-    uint32_t arrivalTime;
-    TYPE left;
-    TYPE right;
-
-    Odometry(uint32_t arrivalTime, TYPE left, TYPE right) :
+    Odometry(uint32_t arrivalTime, TYPE linear, TYPE angular) :
             arrivalTime(arrivalTime),
-            left(left),
-            right(right)
+            linear(linear),
+            angular(angular)
     {}
 
     virtual ~Odometry()
@@ -35,13 +31,18 @@ struct Odometry : public Measurement
     string toString()
     {
         ostringstream output;
-        output << "Odometry ";
-        output << "arrivalTime: " << arrivalTime << endl;
-        output << "left: " << left << endl;
-        output << "right: " << right << endl;
+        output << "Odometry {";
+        output << "  arrivalTime: " << arrivalTime << endl;
+        output << "       linear: " << linear << endl;
+        output << "      angular: " << angular << endl;
+        output << "}" << endl;
 
         return output.str();
     }
+
+    uint32_t arrivalTime;
+    TYPE linear;
+    TYPE angular;
 };
 
 } // namespace srs

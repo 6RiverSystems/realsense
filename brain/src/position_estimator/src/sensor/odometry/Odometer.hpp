@@ -8,8 +8,6 @@
 
 #include <ros/ros.h>
 
-#include <brain_msgs/RawOdometry.h>
-
 #include <filter/Sensor.hpp>
 
 #include "Odometry.hpp"

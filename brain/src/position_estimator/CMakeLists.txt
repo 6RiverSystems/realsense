@@ -17,7 +17,7 @@ set(${PROJECT_NAME}_SOURCES
     src/filter/Sensor.hpp
     src/filter/ukf/UnscentedKalmanFilter.hpp
 
-#    src/sensor/MeasurementQueue.hpp
+    # src/sensor/MeasurementQueue.hpp
     
     src/sensor/odometry/Odometry.hpp
     src/sensor/odometry/Odometer.hpp
@@ -43,7 +43,6 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
     std_msgs
-    brain_msgs
 )
 
 find_package(OpenCV REQUIRED)
@@ -52,7 +51,7 @@ find_package(GTest REQUIRED)
 catkin_package(
     INCLUDE_DIRS src test
     LIBRARIES ${PROJECT_NAME}
-    CATKIN-DEPENDS std_msgs brain_msgs
+    CATKIN-DEPENDS std_msgs
     DEPENDS opencv
 )
 
@@ -78,6 +77,7 @@ if (CATKIN_ENABLE_TESTING)
         test/ukf/UkfTest.cpp
         test/ukf/UkfTest_Basic.cpp
         test/ukf/UkfTest_11ConstantSteps.cpp 
+        test/ukf/UkfTest_Straight.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${${PROJECT_NAME}_TEST_SOURCES}
     )

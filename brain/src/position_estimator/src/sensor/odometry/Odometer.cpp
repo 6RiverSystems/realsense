@@ -37,10 +37,10 @@ cv::Mat Odometer<STATE_SIZE, TYPE>::getCurrentData()
 {
     // Transfer the value that the odometer care about to the new state
     PEState<TYPE> state = PEState<TYPE>();
-    state.v = 0.5 * (currentData_.left + currentData_.right);
-    state.omega = wheelsRatio_ * (currentData_.right - currentData_.left);
+    state.v = currentData_.linear;
+    state.omega = currentData_.angular;
 
-    return state.getStateVector();
+    return state.getVectorForm();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -14,8 +14,10 @@ using namespace std;
 
 #include <opencv2/opencv.hpp>
 
+#include <filter/Command.hpp>
 #include <filter/Measurement.hpp>
 #include <sensor/odometry/Odometry.hpp>
+#include <VelCmd.hpp>
 
 namespace srs {
 
@@ -28,7 +30,7 @@ struct Utils
         {
             cout << name << " ";
         }
-        cout << "(" << matrix.rows << "x" << matrix.cols << ")" << endl;
+        cout << "(" << matrix.rows << "x" << matrix.cols << ") {" << endl;
 
         TYPE threshold = pow(TYPE(10.0), -TYPE(PRECISION));
         for (unsigned int r = 0; r < matrix.rows; ++r)
@@ -48,14 +50,13 @@ struct Utils
             }
             cout << endl;
         }
+        cout << "}" << endl;
     }
 
-    static void print(vector<srs::Odometry<>> odometryVector)
+    template<typename TYPE>
+    static void print(TYPE object)
     {
-        for (auto odometry : odometryVector)
-        {
-            cout << odometry.toString() << endl;
-        }
+        cout << object.toString() << endl;
     }
 };
 

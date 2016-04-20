@@ -21,7 +21,7 @@ PositionEstimator::PositionEstimator() :
     currentState_ = PEState<>(0.0, 0.0, 0.0);
     currentCovariance_ = cv::Mat::zeros(STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_STATE_VECTOR_SIZE, CV_64F);
 
-    ukf_.reset(currentState_.getStateVector(), currentCovariance_);
+    ukf_.reset(currentState_.getVectorForm(), currentCovariance_);
 
     rosSubscriberCmdVel_ = rosNodeHandle_.subscribe("/cmd_vel", 100,
         &PositionEstimator::cbCmdVelReceived, this);

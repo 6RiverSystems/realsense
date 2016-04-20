@@ -10,7 +10,6 @@ find_package(
 	roscpp
 	rospy
 	std_msgs
-	brain_msgs
 	tf
 )
 

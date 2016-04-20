@@ -43,7 +43,7 @@ cv::Mat Robot<TYPE>::transformWithAB(const cv::Mat stateVector,
         state.omega = reinterpret_cast<VelCmd<>*>(command)->omega;
     }
 
-    return state.getStateVector();
+    return state.getVectorForm();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

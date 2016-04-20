@@ -1,6 +1,0 @@
-eclipse.preferences.version=1
-environment/project/com.nvidia.cuda.ide.configuration.debug.430429515/CMAKE_PREFIX_PATH/delimiter=\:
-environment/project/com.nvidia.cuda.ide.configuration.debug.430429515/CMAKE_PREFIX_PATH/operation=append
-environment/project/com.nvidia.cuda.ide.configuration.debug.430429515/CMAKE_PREFIX_PATH/value=/opt/ros/indigo\:/usr/share
-environment/project/com.nvidia.cuda.ide.configuration.debug.430429515/append=true
-environment/project/com.nvidia.cuda.ide.configuration.debug.430429515/appendContributed=true

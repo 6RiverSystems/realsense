@@ -9,17 +9,21 @@
 #include <vector>
 using namespace std;
 
+#include <tf/transform_broadcaster.h>
+#include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
 
-#include <framework/RosSensor.hpp>
-
-#include "Robot.hpp"
-#include "PEState.hpp"
-#include "VelCmd.hpp"
-
-#include <filter/ukf/UnscentedKalmanFilter.hpp>
+#include <framework/RosTap.hpp>
 
 #include "Configuration.hpp"
+#include "Robot.hpp"
+
+#include "PEState.hpp"
+#include <filter/ukf/UnscentedKalmanFilter.hpp>
+
+#include <tap/odometry/RosOdometer.hpp>
+#include <tap/brain_stem_status/RosBrainStemStatus.hpp>
+#include <tap/vel_cmd/RosVelCmd.hpp>
 
 namespace srs {
 
@@ -27,30 +31,45 @@ class PositionEstimator
 {
 public:
     PositionEstimator();
-    ~PositionEstimator();
 
-    void addSensor(const RosSensor* newSensor);
+    ~PositionEstimator()
+    {
+        disconnectAllTaps();
+    }
 
     void run();
 
 private:
-    constexpr static unsigned int REFRESH_RATE_HZ = 1;
+    constexpr static unsigned int REFRESH_RATE_HZ = 50;
     constexpr static double ALPHA = 1.0;
     constexpr static double BETA = 0.0;
 
-    void cbCmdVelReceived(geometry_msgs::TwistConstPtr message);
+    void disconnectAllTaps();
+
+    void publishInformation();
+
+    void scanTapsForData();
+    void stepUkf();
+
+    RosBrainStemStatus brainStemStatusTap_;
+
+    VelCmd<> currentCommand_;
+    cv::Mat currentCovariance_;
+    PEState<> currentState_;
+    ros::Time currentTimeStep_;
+
+    RosOdometer odometerTap_;
+
+    ros::Time lastTimeStep_;
 
     Robot<> robot_;
-    vector<const RosSensor*> sensors_;
+    ros::NodeHandle rosNodeHandle_;
+    ros::Publisher rosPubPose;
+    tf::TransformBroadcaster rosTfBroadcaster_;
+
+    RosVelCmd velCmdTap_;
 
     UnscentedKalmanFilter<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE> ukf_;
-
-    PEState<> currentState_;
-    cv::Mat currentCovariance_;
-    VelCmd<>* currentCommand_;
-
-    ros::NodeHandle rosNodeHandle_;
-    ros::Subscriber rosSubscriberCmdVel_;
 };
 
 } // namespace srs

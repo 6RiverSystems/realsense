@@ -3,7 +3,9 @@
 #include <opencv2/opencv.hpp>
 
 #include <ros/ros.h>
-#include <boost/assert.hpp>
+#include <nav_msgs/Odometry.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <tf/transform_broadcaster.h>
 
 namespace srs {
 
@@ -13,50 +15,38 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 PositionEstimator::PositionEstimator() :
     ukf_(ALPHA, BETA, robot_, 1 / REFRESH_RATE_HZ),
-    rosNodeHandle_(),
-    currentCommand_(nullptr)
+    rosNodeHandle_()
 {
-    sensors_.clear();
+    ROS_INFO_STREAM("position_estimator_node started");
 
-    currentState_ = PEState<>(0.0, 0.0, 0.0);
-    currentCovariance_ = cv::Mat::zeros(STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_STATE_VECTOR_SIZE, CV_64F);
+    currentCovariance_ = robot_.getNoiseMatrix();
+    currentState_ = PEState<>(2.5, 1.5, 0.0);
 
     ukf_.reset(currentState_.getVectorForm(), currentCovariance_);
 
-    rosSubscriberCmdVel_ = rosNodeHandle_.subscribe("/cmd_vel", 100,
-        &PositionEstimator::cbCmdVelReceived, this);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-PositionEstimator::~PositionEstimator()
-{
-    sensors_.clear();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void PositionEstimator::addSensor(const RosSensor* newSensor)
-{
-    BOOST_ASSERT_MSG(newSensor != nullptr, "Expected sensor pointer not null");
-
-    ROS_INFO_STREAM("Registering sensor: " << newSensor->getName());
-
-    sensors_.push_back(newSensor);
+    rosPubPose = rosNodeHandle_.advertise<nav_msgs::Odometry>("/odom", 50);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void PositionEstimator::run()
 {
-    ros::Rate refreshRate(REFRESH_RATE_HZ);
+    brainStemStatusTap_.connectTap();
+    velCmdTap_.connectTap();
+    odometerTap_.connectTap();
 
+    currentTimeStep_ = ros::Time::now();
+
+    ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
     {
-        ukf_.run(currentCommand_);
+        ros::spinOnce();
 
-        if (currentCommand_)
-        {
-            delete currentCommand_;
-            currentCommand_ = nullptr;
-        }
+        lastTimeStep_ = currentTimeStep_;
+        currentTimeStep_ = ros::Time::now();
+
+        scanTapsForData();
+        stepUkf();
+        publishInformation();
 
         refreshRate.sleep();
     }
@@ -66,9 +56,88 @@ void PositionEstimator::run()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void PositionEstimator::cbCmdVelReceived(geometry_msgs::TwistConstPtr message)
+void PositionEstimator::disconnectAllTaps()
 {
-    currentCommand_ = new VelCmd<>(message->linear.x, message->angular.z);
+    brainStemStatusTap_.disconnectTap();
+    odometerTap_.disconnectTap();
+    velCmdTap_.disconnectTap();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void PositionEstimator::publishInformation()
+{
+    geometry_msgs::Quaternion orientation = tf::createQuaternionMsgFromYaw(currentState_.theta);
+
+    // Publish the TF of the pose
+    geometry_msgs::TransformStamped messagePoseTf;
+    messagePoseTf.header.frame_id = "odom";
+    messagePoseTf.child_frame_id = "base_footprint";
+
+    messagePoseTf.header.stamp = currentTimeStep_;
+    messagePoseTf.transform.translation.x = currentState_.x;
+    messagePoseTf.transform.translation.y = currentState_.y;
+    messagePoseTf.transform.translation.z = 0.0;
+    messagePoseTf.transform.rotation = orientation;
+
+    rosTfBroadcaster_.sendTransform(messagePoseTf);
+
+    // Publish the required odometry for the planners
+    nav_msgs::Odometry messagePose;
+    messagePose.header.stamp = currentTimeStep_;
+    messagePose.header.frame_id = "odom";
+    messagePose.child_frame_id = "base_footprint";
+
+    // Position
+    messagePose.pose.pose.position.x = currentState_.x;
+    messagePose.pose.pose.position.y = currentState_.y;
+    messagePose.pose.pose.position.z = 0.0;
+    messagePose.pose.pose.orientation = orientation;
+
+    // Velocity
+    messagePose.twist.twist.linear.x = currentState_.v;
+    messagePose.twist.twist.linear.y = 0.0;
+    messagePose.twist.twist.linear.z = 0.0;
+    messagePose.twist.twist.angular.x = 0.0;
+    messagePose.twist.twist.angular.y = 0.0;
+    messagePose.twist.twist.angular.z = currentState_.omega;
+
+    // Publish the Odometry
+    rosPubPose.publish(messagePose);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void PositionEstimator::scanTapsForData()
+{
+    //if (velCmdTap_.newDataAvailable())
+    //{
+        currentCommand_ = velCmdTap_.getCurrentData();
+    //}
+
+    if (!brainStemStatusTap_.isBrainStemConnected())
+    {
+        odometerTap_.set(currentTimeStep_.nsec, currentCommand_.v, currentCommand_.omega);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void PositionEstimator::stepUkf()
+{
+    double dT = (currentTimeStep_ - lastTimeStep_).toSec();
+
+    currentState_.x += currentCommand_.v * dT * cos(currentState_.theta);
+    currentState_.y += currentCommand_.v * dT * sin(currentState_.theta);
+    currentState_.theta += currentCommand_.omega * dT;
+
+    currentState_.v = currentCommand_.v;
+    currentState_.omega = currentCommand_.omega;
+
+    // currentState_.theta = Math::normalizeAngle(currentState_.theta);
+
+    Utils::print<PEState<>>(currentState_);
+
+    // ukf_.run(currentCommand_);
+    // currentState_ = PEState<>(ukf_.getState());
+    // currentCovariance_ = ukf_.getCovariance();
 }
 
 } // namespace srs

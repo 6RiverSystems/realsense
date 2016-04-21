@@ -32,7 +32,9 @@ struct VelCmd : public Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>
     {}
 
     VelCmd() :
-        Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>()
+        Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>(),
+        v(BaseType()),
+        omega(BaseType())
     {}
 
     ~VelCmd()

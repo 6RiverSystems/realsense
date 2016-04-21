@@ -3,12 +3,14 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME position_estimator)
 set(PROJECT_NODE ${PROJECT_NAME}_node)
 set(${PROJECT_NAME}_SOURCES
+
     src/platform/ThreadSafeQueue.hpp
     src/platform/Object.hpp
     
     src/framework/Math.hpp
     src/framework/Utils.hpp
     src/framework/Pose.hpp
+    src/framework/RosTap.hpp
 
     src/filter/FilterState.hpp
     src/filter/Command.hpp
@@ -17,18 +19,22 @@ set(${PROJECT_NAME}_SOURCES
     src/filter/Sensor.hpp
     src/filter/ukf/UnscentedKalmanFilter.hpp
 
-    # src/sensor/MeasurementQueue.hpp
+    src/tap/odometry/Odometry.hpp
+    src/tap/odometry/Odometer.hpp
+    src/tap/odometry/RosOdometer.cpp
+
+    src/tap/vel_cmd/VelCmd.hpp
+    src/tap/vel_cmd/RosVelCmd.cpp
     
-    src/sensor/odometry/Odometry.hpp
-    src/sensor/odometry/Odometer.hpp
-    src/sensor/odometry/RosOdometer.cpp
+    src/tap/brain_stem_status/RosBrainStemStatus.cpp
 
     src/PositionEstimator.cpp
+    
     src/PEState.hpp
-    src/VelCmd.hpp
+    src/Robot.hpp
+    
     src/RobotProfile.hpp
     src/Configuration.hpp
-    src/Robot.hpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES
@@ -42,7 +48,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
-    std_msgs
+    tf
 )
 
 find_package(OpenCV REQUIRED)
@@ -51,7 +57,7 @@ find_package(GTest REQUIRED)
 catkin_package(
     INCLUDE_DIRS src test
     LIBRARIES ${PROJECT_NAME}
-    CATKIN-DEPENDS std_msgs
+    CATKIN-DEPENDS tf
     DEPENDS opencv
 )
 

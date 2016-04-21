@@ -18,13 +18,13 @@ using namespace std;
 #include <filter/Measurement.hpp>
 #include <filter/ukf/UnscentedKalmanFilter.hpp>
 
-#include <sensor/odometry/Odometry.hpp>
-#include <sensor/odometry/Odometer.hpp>
+#include <tap/odometry/Odometry.hpp>
+#include <tap/odometry/Odometer.hpp>
+#include <tap/vel_cmd/VelCmd.hpp>
 
 #include <RobotProfile.hpp>
 #include <Robot.hpp>
 #include <PEState.hpp>
-#include <VelCmd.hpp>
 
 using namespace srs;
 
@@ -41,7 +41,7 @@ TEST(UnscentedKalmanFilter, Straight)
 {
     // Create standard robot process model
     Robot<> robot;
-    Odometer<UKF_STATE_SIZE> odometer(RobotProfile<>::SIZE_WHEEL_DISTANCE);
+    Odometer<UKF_STATE_SIZE, CV_64F> odometer;
 
     UnscentedKalmanFilter<UKF_STATE_SIZE> ukf(ALPHA, BETA, robot, DT);
     ukf.addSensor(&odometer);
@@ -104,18 +104,16 @@ TEST(UnscentedKalmanFilter, Straight)
     pose0.setThetaDegrees(90.0);
 
     PEState<> stateT0(pose0);
-
-    cv::Mat covarianceT0 = cv::Mat::eye(UKF_STATE_SIZE, UKF_STATE_SIZE, CV_64F);
-    covarianceT0 = covarianceT0 * 0.0001;
-
+    cv::Mat covarianceT0 = robot.getNoiseMatrix();
     ukf.reset(stateT0.getVectorForm(), covarianceT0);
 
     for (unsigned int t = 0; t < measurements.size(); ++t)
     {
         // Push the simulated measurement
         auto odometry = *measurements.at(t);
-        odometer.push_back(odometry.arrivalTime, odometry.linear, odometry.angular);
+        odometer.set(odometry.arrivalTime, odometry.linear, odometry.angular);
 
+        // Run the step of the UKF
         ukf.run(const_cast<VelCmd<>*>(commands.at(t)));
 
         ASSERT_TRUE(test::Compare::similar<>(ukf.getState(), correctStates[t], 1e-1)) <<

@@ -172,8 +172,6 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::unscentedTransform(
     S.setTo(0);
     C.setTo(0);
 
-    cv::Mat Ts = Math::zeros(S);
-
     for (unsigned int i = 0; i < Y.cols; ++i)
     {
         S += WC_.at<BaseType>(i) * (Y.col(i) - Ybar) * (Y.col(i) - Ybar).t();

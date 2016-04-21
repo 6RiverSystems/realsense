@@ -3,15 +3,14 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ODOMETRYSENSOR_HPP_
-#define ODOMETRYSENSOR_HPP_
+#ifndef ODOMETER_HPP_
+#define ODOMETER_HPP_
 
 #include <ros/ros.h>
 
 #include <filter/Sensor.hpp>
 
 #include "Odometry.hpp"
-#include "Configuration.hpp"
 
 namespace srs {
 
@@ -22,9 +21,8 @@ class Odometer :
 public:
     typedef typename Sensor<STATE_SIZE, TYPE>::BaseType BaseType;
 
-    Odometer(BaseType wheelsDistance) :
+    Odometer() :
         Sensor<STATE_SIZE, TYPE>(cv::Mat::diag(R)),
-        wheelsRatio_(BaseType(0.5) / BaseType(wheelsDistance)),
         currentData_(Odometry<BaseType>(0, 0, 0))
     {
         reset();
@@ -33,11 +31,7 @@ public:
     virtual ~Odometer()
     {}
 
-    void push_back(uint32_t arrivalTime, BaseType left, BaseType right)
-    {
-        currentData_ = Odometry<BaseType>(arrivalTime, left, right);
-        Sensor<STATE_SIZE, TYPE>::setNewData(true);
-    }
+    virtual cv::Mat getCurrentData();
 
     void reset()
     {
@@ -45,13 +39,16 @@ public:
         Sensor<STATE_SIZE, TYPE>::setNewData(false);
     }
 
-    virtual cv::Mat getCurrentData();
+    void set(uint32_t arrivalTime, BaseType linear, BaseType angular)
+    {
+        currentData_ = Odometry<BaseType>(arrivalTime, linear, angular);
+        Sensor<STATE_SIZE, TYPE>::setNewData(true);
+    }
+
     virtual cv::Mat transformWithH(const cv::Mat stateVector);
 
 private:
     const static cv::Mat R;
-
-    BaseType wheelsRatio_;
     Odometry<BaseType> currentData_;
 };
 
@@ -59,4 +56,4 @@ private:
 
 #include "Odometer.cpp"
 
-#endif // ODOMETRYSENSOR_HPP_
+#endif // ODOMETER_HPP_

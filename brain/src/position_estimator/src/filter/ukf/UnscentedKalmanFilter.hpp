@@ -29,6 +29,7 @@ public:
     UnscentedKalmanFilter(BaseType alpha, BaseType beta,
         Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process,
         BaseType dT);
+
     ~UnscentedKalmanFilter()
     {}
 

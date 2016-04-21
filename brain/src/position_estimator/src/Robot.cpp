@@ -24,7 +24,7 @@ cv::Mat Robot<TYPE>::transformWithAB(const cv::Mat stateVector,
     Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>* const command,
     BaseType dT)
 {
-    PEState<TYPE> state = PEState<TYPE>(stateVector);
+    PEState<TYPE> state(stateVector);
 
     // x = x + v * DT * cos(theta);
     // y = y + v * DT * sin(theta);

@@ -1,0 +1,32 @@
+#include "RosVelCmd.hpp"
+
+namespace srs {
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Public methods
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+bool RosVelCmd::connect()
+{
+    rosSubscriber_ = rosNodeHandle_.subscribe("/cmd_vel", 1000, &RosVelCmd::onCmdVel, this);
+
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Private methods
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void RosVelCmd::onCmdVel(geometry_msgs::TwistConstPtr message)
+{
+    ros::Time timestamp = ros::Time::now();
+
+    currentCommand_.v = message->linear.x;
+    currentCommand_.omega = message->angular.z;
+
+    ROS_INFO_THROTTLE(0.5f, "RosVelCmd | v = %f, omega = %f", currentCommand_.v, currentCommand_.omega);
+
+    setNewData(true, timestamp.nsec);
+}
+
+} // namespace srs

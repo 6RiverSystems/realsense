@@ -21,3 +21,4 @@ ohps/.metadata
 ohps/build
 ohps/devel
 CMakeLists.txt
+brain/src/brain_stem/Debug

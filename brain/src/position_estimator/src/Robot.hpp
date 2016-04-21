@@ -11,9 +11,9 @@
 #include <framework/Math.hpp>
 
 #include <filter/Process.hpp>
+#include <filter/Command.hpp>
 
 #include "Configuration.hpp"
-#include "VelCmd.hpp"
 
 namespace srs {
 

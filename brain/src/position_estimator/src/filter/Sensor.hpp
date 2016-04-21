@@ -39,13 +39,14 @@ public:
         return newData_;
     }
 
+    virtual cv::Mat getCurrentData() = 0;
+    virtual cv::Mat transformWithH(const cv::Mat stateVector) = 0;
+
+protected:
     void setNewData(bool newValue)
     {
         newData_ = newValue;
     }
-
-    virtual cv::Mat getCurrentData() = 0;
-    virtual cv::Mat transformWithH(const cv::Mat stateVector) = 0;
 
 private:
     bool newData_;

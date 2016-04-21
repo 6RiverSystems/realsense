@@ -14,10 +14,8 @@ using namespace std;
 
 #include <opencv2/opencv.hpp>
 
-#include <filter/Command.hpp>
-#include <filter/Measurement.hpp>
-#include <sensor/odometry/Odometry.hpp>
-#include <VelCmd.hpp>
+#include <tap/odometry/Odometry.hpp>
+#include <tap/vel_cmd/VelCmd.hpp>
 
 namespace srs {
 

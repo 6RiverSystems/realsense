@@ -128,6 +128,11 @@ struct Math
         return TYPE(180 / M_PI) * rad;
     }
 
+    template<typename TYPE = double>
+    constexpr inline static TYPE normalizeAngle(TYPE rad) {
+        return rad - 2 * M_PI * floor((rad + M_PI) / (2 * M_PI));
+    }
+
     static cv::Mat zeros(const cv::Mat original)
     {
         return cv::Mat::zeros(original.rows, original.cols, original.type());

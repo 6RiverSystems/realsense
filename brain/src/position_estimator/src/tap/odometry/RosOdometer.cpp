@@ -1,34 +1,26 @@
 #include "RosOdometer.hpp"
 
-#include <RobotProfile.hpp>
-
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-RosOdometer::RosOdometer(string name) :
-    RosSensor(name),
-    sensor_(RobotProfile<>::SIZE_WHEEL_DISTANCE)
+bool RosOdometer::connect()
 {
     rosSubscriber_ = rosNodeHandle_.subscribe("/sensors/odometry/raw", 100,
-        &RosOdometer::cbOdometryReceived, this);
-}
+        &RosOdometer::onSensorsOdometryRaw, this);
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-RosOdometer::~RosOdometer()
-{
-    rosSubscriber_.shutdown();
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void RosOdometer::cbOdometryReceived(geometry_msgs::TwistStampedConstPtr message)
+void RosOdometer::onSensorsOdometryRaw(geometry_msgs::TwistStampedConstPtr message)
 {
-    sensor_.push_back(message->header.stamp.nsec,
+    sensor_.set(message->header.stamp.nsec,
         static_cast<double>(message->twist.linear.x),
         static_cast<double>(message->twist.angular.z));
 }

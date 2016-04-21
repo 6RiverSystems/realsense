@@ -26,11 +26,11 @@ struct PEState : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
     typedef typename FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>::BaseType BaseType;
 
     enum {
-        STATE_X,
-        STATE_Y,
-        STATE_THETA,
-        STATE_V,
-        STATE_OMEGA,
+        STATE_X = 0,
+        STATE_Y = 1,
+        STATE_THETA = 2,
+        STATE_V = 3,
+        STATE_OMEGA = 4
     };
 
     PEState(BaseType x, BaseType y, BaseType theta) :
@@ -102,6 +102,20 @@ struct PEState : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
     Velocity<BaseType> getVelocity()
     {
         return Velocity<BaseType>(v, omega);
+    }
+
+    string toString()
+    {
+        ostringstream output;
+        output << "PEState {" << endl;
+        output << "      x: " << x << endl;
+        output << "      y: " << y << endl;
+        output << "  theta: " << theta << endl;
+        output << "      v: " << v << endl;
+        output << "  omega: " << omega << endl;
+        output << "}" << endl;
+
+        return output.str();
     }
 
     BaseType x;

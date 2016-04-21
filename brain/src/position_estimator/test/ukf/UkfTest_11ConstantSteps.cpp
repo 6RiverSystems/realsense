@@ -18,13 +18,13 @@ using namespace std;
 #include <filter/Measurement.hpp>
 #include <filter/ukf/UnscentedKalmanFilter.hpp>
 
-#include <sensor/odometry/Odometry.hpp>
-#include <sensor/odometry/Odometer.hpp>
+#include <tap/odometry/Odometry.hpp>
+#include <tap/odometry/Odometer.hpp>
 
 #include <RobotProfile.hpp>
 #include <Robot.hpp>
 #include <PEState.hpp>
-#include <VelCmd.hpp>
+#include <tap/vel_cmd/VelCmd.hpp>
 
 using namespace srs;
 
@@ -41,13 +41,13 @@ TEST(UnscentedKalmanFilter, Run11ConstantSteps)
 {
     // Create standard robot process model
     Robot<> robot;
-    Odometer<UKF_STATE_SIZE> odometer(RobotProfile<>::SIZE_WHEEL_DISTANCE);
+    Odometer<UKF_STATE_SIZE> odometer;
 
     UnscentedKalmanFilter<UKF_STATE_SIZE> ukf(ALPHA, BETA, robot, DT);
     ukf.addSensor(&odometer);
 
     // Prepare a sequence of commands
-    vector<const Command<>*> commands = {
+    vector<const VelCmd<>*> commands = {
         &COMMAND_STEP_00,
         nullptr,
         nullptr,
@@ -62,7 +62,7 @@ TEST(UnscentedKalmanFilter, Run11ConstantSteps)
     };
 
     // Prepare a sequence of odometry readings
-    vector<const Measurement*> measurements = {
+    vector<const Odometry<>*> measurements = {
         &ODOMETRY_STEP_01,
         &ODOMETRY_STEP_01,
         &ODOMETRY_STEP_01,
@@ -121,7 +121,7 @@ TEST(UnscentedKalmanFilter, Run11ConstantSteps)
     {
         // Push the simulated measurement
         auto odometry = *measurements.at(t);
-        odometer.push_back(odometry.arrivalTime, odometry.linear, odometry.angular);
+        odometer.set(odometry.arrivalTime, odometry.linear, odometry.angular);
 
         // Run the step of the UKF
         ukf.run(const_cast<VelCmd<>*>(commands.at(t)));

@@ -20,7 +20,6 @@ SerialIO::SerialIO( bool bGenerateCRC, bool bIncludeLength, char cTerminating, c
 	m_cEscape( cEscape ),
 	m_setCharsToEscape( setCharsToEscape ),
 	m_Thread( ),
-
 	m_oWork( m_IOService ),
 	m_SerialPort( m_IOService ),
 	m_bIsWriting( false ),
@@ -141,6 +140,12 @@ void SerialIO::WriteInSerialThread( std::vector<char> buffer, bool bIsRaw )
 		// Generate CRC
 		if( m_bGenerateCRC )
 		{
+			// Escape the character
+			if( m_setCharsToEscape.find( -cCRC ) != m_setCharsToEscape.end( ) )
+			{
+				m_writeData.push_back( m_cEscape );
+			}
+
 			m_writeData.push_back( -cCRC );
 		}
 
@@ -189,24 +194,31 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 {
 	if( !error )
 	{
-        // Combine buffers
+		// Combine buffers
 		m_readData.insert( m_readData.end( ), m_ReadBuffer.begin( ), m_ReadBuffer.begin( ) + size );
 
 		if( std::find( m_readData.begin( ), m_readData.end( ), m_cTerminating ) != m_readData.end( ) )
 		{
-			std::vector<char> messageData;
+			// A copy of the raw original data (in the case of a partial message)
+			std::vector<char> messageDataLeftOver;
 
-			bool bIsEscaped = false;
+			std::vector<char> messageData;
 
 			uint8_t cCRC = 0;
 
+			bool bIsEscaped = false;
+
 			for( char c : m_readData )
 			{
+				messageDataLeftOver.push_back( c );
+
 				if( c == m_cEscape )
 				{
 					if( bIsEscaped )
 					{
 						messageData.push_back( c );
+
+						cCRC += c;
 
 						bIsEscaped = false;
 					}
@@ -227,15 +239,20 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				{
 					if( m_readCallback )
 					{
-//						ROS_DEBUG_STREAM_NAMED( "SerialIO", "Read Message: " << ToHex( messageData ) );
-
-						if( cCRC == 0 )
+						if( messageData.size( ) > 0 )
 						{
-							m_readCallback( messageData );
+							if( cCRC == 0 || messageData[0] == '<' )
+							{
+								m_readCallback( messageData );
+							}
+							else
+							{
+								ROS_ERROR_STREAM_NAMED( "SerialIO", "Invalid CRC: " << ToHex( messageData ) );
+							}
 						}
 						else
 						{
-							ROS_DEBUG_STREAM_NAMED( "SerialIO", "Invalid CRC: " << ToHex( messageData ) );
+							ROS_ERROR_STREAM_NAMED( "SerialIO", "Empty Message" );
 						}
 
 						messageData.clear( );
@@ -250,7 +267,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 			}
 
 			// Remainder of message
-			m_readData = messageData;
+			m_readData = messageDataLeftOver;
 		}
 	}
 	else

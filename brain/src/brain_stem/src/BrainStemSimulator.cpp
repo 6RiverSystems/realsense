@@ -13,25 +13,27 @@ void OnCommandVelocity( const geometry_msgs::Twist& desiredVelocity )
 	if( !g_bUseEstimatedVelocity )
 	{
 		g_velocity = desiredVelocity;
-
-		ROS_DEBUG_THROTTLE( 5.0f, "Simulated Velocity Changed: linear=%f, angular=%f",
-			g_velocity.linear.x, g_velocity.angular.z );
 	}
+
+	ROS_DEBUG_THROTTLE( 1.0f, "Desired Velocity Changed: linear=%f, angular=%f",
+		g_velocity.linear.x, g_velocity.angular.z );
 }
 
 void RawOdometryVelocity( const geometry_msgs::TwistStamped& estimatedVelocity )
 {
 	if( !g_bUseEstimatedVelocity )
 	{
-		ROS_DEBUG( "Switching to actual estimated velocity: " );
-
 		g_bUseEstimatedVelocity = true;
 	}
 
-	g_velocity = estimatedVelocity.twist;
+	if( g_velocity.linear.x != estimatedVelocity.twist.linear.x  ||
+		g_velocity.angular.z != estimatedVelocity.twist.angular.z )
+	{
+		ROS_DEBUG_THROTTLE( 1.0f, "Estimated Velocity Changed: linear=%f, angular=%f",
+				estimatedVelocity.twist.linear.x, estimatedVelocity.twist.angular.z );
+	}
 
-	ROS_DEBUG_THROTTLE( 1.0f, "Estimated Velocity Changed: linear=%f, angular=%f",
-		g_velocity.linear.x, g_velocity.angular.z );
+	g_velocity = estimatedVelocity.twist;
 }
 
 int main(int argc, char** argv) {

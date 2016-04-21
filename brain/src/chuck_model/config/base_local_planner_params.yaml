@@ -1,13 +1,13 @@
 TrajectoryPlannerROS:
 
 # Robot Configuration Parameters
-  max_vel_x: 1.0
-  min_vel_x: 0.05
+  max_vel_x: 2.0
+  min_vel_x: 0.1
   max_vel_theta: 0.65
   min_vel_theta: -0.65
 
-  acc_lim_x: 2.0
-  acc_lim_theta: 1.0
+  acc_lim_x: 0.65
+  acc_lim_theta: 0.5
 
 # Goal Tolerance Parameters
   yaw_goal_tolerance: 0.3
@@ -20,10 +20,10 @@ TrajectoryPlannerROS:
  
 # Trajectory Scoring Parameters
   meter_scoring: true
-  pdist_scale: 1.0
+  pdist_scale: 2.0
   gdist_scale: 0.8
   occdist_scale: 0.01
-  heading_lookahead: 0.5
+  heading_lookahead: 0.0
   heading_scoring: true
   heading_scoring_timestep: 1.0
   dwa: true

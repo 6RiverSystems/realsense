@@ -30,6 +30,7 @@ MessageProcessor::MessageProcessor( ros::NodeHandle& node, IO* pIO ) :
 	m_pIO( pIO ),
 	m_VelocitySubscriber( node.subscribe<geometry_msgs::Twist>( "/cmd_vel", 100,
 		std::bind( &MessageProcessor::OnChangeVelocity, this, std::placeholders::_1 ) ) ),
+	m_VelocityPublisher( node.advertise<geometry_msgs::Twist>( "/cmd_vel", 1 ) ),
 	m_OdometryRawPublisher( node.advertise<geometry_msgs::TwistStamped>( "/sensors/odometry/raw", 1000 ) ),
 	m_ConnectedPublisher( node.advertise<std_msgs::Bool>( "/brain_stem/connected", 1 ) ),
 	m_llcmdSubscriber( node.subscribe<std_msgs::String>( "/cmd_ll", 1000,
@@ -152,7 +153,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 		{
 			ODOMETRY_DATA* pOdometry = reinterpret_cast<ODOMETRY_DATA*>( buffer.data( ) );
 
-			ROS_DEBUG_THROTTLE_NAMED( 2, "Brainstem", "Raw Odometry: %f, %f", pOdometry->linear_velocity, pOdometry->angular_velocity );
+//			ROS_DEBUG_THROTTLE_NAMED( 2, "Brainstem", "Raw Odometry: %f, %f", pOdometry->linear_velocity, pOdometry->angular_velocity );
 
 			geometry_msgs::TwistStamped odometry;
 			odometry.header.stamp.nsec = pOdometry->timestamp * 1000;
@@ -166,7 +167,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 		case BRAIN_STEM_MSG::UNKNOWN:
 		default:
 		{
-			ROS_ERROR_STREAM_NAMED( "Brainstem", "Unknown message from brainstem: " << ToHex( buffer ) );
+			ROS_ERROR_STREAM_NAMED( "Brainstem", "Unknown message from brainstem: " << (int)eCommand << ", data: " << ToHex( buffer ) );
 		}
 		break;
 	}
@@ -180,7 +181,7 @@ void MessageProcessor::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& v
 		static_cast<float>( velocity->angular.z )
 	};
 
-	ROS_DEBUG_NAMED( "Brainstem", "Set Velocity: linear=%f, angular=%f", velocity->linear.x, velocity->angular.z );
+	ROS_DEBUG_THROTTLE_NAMED( 1.0f, "Brainstem", "Set Velocity: linear=%f, angular=%f", velocity->linear.x, velocity->angular.z );
 
 	// Send the velocity down to the motors
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
@@ -230,6 +231,8 @@ void MessageProcessor::SetConnected( bool bIsConnected )
 	msg.data = bIsConnected;
 
 	m_ConnectedPublisher.publish( msg );
+
+	m_VelocityPublisher.publish( geometry_msgs::Twist( ) );
 }
 
 //////////////////////////////////////////////////////////////////////////

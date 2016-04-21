@@ -41,6 +41,8 @@ private:
 
 	ros::Subscriber					m_VelocitySubscriber;
 
+	ros::Publisher					m_VelocityPublisher;
+
 	ros::Publisher					m_llEventPublisher;
 
 	ros::Publisher					m_OdometryRawPublisher;

@@ -114,6 +114,7 @@ public:
 		    {
 		    	strError = e.what( );
 		    }
+
 		    catch( ... )
 		    {
 		    	strError = "Unknown error";

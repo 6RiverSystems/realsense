@@ -181,7 +181,7 @@ void MessageProcessor::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& v
 		static_cast<float>( velocity->angular.z )
 	};
 
-	ROS_DEBUG_THROTTLE_NAMED( 1.0f, "Brainstem", "Set Velocity: linear=%f, angular=%f", velocity->linear.x, velocity->angular.z );
+	ROS_DEBUG_NAMED( "Brainstem", "Set Brainstem Velocity (/cmd_vel): linear=%f, angular=%f", velocity->linear.x, velocity->angular.z );
 
 	// Send the velocity down to the motors
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );

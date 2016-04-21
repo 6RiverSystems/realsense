@@ -13,10 +13,10 @@ void OnCommandVelocity( const geometry_msgs::Twist& desiredVelocity )
 	if( !g_bUseEstimatedVelocity )
 	{
 		g_velocity = desiredVelocity;
-	}
 
-	ROS_DEBUG_THROTTLE( 1.0f, "Desired Velocity Changed: linear=%f, angular=%f",
-		g_velocity.linear.x, g_velocity.angular.z );
+		ROS_DEBUG( "Desired Velocity Changed: linear=%f, angular=%f",
+			desiredVelocity.linear.x, desiredVelocity.angular.z );
+	}
 }
 
 void RawOdometryVelocity( const geometry_msgs::TwistStamped& estimatedVelocity )
@@ -29,7 +29,7 @@ void RawOdometryVelocity( const geometry_msgs::TwistStamped& estimatedVelocity )
 	if( g_velocity.linear.x != estimatedVelocity.twist.linear.x  ||
 		g_velocity.angular.z != estimatedVelocity.twist.angular.z )
 	{
-		ROS_DEBUG_THROTTLE( 1.0f, "Estimated Velocity Changed: linear=%f, angular=%f",
+		ROS_DEBUG( "Estimated Velocity Changed: linear=%f, angular=%f",
 				estimatedVelocity.twist.linear.x, estimatedVelocity.twist.angular.z );
 	}
 
@@ -77,17 +77,17 @@ int main(int argc, char** argv) {
 		double dfTimeDelta = (current_time - last_time).toSec( );
 		double dfXDelta = g_velocity.linear.x * cos( dfTheta ) * dfTimeDelta;
 		double dfYDelta = g_velocity.linear.x * sin( dfTheta ) * dfTimeDelta;
-		double dfThetaDelta = g_velocity.angular.z* dfTimeDelta;
+		double dfThetaDelta = g_velocity.angular.z * dfTimeDelta;
 
 		dfX += dfXDelta;
 		dfY += dfYDelta;
 		dfTheta += dfThetaDelta;
 
-		if( dfXDelta || dfYDelta || dfThetaDelta )
-		{
-			ROS_DEBUG_THROTTLE( 1.0f, "Pose Changed: x=%lf, y=%lf, theta=%lf",
-				dfX, dfY, dfTheta );
-		}
+//		if( dfXDelta || dfYDelta || dfThetaDelta )
+//		{
+//			ROS_DEBUG_THROTTLE( 1.0f, "Pose Changed: x=%lf, y=%lf, theta=%lf",
+//				dfX, dfY, dfTheta );
+//		}
 
 		geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( dfTheta );
 

@@ -1,0 +1,2 @@
+srsc_6rhq:srsc_empty
+-DCATKIN_DEVEL_PREFIX=/home/fsantini/projects/repos/ros/srs_customers/devel -DCMAKE_INSTALL_PREFIX=/home/fsantini/projects/repos/ros/srs_customers/install -G Unix Makefiles

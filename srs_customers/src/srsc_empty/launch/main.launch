@@ -1,0 +1,35 @@
+<launch>
+    <arg name="customer_map" value="empty.yaml" />
+
+    <arg name="paused" default="false" />
+    <arg name="use_sim_time" default="true" />
+    <arg name="gui" default="true" />
+    <arg name="headless" default="false" />
+    <arg name="debug" default="true" />
+
+    <!-- Launch visualization in rviz -->
+    <node name="rviz" pkg="rviz" type="rviz" 
+        args="-d $(find srs_bot_chuck)/rviz/urdf.rviz" 
+        required="true" />
+
+    <!-- Spawn a robot into Gazebo -->
+    <!-- 
+        <node name="spawn_urdf" pkg="gazebo_ros" 
+            type="spawn_model" 
+            args="-param robot_description -urdf -model chuck" /> 
+    -->
+
+    <!-- Launch the robot with the specified cost parameters -->
+    <include file="$(find srs_bot_chuck)/launch/robot.launch">
+
+        <arg name="target_map" value="$(find srsc_empty)/map/$(arg customer_map)" />
+
+        <arg name="global_costmap_common_params" value="$(find srsc_empty)/config/costmap_common_params.yaml" />
+        <arg name="local_costmap_common_params" value="$(find srsc_empty)/config/costmap_common_params.yaml" />
+        <arg name="local_costmap_params" value="$(find srsc_empty)/config/local_costmap_params.yaml" />
+        <arg name="global_costmap_params" value="$(find srsc_empty)/config/global_costmap_params.yaml" />
+        <arg name="dwa_local_planner_params" value="$(find srsc_empty)/config/dwa_local_planner_params.yaml" />
+        <arg name="move_base_params" value="$(find srsc_empty)/config/move_base_params.yaml" />
+
+    </include>
+</launch>

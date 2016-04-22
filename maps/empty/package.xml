@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<package>
+    <name>empty_map</name>
+    <version>1.0.0</version>
+    <description>The empty map package</description>
+
+    <author email="dan@6river.com">Dan Winkler</author>
+    <maintainer email="dan@6river.com">Dan Winkler</maintainer>
+
+    <license>TODO</license>
+</package>

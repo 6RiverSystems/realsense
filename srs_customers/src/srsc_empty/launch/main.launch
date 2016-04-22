@@ -20,7 +20,7 @@
     -->
 
     <!-- Launch the robot with the specified cost parameters -->
-    <include file="$(find srs_bot_chuck)/launch/robot.launch">
+    <include file="$(find srsbot_chuck)/launch/robot.launch">
 
         <arg name="target_map" value="$(find srsc_empty)/map/$(arg customer_map)" />
 

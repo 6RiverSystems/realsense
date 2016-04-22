@@ -2,7 +2,7 @@
 <package>
   <name>srsc_empty</name>
   <version>1.0.0</version>
-  <description>The customer package: empty map</description>
+  <description>Customer package: empty map</description>
 
   <author email="dan@6river.com">Dan Winkler</author> -->
   <maintainer email="dan@6river.com">Dan Winkler</maintainer>

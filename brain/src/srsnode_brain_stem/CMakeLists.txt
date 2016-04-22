@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 
-set(PROJECT_NAME brain_stem)
+set(PROJECT_NAME srsnode_brain_stem)
 
 project(${PROJECT_NAME})
 

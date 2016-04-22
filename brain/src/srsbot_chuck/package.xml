@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>srs_bot_chuck</name>
+  <name>srsbot_chuck</name>
   <version>0.0.0</version>
   <description>The chuck_model package</description>
 

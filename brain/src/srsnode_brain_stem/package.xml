@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+    <name>srsnode_brain_stem</name>
+    <version>1.0.0</version>
+    <description>Node package: Brain Stem</description>
+    
+    <author email="dan@6river.com">Dan Winkler</author>
+    <maintainer email="dan@6river.com">Dan Winkler</maintainer>
+
+    <license>TODO</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+ 
+    <build_depend>std_msgs</build_depend>
+    <run_depend>std_msgs</run_depend>
+
+    <build_depend>geometry_msgs</build_depend>
+    <run_depend>geometry_msgs</run_depend>
+
+    <build_depend>nav_msgs</build_depend>
+    <run_depend>nav_msgs</run_depend>
+
+    <test_depend>rosunit</test_depend>
+</package>

@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 <package>
-    <name>position_estimator</name>
-    <version>0.0.1</version>
-    <description>The Position Estimator package</description>
-    <maintainer email="fsantini@6river.com">fsantini</maintainer>
+    <name>srsnode_position_estimator</name>
+    <version>1.0.0</version>
+    <description>Node package: Position Estimator</description>
+    
+    <author email="fsantini@6river.com">Fabrizio Santini</author>
+    <maintainer email="fsantini@6river.com">Fabrizio Santini</maintainer>
 
     <license>TODO</license>
 
@@ -11,7 +13,7 @@
  
     <build_depend>std_msgs</build_depend>
     <run_depend>std_msgs</run_depend>
-    
+
     <build_depend>geometry_msgs</build_depend>
     <run_depend>geometry_msgs</run_depend>
 

@@ -1,5 +1,0 @@
-<launch>
-    <node name="position_estimator" pkg="position_estimator" 
-        type="position_estimator_node"
-        output="screen" respawn="true"/>
-</launch>

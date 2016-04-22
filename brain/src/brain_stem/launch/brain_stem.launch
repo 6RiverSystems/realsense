@@ -1,5 +1,0 @@
-<launch>
-    <node name="brain_stem" pkg="brain_stem" 
-        type="brain_stem" 
-        output="screen" respawn="true"/>
-</launch>

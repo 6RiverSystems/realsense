@@ -15,7 +15,6 @@ set(${PROJECT_NAME}_SOURCES
     
     src/tap/brain_stem_status/RosBrainStemStatus.cpp
 
-    src/position_estimator_node.cpp
     src/PositionEstimator.cpp
     
     src/PEState.hpp
@@ -54,6 +53,7 @@ include_directories(include
 )
 
 add_executable(${PROJECT_NODE} 
+    src/position_estimator_node.cpp
     ${${PROJECT_NAME}_SOURCES}
 )
 target_link_libraries(${PROJECT_NODE}

@@ -4,11 +4,10 @@
 
 int main(int argc, char** argv)
 {
-    // Initialize ROS and ROSCPP
-    ros::init(argc, argv, "node_pe");
-    ros::NodeHandle nh;
+    // Initialize ROS
+    ros::init(argc, argv, "srsnode_joystick_adapter");
 
-    ROS_INFO_STREAM("joystick_adapter_node started");
+    ROS_INFO_STREAM("srsnode_joystick_adapter_node started");
 
     // Create the estimator and run it
     srs::JoystickAdapter joystickAdapter;

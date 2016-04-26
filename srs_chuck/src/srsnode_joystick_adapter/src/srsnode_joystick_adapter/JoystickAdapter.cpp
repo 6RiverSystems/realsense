@@ -3,9 +3,7 @@
 #include <opencv2/opencv.hpp>
 
 #include <ros/ros.h>
-#include <nav_msgs/Odometry.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include <tf/transform_broadcaster.h>
+#include <geometry_msgs/Twist.h>
 
 namespace srs {
 
@@ -16,7 +14,7 @@ namespace srs {
 JoystickAdapter::JoystickAdapter() :
     rosNodeHandle_()
 {
-    rosPubCmdVel_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("/cmd_vel", 50);
+    rosPubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 50);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

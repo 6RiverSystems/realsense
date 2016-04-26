@@ -1,5 +1,0 @@
-<launch>
-    <node name="srsnode_brain_stem" pkg="srsnode_brain_stem" 
-        type="srsnode_brain_stem" 
-        output="screen" respawn="true"/>
-</launch>

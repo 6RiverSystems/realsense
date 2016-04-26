@@ -1,7 +1,12 @@
+#
+# (c) Copyright 2015-2016 River Systems, all rights reserved.
+#
+# This is proprietary software, unauthorized distribution is not permitted.
+#
 cmake_minimum_required(VERSION 2.8.3)
 
+####################################################################################################
 set(PROJECT_NAME srsnode_position_estimator)
-set(PROJECT_NODE ${PROJECT_NAME}_node)
 set(${PROJECT_NAME}_SOURCES
 
     src/${PROJECT_NAME}/tap/brain_stem_status/RosBrainStemStatus.cpp
@@ -18,10 +23,17 @@ set(${PROJECT_NAME}_SOURCES
 
     src/${PROJECT_NAME}/PositionEstimator.cpp
 )
+set(${PROJECT_NAME}_TEST_SOURCES
+
+    test/Test_Pe_11ConstantSteps.cpp
+    test/Test_Pe_Straight.cpp
+)
+####################################################################################################
+set(PROJECT_NODE ${PROJECT_NAME}_node)
 
 project(${PROJECT_NAME})
 
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
@@ -63,8 +75,7 @@ target_link_libraries(${PROJECT_NODE}
 if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(TestSuite_Pe
         test/TestSuite_Pe.cpp
-        test/Test_Pe_11ConstantSteps.cpp
-        test/Test_Pe_Straight.cpp
+        ${${PROJECT_NAME}_TEST_SOURCES}
         ${${PROJECT_NAME}_SOURCES}
     )
     target_link_libraries(TestSuite_Pe

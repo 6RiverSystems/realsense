@@ -1,3 +1,10 @@
+<!-- 
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
 <launch>
     <!-- Declare the parameters passed by the main launch file -->
     <arg name="target_map" />
@@ -10,6 +17,9 @@
 
     <!-- Robot description -->
     <param name="robot_description" command="$(find xacro)/xacro.py $(find srsbot_chuck)/urdf/chuck.urdf.xacro" />
+
+    <!-- Basic sensor drivers -->
+    <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
 
     <!-- Launch map server -->
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg target_map)" />
@@ -29,8 +39,8 @@
     </node>
 
     <!-- Launch all the robot components -->
-    <include file="$(find srsnode_brain_stem)/launch/brain_stem.launch" />
-    <include file="$(find srsnode_position_estimator)/launch/position_estimator.launch" />
+    <include file="$(find srsnode_brain_stem)/launch/node.launch" />
+    <include file="$(find srsnode_position_estimator)/launch/node.launch" />
 
     <!-- Launch the ros-bridge -->
     <!-- <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" /> -->

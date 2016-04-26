@@ -1,4 +1,12 @@
 <?xml version="1.0"?>
+<!-- 
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+
 <package>
     <name>srsnode_brain_stem</name>
     <version>1.0.0</version>
@@ -20,5 +28,9 @@
     <build_depend>nav_msgs</build_depend>
     <run_depend>nav_msgs</run_depend>
 
+    <build_depend>srslib_framework</build_depend>
+    <run_depend>srslib_framework</run_depend>
+
     <test_depend>rosunit</test_depend>
+    <test_depend>srslib_test</test_depend>
 </package>

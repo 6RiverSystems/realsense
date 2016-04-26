@@ -1,6 +1,0 @@
-/media/psf/Home/Projects/repos/ros/srs_customers/build/CMakeFiles/clean_test_results.dir
-/media/psf/Home/Projects/repos/ros/srs_customers/build/CMakeFiles/clean_test_results_Project.dir
-/media/psf/Home/Projects/repos/ros/srs_customers/build/CMakeFiles/download_extra_data.dir
-/media/psf/Home/Projects/repos/ros/srs_customers/build/CMakeFiles/doxygen.dir
-/media/psf/Home/Projects/repos/ros/srs_customers/build/CMakeFiles/run_tests.dir
-/media/psf/Home/Projects/repos/ros/srs_customers/build/CMakeFiles/tests.dir

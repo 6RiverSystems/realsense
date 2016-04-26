@@ -1,0 +1,13 @@
+<!-- 
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+<launch>
+    <node name="srsnode_brain_stem"
+        pkg="srsnode_brain_stem"
+        type="srsnode_brain_stem_node" 
+        output="screen" respawn="true"/>
+</launch>

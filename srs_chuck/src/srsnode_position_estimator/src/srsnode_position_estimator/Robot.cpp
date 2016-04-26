@@ -1,7 +1,7 @@
 #include <srslib_framework/math/Math.hpp>
 
-#include <srsnode_position_estimator/PEState.hpp>
-#include <srsnode_position_estimator/tap/vel_cmd/VelCmd.hpp>
+#include <srsnode_position_estimator/StatePe.hpp>
+#include <srsnode_position_estimator/CmdVelocity.hpp>
 
 namespace srs {
 
@@ -24,7 +24,7 @@ cv::Mat Robot<TYPE>::transformWithAB(const cv::Mat stateVector,
     Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>* const command,
     BaseType dT)
 {
-    PEState<TYPE> state(stateVector);
+    StatePe<TYPE> state(stateVector);
 
     // x = x + v * DT * cos(theta);
     // y = y + v * DT * sin(theta);
@@ -39,8 +39,8 @@ cv::Mat Robot<TYPE>::transformWithAB(const cv::Mat stateVector,
     // end
     if (command)
     {
-        state.v = reinterpret_cast<VelCmd<>*>(command)->v;
-        state.omega = reinterpret_cast<VelCmd<>*>(command)->omega;
+        state.v = reinterpret_cast<CmdVelocity<>*>(command)->velocity.linear;
+        state.omega = reinterpret_cast<CmdVelocity<>*>(command)->velocity.angular;
     }
 
     return state.getVectorForm();

@@ -19,7 +19,7 @@ PositionEstimator::PositionEstimator() :
     commandUpdated_(false)
 {
     currentCovariance_ = robot_.getNoiseMatrix();
-    currentState_ = PEState<>(3.0, 2.0, 0.0);
+    currentState_ = StatePe<>(3.0, 2.0, 0.0);
 
     ukf_.reset(currentState_.getVectorForm(), currentCovariance_);
 
@@ -29,9 +29,9 @@ PositionEstimator::PositionEstimator() :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void PositionEstimator::run()
 {
-    brainStemStatusTap_.connectTap();
-    velCmdTap_.connectTap();
-    odometerTap_.connectTap();
+    tapBrainStemStatus_.connectTap();
+    tapCmdVel_.connectTap();
+    tapOdometer_.connectTap();
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
@@ -53,9 +53,9 @@ void PositionEstimator::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void PositionEstimator::disconnectAllTaps()
 {
-    brainStemStatusTap_.disconnectTap();
-    odometerTap_.disconnectTap();
-    velCmdTap_.disconnectTap();
+    tapBrainStemStatus_.disconnectTap();
+    tapCmdVel_.disconnectTap();
+    tapOdometer_.disconnectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,12 +103,14 @@ void PositionEstimator::publishInformation()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void PositionEstimator::scanTapsForData()
 {
-    commandUpdated_ = velCmdTap_.newDataAvailable();
-    currentCommand_ = velCmdTap_.getCurrentData();
+    commandUpdated_ = tapCmdVel_.newDataAvailable();
+    currentCommand_ = CmdVelocity<>(tapCmdVel_.getCurrentData());
 
-    if (!brainStemStatusTap_.isBrainStemConnected())
+    if (!tapBrainStemStatus_.isBrainStemConnected())
     {
-        odometerTap_.set(currentTime_.nsec, currentCommand_.v, currentCommand_.omega);
+        tapOdometer_.set(currentTime_.nsec,
+            currentCommand_.velocity.linear,
+            currentCommand_.velocity.angular);
     }
 }
 
@@ -116,7 +118,7 @@ void PositionEstimator::scanTapsForData()
 void PositionEstimator::stepUkf()
 {
     ukf_.run(currentTime_.sec, commandUpdated_ ? &currentCommand_ : nullptr);
-    currentState_ = PEState<>(ukf_.getState());
+    currentState_ = StatePe<>(ukf_.getState());
     currentCovariance_ = ukf_.getCovariance();
 }
 

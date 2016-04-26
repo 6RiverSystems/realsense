@@ -7,17 +7,14 @@ set(${PROJECT_NAME}_SOURCES
     src/${PROJECT_NAME}/tap/brain_stem_status/RosBrainStemStatus.cpp
     
     include/${PROJECT_NAME}/tap/odometry/Odometer.hpp
-    include/${PROJECT_NAME}/tap/odometry/Odometry.hpp
     src/${PROJECT_NAME}/tap/odometry/RosOdometer.cpp
 
-    include/${PROJECT_NAME}/tap/vel_cmd/VelCmd.hpp
-    src/${PROJECT_NAME}/tap/vel_cmd/RosVelCmd.cpp
-
+    include/${PROJECT_NAME}/CmdVelocity.hpp
     include/${PROJECT_NAME}/Configuration.hpp
-    include/${PROJECT_NAME}/PEState.hpp
     include/${PROJECT_NAME}/PositionEstimator.hpp
     include/${PROJECT_NAME}/Robot.hpp
     include/${PROJECT_NAME}/RobotProfile.hpp
+    include/${PROJECT_NAME}/StatePe.hpp
 
     src/${PROJECT_NAME}/PositionEstimator.cpp
 )

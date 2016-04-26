@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef POSITIONESTIMATORSTATE_HPP_
-#define POSITIONESTIMATORSTATE_HPP_
+#ifndef STATEPE_HPP_
+#define STATEPE_HPP_
 
 #include <opencv2/opencv.hpp>
 
@@ -20,7 +20,7 @@
 namespace srs {
 
 template<int TYPE = CV_64F>
-struct PEState : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
+struct StatePe : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
 {
     typedef typename FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>::BaseType BaseType;
 
@@ -32,7 +32,7 @@ struct PEState : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
         STATE_OMEGA = 4
     };
 
-    PEState(BaseType x, BaseType y, BaseType theta) :
+    StatePe(BaseType x, BaseType y, BaseType theta) :
         FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>(),
         x(x),
         y(y),
@@ -41,7 +41,7 @@ struct PEState : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
         omega(BaseType())
     {}
 
-    PEState(Pose<BaseType> pose) :
+    StatePe(Pose<BaseType> pose) :
         FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>(),
         x(pose.x),
         y(pose.y),
@@ -50,7 +50,7 @@ struct PEState : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
         omega(BaseType())
     {}
 
-    PEState(Velocity<BaseType> velocity) :
+    StatePe(Velocity<BaseType> velocity) :
         FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>(),
         x(BaseType()),
         y(BaseType()),
@@ -59,7 +59,7 @@ struct PEState : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
         omega(velocity.angular)
     {}
 
-    PEState(cv::Mat vector) :
+    StatePe(cv::Mat vector) :
         FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>(),
         x(vector.at<BaseType>(STATE_X)),
         y(vector.at<BaseType>(STATE_Y)),
@@ -68,7 +68,7 @@ struct PEState : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
         omega(vector.at<BaseType>(STATE_OMEGA))
     {}
 
-    PEState() :
+    StatePe() :
         FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>(),
         x(BaseType()),
         y(BaseType()),
@@ -77,7 +77,7 @@ struct PEState : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
         omega(BaseType())
     {}
 
-    ~PEState()
+    ~StatePe()
     {}
 
     Pose<BaseType> getPose()
@@ -126,4 +126,4 @@ struct PEState : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
 
 } // namespace srs
 
-#endif // POSITIONESTIMATORSTATE_HPP_
+#endif // STATEPE_HPP_

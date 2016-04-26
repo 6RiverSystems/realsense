@@ -10,7 +10,7 @@ environment/project/com.nvidia.cuda.ide.configuration.debug.334877419.559077818/
 environment/project/com.nvidia.cuda.ide.configuration.debug.334877419.559077818/append=true
 environment/project/com.nvidia.cuda.ide.configuration.debug.334877419.559077818/appendContributed=true
 environment/project/com.nvidia.cuda.ide.configuration.debug.334877419/CMAKE_PREFIX_PATH/delimiter=\:
-environment/project/com.nvidia.cuda.ide.configuration.debug.334877419/CMAKE_PREFIX_PATH/operation=append
+environment/project/com.nvidia.cuda.ide.configuration.debug.334877419/CMAKE_PREFIX_PATH/operation=replace
 environment/project/com.nvidia.cuda.ide.configuration.debug.334877419/CMAKE_PREFIX_PATH/value=/opt/ros/indigo\:/usr/share
 environment/project/com.nvidia.cuda.ide.configuration.debug.334877419/append=true
 environment/project/com.nvidia.cuda.ide.configuration.debug.334877419/appendContributed=true

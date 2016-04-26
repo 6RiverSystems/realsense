@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef VELCMD_HPP_
-#define VELCMD_HPP_
+#ifndef CMDVELOCITY_HPP_
+#define CMDVELOCITY_HPP_
 
 #include <string>
 using namespace std;
@@ -14,46 +14,49 @@ using namespace std;
 #include <srslib_framework/platform/Object.hpp>
 #include <srslib_framework/platform/Ocv2Base.hpp>
 #include <srslib_framework/filter/Command.hpp>
+#include <srslib_framework/robotics/Velocity.hpp>
 
 #include <srsnode_position_estimator/Configuration.hpp>
 
 namespace srs {
 
 template<int TYPE = CV_64F>
-struct VelCmd : public Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>
+struct CmdVelocity : public Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>
 {
     typedef typename Ocv2Base<TYPE>::BaseType BaseType;
 
-    VelCmd(const BaseType v, const BaseType omega) :
+    CmdVelocity(const BaseType linear, const BaseType angular) :
         Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>(),
-        v(v),
-        omega(omega)
+        velocity(linear, angular)
     {}
 
-    VelCmd() :
+    CmdVelocity(const Velocity<BaseType> velocity) :
         Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>(),
-        v(BaseType()),
-        omega(BaseType())
+        velocity(velocity)
     {}
 
-    ~VelCmd()
+    CmdVelocity() :
+        Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>(),
+        velocity()
+    {}
+
+    ~CmdVelocity()
     {}
 
     string toString()
     {
         ostringstream output;
         output << "VelCmd {" << endl;
-        output << "      v: " << v << endl;
-        output << "  omega: " << omega << endl;
+        output << "  linear: " << velocity.linear << endl;
+        output << " angular: " << velocity.angular << endl;
         output << "}" << endl;
 
         return output.str();
     }
 
-    BaseType v;
-    BaseType omega;
+    Velocity<BaseType> velocity;
 };
 
 } // namespace srs
 
-#endif // VELCMD_HPP_
+#endif // CMDVELOCITY_HPP_

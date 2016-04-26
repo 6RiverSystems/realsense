@@ -8,7 +8,7 @@
 
 namespace srs {
 
-const static VelCmd<> COMMAND_STEP_00 = VelCmd<>(1, 0);
+const static CmdVelocity<> COMMAND_STEP_00 = CmdVelocity<>(1, 0);
 const static Odometry<> ODOMETRY_STEP_00 = Odometry<>(0, 0, 0);
 const static cv::Mat STATE_STEP_00 = (cv::Mat_<double>(UKF_STATE_SIZE, 1) <<
               0,

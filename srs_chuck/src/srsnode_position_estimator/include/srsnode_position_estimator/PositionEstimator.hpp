@@ -14,15 +14,15 @@ using namespace std;
 #include <geometry_msgs/Twist.h>
 
 #include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTapCmdVel.hpp>
 #include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
 
 #include <srsnode_position_estimator/Configuration.hpp>
 #include <srsnode_position_estimator/Robot.hpp>
-#include <srsnode_position_estimator/PEState.hpp>
+#include <srsnode_position_estimator/StatePe.hpp>
 
 #include <srsnode_position_estimator/tap/odometry/RosOdometer.hpp>
 #include <srsnode_position_estimator/tap/brain_stem_status/RosBrainStemStatus.hpp>
-#include <srsnode_position_estimator/tap/vel_cmd/RosVelCmd.hpp>
 
 namespace srs {
 
@@ -50,23 +50,21 @@ private:
     void scanTapsForData();
     void stepUkf();
 
-    RosBrainStemStatus brainStemStatusTap_;
-
     bool commandUpdated_;
-    VelCmd<> currentCommand_;
+    CmdVelocity<> currentCommand_;
 
     cv::Mat currentCovariance_;
-    PEState<> currentState_;
+    StatePe<> currentState_;
     ros::Time currentTime_;
-
-    RosOdometer odometerTap_;
 
     Robot<> robot_;
     ros::NodeHandle rosNodeHandle_;
     ros::Publisher rosPubOdom_;
     tf::TransformBroadcaster rosTfBroadcaster_;
 
-    RosVelCmd velCmdTap_;
+    RosBrainStemStatus tapBrainStemStatus_;
+    RosTapCmdVel<> tapCmdVel_;
+    RosOdometer tapOdometer_;
 
     UnscentedKalmanFilter<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE> ukf_;
 };

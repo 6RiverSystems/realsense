@@ -15,14 +15,14 @@ using namespace std;
 #include <srslib_framework/filter/Measurement.hpp>
 #include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/robotics/Odometry.hpp>
 
-#include <srsnode_position_estimator/tap/odometry/Odometry.hpp>
 #include <srsnode_position_estimator/tap/odometry/Odometer.hpp>
-#include <srsnode_position_estimator/tap/vel_cmd/VelCmd.hpp>
 
 #include <srsnode_position_estimator/RobotProfile.hpp>
 #include <srsnode_position_estimator/Robot.hpp>
-#include <srsnode_position_estimator/PEState.hpp>
+#include <srsnode_position_estimator/StatePe.hpp>
+#include <srsnode_position_estimator/CmdVelocity.hpp>
 
 using namespace srs;
 
@@ -45,7 +45,7 @@ TEST(Test_pe, Straight)
     ukf.addSensor(&odometer);
 
     // Create a sequence of commands
-    vector<const VelCmd<>*> commands = {
+    vector<const CmdVelocity<>*> commands = {
         &COMMAND_STEP_00,
         &COMMAND_STEP_01,
         &COMMAND_STEP_02,
@@ -101,7 +101,7 @@ TEST(Test_pe, Straight)
     Pose<double> pose0;
     pose0.setThetaDegrees(90.0);
 
-    PEState<> stateT0(pose0);
+    StatePe<> stateT0(pose0);
     cv::Mat covarianceT0 = robot.getNoiseMatrix();
     ukf.reset(stateT0.getVectorForm(), covarianceT0);
 
@@ -112,7 +112,7 @@ TEST(Test_pe, Straight)
         odometer.set(odometry.arrivalTime, odometry.linear, odometry.angular);
 
         // Run the step of the UKF
-        ukf.run(t * DT, const_cast<VelCmd<>*>(commands.at(t)));
+        ukf.run(t * DT, const_cast<CmdVelocity<>*>(commands.at(t)));
 
         ASSERT_TRUE(test::Compare::similar<>(ukf.getState(), correctStates[t], 1e-1)) <<
             " State vector at time-step " << t;

@@ -9,8 +9,7 @@
 #include <ros/ros.h>
 
 #include <srslib_framework/filter/Sensor.hpp>
-
-#include <srsnode_position_estimator/tap/odometry/Odometry.hpp>
+#include <srslib_framework/robotics/Odometry.hpp>
 
 namespace srs {
 

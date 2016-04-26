@@ -18,9 +18,12 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/math/Math.hpp
     
     include/${PROJECT_NAME}/robotics/Pose.hpp
+    include/${PROJECT_NAME}/robotics/Odometry.hpp
     include/${PROJECT_NAME}/robotics/Velocity.hpp
 
     include/${PROJECT_NAME}/ros/RosTap.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapJoy.hpp
 
     include/${PROJECT_NAME}/utils/Print.hpp
 )

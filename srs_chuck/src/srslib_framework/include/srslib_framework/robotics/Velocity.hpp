@@ -20,6 +20,11 @@ struct Velocity : public Object
         angular(angular)
     {}
 
+    Velocity(const Velocity<TYPE>& other) :
+        linear(other.linear),
+        angular(other.angular)
+    {}
+
     ~Velocity()
     {}
 

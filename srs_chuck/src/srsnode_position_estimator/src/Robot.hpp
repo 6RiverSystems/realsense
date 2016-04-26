@@ -8,10 +8,9 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <framework/Math.hpp>
-
-#include <filter/Process.hpp>
-#include <filter/Command.hpp>
+#include <srslib_framework/math/Math.hpp>
+#include <srslib_framework/filter/Process.hpp>
+#include <srslib_framework/filter/Command.hpp>
 
 #include "Configuration.hpp"
 

@@ -1,0 +1,74 @@
+cmake_minimum_required(VERSION 2.8.3)
+
+set(PROJECT_NAME srslib_framework)
+set(PROJECT_LIBRARY ${PROJECT_NAME})
+set(${PROJECT_NAME}_SOURCES
+
+    include/srslib_framework/platform/ThreadSafeQueue.hpp
+    include/srslib_framework/platform/Object.hpp
+
+    include/srslib_framework/math/Math.hpp
+    
+    include/srslib_framework/ros/RosTap.hpp
+
+    include/srslib_framework/utils/Print.hpp
+    
+    include/srslib_framework/filter/FilterState.hpp
+    include/srslib_framework/filter/Command.hpp
+    include/srslib_framework/filter/Process.hpp
+    include/srslib_framework/filter/Measurement.hpp
+    include/srslib_framework/filter/Sensor.hpp
+    include/srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp
+)
+
+project(${PROJECT_NAME})
+
+set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_BUILD_TYPE Debug)
+
+find_package(catkin REQUIRED COMPONENTS 
+    roscpp
+)
+find_package(OpenCV REQUIRED)
+find_package(srslib_test REQUIRED)
+
+catkin_package(
+    INCLUDE_DIRS include
+    LIBRARIES ${PROJECT_LIBRARY}
+    DEPENDS opencv
+)
+
+include_directories(
+    include/
+    test/
+    ${roscpp_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS} 
+    ${srslib_test_INCLUDE_DIRS}
+)
+
+add_library(${PROJECT_LIBRARY}
+    ${${PROJECT_NAME}_SOURCES}
+)
+target_link_libraries(${PROJECT_LIBRARY}
+    ${roscpp_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+)
+
+set_target_properties(${PROJECT_LIBRARY} PROPERTIES LINKER_LANGUAGE CXX)
+
+####################################################################################################
+# Tests
+
+if (CATKIN_ENABLE_TESTING)
+    catkin_add_gtest(TestSuite_Ukf
+        test/ukf/TestSuite_Ukf.cpp
+        test/ukf/Test_Ukf_Basic.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        ${${PROJECT_NAME}_TEST_SOURCES}
+    )
+    target_link_libraries(TestSuite_Ukf
+        ${catkin_LIBRARIES}
+        ${OpenCV_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+    )
+endif()

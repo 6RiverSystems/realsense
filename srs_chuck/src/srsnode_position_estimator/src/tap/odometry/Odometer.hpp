@@ -8,7 +8,7 @@
 
 #include <ros/ros.h>
 
-#include <filter/Sensor.hpp>
+#include <srslib_framework/filter/Sensor.hpp>
 
 #include "Odometry.hpp"
 

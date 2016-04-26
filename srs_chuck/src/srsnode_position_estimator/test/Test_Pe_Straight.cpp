@@ -8,15 +8,14 @@
 #include <vector>
 using namespace std;
 
-#include <framework/Compare.hpp>
+#include <srslib_test/utils/Compare.hpp>
 
-#include <framework/Utils.hpp>
 #include <framework/Pose.hpp>
 
-#include <filter/FilterState.hpp>
-#include <filter/Command.hpp>
-#include <filter/Measurement.hpp>
-#include <filter/ukf/UnscentedKalmanFilter.hpp>
+#include <srslib_framework/filter/FilterState.hpp>
+#include <srslib_framework/filter/Command.hpp>
+#include <srslib_framework/filter/Measurement.hpp>
+#include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
 
 #include <tap/odometry/Odometry.hpp>
 #include <tap/odometry/Odometer.hpp>
@@ -37,13 +36,13 @@ constexpr double DT = 0.5;
 
 #include "data/UkfTestData_Straight.hpp"
 
-TEST(UnscentedKalmanFilter, Straight)
+TEST(Test_pe, Straight)
 {
     // Create standard robot process model
     Robot<> robot;
     Odometer<UKF_STATE_SIZE, CV_64F> odometer;
 
-    UnscentedKalmanFilter<UKF_STATE_SIZE> ukf(ALPHA, BETA, robot, DT);
+    UnscentedKalmanFilter<UKF_STATE_SIZE> ukf(ALPHA, BETA, robot);
     ukf.addSensor(&odometer);
 
     // Create a sequence of commands
@@ -114,7 +113,7 @@ TEST(UnscentedKalmanFilter, Straight)
         odometer.set(odometry.arrivalTime, odometry.linear, odometry.angular);
 
         // Run the step of the UKF
-        ukf.run(const_cast<VelCmd<>*>(commands.at(t)));
+        ukf.run(t * DT, const_cast<VelCmd<>*>(commands.at(t)));
 
         ASSERT_TRUE(test::Compare::similar<>(ukf.getState(), correctStates[t], 1e-1)) <<
             " State vector at time-step " << t;

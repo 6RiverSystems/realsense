@@ -1,5 +1,6 @@
-#include <framework/Math.hpp>
-#include <framework/Utils.hpp>
+#include <srslib_framework/math/Math.hpp>
+
+#include <tap/vel_cmd/VelCmd.hpp>
 
 #include "PEState.hpp"
 

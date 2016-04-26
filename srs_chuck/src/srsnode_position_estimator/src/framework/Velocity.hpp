@@ -8,9 +8,7 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <platform/Object.hpp>
-
-#include <framework/Math.hpp>
+#include <srslib_framework/platform/Object.hpp>
 
 namespace srs {
 

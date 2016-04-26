@@ -8,6 +8,8 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "node_pe");
     ros::NodeHandle nh;
 
+    ROS_INFO_STREAM("position_estimator_node started");
+
     // Create the estimator and run it
     srs::PositionEstimator positionEstimator;
     positionEstimator.run();

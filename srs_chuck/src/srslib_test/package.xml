@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+    <name>srslib_test</name>
+    <version>1.0.0</version>
+    <description>Library package: Test Framework</description>
+    
+    <author email="fsantini@6river.com">Fabrizio Santini</author>
+    <maintainer email="fsantini@6river.com">Fabrizio Santini</maintainer>
+
+    <license>TODO</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <build_depend>roscpp</build_depend>
+    <run_depend>roscpp</run_depend>
+</package>

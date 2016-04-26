@@ -11,12 +11,11 @@ using namespace std;
 
 #include <opencv2/opencv.hpp>
 
-#include <platform/Object.hpp>
-#include <platform/Ocv2Base.hpp>
+#include <srslib_framework/platform/Object.hpp>
+#include <srslib_framework/platform/Ocv2Base.hpp>
+#include <srslib_framework/filter/Command.hpp>
 
 #include "Configuration.hpp"
-
-#include <filter/Command.hpp>
 
 namespace srs {
 

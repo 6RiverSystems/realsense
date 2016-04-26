@@ -13,13 +13,13 @@ using namespace std;
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
 
-#include <framework/RosTap.hpp>
+#include <srslib_framework/ros/RosTap.hpp>
 
 #include "Configuration.hpp"
 #include "Robot.hpp"
 
 #include "PEState.hpp"
-#include <filter/ukf/UnscentedKalmanFilter.hpp>
+#include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
 
 #include <tap/odometry/RosOdometer.hpp>
 #include <tap/brain_stem_status/RosBrainStemStatus.hpp>
@@ -53,18 +53,18 @@ private:
 
     RosBrainStemStatus brainStemStatusTap_;
 
+    bool commandUpdated_;
     VelCmd<> currentCommand_;
+
     cv::Mat currentCovariance_;
     PEState<> currentState_;
-    ros::Time currentTimeStep_;
+    ros::Time currentTime_;
 
     RosOdometer odometerTap_;
 
-    ros::Time lastTimeStep_;
-
     Robot<> robot_;
     ros::NodeHandle rosNodeHandle_;
-    ros::Publisher rosPubPose;
+    ros::Publisher rosPubOdom_;
     tf::TransformBroadcaster rosTfBroadcaster_;
 
     RosVelCmd velCmdTap_;

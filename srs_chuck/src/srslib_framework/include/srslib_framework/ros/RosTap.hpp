@@ -11,8 +11,6 @@ using namespace std;
 
 #include <ros/ros.h>
 
-//#include <filter/Measurement.hpp>
-
 namespace srs {
 
 class RosTap

@@ -3,16 +3,14 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef MATH_HPP_
-#define MATH_HPP_
+#ifndef MATH2_HPP_
+#define MATH2_HPP_
 
 #include <cmath>
 #include <limits>
 using namespace std;
 
 #include <opencv2/opencv.hpp>
-
-#include "Utils.hpp"
 
 namespace srs {
 

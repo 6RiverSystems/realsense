@@ -4,20 +4,7 @@ set(PROJECT_NAME srsnode_position_estimator)
 set(PROJECT_NODE ${PROJECT_NAME}_node)
 set(${PROJECT_NAME}_SOURCES
 
-    src/platform/ThreadSafeQueue.hpp
-    src/platform/Object.hpp
-    
-    src/framework/Math.hpp
-    src/framework/Utils.hpp
     src/framework/Pose.hpp
-    src/framework/RosTap.hpp
-
-    src/filter/FilterState.hpp
-    src/filter/Command.hpp
-    src/filter/Process.hpp
-    src/filter/Measurement.hpp
-    src/filter/Sensor.hpp
-    src/filter/ukf/UnscentedKalmanFilter.hpp
 
     src/tap/odometry/Odometry.hpp
     src/tap/odometry/Odometer.hpp
@@ -28,6 +15,7 @@ set(${PROJECT_NAME}_SOURCES
     
     src/tap/brain_stem_status/RosBrainStemStatus.cpp
 
+    src/position_estimator_node.cpp
     src/PositionEstimator.cpp
     
     src/PEState.hpp
@@ -35,10 +23,6 @@ set(${PROJECT_NAME}_SOURCES
     
     src/RobotProfile.hpp
     src/Configuration.hpp
-)
-
-set(${PROJECT_NAME}_TEST_SOURCES
-    test/framework/Compare.hpp
 )
 
 project(${PROJECT_NAME})
@@ -49,43 +33,48 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
     tf
+    srslib_framework
+    srslib_test
 )
 
 find_package(OpenCV REQUIRED)
 find_package(GTest REQUIRED)
 
 catkin_package(
-    INCLUDE_DIRS src test
-    LIBRARIES ${PROJECT_NAME}
-    CATKIN-DEPENDS tf
-    DEPENDS opencv
+    DEPENDS opencv srslib_framework
 )
 
 include_directories(include 
     src/
-    test/
     ${catkin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS} 
+    ${srslib_framework_INCLUDE_DIRS}
+    ${srslib_test_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIRS}
 )
 
 add_executable(${PROJECT_NODE} 
-    src/position_estimator_node.cpp
     ${${PROJECT_NAME}_SOURCES}
 )
-target_link_libraries(${PROJECT_NODE} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(${PROJECT_NODE}
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    ${srslib_framework_LIBRARIES}
+)
 
 ####################################################################################################
 # Tests
 
 if (CATKIN_ENABLE_TESTING)
-    catkin_add_gtest(UkfTest
-        test/ukf/UkfTest.cpp
-        test/ukf/UkfTest_Basic.cpp
-        test/ukf/UkfTest_11ConstantSteps.cpp 
-        test/ukf/UkfTest_Straight.cpp
+    catkin_add_gtest(TestSuite_Pe
+        test/TestSuite_Pe.cpp
+        test/Test_Pe_11ConstantSteps.cpp
+        test/Test_Pe_Straight.cpp
         ${${PROJECT_NAME}_SOURCES}
-        ${${PROJECT_NAME}_TEST_SOURCES}
     )
-    target_link_libraries(UkfTest ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+    target_link_libraries(TestSuite_Pe
+        ${catkin_LIBRARIES}
+        ${OpenCV_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+    )
 endif()

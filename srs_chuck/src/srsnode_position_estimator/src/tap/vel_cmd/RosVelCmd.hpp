@@ -12,7 +12,7 @@ using namespace std;
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 
-#include <framework/RosTap.hpp>
+#include <srslib_framework/ros/RosTap.hpp>
 
 #include "VelCmd.hpp"
 

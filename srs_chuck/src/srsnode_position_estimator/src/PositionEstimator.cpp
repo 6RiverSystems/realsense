@@ -14,17 +14,16 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 PositionEstimator::PositionEstimator() :
-    ukf_(ALPHA, BETA, robot_, 1 / REFRESH_RATE_HZ),
-    rosNodeHandle_()
+    ukf_(ALPHA, BETA, robot_),
+    rosNodeHandle_(),
+    commandUpdated_(false)
 {
-    ROS_INFO_STREAM("position_estimator_node started");
-
     currentCovariance_ = robot_.getNoiseMatrix();
-    currentState_ = PEState<>(2.5, 1.5, 0.0);
+    currentState_ = PEState<>(3.0, 2.0, 0.0);
 
     ukf_.reset(currentState_.getVectorForm(), currentCovariance_);
 
-    rosPubPose = rosNodeHandle_.advertise<nav_msgs::Odometry>("/odom", 50);
+    rosPubOdom_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("/odom", 50);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,15 +33,11 @@ void PositionEstimator::run()
     velCmdTap_.connectTap();
     odometerTap_.connectTap();
 
-    currentTimeStep_ = ros::Time::now();
-
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
     {
         ros::spinOnce();
-
-        lastTimeStep_ = currentTimeStep_;
-        currentTimeStep_ = ros::Time::now();
+        currentTime_ = ros::Time::now();
 
         scanTapsForData();
         stepUkf();
@@ -73,7 +68,7 @@ void PositionEstimator::publishInformation()
     messagePoseTf.header.frame_id = "odom";
     messagePoseTf.child_frame_id = "base_footprint";
 
-    messagePoseTf.header.stamp = currentTimeStep_;
+    messagePoseTf.header.stamp = currentTime_;
     messagePoseTf.transform.translation.x = currentState_.x;
     messagePoseTf.transform.translation.y = currentState_.y;
     messagePoseTf.transform.translation.z = 0.0;
@@ -83,7 +78,7 @@ void PositionEstimator::publishInformation()
 
     // Publish the required odometry for the planners
     nav_msgs::Odometry messagePose;
-    messagePose.header.stamp = currentTimeStep_;
+    messagePose.header.stamp = currentTime_;
     messagePose.header.frame_id = "odom";
     messagePose.child_frame_id = "base_footprint";
 
@@ -102,42 +97,27 @@ void PositionEstimator::publishInformation()
     messagePose.twist.twist.angular.z = currentState_.omega;
 
     // Publish the Odometry
-    rosPubPose.publish(messagePose);
+    rosPubOdom_.publish(messagePose);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void PositionEstimator::scanTapsForData()
 {
-    //if (velCmdTap_.newDataAvailable())
-    //{
-        currentCommand_ = velCmdTap_.getCurrentData();
-    //}
+    commandUpdated_ = velCmdTap_.newDataAvailable();
+    currentCommand_ = velCmdTap_.getCurrentData();
 
     if (!brainStemStatusTap_.isBrainStemConnected())
     {
-        odometerTap_.set(currentTimeStep_.nsec, currentCommand_.v, currentCommand_.omega);
+        odometerTap_.set(currentTime_.nsec, currentCommand_.v, currentCommand_.omega);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void PositionEstimator::stepUkf()
 {
-    double dT = (currentTimeStep_ - lastTimeStep_).toSec();
-
-    currentState_.x += currentCommand_.v * dT * cos(currentState_.theta);
-    currentState_.y += currentCommand_.v * dT * sin(currentState_.theta);
-    currentState_.theta += currentCommand_.omega * dT;
-
-    currentState_.v = currentCommand_.v;
-    currentState_.omega = currentCommand_.omega;
-
-    // currentState_.theta = Math::normalizeAngle(currentState_.theta);
-
-    Utils::print<PEState<>>(currentState_);
-
-    // ukf_.run(currentCommand_);
-    // currentState_ = PEState<>(ukf_.getState());
-    // currentCovariance_ = ukf_.getCovariance();
+    ukf_.run(currentTime_.sec, commandUpdated_ ? &currentCommand_ : nullptr);
+    currentState_ = PEState<>(ukf_.getState());
+    currentCovariance_ = ukf_.getCovariance();
 }
 
 } // namespace srs

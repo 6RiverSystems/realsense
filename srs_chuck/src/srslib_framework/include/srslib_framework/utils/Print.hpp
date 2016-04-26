@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef UTILS_HPP_
-#define UTILS_HPP_
+#ifndef PRINT_HPP_
+#define PRINT_HPP_
 
 #include <string>
 #include <iostream>
@@ -14,12 +14,9 @@ using namespace std;
 
 #include <opencv2/opencv.hpp>
 
-#include <tap/odometry/Odometry.hpp>
-#include <tap/vel_cmd/VelCmd.hpp>
-
 namespace srs {
 
-struct Utils
+struct Print
 {
     template<unsigned int PRECISION = 6, typename TYPE = double>
     static void print(cv::Mat matrix, string name = "")
@@ -50,14 +47,8 @@ struct Utils
         }
         cout << "}" << endl;
     }
-
-    template<typename TYPE>
-    static void print(TYPE object)
-    {
-        cout << object.toString() << endl;
-    }
 };
 
 } // namespace srs
 
-#endif // UTILS_HPP_
+#endif // PRINT_HPP_

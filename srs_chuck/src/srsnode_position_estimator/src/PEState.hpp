@@ -8,10 +8,9 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <platform/Object.hpp>
-#include <platform/Ocv2Base.hpp>
-
-#include <filter/FilterState.hpp>
+#include <srslib_framework/platform/Object.hpp>
+#include <srslib_framework/platform/Ocv2Base.hpp>
+#include <srslib_framework/filter/FilterState.hpp>
 
 #include <framework/Pose.hpp>
 #include <framework/Velocity.hpp>

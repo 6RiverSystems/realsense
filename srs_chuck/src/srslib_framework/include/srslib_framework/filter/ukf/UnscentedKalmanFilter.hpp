@@ -11,12 +11,11 @@ using namespace std;
 
 #include <opencv2/opencv.hpp>
 
-#include <platform/Ocv2Base.hpp>
-
-#include <filter/Process.hpp>
-#include <filter/FilterState.hpp>
-#include <filter/Command.hpp>
-#include <filter/Sensor.hpp>
+#include <srslib_framework/platform/Ocv2Base.hpp>
+#include <srslib_framework/filter/Process.hpp>
+#include <srslib_framework/filter/FilterState.hpp>
+#include <srslib_framework/filter/Command.hpp>
+#include <srslib_framework/filter/Sensor.hpp>
 
 namespace srs {
 
@@ -27,8 +26,7 @@ public:
     typedef typename Ocv2Base<TYPE>::BaseType BaseType;
 
     UnscentedKalmanFilter(BaseType alpha, BaseType beta,
-        Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process,
-        BaseType dT);
+        Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process);
 
     ~UnscentedKalmanFilter()
     {}
@@ -49,19 +47,21 @@ public:
     }
 
     void reset(cv::Mat stateT0, cv::Mat covarianceT0);
-    void run(Command<COMMAND_SIZE, TYPE>* const command);
+    void run(BaseType time, Command<COMMAND_SIZE, TYPE>* const command);
 
 private:
     constexpr static BaseType UNDERFLOW_THRESHOLD = BaseType(1.0e-5);
 
     vector<Sensor<STATE_SIZE, TYPE>*> sensors_;
 
+    BaseType previousTimeInstant_;
+    BaseType currentTimeInstant_;
+
     BaseType alpha_;
     BaseType beta_;
     BaseType kappa_;
     BaseType lambda_;
     BaseType c_;
-    BaseType dT_;
 
     cv::Mat WM_;
     cv::Mat WC_;
@@ -75,7 +75,7 @@ private:
 
     void initializeWeights();
 
-    void predict(Command<COMMAND_SIZE, TYPE>* const command);
+    void predict(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command);
 
     void unscentedTransform(
         const cv::Mat X, const cv::Mat Y, const cv::Mat CHI,

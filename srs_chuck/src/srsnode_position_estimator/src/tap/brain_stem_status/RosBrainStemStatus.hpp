@@ -12,7 +12,7 @@ using namespace std;
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 
-#include <framework/RosTap.hpp>
+#include <srslib_framework/ros/RosTap.hpp>
 
 namespace srs {
 

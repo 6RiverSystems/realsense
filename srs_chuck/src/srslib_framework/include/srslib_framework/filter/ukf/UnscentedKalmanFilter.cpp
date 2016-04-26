@@ -3,7 +3,7 @@
 #include <iostream>
 #include <functional>
 
-#include <framework/Utils.hpp>
+#include <srslib_framework/math/Math.hpp>
 
 namespace srs {
 
@@ -14,15 +14,15 @@ namespace srs {
 template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
 UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::UnscentedKalmanFilter(
     BaseType alpha, BaseType beta,
-    Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process,
-    BaseType dT) :
+    Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process) :
         sensors_(),
         alpha_(alpha),
         beta_(beta),
         kappa_(BaseType()),
         lambda_(BaseType()),
         process_(process),
-        dT_(dT)
+        previousTimeInstant_(BaseType()),
+        currentTimeInstant_(BaseType())
 {
     initializeWeights();
 }
@@ -40,10 +40,14 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::reset(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
-void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::run(
+void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::run(BaseType time,
     Command<COMMAND_SIZE, TYPE>* const command)
 {
-    predict(command);
+    previousTimeInstant_ = currentTimeInstant_;
+    currentTimeInstant_ = time;
+    BaseType dT = currentTimeInstant_ - previousTimeInstant_;
+
+    predict(dT, command);
     update();
 }
 
@@ -113,7 +117,7 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::initializeWeights()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
-void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::predict(
+void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::predict(BaseType dT,
     Command<COMMAND_SIZE, TYPE>* const command)
 {
     // Calculate the sigma points
@@ -130,7 +134,7 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::predict(
     cv::Mat Y = Math::zeros(CHI);
     for (unsigned int i = 0; i < CHI.cols; ++i)
     {
-        cv::Mat T = process_.transformWithAB(CHI.col(i), command, dT_);
+        cv::Mat T = process_.transformWithAB(CHI.col(i), command, dT);
         T.copyTo(Y.col(i));
     }
 

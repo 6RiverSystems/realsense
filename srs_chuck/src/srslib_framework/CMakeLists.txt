@@ -4,21 +4,25 @@ set(PROJECT_NAME srslib_framework)
 set(PROJECT_LIBRARY ${PROJECT_NAME})
 set(${PROJECT_NAME}_SOURCES
 
-    include/srslib_framework/platform/ThreadSafeQueue.hpp
-    include/srslib_framework/platform/Object.hpp
+    include/${PROJECT_NAME}/filter/Command.hpp
+    include/${PROJECT_NAME}/filter/FilterState.hpp
+    include/${PROJECT_NAME}/filter/Measurement.hpp
+    include/${PROJECT_NAME}/filter/Process.hpp
+    include/${PROJECT_NAME}/filter/Sensor.hpp
 
-    include/srslib_framework/math/Math.hpp
-    
-    include/srslib_framework/ros/RosTap.hpp
+    include/${PROJECT_NAME}/filter/ukf/UnscentedKalmanFilter.hpp
 
-    include/srslib_framework/utils/Print.hpp
+    include/${PROJECT_NAME}/platform/Object.hpp
+    include/${PROJECT_NAME}/platform/ThreadSafeQueue.hpp
+
+    include/${PROJECT_NAME}/math/Math.hpp
     
-    include/srslib_framework/filter/FilterState.hpp
-    include/srslib_framework/filter/Command.hpp
-    include/srslib_framework/filter/Process.hpp
-    include/srslib_framework/filter/Measurement.hpp
-    include/srslib_framework/filter/Sensor.hpp
-    include/srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp
+    include/${PROJECT_NAME}/robotics/Pose.hpp
+    include/${PROJECT_NAME}/robotics/Velocity.hpp
+
+    include/${PROJECT_NAME}/ros/RosTap.hpp
+
+    include/${PROJECT_NAME}/utils/Print.hpp
 )
 
 project(${PROJECT_NAME})

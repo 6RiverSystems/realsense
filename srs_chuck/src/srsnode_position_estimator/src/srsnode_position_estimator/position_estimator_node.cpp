@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 
-#include "PositionEstimator.hpp"
+#include <srsnode_position_estimator/PositionEstimator.hpp>
 
 int main(int argc, char** argv)
 {

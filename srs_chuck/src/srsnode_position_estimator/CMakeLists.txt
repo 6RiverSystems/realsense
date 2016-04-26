@@ -4,24 +4,22 @@ set(PROJECT_NAME srsnode_position_estimator)
 set(PROJECT_NODE ${PROJECT_NAME}_node)
 set(${PROJECT_NAME}_SOURCES
 
-    src/framework/Pose.hpp
-
-    src/tap/odometry/Odometry.hpp
-    src/tap/odometry/Odometer.hpp
-    src/tap/odometry/RosOdometer.cpp
-
-    src/tap/vel_cmd/VelCmd.hpp
-    src/tap/vel_cmd/RosVelCmd.cpp
+    src/${PROJECT_NAME}/tap/brain_stem_status/RosBrainStemStatus.cpp
     
-    src/tap/brain_stem_status/RosBrainStemStatus.cpp
+    include/${PROJECT_NAME}/tap/odometry/Odometer.hpp
+    include/${PROJECT_NAME}/tap/odometry/Odometry.hpp
+    src/${PROJECT_NAME}/tap/odometry/RosOdometer.cpp
 
-    src/PositionEstimator.cpp
-    
-    src/PEState.hpp
-    src/Robot.hpp
-    
-    src/RobotProfile.hpp
-    src/Configuration.hpp
+    include/${PROJECT_NAME}/tap/vel_cmd/VelCmd.hpp
+    src/${PROJECT_NAME}/tap/vel_cmd/RosVelCmd.cpp
+
+    include/${PROJECT_NAME}/Configuration.hpp
+    include/${PROJECT_NAME}/PEState.hpp
+    include/${PROJECT_NAME}/PositionEstimator.hpp
+    include/${PROJECT_NAME}/Robot.hpp
+    include/${PROJECT_NAME}/RobotProfile.hpp
+
+    src/${PROJECT_NAME}/PositionEstimator.cpp
 )
 
 project(${PROJECT_NAME})
@@ -53,7 +51,7 @@ include_directories(include
 )
 
 add_executable(${PROJECT_NODE} 
-    src/position_estimator_node.cpp
+    src/${PROJECT_NAME}/position_estimator_node.cpp
     ${${PROJECT_NAME}_SOURCES}
 )
 target_link_libraries(${PROJECT_NODE}

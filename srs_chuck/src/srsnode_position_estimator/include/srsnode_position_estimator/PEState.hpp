@@ -12,10 +12,10 @@
 #include <srslib_framework/platform/Ocv2Base.hpp>
 #include <srslib_framework/filter/FilterState.hpp>
 
-#include <framework/Pose.hpp>
-#include <framework/Velocity.hpp>
+#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/robotics/Velocity.hpp>
 
-#include "Configuration.hpp"
+#include <srsnode_position_estimator/Configuration.hpp>
 
 namespace srs {
 

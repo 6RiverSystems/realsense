@@ -12,7 +12,7 @@
 #include <srslib_framework/filter/Process.hpp>
 #include <srslib_framework/filter/Command.hpp>
 
-#include "Configuration.hpp"
+#include <srsnode_position_estimator/Configuration.hpp>
 
 namespace srs {
 
@@ -39,6 +39,6 @@ private:
 
 } // namespace srs
 
-#include "Robot.cpp"
+#include <srsnode_position_estimator/Robot.cpp>
 
 #endif // ROBOT_HPP_

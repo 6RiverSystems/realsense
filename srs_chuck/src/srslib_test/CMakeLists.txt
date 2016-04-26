@@ -4,7 +4,7 @@ set(PROJECT_NAME srslib_test)
 set(PROJECT_LIBRARY ${PROJECT_NAME})
 set(${PROJECT_NAME}_SOURCES
 
-    include/srslib_test/utils/Compare.hpp
+    include/${PROJECT_NAME}/utils/Compare.hpp
 )
 
 project(${PROJECT_NAME})

@@ -14,16 +14,15 @@ using namespace std;
 #include <geometry_msgs/Twist.h>
 
 #include <srslib_framework/ros/RosTap.hpp>
-
-#include "Configuration.hpp"
-#include "Robot.hpp"
-
-#include "PEState.hpp"
 #include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
 
-#include <tap/odometry/RosOdometer.hpp>
-#include <tap/brain_stem_status/RosBrainStemStatus.hpp>
-#include <tap/vel_cmd/RosVelCmd.hpp>
+#include <srsnode_position_estimator/Configuration.hpp>
+#include <srsnode_position_estimator/Robot.hpp>
+#include <srsnode_position_estimator/PEState.hpp>
+
+#include <srsnode_position_estimator/tap/odometry/RosOdometer.hpp>
+#include <srsnode_position_estimator/tap/brain_stem_status/RosBrainStemStatus.hpp>
+#include <srsnode_position_estimator/tap/vel_cmd/RosVelCmd.hpp>
 
 namespace srs {
 

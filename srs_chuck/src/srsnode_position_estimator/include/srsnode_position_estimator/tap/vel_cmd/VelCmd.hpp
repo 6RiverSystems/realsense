@@ -15,7 +15,7 @@ using namespace std;
 #include <srslib_framework/platform/Ocv2Base.hpp>
 #include <srslib_framework/filter/Command.hpp>
 
-#include "Configuration.hpp"
+#include <srsnode_position_estimator/Configuration.hpp>
 
 namespace srs {
 

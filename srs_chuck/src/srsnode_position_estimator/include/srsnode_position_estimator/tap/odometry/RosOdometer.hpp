@@ -14,7 +14,7 @@ using namespace std;
 
 #include <srslib_framework/ros/RosTap.hpp>
 
-#include <Configuration.hpp>
+#include <srsnode_position_estimator/Configuration.hpp>
 
 #include "Odometer.hpp"
 

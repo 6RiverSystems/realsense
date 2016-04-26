@@ -10,7 +10,7 @@
 
 #include <srslib_framework/filter/Sensor.hpp>
 
-#include "Odometry.hpp"
+#include <srsnode_position_estimator/tap/odometry/Odometry.hpp>
 
 namespace srs {
 
@@ -54,6 +54,6 @@ private:
 
 } // namespace srs
 
-#include "Odometer.cpp"
+#include <srsnode_position_estimator/tap/odometry/Odometer.cpp>
 
 #endif // ODOMETER_HPP_

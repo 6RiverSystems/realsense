@@ -45,13 +45,14 @@ find_package(OpenCV REQUIRED)
 find_package(srslib_test REQUIRED)
 
 catkin_package(
-    INCLUDE_DIRS include
+    INCLUDE_DIRS src include
     LIBRARIES ${PROJECT_LIBRARY}
     DEPENDS opencv
 )
 
 include_directories(
     include/
+    src/
     test/
     ${roscpp_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS} 

@@ -106,7 +106,7 @@ struct StatePe : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
     string toString()
     {
         ostringstream output;
-        output << "PEState {" << endl;
+        output << "StatePe {" << endl;
         output << "      x: " << x << endl;
         output << "      y: " << y << endl;
         output << "  theta: " << theta << endl;

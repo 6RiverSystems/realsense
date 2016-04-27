@@ -1,5 +1,3 @@
-#include "UnscentedKalmanFilter.hpp"
-
 #include <iostream>
 #include <functional>
 
@@ -20,9 +18,7 @@ UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::UnscentedKalmanFilter(
         beta_(beta),
         kappa_(BaseType()),
         lambda_(BaseType()),
-        process_(process),
-        previousTimeInstant_(BaseType()),
-        currentTimeInstant_(BaseType())
+        process_(process)
 {
     initializeWeights();
 }
@@ -40,15 +36,13 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::reset(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
-void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::run(BaseType time,
+void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::run(BaseType dT,
     Command<COMMAND_SIZE, TYPE>* const command)
 {
-    previousTimeInstant_ = currentTimeInstant_;
-    currentTimeInstant_ = time;
-    BaseType dT = currentTimeInstant_ - previousTimeInstant_;
-
     predict(dT, command);
     update();
+
+    Math::checkRange(state_, UNDERFLOW_THRESHOLD, BaseType());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,13 +69,6 @@ cv::Mat UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::calculateSigmaPoi
     cv::scaleAdd(CHI, c_, repeatedX, CHI);
 
     return CHI;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
-void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::checkDiagonalUnderflow(cv::Mat& S)
-{
-    Math::checkDiagonal(S, UNDERFLOW_THRESHOLD, UNDERFLOW_THRESHOLD);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,7 +206,7 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::update()
             S += sensor->getNoiseMatrix();
 
             // S = o.checkUnderflow(S);
-            checkDiagonalUnderflow(S);
+            Math::checkDiagonal(S, UNDERFLOW_THRESHOLD, UNDERFLOW_THRESHOLD);
 
             // z = sensor.measurement2state(measurement);
             cv::Mat z = sensor->getCurrentData();

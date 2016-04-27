@@ -21,6 +21,7 @@ PositionEstimator::PositionEstimator() :
     currentCovariance_ = robot_.getNoiseMatrix();
     currentState_ = StatePe<>(3.0, 2.0, 0.0);
 
+    ukf_.addSensor(tapOdometer_.getSensor());
     ukf_.reset(currentState_.getVectorForm(), currentCovariance_);
 
     rosPubOdom_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("/odom", 50);
@@ -106,6 +107,8 @@ void PositionEstimator::scanTapsForData()
     commandUpdated_ = tapCmdVel_.newDataAvailable();
     currentCommand_ = CmdVelocity<>(tapCmdVel_.getCurrentData());
 
+    // If the brain stem is disconnected, simulate odometry
+    // feeding the odometer the commanded velocity
     if (!tapBrainStemStatus_.isBrainStemConnected())
     {
         tapOdometer_.set(currentTime_.nsec,
@@ -117,7 +120,19 @@ void PositionEstimator::scanTapsForData()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void PositionEstimator::stepUkf()
 {
-    ukf_.run(currentTime_.sec, commandUpdated_ ? &currentCommand_ : nullptr);
+    // Calculate how many seconds have passed from the previous update
+    previousTimeNs_ = currentTimeNs_;
+    currentTimeNs_ = static_cast<double>(currentTime_.nsec) * 1.0e-9;
+
+    previousTimeS_ = currentTimeS_;
+    currentTimeS_ = static_cast<double>(currentTime_.sec);
+
+    double dT = currentTimeNs_ + (currentTimeS_ - previousTimeS_) - previousTimeNs_;
+
+    // Advance the state of the UKF
+    ukf_.run(dT, commandUpdated_ ? &currentCommand_ : nullptr);
+
+    // Store the new state and covariance for publication
     currentState_ = StatePe<>(ukf_.getState());
     currentCovariance_ = ukf_.getCovariance();
 }

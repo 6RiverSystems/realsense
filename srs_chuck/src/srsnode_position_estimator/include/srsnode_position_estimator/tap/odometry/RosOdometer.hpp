@@ -28,26 +28,34 @@ public:
 
     RosOdometer() :
         RosTap("Odometer")
-    {}
+    {
+        sensor_ = new Odometer<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>();
+    }
 
     ~RosOdometer()
     {
         disconnectTap();
+        delete sensor_;
+    }
+
+    Odometer<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* getSensor() const
+    {
+        return sensor_;
     }
 
     bool newDataAvailable() const
     {
-        return sensor_.newDataAvailable();
+        return sensor_->newDataAvailable();
     }
 
     void reset()
     {
-        sensor_.reset();
+        sensor_->reset();
     }
 
     void set(uint32_t arrivalTime, BaseType linear, BaseType angular)
     {
-        sensor_.set(arrivalTime, linear, angular);
+        sensor_->set(arrivalTime, linear, angular);
     }
 
 protected:
@@ -56,7 +64,7 @@ protected:
 private:
     void onSensorsOdometryRaw(geometry_msgs::TwistStampedConstPtr message);
 
-    Odometer<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE> sensor_;
+    Odometer<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensor_;
 };
 
 } // namespace srs

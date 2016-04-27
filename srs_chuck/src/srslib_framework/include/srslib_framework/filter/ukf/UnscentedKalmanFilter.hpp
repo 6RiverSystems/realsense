@@ -47,15 +47,12 @@ public:
     }
 
     void reset(cv::Mat stateT0, cv::Mat covarianceT0);
-    void run(BaseType time, Command<COMMAND_SIZE, TYPE>* const command);
+    void run(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command);
 
 private:
     constexpr static BaseType UNDERFLOW_THRESHOLD = BaseType(1.0e-5);
 
     vector<Sensor<STATE_SIZE, TYPE>*> sensors_;
-
-    BaseType previousTimeInstant_;
-    BaseType currentTimeInstant_;
 
     BaseType alpha_;
     BaseType beta_;
@@ -71,7 +68,6 @@ private:
     cv::Mat state_;
 
     cv::Mat calculateSigmaPoints(cv::Mat M, cv::Mat P);
-    void checkDiagonalUnderflow(cv::Mat& S);
 
     void initializeWeights();
 
@@ -85,6 +81,6 @@ private:
 
 } // namespace srs
 
-#include "UnscentedKalmanFilter.cpp"
+#include <srslib_framework/filter/ukf/UnscentedKalmanFilter.cpp>
 
 #endif // UNSCENTEDKALMANFILTER_HPP_

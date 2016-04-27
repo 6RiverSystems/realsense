@@ -67,6 +67,12 @@ private:
     RosOdometer tapOdometer_;
 
     UnscentedKalmanFilter<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE> ukf_;
+
+    double previousTimeNs_;
+    double previousTimeS_;
+
+    double currentTimeNs_;
+    double currentTimeS_;
 };
 
 } // namespace srs

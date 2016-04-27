@@ -20,7 +20,7 @@ bool RosOdometer::connect()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void RosOdometer::onSensorsOdometryRaw(geometry_msgs::TwistStampedConstPtr message)
 {
-    sensor_.set(message->header.stamp.nsec,
+    set(message->header.stamp.nsec,
         static_cast<double>(message->twist.linear.x),
         static_cast<double>(message->twist.angular.z));
 }

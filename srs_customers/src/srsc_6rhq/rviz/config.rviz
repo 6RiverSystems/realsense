@@ -4,6 +4,8 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /Global Options1
+        - /Grid1
         - /Path1
       Splitter Ratio: 0.416318
     Tree Height: 1031
@@ -45,7 +47,7 @@ Visualization Manager:
         Z: 0
       Plane: XY
       Plane Cell Count: 10
-      Reference Frame: <Fixed Frame>
+      Reference Frame: base_link
       Value: true
     - Alpha: 1
       Class: rviz/RobotModel
@@ -161,7 +163,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: base_link
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:
@@ -181,24 +183,55 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Class: rviz/XYOrbit
-      Distance: 10
+      Class: rviz/ThirdPersonFollower
+      Distance: 7.96839
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: 0.0838368
+        Y: -0.0939725
+        Z: 2.38419e-07
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.785398
-      Target Frame: <Fixed Frame>
-      Value: XYOrbit (rviz)
-      Yaw: 0.785398
-    Saved: ~
+      Pitch: 0.210398
+      Target Frame: base_link
+      Value: ThirdPersonFollower (rviz)
+      Yaw: 3.1304
+    Saved:
+      - Class: rviz/ThirdPersonFollower
+        Distance: 10
+        Enable Stereo Rendering:
+          Stereo Eye Separation: 0.06
+          Stereo Focal Distance: 1
+          Swap Stereo Eyes: false
+          Value: false
+        Focal Point:
+          X: -0.179971
+          Y: 0.1216
+          Z: 0
+        Name: Robot View
+        Near Clip Distance: 0.01
+        Pitch: 0.200398
+        Target Frame: base_link
+        Value: ThirdPersonFollower (rviz)
+        Yaw: 3.0654
+      - Angle: -0.0050001
+        Class: rviz/TopDownOrtho
+        Enable Stereo Rendering:
+          Stereo Eye Separation: 0.06
+          Stereo Focal Distance: 1
+          Swap Stereo Eyes: false
+          Value: false
+        Name: World View
+        Near Clip Distance: 0.01
+        Scale: 17.7402
+        Target Frame: <Fixed Frame>
+        Value: TopDownOrtho (rviz)
+        X: 17.2926
+        Y: 26.707
 Window Geometry:
   Displays:
     collapsed: false

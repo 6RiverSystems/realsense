@@ -6,7 +6,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 
 set(PROJECT_NAME srslib_framework)
-set(PROJECT_LIBRARY ${PROJECT_NAME})
+
 set(${PROJECT_NAME}_SOURCES
 
     include/${PROJECT_NAME}/filter/Command.hpp
@@ -33,22 +33,32 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/utils/Print.hpp
 )
 
+set(${PROJECT_NAME}_MSGS
+
+    Aps.msg
+)
+
+set(${PROJECT_NAME}_TEST_SOURCES
+
+    test/ukf/Test_Ukf_Basic.cpp
+)
+
+####################################################################################################
+# Project
+
 project(${PROJECT_NAME})
+
+set(PROJECT_LIBRARY ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
+    message_generation
 )
 find_package(OpenCV REQUIRED)
 find_package(srslib_test REQUIRED)
-
-catkin_package(
-    INCLUDE_DIRS src include
-    LIBRARIES ${PROJECT_LIBRARY}
-    DEPENDS opencv
-)
 
 include_directories(
     include/
@@ -59,9 +69,26 @@ include_directories(
     ${srslib_test_INCLUDE_DIRS}
 )
 
+####################################################################################################
+# Messages
+
+add_message_files(
+    FILES
+    ${${PROJECT_NAME}_MSGS}
+)
+
+generate_messages(
+    DEPENDENCIES
+    std_msgs
+)
+
+####################################################################################################
+# Target
+
 add_library(${PROJECT_LIBRARY}
     ${${PROJECT_NAME}_SOURCES}
 )
+
 target_link_libraries(${PROJECT_LIBRARY}
     ${roscpp_LIBRARIES}
     ${OpenCV_LIBRARIES}
@@ -69,13 +96,18 @@ target_link_libraries(${PROJECT_LIBRARY}
 
 set_target_properties(${PROJECT_LIBRARY} PROPERTIES LINKER_LANGUAGE CXX)
 
+catkin_package(
+    INCLUDE_DIRS src include
+    LIBRARIES ${PROJECT_LIBRARY}
+    DEPENDS message_runtime opencv
+)
+
 ####################################################################################################
 # Tests
 
 if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(TestSuite_Ukf
         test/ukf/TestSuite_Ukf.cpp
-        test/ukf/Test_Ukf_Basic.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${${PROJECT_NAME}_TEST_SOURCES}
     )

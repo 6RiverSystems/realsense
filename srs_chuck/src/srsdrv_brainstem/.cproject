@@ -73,12 +73,12 @@
 					<folderInfo id="com.nvidia.cuda.ide.configuration.release.1076128781." name="/" resourcePath="">
 						<toolChain id="com.nvidia.cuda.ide.toolchain.exe.release.614309668" name="CUDA Toolkit 7.0" superClass="com.nvidia.cuda.ide.toolchain.exe.release">
 							<targetPlatform archList="all" binaryParser="com.nvidia.cuda.ide.elf;com.nvidia.cuda.ide.macho;com.nvidia.cuda.ide.cubin" id="com.nvidia.cuda.ide.targetPlatform.1772444727" isAbstract="false" name="Debug Platform" osList="linux,macosx" superClass="com.nvidia.cuda.ide.targetPlatform"/>
-							<builder buildPath="${workspace_loc:/srsnode_brainstem}/Release" id="com.nvidia.cuda.ide.builder.876218257" managedBuildOn="true" name="CUDA Toolkit 7.0 Builder.Release" superClass="com.nvidia.cuda.ide.builder"/>
+							<builder buildPath="${workspace_loc:/srsnode_brainstem}/Release" id="com.nvidia.cuda.ide.builder.876218257" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CUDA Toolkit 7.0 Builder" superClass="com.nvidia.cuda.ide.builder"/>
 							<tool id="nvcc.compiler.base.1270493463" name="NVCC Compiler" superClass="nvcc.compiler.base">
-								<option id="nvcc.compiler.deviceDebug.25673054" superClass="nvcc.compiler.deviceDebug"/>
-								<option id="nvcc.compiler.option.level.836536577" superClass="nvcc.compiler.option.level"/>
-								<option defaultValue="nvcc.compiler.optimization.level.most" id="nvcc.compiler.optimization.level.1275437709" superClass="nvcc.compiler.optimization.level" valueType="enumerated"/>
-								<option id="nvcc.compiler.pic.1301061623" superClass="nvcc.compiler.pic"/>
+								<option id="nvcc.compiler.deviceDebug.25673054" name="Generate device debug information (-G)" superClass="nvcc.compiler.deviceDebug"/>
+								<option id="nvcc.compiler.option.level.836536577" name="Generate host debug information (-g)" superClass="nvcc.compiler.option.level"/>
+								<option defaultValue="nvcc.compiler.optimization.level.most" id="nvcc.compiler.optimization.level.1275437709" name="Optimization Level" superClass="nvcc.compiler.optimization.level" valueType="enumerated"/>
+								<option id="nvcc.compiler.pic.1301061623" name="Position Independent Code (-fPIC)" superClass="nvcc.compiler.pic"/>
 								<inputType id="nvcc.compiler.input.cu.1137887020" superClass="nvcc.compiler.input.cu"/>
 								<inputType id="nvcc.compiler.input.cpp.1544296813" superClass="nvcc.compiler.input.cpp"/>
 								<inputType id="nvcc.compiler.input.c.2064463482" superClass="nvcc.compiler.input.c"/>

@@ -18,9 +18,6 @@
     <!-- Robot description -->
     <param name="robot_description" command="$(find xacro)/xacro.py $(find srsbot_chuck)/urdf/chuck.urdf.xacro" />
 
-    <!-- Basic sensor drivers -->
-    <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
-
     <!-- Launch map server -->
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg target_map)" />
 
@@ -39,7 +36,9 @@
     </node>
 
     <!-- Launch all the robot components -->
-    <include file="$(find srsnode_brain_stem)/launch/node.launch" />
+    <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
+
+    <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
     <include file="$(find srsnode_position_estimator)/launch/node.launch" />
 
     <!-- Launch the ros-bridge -->

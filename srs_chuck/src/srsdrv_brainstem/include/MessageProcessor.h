@@ -33,6 +33,10 @@ private:
 
 	bool							m_bControllerFault;
 
+	uint32_t						m_dwLastOdomTime;
+
+	ros::Time						m_rosOdomTime;
+
 	ros::NodeHandle&				m_node;
 
 	IO*								m_pIO;
@@ -40,8 +44,6 @@ private:
 	ros::Subscriber					m_llcmdSubscriber;
 
 	ros::Subscriber					m_VelocitySubscriber;
-
-	ros::Publisher					m_VelocityPublisher;
 
 	ros::Publisher					m_llEventPublisher;
 

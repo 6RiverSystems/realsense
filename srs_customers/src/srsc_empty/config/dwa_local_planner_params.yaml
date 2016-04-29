@@ -1,19 +1,19 @@
 DWAPlannerROS:
 
-  max_vel_x: 2.0
+  max_vel_x: 1.0
   min_vel_x: 0.1
 
   max_trans_vel: 1.0
   min_trans_vel: 0.1
-  trans_stopped_vel: 0.1
+  trans_stopped_vel: 1.0
 
   max_rot_vel: 0.65
   min_rot_vel: 0.1
   rot_stopped_vel: 0.65
   
-  acc_lim_x: 0.65
-  acc_lim_theta: 0.65
-  acc_limit_trans: 0.65
+  acc_lim_x: .65
+  acc_lim_theta: .65
+  acc_limit_trans: .65
 
 # Goal Tolerance Parameters
   yaw_goal_tolerance: 0.3
@@ -27,13 +27,13 @@ DWAPlannerROS:
 #  vtheta_samples: 20
 
 # Trajectory Scoring Parameters
-  path_distance_bias: 200.0     # weighting for how much it should stick to the global path plan
-  goal_distance_bias: 0.0       # wighting for how much it should attempt to reach its goal
-  occdist_scale: 0.05           # weighting for how much the controller should avoid obstacles
-  forward_point_distance: 0.0   # how far along to place an additional scoring point
-  stop_time_buffer: 0.2         # amount of time a robot must stop in before colliding for a valid traj.
-  scaling_speed: 0.0            # absolute velocity at which to start scaling the robot's footprint
-  max_scaling_factor: 0.0       # how much to scale the robot's footprint when at speed.
+#  path_distance_bias: 64.0     # weighting for how much it should stick to the global path plan
+#  goal_distance_bias: 32.0       # wighting for how much it should attempt to reach its goal
+#  occdist_scale: 0.05           # weighting for how much the controller should avoid obstacles
+#  forward_point_distance: 0.0   # how far along to place an additional scoring point
+#  stop_time_buffer: 0.2         # amount of time a robot must stop in before colliding for a valid traj.
+#  scaling_speed: 0.0            # absolute velocity at which to start scaling the robot's footprint
+#  max_scaling_factor: 0.0       # how much to scale the robot's footprint when at speed.
 
 # Oscillation Prevention Parameters
   oscillation_reset_dist: 0.05  # how far to travel before resetting oscillation flags

@@ -257,6 +257,8 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 
 						messageData.clear( );
 
+						messageDataLeftOver.clear( );
+
 						cCRC = 0;
 					}
 					else

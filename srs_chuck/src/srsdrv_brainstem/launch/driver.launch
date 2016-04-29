@@ -6,8 +6,8 @@
   *
 -->
 <launch>
-    <node name="srsdrv_brain_stem"
-        pkg="srsdrv_brain_stem"
-        type="srsdrv_brain_stem_driver" 
+    <node name="srsdrv_brainstem"
+        pkg="srsdrv_brainstem"
+        type="srsdrv_brainstem" 
         output="screen" respawn="true"/>
 </launch>

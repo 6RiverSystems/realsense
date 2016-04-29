@@ -20,19 +20,19 @@ using namespace std;
 
 namespace srs {
 
-class RosOdometer :
+class RosTapOdometer :
     public RosTap
 {
 public:
     typedef typename Odometer<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>::BaseType BaseType;
 
-    RosOdometer() :
+    RosTapOdometer() :
         RosTap("Odometer")
     {
         sensor_ = new Odometer<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>();
     }
 
-    ~RosOdometer()
+    ~RosTapOdometer()
     {
         disconnectTap();
         delete sensor_;
@@ -53,7 +53,7 @@ public:
         sensor_->reset();
     }
 
-    void set(uint32_t arrivalTime, BaseType linear, BaseType angular)
+    void set(double arrivalTime, BaseType linear, BaseType angular)
     {
         sensor_->set(arrivalTime, linear, angular);
     }

@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef MATH2_HPP_
-#define MATH2_HPP_
+#ifndef MATH_HPP_
+#define MATH_HPP_
 
 #include <cmath>
 #include <limits>

@@ -21,7 +21,7 @@ using namespace std;
 #include <srsnode_position_estimator/Robot.hpp>
 #include <srsnode_position_estimator/StatePe.hpp>
 
-#include <srsnode_position_estimator/tap/odometry/RosOdometer.hpp>
+#include <srsnode_position_estimator/tap/odometry/RosTapOdometer.hpp>
 #include <srsnode_position_estimator/tap/brain_stem_status/RosBrainStemStatus.hpp>
 
 namespace srs {
@@ -55,7 +55,6 @@ private:
 
     cv::Mat currentCovariance_;
     StatePe<> currentState_;
-    ros::Time currentTime_;
 
     Robot<> robot_;
     ros::NodeHandle rosNodeHandle_;
@@ -64,13 +63,15 @@ private:
 
     RosBrainStemStatus tapBrainStemStatus_;
     RosTapCmdVel<> tapCmdVel_;
-    RosOdometer tapOdometer_;
+    RosTapOdometer tapOdometer_;
 
     UnscentedKalmanFilter<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE> ukf_;
 
+    ros::Time previousTime_;
+    ros::Time currentTime_;
+
     double previousTimeNs_;
     double previousTimeS_;
-
     double currentTimeNs_;
     double currentTimeS_;
 };

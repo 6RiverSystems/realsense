@@ -8,6 +8,6 @@
 <launch>
     <node name="srsnode_position_estimator" 
         pkg="srsnode_position_estimator"
-        type="srsnode_position_estimator_node"
+        type="srsnode_position_estimator"
         output="screen" respawn="true"/>
 </launch>

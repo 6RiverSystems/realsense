@@ -21,7 +21,8 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/platform/ThreadSafeQueue.hpp
 
     include/${PROJECT_NAME}/math/Math.hpp
-    
+    include/${PROJECT_NAME}/math/Time.hpp
+
     include/${PROJECT_NAME}/robotics/Pose.hpp
     include/${PROJECT_NAME}/robotics/Odometry.hpp
     include/${PROJECT_NAME}/robotics/Velocity.hpp
@@ -85,6 +86,12 @@ generate_messages(
 ####################################################################################################
 # Target
 
+catkin_package(
+    INCLUDE_DIRS src include
+    LIBRARIES ${PROJECT_LIBRARY}
+    DEPENDS message_runtime opencv
+)
+
 add_library(${PROJECT_LIBRARY}
     ${${PROJECT_NAME}_SOURCES}
 )
@@ -95,12 +102,6 @@ target_link_libraries(${PROJECT_LIBRARY}
 )
 
 set_target_properties(${PROJECT_LIBRARY} PROPERTIES LINKER_LANGUAGE CXX)
-
-catkin_package(
-    INCLUDE_DIRS src include
-    LIBRARIES ${PROJECT_LIBRARY}
-    DEPENDS message_runtime opencv
-)
 
 ####################################################################################################
 # Tests

@@ -24,7 +24,7 @@ set(${PROJECT_NAME}_TEST_SOURCES
 
 project(${PROJECT_NAME})
 
-set(PROJECT_NODE ${PROJECT_NAME}_driver)
+set(PROJECT_NODE ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
 set(CMAKE_BUILD_TYPE Debug)
@@ -51,6 +51,10 @@ include_directories(include
 ####################################################################################################
 # Target
 
+catkin_package(
+    DEPENDS system_lib srslib_framework
+)
+
 add_executable(${PROJECT_NODE} 
     src/BrainStem.cpp
     ${${PROJECT_NAME}_SOURCES}
@@ -59,10 +63,6 @@ target_link_libraries(${PROJECT_NODE}
     ${catkin_LIBRARIES}
     ${boost_LIBRARIES}
     ${srslib_framework_LIBRARIES}
-)
-
-catkin_package(
-    DEPENDS system_lib srslib_framework
 )
 
 ####################################################################################################

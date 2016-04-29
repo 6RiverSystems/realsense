@@ -1,13 +1,23 @@
+#
+# (c) Copyright 2015-2016 River Systems, all rights reserved.
+#
+# This is proprietary software, unauthorized distribution is not permitted.
+#
 cmake_minimum_required(VERSION 2.8.3)
 
 set(PROJECT_NAME srslib_test)
-set(PROJECT_LIBRARY ${PROJECT_NAME})
+
 set(${PROJECT_NAME}_SOURCES
 
     include/${PROJECT_NAME}/utils/Compare.hpp
 )
 
+####################################################################################################
+# Project
+
 project(${PROJECT_NAME})
+
+set(PROJECT_LIBRARY ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_BUILD_TYPE Debug)
@@ -17,21 +27,25 @@ find_package(catkin REQUIRED COMPONENTS
 )
 find_package(OpenCV REQUIRED)
 
-catkin_package(
-    INCLUDE_DIRS include
-    LIBRARIES ${PROJECT_LIBRARY}
-    DEPENDS opencv
-)
-
 include_directories(
     include/
     ${roscpp_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS} 
 )
 
+####################################################################################################
+# Target
+
+catkin_package(
+    INCLUDE_DIRS include
+    LIBRARIES ${PROJECT_LIBRARY}
+    DEPENDS opencv
+)
+
 add_library(${PROJECT_LIBRARY}
     ${${PROJECT_NAME}_SOURCES}
 )
+
 target_link_libraries(${PROJECT_LIBRARY}
     ${roscpp_LIBRARIES}
     ${OpenCV_LIBRARIES}

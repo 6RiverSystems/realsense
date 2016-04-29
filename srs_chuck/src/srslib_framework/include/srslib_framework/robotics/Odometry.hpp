@@ -19,8 +19,14 @@ namespace srs {
 template<typename TYPE = double>
 struct Odometry : public Measurement
 {
-    Odometry(uint32_t arrivalTime, TYPE linear, TYPE angular) :
+    Odometry(double arrivalTime, TYPE linear, TYPE angular) :
             arrivalTime(arrivalTime),
+            linear(linear),
+            angular(angular)
+    {}
+
+    Odometry(TYPE linear, TYPE angular) :
+            arrivalTime(0.0),
             linear(linear),
             angular(angular)
     {}
@@ -40,7 +46,7 @@ struct Odometry : public Measurement
         return output.str();
     }
 
-    uint32_t arrivalTime;
+    double arrivalTime;
     TYPE linear;
     TYPE angular;
 };

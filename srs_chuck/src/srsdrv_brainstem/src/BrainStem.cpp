@@ -146,9 +146,9 @@ public:
 int main(int argc, char **argv)
 {
     // Initialize ROS
-    ros::init(argc, argv, "srsnode_brain_stem");
+    ros::init(argc, argv, "srsdrv_brainstem");
 
-    ROS_INFO_STREAM("srsnode_brain_stem_node started");
+    ROS_INFO_STREAM("srsdrv_brainstem started");
 
     try
     {

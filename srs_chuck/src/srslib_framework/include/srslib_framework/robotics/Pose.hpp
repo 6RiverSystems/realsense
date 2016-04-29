@@ -16,7 +16,15 @@ namespace srs {
 template<typename TYPE = double>
 struct Pose : public Object
 {
+    Pose(double arrivalTime, TYPE x, TYPE y, TYPE theta) :
+        arrivalTime(arrivalTime),
+        x(x),
+        y(y),
+        theta(theta)
+    {}
+
     Pose(TYPE x = TYPE(), TYPE y = TYPE(), TYPE theta = TYPE()) :
+        arrivalTime(0.0),
         x(x),
         y(y),
         theta(theta)
@@ -30,6 +38,7 @@ struct Pose : public Object
         theta = Math::deg2rad<TYPE>(deg);
     }
 
+    double arrivalTime;
     TYPE x;
     TYPE y;
     TYPE theta;

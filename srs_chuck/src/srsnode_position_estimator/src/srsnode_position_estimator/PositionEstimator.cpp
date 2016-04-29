@@ -7,6 +7,8 @@
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <tf/transform_broadcaster.h>
 
+#include <srslib_framework/math/Time.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,6 +24,7 @@ PositionEstimator::PositionEstimator() :
     currentState_ = StatePe<>(3.0, 2.0, 0.0);
 
     ukf_.addSensor(tapOdometer_.getSensor());
+    // ukf_.addSensor(tapAps_.getSensor());
     ukf_.reset(currentState_.getVectorForm(), currentCovariance_);
 
     rosPubOdom_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("/odom", 50);
@@ -38,6 +41,8 @@ void PositionEstimator::run()
     while (ros::ok())
     {
         ros::spinOnce();
+
+        previousTime_ = currentTime_;
         currentTime_ = ros::Time::now();
 
         scanTapsForData();
@@ -111,7 +116,7 @@ void PositionEstimator::scanTapsForData()
     // feeding the odometer the commanded velocity
     if (!tapBrainStemStatus_.isBrainStemConnected())
     {
-        tapOdometer_.set(currentTime_.nsec,
+        tapOdometer_.set(Time::time2number(currentTime_),
             currentCommand_.velocity.linear,
             currentCommand_.velocity.angular);
     }
@@ -127,10 +132,28 @@ void PositionEstimator::stepUkf()
     previousTimeS_ = currentTimeS_;
     currentTimeS_ = static_cast<double>(currentTime_.sec);
 
-    double dT = currentTimeNs_ + (currentTimeS_ - previousTimeS_) - previousTimeNs_;
+    double dT1 = currentTimeNs_ + (currentTimeS_ - previousTimeS_) - previousTimeNs_;
+
+    double cT = Time::time2number(currentTime_);
+    double pT = Time::time2number(previousTime_);
+    double dT2 =  cT - pT;
+
+    if (abs(dT1 - dT2) > 0.1)
+    {
+        ROS_ERROR_STREAM("--------------------------------");
+        ROS_ERROR_STREAM("dT1: " << dT1);
+        ROS_ERROR_STREAM("dT2: " << dT2);
+        ROS_ERROR_STREAM("pTns: " << previousTimeNs_);
+        ROS_ERROR_STREAM("cTns: " << currentTimeNs_);
+        ROS_ERROR_STREAM("pTs: " << previousTimeS_);
+        ROS_ERROR_STREAM("cTs: " << currentTimeS_);
+        ROS_ERROR_STREAM("cT: " << cT);
+        ROS_ERROR_STREAM("pT: " << pT);
+        ROS_ERROR_STREAM("--------------------------------");
+    }
 
     // Advance the state of the UKF
-    ukf_.run(dT, commandUpdated_ ? &currentCommand_ : nullptr);
+    ukf_.run(dT2, commandUpdated_ ? &currentCommand_ : nullptr);
 
     // Store the new state and covariance for publication
     currentState_ = StatePe<>(ukf_.getState());

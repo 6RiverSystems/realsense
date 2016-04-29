@@ -10,6 +10,6 @@
 
     <node name="srsnode_joystick_adapter"
         pkg="srsnode_joystick_adapter" 
-        type="srsnode_joystick_adapter_node"
+        type="srsnode_joystick_adapter"
         output="screen" respawn="true"/>
 </launch>

@@ -73,7 +73,7 @@ protected:
         return true;
     }
 
-    void setNewData(bool newValue, uint32_t timestamp)
+    void setNewData(bool newValue, double timestamp)
     {
         newData_ = newValue;
         timestamp_ = timestamp;
@@ -83,7 +83,7 @@ private:
     bool connected_;
     string name_;
     bool newData_;
-    uint32_t timestamp_;
+    double timestamp_;
 };
 
 } // namespace srs

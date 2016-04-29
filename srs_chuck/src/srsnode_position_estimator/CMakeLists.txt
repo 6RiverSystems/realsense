@@ -12,7 +12,10 @@ set(${PROJECT_NAME}_SOURCES
     src/${PROJECT_NAME}/tap/brain_stem_status/RosBrainStemStatus.cpp
 
     include/${PROJECT_NAME}/tap/odometry/Odometer.hpp
-    src/${PROJECT_NAME}/tap/odometry/RosOdometer.cpp
+    src/${PROJECT_NAME}/tap/odometry/RosTapOdometer.cpp
+
+    include/${PROJECT_NAME}/tap/aps/ApsSensor.hpp
+    src/${PROJECT_NAME}/tap/aps/RosTapAps.cpp
 
     include/${PROJECT_NAME}/CmdVelocity.hpp
     include/${PROJECT_NAME}/Configuration.hpp
@@ -34,7 +37,7 @@ set(${PROJECT_NAME}_TEST_SOURCES
 
 project(${PROJECT_NAME})
 
-set(PROJECT_NODE ${PROJECT_NAME}_node)
+set(PROJECT_NODE ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 set(CMAKE_BUILD_TYPE Debug)
@@ -61,6 +64,10 @@ include_directories(include
 ####################################################################################################
 # Target
 
+catkin_package(
+    DEPENDS opencv srslib_framework
+)
+
 add_executable(${PROJECT_NODE} 
     src/${PROJECT_NAME}/position_estimator_node.cpp
     ${${PROJECT_NAME}_SOURCES}
@@ -70,10 +77,6 @@ target_link_libraries(${PROJECT_NODE}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBRARIES}
     ${srslib_framework_LIBRARIES}
-)
-
-catkin_package(
-    DEPENDS opencv srslib_framework
 )
 
 ####################################################################################################

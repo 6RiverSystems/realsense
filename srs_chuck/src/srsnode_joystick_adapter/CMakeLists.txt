@@ -17,7 +17,7 @@ set(${PROJECT_NAME}_SOURCES
 
 project(${PROJECT_NAME})
 
-set(PROJECT_NODE ${PROJECT_NAME}_node)
+set(PROJECT_NODE ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_BUILD_TYPE Debug)
@@ -41,6 +41,10 @@ include_directories(include
 ####################################################################################################
 # Target
 
+catkin_package(
+    DEPENDS srslib_framework
+)
+
 add_executable(${PROJECT_NODE} 
     src/${PROJECT_NAME}/joystick_adapter_node.cpp
     ${${PROJECT_NAME}_SOURCES}
@@ -49,10 +53,6 @@ add_executable(${PROJECT_NODE}
 target_link_libraries(${PROJECT_NODE}
     ${catkin_LIBRARIES}
     ${srslib_framework_LIBRARIES}
-)
-
-catkin_package(
-    DEPENDS srslib_framework
 )
 
 ####################################################################################################

@@ -9,12 +9,12 @@ namespace srs {
 
 template<unsigned int STATE_SIZE, int TYPE>
 const cv::Mat ApsSensor<STATE_SIZE, TYPE>::R = (
-    cv::Mat_<BaseType>(1, STATE_SIZE) <<
-        0,
-        0,
-        0,
-        0.001,
-        0.001
+    cv::Mat_<ApsSensor<STATE_SIZE, TYPE>::BaseType>(1, STATE_SIZE) <<
+        0.01,
+        0.01,
+        0.01,
+        0.0,
+        0.0
 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,9 +41,9 @@ cv::Mat ApsSensor<STATE_SIZE, TYPE>::transformWithH(const cv::Mat stateVector)
 
     // Transfer the value that the odometer care about to the new state
     cv::Mat result = Math::zeros(stateVector);
-    result.at<BaseType>(StatePe<TYPE>::STATE_X, 0) = state.x;
-    result.at<BaseType>(StatePe<TYPE>::STATE_Y, 0) = state.y;
-    result.at<BaseType>(StatePe<TYPE>::STATE_THETA, 0) = state.theta;
+    result.at<BaseType>(StatePe<TYPE>::STATE_X) = state.x;
+    result.at<BaseType>(StatePe<TYPE>::STATE_Y) = state.y;
+    result.at<BaseType>(StatePe<TYPE>::STATE_THETA) = state.theta;
 
     return result;
 }

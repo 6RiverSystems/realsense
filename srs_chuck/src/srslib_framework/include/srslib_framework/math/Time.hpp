@@ -19,10 +19,13 @@ struct Time
     template<typename TYPE = double>
     inline static TYPE time2number(ros::Time& time)
     {
-        TYPE ns = static_cast<TYPE>(time.nsec) * 1.0e-9;
-        TYPE s = static_cast<TYPE>(time.sec);
+        return static_cast<TYPE>(time.nsec) * 1.0e-9 + static_cast<TYPE>(time.sec);
+    }
 
-        return s + ns;
+    template<typename TYPE = double>
+    inline static TYPE time2number(const ros::Time& time)
+    {
+        return static_cast<TYPE>(time.nsec) * 1.0e-9 + static_cast<TYPE>(time.sec);
     }
 };
 

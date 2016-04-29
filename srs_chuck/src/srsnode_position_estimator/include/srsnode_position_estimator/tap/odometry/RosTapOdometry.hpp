@@ -16,29 +16,29 @@ using namespace std;
 
 #include <srsnode_position_estimator/Configuration.hpp>
 
-#include "Odometer.hpp"
+#include <srsnode_position_estimator/tap/odometry/OdometrySensor.hpp>
 
 namespace srs {
 
-class RosTapOdometer :
+class RosTapOdometry :
     public RosTap
 {
 public:
-    typedef typename Odometer<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>::BaseType BaseType;
+    typedef typename OdometrySensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>::BaseType BaseType;
 
-    RosTapOdometer() :
-        RosTap("Odometer")
+    RosTapOdometry() :
+        RosTap("Odometry")
     {
-        sensor_ = new Odometer<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>();
+        sensor_ = new OdometrySensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>();
     }
 
-    ~RosTapOdometer()
+    ~RosTapOdometry()
     {
         disconnectTap();
         delete sensor_;
     }
 
-    Odometer<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* getSensor() const
+    OdometrySensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* getSensor() const
     {
         return sensor_;
     }
@@ -64,7 +64,7 @@ protected:
 private:
     void onSensorsOdometryRaw(geometry_msgs::TwistStampedConstPtr message);
 
-    Odometer<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensor_;
+    OdometrySensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensor_;
 };
 
 } // namespace srs

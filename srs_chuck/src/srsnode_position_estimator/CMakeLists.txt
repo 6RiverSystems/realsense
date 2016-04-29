@@ -11,8 +11,8 @@ set(${PROJECT_NAME}_SOURCES
 
     src/${PROJECT_NAME}/tap/brain_stem_status/RosBrainStemStatus.cpp
 
-    include/${PROJECT_NAME}/tap/odometry/Odometer.hpp
-    src/${PROJECT_NAME}/tap/odometry/RosTapOdometer.cpp
+    include/${PROJECT_NAME}/tap/odometry/OdometrySensor.hpp
+    src/${PROJECT_NAME}/tap/odometry/RosTapOdometry.cpp
 
     include/${PROJECT_NAME}/tap/aps/ApsSensor.hpp
     src/${PROJECT_NAME}/tap/aps/RosTapAps.cpp

@@ -1,5 +1,7 @@
 #include <srsnode_position_estimator/tap/aps/RosTapAps.hpp>
 
+#include <srslib_framework/math/Time.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,10 +22,10 @@ bool RosTapAps::connect()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void RosTapAps::onAps(srslib_framework::ApsConstPtr message)
 {
-//    set(Time::time2number(message->header.stamp),
-//        static_cast<double>(message->x),
-//        static_cast<double>(message->y),
-//        static_cast<double>(message->yaw));
+    set(Time::time2number(message->header.stamp),
+        static_cast<double>(message->x),
+        static_cast<double>(message->y),
+        static_cast<double>(message->yaw));
 }
 
 } // namespace srs

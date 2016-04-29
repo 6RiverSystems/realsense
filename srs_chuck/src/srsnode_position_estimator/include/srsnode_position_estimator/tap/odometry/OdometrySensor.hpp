@@ -14,20 +14,20 @@
 namespace srs {
 
 template<unsigned int STATE_SIZE = 5, int TYPE = CV_64F>
-class Odometer :
+class OdometrySensor :
     public Sensor<STATE_SIZE, TYPE>
 {
 public:
     typedef typename Sensor<STATE_SIZE, TYPE>::BaseType BaseType;
 
-    Odometer() :
+    OdometrySensor() :
         Sensor<STATE_SIZE, TYPE>(cv::Mat::diag(R)),
         currentData_(Odometry<BaseType>(0, 0, 0))
     {
         reset();
     }
 
-    virtual ~Odometer()
+    virtual ~OdometrySensor()
     {}
 
     virtual cv::Mat getCurrentData();
@@ -53,6 +53,6 @@ private:
 
 } // namespace srs
 
-#include <srsnode_position_estimator/tap/odometry/Odometer.cpp>
+#include <srsnode_position_estimator/tap/odometry/OdometrySensor.cpp>
 
 #endif // ODOMETER_HPP_

@@ -14,6 +14,7 @@
     <arg name="global_costmap_params" />
     <arg name="dwa_local_planner_params" />
     <arg name="move_base_params" />
+    <arg name="global_planner_params" />
 
     <!-- Robot description -->
     <param name="robot_description" command="$(find xacro)/xacro.py $(find srsbot_chuck)/urdf/chuck.urdf.xacro" />
@@ -33,6 +34,7 @@
         <rosparam file="$(arg global_costmap_params)" command="load" />
         <rosparam file="$(arg dwa_local_planner_params)" command="load" />
         <rosparam file="$(arg move_base_params)" command="load" />
+        <rosparam file="$(arg global_planner_params)" command="load" />
     </node>
 
     <!-- Launch all the robot components -->

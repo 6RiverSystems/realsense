@@ -1,7 +1,21 @@
+#
+# (c) Copyright 2015-2016 River Systems, all rights reserved.
+#
+# This is proprietary software, unauthorized distribution is not permitted.
+#
+
 local_costmap:
-  global_frame: /odom
-  robot_base_frame: /base_footprint
-  update_frequency: 1.0
-  publish_frequency: 1.0
-  static_map: true
-  rolling_window: false
+    global_frame: /odom
+    robot_base_frame: /base_footprint
+    update_frequency: 1.0
+    publish_frequency: 1.0
+    static_map: true
+    rolling_window: false
+
+#    local_costmap:
+#  global_frame: /odom
+#  robot_base_frame: /base_footprint
+#  update_frequency: 1.0
+#  publish_frequency: 1.0
+#  static_map: true
+#  rolling_window: false

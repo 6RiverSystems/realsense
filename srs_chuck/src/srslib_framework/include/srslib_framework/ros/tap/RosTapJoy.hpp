@@ -34,7 +34,7 @@ public:
 
     Velocity<TYPE> getCurrentVelocity()
     {
-        setNewData(false, 0);
+        setNewData(false);
         return currentVelocity_;
     }
 
@@ -50,10 +50,8 @@ private:
 
     void onJoy(const sensor_msgs::Joy::ConstPtr& message)
     {
-        currentVelocity_.linear = message->axes[1];
-        currentVelocity_.angular = message->axes[0];
-
-        setNewData(true, ros::Time::now().nsec);
+        currentVelocity_ = Velocity<TYPE>(message->axes[1], message->axes[0]);
+        setNewData(true);
     }
 };
 

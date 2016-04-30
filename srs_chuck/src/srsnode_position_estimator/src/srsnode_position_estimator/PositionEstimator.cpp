@@ -21,7 +21,7 @@ PositionEstimator::PositionEstimator() :
     commandUpdated_(false)
 {
     currentCovariance_ = robot_.getNoiseMatrix();
-    currentState_ = StatePe<>(3.0, 2.0, 0.0);
+    currentState_ = StatePe<>(2.0, 1.5, 0.0);
 
     ukf_.addSensor(tapOdometry_.getSensor());
     // ukf_.addSensor(tapAps_.getSensor());
@@ -36,6 +36,7 @@ void PositionEstimator::run()
     tapBrainStemStatus_.connectTap();
     tapCmdVel_.connectTap();
     tapOdometry_.connectTap();
+    tapInitialPose_.connectTap();
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
@@ -62,6 +63,7 @@ void PositionEstimator::disconnectAllTaps()
     tapBrainStemStatus_.disconnectTap();
     tapCmdVel_.disconnectTap();
     tapOdometry_.disconnectTap();
+    tapInitialPose_.disconnectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,6 +121,14 @@ void PositionEstimator::scanTapsForData()
         tapOdometry_.set(Time::time2number(currentTime_),
             currentCommand_.velocity.linear,
             currentCommand_.velocity.angular);
+    }
+
+    if (tapInitialPose_.newDataAvailable())
+    {
+        currentCovariance_ = robot_.getNoiseMatrix();
+        currentState_ = StatePe<>(tapInitialPose_.getInitialPose());
+
+        ukf_.reset(currentState_.getVectorForm(), currentCovariance_);
     }
 }
 

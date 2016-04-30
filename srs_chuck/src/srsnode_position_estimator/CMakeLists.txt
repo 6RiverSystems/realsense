@@ -9,13 +9,15 @@ set(PROJECT_NAME srsnode_position_estimator)
 
 set(${PROJECT_NAME}_SOURCES
 
-    src/${PROJECT_NAME}/tap/brain_stem_status/RosBrainStemStatus.cpp
-
-    include/${PROJECT_NAME}/tap/odometry/OdometrySensor.hpp
-    src/${PROJECT_NAME}/tap/odometry/RosTapOdometry.cpp
-
     include/${PROJECT_NAME}/tap/aps/ApsSensor.hpp
     src/${PROJECT_NAME}/tap/aps/RosTapAps.cpp
+
+    include/${PROJECT_NAME}/tap/brain_stem_status/RosTapBrainStemStatus.hpp
+
+    include/${PROJECT_NAME}/tap/initial_pose/RosTapInitialPose.hpp
+
+    include/${PROJECT_NAME}/tap/odometry/OdometrySensor.hpp
+    include/${PROJECT_NAME}/tap/odometry/RosTapOdometry.hpp
 
     include/${PROJECT_NAME}/CmdVelocity.hpp
     include/${PROJECT_NAME}/Configuration.hpp

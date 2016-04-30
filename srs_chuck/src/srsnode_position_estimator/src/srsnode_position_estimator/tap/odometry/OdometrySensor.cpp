@@ -26,8 +26,8 @@ cv::Mat OdometrySensor<STATE_SIZE, TYPE>::getCurrentData()
 {
     // Transfer the value that the odometer care about to the new state
     StatePe<TYPE> state = StatePe<TYPE>();
-    state.v = currentData_.linear;
-    state.omega = currentData_.angular;
+    state.v = currentData_.velocity.linear;
+    state.omega = currentData_.velocity.angular;
 
     return state.getVectorForm();
 }

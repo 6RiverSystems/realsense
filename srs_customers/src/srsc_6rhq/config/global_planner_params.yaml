@@ -3,7 +3,5 @@
 #
 # This is proprietary software, unauthorized distribution is not permitted.
 #
-cmake_minimum_required(VERSION 2.8.3)
 
-project(srsc_6rhq)
-
+use_grid_path: true

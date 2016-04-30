@@ -6,6 +6,10 @@
 #ifndef POSE_HPP_
 #define POSE_HPP_
 
+#include <string>
+#include <sstream>
+using namespace std;
+
 #include <opencv2/opencv.hpp>
 
 #include <srslib_framework/platform/Object.hpp>
@@ -16,32 +20,54 @@ namespace srs {
 template<typename TYPE = double>
 struct Pose : public Object
 {
-    Pose(double arrivalTime, TYPE x, TYPE y, TYPE theta) :
+    typedef TYPE BaseType;
+
+    Pose(double arrivalTime, BaseType x, BaseType y, BaseType theta) :
         arrivalTime(arrivalTime),
         x(x),
         y(y),
         theta(theta)
     {}
 
-    Pose(TYPE x = TYPE(), TYPE y = TYPE(), TYPE theta = TYPE()) :
+    Pose(BaseType x = BaseType(), BaseType y = BaseType(), BaseType theta = BaseType()) :
         arrivalTime(0.0),
         x(x),
         y(y),
         theta(theta)
     {}
 
-    ~Pose()
+    Pose(const Pose<BaseType>& other) :
+        arrivalTime(other.arrivalTime),
+        x(other.x),
+        y(other.y),
+        theta(other.theta)
     {}
 
-    void setThetaDegrees(TYPE deg)
+    virtual ~Pose()
+    {}
+
+    void setThetaDegrees(BaseType deg)
     {
         theta = Math::deg2rad<TYPE>(deg);
     }
 
+    string toString()
+    {
+        ostringstream output;
+        output << "Pose {";
+        output << "  arrivalTime: " << arrivalTime << endl;
+        output << "       x: " << x << endl;
+        output << "       y: " << y << endl;
+        output << "   theta: " << theta << endl;
+        output << "}" << endl;
+
+        return output.str();
+    }
+
     double arrivalTime;
-    TYPE x;
-    TYPE y;
-    TYPE theta;
+    BaseType x;
+    BaseType y;
+    BaseType theta;
 };
 
 } // namespace srs

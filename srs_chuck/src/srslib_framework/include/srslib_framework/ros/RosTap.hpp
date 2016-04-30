@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSSENSOR_HPP_
-#define ROSSENSOR_HPP_
+#ifndef ROSTAP_HPP_
+#define ROSTAP_HPP_
 
 #include <string>
 using namespace std;
@@ -19,8 +19,8 @@ public:
     RosTap(string name) :
         connected_(false),
         name_(name),
-        newData_(false),
-        timestamp_(0)
+        newData_(false)/*,
+        timestamp_(0)*/
     {}
 
     virtual ~RosTap()
@@ -43,10 +43,10 @@ public:
         return name_;
     }
 
-    uint32_t getTimestamp() const
-    {
-        return timestamp_;
-    }
+//    double getTimestamp() const
+//    {
+//        return timestamp_;
+//    }
 
     bool isTapConnected() const
     {
@@ -73,19 +73,19 @@ protected:
         return true;
     }
 
-    void setNewData(bool newValue, double timestamp)
+    void setNewData(bool newValue/*, double timestamp*/)
     {
         newData_ = newValue;
-        timestamp_ = timestamp;
+        // timestamp_ = timestamp;
     }
 
 private:
     bool connected_;
     string name_;
     bool newData_;
-    double timestamp_;
+    // double timestamp_;
 };
 
 } // namespace srs
 
-#endif // ROSSENSOR_HPP_
+#endif // ROSTAP_HPP_

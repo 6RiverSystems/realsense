@@ -22,7 +22,8 @@ using namespace std;
 #include <srsnode_position_estimator/StatePe.hpp>
 
 #include <srsnode_position_estimator/tap/odometry/RosTapOdometry.hpp>
-#include <srsnode_position_estimator/tap/brain_stem_status/RosBrainStemStatus.hpp>
+#include <srsnode_position_estimator/tap/brain_stem_status/RosTapBrainStemStatus.hpp>
+#include <srsnode_position_estimator/tap/initial_pose/RosTapInitialPose.hpp>
 
 namespace srs {
 
@@ -61,9 +62,10 @@ private:
     ros::Publisher rosPubOdom_;
     tf::TransformBroadcaster rosTfBroadcaster_;
 
-    RosBrainStemStatus tapBrainStemStatus_;
+    RosTapBrainStemStatus tapBrainStemStatus_;
     RosTapCmdVel<> tapCmdVel_;
     RosTapOdometry tapOdometry_;
+    RosTapInitialPose tapInitialPose_;
 
     UnscentedKalmanFilter<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE> ukf_;
 

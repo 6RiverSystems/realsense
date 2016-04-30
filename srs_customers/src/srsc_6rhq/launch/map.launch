@@ -9,7 +9,7 @@
 
     <!-- Launch visualization in rviz -->
     <node name="rviz" pkg="rviz" type="rviz" 
-        args="-d $(find srsc_6rhq)/rviz/urdf.rviz" 
+        args="-d $(find srsc_6rhq)/rviz/config.rviz" 
         required="true" />
 
     <!-- Spawn a robot into Gazebo -->
@@ -28,6 +28,8 @@
         <arg name="local_costmap_common_params" value="$(find srsc_6rhq)/config/costmap_common_params.yaml" />
         <arg name="local_costmap_params" value="$(find srsc_6rhq)/config/local_costmap_params.yaml" />
         <arg name="global_costmap_params" value="$(find srsc_6rhq)/config/global_costmap_params.yaml" />
+
+        <arg name="global_planner_params" value="$(find srsc_6rhq)/config/global_planner_params.yaml" />
         <arg name="dwa_local_planner_params" value="$(find srsc_6rhq)/config/dwa_local_planner_params.yaml" />
         <arg name="move_base_params" value="$(find srsc_6rhq)/config/move_base_params.yaml" />
 

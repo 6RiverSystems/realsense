@@ -13,6 +13,7 @@ using namespace std;
 #include <geometry_msgs/TwistStamped.h>
 
 #include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/math/Time.hpp>
 
 #include <srsnode_position_estimator/Configuration.hpp>
 
@@ -59,10 +60,21 @@ public:
     }
 
 protected:
-    bool connect();
+    bool connect()
+    {
+        rosSubscriber_ = rosNodeHandle_.subscribe("/sensors/odometry/raw", 100,
+            &RosTapOdometry::onSensorsOdometryRaw, this);
+
+        return true;
+    }
 
 private:
-    void onSensorsOdometryRaw(geometry_msgs::TwistStampedConstPtr message);
+    void onSensorsOdometryRaw(geometry_msgs::TwistStampedConstPtr message)
+    {
+        set(Time::time2number(message->header.stamp),
+            static_cast<double>(message->twist.linear.x),
+            static_cast<double>(message->twist.angular.z));
+    }
 
     OdometrySensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensor_;
 };

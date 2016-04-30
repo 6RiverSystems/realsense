@@ -13,22 +13,25 @@ using namespace std;
 #include <opencv2/opencv.hpp>
 
 #include <srslib_framework/filter/Measurement.hpp>
+#include <srslib_framework/robotics/Velocity.hpp>
 
 namespace srs {
 
 template<typename TYPE = double>
 struct Odometry : public Measurement
 {
-    Odometry(double arrivalTime, TYPE linear, TYPE angular) :
-            arrivalTime(arrivalTime),
-            linear(linear),
-            angular(angular)
+    typedef TYPE BaseType;
+
+    Odometry(double arrivalTime, BaseType linear, BaseType angular) :
+        velocity(arrivalTime, linear, angular)
     {}
 
-    Odometry(TYPE linear, TYPE angular) :
-            arrivalTime(0.0),
-            linear(linear),
-            angular(angular)
+    Odometry(BaseType linear, BaseType angular) :
+        velocity(linear, angular)
+    {}
+
+    Odometry(const Odometry<BaseType>& other) :
+        velocity(other.velocity)
     {}
 
     virtual ~Odometry()
@@ -38,17 +41,13 @@ struct Odometry : public Measurement
     {
         ostringstream output;
         output << "Odometry {";
-        output << "  arrivalTime: " << arrivalTime << endl;
-        output << "       linear: " << linear << endl;
-        output << "      angular: " << angular << endl;
+        output << "  velocity: " << velocity.toString() << endl;
         output << "}" << endl;
 
         return output.str();
     }
 
-    double arrivalTime;
-    TYPE linear;
-    TYPE angular;
+    Velocity<TYPE> velocity;
 };
 
 } // namespace srs

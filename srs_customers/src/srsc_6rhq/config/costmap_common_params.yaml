@@ -1,8 +1,22 @@
-# Obstacle cost shapping
+#
+# (c) Copyright 2015-2016 River Systems, all rights reserved.
+#
+# This is proprietary software, unauthorized distribution is not permitted.
+#
+
+# Robot footprint
 footprint: [[-0.5,-0.3], [-0.5,0.3], [0.5, 0.3], [0.5,-0.3]]
-resolution: 0.10000
+
+# Cost factors
 inflation_radius: 3.0
-cost_scaling_factor: 5.0
+cost_scaling_factor: 5000.0
+resolution: 0.01
+
+# Obstacle cost shapping
+#footprint: [[-0.5,-0.3], [-0.5,0.3], [0.5, 0.3], [0.5,-0.3]]
+#resolution: 0.10000
+#inflation_radius: 3.0
+#cost_scaling_factor: 5.0
 
 #robot_radius: ir_of_robot
 #observation_sources: laser_scan_sensor

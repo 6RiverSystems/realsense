@@ -16,18 +16,18 @@ using namespace std;
 
 namespace srs {
 
-class RosBrainStemStatus :
+class RosTapBrainStemStatus :
     public RosTap
 {
 public:
-    RosBrainStemStatus() :
+    RosTapBrainStemStatus() :
         RosTap("Brain Stem Status Tap"),
         connectionStateChanged_(false),
         isBrainStemConnected_(false),
         prevBrainStemConnected_(false)
     {}
 
-    ~RosBrainStemStatus()
+    ~RosTapBrainStemStatus()
     {
         disconnectTap();
     }
@@ -43,14 +43,33 @@ public:
     }
 
 protected:
-    bool connect();
+    bool connect()
+    {
+        rosSubscriber_ = rosNodeHandle_.subscribe("/brain_stem/connected", 100,
+            &RosTapBrainStemStatus::onBrainStemConnected, this);
+
+        return true;
+    }
 
 private:
     bool connectionStateChanged_;
     bool isBrainStemConnected_;
     bool prevBrainStemConnected_;
 
-    void onBrainStemConnected(std_msgs::BoolConstPtr message);
+    void onBrainStemConnected(std_msgs::BoolConstPtr message)
+    {
+        isBrainStemConnected_ = message->data;
+        connectionStateChanged_ = prevBrainStemConnected_ != isBrainStemConnected_;
+
+        if (connectionStateChanged_)
+        {
+            ROS_INFO_STREAM("Brain stem changed the connection state from " <<
+                prevBrainStemConnected_ << " to " << isBrainStemConnected_);
+        }
+
+        prevBrainStemConnected_ = isBrainStemConnected_;
+        setNewData(true);
+    }
 };
 
 } // namespace srs

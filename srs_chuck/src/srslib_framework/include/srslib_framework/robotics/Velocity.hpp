@@ -6,6 +6,10 @@
 #ifndef VELOCITY_HPP_
 #define VELOCITY_HPP_
 
+#include <string>
+#include <sstream>
+using namespace std;
+
 #include <opencv2/opencv.hpp>
 
 #include <srslib_framework/platform/Object.hpp>
@@ -15,21 +19,44 @@ namespace srs {
 template<typename TYPE = double>
 struct Velocity : public Object
 {
-    Velocity(TYPE linear = TYPE(), TYPE angular = TYPE()) :
+    typedef TYPE BaseType;
+
+    Velocity(double arrivalTime, BaseType linear, BaseType angular) :
+        arrivalTime(arrivalTime),
         linear(linear),
         angular(angular)
     {}
 
-    Velocity(const Velocity<TYPE>& other) :
+    Velocity(BaseType linear = BaseType(), BaseType angular = BaseType()) :
+        arrivalTime(0.0),
+        linear(linear),
+        angular(angular)
+    {}
+
+    Velocity(const Velocity<BaseType>& other) :
+        arrivalTime(other.arrivalTime),
         linear(other.linear),
         angular(other.angular)
     {}
 
-    ~Velocity()
+    virtual ~Velocity()
     {}
 
-    TYPE linear;
-    TYPE angular;
+    string toString()
+    {
+        ostringstream output;
+        output << "Velocity {";
+        output << "  arrivalTime: " << arrivalTime << endl;
+        output << "       linear: " << linear << endl;
+        output << "      angular: " << angular << endl;
+        output << "}" << endl;
+
+        return output.str();
+    }
+
+    double arrivalTime;
+    BaseType linear;
+    BaseType angular;
 };
 
 } // namespace srs

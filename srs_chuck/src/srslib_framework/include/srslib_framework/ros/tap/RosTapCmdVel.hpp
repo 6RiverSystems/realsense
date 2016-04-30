@@ -34,15 +34,10 @@ public:
 
     Velocity<TYPE> getCurrentData()
     {
-        setNewData(false, 0);
+        setNewData(false);
         return currentCmdVel_;
     }
 
-//    Velocity<TYPE> getPreviousData()
-//    {
-//        return currentCmdVel_;
-//    }
-//
 protected:
     bool connect()
     {
@@ -55,16 +50,8 @@ private:
 
     void onCmdVel(geometry_msgs::TwistConstPtr message)
     {
-        ros::Time timestamp = ros::Time::now();
-
-        currentCmdVel_.linear = message->linear.x;
-        currentCmdVel_.angular = message->angular.z;
-
-        ROS_DEBUG_THROTTLE(0.5f, "RosTapCmdVel | linear = %f, angular = %f",
-            currentCmdVel_.linear,
-            currentCmdVel_.angular);
-
-        setNewData(true, timestamp.nsec);
+        currentCmdVel_ = Velocity<TYPE>(message->linear.x, message->angular.z);
+        setNewData(true);
     }
 };
 

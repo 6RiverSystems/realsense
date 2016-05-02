@@ -9,6 +9,9 @@ set(PROJECT_NAME srslib_framework)
 
 set(${PROJECT_NAME}_SOURCES
 
+    include/${PROJECT_NAME}/datastructure/ThreadSafeQueue.hpp
+    include/${PROJECT_NAME}/datastructure/PriorityQueue.hpp
+
     include/${PROJECT_NAME}/filter/Command.hpp
     include/${PROJECT_NAME}/filter/FilterState.hpp
     include/${PROJECT_NAME}/filter/Measurement.hpp
@@ -17,8 +20,9 @@ set(${PROJECT_NAME}_SOURCES
 
     include/${PROJECT_NAME}/filter/ukf/UnscentedKalmanFilter.hpp
 
+    include/${PROJECT_NAME}/graph/Grid2d.hpp
+
     include/${PROJECT_NAME}/platform/Object.hpp
-    include/${PROJECT_NAME}/platform/ThreadSafeQueue.hpp
 
     include/${PROJECT_NAME}/math/Math.hpp
     include/${PROJECT_NAME}/math/Time.hpp
@@ -39,9 +43,12 @@ set(${PROJECT_NAME}_MSGS
     Aps.msg
 )
 
-set(${PROJECT_NAME}_TEST_SOURCES
+set(TEST_SOURCES_UKF 
+    test/filter/ukf/Test_Ukf_Basic.cpp
+)
 
-    test/ukf/Test_Ukf_Basic.cpp
+set(TEST_SOURCES_ASTAR
+    test/search/Test_AStar_Basic.cpp
 )
 
 ####################################################################################################
@@ -107,12 +114,24 @@ set_target_properties(${PROJECT_LIBRARY} PROPERTIES LINKER_LANGUAGE CXX)
 # Tests
 
 if (CATKIN_ENABLE_TESTING)
+
     catkin_add_gtest(TestSuite_Ukf
-        test/ukf/TestSuite_Ukf.cpp
+        test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
-        ${${PROJECT_NAME}_TEST_SOURCES}
+        ${TEST_SOURCES_UKF}
     )
     target_link_libraries(TestSuite_Ukf
+        ${catkin_LIBRARIES}
+        ${OpenCV_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+    )
+
+    catkin_add_gtest(TestSuite_AStar
+        test/TestSuite.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_ASTAR}
+    )
+    target_link_libraries(TestSuite_AStar
         ${catkin_LIBRARIES}
         ${OpenCV_LIBRARIES}
         ${srslib_test_LIBRARIES}

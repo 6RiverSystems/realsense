@@ -1,8 +1,5 @@
-#include <srsnode_highlevel_behavior/HighLevelBehavior.hpp>
+#include <srsnode_highlevel_behavior/costmap_2d/CostMap2d.hpp>
 
-#include <opencv2/opencv.hpp>
-
-#include <ros/ros.h>
 
 namespace srs {
 
@@ -10,21 +7,15 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-HighLevelBehavior::HighLevelBehavior() :
-    rosNodeHandle_()
+CostMap2d::CostMap2d() :
+    costGrid_(nullptr)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void HighLevelBehavior::run()
+CostMap2d::~CostMap2d()
 {
-    ros::Rate refreshRate(REFRESH_RATE_HZ);
-    while (ros::ok())
-    {
-        ros::spinOnce();
-
-        refreshRate.sleep();
-    }
+    delete costGrid_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

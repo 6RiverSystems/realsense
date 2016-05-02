@@ -10,6 +10,7 @@ set(PROJECT_MAIN src/highlevel_behavior_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
     src/HighLevelBehavior.cpp
+    src/costmap_2d/CostMap2d.cpp
 )
 
 ####################################################################################################

@@ -17,7 +17,7 @@ using namespace std;
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
 
-#include <srsnode_position_estimator/tap/odometry/Odometer.hpp>
+#include <srsnode_position_estimator/tap/odometry/OdometrySensor.hpp>
 
 #include <srsnode_position_estimator/RobotProfile.hpp>
 #include <srsnode_position_estimator/Robot.hpp>
@@ -39,7 +39,7 @@ TEST(Test_pe, Run11ConstantSteps)
 {
     // Create standard robot process model
     Robot<> robot;
-    Odometer<UKF_STATE_SIZE> odometer;
+    OdometrySensor<UKF_STATE_SIZE> odometer;
 
     UnscentedKalmanFilter<UKF_STATE_SIZE> ukf(ALPHA, BETA, robot);
     ukf.addSensor(&odometer);
@@ -119,7 +119,7 @@ TEST(Test_pe, Run11ConstantSteps)
     {
         // Push the simulated measurement
         auto odometry = *measurements.at(t);
-        odometer.set(odometry.arrivalTime, odometry.linear, odometry.angular);
+        odometer.set(t * DT, odometry.velocity.linear, odometry.velocity.angular);
 
         // Run the step of the UKF
         ukf.run(t * DT, const_cast<CmdVelocity<>*>(commands.at(t)));

@@ -81,6 +81,6 @@ private:
 
 } // namespace srs
 
-#include <srslib_framework/filter/ukf/UnscentedKalmanFilter.cpp>
+#include <filter/ukf/UnscentedKalmanFilter.cpp>
 
 #endif // UNSCENTEDKALMANFILTER_HPP_

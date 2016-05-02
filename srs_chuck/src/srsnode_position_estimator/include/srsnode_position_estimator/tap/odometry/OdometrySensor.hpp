@@ -53,6 +53,6 @@ private:
 
 } // namespace srs
 
-#include <srsnode_position_estimator/tap/odometry/OdometrySensor.cpp>
+#include <tap/odometry/OdometrySensor.cpp>
 
 #endif // ODOMETER_HPP_

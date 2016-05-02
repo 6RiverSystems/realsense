@@ -53,6 +53,6 @@ private:
 
 } // namespace srs
 
-#include <srsnode_position_estimator/tap/aps/ApsSensor.cpp>
+#include <tap/aps/ApsSensor.cpp>
 
 #endif // APS_HPP_

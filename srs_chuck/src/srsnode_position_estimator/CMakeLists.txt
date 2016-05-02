@@ -6,11 +6,11 @@
 cmake_minimum_required(VERSION 2.8.3)
 
 set(PROJECT_NAME srsnode_position_estimator)
-
+set(PROJECT_MAIN src/position_estimator_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
     include/${PROJECT_NAME}/tap/aps/ApsSensor.hpp
-    src/${PROJECT_NAME}/tap/aps/RosTapAps.cpp
+    src/tap/aps/RosTapAps.cpp
 
     include/${PROJECT_NAME}/tap/brain_stem_status/RosTapBrainStemStatus.hpp
 
@@ -26,7 +26,7 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/RobotProfile.hpp
     include/${PROJECT_NAME}/StatePe.hpp
 
-    src/${PROJECT_NAME}/PositionEstimator.cpp
+    src/PositionEstimator.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES
@@ -71,7 +71,7 @@ catkin_package(
 )
 
 add_executable(${PROJECT_NODE} 
-    src/${PROJECT_NAME}/position_estimator_node.cpp
+    ${PROJECT_MAIN}
     ${${PROJECT_NAME}_SOURCES}
 )
 

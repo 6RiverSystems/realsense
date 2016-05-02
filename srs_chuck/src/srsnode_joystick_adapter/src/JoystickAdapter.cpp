@@ -33,13 +33,16 @@ void JoystickAdapter::run()
 
             geometry_msgs::Twist messageCmdVel;
 
-            messageCmdVel.linear.x = currentVelocity.linear;
+            double linear = currentVelocity.linear * RATIO_LINEAR;
+            double angular = currentVelocity.angular * RATIO_ANGULAR;
+
+            messageCmdVel.linear.x = abs(linear) > THRESHOLD_LINEAR ? linear : 0.0;
             messageCmdVel.linear.y = 0.0;
             messageCmdVel.linear.z = 0.0;
 
             messageCmdVel.angular.x = 0.0;
             messageCmdVel.angular.y = 0.0;
-            messageCmdVel.angular.z = currentVelocity.angular;
+            messageCmdVel.angular.z = abs(angular) > THRESHOLD_ANGULAR ? angular : 0.0;
 
             rosPubCmdVel_.publish(messageCmdVel);
         }

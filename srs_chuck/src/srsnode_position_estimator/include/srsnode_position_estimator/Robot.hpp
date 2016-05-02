@@ -39,6 +39,6 @@ private:
 
 } // namespace srs
 
-#include <srsnode_position_estimator/Robot.cpp>
+#include <Robot.cpp>
 
 #endif // ROBOT_HPP_

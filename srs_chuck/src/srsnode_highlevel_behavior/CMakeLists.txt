@@ -5,11 +5,11 @@
 #
 cmake_minimum_required(VERSION 2.8.3)
 
-set(PROJECT_NAME srsnode_joystick_adapter)
-set(PROJECT_MAIN src/joystick_adapter_node.cpp)
+set(PROJECT_NAME srsnode_highlevel_behavior)
+set(PROJECT_MAIN src/highlevel_behavior_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
-    src/JoystickAdapter.cpp
+    src/HighLevelBehavior.cpp
 )
 
 ####################################################################################################

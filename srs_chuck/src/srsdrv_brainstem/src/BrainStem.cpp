@@ -153,7 +153,7 @@ int main(int argc, char **argv)
 	try
 	{
 		// Connect to serial port "/dev/malg" with a retry of 1s
-		BrainStem brainStem ( "/dev/malg", 1.0f );
+		BrainStem brainStem ( "/dev/ttyUSB0", 1.0f );
 
 		ros::Rate rate( 100 );
 

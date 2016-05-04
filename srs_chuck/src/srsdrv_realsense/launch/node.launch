@@ -1,0 +1,28 @@
+<!-- 
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+<launch>
+	
+	<include file="$(find realsense_camera)/launch/realsense_r200_nodelet_standalone_manual.launch" >
+		<arg name="color_height" default="240" />
+		<arg name="color_width" default="320" />
+		<arg name="depth_height" default="252" />
+		<arg name="depth_width" default="332" />
+		<arg name="enable_depth" default="true" />
+		<arg name="enable_color" default="true" />
+		<arg name="enable_pointcloud" default="true" />
+		<arg name="enable_tf" default="false" />
+		<arg name="depth_fps" default="30" />
+		<arg name="color_fps" default="30" />	
+	</include>
+
+    <node name="srsdrv_realsense" 
+        pkg="srsdrv_realsense"
+        type="srsdrv_realsense"
+        output="screen" respawn="true"/>
+</launch>
+

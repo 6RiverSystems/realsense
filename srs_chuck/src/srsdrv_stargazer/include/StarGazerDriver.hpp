@@ -3,19 +3,20 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef STARGAZER_HPP_
-#define STARGAZER_HPP_
+#ifndef STARGAZER_DRIVER_HPP_
+#define STARGAZER_DRIVER_HPP_
 
 #include <ros/ros.h>
+#include "StarGazer.h"
 
 namespace srs {
 
-class Stargazer
+class StarGazerDriver
 {
 public:
-    Stargazer();
+	StarGazerDriver();
 
-    ~Stargazer()
+    ~StarGazerDriver()
     {
 
     }
@@ -26,9 +27,12 @@ private:
     constexpr static unsigned int REFRESH_RATE_HZ = 10;
 
     ros::NodeHandle rosNodeHandle_;
+
     ros::Publisher rosPubXXX_;
+
+    StarGazer starGazer_;
 };
 
 } // namespace srs
 
-#endif  // STARGAZER_HPP_
+#endif  // STARGAZER_DRIVER_

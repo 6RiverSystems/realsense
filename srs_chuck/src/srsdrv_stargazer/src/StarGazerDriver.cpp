@@ -1,4 +1,4 @@
-#include <Stargazer.hpp>
+#include <StarGazerDriver.hpp>
 
 namespace srs {
 
@@ -6,20 +6,28 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Stargazer::Stargazer() :
-    rosNodeHandle_()
+StarGazerDriver::StarGazerDriver() :
+    rosNodeHandle_(),
+    rosPubXXX_(),
+    starGazer_("/dev/ttyUSB0")
 {
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Stargazer::run()
+void StarGazerDriver::run()
 {
     ros::Rate refreshRate(REFRESH_RATE_HZ);
+
+    starGazer_.Configure();
+//	starGazer_.AutoCalculateHeight();
+    starGazer_.Start();
 
     while (ros::ok())
     {
         ros::spinOnce();
+
+        starGazer_.PumpMessageProcessor();
 
         refreshRate.sleep();
     }

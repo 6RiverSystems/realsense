@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 
-#include <Stargazer.hpp>
+#include <StarGazerDriver.hpp>
 
 int main(int argc, char** argv)
 {
@@ -10,7 +10,7 @@ int main(int argc, char** argv)
     ROS_INFO_STREAM("srsdrv_stargazer_node started");
 
     // Create the stargazer driver and run it
-    srs::Stargazer stargazer;
+    srs::StarGazerDriver stargazer;
     stargazer.run();
 
     return 0;

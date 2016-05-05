@@ -1,10 +1,9 @@
 /*
-* StarGazerMessageProcessor.cpp
-*
-*  Created on: May 4, 2016
-*      Author: cacioppo
-*/
-
+ * StarGazerMessageProcessor.cpp
+ *
+ *  Created on: May 4, 2016
+ *      Author: cacioppo
+ */
 
 #ifndef STARGAZER_H_
 #define STARGAZER_H_
@@ -16,48 +15,57 @@
 #include <queue>
 #include "StarGazerMessageProcessor.h"
 
-
 namespace srs {
 
-	class StarGazer {
-	private:
+class StarGazer {
 
-		bool							m_bControllerFault;
+	typedef std::function<void(int, float, float, float, float)> OdometryCallbackFn;
 
-		bool							m_bStargazerStarted;
+	typedef std::function<void(std::string, std::string)> ReadCallbackFn;
 
-		StarGazerMessageProcessor		m_messageProcessor;
+private:
 
-		void ReadCallback(std::string type, std::string param);
+	bool						m_bControllerFault;
 
-		void OdometryCallback(int tagID, float x, float y, float z, float angle);
+	bool						m_bStargazerStarted;
 
+	StarGazerMessageProcessor	m_messageProcessor;
 
-	public:
+	OdometryCallbackFn			m_odometryCallback;
 
-		StarGazer(const char *comPort);
+	ReadCallbackFn				m_readCallback;
 
-		virtual ~StarGazer();
+public:
 
-		void SetConnected(bool bIsConnected);
+	StarGazer( const char *comPort );
 
-		void Configure();
+	virtual ~StarGazer();
 
-		void AutoCalculateHeight();
+	void SetOdometryCallback( OdometryCallbackFn callback );
 
-		void Start();
+	void SetConnected(bool bIsConnected);
 
-		void Stop();
+	void Configure();
 
-		void PumpMessageProcessor();
+	void AutoCalculateHeight();
 
-	private:
+	void Start();
 
-		// Message Processing
+	void Stop();
 
-		void OnVersion(std::vector<std::string> vecParams);
+	void PumpMessageProcessor();
 
-	};
+	void ReadCallback(std::string type, std::string param);
+
+	void OdometryCallback(int tagID, float x, float y, float z, float angle);
+
+private:
+
+	// Message Processing
+
+	void OnVersion(std::vector<std::string> vecParams);
+
+};
 
 } /* namespace srs */
 

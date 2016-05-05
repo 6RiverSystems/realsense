@@ -23,12 +23,17 @@ public:
 
     void run();
 
+
+private:
+
+	void OdometryCallback(int tagID, float x, float y, float z, float angle);
+
 private:
     constexpr static unsigned int REFRESH_RATE_HZ = 10;
 
     ros::NodeHandle rosNodeHandle_;
 
-    ros::Publisher rosPubXXX_;
+    ros::Publisher rosApsPublisher;
 
     StarGazer starGazer_;
 };

@@ -51,20 +51,20 @@ void StarGazerSerialIO::Open(const char* pszName, std::function<void(std::vector
 	try
 	{
 		m_SerialPort.open(pszName);
+
+		// Setup serial port for 8/N/1 operation @ 115.2kHz
+		m_SerialPort.set_option( boost::asio::serial_port::baud_rate( 115200 ) );
+		m_SerialPort.set_option( boost::asio::serial_port::flow_control( boost::asio::serial_port::flow_control::none ) );
+		m_SerialPort.set_option( boost::asio::serial_port::character_size( 8 ) );
+		m_SerialPort.set_option( boost::asio::serial_port::parity( boost::asio::serial_port::parity::none ) );
+		m_SerialPort.set_option( boost::asio::serial_port::stop_bits( boost::asio::serial_port::stop_bits::one ) );
+
+		StartAsyncRead( );
 	}
 	catch (const std::exception&)
 	{
 		ROS_ERROR_NAMED("StarGazerSerialIO", "Can not open serial port %s\n", pszName);
 	}
-
-	// Setup serial port for 8/N/1 operation @ 115.2kHz
-	m_SerialPort.set_option( boost::asio::serial_port::baud_rate( 115200 ) );
-	m_SerialPort.set_option( boost::asio::serial_port::flow_control( boost::asio::serial_port::flow_control::none ) );
-	m_SerialPort.set_option( boost::asio::serial_port::character_size( 8 ) );
-	m_SerialPort.set_option( boost::asio::serial_port::parity( boost::asio::serial_port::parity::none ) );
-	m_SerialPort.set_option( boost::asio::serial_port::stop_bits( boost::asio::serial_port::stop_bits::one ) );
-
-	StartAsyncRead( );
 }
 
 bool StarGazerSerialIO::IsOpen() const

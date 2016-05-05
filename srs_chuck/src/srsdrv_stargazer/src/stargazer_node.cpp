@@ -11,6 +11,7 @@ int main(int argc, char** argv)
 
     // Create the stargazer driver and run it
     srs::StarGazerDriver stargazer;
+
     stargazer.run();
 
     return 0;

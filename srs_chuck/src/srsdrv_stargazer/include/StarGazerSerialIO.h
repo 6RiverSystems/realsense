@@ -27,9 +27,9 @@ class StarGazerSerialIO :
 public:
 	StarGazerSerialIO( );
 
-	virtual ~StarGazerSerialIO();
+	virtual ~StarGazerSerialIO( );
 
-	void Open( const char* pszName, std::function<void(std::vector<char>)> readCallback );
+	void Open( const char* pszName, std::function<void( std::vector<char> )> readCallback );
 
 	bool IsOpen( ) const;
 
@@ -37,11 +37,11 @@ public:
 
 	void Write( const std::vector<char>& buffer );
 
-	void WriteSyncronous(const std::vector<char>& buffer);
+	void WriteSyncronous( const std::vector<char>& buffer );
 
 private:
 
-	void WriteInSerialThread( std::vector<char> buffer);
+	void WriteInSerialThread( std::vector<char> buffer );
 
 	void StartAsyncRead( );
 

@@ -19,10 +19,6 @@ namespace srs {
 
 class StarGazer {
 
-	typedef std::function<void(int, float, float, float, float)> OdometryCallbackFn;
-
-	typedef std::function<void(std::string, std::string)> ReadCallbackFn;
-
 private:
 
 	bool						m_bControllerFault;
@@ -39,31 +35,31 @@ public:
 
 	StarGazer( const char *comPort );
 
-	virtual ~StarGazer();
+	virtual ~StarGazer( );
 
 	void SetOdometryCallback( OdometryCallbackFn callback );
 
-	void SetConnected(bool bIsConnected);
+	void SetConnected( bool bIsConnected );
 
-	void Configure();
+	void Configure( );
 
-	void AutoCalculateHeight();
+	void AutoCalculateHeight( );
 
-	void Start();
+	void Start( );
 
-	void Stop();
+	void Stop( );
 
-	void PumpMessageProcessor();
+	void PumpMessageProcessor( );
 
-	void ReadCallback(std::string type, std::string param);
+	void ReadCallback( std::string type, std::string param );
 
-	void OdometryCallback(int tagID, float x, float y, float z, float angle);
+	void OdometryCallback( int tagID, float x, float y, float z, float angle );
 
 private:
 
 	// Message Processing
 
-	void OnVersion(std::vector<std::string> vecParams);
+	void OnVersion( std::vector<std::string> vecParams );
 
 };
 

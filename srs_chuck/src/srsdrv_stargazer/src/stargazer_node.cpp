@@ -2,17 +2,17 @@
 
 #include <StarGazerDriver.hpp>
 
-int main(int argc, char** argv)
+int main( int argc, char** argv )
 {
-    // Initialize ROS
-    ros::init(argc, argv, "srsdrv_stargazer");
+	// Initialize ROS
+	ros::init( argc, argv, "srsdrv_stargazer" );
 
-    ROS_INFO_STREAM("srsdrv_stargazer_node started");
+	ROS_INFO_STREAM( "srsdrv_stargazer_node started" );
 
-    // Create the stargazer driver and run it
-    srs::StarGazerDriver stargazer;
+	// Create the stargazer driver and run it
+	srs::StarGazerDriver stargazer;
 
-    stargazer.run();
+	stargazer.run( );
 
-    return 0;
+	return 0;
 }

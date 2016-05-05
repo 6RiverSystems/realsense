@@ -14,22 +14,22 @@ namespace srs {
 class StarGazerDriver
 {
 public:
-	StarGazerDriver();
+	StarGazerDriver( );
 
-    ~StarGazerDriver()
-    {
+	~StarGazerDriver( )
+	{
 
-    }
+	}
 
-    void run();
+	void run( );
 
+private:
+
+	void OdometryCallback( int tagID, float x, float y, float z, float angle );
 
 private:
 
-	void OdometryCallback(int tagID, float x, float y, float z, float angle);
-
-private:
-    constexpr static unsigned int REFRESH_RATE_HZ = 10;
+	constexpr static unsigned int REFRESH_RATE_HZ = 10;
 
     ros::NodeHandle rosNodeHandle_;
 

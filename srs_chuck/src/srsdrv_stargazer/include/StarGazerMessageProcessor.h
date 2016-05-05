@@ -7,6 +7,7 @@
 
 #ifndef STARGAZERMESSAGEPROCESSOR_H_
 #define STARGAZERMESSAGEPROCESSOR_H_
+
 #include <stdint.h>
 #include <vector>
 #include <functional>
@@ -16,88 +17,82 @@
 #include <regex>
 #include "StarGazerMessage.h"
 
-
 namespace srs {
 
 class StarGazerSerialIO;
 class StarGazerMessageProcessor;
 
-struct Handler
-{
-	std::function<void(std::vector<std::string>)>	callback;
 
-	uint32_t										dwNumParams;
+typedef std::function<void(int, float, float, float, float)> OdometryCallbackFn;
 
-};
+typedef std::function<void(std::string, std::string)> ReadCallbackFn;
 
 class StarGazerMessageProcessor {
+
 private:
 
-	bool							m_bControllerFault;
+	StarGazerSerialIO*									m_pIO;
 
-	StarGazerSerialIO*				m_pIO;
+	std::chrono::high_resolution_clock::time_point		m_lastTxTime;
 
-	std::map<std::string, Handler>	m_vecBridgeCallbacks;
+	std::string											m_lastTxMessage;
 
-	std::chrono::high_resolution_clock::time_point m_lastTxTime;
+	std::chrono::high_resolution_clock					m_highrezclk;
 
-	std::string						m_lastTxMessage;
+	std::queue<std::string>								m_txMessageQueue;
 
-	std::chrono::high_resolution_clock m_highrezclk;
+	std::string											m_lastAck;
 
-	std::queue<std::string>			m_txMessageQueue;
+	std::regex											m_odometryRegex;
 
-	std::string						m_lastAck;
+	std::regex											m_messageRegex;
 
-	std::regex						m_odometryRegex;
+	ReadCallbackFn										m_readCallback;
 
-	std::regex						m_messageRegex;
+	OdometryCallbackFn									m_odometryCallback;
 
-	std::function<void(std::string msg, std::string param)>	m_readCallback;
+private:
 
-	std::function<void(int tagID, float x, float y, float z, float angle)>	    m_odometryCallback;
+	void SendRawCommand( std::string fullCmd );
 
-	void SendRawCommand(std::string fullCmd);
+	void BaseCommand( STAR_GAZER_MESSAGE_TYPES type, std::string cmd );
 
-	void BaseCommand(STAR_GAZER_MESSAGE_TYPES type, std::string cmd);
+	void BaseWriteCommand( std::string cmd );
 
-	void BaseWriteCommand(std::string cmd);
+	void BaseWriteCommand( std::string cmd, std::string arg1 );
 
-	void BaseWriteCommand(std::string cmd, std::string arg1);
+	void BaseWriteCommand( std::string cmd, int arg1 );
 
-	void BaseWriteCommand(std::string cmd, int arg1);
+	void BaseReadCommand( std::string cmd );
 
-	void BaseReadCommand(std::string cmd);
-
-	void RxMsgCallback(std::vector<char> msgBuffer);
-
+	void RxMsgCallback( std::vector<char> msgBuffer );
 
 public:
 
 	//StarGazerMessageProcessor(StarGazerSerialIO* pIO);
-	StarGazerMessageProcessor(const char *comPort, 
-		std::function<void(std::string msg, std::string param)> readCallback,
-		std::function<void(int tagID, float x, float y, float z, float angle)> odometryCallback);
+	StarGazerMessageProcessor( const char *comPort,
+		std::function<void( std::string msg, std::string param )> readCallback,
+		std::function<void( int tagID, float x, float y, float z, float angle )> odometryCallback );
 
-	virtual ~StarGazerMessageProcessor();
+	virtual ~StarGazerMessageProcessor( );
 
 	void SetConnected( bool bIsConnected );
 
-	void CalcStop();
+	void CalcStop( );
 
-	void CalcStart();
+	void CalcStart( );
 
-	void SetEnd();
+	void SetEnd( );
 
-	void SetMarkType(STAR_GAZER_LANDMARK_TYPES type);
+	void SetMarkType( STAR_GAZER_LANDMARK_TYPES type );
 
-	void HeightCalc();
+	void HeightCalc( );
 
-	void SetMarkHeight(int height_mm);
+	void SetMarkHeight( int height_mm );
 
-	void PumpMessageProcessor();
+	void PumpMessageProcessor( );
 
-	void GetVersion();
+	void GetVersion( );
 
 private:
 

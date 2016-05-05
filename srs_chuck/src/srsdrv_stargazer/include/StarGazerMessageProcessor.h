@@ -43,9 +43,9 @@ private:
 
 	std::string											m_lastAck;
 
-	std::regex											m_odometryRegex;
+	boost::regex										m_odometryRegex;
 
-	std::regex											m_messageRegex;
+	boost::regex										m_messageRegex;
 
 	ReadCallbackFn										m_readCallback;
 

@@ -11,7 +11,7 @@ namespace srs
 StarGazerDriver::StarGazerDriver( ) :
 	rosNodeHandle_( ),
 	rosApsPublisher( rosNodeHandle_.advertise<srslib_framework::Aps>( "/sensors/aps/pose", 1000 ) ),
-	starGazer_( "/dev/ttyUSB0" )
+	starGazer_( "/dev/ft232" )
 {
 	starGazer_.SetOdometryCallback(
 		std::bind( &StarGazerDriver::OdometryCallback, this, std::placeholders::_1, std::placeholders::_2,

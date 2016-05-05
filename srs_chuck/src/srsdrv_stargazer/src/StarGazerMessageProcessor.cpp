@@ -26,11 +26,23 @@ StarGazerMessageProcessor::StarGazerMessageProcessor( const char* pszPort ) :
 	m_lastTxMessage( ),
 	m_txMessageQueue( ),
 	m_lastTxTime( std::chrono::milliseconds( 0 ) ),
-	m_odometryRegex(
-		"~\\^I([0-9]*)\\|([+-][0-9]*\\.[0-9]*)\\|([+-][0-9]*\\.[0-9]*)\\|([+-][0-9]*\\.[0-9]*)\\|(-?[0-9]*\\.[0-9]*)" ),
-	m_messageRegex( "~\\$([^\\|]*)(?:\\|([^\\`]*))?" ),
+	m_odometryRegex( ),
+	m_messageRegex( ),
 	m_highrezclk( )
 {
+	// Protect against odd compiler versions (boost seems to fix the regex bugs in gcc 4.8.4)
+	try
+	{
+		m_odometryRegex = boost::regex(
+			"~\\^I([0-9]*)\\|([+-][0-9]*\\.[0-9]*)\\|([+-][0-9]*\\.[0-9]*)\\|([+-][0-9]*\\.[0-9]*)\\|(-?[0-9]*\\.[0-9]*)" );
+
+		m_messageRegex = boost::regex( "~\\$([^\\|]*)(?:\\|([^\\`]*))?" );
+	}
+	catch( const boost::regex_error& e )
+	{
+		ROS_ERROR( "regex: %s (%d)", e.what( ), e.code( ) );
+	}
+
 	m_pIO->Open( pszPort, std::bind( &StarGazerMessageProcessor::RxMsgCallback, this, std::placeholders::_1 ) );
 }
 
@@ -38,8 +50,6 @@ StarGazerMessageProcessor::~StarGazerMessageProcessor( )
 {
 	m_pIO->Close( );
 }
-
-
 
 void StarGazerMessageProcessor::SetOdometryCallback( OdometryCallbackFn odometryCallback )
 {
@@ -263,14 +273,14 @@ void StarGazerMessageProcessor::RxMsgCallback( std::vector<char> msgBuffer )
 
 	std::string typeStr( typeStart, typeEnd );
 
-	std::smatch regexMatch;
+	boost::smatch regexMatch;
 	std::string regexString = std::string( msgBuffer.begin( ), msgBuffer.end( ) );
 
 	switch( command )
 	{
 		case STAR_GAZER_MESSAGE_TYPES::POSE:
 		{
-			if( std::regex_match( regexString, regexMatch, m_odometryRegex ) )
+			if( boost::regex_match( regexString, regexMatch, m_odometryRegex ) )
 			{
 				if( regexMatch.size( ) != 6 )
 				{
@@ -332,7 +342,7 @@ void StarGazerMessageProcessor::RxMsgCallback( std::vector<char> msgBuffer )
 
 		case STAR_GAZER_MESSAGE_TYPES::RETURN_VALUE:
 		{
-			if( std::regex_match( regexString, regexMatch, m_messageRegex ) )
+			if( boost::regex_match( regexString, regexMatch, m_messageRegex ) )
 			{
 				if( regexMatch.size( ) != 3 )
 				{

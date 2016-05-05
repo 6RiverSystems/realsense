@@ -69,14 +69,17 @@ private:
 
 public:
 
-	//StarGazerMessageProcessor(StarGazerSerialIO* pIO);
-	StarGazerMessageProcessor( const char *comPort,
-		std::function<void( std::string msg, std::string param )> readCallback,
-		std::function<void( int tagID, float x, float y, float z, float angle )> odometryCallback );
+	StarGazerMessageProcessor( const char* pszPort );
 
 	virtual ~StarGazerMessageProcessor( );
 
+	void SetOdometryCallback( OdometryCallbackFn odometryCallback );
+
+	void SetReadCallback( ReadCallbackFn readCallback );
+
 	void SetConnected( bool bIsConnected );
+
+	void HardReset( );
 
 	void CalcStop( );
 

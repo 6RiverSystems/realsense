@@ -19,11 +19,9 @@
 namespace srs
 {
 
-StarGazerMessageProcessor::StarGazerMessageProcessor( const char *comPort,
-	std::function<void( std::string msg, std::string param )> readCallback,
-	std::function<void( int tagID, float x, float y, float z, float angle )> odometryCallback ) :
-	m_readCallback( readCallback ),
-	m_odometryCallback( odometryCallback ),
+StarGazerMessageProcessor::StarGazerMessageProcessor( const char* pszPort ) :
+	m_readCallback( ),
+	m_odometryCallback( ),
 	m_pIO( new StarGazerSerialIO( ) ),
 	m_lastTxMessage( ),
 	m_txMessageQueue( ),
@@ -33,7 +31,7 @@ StarGazerMessageProcessor::StarGazerMessageProcessor( const char *comPort,
 	m_messageRegex( "~\\$([^\\|]*)(?:\\|([^\\`]*))?" ),
 	m_highrezclk( )
 {
-	m_pIO->Open( comPort, std::bind( &StarGazerMessageProcessor::RxMsgCallback, this, std::placeholders::_1 ) );
+	m_pIO->Open( pszPort, std::bind( &StarGazerMessageProcessor::RxMsgCallback, this, std::placeholders::_1 ) );
 }
 
 StarGazerMessageProcessor::~StarGazerMessageProcessor( )
@@ -41,9 +39,22 @@ StarGazerMessageProcessor::~StarGazerMessageProcessor( )
 	m_pIO->Close( );
 }
 
+
+
+void StarGazerMessageProcessor::SetOdometryCallback( OdometryCallbackFn odometryCallback )
+{
+	m_odometryCallback = odometryCallback;
+}
+
+void StarGazerMessageProcessor::SetReadCallback( ReadCallbackFn readCallback )
+{
+	m_readCallback = readCallback;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // StarGazer Commands
 //////////////////////////////////////////////////////////////////////////
+
 void StarGazerMessageProcessor::SendRawCommand( std::string fullCmd )
 {
 	std::cout << "Rawsend: " << fullCmd << std::endl;
@@ -53,7 +64,7 @@ void StarGazerMessageProcessor::SendRawCommand( std::string fullCmd )
 	auto typeEndField = std::find( typeStart, fullCmd.end( ), STARGAZER_SEPERATOR );
 	auto typeEndMsg = std::find( typeStart, fullCmd.end( ), STARGAZER_RTX );
 
-	// The command ends at the first instance of message end or a seperator
+	// The command ends at the first instance of message end or a separator
 	if( typeEndField < typeEndMsg )
 	{
 		typeEndMsg = typeEndField;
@@ -63,7 +74,6 @@ void StarGazerMessageProcessor::SendRawCommand( std::string fullCmd )
 
 	std::vector<char> cmdVec( fullCmd.begin( ), fullCmd.end( ) );
 	m_pIO->Write( cmdVec );
-
 }
 
 void StarGazerMessageProcessor::BaseCommand( STAR_GAZER_MESSAGE_TYPES type, std::string cmd )
@@ -128,27 +138,48 @@ void StarGazerMessageProcessor::SetMarkType( STAR_GAZER_LANDMARK_TYPES type )
 	switch( type )
 	{
 		case STAR_GAZER_LANDMARK_TYPES::HLD1S:
+		{
 			arg1 += "HLD1S";
+		}
 		break;
+
 		case STAR_GAZER_LANDMARK_TYPES::HLD1L:
+		{
 			arg1 += "HLD1L";
+		}
 		break;
+
 		case STAR_GAZER_LANDMARK_TYPES::HLD2S:
+		{
 			arg1 += "HLD2S";
+		}
 		break;
+
 		case STAR_GAZER_LANDMARK_TYPES::HLD2L:
+		{
 			arg1 += "HLD2L";
+		}
 		break;
+
 		case STAR_GAZER_LANDMARK_TYPES::HLD3S:
+		{
 			arg1 += "HLD3S";
+		}
 		break;
+
 		case STAR_GAZER_LANDMARK_TYPES::HLD3L:
+		{
 			arg1 += "HLD3L";
+		}
 		break;
+
 		default:
+		{
 			// Throw error
 			throw std::runtime_error( "unknown Marktype" );
+		}
 	}
+
 	BaseWriteCommand( cmd, arg1 );
 }
 
@@ -170,6 +201,11 @@ void StarGazerMessageProcessor::SetMarkHeight( int height_mm )
 void StarGazerMessageProcessor::SetEnd( )
 {
 	BaseWriteCommand( "SetEnd" );
+}
+
+void StarGazerMessageProcessor::HardReset( )
+{
+	BaseWriteCommand( "Reset" );
 }
 
 void StarGazerMessageProcessor::PumpMessageProcessor( )
@@ -279,16 +315,23 @@ void StarGazerMessageProcessor::RxMsgCallback( std::vector<char> msgBuffer )
 			}
 		}
 		break;
+
 		case STAR_GAZER_MESSAGE_TYPES::MESSAGE:
+		{
 			//std::cout << "Message " << typeStr << std::endl;
 			ROS_DEBUG_NAMED( "StarGazerMessageProcessor", "%s\n", typeStr.c_str( ) );
+		}
 		break;
+
 		case STAR_GAZER_MESSAGE_TYPES::ACK:
+		{
 			//std::cout << "Ack " << typeStr << std::endl;
 			m_lastAck = typeStr;
+		}
 		break;
-		case STAR_GAZER_MESSAGE_TYPES::RETURN_VALUE:
 
+		case STAR_GAZER_MESSAGE_TYPES::RETURN_VALUE:
+		{
 			if( std::regex_match( regexString, regexMatch, m_messageRegex ) )
 			{
 				if( regexMatch.size( ) != 3 )
@@ -315,11 +358,14 @@ void StarGazerMessageProcessor::RxMsgCallback( std::vector<char> msgBuffer )
 				printMessage = true;
 
 			}
-
+		}
 		break;
+
 		default:
+		{
 			std::cout << "Unknown command type " << (char) command << " ";
 			printMessage = true;
+		}
 		break;
 	}
 
@@ -345,6 +391,7 @@ void StarGazerMessageProcessor::SetConnected( bool bIsConnected )
 	 m_VelocityPublisher.publish( geometry_msgs::Twist( ) );
 	 */
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 // Helper Methods

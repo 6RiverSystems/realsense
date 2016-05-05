@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 
-#include <StarGazerDriver.hpp>
+#include <StarGazerDriver.h>
 
 int main( int argc, char** argv )
 {

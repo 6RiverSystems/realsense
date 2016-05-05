@@ -9,7 +9,8 @@
 #include <ros/ros.h>
 #include "StarGazer.h"
 
-namespace srs {
+namespace srs
+{
 
 class StarGazerDriver
 {
@@ -18,7 +19,6 @@ public:
 
 	~StarGazerDriver( )
 	{
-
 	}
 
 	void run( );
@@ -31,11 +31,11 @@ private:
 
 	constexpr static unsigned int REFRESH_RATE_HZ = 10;
 
-    ros::NodeHandle rosNodeHandle_;
+	ros::NodeHandle rosNodeHandle_;
 
-    ros::Publisher rosApsPublisher;
+	ros::Publisher rosApsPublisher;
 
-    StarGazer starGazer_;
+	StarGazer starGazer_;
 };
 
 } // namespace srs

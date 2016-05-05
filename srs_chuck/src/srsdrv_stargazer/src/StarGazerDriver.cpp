@@ -1,4 +1,4 @@
-#include <StarGazerDriver.hpp>
+#include <StarGazerDriver.h>
 #include <srslib_framework/Aps.h>
 
 namespace srs
@@ -24,7 +24,9 @@ void StarGazerDriver::run( )
 	ros::Rate refreshRate( REFRESH_RATE_HZ );
 
 	starGazer_.Configure( );
+
 //	starGazer_.AutoCalculateHeight();
+
 	starGazer_.Start( );
 
 	while( ros::ok( ) )

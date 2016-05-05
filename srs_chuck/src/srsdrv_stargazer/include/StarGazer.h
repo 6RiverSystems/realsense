@@ -21,15 +21,9 @@ class StarGazer {
 
 private:
 
-	bool						m_bControllerFault;
-
 	bool						m_bStargazerStarted;
 
 	StarGazerMessageProcessor	m_messageProcessor;
-
-	OdometryCallbackFn			m_odometryCallback;
-
-	ReadCallbackFn				m_readCallback;
 
 public:
 
@@ -40,6 +34,8 @@ public:
 	void SetOdometryCallback( OdometryCallbackFn callback );
 
 	void SetConnected( bool bIsConnected );
+
+	void HardReset( );
 
 	void Configure( );
 
@@ -57,7 +53,7 @@ public:
 
 private:
 
-	// Message Processing
+// Message Processing
 
 	void OnVersion( std::vector<std::string> vecParams );
 

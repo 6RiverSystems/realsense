@@ -45,6 +45,11 @@ private:
     ros::Subscriber infrared2Subscriber_;
 
     ros::Subscriber pointCloudSubscriber_;
+
+    ros::Publisher infrared1Publisher_;
+
+    ros::Publisher infrared2Publisher_;
+
 };
 
 } // namespace srs

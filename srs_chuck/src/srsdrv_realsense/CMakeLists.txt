@@ -25,14 +25,21 @@ set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
+    cv_bridge
 )
 
 find_package(GTest REQUIRED)
+
+find_package(OpenCV 1.7 REQUIRED)
+
+find_package(PCL REQUIRED)
 
 include_directories(include 
     src/
     ${catkin_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
+	${PCL_INCLUDE_DIRS}
 )
 
 ####################################################################################################
@@ -49,6 +56,8 @@ add_executable(${PROJECT_NODE}
 
 target_link_libraries(${PROJECT_NODE}
     ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    ${PCL_LIBRARIES}
 )
 
 ####################################################################################################

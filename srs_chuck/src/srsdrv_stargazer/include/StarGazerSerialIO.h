@@ -1,9 +1,9 @@
 /*
- * SerialIO.h
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
  *
- *  Created on: Apr 4, 2016
- *      Author: dan
+ * This is proprietary software, unauthorized distribution is not permitted.
  */
+
 #include <vector>
 #include <memory>
 #include <boost/asio.hpp>
@@ -14,9 +14,8 @@
 #include <set>
 #include <chrono>
 
-
-#ifndef SRC_STARGAZERSERIALIO_H_
-#define SRC_STARGAZERSERIALIO_H_
+#ifndef STARGAZER_SERIALIO_H_
+#define STARGAZER_SERIALIO_H_
 
 namespace srs {
 
@@ -74,4 +73,4 @@ private:
 
 } /* namespace srs */
 
-#endif /* SRC_STARGAZERSERIALIO_H_ */
+#endif /* STARGAZER_SERIALIO_H_ */

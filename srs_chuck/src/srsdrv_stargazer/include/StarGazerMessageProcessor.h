@@ -1,12 +1,11 @@
 /*
- * StarGazerMessageProcessor.h
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
  *
- *  Created on: Apr 27, 2016
- *      Author: cacioppo
+ * This is proprietary software, unauthorized distribution is not permitted.
  */
 
-#ifndef STARGAZERMESSAGEPROCESSOR_H_
-#define STARGAZERMESSAGEPROCESSOR_H_
+#ifndef STARGAZER_MESSAGE_PROCESSOR_H_
+#define STARGAZER_MESSAGE_PROCESSOR_H_
 
 #include <stdint.h>
 #include <vector>
@@ -16,12 +15,11 @@
 #include <queue>
 #include <regex>
 #include "StarGazerMessage.h"
+#include "StarGazerSerialIO.h"
 
 namespace srs {
 
 class StarGazerSerialIO;
-class StarGazerMessageProcessor;
-
 
 typedef std::function<void(int, float, float, float, float)> OdometryCallbackFn;
 
@@ -31,7 +29,7 @@ class StarGazerMessageProcessor {
 
 private:
 
-	StarGazerSerialIO*									m_pIO;
+	StarGazerSerialIO									m_serialIO;
 
 	std::chrono::high_resolution_clock::time_point		m_lastTxTime;
 
@@ -69,15 +67,13 @@ private:
 
 public:
 
-	StarGazerMessageProcessor( const char* pszPort );
+	StarGazerMessageProcessor( const std::string& strSerialPort );
 
 	virtual ~StarGazerMessageProcessor( );
 
 	void SetOdometryCallback( OdometryCallbackFn odometryCallback );
 
 	void SetReadCallback( ReadCallbackFn readCallback );
-
-	void SetConnected( bool bIsConnected );
 
 	void HardReset( );
 
@@ -107,4 +103,4 @@ private:
 
 } /* namespace srs */
 
-#endif /* STARGAZERMESSAGEPROCESSOR_H_ */
+#endif /* STARGAZER_MESSAGE_PROCESSOR_H_ */

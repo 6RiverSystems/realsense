@@ -1,60 +1,77 @@
-#include <StarGazerDriver.h>
-#include <srslib_framework/Aps.h>
+/*
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
+ *
+ * This is proprietary software, unauthorized distribution is not permitted.
+ */
+
+#include "StarGazerDriver.h"
+#include <iostream>
+#include <ros/ros.h>
 
 namespace srs
 {
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// Public methods
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-StarGazerDriver::StarGazerDriver( ) :
-	rosNodeHandle_( ),
-	rosApsPublisher( rosNodeHandle_.advertise<srslib_framework::Aps>( "/sensors/aps/pose", 1000 ) ),
-	starGazer_( "/dev/ft232" )
+StarGazerDriver::StarGazerDriver( const std::string& strSerialPort ) :
+	m_bStarted( true ),
+	m_messageProcessor( strSerialPort )
 {
-	starGazer_.SetOdometryCallback(
-		std::bind( &StarGazerDriver::OdometryCallback, this, std::placeholders::_1, std::placeholders::_2,
-			std::placeholders::_3, std::placeholders::_4, std::placeholders::_5 ) );
+	m_messageProcessor.SetReadCallback(
+		std::bind( &StarGazerDriver::ReadCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void StarGazerDriver::run( )
+StarGazerDriver::~StarGazerDriver( )
 {
-	ros::Rate refreshRate( REFRESH_RATE_HZ );
 
-	starGazer_.Configure( );
-
-//	starGazer_.AutoCalculateHeight();
-
-	starGazer_.Start( );
-
-	while( ros::ok( ) )
-	{
-		ros::spinOnce( );
-
-		starGazer_.PumpMessageProcessor( );
-
-		refreshRate.sleep( );
-	}
-
-	starGazer_.Stop( );
 }
 
-void StarGazerDriver::OdometryCallback( int tagID, float x, float y, float z, float angle )
+void StarGazerDriver::SetOdometryCallback( OdometryCallbackFn callback )
 {
-	srslib_framework::Aps msg;
-
-	msg.x = x;
-	msg.y = y;
-	msg.yaw = angle;
-
-	rosApsPublisher.publish( msg );
-
-	ROS_DEBUG_NAMED( "StarGazer", "Tag: %04i (%2.2f, %2.2f, %2.2f) %2.2f deg\n", tagID, x, y, z, angle );
+	m_messageProcessor.SetOdometryCallback( callback );
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// Private methods
+void StarGazerDriver::HardReset( )
+{
+	Stop( );
 
-}// namespace srs
+	m_messageProcessor.HardReset( );
+}
+
+void StarGazerDriver::Configure( )
+{
+	Stop( );
+
+	m_messageProcessor.GetVersion( );
+
+	m_messageProcessor.SetMarkType( STAR_GAZER_LANDMARK_TYPES::HLD3L );
+
+	m_messageProcessor.SetEnd( );
+}
+
+void StarGazerDriver::AutoCalculateHeight( )
+{
+	Stop( );
+
+	m_messageProcessor.HeightCalc( );
+}
+
+void StarGazerDriver::Start( )
+{
+	m_messageProcessor.CalcStart( );
+}
+
+void StarGazerDriver::Stop( )
+{
+	m_messageProcessor.CalcStop( );
+}
+
+void StarGazerDriver::PumpMessageProcessor( )
+{
+	m_messageProcessor.PumpMessageProcessor( );
+}
+
+void StarGazerDriver::ReadCallback( std::string strType, std::string strValue )
+{
+	ROS_DEBUG_STREAM_NAMED( "StarGazer", strType << " = " << strValue );
+}
+
+} /* namespace srs */

@@ -182,9 +182,9 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 			else
 			{
 				double dfOdomTimeDelta = (double)(pOdometry->timestamp - m_dwLastOdomTime) / 1000.0f;
-//
-//				ROS_DEBUG_NAMED( "Brainstem", "Odometry (%f): %f, %f",
-//					dfOdomTimeDelta, pOdometry->linear_velocity, pOdometry->angular_velocity );
+
+				ROS_DEBUG_NAMED( "Brainstem", "Odometry (%f): %f, %f",
+					dfOdomTimeDelta, pOdometry->linear_velocity, pOdometry->angular_velocity );
 
 				// Base our time on the realtime clock (brain_stem) since our clock does not match odom info
 				// and our loop is not realtime

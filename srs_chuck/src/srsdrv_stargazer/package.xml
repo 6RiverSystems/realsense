@@ -10,7 +10,7 @@
 <package>
     <name>srsdrv_stargazer</name>
     <version>1.0.0</version>
-    <description>Node package: Stargazer</description>
+    <description>Node package: StarGazer</description>
     
     <author email="dan@6river.com">Dan Winkler</author>
     <maintainer email="dan@6river.com">Dan Winkler</maintainer>

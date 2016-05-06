@@ -1,65 +1,42 @@
 /*
- * StarGazerMessageProcessor.cpp
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
  *
- *  Created on: May 4, 2016
- *      Author: cacioppo
+ * This is proprietary software, unauthorized distribution is not permitted.
  */
 
-#ifndef STARGAZER_H_
-#define STARGAZER_H_
-#include <stdint.h>
-#include <vector>
-#include <functional>
-#include <chrono>
-#include <map>
-#include <queue>
-#include "StarGazerMessageProcessor.h"
+#ifndef STARGAZER_HPP_
+#define STARGAZER_HPP_
 
-namespace srs {
+#include <ros/ros.h>
+#include <StarGazerDriver.h>
 
-class StarGazer {
+namespace srs
+{
 
-private:
-
-	bool						m_bStargazerStarted;
-
-	StarGazerMessageProcessor	m_messageProcessor;
-
+class StarGazer
+{
 public:
-
-	StarGazer( const char *comPort );
+	StarGazer( const std::string& strSerialPort, const std::string& strApsTopic );
 
 	virtual ~StarGazer( );
 
-	void SetOdometryCallback( OdometryCallbackFn callback );
+	void run( );
 
-	void SetConnected( bool bIsConnected );
-
-	void HardReset( );
-
-	void Configure( );
-
-	void AutoCalculateHeight( );
-
-	void Start( );
-
-	void Stop( );
-
-	void PumpMessageProcessor( );
-
-	void ReadCallback( std::string type, std::string param );
+private:
 
 	void OdometryCallback( int tagID, float x, float y, float z, float angle );
 
 private:
 
-// Message Processing
+	constexpr static unsigned int REFRESH_RATE_HZ = 10;
 
-	void OnVersion( std::vector<std::string> vecParams );
+	ros::NodeHandle rosNodeHandle_;
 
+	ros::Publisher rosApsPublisher;
+
+	StarGazerDriver starGazerDriver_;
 };
 
-} /* namespace srs */
+} // namespace srs
 
-#endif /* STARGAZER_H_ */
-
+#endif  // STARGAZER_HPP_

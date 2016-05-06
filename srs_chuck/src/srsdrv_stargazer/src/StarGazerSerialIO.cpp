@@ -1,8 +1,7 @@
 /*
- * StarGazerSerialIO.cpp
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
  *
- *  Created on: May 2, 2016
- *      Author: cacioppo
+ * This is proprietary software, unauthorized distribution is not permitted.
  */
 
 #include <thread>
@@ -127,6 +126,8 @@ void StarGazerSerialIO::OnWriteComplete( const boost::system::error_code& error,
 		m_SerialPort.async_write_some( boost::asio::buffer( m_writeData.data( ), 1 ),
 			std::bind( &StarGazerSerialIO::OnWriteComplete, this, std::placeholders::_1, std::placeholders::_2 ) );
 
+		// TOOD: Move these to a #define
+
 		// We have already sent out a character, so we only need to wait for 100uSec
 		m_interByteDelay = std::chrono::microseconds( 5000 );
 	}
@@ -147,8 +148,8 @@ void StarGazerSerialIO::OnReadComplete( const boost::system::error_code& error, 
 		// Combine buffers
 		m_readData.insert( m_readData.end( ), m_ReadBuffer.begin( ), m_ReadBuffer.begin( ) + size );
 
-		auto msgStart = std::find( m_readData.begin( ), m_readData.end( ), STARGAZER_STX );
-		auto msgEnd = std::find( msgStart, m_readData.end( ), STARGAZER_RTX );
+		auto msgStart = std::find( m_readData.begin( ), m_readData.end( ), StarGazer_STX );
+		auto msgEnd = std::find( msgStart, m_readData.end( ), StarGazer_RTX );
 
 		// While we found a message, process it
 		while( msgEnd != m_readData.end( ) )
@@ -167,8 +168,8 @@ void StarGazerSerialIO::OnReadComplete( const boost::system::error_code& error, 
 			// Remove the consumed message
 			m_readData.erase( m_readData.begin( ), msgEnd );
 
-			msgStart = std::find( m_readData.begin( ), m_readData.end( ), STARGAZER_STX );
-			msgEnd = std::find( msgStart, m_readData.end( ), STARGAZER_RTX );
+			msgStart = std::find( m_readData.begin( ), m_readData.end( ), StarGazer_STX );
+			msgEnd = std::find( msgStart, m_readData.end( ), StarGazer_RTX );
 		}
 	}
 	else

@@ -1,9 +1,9 @@
 /*
-* StargazerMessage.h
-*
-*  Created on: Apr 29, 2016
-*      Author: cacioppoc
-*/
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
+ *
+ * This is proprietary software, unauthorized distribution is not permitted.
+ */
+
 #include <stdint.h>
 #include <limits>
 #include <vector>
@@ -12,11 +12,12 @@
 #ifndef _STARGAZER_MESSAGE_H_
 #define _STARGAZER_MESSAGE_H_
 
-namespace srs {
+namespace srs
+{
 
-const char STARGAZER_STX = '~';
-const char STARGAZER_RTX = '`';
-const char STARGAZER_SEPERATOR = '|';
+const char StarGazer_STX = '~';
+const char StarGazer_RTX = '`';
+const char StarGazer_SEPERATOR = '|';
 
 const float STARTGAZER_TIMEOUT = 0.5;
 
@@ -31,7 +32,7 @@ enum class STAR_GAZER_MESSAGE_TYPES
 	UNKNOWN
 };
 
-const char STARGAZER_LANDMARK_STIRNGS[][6] =
+const char StarGazer_LANDMARK_STIRNGS[][6] =
 {
 	"HLD1S",
 	"HLD1L",

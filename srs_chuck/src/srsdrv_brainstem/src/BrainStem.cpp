@@ -1,8 +1,11 @@
 #include <ros/ros.h>
-#include <ros/callback_queue.h>
-#include <ros/callback_queue_interface.h>
 
+<<<<<<< HEAD
 #include <SerialIO.h>
+=======
+#include "srslib_framework/utils/Thread.hpp"
+#include "SerialIO.h"
+>>>>>>> Added threading helper class
 #include "MessageProcessor.h"
 #include <geometry_msgs/TwistStamped.h>
 
@@ -11,41 +14,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 using namespace srs;
-
-class GenericCallback : public ros::CallbackInterface
-{
-private:
-
-	std::function<void()> m_callback;
-
-public:
-
-	explicit GenericCallback( const std::function<void()>& callback ) :
-		m_callback( callback ) { }
-
-	virtual ~GenericCallback( ) { }
-
-	virtual CallResult call( )
-	{
-		if( m_callback )
-		{
-			m_callback( );
-
-			return Success;
-		}
-		else
-		{
-			return Invalid;
-		}
-	}
-};
-
-void PostMessageToEventQueue( ros::CallbackQueue* pCallbackQueue,
-		MessageProcessor& processor, std::vector<char> data )
-{
-	pCallbackQueue->addCallback( ros::CallbackInterfacePtr( new GenericCallback(
-		std::bind( &MessageProcessor::ProcessMessage, &processor, data ) ) ) );
-}
 
 class BrainStem
 {
@@ -103,10 +71,12 @@ public:
 		{
 			try
 			{
-				ros::CallbackQueue* pCallbackQueue = ros::getGlobalCallbackQueue( );
-
-				m_serialIO.Open( m_strSerialPort.c_str( ), std::bind( PostMessageToEventQueue,
-					pCallbackQueue, m_messageProcessor, std::placeholders::_1 ) );
+				// Anonymous function call the message processor in the main ros thread
+				m_serialIO.Open( m_strSerialPort.c_str( ), [&](std::vector<char> buffer)
+					{
+						ExecuteInRosThread( std::bind( &MessageProcessor::ProcessMessage, &m_messageProcessor,
+							buffer ) );
+					} );
 
 				m_bIsSerialOpen = true;
 			}

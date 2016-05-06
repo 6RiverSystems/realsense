@@ -10,8 +10,8 @@ set(PROJECT_NAME srsdrv_stargazer)
 set(${PROJECT_NAME}_SOURCES
 	src/StarGazerSerialIO.cpp
 	src/StarGazerMessageProcessor.cpp
-	src/StarGazer.cpp
-    src/StarGazerDriver.cpp
+	src/StarGazerDriver.cpp
+    src/StarGazer.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES
@@ -36,6 +36,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(Boost REQUIRED)
+
 find_package(GTest REQUIRED)
 
 include_directories(include 

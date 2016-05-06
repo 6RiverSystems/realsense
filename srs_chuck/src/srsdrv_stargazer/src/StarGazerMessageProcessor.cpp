@@ -1,8 +1,7 @@
 /*
- * StarGazerMessageProcessor.cpp
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
  *
- *  Created on: Apr 27, 2016
- *      Author: cacioppo
+ * This is proprietary software, unauthorized distribution is not permitted.
  */
 
 #include <ros/ros.h>
@@ -15,14 +14,15 @@
 #include "StarGazerMessage.h"
 #include "StarGazerMessageProcessor.h"
 #include "StarGazerSerialIO.h"
+#include "srslib_framework/utils/Thread.hpp"
 
 namespace srs
 {
 
-StarGazerMessageProcessor::StarGazerMessageProcessor( const char* pszPort ) :
+StarGazerMessageProcessor::StarGazerMessageProcessor( const std::string& strSerialPort ) :
 	m_readCallback( ),
 	m_odometryCallback( ),
-	m_pIO( new StarGazerSerialIO( ) ),
+	m_serialIO( ),
 	m_lastTxMessage( ),
 	m_txMessageQueue( ),
 	m_lastTxTime( std::chrono::milliseconds( 0 ) ),
@@ -43,12 +43,17 @@ StarGazerMessageProcessor::StarGazerMessageProcessor( const char* pszPort ) :
 		ROS_ERROR( "regex: %s (%d)", e.what( ), e.code( ) );
 	}
 
-	m_pIO->Open( pszPort, std::bind( &StarGazerMessageProcessor::RxMsgCallback, this, std::placeholders::_1 ) );
+	// Anonymous function call the message processor in the main ros thread
+	m_serialIO.Open( strSerialPort.c_str( ), [&](std::vector<char> buffer)
+		{
+			ExecuteInRosThread( std::bind( &StarGazerMessageProcessor::RxMsgCallback, this,
+				buffer ) );
+		} );
 }
 
 StarGazerMessageProcessor::~StarGazerMessageProcessor( )
 {
-	m_pIO->Close( );
+	m_serialIO.Close( );
 }
 
 void StarGazerMessageProcessor::SetOdometryCallback( OdometryCallbackFn odometryCallback )
@@ -67,12 +72,13 @@ void StarGazerMessageProcessor::SetReadCallback( ReadCallbackFn readCallback )
 
 void StarGazerMessageProcessor::SendRawCommand( std::string fullCmd )
 {
-	std::cout << "Rawsend: " << fullCmd << std::endl;
+	ROS_DEBUG_STREAM_NAMED( "StarGazer", "Rawsend: " << fullCmd );
+
 	m_lastTxTime = m_highrezclk.now( );
 
 	auto typeStart = fullCmd.begin( ) + 2;
-	auto typeEndField = std::find( typeStart, fullCmd.end( ), STARGAZER_SEPERATOR );
-	auto typeEndMsg = std::find( typeStart, fullCmd.end( ), STARGAZER_RTX );
+	auto typeEndField = std::find( typeStart, fullCmd.end( ), StarGazer_SEPERATOR );
+	auto typeEndMsg = std::find( typeStart, fullCmd.end( ), StarGazer_RTX );
 
 	// The command ends at the first instance of message end or a separator
 	if( typeEndField < typeEndMsg )
@@ -83,17 +89,18 @@ void StarGazerMessageProcessor::SendRawCommand( std::string fullCmd )
 	m_lastTxMessage = std::string( typeStart, typeEndMsg );
 
 	std::vector<char> cmdVec( fullCmd.begin( ), fullCmd.end( ) );
-	m_pIO->Write( cmdVec );
+
+	m_serialIO.Write( cmdVec );
 }
 
 void StarGazerMessageProcessor::BaseCommand( STAR_GAZER_MESSAGE_TYPES type, std::string cmd )
 {
 	// Build the command
 	std::string fullCmd( "" );
-	fullCmd += STARGAZER_STX;
+	fullCmd += StarGazer_STX;
 	fullCmd += (char) type;
 	fullCmd += cmd;
-	fullCmd += STARGAZER_RTX;
+	fullCmd += StarGazer_RTX;
 
 	m_txMessageQueue.push( fullCmd );
 
@@ -104,8 +111,6 @@ void StarGazerMessageProcessor::BaseCommand( STAR_GAZER_MESSAGE_TYPES type, std:
 	{
 		SendRawCommand( fullCmd );
 	}
-
-	std::cout << fullCmd << std::endl;
 }
 
 void StarGazerMessageProcessor::BaseWriteCommand( std::string cmd )
@@ -116,7 +121,7 @@ void StarGazerMessageProcessor::BaseWriteCommand( std::string cmd )
 void StarGazerMessageProcessor::BaseWriteCommand( std::string cmd, std::string arg1 )
 {
 	std::string compoundCommand( cmd );
-	compoundCommand += STARGAZER_SEPERATOR;
+	compoundCommand += StarGazer_SEPERATOR;
 	compoundCommand += arg1;
 	BaseCommand( STAR_GAZER_MESSAGE_TYPES::WRITE, compoundCommand );
 }
@@ -144,7 +149,9 @@ void StarGazerMessageProcessor::CalcStart( )
 void StarGazerMessageProcessor::SetMarkType( STAR_GAZER_LANDMARK_TYPES type )
 {
 	std::string cmd( "MarkType" );
+
 	std::string arg1( "" );
+
 	switch( type )
 	{
 		case STAR_GAZER_LANDMARK_TYPES::HLD1S:
@@ -225,7 +232,7 @@ void StarGazerMessageProcessor::PumpMessageProcessor( )
 
 	if( m_lastTxMessage == m_lastAck )
 	{
-		std::cout << "Got Ack for " << m_lastAck << " took " << time_span.count( ) << " seconds. " << std::endl;
+		ROS_DEBUG_STREAM_NAMED( "StarGazer", "Got Ack for " << m_lastAck << " took " << time_span.count( ) << " seconds. " );
 
 		// Make sure we consume the ACK so that we don't get here again
 		m_lastTxMessage = "";
@@ -236,23 +243,20 @@ void StarGazerMessageProcessor::PumpMessageProcessor( )
 		// If there is another message to send, then send it.  Otherwise do nothing
 		if( m_txMessageQueue.size( ) > 0 )
 		{
-			ROS_DEBUG_NAMED( "StarGazerMessageProcessor", "Sending next message %s\n",
-				m_txMessageQueue.front( ).c_str( ) );
+			ROS_DEBUG_STREAM_NAMED( "StarGazer", "Sending next message " << m_txMessageQueue.front( ) );
+
 			SendRawCommand( m_txMessageQueue.front( ) );
 		}
 		else
 		{
-			ROS_DEBUG_NAMED( "StarGazerMessageProcessor", "Message Queue Empty\n" );
+			ROS_DEBUG_STREAM_NAMED( "StarGazer", "Message Queue Empty" );
 		}
 	}
 	// If we have timed out - resend the message
 	else if( m_lastTxMessage.size( ) > 0 && time_span.count( ) > STARTGAZER_TIMEOUT )
 	{
-		std::cout << "No Ack in " << time_span.count( ) << ", retransmitting " << m_txMessageQueue.front( ).c_str( )
-			<< std::endl;
-
-		ROS_DEBUG_NAMED( "StarGazerMessageProcessor", "ACK timeout - retransmitting %s\n",
-			m_txMessageQueue.front( ).c_str( ) );
+		ROS_DEBUG_STREAM_NAMED( "StarGazer", "No Ack in " << time_span.count( ) << ", retransmitting "
+			<< m_txMessageQueue.front( ) << std::endl );
 
 		SendRawCommand( m_txMessageQueue.front( ) );
 	}
@@ -269,7 +273,7 @@ void StarGazerMessageProcessor::RxMsgCallback( std::vector<char> msgBuffer )
 	STAR_GAZER_MESSAGE_TYPES command = (STAR_GAZER_MESSAGE_TYPES) msgBuffer[1];
 
 	auto typeStart = msgBuffer.begin( ) + 2;
-	auto typeEnd = std::find( typeStart, msgBuffer.end( ), STARGAZER_SEPERATOR );
+	auto typeEnd = std::find( typeStart, msgBuffer.end( ), StarGazer_SEPERATOR );
 
 	std::string typeStr( typeStart, typeEnd );
 
@@ -284,8 +288,8 @@ void StarGazerMessageProcessor::RxMsgCallback( std::vector<char> msgBuffer )
 			{
 				if( regexMatch.size( ) != 6 )
 				{
-					ROS_DEBUG_NAMED( "StarGazerMessageProcessor", "Odometry with only %zu fields: %s\n",
-						regexMatch.size( ), std::string( msgBuffer.begin( ), msgBuffer.end( ) ).c_str( ) );
+					ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry with only " <<
+						regexMatch.size( ) << " fields: " << std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
 				}
 				else if( m_odometryCallback )
 				{
@@ -305,37 +309,35 @@ void StarGazerMessageProcessor::RxMsgCallback( std::vector<char> msgBuffer )
 					}
 					catch( const std::invalid_argument& )
 					{
-						ROS_ERROR_NAMED( "StarGazerMessageProcessor", "Odometry has invalid parameter\n" );
+						ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry has invalid parameter" );
 					}
 					catch( const std::out_of_range& )
 					{
-						ROS_ERROR_NAMED( "StarGazerMessageProcessor", "Odometry has parameter out of range\n" );
+						ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry has parameter out of range" );
 					}
 				}
 				else
 				{
-					ROS_ERROR_NAMED( "StarGazerMessageProcessor",
-						"Serial port data read but no callback specified!\n" );
+					ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor",
+						"Serial port data read but no callback specified!" );
 				}
 			}
 			else
 			{
-				ROS_DEBUG_NAMED( "StarGazerMessageProcessor", "Odometry with bad format: %s\n",
-					std::string( msgBuffer.begin( ), msgBuffer.end( ) ).c_str( ) );
+				ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry with bad format: " <<
+					std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
 			}
 		}
 		break;
 
 		case STAR_GAZER_MESSAGE_TYPES::MESSAGE:
 		{
-			//std::cout << "Message " << typeStr << std::endl;
-			ROS_DEBUG_NAMED( "StarGazerMessageProcessor", "%s\n", typeStr.c_str( ) );
+			ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", typeStr );
 		}
 		break;
 
 		case STAR_GAZER_MESSAGE_TYPES::ACK:
 		{
-			//std::cout << "Ack " << typeStr << std::endl;
 			m_lastAck = typeStr;
 		}
 		break;
@@ -346,8 +348,9 @@ void StarGazerMessageProcessor::RxMsgCallback( std::vector<char> msgBuffer )
 			{
 				if( regexMatch.size( ) != 3 )
 				{
-					ROS_DEBUG_NAMED( "StarGazerMessageProcessor", "Return value with only %zu fields: %s\n",
-						regexMatch.size( ), std::string( msgBuffer.begin( ), msgBuffer.end( ) ).c_str( ) );
+					ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Return value with only "
+						<< regexMatch.size( ) << " fields: " <<
+						std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
 				}
 				else if( m_readCallback )
 				{
@@ -356,15 +359,15 @@ void StarGazerMessageProcessor::RxMsgCallback( std::vector<char> msgBuffer )
 				}
 				else
 				{
-					ROS_ERROR_NAMED( "StarGazerMessageProcessor",
+					ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor",
 						"Serial port data read but no callback specified!\n" );
 					printMessage = true;
 				}
 			}
 			else
 			{
-				ROS_DEBUG_NAMED( "StarGazerMessageProcessor", "Return value with bad format: %s\n",
-					std::string( msgBuffer.begin( ), msgBuffer.end( ) ).c_str( ) );
+				ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Return value with bad format: " <<
+					std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
 				printMessage = true;
 
 			}
@@ -373,7 +376,8 @@ void StarGazerMessageProcessor::RxMsgCallback( std::vector<char> msgBuffer )
 
 		default:
 		{
-			std::cout << "Unknown command type " << (char) command << " ";
+			ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Unknown command type " << (char)command );
+
 			printMessage = true;
 		}
 		break;
@@ -381,27 +385,9 @@ void StarGazerMessageProcessor::RxMsgCallback( std::vector<char> msgBuffer )
 
 	if( printMessage )
 	{
-		std::cout << "Raw Message: \"";
-		for( char value : msgBuffer )
-		{
-			std::cout << value;
-		}
-		std::cout << "\" " << std::endl;
+		ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Raw Message: \"" << std::string( msgBuffer.begin( ), msgBuffer.end( ) ) << "\"" );
 	}
 }
-
-void StarGazerMessageProcessor::SetConnected( bool bIsConnected )
-{
-	/*
-	 std_msgs::Bool msg;
-	 msg.data = bIsConnected;
-
-	 m_ConnectedPublisher.publish( msg );
-
-	 m_VelocityPublisher.publish( geometry_msgs::Twist( ) );
-	 */
-}
-
 
 //////////////////////////////////////////////////////////////////////////
 // Helper Methods
@@ -409,14 +395,14 @@ void StarGazerMessageProcessor::SetConnected( bool bIsConnected )
 
 void StarGazerMessageProcessor::WriteToSerialPort( char* pszData, std::size_t dwSize )
 {
-	if( m_pIO->IsOpen( ) )
+	if( m_serialIO.IsOpen( ) )
 	{
-		m_pIO->Write( std::vector<char>( pszData, pszData + dwSize ) );
+		m_serialIO.Write( std::vector<char>( pszData, pszData + dwSize ) );
 	}
 	else
 	{
-		ROS_ERROR_THROTTLE_NAMED( 60, "BrainStem",
-			"Attempt to write to the brain stem, but the serial port is not open!" );
+		ROS_ERROR_THROTTLE_NAMED( 60, "StarGazer",
+			"Attempt to write to the serial port, but the serial port is not open!" );
 	}
 }
 

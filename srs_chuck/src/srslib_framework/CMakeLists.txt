@@ -10,7 +10,7 @@ set(PROJECT_NAME srslib_framework)
 set(${PROJECT_NAME}_SOURCES
 
     include/${PROJECT_NAME}/datastructure/ThreadSafeQueue.hpp
-    include/${PROJECT_NAME}/datastructure/PriorityQueue.hpp
+    include/${PROJECT_NAME}/datastructure/MappedPriorityQueue.hpp
 
     include/${PROJECT_NAME}/filter/Command.hpp
     include/${PROJECT_NAME}/filter/FilterState.hpp
@@ -20,7 +20,9 @@ set(${PROJECT_NAME}_SOURCES
 
     include/${PROJECT_NAME}/filter/ukf/UnscentedKalmanFilter.hpp
 
-    include/${PROJECT_NAME}/graph/Grid2d.hpp
+    include/${PROJECT_NAME}/graph/grid2d/Grid2dLocation.hpp
+    include/${PROJECT_NAME}/graph/grid2d/Grid2dNode.hpp
+    include/${PROJECT_NAME}/graph/grid2d/Grid2d.hpp
 
     include/${PROJECT_NAME}/platform/Object.hpp
 
@@ -35,7 +37,9 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapJoy.hpp
 
-    include/${PROJECT_NAME}/utils/Print.hpp
+    include/${PROJECT_NAME}/search/SolutionNode.hpp
+    include/${PROJECT_NAME}/search/SearchNode.hpp
+    include/${PROJECT_NAME}/search/AStar.hpp
 )
 
 set(${PROJECT_NAME}_MSGS
@@ -47,10 +51,18 @@ set(TEST_SOURCES_UKF
     test/filter/ukf/Test_Ukf_Basic.cpp
 )
 
+set(TEST_SOURCES_GRAPH
+    test/graph/Test_Grid2d_Basic.cpp
+)
+
+set(TEST_SOURCES_MAPPEDPRIORITYQUEUE
+    test/datastructure/Test_MappedPriorityQueue_Basic.cpp
+    test/datastructure/Test_MappedPriorityQueue_UserDefinedKey.cpp
+)
+
 set(TEST_SOURCES_ASTAR
     test/search/Test_AStar_Basic.cpp
 )
-
 ####################################################################################################
 # Project
 
@@ -58,7 +70,7 @@ project(${PROJECT_NAME})
 
 set(PROJECT_LIBRARY ${PROJECT_NAME})
 
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
@@ -67,6 +79,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 find_package(OpenCV REQUIRED)
 find_package(srslib_test REQUIRED)
+find_package(GTest REQUIRED)
 
 include_directories(
     include/
@@ -76,6 +89,7 @@ include_directories(
     ${OpenCV_INCLUDE_DIRS} 
     ${srslib_test_INCLUDE_DIRS}
 )
+
 
 ####################################################################################################
 # Messages
@@ -103,6 +117,8 @@ add_library(${PROJECT_LIBRARY}
     ${${PROJECT_NAME}_SOURCES}
 )
 
+add_dependencies(${PROJECT_LIBRARY} ${catkin_EXPORTED_TARGETS})
+
 target_link_libraries(${PROJECT_LIBRARY}
     ${roscpp_LIBRARIES}
     ${OpenCV_LIBRARIES}
@@ -124,6 +140,29 @@ if (CATKIN_ENABLE_TESTING)
         ${catkin_LIBRARIES}
         ${OpenCV_LIBRARIES}
         ${srslib_test_LIBRARIES}
+        ${GTest_LIBRARIES}
+    )
+
+    catkin_add_gtest(TestSuite_Graph
+        test/TestSuite.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_GRAPH}
+    )
+    target_link_libraries(TestSuite_Graph
+        ${catkin_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+        ${GTest_LIBRARIES}
+    )
+
+    catkin_add_gtest(TestSuite_MappedPriorityQueue
+        test/TestSuite.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_MAPPEDPRIORITYQUEUE}
+    )
+    target_link_libraries(TestSuite_Graph
+        ${catkin_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+        ${GTest_LIBRARIES}
     )
 
     catkin_add_gtest(TestSuite_AStar
@@ -133,7 +172,7 @@ if (CATKIN_ENABLE_TESTING)
     )
     target_link_libraries(TestSuite_AStar
         ${catkin_LIBRARIES}
-        ${OpenCV_LIBRARIES}
         ${srslib_test_LIBRARIES}
+        ${GTest_LIBRARIES}
     )
 endif()

@@ -6,7 +6,7 @@
 #ifndef COSTMAP2D_HPP_
 #define COSTMAP2D_HPP_
 
-#include <srslib_framework/graph/Grid2d.hpp>
+#include <srslib_framework/graph/grid2d/Grid2d.hpp>
 
 namespace srs {
 

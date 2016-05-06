@@ -41,7 +41,7 @@ project(${PROJECT_NAME})
 
 set(PROJECT_NODE ${PROJECT_NAME})
 
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
@@ -75,6 +75,8 @@ add_executable(${PROJECT_NODE}
     ${${PROJECT_NAME}_SOURCES}
 )
 
+add_dependencies(${PROJECT_LIBRARY} ${catkin_EXPORTED_TARGETS})
+
 target_link_libraries(${PROJECT_NODE}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBRARIES}
@@ -92,7 +94,10 @@ if (CATKIN_ENABLE_TESTING)
     )
     target_link_libraries(TestSuite_Pe
         ${catkin_LIBRARIES}
+        ${boost_LIBRARIES}
         ${OpenCV_LIBRARIES}
         ${srslib_test_LIBRARIES}
+        ${srslib_framework_LIBRARIES}
+        ${GTEST_LIBRARIES}
     )
 endif()

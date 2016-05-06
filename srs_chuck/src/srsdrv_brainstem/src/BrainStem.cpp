@@ -2,7 +2,7 @@
 #include <ros/callback_queue.h>
 #include <ros/callback_queue_interface.h>
 
-#include "SerialIO.h"
+#include <SerialIO.h>
 #include "MessageProcessor.h"
 #include <geometry_msgs/TwistStamped.h>
 

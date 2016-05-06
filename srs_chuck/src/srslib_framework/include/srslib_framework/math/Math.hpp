@@ -127,8 +127,15 @@ struct Math
     }
 
     template<typename TYPE = double>
-    constexpr inline static TYPE normalizeAngle(TYPE rad) {
+    constexpr inline static TYPE normalizeAngleRad(TYPE rad)
+    {
         return rad - 2 * M_PI * floor((rad + M_PI) / (2 * M_PI));
+    }
+
+    template<typename TYPE = int>
+    inline static TYPE normalizeAngleDeg(TYPE deg)
+    {
+        return deg < 0 ? 360 - (abs(deg) % 360) : deg % 360;
     }
 
     static cv::Mat zeros(const cv::Mat original)

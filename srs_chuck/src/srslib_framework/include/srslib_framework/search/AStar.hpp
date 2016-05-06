@@ -6,10 +6,17 @@
 #ifndef ASTAR_HPP_
 #define ASTAR_HPP_
 
+#include <array>
 #include <vector>
+#include <limits>
+#include <unordered_set>
 using namespace std;
 
-#include <srslib_framework/datastructure/PriorityQueue.hpp>
+#include <srslib_framework/datastructure/MappedPriorityQueue.hpp>
+
+#include <srslib_framework/search/SolutionNode.hpp>
+#include <srslib_framework/search/SearchNode.hpp>
+#include <srslib_framework/search/SearchPosition.hpp>
 
 namespace srs {
 
@@ -17,56 +24,126 @@ template<typename GRAPH>
 class AStar
 {
 public:
-    typedef typename GRAPH::NodeType NodeType;
+    typedef typename GRAPH::LocationType LocationType;
+    typedef SearchNode<GRAPH> SearchNodeType;
+    typedef SearchAction<GRAPH> SearchActionType;
 
     AStar(const GRAPH& graph) :
-        graph_(graph)
+        graph_(graph),
+        lastNode_(nullptr)
     {}
 
-    ~AStar();
+    ~AStar()
+    {}
 
-    vector<NodeType> getPath()
+    void clear()
     {
-        return path_;
+        // TODO: Use foreach operation in the queue
+        SearchNodeType* node = nullptr;
+        while (!open_.empty())
+        {
+            if (open_.pop(node))
+            {
+                delete node;
+            }
+        }
+
+        for (auto node : closed_)
+        {
+            delete node;
+        }
+        lastNode_ = nullptr;
     }
 
-    void search(NodeType start, NodeType goal)
+    vector<SolutionNode<GRAPH>> getPath()
     {
-        unordered_map<NodeType, float> costs_;
+        vector<SolutionNode<GRAPH>> result;
 
-        queue_.push(start, 0);
-        path_.push_back(start);
-
-        while (!queue_.empty())
+        SearchNode<GRAPH>* cursor = lastNode_;
+        while (cursor)
         {
-            auto currentNode = queue_.pop();
-            if (currentNode == goal)
+            SolutionNode<GRAPH> node;
+            node.action = cursor->action;
+
+            result.insert(result.begin(), node);
+            cursor = cursor->parent;
+        }
+
+        return result;
+    }
+
+    void search(SearchPosition<GRAPH> start, SearchPosition<GRAPH> goal)
+    {
+        SearchActionType startAction = SearchActionType(SearchActionType::NONE,
+            start, 0, SearchPosition<GRAPH>::heuristic(start, goal));
+        SearchNodeType* currentNode = new SearchNodeType(startAction, nullptr);
+
+        SearchActionType goalAction = SearchActionType(SearchActionType::NONE, goal);
+        SearchNodeType* goalNode = new SearchNodeType(goalAction, nullptr);
+
+        clear();
+        open_.push(currentNode->getTotalCost(), currentNode);
+
+        while (!open_.empty())
+        {
+            open_.pop(currentNode);
+            if (*currentNode == *goalNode)
             {
+                lastNode_ = currentNode;
                 break;
             }
 
-            int currentNodeCost = costs_[currentNode];
-            for (auto neighborNode : graph_.neighbors(currentNode))
-            {
-                int newCost = currentNodeCost; // + graph_.getValue(currentNode, neighborNode);
-                costs_[neighborNode] = newCost;
+            closed_.insert(currentNode);
 
-                if (!costs_.count(neighborNode) || newCost < costs_[neighborNode])
+            for (auto action : SearchAction<GRAPH>::ACTIONS)
+            {
+                SearchAction<GRAPH> searchAction = SearchAction<GRAPH>::instanceOf(
+                    action,
+                    graph_,
+                    currentNode);
+
+                if (searchAction.action != SearchAction<GRAPH>::NONE)
                 {
-                    costs_[neighborNode] = newCost;
-                    int newPriority = newCost + GRAPH::getHeuristic(neighborNode, goal);
-                    queue_.push_back(neighborNode, newPriority);
-                    path_[neighborNode] = currentNode;
+                    SearchNodeType* newNode = new SearchNodeType(searchAction, currentNode);
+
+                    pushSearchNode(newNode);
                 }
             }
         }
     }
 
 private:
-    PriorityQueue<NodeType> queue_;
-    vector<NodeType> path_;
+    void pushSearchNode(SearchNodeType* node)
+    {
+        if (!closed_.count(node))
+        {
+            if (open_.exists(node))
+            {
+                SearchNodeType* inOpenQueue = open_.find(node);
+                if (inOpenQueue->getTotalCost() > node->getTotalCost())
+                {
+                    open_.erase(inOpenQueue);
+                    delete inOpenQueue;
+
+                    open_.push(node->getTotalCost(), node);
+                }
+                else
+                {
+                    delete node;
+                }
+            }
+            else
+            {
+                open_.push(node->getTotalCost(), node);
+            }
+        }
+    }
+
+    unordered_set<SearchNodeType*> closed_;
+    MappedPriorityQueue<SearchNodeType*, int> open_;
 
     GRAPH graph_;
+    SearchNodeType* lastNode_;
 };
 
 } // namespace srs

@@ -75,7 +75,8 @@ if (CATKIN_ENABLE_TESTING)
     )
     target_link_libraries(serial-io-test
         ${catkin_LIBRARIES}
-        pthread
-        boost_system
+        ${boost_LIBRARIES}
+        ${srslib_framework_LIBRARIES}
+        ${GTEST_LIBRARIES}
     )
 endif()

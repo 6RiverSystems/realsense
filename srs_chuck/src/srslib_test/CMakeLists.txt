@@ -9,7 +9,10 @@ set(PROJECT_NAME srslib_test)
 
 set(${PROJECT_NAME}_SOURCES
 
+    include/${PROJECT_NAME}/graph/grid2d/Grid2dUtils.hpp
+
     include/${PROJECT_NAME}/utils/Compare.hpp
+    include/${PROJECT_NAME}/utils/Print.hpp
 )
 
 ####################################################################################################
@@ -19,7 +22,7 @@ project(${PROJECT_NAME})
 
 set(PROJECT_LIBRARY ${PROJECT_NAME})
 
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 

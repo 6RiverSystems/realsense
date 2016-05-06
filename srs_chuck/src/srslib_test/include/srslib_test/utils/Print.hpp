@@ -15,6 +15,7 @@ using namespace std;
 #include <opencv2/opencv.hpp>
 
 namespace srs {
+namespace test {
 
 struct Print
 {
@@ -49,6 +50,7 @@ struct Print
     }
 };
 
+} // namespace test
 } // namespace srs
 
 #endif // PRINT_HPP_

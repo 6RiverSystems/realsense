@@ -57,7 +57,7 @@ struct hash<srs::SearchPosition<GRAPH>>
 {
     unsigned long operator()(const srs::SearchPosition<GRAPH>& node) const
     {
-        return hash<typename GRAPH::LocationType>()(node.location) + 101 * node.orientation;
+        return hash<typename GRAPH::LocationType>()(node.location) + 1001 * node.orientation;
     }
 };
 

@@ -39,7 +39,7 @@ struct hash<srs::Grid2dLocation>
 {
     unsigned long operator()(const srs::Grid2dLocation& location) const
     {
-        return location.x + 101 * location.y;
+        return location.x + 1812433253 * location.y;
     }
 };
 

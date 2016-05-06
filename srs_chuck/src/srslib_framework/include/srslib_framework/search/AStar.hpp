@@ -117,9 +117,9 @@ private:
     {
         if (!closed_.count(node))
         {
-            if (open_.exists(node))
+            SearchNodeType* inOpenQueue = open_.find(node);
+            if (inOpenQueue)
             {
-                SearchNodeType* inOpenQueue = open_.find(node);
                 if (inOpenQueue->getTotalCost() > node->getTotalCost())
                 {
                     open_.erase(inOpenQueue);

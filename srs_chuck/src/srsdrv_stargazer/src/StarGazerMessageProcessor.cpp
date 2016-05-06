@@ -15,14 +15,15 @@
 #include "StarGazerMessageProcessor.h"
 #include "StarGazerSerialIO.h"
 #include "srslib_framework/utils/Thread.hpp"
+#include "srslib_framework/io/SerialIO.hpp"
 
 namespace srs
 {
 
-StarGazerMessageProcessor::StarGazerMessageProcessor( const std::string& strSerialPort ) :
+StarGazerMessageProcessor::StarGazerMessageProcessor( std::shared_ptr<IO> pIO ) :
 	m_readCallback( ),
 	m_odometryCallback( ),
-	m_serialIO( ),
+	m_pSerialIO( pIO ),
 	m_lastTxMessage( ),
 	m_txMessageQueue( ),
 	m_lastTxTime( std::chrono::milliseconds( 0 ) ),
@@ -42,18 +43,11 @@ StarGazerMessageProcessor::StarGazerMessageProcessor( const std::string& strSeri
 	{
 		ROS_ERROR( "regex: %s (%d)", e.what( ), e.code( ) );
 	}
-
-	// Anonymous function call the message processor in the main ros thread
-	m_serialIO.Open( strSerialPort.c_str( ), [&](std::vector<char> buffer)
-		{
-			ExecuteInRosThread( std::bind( &StarGazerMessageProcessor::RxMsgCallback, this,
-				buffer ) );
-		} );
 }
 
 StarGazerMessageProcessor::~StarGazerMessageProcessor( )
 {
-	m_serialIO.Close( );
+
 }
 
 void StarGazerMessageProcessor::SetOdometryCallback( OdometryCallbackFn odometryCallback )
@@ -90,7 +84,7 @@ void StarGazerMessageProcessor::SendRawCommand( std::string fullCmd )
 
 	std::vector<char> cmdVec( fullCmd.begin( ), fullCmd.end( ) );
 
-	m_serialIO.Write( cmdVec );
+	m_pSerialIO->Write( cmdVec );
 }
 
 void StarGazerMessageProcessor::BaseCommand( STAR_GAZER_MESSAGE_TYPES type, std::string cmd )
@@ -266,7 +260,7 @@ void StarGazerMessageProcessor::PumpMessageProcessor( )
 // StarGazer Callbacks
 //////////////////////////////////////////////////////////////////////////
 
-void StarGazerMessageProcessor::RxMsgCallback( std::vector<char> msgBuffer )
+void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBuffer )
 {
 	bool printMessage = false;
 
@@ -393,11 +387,12 @@ void StarGazerMessageProcessor::RxMsgCallback( std::vector<char> msgBuffer )
 // Helper Methods
 //////////////////////////////////////////////////////////////////////////
 
+// TODO: Move down to base class
 void StarGazerMessageProcessor::WriteToSerialPort( char* pszData, std::size_t dwSize )
 {
-	if( m_serialIO.IsOpen( ) )
+	if( m_pSerialIO->IsOpen( ) )
 	{
-		m_serialIO.Write( std::vector<char>( pszData, pszData + dwSize ) );
+		m_pSerialIO->Write( std::vector<char>( pszData, pszData + dwSize ) );
 	}
 	else
 	{

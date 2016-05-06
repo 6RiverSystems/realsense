@@ -1,47 +1,25 @@
 /*
- * MessageProcessor.cpp
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
  *
- *  Created on: Apr 7, 2016
- *      Author: dan
+ * This is proprietary software, unauthorized distribution is not permitted.
  */
 
-#include "MessageProcessor.h"
-#include "Messages.h"
-#include "Helper.h"
-#include "IO.h"
+#include <BrainStemMessageProcessor.h>
+#include <BrainStemMessages.h>
+#include <srslib_framework/io/IO.hpp>
+#include <srslib_framework/utils/Logging.hpp>
 
 #include <chrono>
 #include <boost/tokenizer.hpp>
-
 #include <ros/ros.h>
-#include <ros/console.h>
-#include <std_msgs/String.h>
-#include <geometry_msgs/Twist.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <geometry_msgs/PoseStamped.h>
-
-bool approximatively_equal(double x, double y, int ulp)
-{
-   return fabs(x-y) <= ulp*DBL_EPSILON*std::max(fabs(x), fabs(y));
-}
 
 namespace srs {
 
 using namespace ros;
 
-MessageProcessor::MessageProcessor( ros::NodeHandle& node, IO* pIO ) :
+BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) :
 	m_bControllerFault( false ),
-	m_dwLastOdomTime( 0 ),
-	m_rosOdomTime( ),
-	m_node( node ),
-	m_pIO( pIO ),
-	m_VelocitySubscriber( node.subscribe<geometry_msgs::Twist>( "/cmd_vel", 100,
-		std::bind( &MessageProcessor::OnChangeVelocity, this, std::placeholders::_1 ) ) ),
-	m_OdometryRawPublisher( node.advertise<geometry_msgs::TwistStamped>( "/sensors/odometry/raw", 1000 ) ),
-	m_ConnectedPublisher( node.advertise<std_msgs::Bool>( "/brain_stem/connected", 1 ) ),
-	m_llcmdSubscriber( node.subscribe<std_msgs::String>( "/cmd_ll", 1000,
-			std::bind( &MessageProcessor::OnRosCallback, this, std::placeholders::_1 ) ) ),
-	m_llEventPublisher( node.advertise<std_msgs::String>( "/ll_event", 50 ) )
+	m_pIO( pIO )
 {
 	m_mapEntityButton[ENTITIES::TOTE0]		= "TOTE0";
 	m_mapEntityButton[ENTITIES::TOTE1]		= "TOTE1";
@@ -69,23 +47,47 @@ MessageProcessor::MessageProcessor( ros::NodeHandle& node, IO* pIO ) :
 		m_mapButtonEntity[kv.second] = kv.first;
 	}
 
-	m_vecBridgeCallbacks["UI"] = { std::bind( &MessageProcessor::OnUI, this, std::placeholders::_1 ), 2 };
-	m_vecBridgeCallbacks["STARTUP"] = { std::bind( &MessageProcessor::OnStartup, this, std::placeholders::_1 ), 0 };
-	m_vecBridgeCallbacks["VERSION"] = { std::bind( &MessageProcessor::OnVersion, this, std::placeholders::_1 ), 0 };
-	m_vecBridgeCallbacks["PAUSE"] = { std::bind( &MessageProcessor::OnPause, this, std::placeholders::_1 ), 1 };
-	m_vecBridgeCallbacks["REENABLE"] = { std::bind( &MessageProcessor::OnReEnable, this, std::placeholders::_1 ), 0 };
+	m_vecBridgeCallbacks["UI"] = { std::bind( &BrainStemMessageProcessor::OnUI, this, std::placeholders::_1 ), 2 };
+	m_vecBridgeCallbacks["STARTUP"] = { std::bind( &BrainStemMessageProcessor::OnStartup, this, std::placeholders::_1 ), 0 };
+	m_vecBridgeCallbacks["VERSION"] = { std::bind( &BrainStemMessageProcessor::OnVersion, this, std::placeholders::_1 ), 0 };
+	m_vecBridgeCallbacks["PAUSE"] = { std::bind( &BrainStemMessageProcessor::OnPause, this, std::placeholders::_1 ), 1 };
+	m_vecBridgeCallbacks["REENABLE"] = { std::bind( &BrainStemMessageProcessor::OnReEnable, this, std::placeholders::_1 ), 0 };
 }
 
-MessageProcessor::~MessageProcessor( )
+BrainStemMessageProcessor::~BrainStemMessageProcessor( )
 {
 
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Brain Stem Callbacks
+// Message Callbacks
 //////////////////////////////////////////////////////////////////////////
 
-void MessageProcessor::ProcessMessage( std::vector<char> buffer )
+void BrainStemMessageProcessor::SetConnectionChangedCallback( ConnectionChangedFn connectionChangedCallback )
+{
+	m_connectionChangedCallback = connectionChangedCallback;
+}
+
+void BrainStemMessageProcessor::SetArrivedCallback( ArrivedCallbackFn arrivedCallback )
+{
+	m_arrivedCallback = arrivedCallback;
+}
+
+void BrainStemMessageProcessor::SetButtonCallback( ButtonCallbackFn buttonCallback )
+{
+	m_buttonCallback = buttonCallback;
+}
+
+void BrainStemMessageProcessor::SetOdometryCallback( OdometryCallbackFn odometryCallback )
+{
+	m_odometryCallback = odometryCallback;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Message Processing
+//////////////////////////////////////////////////////////////////////////
+
+void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffer )
 {
 	BRAIN_STEM_MSG eCommand = BRAIN_STEM_MSG::UNKNOWN;
 
@@ -119,12 +121,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 
 		case BRAIN_STEM_MSG::STOP:
 		{
-			std_msgs::String msg;
-			msg.data = "ARRIVED";
-
-			ROS_DEBUG_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
-
-			m_llEventPublisher.publish( msg );
+			m_arrivedCallback( );
 		}
 		break;
 
@@ -132,26 +129,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 		{
 			ENTITIES eButtonId = static_cast<ENTITIES>( buffer[1] );
 
-			std::string strEntity;
-
-			auto iter = m_mapEntityButton.find( eButtonId );
-
-			if( iter != m_mapEntityButton.end( ) )
-			{
-				std_msgs::String msg;
-
-				std::stringstream ss;
-				ss << "UI " << iter->second;
-				msg.data = ss.str();
-
-				ROS_DEBUG_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
-
-				m_llEventPublisher.publish( msg );
-			}
-			else
-			{
-				ROS_ERROR_NAMED( "Brainstem", "Unknown button entity %d", eButtonId );
-			}
+			m_buttonCallback( eButtonId );
 		}
 		break;
 
@@ -159,55 +137,7 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 		{
 			ODOMETRY_DATA* pOdometry = reinterpret_cast<ODOMETRY_DATA*>( buffer.data( ) );
 
-			ros::Time currentTime = ros::Time::now( );
-
-			static ros::Time sLastTime = currentTime;
-
-			bool bInvalidTime = ( currentTime.toSec( ) - m_rosOdomTime.toSec( ) ) > 0.1;
-
-			if( !m_rosOdomTime.isZero( ) &&
-				bInvalidTime )
-			{
-				ROS_ERROR_NAMED( "Brainstem", "Timestamp out of range and resynced (possible communication problem): odom: %f, ros: %f",
-					m_rosOdomTime.toSec( ), currentTime.toSec( ) );
-			}
-
-			if( bInvalidTime ||
-				( approximatively_equal( pOdometry->linear_velocity, 0.0f, 0.00001 ) &&
-				  approximatively_equal( pOdometry->angular_velocity, 0.0f, 0.00001 ) ) )
-			{
-				// Reset our time basis to account for any drift
-				m_rosOdomTime = currentTime - ros::Duration( 0, 1200000 );
-			}
-			else
-			{
-				double dfOdomTimeDelta = (double)(pOdometry->timestamp - m_dwLastOdomTime) / 1000.0f;
-
-				ROS_DEBUG_NAMED( "Brainstem", "Odometry (%f): %f, %f",
-					dfOdomTimeDelta, pOdometry->linear_velocity, pOdometry->angular_velocity );
-
-				// Base our time on the realtime clock (brain_stem) since our clock does not match odom info
-				// and our loop is not realtime
-				m_rosOdomTime += ros::Duration( dfOdomTimeDelta );
-			}
-
-			geometry_msgs::TwistStamped odometry;
-			odometry.header.stamp = m_rosOdomTime;
-			odometry.twist.linear.x = pOdometry->linear_velocity;
-			odometry.twist.angular.z = pOdometry->angular_velocity;
-
-			m_OdometryRawPublisher.publish( odometry );
-
-			double dfClockDiff = currentTime.toSec( ) - m_rosOdomTime.toSec( );
-
-			if( dfClockDiff > 0.05 )
-			{
-				ROS_ERROR_NAMED( "Brainstem", "Odometry clock drift: %f", dfClockDiff );
-			}
-
-			m_dwLastOdomTime = pOdometry->timestamp;
-
-			sLastTime = currentTime;
+			m_odometryCallback( pOdometry->timestamp, pOdometry->linear_velocity, pOdometry->angular_velocity );
 		}
 		break;
 
@@ -220,37 +150,36 @@ void MessageProcessor::ProcessMessage( std::vector<char> buffer )
 	}
 }
 
-void MessageProcessor::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity )
+void BrainStemMessageProcessor::SetVelocity( double dfLinear, double dfAngular )
 {
 	VELOCITY_DATA msg = {
 		static_cast<uint8_t>( BRAIN_STEM_CMD::SET_VELOCITY ),
-		static_cast<float>( velocity->linear.x ),
-		static_cast<float>( velocity->angular.z )
+		static_cast<float>( dfLinear ),
+		static_cast<float>( dfAngular )
 	};
 
-	static geometry_msgs::Twist s_currentVelocity;
+	static double s_dfLinear = dfLinear;
+	static double s_dfAngular = dfAngular;
 
-	if( velocity->linear.x != s_currentVelocity.linear.x ||
-		velocity->angular.z != s_currentVelocity.angular.z )
+	if( dfLinear != s_dfLinear ||
+		dfAngular != s_dfAngular )
 	{
-		ROS_DEBUG_NAMED( "Brainstem", "Velocity: %f, %f",
-			velocity->linear.x, velocity->angular.z );
+		ROS_DEBUG_NAMED( "Brainstem", "Velocity: %f, %f", dfLinear, dfAngular );
 
-		s_currentVelocity = *velocity;
+		s_dfLinear = dfLinear;
+		s_dfAngular = dfAngular;
 	}
 
 	// Send the velocity down to the motors
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 
-//////////////////////////////////////////////////////////////////////////
-// ROS Callbacks
-//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+//// ROS Callbacks
+////////////////////////////////////////////////////////////////////////////
 
-void MessageProcessor::OnRosCallback( const std_msgs::String::ConstPtr& msg )
+void BrainStemMessageProcessor::ProcessRosMessage( const std::string& strMessage )
 {
-	const std::string& strMessage = msg->data;
-
 	ROS_DEBUG_NAMED( "Brainstem", "Received command: %s", strMessage.c_str( ) );
 
 	std::vector<std::string> vecParsed;
@@ -280,22 +209,34 @@ void MessageProcessor::OnRosCallback( const std_msgs::String::ConstPtr& msg )
 	}
 }
 
-
-void MessageProcessor::SetConnected( bool bIsConnected )
+void BrainStemMessageProcessor::SetConnected( bool bIsConnected )
 {
-	std_msgs::Bool msg;
-	msg.data = bIsConnected;
+	m_connectionChangedCallback( bIsConnected );
+}
 
-	m_ConnectedPublisher.publish( msg );
+//////////////////////////////////////////////////////////////////////////
+// Helper
+//////////////////////////////////////////////////////////////////////////
 
-	m_rosOdomTime = ros::Time( );
+std::string BrainStemMessageProcessor::GetButtonName( ENTITIES eButtonId ) const
+{
+	std::string strName;
+
+	auto iter = m_mapEntityButton.find( eButtonId );
+
+	if( iter != m_mapEntityButton.end( ) )
+	{
+		strName = iter->second;
+	}
+
+	return strName;
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Bridge Callbacks
 //////////////////////////////////////////////////////////////////////////
 
-void MessageProcessor::OnUI( std::vector<std::string> vecParams )
+void BrainStemMessageProcessor::OnUI( std::vector<std::string> vecParams )
 {
 	std::string strEntity = vecParams[0];
 
@@ -336,21 +277,21 @@ void MessageProcessor::OnUI( std::vector<std::string> vecParams )
 	}
 }
 
-void MessageProcessor::OnStartup( std::vector<std::string> vecParams )
+void BrainStemMessageProcessor::OnStartup( std::vector<std::string> vecParams )
 {
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::STARTUP );
 
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
 }
 
-void MessageProcessor::OnVersion( std::vector<std::string> vecParams )
+void BrainStemMessageProcessor::OnVersion( std::vector<std::string> vecParams )
 {
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::GET_VERSION );
 
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
 }
 
-void MessageProcessor::OnPause( std::vector<std::string> vecParams )
+void BrainStemMessageProcessor::OnPause( std::vector<std::string> vecParams )
 {
 	std::string& strPaused = vecParams[0];
 
@@ -360,7 +301,7 @@ void MessageProcessor::OnPause( std::vector<std::string> vecParams )
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 
-void MessageProcessor::OnReEnable( std::vector<std::string> vecParams )
+void BrainStemMessageProcessor::OnReEnable( std::vector<std::string> vecParams )
 {
 	ROS_INFO_NAMED( "BrainStem", "ReEnable from fault mode" );
 
@@ -371,7 +312,7 @@ void MessageProcessor::OnReEnable( std::vector<std::string> vecParams )
 // Helper Methods
 //////////////////////////////////////////////////////////////////////////
 
-void MessageProcessor::WriteToSerialPort( char* pszData, std::size_t dwSize )
+void BrainStemMessageProcessor::WriteToSerialPort( char* pszData, std::size_t dwSize )
 {
 	if( !m_bControllerFault )
 	{

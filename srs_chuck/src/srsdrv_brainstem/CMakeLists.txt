@@ -8,15 +8,12 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srsdrv_brainstem)
 set(PROJECT_MAIN src/BrainStem.cpp)
 set(${PROJECT_NAME}_SOURCES
-
-    src/SerialIO.cpp
-    src/MessageProcessor.cpp
-    src/Helper.cpp
+    src/BrainStemMessageProcessor.cpp
+    src/BrainStem.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES
 
-    test/SerialIO_test.cpp
 )
 
 ####################################################################################################
@@ -56,6 +53,7 @@ catkin_package(
 )
 
 add_executable(${PROJECT_NODE} 
+    src/brainstem_node.cpp
     ${PROJECT_MAIN}
     ${${PROJECT_NAME}_SOURCES}
 )

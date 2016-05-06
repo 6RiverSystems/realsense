@@ -10,7 +10,6 @@ set(PROJECT_NAME srsdrv_stargazer)
 set(${PROJECT_NAME}_SOURCES
 	src/StarGazerSerialIO.cpp
 	src/StarGazerMessageProcessor.cpp
-	src/StarGazerDriver.cpp
     src/StarGazer.cpp
 )
 

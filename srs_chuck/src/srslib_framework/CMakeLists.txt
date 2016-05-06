@@ -40,10 +40,12 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/search/SolutionNode.hpp
     include/${PROJECT_NAME}/search/SearchNode.hpp
     include/${PROJECT_NAME}/search/AStar.hpp
+
+    include/${PROJECT_NAME}/io/SerialIO.hpp
+    src/io/SerialIO.cpp
 )
 
 set(${PROJECT_NAME}_MSGS
-
     Aps.msg
 )
 

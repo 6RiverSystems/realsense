@@ -8,7 +8,8 @@
 #define STARGAZER_HPP_
 
 #include <ros/ros.h>
-#include <StarGazerDriver.h>
+#include <StarGazerMessageProcessor.h>
+#include <srslib_framework/io/IO.hpp>
 
 namespace srs
 {
@@ -20,9 +21,29 @@ public:
 
 	virtual ~StarGazer( );
 
-	void run( );
+	void Run( );
+
+	void SetOdometryCallback( OdometryCallbackFn callback );
+
+	void HardReset( );
+
+	void Configure( );
+
+	void AutoCalculateHeight( );
+
+	void Start( );
+
+	void Stop( );
+
+	void PumpMessageProcessor( );
+
+	void ReadCallback( std::string strType, std::string strValue );
 
 private:
+
+// Message Processing
+
+	void OnVersion( std::vector<std::string> vecParams );
 
 	void OdometryCallback( int tagID, float x, float y, float z, float angle );
 
@@ -30,11 +51,14 @@ private:
 
 	constexpr static unsigned int REFRESH_RATE_HZ = 10;
 
-	ros::NodeHandle rosNodeHandle_;
+	ros::NodeHandle				m_rosNodeHandle;
 
-	ros::Publisher rosApsPublisher;
+	ros::Publisher				m_rosApsPublisher;
 
-	StarGazerDriver starGazerDriver_;
+	std::shared_ptr<IO>			m_pSerialIO;
+
+	StarGazerMessageProcessor	m_messageProcessor;
+
 };
 
 } // namespace srs

@@ -1,8 +1,7 @@
 /*
- * BrainStemMessages.h
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
  *
- *  Created on: Apr 7, 2016
- *      Author: dan
+ * This is proprietary software, unauthorized distribution is not permitted.
  */
 
 #include <stdint.h>

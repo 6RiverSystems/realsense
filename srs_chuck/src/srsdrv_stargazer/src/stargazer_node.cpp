@@ -21,7 +21,7 @@ int main( int argc, char** argv )
 	// Create the StarGazer node and run it
 	srs::StarGazer StarGazer( g_SerialPort, g_strApsTopic );
 
-	StarGazer.run( );
+	StarGazer.Run( );
 
 	return 0;
 }

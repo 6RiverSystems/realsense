@@ -29,7 +29,7 @@ class StarGazerMessageProcessor {
 
 private:
 
-	StarGazerSerialIO									m_serialIO;
+	std::shared_ptr<IO>									m_pSerialIO;
 
 	std::chrono::high_resolution_clock::time_point		m_lastTxTime;
 
@@ -63,13 +63,13 @@ private:
 
 	void BaseReadCommand( std::string cmd );
 
-	void RxMsgCallback( std::vector<char> msgBuffer );
-
 public:
 
-	StarGazerMessageProcessor( const std::string& strSerialPort );
+	StarGazerMessageProcessor( std::shared_ptr<IO> pIO );
 
 	virtual ~StarGazerMessageProcessor( );
+
+	void ProcessStarGazerMessage( std::vector<char> msgBuffer );
 
 	void SetOdometryCallback( OdometryCallbackFn odometryCallback );
 

@@ -1,11 +1,11 @@
 /*
- * SerialIO_test.cpp
+ * BrainStemSerialIO_test.cpp
  *
  *  Created on: Apr 4, 2016
  *      Author: dan
  */
 
-#include "SerialIO.h"
+#include "BrainStemSerialIO.h"
 #include "gtest/gtest.h"
 #include <cstdlib>
 #include <unistd.h>
@@ -73,13 +73,13 @@ public:
 	}
 } g_socat;
 
-class SerialIOTest : public ::testing::Test
+class BrainStemSerialIOTest : public ::testing::Test
 {
 public:
 
-	SerialIO						m_serial1;
+	BrainStemSerialIO						m_serial1;
 
-	SerialIO						m_serial2;
+	BrainStemSerialIO						m_serial2;
 
 	std::queue<std::vector<char>>	m_readData1;
 
@@ -94,13 +94,13 @@ public:
 	std::condition_variable			m_condition2;
 
 public:
-	SerialIOTest( )
+	BrainStemSerialIOTest( )
 	{
 
 	}
 
-	void OpenSerialPort( SerialIO& serial, std::string strPort,
-		void (SerialIOTest::* callback) (std::vector<char>) )
+	void OpenSerialPort( BrainStemSerialIO& serial, std::string strPort,
+		void (BrainStemSerialIOTest::* callback) (std::vector<char>) )
 	{
 	    try
 	    {
@@ -121,12 +121,12 @@ public:
 
 	void OpenSerialPort1( )
 	{
-		OpenSerialPort( m_serial1, g_strPort1, &SerialIOTest::ReadMessageFrom2 );
+		OpenSerialPort( m_serial1, g_strPort1, &BrainStemSerialIOTest::ReadMessageFrom2 );
 	}
 
 	void OpenSerialPort2( )
 	{
-		OpenSerialPort( m_serial2, g_strPort2, &SerialIOTest::ReadMessageFrom1 );
+		OpenSerialPort( m_serial2, g_strPort2, &BrainStemSerialIOTest::ReadMessageFrom1 );
 	}
 
 	void SetUp( )
@@ -165,7 +165,7 @@ public:
 		m_condition2.notify_one( );
 	}
 
-	~SerialIOTest( )
+	~BrainStemSerialIOTest( )
 	{
 
 	}
@@ -173,11 +173,11 @@ public:
    // put in any custom data members that you need
 };
 
-TEST_F( SerialIOTest, OpenInvalidSerialPort )
+TEST_F( BrainStemSerialIOTest, OpenInvalidSerialPort )
 {
     try
     {
-    	m_serial1.Open( "/foobar", std::bind( &SerialIOTest::ReadMessageFrom2, this,
+    	m_serial1.Open( "/foobar", std::bind( &BrainStemSerialIOTest::ReadMessageFrom2, this,
     		std::placeholders::_1 ) );
 
     	FAIL( ) << "Expected std::exception";
@@ -194,14 +194,14 @@ TEST_F( SerialIOTest, OpenInvalidSerialPort )
     }
 }
 
-TEST_F( SerialIOTest, TestSpinUntilOpen )
+TEST_F( BrainStemSerialIOTest, TestSpinUntilOpen )
 {
 	// Try once when it is closed, then spin until it connects (wait for 3 seconds)
 	for( int i : boost::irange( 0, 300 ) )
 	{
 		try
 		{
-			m_serial1.Open( g_strPort1.c_str( ), std::bind( &SerialIOTest::ReadMessageFrom2, this,
+			m_serial1.Open( g_strPort1.c_str( ), std::bind( &BrainStemSerialIOTest::ReadMessageFrom2, this,
 				std::placeholders::_1 ) );
 		}
 		catch( const std::exception& err )
@@ -235,7 +235,7 @@ TEST_F( SerialIOTest, TestSpinUntilOpen )
 	EXPECT_TRUE( m_serial1.IsOpen( ) );
 }
 
-TEST_F( SerialIOTest, TestOpen )
+TEST_F( BrainStemSerialIOTest, TestOpen )
 {
 	OpenSerialPort1( );
 
@@ -246,7 +246,7 @@ TEST_F( SerialIOTest, TestOpen )
 	EXPECT_TRUE( m_serial2.IsOpen( ) );
 }
 
-TEST_F( SerialIOTest, TestClose )
+TEST_F( BrainStemSerialIOTest, TestClose )
 {
 	OpenSerialPort1( );
 
@@ -265,7 +265,7 @@ TEST_F( SerialIOTest, TestClose )
 	EXPECT_TRUE( !m_serial2.IsOpen( ) );
 }
 
-TEST_F( SerialIOTest, TestSimpleReadWrite )
+TEST_F( BrainStemSerialIOTest, TestSimpleReadWrite )
 {
 	OpenSerialPort1( );
 
@@ -288,7 +288,7 @@ TEST_F( SerialIOTest, TestSimpleReadWrite )
 	EXPECT_EQ( m_readData2.front( ), expectedData );
 }
 
-TEST_F( SerialIOTest, TestEscapeSequence )
+TEST_F( BrainStemSerialIOTest, TestEscapeSequence )
 {
 	OpenSerialPort1( );
 
@@ -310,7 +310,7 @@ TEST_F( SerialIOTest, TestEscapeSequence )
 	EXPECT_EQ( m_readData2.front( ), expectedData );
 }
 
-TEST_F( SerialIOTest, TestMultipleReadWrites )
+TEST_F( BrainStemSerialIOTest, TestMultipleReadWrites )
 {
 	OpenSerialPort1( );
 
@@ -340,7 +340,7 @@ TEST_F( SerialIOTest, TestMultipleReadWrites )
 }
 
 
-TEST_F( SerialIOTest, TestMultipleMessages )
+TEST_F( BrainStemSerialIOTest, TestMultipleMessages )
 {
 	OpenSerialPort1( );
 
@@ -388,7 +388,7 @@ TEST_F( SerialIOTest, TestMultipleMessages )
 	}
 }
 
-TEST_F( SerialIOTest, TestCloseWhileReadWrite )
+TEST_F( BrainStemSerialIOTest, TestCloseWhileReadWrite )
 {
 	OpenSerialPort1( );
 

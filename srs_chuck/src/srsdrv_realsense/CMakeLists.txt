@@ -62,11 +62,6 @@ target_link_libraries(${PROJECT_NODE}
 
 ####################################################################################################
 # Tests
-<<<<<<< HEAD
-
-=======
-#
->>>>>>> Added threading helper class
 #if (CATKIN_ENABLE_TESTING)
 #    catkin_add_gtest(TestSuite_RealsenseDriver
 #        ${${PROJECT_NAME}_TEST_SOURCES}

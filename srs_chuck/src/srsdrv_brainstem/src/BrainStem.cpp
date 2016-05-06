@@ -1,12 +1,7 @@
 #include <ros/ros.h>
-
-<<<<<<< HEAD
+#include <srslib_framework/utils/Thread.hpp>
 #include <SerialIO.h>
-=======
-#include "srslib_framework/utils/Thread.hpp"
-#include "SerialIO.h"
->>>>>>> Added threading helper class
-#include "MessageProcessor.h"
+#include <MessageProcessor.h>
 #include <geometry_msgs/TwistStamped.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////

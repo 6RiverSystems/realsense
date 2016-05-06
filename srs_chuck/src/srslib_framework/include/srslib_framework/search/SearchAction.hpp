@@ -154,9 +154,9 @@ private:
     {
         unsigned int forward = 1;
         unsigned int backward = 40;
-        unsigned int rotateM90 = 2;
-        unsigned int rotateP90 = 2;
-        unsigned int rotate180 = 2;
+        unsigned int rotateM90 = 4;
+        unsigned int rotateP90 = 4;
+        unsigned int rotate180 = 4;
 
         unsigned int hazardousCost = 0;
 

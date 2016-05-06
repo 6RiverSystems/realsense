@@ -130,7 +130,7 @@ public:
 
     friend ostream& operator<<(ostream& stream, const Grid2d& grid)
     {
-        constexpr int WIDTH = 8;
+        constexpr int WIDTH = 6;
         stream << "Grid2d {" << '\n';
 
         cout << "(" << grid.height_ << "x" << grid.width_ << ")" << endl;

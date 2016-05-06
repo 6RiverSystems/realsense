@@ -31,6 +31,7 @@ SerialIO::SerialIO( ) :
 	m_cLeading( 0 ),
 	m_bHasTerminating( false ),
 	m_cTerminating( 0 ),
+	m_bHasEscape( false ),
 	m_cEscape( 0 ),
 	m_setCharsToEscape( ),
 	m_firstByteDelay( ),
@@ -109,6 +110,8 @@ void SerialIO::SetTerminatingCharacter( char cTerminating )
 void SerialIO::SetEscapeCharacter( char cEscape )
 {
 	m_cEscape = cEscape;
+
+	m_bHasEscape = true;
 }
 
 void SerialIO::SetEscapeCharacters( std::set<char> vecCharsToEscape )
@@ -253,35 +256,23 @@ void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::siz
 	}
 }
 
+// TODO: Write all unit tests for cases which bit us the last go round
 void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size_t size )
 {
 	if( !error )
 	{
-		// Combine buffers
-		m_readData.insert( m_readData.end( ), m_ReadBuffer.begin( ), m_ReadBuffer.begin( ) + size );
-
-		if( std::find( m_readData.begin( ), m_readData.end( ), m_cTerminating ) != m_readData.end( ) )
+		// Unescape the buffer if necessary (TODO: Fix edge case where last character is escape
+		if( m_bHasEscape )
 		{
-			// A copy of the raw original data (in the case of a partial message)
-			std::vector<char> messageDataLeftOver;
-
-			std::vector<char> messageData;
-
-			uint8_t cCRC = 0;
-
 			bool bIsEscaped = false;
 
-			for( char c : m_readData )
+			for( auto iter = m_ReadBuffer.begin( ); iter < m_ReadBuffer.begin( ) + size; iter++ )
 			{
-				messageDataLeftOver.push_back( c );
-
-				if( c == m_cEscape )
+				if( *iter == m_cEscape )
 				{
 					if( bIsEscaped )
 					{
-						messageData.push_back( c );
-
-						cCRC += c;
+						m_readData.push_back( *iter );
 
 						bIsEscaped = false;
 					}
@@ -290,49 +281,73 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 						bIsEscaped = true;
 					}
 				}
-				else if( bIsEscaped || c != m_cTerminating )
+				else if( bIsEscaped )
 				{
-					messageData.push_back( c );
-
-					cCRC += c;
+					m_readData.push_back( *iter );
 
 					bIsEscaped = false;
 				}
-				else
+			}
+		}
+		else
+		{
+			m_readData.insert( m_readData.end( ), m_ReadBuffer.begin( ), m_ReadBuffer.begin( ) + size );
+		}
+
+		auto msgStart = m_bHasLeading ? std::find( m_readData.begin( ), m_readData.end( ), m_cLeading ) : m_readData.begin( );
+		auto msgEnd = m_bHasTerminating ? std::find( msgStart, m_readData.end( ), m_cTerminating ) : m_readData.end( );
+
+		// While we found a message, process it
+		while( msgEnd != m_readData.end( ) )
+		{
+			if( m_readCallback )
+			{
+				std::vector<char> messageData( msgStart, msgEnd );
+
+				if( messageData.size( ) > 0 )
 				{
-					if( m_readCallback )
+					bool bIsCRCValid = true;
+
+					if( m_bGenerateCRC )
 					{
-						if( messageData.size( ) > 0 )
+						uint8_t cCRC = 0;
+
+						for( auto iter = msgStart; iter < msgEnd; iter++ )
 						{
-							if( cCRC == 0 || messageData[0] == '<' )
-							{
-								m_readCallback( messageData );
-							}
-							else
-							{
-								ROS_ERROR_STREAM_NAMED( "SerialIO", "Invalid CRC: " << ToHex( messageData ) );
-							}
-						}
-						else
-						{
-							ROS_ERROR_STREAM_NAMED( "SerialIO", "Empty Message" );
+							cCRC += *iter;
 						}
 
-						messageData.clear( );
+						if( !(cCRC == 0 || messageData[0] == '<') )
+						{
+							bIsCRCValid = false;
+						}
+					}
 
-						messageDataLeftOver.clear( );
-
-						cCRC = 0;
+					if( bIsCRCValid )
+					{
+						// Return the whole message
+						m_readCallback( messageData );
 					}
 					else
 					{
-						ROS_ERROR_NAMED( "SerialIO", "Serial port data read but no callback specified!\n" );
+						ROS_ERROR_STREAM_NAMED( "SerialIO", "Invalid CRC: " << ToHex( messageData ) );
 					}
 				}
+				else
+				{
+					ROS_ERROR_STREAM_NAMED( "SerialIO", "Empty Message" );
+				}
+			}
+			else
+			{
+				ROS_ERROR_NAMED( "StarGazerSerialIO", "Serial port data read but no callback specified!\n" );
 			}
 
-			// Remainder of message
-			m_readData = messageDataLeftOver;
+			// Remove the consumed message
+			m_readData.erase( m_readData.begin( ), msgEnd );
+
+			msgStart = m_bHasLeading ? std::find( m_readData.begin( ), m_readData.end( ), m_cLeading ) : m_readData.begin( );
+			msgEnd = m_bHasTerminating ? std::find( msgStart, m_readData.end( ), m_cTerminating ) : m_readData.end( );
 		}
 	}
 	else

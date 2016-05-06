@@ -116,6 +116,8 @@ private:
 
 	char									m_cTerminating;
 
+	bool									m_bHasEscape;
+
 	char									m_cEscape;
 
 	std::set<char>							m_setCharsToEscape;

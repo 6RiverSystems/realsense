@@ -8,7 +8,6 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srsdrv_stargazer)
 
 set(${PROJECT_NAME}_SOURCES
-	src/StarGazerSerialIO.cpp
 	src/StarGazerMessageProcessor.cpp
     src/StarGazer.cpp
 )

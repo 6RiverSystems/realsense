@@ -6,10 +6,11 @@
 #ifndef SEARCHNODE_HPP_
 #define SEARCHNODE_HPP_
 
-namespace srs {
-
+#include <srslib_framework/math/Math.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
 #include <srslib_framework/search/SearchAction.hpp>
+
+namespace srs {
 
 template<typename GRAPH>
 struct SearchNode
@@ -21,9 +22,9 @@ struct SearchNode
         parent(parent)
     {}
 
-    int getTotalCost()
+    unsigned int getTotalCost()
     {
-        return action.g + action.h;
+        return action.getTotalCost();
     }
 
     friend ostream& operator<<(ostream& stream, const SearchNode* searchNode)

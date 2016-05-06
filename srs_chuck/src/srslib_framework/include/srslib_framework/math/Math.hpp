@@ -120,10 +120,19 @@ struct Math
         return mm / TYPE(25.4);
     }
 
-    template<typename TYPE = double>
-    constexpr inline static TYPE rad2deg(TYPE rad)
+    inline static unsigned int noOverflowAdd(unsigned int a, unsigned int b)
     {
-        return TYPE(180 / M_PI) * rad;
+        if (a > numeric_limits<unsigned int>::max() - b)
+        {
+            return numeric_limits<unsigned int>::max();
+        }
+        return a + b;
+    }
+
+    template<typename TYPE = int>
+    inline static TYPE normalizeAngleDeg(TYPE deg)
+    {
+        return deg < 0 ? 360 - (abs(deg) % 360) : deg % 360;
     }
 
     template<typename TYPE = double>
@@ -132,10 +141,10 @@ struct Math
         return rad - 2 * M_PI * floor((rad + M_PI) / (2 * M_PI));
     }
 
-    template<typename TYPE = int>
-    inline static TYPE normalizeAngleDeg(TYPE deg)
+    template<typename TYPE = double>
+    constexpr inline static TYPE rad2deg(TYPE rad)
     {
-        return deg < 0 ? 360 - (abs(deg) % 360) : deg % 360;
+        return TYPE(180 / M_PI) * rad;
     }
 
     static cv::Mat zeros(const cv::Mat original)

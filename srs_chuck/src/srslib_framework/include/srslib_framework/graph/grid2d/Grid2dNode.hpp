@@ -12,21 +12,23 @@ namespace srs {
 
 struct Grid2dNode
 {
-    Grid2dNode(Grid2dLocation location, int cost) :
+    Grid2dNode(Grid2dLocation location, unsigned int cost, void* notes) :
         location(location),
-        cost(cost)
+        cost(cost),
+        notes(notes)
     {}
 
     friend ostream& operator<<(ostream& stream, const Grid2dNode* node)
     {
         stream << "Grid2dNode "<< hex << reinterpret_cast<long>(node) << dec << " {" << '\n';
-        stream << "  l: " << node->location << " c: " << node->cost << '\n';
-        stream << "}";
+        stream << "  l: " << node->location << " c: " << node->cost <<
+            " n: " << node->notes << "\n}";
         return stream;
     }
 
     Grid2dLocation location;
-    int cost;
+    unsigned int cost;
+    void* notes;
 };
 
 } // namespace srs

@@ -102,10 +102,10 @@ public:
                     graph_,
                     currentNode);
 
-                if (searchAction.action != SearchAction<GRAPH>::NONE)
+                if (searchAction.action != SearchAction<GRAPH>::NONE &&
+                    searchAction.getTotalCost() < SearchActionType::MAX_COST)
                 {
                     SearchNodeType* newNode = new SearchNodeType(searchAction, currentNode);
-
                     pushSearchNode(newNode);
                 }
             }
@@ -140,7 +140,7 @@ private:
     }
 
     unordered_set<SearchNodeType*> closed_;
-    MappedPriorityQueue<SearchNodeType*, int> open_;
+    MappedPriorityQueue<SearchNodeType*, unsigned int> open_;
 
     GRAPH graph_;
     SearchNodeType* lastNode_;

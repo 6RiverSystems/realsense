@@ -33,9 +33,9 @@ public:
         height_(height)
     {}
 
-    void addValue(const Grid2dLocation location, const int cost)
+    void addValue(const Grid2dLocation location, const unsigned int cost, void* notes = nullptr)
     {
-        Grid2dNode* newNode = new Grid2dNode(location, cost);
+        Grid2dNode* newNode = new Grid2dNode(location, cost, notes);
         grid_[location] = newNode;
     }
 
@@ -63,7 +63,7 @@ public:
         return height_;
     }
 
-    int getCost(Grid2dLocation location) const
+    unsigned int getCost(Grid2dLocation location) const
     {
         if (!isWithinBounds(location))
         {
@@ -76,6 +76,21 @@ public:
             return node->second->cost;
         }
         return 0;
+    }
+
+    void* getNote(Grid2dLocation location) const
+    {
+        if (!isWithinBounds(location))
+        {
+            throw;
+        }
+
+        auto node = grid_.find(location);
+        if (node != grid_.end())
+        {
+            return node->second->notes;
+        }
+        return nullptr;
     }
 
     bool getNeighbor(Grid2dLocation location, int orientation, Grid2dLocation& result) const
@@ -115,34 +130,36 @@ public:
 
     friend ostream& operator<<(ostream& stream, const Grid2d& grid)
     {
+        constexpr int WIDTH = 8;
         stream << "Grid2d {" << '\n';
 
         cout << "(" << grid.height_ << "x" << grid.width_ << ")" << endl;
 
-        cout << left << setw(5) << " ";
+        cout << right << setw(WIDTH) << ' ';
         for (int x = 0; x < grid.width_; ++x)
         {
-            cout << left << setw(5) << x;
+            cout << right << setw(WIDTH - 1) << x << ' ';
         }
         cout << endl;
 
         for (int y = 0; y < grid.height_; ++y)
         {
-            cout << left << setw(5) << y;
+            cout << right << setw(WIDTH) << y;
             for (int x = 0; x < grid.width_; ++x)
             {
                 Grid2dLocation nodeLocation;
                 nodeLocation.x = x;
                 nodeLocation.y = y;
 
-                cout << left << setw(5);
                 if (grid.exists(nodeLocation))
                 {
-                    cout << grid.grid_.at(nodeLocation)->cost;
+                    Grid2dNode* node = grid.grid_.at(nodeLocation);
+                    cout << right << setw(WIDTH - 1) << node->cost;
+                    cout << (node->notes ? '*' : ' ');
                 }
                 else
                 {
-                    std::cout << '.';
+                    cout << right << setw(WIDTH) << ". ";
                 }
             }
             cout << endl;

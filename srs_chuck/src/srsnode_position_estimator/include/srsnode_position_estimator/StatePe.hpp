@@ -9,7 +9,7 @@
 #include <opencv2/opencv.hpp>
 
 #include <srslib_framework/platform/Object.hpp>
-#include <srslib_framework/platform/Ocv2Base.hpp>
+#include <srslib_framework/utils/Ocv2Base.hpp>
 #include <srslib_framework/filter/FilterState.hpp>
 
 #include <srslib_framework/robotics/Pose.hpp>

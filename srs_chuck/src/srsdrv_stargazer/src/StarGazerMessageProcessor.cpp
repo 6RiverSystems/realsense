@@ -14,7 +14,7 @@
 #include "StarGazerMessage.h"
 #include "StarGazerMessageProcessor.h"
 #include "StarGazerSerialIO.h"
-#include "srslib_framework/utils/Thread.hpp"
+#include "srslib_framework/platform/Thread.hpp"
 #include "srslib_framework/io/SerialIO.hpp"
 
 namespace srs

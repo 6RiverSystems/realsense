@@ -46,6 +46,11 @@ struct Pose : public Object
     virtual ~Pose()
     {}
 
+    friend ostream& operator<<(ostream& stream, const Pose& pose)
+    {
+        return stream << pose.toString();
+    }
+
     void setThetaDegrees(BaseType deg)
     {
         theta = Math::deg2rad<TYPE>(deg);

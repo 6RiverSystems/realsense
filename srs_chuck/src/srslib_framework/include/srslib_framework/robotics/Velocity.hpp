@@ -42,6 +42,11 @@ struct Velocity : public Object
     virtual ~Velocity()
     {}
 
+    friend ostream& operator<<(ostream& stream, const Velocity& velocity)
+    {
+        return stream << velocity.toString();
+    }
+
     string toString()
     {
         ostringstream output;

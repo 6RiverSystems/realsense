@@ -8,7 +8,7 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <srslib_framework/platform/Ocv2Base.hpp>
+#include <srslib_framework/utils/Ocv2Base.hpp>
 
 #include "Model.hpp"
 #include "Measurement.hpp"

@@ -14,5 +14,5 @@ using namespace srs;
 TEST(Test_Chuck, Usage)
 {
     Chuck robotProfile;
-    cout << robotProfile.width() << endl;
+    cout << robotProfile.bodyWidth() << endl;
 }

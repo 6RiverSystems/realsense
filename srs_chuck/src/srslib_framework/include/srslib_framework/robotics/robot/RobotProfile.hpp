@@ -10,11 +10,19 @@
 
 namespace srs {
 
-template<typename TYPE = double>
 struct RobotProfile
 {
-    constexpr static width() = 0; // [m]
-    constexpr static depth() = 0; // [m]
+    virtual ~RobotProfile()
+    {}
+
+    virtual double bodyWidth() = 0; // [m]
+    virtual double bodyDepth() = 0; // [m]
+
+    virtual double linearAccelerationTravelMax() = 0; // [m/s^2]
+    virtual double linearVelocityTravelMax() = 0; // [m/s]
+
+    virtual double wheelDiameter() = 0; // [m]
+    virtual double wheelDistance() = 0; // [m]
 };
 
 } // namespace srs

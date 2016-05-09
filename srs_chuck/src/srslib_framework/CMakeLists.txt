@@ -67,6 +67,10 @@ set(TEST_SOURCES_GRAPH
     test/graph/Test_Grid2d_Basic.cpp
 )
 
+set(TEST_SOURCES_PLANNING
+    test/planning/pathplanning/Test_Trajectory.cpp
+)
+
 set(TEST_SOURCES_ROBOTICS
     test/robotics/robot/Test_Chuck.cpp
 )
@@ -171,6 +175,28 @@ if (CATKIN_ENABLE_TESTING)
         ${TEST_SOURCES_GRAPH}
     )
     target_link_libraries(TestSuite_Graph
+        ${catkin_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+        ${GTest_LIBRARIES}
+    )
+
+    catkin_add_gtest(TestSuite_Planning
+        test/TestSuite.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_PLANNING}
+    )
+    target_link_libraries(TestSuite_Planning
+        ${catkin_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+        ${GTest_LIBRARIES}
+    )
+
+    catkin_add_gtest(TestSuite_Robotics
+        test/TestSuite.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_ROBOTICS}
+    )
+    target_link_libraries(TestSuite_Robotics
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
         ${GTest_LIBRARIES}

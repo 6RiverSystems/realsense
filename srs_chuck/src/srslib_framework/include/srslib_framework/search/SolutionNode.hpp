@@ -18,6 +18,10 @@ struct SolutionNode
         action(SearchAction<GRAPH>::NONE)
     {}
 
+    SolutionNode(SearchAction<GRAPH> action) :
+        action(action)
+    {}
+
     friend ostream& operator<<(ostream& stream, const SolutionNode& solutionNode)
     {
         return stream << " (" << solutionNode.action << ") ";

@@ -103,6 +103,14 @@ struct Math
     }
 
     template<typename TYPE = double>
+    inline static TYPE euclidean(TYPE x1, TYPE y1, TYPE x2, TYPE y2)
+    {
+        TYPE deltaX = x2 - x1;
+        TYPE deltaY = y2 - y1;
+        return sqrt(deltaX * deltaX + deltaY * deltaY);
+    }
+
+    template<typename TYPE = double>
     constexpr inline static TYPE inch2m(TYPE inch)
     {
         return TYPE(0.0254) * inch;

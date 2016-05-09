@@ -1,11 +1,11 @@
 /*
- * BrainStemSerialIO_test.cpp
+ * SerialIO_test.cpp
  *
  *  Created on: Apr 4, 2016
  *      Author: dan
  */
 
-#include "BrainStemSerialIO.h"
+#include <srslib_framework/io/SerialIO.hpp>
 #include "gtest/gtest.h"
 #include <cstdlib>
 #include <unistd.h>
@@ -24,6 +24,7 @@ class SocatRunner
 {
 private:
 	bool	m_bIsRunning;
+
 public:
 
 	SocatRunner( ) :
@@ -31,12 +32,16 @@ public:
 	{
 		Stop( );
 
+		RemovePseudoTerminals( );
+
 		usleep( 1000000 );
 	}
 
 	~SocatRunner( )
 	{
 		Stop( );
+
+		RemovePseudoTerminals( );
 	}
 
 	void Start( )
@@ -71,15 +76,26 @@ public:
 			m_bIsRunning = false;
 		}
 	}
+
+	void RemovePseudoTerminals( )
+	{
+		std::string strRemoveTempTerminal( "rm " );
+		strRemoveTempTerminal += g_strPort1;
+		strRemoveTempTerminal += " ";
+		strRemoveTempTerminal += g_strPort2;
+
+		std::system( strRemoveTempTerminal.c_str( ) );
+	}
+
 } g_socat;
 
-class BrainStemSerialIOTest : public ::testing::Test
+class SerialIOTest : public ::testing::Test
 {
 public:
 
-	BrainStemSerialIO						m_serial1;
+	SerialIO						m_serial1;
 
-	BrainStemSerialIO						m_serial2;
+	SerialIO						m_serial2;
 
 	std::queue<std::vector<char>>	m_readData1;
 
@@ -94,39 +110,34 @@ public:
 	std::condition_variable			m_condition2;
 
 public:
-	BrainStemSerialIOTest( )
+	SerialIOTest( )
 	{
 
 	}
 
-	void OpenSerialPort( BrainStemSerialIO& serial, std::string strPort,
-		void (BrainStemSerialIOTest::* callback) (std::vector<char>) )
+	void OpenSerialPort( SerialIO& serial, std::string strPort,
+		void (SerialIOTest::* callback) (std::vector<char>) )
 	{
-	    try
-	    {
-	    	serial.Open( strPort.c_str( ), std::bind( callback, this,
-	    		std::placeholders::_1 ) );
+		serial.Open( strPort.c_str( ), std::bind( callback, this,
+			std::placeholders::_1 ) );
 
-	    	EXPECT_TRUE( serial.IsOpen( ) );
-	    }
-	    catch( const std::exception& e )
-	    {
-	        FAIL( ) << "Open failed: " <<  e.what( );
-	    }
-	    catch( ... )
-	    {
-	        FAIL( ) << "Open failed: unknown exception";
-	    }
+		serial.EnableCRC( true );
+		serial.SetIncludeLength( false );
+		serial.SetTerminatingCharacter( '\n' );
+		serial.SetEscapeCharacter( '\\' );
+		serial.SetEscapeCharacters( std::set<char>( { '\\', '\n' } ) );
+
+		EXPECT_TRUE( serial.IsOpen( ) );
 	}
 
 	void OpenSerialPort1( )
 	{
-		OpenSerialPort( m_serial1, g_strPort1, &BrainStemSerialIOTest::ReadMessageFrom2 );
+		OpenSerialPort( m_serial1, g_strPort1, &SerialIOTest::ReadMessageFrom2 );
 	}
 
 	void OpenSerialPort2( )
 	{
-		OpenSerialPort( m_serial2, g_strPort2, &BrainStemSerialIOTest::ReadMessageFrom1 );
+		OpenSerialPort( m_serial2, g_strPort2, &SerialIOTest::ReadMessageFrom1 );
 	}
 
 	void SetUp( )
@@ -136,6 +147,12 @@ public:
 
 	void TearDown( )
 	{
+		std::queue<std::vector<char>> emptyQueue;
+
+		m_readData1.swap( emptyQueue );
+
+		m_readData2.swap( emptyQueue );
+
 		m_serial1.Close( );
 
 		m_serial2.Close( );
@@ -165,7 +182,7 @@ public:
 		m_condition2.notify_one( );
 	}
 
-	~BrainStemSerialIOTest( )
+	~SerialIOTest( )
 	{
 
 	}
@@ -173,41 +190,21 @@ public:
    // put in any custom data members that you need
 };
 
-TEST_F( BrainStemSerialIOTest, OpenInvalidSerialPort )
+TEST_F( SerialIOTest, OpenInvalidSerialPort )
 {
-    try
-    {
-    	m_serial1.Open( "/foobar", std::bind( &BrainStemSerialIOTest::ReadMessageFrom2, this,
-    		std::placeholders::_1 ) );
+	m_serial1.Open( "/foobar", std::bind( &SerialIOTest::ReadMessageFrom2, this,
+		std::placeholders::_1 ) );
 
-    	FAIL( ) << "Expected std::exception";
-    }
-    catch( boost::system::system_error const & err )
-    {
-//    	const char* pszError = err.what( );
-
-    	ASSERT_STREQ( "open: No such file or directory", err.what( ) );
-    }
-    catch( ... )
-    {
-        FAIL( ) << "Expected std::exception";
-    }
+	EXPECT_FALSE( m_serial1.IsOpen( ) );
 }
 
-TEST_F( BrainStemSerialIOTest, TestSpinUntilOpen )
+TEST_F( SerialIOTest, TestSpinUntilOpen )
 {
 	// Try once when it is closed, then spin until it connects (wait for 3 seconds)
 	for( int i : boost::irange( 0, 300 ) )
 	{
-		try
-		{
-			m_serial1.Open( g_strPort1.c_str( ), std::bind( &BrainStemSerialIOTest::ReadMessageFrom2, this,
-				std::placeholders::_1 ) );
-		}
-		catch( const std::exception& err )
-		{
-			// Ignore expected errors until serial port is open
-		}
+		m_serial1.Open( g_strPort1.c_str( ), std::bind( &SerialIOTest::ReadMessageFrom2, this,
+			std::placeholders::_1 ) );
 
 		// If we are able to open when socat is not running, we have failed
 		if( i == 0 )
@@ -235,7 +232,7 @@ TEST_F( BrainStemSerialIOTest, TestSpinUntilOpen )
 	EXPECT_TRUE( m_serial1.IsOpen( ) );
 }
 
-TEST_F( BrainStemSerialIOTest, TestOpen )
+TEST_F( SerialIOTest, TestOpen )
 {
 	OpenSerialPort1( );
 
@@ -246,7 +243,7 @@ TEST_F( BrainStemSerialIOTest, TestOpen )
 	EXPECT_TRUE( m_serial2.IsOpen( ) );
 }
 
-TEST_F( BrainStemSerialIOTest, TestClose )
+TEST_F( SerialIOTest, TestClose )
 {
 	OpenSerialPort1( );
 
@@ -265,7 +262,7 @@ TEST_F( BrainStemSerialIOTest, TestClose )
 	EXPECT_TRUE( !m_serial2.IsOpen( ) );
 }
 
-TEST_F( BrainStemSerialIOTest, TestSimpleReadWrite )
+TEST_F( SerialIOTest, TestSimpleReadWrite )
 {
 	OpenSerialPort1( );
 
@@ -283,12 +280,12 @@ TEST_F( BrainStemSerialIOTest, TestSimpleReadWrite )
 	std::vector<char> expectedData( data1.begin( ), data1.end( ) );
 
 	// Add the CRC
-	expectedData.push_back( 12 );
+//	expectedData.push_back( 12 );
 
 	EXPECT_EQ( m_readData2.front( ), expectedData );
 }
 
-TEST_F( BrainStemSerialIOTest, TestEscapeSequence )
+TEST_F( SerialIOTest, TestEscapeSequence )
 {
 	OpenSerialPort1( );
 
@@ -304,17 +301,20 @@ TEST_F( BrainStemSerialIOTest, TestEscapeSequence )
 	m_condition1.wait( lock );
 
 	std::vector<char> expectedData( data1.begin( ), data1.end( ) );
-	// Add the CRC
-	expectedData.push_back( 114 );
+//
+//	// Add the CRC
+//	expectedData.push_back( 114 );
 
 	EXPECT_EQ( m_readData2.front( ), expectedData );
 }
 
-TEST_F( BrainStemSerialIOTest, TestMultipleReadWrites )
+TEST_F( SerialIOTest, TestMultipleReadWrites )
 {
 	OpenSerialPort1( );
 
 	OpenSerialPort2( );
+
+	m_serial2.EnableCRC( false );
 
 	std::string string1( "Hello" );
 	std::vector<char> data1( string1.begin( ), string1.end( ) );
@@ -339,8 +339,7 @@ TEST_F( BrainStemSerialIOTest, TestMultipleReadWrites )
 	EXPECT_EQ( m_readData2.front( ), expectedData );
 }
 
-
-TEST_F( BrainStemSerialIOTest, TestMultipleMessages )
+TEST_F( SerialIOTest, TestMultipleMessages )
 {
 	OpenSerialPort1( );
 
@@ -349,28 +348,23 @@ TEST_F( BrainStemSerialIOTest, TestMultipleMessages )
 	std::string string1( "HelloHelloHelloHelloHelloHelloHelloHelloHello" );
 	std::vector<char> data1( string1.begin( ), string1.end( ) );
 
-	m_serial1.WriteRaw( data1 );
-	m_serial1.WriteRaw( std::vector<char>( { '\n' } ) );
+	m_serial1.Write( data1 );
 
 	usleep( 10000 );
 
-	m_serial1.WriteRaw( data1 );
-	m_serial1.WriteRaw( std::vector<char>( { '\n' } ) );
+	m_serial1.Write( data1 );
 
 	usleep( 500 );
 
-	m_serial1.WriteRaw( data1 );
-	m_serial1.WriteRaw( std::vector<char>( { '\n' } ) );
+	m_serial1.Write( data1 );
 
 	usleep( 10000 );
 
-	m_serial1.WriteRaw( data1 );
-	m_serial1.WriteRaw( std::vector<char>( { '\n' } ) );
+	m_serial1.Write( data1 );
 
 	usleep( 20000 );
 
-	m_serial1.WriteRaw( data1 );
-	m_serial1.WriteRaw( std::vector<char>( { '\n' } ) );
+	m_serial1.Write( data1 );
 
 	for( int i : boost::irange( 0, 5 ) )
 	{
@@ -382,13 +376,13 @@ TEST_F( BrainStemSerialIOTest, TestMultipleMessages )
 			m_condition1.wait( lock );
 		}
 
-		EXPECT_EQ( m_readData2.front( ), data1 );
+		EXPECT_EQ( std::string( m_readData2.front( ).begin( ), m_readData2.front( ).end( ) ), string1 );
 
 		m_readData2.pop( );
 	}
 }
 
-TEST_F( BrainStemSerialIOTest, TestCloseWhileReadWrite )
+TEST_F( SerialIOTest, TestCloseWhileReadWrite )
 {
 	OpenSerialPort1( );
 
@@ -430,6 +424,8 @@ TEST_F( BrainStemSerialIOTest, TestCloseWhileReadWrite )
 
 int main(int argc, char **argv)
 {
+	g_socat.Stop( );
+
 	::testing::InitGoogleTest( &argc, argv );
 
 	int success = RUN_ALL_TESTS( );

@@ -65,6 +65,10 @@ set(TEST_SOURCES_MAPPEDPRIORITYQUEUE
 set(TEST_SOURCES_ASTAR
     test/search/Test_AStar_Basic.cpp
 )
+
+set(TEST_SOURCES_IO
+    test/io/Test_SerialIO.cpp
+)
 ####################################################################################################
 # Project
 
@@ -82,6 +86,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(OpenCV REQUIRED)
 find_package(srslib_test REQUIRED)
 find_package(GTest REQUIRED)
+find_package(Boost REQUIRED)
 
 include_directories(
     include/
@@ -176,5 +181,16 @@ if (CATKIN_ENABLE_TESTING)
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
         ${GTest_LIBRARIES}
+    )
+
+    catkin_add_gtest(TestSuite_Io
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_IO}
+    )
+    target_link_libraries(TestSuite_Io
+        ${catkin_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+        ${GTest_LIBRARIES}
+        ${Boost_LIBRARIES}
     )
 endif()

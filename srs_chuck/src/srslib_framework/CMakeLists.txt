@@ -98,7 +98,6 @@ find_package(catkin REQUIRED COMPONENTS
 )
 find_package(OpenCV REQUIRED)
 find_package(srslib_test REQUIRED)
-find_package(GTest REQUIRED)
 find_package(Boost REQUIRED)
 
 include_directories(
@@ -159,7 +158,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(TestSuite_Datastructure
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
-        ${GTest_LIBRARIES}
     )
 
     catkin_add_gtest(TestSuite_Filter
@@ -171,7 +169,6 @@ if (CATKIN_ENABLE_TESTING)
         ${catkin_LIBRARIES}
         ${OpenCV_LIBRARIES}
         ${srslib_test_LIBRARIES}
-        ${GTest_LIBRARIES}
     )
 
     catkin_add_gtest(TestSuite_Graph
@@ -182,7 +179,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(TestSuite_Graph
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
-        ${GTest_LIBRARIES}
     )
 
     catkin_add_gtest(TestSuite_Planning
@@ -193,7 +189,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(TestSuite_Planning
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
-        ${GTest_LIBRARIES}
     )
 
     catkin_add_gtest(TestSuite_Robotics
@@ -204,7 +199,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(TestSuite_Robotics
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
-        ${GTest_LIBRARIES}
     )
 
     catkin_add_gtest(TestSuite_Search
@@ -215,7 +209,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(TestSuite_Search
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
-        ${GTest_LIBRARIES}
     )
 
     catkin_add_gtest(TestSuite_Io
@@ -225,7 +218,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(TestSuite_Io
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
-        ${GTest_LIBRARIES}
         ${Boost_LIBRARIES}
     )
 endif()

@@ -28,14 +28,11 @@ find_package(catkin REQUIRED COMPONENTS
     srslib_test
 )
 
-find_package(GTest REQUIRED)
-
 include_directories(include
     src/
     ${catkin_INCLUDE_DIRS}
     ${srslib_framework_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
-    ${GTEST_INCLUDE_DIRS}
 )
 
 ####################################################################################################

@@ -16,6 +16,6 @@ dependencies:
     - sudo apt-get install python-gevent=1.0-1ubuntu1
     - echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:${PYTHONPATH}" >> ~/.bashrc
 
-  test:
-    override:
-      - cd ~/ros/srs_chuck && catkin_make run_tests
+test:
+  override:
+    - cd ~/ros/srs_chuck && catkin_make run_tests

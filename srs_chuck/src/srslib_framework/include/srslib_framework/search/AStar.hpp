@@ -74,7 +74,7 @@ public:
 
     void search(SearchPosition<GRAPH> start, SearchPosition<GRAPH> goal)
     {
-        SearchActionType startAction = SearchActionType(SearchActionType::NONE,
+        SearchActionType startAction = SearchActionType(SearchActionType::START,
             start, 0, SearchPosition<GRAPH>::heuristic(start, goal));
         SearchNodeType* currentNode = new SearchNodeType(startAction, nullptr);
 
@@ -89,7 +89,13 @@ public:
             open_.pop(currentNode);
             if (*currentNode == *goalNode)
             {
-                lastNode_ = currentNode;
+                SearchAction<GRAPH> searchAction = SearchAction<GRAPH>::instanceOf(
+                    SearchActionType::GOAL,
+                    graph_,
+                    currentNode);
+
+                lastNode_ = new SearchNodeType(searchAction, currentNode);
+
                 break;
             }
 
@@ -102,7 +108,7 @@ public:
                     graph_,
                     currentNode);
 
-                if (searchAction.action != SearchAction<GRAPH>::NONE &&
+                if (searchAction.actionType != SearchAction<GRAPH>::NONE &&
                     searchAction.getTotalCost() < SearchActionType::MAX_COST)
                 {
                     SearchNodeType* newNode = new SearchNodeType(searchAction, currentNode);

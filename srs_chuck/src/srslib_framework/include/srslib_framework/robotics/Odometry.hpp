@@ -37,14 +37,13 @@ struct Odometry : public Measurement
     virtual ~Odometry()
     {}
 
-    string toString()
+    friend ostream& operator<<(ostream& stream, const Odometry& odometry)
     {
-        ostringstream output;
-        output << "Odometry {";
-        output << "  velocity: " << velocity.toString() << endl;
-        output << "}" << endl;
+        stream << "Odometry {";
+        stream << "  velocity: " << odometry.velocity.toString() << endl;
+        stream << "}" << endl;
 
-        return output.str();
+        return stream;
     }
 
     Velocity<TYPE> velocity;

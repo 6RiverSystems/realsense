@@ -46,22 +46,21 @@ struct Pose : public Object
     virtual ~Pose()
     {}
 
+    friend ostream& operator<<(ostream& stream, const Pose& pose)
+    {
+        stream << "Pose {";
+        stream << "  arrivalTime: " << pose.arrivalTime << endl;
+        stream << "       x: " << pose.x << endl;
+        stream << "       y: " << pose.y << endl;
+        stream << "   theta: " << pose.theta << endl;
+        stream << "}" << endl;
+
+        return stream;
+    }
+
     void setThetaDegrees(BaseType deg)
     {
         theta = Math::deg2rad<TYPE>(deg);
-    }
-
-    string toString()
-    {
-        ostringstream output;
-        output << "Pose {";
-        output << "  arrivalTime: " << arrivalTime << endl;
-        output << "       x: " << x << endl;
-        output << "       y: " << y << endl;
-        output << "   theta: " << theta << endl;
-        output << "}" << endl;
-
-        return output.str();
     }
 
     double arrivalTime;

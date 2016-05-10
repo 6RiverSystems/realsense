@@ -16,9 +16,11 @@ using namespace std;
 #include <srslib_test/graph/grid2d/Grid2dUtils.hpp>
 using namespace srs;
 
+constexpr int GRID_SIZE = 60;
+
 TEST(Test_AStar, SearchCreation)
 {
-    Grid2d grid(6, 8);
+    Grid2d grid(GRID_SIZE, GRID_SIZE);
 
     SearchPositionNote permanentObstacle(numeric_limits<unsigned int>::max());
     SearchPositionNote noRotationNote(true);
@@ -30,12 +32,10 @@ TEST(Test_AStar, SearchCreation)
     test::Grid2dUtils::addLocationCost(grid, 4, 1, 1000, &permanentObstacle);
     test::Grid2dUtils::addRectangleCost(grid, 3, 4, 3, 7, 1000, &permanentObstacle);
 
-    cout << grid << endl;
-
     AStar<Grid2d> algorithm(grid);
 
     Grid2d::LocationType start(0, 0);
-    Grid2d::LocationType goal(4, 2);
+    Grid2d::LocationType goal(GRID_SIZE - 1, GRID_SIZE - 1);
 
     algorithm.search(SearchPosition<Grid2d>(start, 180), SearchPosition<Grid2d>(goal, 270));
     vector<SolutionNode<Grid2d>> path = algorithm.getPath();

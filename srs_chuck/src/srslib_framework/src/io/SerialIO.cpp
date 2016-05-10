@@ -7,7 +7,7 @@
 
 #include <srslib_framework/io/SerialIO.hpp>
 #include <srslib_framework/utils/Logging.hpp>
-#include <srslib_framework/utils/Thread.hpp>
+#include <srslib_framework/platform/Thread.hpp>
 #include <thread>
 #include <ros/ros.h>
 

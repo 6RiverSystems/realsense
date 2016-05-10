@@ -24,10 +24,16 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/graph/grid2d/Grid2dNode.hpp
     include/${PROJECT_NAME}/graph/grid2d/Grid2d.hpp
 
+    include/${PROJECT_NAME}/io/SerialIO.hpp
+    src/io/SerialIO.cpp
+
     include/${PROJECT_NAME}/platform/Object.hpp
+    include/${PROJECT_NAME}/platform/Thread.hpp
 
     include/${PROJECT_NAME}/math/Math.hpp
     include/${PROJECT_NAME}/math/Time.hpp
+
+    include/${PROJECT_NAME}/planning/pathplanning/Trajectory.hpp
 
     include/${PROJECT_NAME}/robotics/Pose.hpp
     include/${PROJECT_NAME}/robotics/Odometry.hpp
@@ -41,15 +47,19 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/search/SearchNode.hpp
     include/${PROJECT_NAME}/search/AStar.hpp
 
-    include/${PROJECT_NAME}/io/SerialIO.hpp
-    src/io/SerialIO.cpp
+    include/${PROJECT_NAME}/Utils/Ocv2Base.hpp
 )
 
 set(${PROJECT_NAME}_MSGS
     Aps.msg
 )
 
-set(TEST_SOURCES_UKF 
+set(TEST_SOURCES_DATASTRUCTURE
+    test/datastructure/Test_MappedPriorityQueue_Basic.cpp
+    test/datastructure/Test_MappedPriorityQueue_UserDefinedKey.cpp
+)
+
+set(TEST_SOURCES_FILTER
     test/filter/ukf/Test_Ukf_Basic.cpp
 )
 
@@ -57,12 +67,15 @@ set(TEST_SOURCES_GRAPH
     test/graph/Test_Grid2d_Basic.cpp
 )
 
-set(TEST_SOURCES_MAPPEDPRIORITYQUEUE
-    test/datastructure/Test_MappedPriorityQueue_Basic.cpp
-    test/datastructure/Test_MappedPriorityQueue_UserDefinedKey.cpp
+set(TEST_SOURCES_PLANNING
+    test/planning/pathplanning/Test_Trajectory.cpp
 )
 
-set(TEST_SOURCES_ASTAR
+set(TEST_SOURCES_ROBOTICS
+    test/robotics/robot/Test_Chuck.cpp
+)
+
+set(TEST_SOURCES_SEARCH
     test/search/Test_AStar_Basic.cpp
 )
 
@@ -138,12 +151,23 @@ set_target_properties(${PROJECT_LIBRARY} PROPERTIES LINKER_LANGUAGE CXX)
 
 if (CATKIN_ENABLE_TESTING)
 
-    catkin_add_gtest(TestSuite_Ukf
+    catkin_add_gtest(TestSuite_Datastructure
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
-        ${TEST_SOURCES_UKF}
+        ${TEST_SOURCES_DATASTRUCTURE}
     )
-    target_link_libraries(TestSuite_Ukf
+    target_link_libraries(TestSuite_Datastructure
+        ${catkin_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+        ${GTest_LIBRARIES}
+    )
+
+    catkin_add_gtest(TestSuite_Filter
+        test/TestSuite.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_FILTER}
+    )
+    target_link_libraries(TestSuite_Filter
         ${catkin_LIBRARIES}
         ${OpenCV_LIBRARIES}
         ${srslib_test_LIBRARIES}
@@ -161,23 +185,34 @@ if (CATKIN_ENABLE_TESTING)
         ${GTest_LIBRARIES}
     )
 
-    catkin_add_gtest(TestSuite_MappedPriorityQueue
+    catkin_add_gtest(TestSuite_Planning
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
-        ${TEST_SOURCES_MAPPEDPRIORITYQUEUE}
+        ${TEST_SOURCES_PLANNING}
     )
-    target_link_libraries(TestSuite_Graph
+    target_link_libraries(TestSuite_Planning
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
         ${GTest_LIBRARIES}
     )
 
-    catkin_add_gtest(TestSuite_AStar
+    catkin_add_gtest(TestSuite_Robotics
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
-        ${TEST_SOURCES_ASTAR}
+        ${TEST_SOURCES_ROBOTICS}
     )
-    target_link_libraries(TestSuite_AStar
+    target_link_libraries(TestSuite_Robotics
+        ${catkin_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+        ${GTest_LIBRARIES}
+    )
+
+    catkin_add_gtest(TestSuite_Search
+        test/TestSuite.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_SEARCH}
+    )
+    target_link_libraries(TestSuite_Search
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
         ${GTest_LIBRARIES}

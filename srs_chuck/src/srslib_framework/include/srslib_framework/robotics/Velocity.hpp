@@ -42,16 +42,15 @@ struct Velocity : public Object
     virtual ~Velocity()
     {}
 
-    string toString()
+    friend ostream& operator<<(ostream& stream, const Velocity& velocity)
     {
-        ostringstream output;
-        output << "Velocity {";
-        output << "  arrivalTime: " << arrivalTime << endl;
-        output << "       linear: " << linear << endl;
-        output << "      angular: " << angular << endl;
-        output << "}" << endl;
+        stream << "Velocity {";
+        stream << "  arrivalTime: " << velocity.arrivalTime << endl;
+        stream << "       linear: " << velocity.linear << endl;
+        stream << "      angular: " << velocity.angular << endl;
+        stream << "}" << endl;
 
-        return output.str();
+        return stream;
     }
 
     double arrivalTime;

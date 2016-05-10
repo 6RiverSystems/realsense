@@ -1,5 +1,3 @@
-machine:
-
 dependencies:
   pre:
     - gpg --keyserver pgp.mit.edu --recv-keys 749D6EEC0353B12C

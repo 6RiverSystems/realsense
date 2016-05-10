@@ -47,7 +47,7 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/search/SearchNode.hpp
     include/${PROJECT_NAME}/search/AStar.hpp
 
-    include/${PROJECT_NAME}/Utils/Ocv2Base.hpp
+    include/${PROJECT_NAME}/utils/Ocv2Base.hpp
 )
 
 set(${PROJECT_NAME}_MSGS

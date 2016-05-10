@@ -138,6 +138,7 @@ private:
             for (unsigned int interval = accelerationIntervals; interval > 0; interval--)
             {
                 velocity -= linearIncrement_;
+                velocity = abs(velocity) > 1e-4 ? velocity : 0.0;
                 t += dT_;
                 velocities.push_back(Velocity<>(t, velocity, 0));
             }

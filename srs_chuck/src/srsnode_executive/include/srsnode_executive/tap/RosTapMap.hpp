@@ -12,7 +12,7 @@ using namespace std;
 #include <ros/ros.h>
 #include <nav_msgs/GetMap.h>
 
-#include <srslib_framework/grid/Grid2d.hpp>
+#include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/ros/RosTap.hpp>
 
 namespace srs {

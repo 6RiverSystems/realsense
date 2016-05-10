@@ -8,13 +8,15 @@
 <launch>
     <!-- Declare the parameters passed by the main launch file -->
     <arg name="target_map" />
+
     <arg name="global_costmap_common_params" />
     <arg name="local_costmap_common_params" />
     <arg name="local_costmap_params" />
     <arg name="global_costmap_params" />
-    <arg name="dwa_local_planner_params" />
+    <arg name="base_local_planner_params" />
     <arg name="move_base_params" />
     <arg name="global_planner_params" />
+
 
     <!-- Robot description -->
     <param name="robot_description" command="$(find xacro)/xacro.py $(find srsbot_chuck)/urdf/chuck.urdf.xacro" />
@@ -26,19 +28,26 @@
     <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
-
+<!--
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        <rosparam file="$(arg move_base_params)" command="load" />
+
         <rosparam file="$(arg global_costmap_common_params)" command="load" ns="global_costmap" />
         <rosparam file="$(arg local_costmap_common_params)" command="load" ns="local_costmap" />
+
+        <rosparam file="$(arg base_local_planner_params)" command="load" ns="TrajectoryPlannerROS" />
+
         <rosparam file="$(arg local_costmap_params)" command="load" />
         <rosparam file="$(arg global_costmap_params)" command="load" />
-        <rosparam file="$(arg dwa_local_planner_params)" command="load" />
-        <rosparam file="$(arg move_base_params)" command="load" />
         <rosparam file="$(arg global_planner_params)" command="load" />
     </node>
-
+-->\
     <!-- Launch all the robot components -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
+
+    <include file="$(find srsnode_reflexes)/launch/node.launch" />
+<!--    <include file="$(find srsnode_motion)/launch/node.launch" />  -->
+<!--    <include file="$(find srsnode_executive)/launch/node.launch" /> -->
 
     <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
     <include file="$(find srsnode_position_estimator)/launch/node.launch" />

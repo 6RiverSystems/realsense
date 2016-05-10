@@ -1,8 +1,7 @@
-#include <srsnode_highlevel_behavior/HighLevelBehavior.hpp>
-
-#include <opencv2/opencv.hpp>
+#include <srsnode_motion/Motion.hpp>
 
 #include <ros/ros.h>
+#include <geometry_msgs/Twist.h>
 
 namespace srs {
 
@@ -10,13 +9,13 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-HighLevelBehavior::HighLevelBehavior() :
+Motion::Motion() :
     rosNodeHandle_()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void HighLevelBehavior::run()
+void Motion::run()
 {
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())

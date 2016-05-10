@@ -19,8 +19,7 @@ public:
     RosTap(string name) :
         connected_(false),
         name_(name),
-        newData_(false)/*,
-        timestamp_(0)*/
+        newData_(false)
     {}
 
     virtual ~RosTap()
@@ -42,11 +41,6 @@ public:
     {
         return name_;
     }
-
-//    double getTimestamp() const
-//    {
-//        return timestamp_;
-//    }
 
     bool isTapConnected() const
     {
@@ -73,17 +67,15 @@ protected:
         return true;
     }
 
-    void setNewData(bool newValue/*, double timestamp*/)
+    void setNewData(bool newValue)
     {
         newData_ = newValue;
-        // timestamp_ = timestamp;
     }
 
 private:
     bool connected_;
     string name_;
     bool newData_;
-    // double timestamp_;
 };
 
 } // namespace srs

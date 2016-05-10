@@ -52,6 +52,9 @@ public:
         {
             delete node;
         }
+        closed_.clear();
+
+        delete lastNode_;
         lastNode_ = nullptr;
     }
 
@@ -79,7 +82,7 @@ public:
         SearchNodeType* currentNode = new SearchNodeType(startAction, nullptr);
 
         SearchActionType goalAction = SearchActionType(SearchActionType::NONE, goal);
-        SearchNodeType* goalNode = new SearchNodeType(goalAction, nullptr);
+        SearchNodeType goalNode = SearchNodeType(goalAction, nullptr);
 
         clear();
         open_.push(currentNode->getTotalCost(), currentNode);
@@ -87,7 +90,7 @@ public:
         while (!open_.empty())
         {
             open_.pop(currentNode);
-            if (*currentNode == *goalNode)
+            if (*currentNode == goalNode)
             {
                 SearchAction<GRAPH> searchAction = SearchAction<GRAPH>::instanceOf(
                     SearchActionType::GOAL,

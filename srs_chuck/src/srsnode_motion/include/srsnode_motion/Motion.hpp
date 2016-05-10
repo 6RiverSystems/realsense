@@ -3,30 +3,30 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef HIGHLEVELBEHAVIOR_HPP_
-#define HIGHLEVELBEHAVIOR_HPP_
+#ifndef MOTION_HPP_
+#define MOTION_HPP_
 
 #include <srslib_framework/ros/tap/RosTapJoy.hpp>
 
 namespace srs {
 
-class HighLevelBehavior
+class Motion
 {
 public:
-    HighLevelBehavior();
+    Motion();
 
-    ~HighLevelBehavior()
+    ~Motion()
     {
     }
 
     void run();
 
 private:
-    constexpr static unsigned int REFRESH_RATE_HZ = 10;
+    constexpr static unsigned int REFRESH_RATE_HZ = 20;
 
     ros::NodeHandle rosNodeHandle_;
 };
 
 } // namespace srs
 
-#endif  // HIGHLEVELBEHAVIOR_HPP_
+#endif  // MOTION_HPP_

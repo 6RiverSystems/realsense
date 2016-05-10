@@ -8,9 +8,9 @@
 -->
 
 <package>
-    <name>srsnode_highlevel_behavior</name>
+    <name>srsnode_motion</name>
     <version>1.0.0</version>
-    <description>Node package: High-level Behavior</description>
+    <description>Node package: Motion</description>
     
     <author email="fsantini@6river.com">Fabrizio Santini</author>
     <maintainer email="fsantini@6river.com">Fabrizio Santini</maintainer>

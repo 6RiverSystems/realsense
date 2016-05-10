@@ -126,7 +126,8 @@ void PositionEstimator::scanTapsForData()
     if (tapInitialPose_.newDataAvailable())
     {
         currentCovariance_ = robot_.getNoiseMatrix();
-        currentState_ = StatePe<>(tapInitialPose_.getInitialPose());
+        Pose<> ZERO(2.0, 1.5, 0.0);
+        currentState_ = StatePe<>(ZERO/*tapInitialPose_.getInitialPose()*/);
 
         ukf_.reset(currentState_.getVectorForm(), currentCovariance_);
     }

@@ -5,12 +5,11 @@
 #
 cmake_minimum_required(VERSION 2.8.3)
 
-set(PROJECT_NAME srsnode_highlevel_behavior)
-set(PROJECT_MAIN src/highlevel_behavior_node.cpp)
+set(PROJECT_NAME srsnode_motion)
+set(PROJECT_MAIN src/motion_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
-    src/HighLevelBehavior.cpp
-    src/costmap_2d/CostMap2d.cpp
+    src/Motion.cpp
 )
 
 ####################################################################################################
@@ -20,7 +19,7 @@ project(${PROJECT_NAME})
 
 set(PROJECT_NODE ${PROJECT_NAME})
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 

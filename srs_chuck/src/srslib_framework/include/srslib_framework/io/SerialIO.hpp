@@ -109,6 +109,8 @@ private:
 
 	READ_STATE								m_readState;
 
+	uint8_t									m_cCRC = 0;
+
     std::vector<char>						m_readPartialData;
 
     std::function<void(std::vector<char>)>	m_readCallback;

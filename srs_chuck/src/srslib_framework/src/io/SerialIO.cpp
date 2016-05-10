@@ -24,6 +24,7 @@ SerialIO::SerialIO( ) :
 	m_readBuffer( 1024 ),
 	m_writeBuffer( ),
 	m_readState( READ_STATE::DEFAULT ),
+	m_cCRC( 0 ),
 	m_readPartialData( ),
 	m_readCallback( ),
 	m_bGenerateCRC( false ),
@@ -265,13 +266,10 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 {
 	if( !error )
 	{
-		uint8_t cCRC = 0;
-
 		// Start with the partially parsed message
 		std::vector<char> messageData( m_readPartialData.begin( ), m_readPartialData.end( ) );
 
-//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Left over read data: " <<
-//			ToHex( std::vector<char>( messageData.begin( ), messageData.end( ) ) ) );
+//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Left over read data: " << ToHex( messageData ) );
 
 		// If we do not have a leading character, then we are always in a message
 		if( m_readState == READ_STATE::DEFAULT &&
@@ -282,7 +280,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 
 		for( auto iter = m_readBuffer.begin( ); iter < m_readBuffer.begin( ) + size; iter++ )
 		{
-//			ROS_ERROR_NAMED( "SerialIO", "Char: %c", *iter );
+//			ROS_ERROR_NAMED( "SerialIO", "Char: %.2x", *iter );
 
 			if( m_bHasEscape &&
 				*iter == m_cEscape )
@@ -291,7 +289,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				{
 					messageData.push_back( *iter );
 
-					cCRC += *iter;
+					m_cCRC += *iter;
 
 					m_readState = READ_STATE::IN_MESSAGE;
 				}
@@ -320,7 +318,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 			{
 				messageData.push_back( *iter );
 
-				cCRC += *iter;
+				m_cCRC += *iter;
 
 				m_readState = READ_STATE::IN_MESSAGE;
 			}
@@ -330,17 +328,21 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				{
 					if( messageData[0] == '<' )
 					{
-						cCRC = 0;
+						m_cCRC = 0;
 					}
 					else if( m_bGenerateCRC )
 					{
 						messageData.pop_back( );
+
 					}
 
-					if( cCRC == 0 )
+					if( m_cCRC == 0 )
 					{
 						if( m_readCallback )
 						{
+							ROS_ERROR_STREAM_NAMED( "SerialIO", "ReadData: " <<
+								ToHex( std::vector<char>( messageData.begin( ), messageData.end( ) ) ) );
+
 							m_readCallback( messageData );
 						}
 						else
@@ -350,7 +352,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					}
 					else
 					{
-						ROS_ERROR_STREAM_NAMED( "SerialIO", "Invalid CRC: " << ToHex( messageData ) );
+						ROS_ERROR_STREAM_NAMED( "SerialIO", "Invalid CRC (" << m_cCRC << "): " << ToHex( messageData ) );
 					}
 				}
 				else
@@ -360,12 +362,11 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 
 				messageData.clear( );
 
-				cCRC = 0;
+				m_cCRC = 0;
 			}
 		}
 
-//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Left over read data: " <<
-//			ToHex( std::vector<char>( m_readPartialData.begin( ), m_readPartialData.end( ) ) ) );
+//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Left over read data: " << ToHex( m_readPartialData ) );
 
 		// Left over partial message
 		m_readPartialData = messageData;
@@ -413,6 +414,8 @@ void SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error
 			m_SerialPort.set_option( boost::asio::serial_port::stop_bits( boost::asio::serial_port::stop_bits::one ) );
 
 			m_readState = READ_STATE::DEFAULT;
+
+			m_cCRC = 0;
 
 			StartAsyncRead( );
 

@@ -117,13 +117,13 @@ void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, 
 
 	static ros::Time sLastTime = currentTime;
 
-	bool bInvalidTime = ( currentTime.toSec( ) - m_rosOdomTime.toSec( ) ) > 0.1;
+	bool bInvalidTime = ( currentTime.toSec( ) - m_rosOdomTime.toSec( ) ) > 0.15;
 
 	if( !m_rosOdomTime.isZero( ) &&
 		bInvalidTime )
 	{
-		ROS_ERROR_NAMED( "Brainstem", "Timestamp out of range and resynced (possible communication problem): odom: %f, ros: %f",
-			m_rosOdomTime.toSec( ), currentTime.toSec( ) );
+		ROS_ERROR_NAMED( "Brainstem", "Timestamp out of range and resynced (possible communication problem) (diff: %f): odom: %f, ros: %f",
+			currentTime.toSec( ) - m_rosOdomTime.toSec( ), m_rosOdomTime.toSec( ), currentTime.toSec( ) );
 	}
 
 	if( bInvalidTime ||

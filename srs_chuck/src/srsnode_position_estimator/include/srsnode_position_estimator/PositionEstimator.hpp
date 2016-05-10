@@ -6,6 +6,7 @@
 #ifndef POSITIONESTIMATOR_HPP_
 #define POSITIONESTIMATOR_HPP_
 
+#include <string>
 #include <vector>
 using namespace std;
 
@@ -30,7 +31,7 @@ namespace srs {
 class PositionEstimator
 {
 public:
-    PositionEstimator();
+    PositionEstimator(string nodeName);
 
     ~PositionEstimator()
     {

@@ -24,8 +24,8 @@ class RosTapAps :
 public:
     typedef typename ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>::BaseType BaseType;
 
-    RosTapAps() :
-        RosTap("Absolute Positioning System")
+    RosTapAps(string nodeName) :
+        RosTap(nodeName, "Absolute Positioning System Tap")
     {
         sensor_ = new ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>();
     }
@@ -57,10 +57,22 @@ public:
     }
 
 protected:
-    bool connect();
+    bool connect()
+    {
+        rosSubscriber_ = rosNodeHandle_.subscribe("/sensors/aps/raw", 100,
+            &RosTapAps::onAps, this);
+
+        return true;
+    }
 
 private:
-    void onAps(srslib_framework::ApsConstPtr message);
+    void onAps(srslib_framework::ApsConstPtr message)
+    {
+        set(Time::time2number(message->header.stamp),
+            static_cast<double>(message->x),
+            static_cast<double>(message->y),
+            static_cast<double>(message->yaw));
+    }
 
     ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensor_;
 };

@@ -16,10 +16,12 @@ namespace srs {
 class RosTap
 {
 public:
-    RosTap(string name) :
+    RosTap(string nodeName = "", string tapName = "") :
         connected_(false),
-        name_(name),
-        newData_(false)
+        newData_(false),
+        nodeName_(nodeName),
+        rosNodeHandle_(nodeName),
+        tapName_(tapName)
     {}
 
     virtual ~RosTap()
@@ -37,9 +39,14 @@ public:
         return connected_;
     }
 
-    string getName() const
+    string getNodeName() const
     {
-        return name_;
+        return nodeName_;
+    }
+
+    string getTapName() const
+    {
+        return tapName_;
     }
 
     bool isTapConnected() const
@@ -74,8 +81,11 @@ protected:
 
 private:
     bool connected_;
-    string name_;
+
     bool newData_;
+    string nodeName_;
+
+    string tapName_;
 };
 
 } // namespace srs

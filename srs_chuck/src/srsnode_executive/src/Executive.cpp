@@ -12,29 +12,33 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Executive::Executive() :
-    rosNodeHandle_("srsnode_executive"),
-    grid_(GRID_SIZE),
+Executive::Executive(string nodeName) :
     algorithm_(grid_),
-    inc_(0)
+    grid_(GRID_SIZE),
+    inc_(0),
+    rosNodeHandle_("srsnode_executive"),
+    robotPose_(),
+    robotPose0_(),
+    tapGoal_(nodeName),
+    tapYouAreHere_(nodeName)
 {
-    tapGoal_.connectTap();
-    pubPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>("/plan", 1);
+    pubPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>("plan", 1);
+    pubInitialPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseWithCovarianceStamped>(
+        "initial_pose", 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::run()
 {
+    tapGoal_.connectTap();
+    tapYouAreHere_.connectTap();
+
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
     {
         ros::spinOnce();
 
-        // If there is a new goal to reach
-        if (tapGoal_.newDataAvailable())
-        {
-            planToGoal(tapGoal_.getCurrentGoal());
-        }
+        stepExecutiveFunctions();
 
         refreshRate.sleep();
     }
@@ -44,20 +48,26 @@ void Executive::run()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::disconnectAllTaps()
+{
+    tapGoal_.disconnectTap();
+    tapYouAreHere_.disconnectTap();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::planToGoal(Pose<> goal)
 {
     Grid2d::LocationType start(0, 0);
     Grid2d::LocationType internalGoal(11, 0);
 
-    inc_++;
     algorithm_.search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(internalGoal, 0));
-
-    publishPlan();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::publishPlan()
 {
+    inc_++;
+
     vector<SolutionNode<Grid2d>> path = algorithm_.getPath();
 
     ros::Time planningTime = ros::Time::now();
@@ -68,9 +78,9 @@ void Executive::publishPlan()
     }
     cout << endl;
 
-    nav_msgs::Path messagePath;
-    messagePath.header.frame_id = "map";
-    messagePath.header.stamp = planningTime;
+    nav_msgs::Path message;
+    message.header.frame_id = "map";
+    message.header.stamp = planningTime;
 
     std::vector<geometry_msgs::PoseStamped> plan;
 
@@ -89,9 +99,44 @@ void Executive::publishPlan()
         plan.push_back(poseStamped);
     }
 
-    messagePath.poses = plan;
+    message.poses = plan;
 
-    pubPlan_.publish(messagePath);
+    pubPlan_.publish(message);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::publishPose0()
+{
+    geometry_msgs::PoseWithCovarianceStamped message;
+
+    tf::Quaternion orientation = tf::createQuaternionFromYaw(robotPose0_.theta);
+
+    message.header.stamp = ros::Time::now();
+    message.pose.pose.position.x = robotPose0_.x;
+    message.pose.pose.position.y = robotPose0_.y;
+    message.pose.pose.orientation.x = orientation.x();
+    message.pose.pose.orientation.y = orientation.y();
+    message.pose.pose.orientation.z = orientation.z();
+    message.pose.pose.orientation.w = orientation.w();
+
+    pubInitialPose_.publish(message);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::stepExecutiveFunctions()
+{
+    // If there is a new goal to reach
+    if (tapGoal_.newDataAvailable())
+    {
+        planToGoal(tapGoal_.getCurrentGoal());
+        publishPlan();
+    }
+
+    if (tapYouAreHere_.newDataAvailable())
+    {
+        robotPose0_ = tapYouAreHere_.getRobotPose();
+        publishPose0();
+    }
 }
 
 } // namespace srs

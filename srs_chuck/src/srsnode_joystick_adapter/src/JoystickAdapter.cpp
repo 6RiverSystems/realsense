@@ -11,8 +11,9 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-JoystickAdapter::JoystickAdapter() :
-    rosNodeHandle_()
+JoystickAdapter::JoystickAdapter(string nodeName) :
+    rosNodeHandle_(),
+    tapJoy_(nodeName)
 {
     rosPubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 50);
 }

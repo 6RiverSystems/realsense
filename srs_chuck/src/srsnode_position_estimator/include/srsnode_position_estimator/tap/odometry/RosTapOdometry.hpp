@@ -27,8 +27,8 @@ class RosTapOdometry :
 public:
     typedef typename OdometrySensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>::BaseType BaseType;
 
-    RosTapOdometry() :
-        RosTap("Odometry")
+    RosTapOdometry(string nodeName) :
+        RosTap(nodeName, "Odometry Tap")
     {
         sensor_ = new OdometrySensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>();
     }

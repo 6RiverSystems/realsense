@@ -21,7 +21,7 @@ class RosTapMap :
     public RosTap
 {
 public:
-    RosTapMap();
+    RosTapMap(string nodeName);
 
     ~RosTapMap()
     {
@@ -43,7 +43,7 @@ protected:
     }
 
 private:
-    Grid2d* currentMap_;
+    //Grid2d* currentMap_;
 
     Grid2d* convertArrayToGrid(int width, int height, unsigned char& array[]);
 

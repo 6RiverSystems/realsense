@@ -19,15 +19,15 @@ using namespace std;
 
 namespace srs {
 
-class RosTapGoal :
+class RosTapCmd_Goal :
     public RosTap
 {
 public:
-    RosTapGoal() :
-        RosTap("Goal")
+    RosTapCmd_Goal(string nodeName) :
+        RosTap(nodeName, "Command 'Goal' Tap")
     {}
 
-    ~RosTapGoal()
+    ~RosTapCmd_Goal()
     {
         disconnectTap();
     }
@@ -41,7 +41,7 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/move_base_simple/goal", 10, &RosTapGoal::onGoal, this);
+        rosSubscriber_ = rosNodeHandle_.subscribe("cmd/goal", 10, &RosTapCmd_Goal::onGoal, this);
         return true;
     }
 

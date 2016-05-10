@@ -10,7 +10,8 @@ set(PROJECT_MAIN src/executive_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
     src/Executive.cpp
-    include/${PROJECT_NAME}/tap/RosTapGoal.hpp
+    include/${PROJECT_NAME}/tap/RosTapCmd_Goal.hpp
+    include/${PROJECT_NAME}/tap/RosTapCmd_YouAreHere.hpp
 )
 
 ####################################################################################################

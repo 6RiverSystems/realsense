@@ -20,8 +20,8 @@ class RosTapBrainStemStatus :
     public RosTap
 {
 public:
-    RosTapBrainStemStatus() :
-        RosTap("Brain Stem Status Tap"),
+    RosTapBrainStemStatus(string nodeName) :
+        RosTap(nodeName, "Brain Stem Status Tap"),
         connectionStateChanged_(false),
         isBrainStemConnected_(false),
         prevBrainStemConnected_(false)

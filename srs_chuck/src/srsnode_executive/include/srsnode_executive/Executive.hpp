@@ -10,17 +10,20 @@
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/AStar.hpp>
 
-#include <srsnode_executive/tap/RosTapGoal.hpp>
+#include <srsnode_executive/tap/RosTapCmd_Goal.hpp>
+#include <srsnode_executive/tap/RosTapCmd_YouAreHere.hpp>
 
 namespace srs {
 
 class Executive
 {
 public:
-    Executive();
+    Executive(string nodeName);
 
     ~Executive()
-    {}
+    {
+        disconnectAllTaps();
+    }
 
     void run();
 
@@ -28,15 +31,29 @@ private:
     constexpr static unsigned int REFRESH_RATE_HZ = 5;
     constexpr static int GRID_SIZE = 60;
 
+    void disconnectAllTaps();
+
     void planToGoal(Pose<> goal);
     void publishPlan();
+    void publishPose0();
 
-    RosTapGoal tapGoal_;
-    ros::NodeHandle rosNodeHandle_;
-    Grid2d grid_;
+    void stepExecutiveFunctions();
+
     AStar<Grid2d> algorithm_;
 
+    Grid2d grid_;
+
     ros::Publisher pubPlan_;
+    ros::Publisher pubInitialPose_;
+
+    Pose<> robotPose_;
+    Pose<> robotPose0_;
+
+    ros::NodeHandle rosNodeHandle_;
+
+    RosTapCmd_Goal tapGoal_;
+    RosTapCmd_YouAreHere tapYouAreHere_;
+
     int inc_;
 };
 

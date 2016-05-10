@@ -15,10 +15,14 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-PositionEstimator::PositionEstimator() :
-    ukf_(ALPHA, BETA, robot_),
-    rosNodeHandle_(),
-    commandUpdated_(false)
+PositionEstimator::PositionEstimator(string nodeName) :
+    commandUpdated_(false),
+    rosNodeHandle_(nodeName),
+    tapBrainStemStatus_(nodeName),
+    tapCmdVel_(nodeName),
+    tapOdometry_(nodeName),
+    tapInitialPose_(nodeName),
+    ukf_(ALPHA, BETA, robot_)
 {
     currentCovariance_ = robot_.getNoiseMatrix();
     currentState_ = StatePe<>(2.0, 1.5, 0.0);

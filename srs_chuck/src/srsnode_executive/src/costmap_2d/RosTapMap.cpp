@@ -6,8 +6,8 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-RosTapMap::RosTapMap() :
-    RosTap("Map Tap"),
+RosTapMap::RosTapMap(string nodeName) :
+    RosTap(nodeName, "Global Map Tap"),
     currentMap_(nullptr)
 {
 }

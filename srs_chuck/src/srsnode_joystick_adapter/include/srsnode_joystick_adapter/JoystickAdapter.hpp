@@ -6,6 +6,9 @@
 #ifndef JOYSTICKADAPTER_HPP_
 #define JOYSTICKADAPTER_HPP_
 
+#include <string>
+using namespace std;
+
 #include <srslib_framework/ros/tap/RosTapJoy.hpp>
 
 namespace srs {
@@ -13,7 +16,7 @@ namespace srs {
 class JoystickAdapter
 {
 public:
-    JoystickAdapter();
+    JoystickAdapter(string nodeName);
 
     ~JoystickAdapter()
     {

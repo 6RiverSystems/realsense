@@ -10,7 +10,7 @@ set(PROJECT_MAIN src/position_estimator_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
     include/${PROJECT_NAME}/tap/aps/ApsSensor.hpp
-    src/tap/aps/RosTapAps.cpp
+    include/${PROJECT_NAME}/tap/aps/RosTapAps.hpp
 
     include/${PROJECT_NAME}/tap/brain_stem_status/RosTapBrainStemStatus.hpp
 

@@ -23,7 +23,6 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/Configuration.hpp
     include/${PROJECT_NAME}/PositionEstimator.hpp
     include/${PROJECT_NAME}/Robot.hpp
-    include/${PROJECT_NAME}/RobotProfile.hpp
     include/${PROJECT_NAME}/StatePe.hpp
 
     src/PositionEstimator.cpp

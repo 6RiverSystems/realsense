@@ -19,7 +19,6 @@ using namespace std;
 
 #include <srsnode_position_estimator/tap/odometry/OdometrySensor.hpp>
 
-#include <srsnode_position_estimator/RobotProfile.hpp>
 #include <srsnode_position_estimator/Robot.hpp>
 #include <srsnode_position_estimator/StatePe.hpp>
 #include <srsnode_position_estimator/CmdVelocity.hpp>

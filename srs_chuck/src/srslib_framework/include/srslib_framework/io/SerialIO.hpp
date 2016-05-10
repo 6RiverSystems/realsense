@@ -24,6 +24,13 @@ class SerialIO :
 {
 	typedef std::shared_ptr<boost::asio::deadline_timer> ConnectionTimer;
 
+	enum class READ_STATE
+	{
+		DEFAULT,
+		IN_MESSAGE,
+		IN_MESSAGE_ESCAPED
+	};
+
 public:
 	SerialIO( );
 
@@ -96,11 +103,13 @@ private:
 
     bool									m_bIsWriting;
 
-    std::vector<char>						m_ReadBuffer;
+    std::vector<char>						m_readBuffer;
 
-    std::vector<char>						m_writeData;
+    std::vector<char>						m_writeBuffer;
 
-    std::vector<char>						m_readData;
+	READ_STATE								m_readState;
+
+    std::vector<char>						m_readPartialData;
 
     std::function<void(std::vector<char>)>	m_readCallback;
 

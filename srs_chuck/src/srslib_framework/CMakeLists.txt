@@ -47,7 +47,7 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/search/SearchNode.hpp
     include/${PROJECT_NAME}/search/AStar.hpp
 
-    include/${PROJECT_NAME}/Utils/Ocv2Base.hpp
+    include/${PROJECT_NAME}/utils/Ocv2Base.hpp
 )
 
 set(${PROJECT_NAME}_MSGS
@@ -78,6 +78,10 @@ set(TEST_SOURCES_ROBOTICS
 set(TEST_SOURCES_SEARCH
     test/search/Test_AStar_Basic.cpp
 )
+
+set(TEST_SOURCES_IO
+    test/io/Test_SerialIO.cpp
+)
 ####################################################################################################
 # Project
 
@@ -94,7 +98,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 find_package(OpenCV REQUIRED)
 find_package(srslib_test REQUIRED)
-find_package(GTest REQUIRED)
+find_package(Boost REQUIRED)
 
 include_directories(
     include/
@@ -154,7 +158,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(TestSuite_Datastructure
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
-        ${GTest_LIBRARIES}
     )
 
     catkin_add_gtest(TestSuite_Filter
@@ -166,7 +169,6 @@ if (CATKIN_ENABLE_TESTING)
         ${catkin_LIBRARIES}
         ${OpenCV_LIBRARIES}
         ${srslib_test_LIBRARIES}
-        ${GTest_LIBRARIES}
     )
 
     catkin_add_gtest(TestSuite_Graph
@@ -177,7 +179,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(TestSuite_Graph
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
-        ${GTest_LIBRARIES}
     )
 
     catkin_add_gtest(TestSuite_Planning
@@ -188,7 +189,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(TestSuite_Planning
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
-        ${GTest_LIBRARIES}
     )
 
     catkin_add_gtest(TestSuite_Robotics
@@ -199,7 +199,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(TestSuite_Robotics
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
-        ${GTest_LIBRARIES}
     )
 
     catkin_add_gtest(TestSuite_Search
@@ -210,6 +209,15 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(TestSuite_Search
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}
-        ${GTest_LIBRARIES}
+    )
+
+    catkin_add_gtest(TestSuite_Io
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_IO}
+    )
+    target_link_libraries(TestSuite_Io
+        ${catkin_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+        ${Boost_LIBRARIES}
     )
 endif()

@@ -34,12 +34,10 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(Boost REQUIRED)
-find_package(GTest REQUIRED)
 
 include_directories(include 
     src/
     ${catkin_INCLUDE_DIRS}
-    ${GTest_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
     ${srslib_framework_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
@@ -75,6 +73,5 @@ target_link_libraries(${PROJECT_NODE}
 #        ${catkin_LIBRARIES}
 #        ${boost_LIBRARIES}
 #        ${srslib_framework_LIBRARIES}
-#        ${GTEST_LIBRARIES}
 #    )
 #endif()

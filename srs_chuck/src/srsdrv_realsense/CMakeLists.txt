@@ -28,8 +28,6 @@ find_package(catkin REQUIRED COMPONENTS
     cv_bridge
 )
 
-find_package(GTest REQUIRED)
-
 find_package(OpenCV 1.7 REQUIRED)
 
 find_package(PCL REQUIRED)
@@ -37,7 +35,6 @@ find_package(PCL REQUIRED)
 include_directories(include 
     src/
     ${catkin_INCLUDE_DIRS}
-    ${GTEST_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
 	${PCL_INCLUDE_DIRS}
 )

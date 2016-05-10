@@ -51,7 +51,6 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(OpenCV REQUIRED)
-find_package(GTest REQUIRED)
 
 include_directories(include 
     src/
@@ -59,7 +58,6 @@ include_directories(include
     ${OpenCV_INCLUDE_DIRS} 
     ${srslib_framework_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
-    ${GTEST_INCLUDE_DIRS}
 )
 
 ####################################################################################################
@@ -97,6 +95,5 @@ if (CATKIN_ENABLE_TESTING)
         ${OpenCV_LIBRARIES}
         ${srslib_test_LIBRARIES}
         ${srslib_framework_LIBRARIES}
-        ${GTEST_LIBRARIES}
     )
 endif()

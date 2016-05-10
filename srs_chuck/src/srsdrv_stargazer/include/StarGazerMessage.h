@@ -15,11 +15,11 @@
 namespace srs
 {
 
-const char StarGazer_STX = '~';
-const char StarGazer_RTX = '`';
-const char StarGazer_SEPERATOR = '|';
+const char STARGAZER_STX = '~';
+const char STARGAZER_RTX = '`';
+const char STARGAZER_SEPERATOR = '|';
 
-const float STARTGAZER_TIMEOUT = 0.5;
+const float STARTGAZER_TIMEOUT = 0.25;
 
 enum class STAR_GAZER_MESSAGE_TYPES
 {

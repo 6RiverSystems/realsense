@@ -44,10 +44,8 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
 	std::shared_ptr<SerialIO> pSerialIO = std::dynamic_pointer_cast<SerialIO>( m_pSerialIO );
 
 	pSerialIO->EnableCRC( true );
-	pSerialIO->SetIncludeLength( false );
 	pSerialIO->SetTerminatingCharacter( '\n' );
 	pSerialIO->SetEscapeCharacter( '\\' );
-	pSerialIO->SetEscapeCharacters( std::set<char>( { '\\', '\n' } ) );
 
 	pSerialIO->Open( strSerialPort.c_str( ), std::bind( &BrainStemMessageProcessor::ProcessBrainStemMessage, &m_messageProcessor,
 		std::placeholders::_1 ) );

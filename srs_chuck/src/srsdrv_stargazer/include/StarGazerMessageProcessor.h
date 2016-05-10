@@ -27,6 +27,12 @@ typedef std::function<void(std::string, std::string)> ReadCallbackFn;
 
 class StarGazerMessageProcessor {
 
+	struct QueuedMessage {
+		std::string sTxMsg;
+		std::string sRxMsg;
+		float       timeoutSec;
+	};
+
 private:
 
 	std::shared_ptr<IO>									m_pSerialIO;
@@ -37,7 +43,7 @@ private:
 
 	std::chrono::high_resolution_clock					m_highrezclk;
 
-	std::queue<std::string>								m_txMessageQueue;
+	std::queue<QueuedMessage>							m_txMessageQueue;
 
 	std::string											m_lastAck;
 
@@ -51,9 +57,9 @@ private:
 
 private:
 
-	void SendRawCommand( std::string fullCmd );
+	void SendRawCommand( QueuedMessage msg );
 
-	void BaseCommand( STAR_GAZER_MESSAGE_TYPES type, std::string cmd );
+	void BaseCommand( STAR_GAZER_MESSAGE_TYPES type, std::string cmd, std::string rxExpected, float timeoutSec );
 
 	void BaseWriteCommand( std::string cmd );
 
@@ -86,6 +92,8 @@ public:
 	void SetMarkType( STAR_GAZER_LANDMARK_TYPES type );
 
 	void HeightCalc( );
+
+	void HightFix( bool fixHeight );
 
 	void SetMarkHeight( int height_mm );
 

@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <thread>
 #include <set>
+#include <future>
 
 #include <srslib_framework/io/IO.hpp>
 
@@ -24,6 +25,8 @@ class SerialIO :
 {
 	typedef std::shared_ptr<boost::asio::deadline_timer> ConnectionTimer;
 
+	typedef std::function<void(std::vector<char>)> ReadCallbackFn;
+
 	enum class READ_STATE
 	{
 		DEFAULT,
@@ -36,7 +39,7 @@ public:
 
 	virtual ~SerialIO( );
 
-	void Open( const char* pszName, std::function<void(std::vector<char>)> readCallback );
+	void Open( const char* pszName, ReadCallbackFn readCallback );
 
 	bool IsOpen( ) const;
 
@@ -46,17 +49,13 @@ public:
 
 	void SetRetryTimeout( float fRetryTimeout );
 
-	void EnableCRC( bool bGenerateCRC );
-
-	void SetIncludeLength( bool bIncludeLength );
+	void EnableCRC( bool bEnableCRC );
 
 	void SetLeadingCharacter( char cLeading );
 
 	void SetTerminatingCharacter( char cTerminating );
 
 	void SetEscapeCharacter( char cEscape );
-
-	void SetEscapeCharacters( std::set<char> vecCharsToEscape );
 
 	void SetFirstByteDelay( std::chrono::microseconds firstByteDelay );
 
@@ -66,11 +65,9 @@ public:
 
 	void Write( const std::vector<char>& buffer );
 
-	void WriteRaw( const std::vector<char>& buffer );
-
 private:
 
-	void WriteInSerialThread( std::vector<char> buffer, bool bIsRaw );
+	void WriteInSerialThread( std::vector<char> writeBuffer );
 
 	void StartAsyncRead( );
 
@@ -80,12 +77,14 @@ private:
 
 // Connection Retry Logic
 
-	void OnCheckSerialPort( bool bInitialCheck, const boost::system::error_code& e =
+	bool OnCheckSerialPort( bool bInitialCheck, const boost::system::error_code& e =
 		boost::system::error_code( ) );
 
 private:
 
     std::shared_ptr<std::thread>			m_Thread;
+
+    std::thread::id							m_serialThreadId;
 
 	boost::asio::io_service					m_IOService;
 
@@ -115,9 +114,7 @@ private:
 
     std::function<void(std::vector<char>)>	m_readCallback;
 
-	bool									m_bGenerateCRC;
-
-	bool									m_bIncludeLength;
+	bool									m_bEnableCRC;
 
 	bool									m_bHasLeading;
 
@@ -130,8 +127,6 @@ private:
 	bool									m_bHasEscape;
 
 	char									m_cEscape;
-
-	std::set<char>							m_setCharsToEscape;
 
 	std::chrono::microseconds				m_firstByteDelay;
 

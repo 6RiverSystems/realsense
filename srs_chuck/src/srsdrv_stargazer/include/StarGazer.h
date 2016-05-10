@@ -29,6 +29,10 @@ public:
 
 	void Configure( );
 
+	void SetFixedHeight( int height_mm );
+
+	void SetVariableHeight( );
+
 	void AutoCalculateHeight( );
 
 	void Start( );

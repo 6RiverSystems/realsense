@@ -33,8 +33,8 @@ StarGazer::StarGazer( const std::string& strSerialPort, const std::string& strAp
 
 	std::shared_ptr<SerialIO> pSerialIO = std::dynamic_pointer_cast<SerialIO>( m_pSerialIO );
 
-	pSerialIO->SetLeadingCharacter( StarGazer_STX );
-	pSerialIO->SetTerminatingCharacter( StarGazer_RTX );
+	pSerialIO->SetLeadingCharacter( STARGAZER_STX );
+	pSerialIO->SetTerminatingCharacter( STARGAZER_RTX );
 	pSerialIO->SetFirstByteDelay( std::chrono::microseconds( 30000 ) );
 	pSerialIO->SetByteDelay( std::chrono::microseconds( 5000 ) );
 
@@ -91,10 +91,24 @@ void StarGazer::Configure( )
 	m_messageProcessor.SetEnd( );
 }
 
+void StarGazer::SetFixedHeight( int height_mm )
+{
+	Stop( );
+	m_messageProcessor.SetMarkHeight( height_mm );
+	m_messageProcessor.HightFix( true );
+	m_messageProcessor.SetEnd( );
+}
+
+void StarGazer::SetVariableHeight( )
+{
+	Stop( );
+	m_messageProcessor.HightFix( false );
+	m_messageProcessor.SetEnd( );
+}
+
 void StarGazer::AutoCalculateHeight( )
 {
 	Stop( );
-
 	m_messageProcessor.HeightCalc( );
 }
 

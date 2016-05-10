@@ -11,10 +11,12 @@
 #include <thread>
 #include <ros/ros.h>
 
-namespace srs {
+namespace srs
+{
 
 SerialIO::SerialIO( ) :
 	m_Thread( ),
+	m_serialThreadId( ),
 	m_oWork( m_IOService ),
 	m_SerialPort( m_IOService ),
 	m_strSerialPort( ),
@@ -27,15 +29,13 @@ SerialIO::SerialIO( ) :
 	m_cCRC( 0 ),
 	m_readPartialData( ),
 	m_readCallback( ),
-	m_bGenerateCRC( false ),
-	m_bIncludeLength( false ),
+	m_bEnableCRC( false ),
 	m_bHasLeading( false ),
 	m_cLeading( 0 ),
 	m_bHasTerminating( false ),
 	m_cTerminating( 0 ),
 	m_bHasEscape( false ),
 	m_cEscape( 0 ),
-	m_setCharsToEscape( ),
 	m_firstByteDelay( ),
 	m_interByteDelay( )
 {
@@ -43,9 +43,9 @@ SerialIO::SerialIO( ) :
 
 	// Spin up the thread
 	m_Thread.reset( new std::thread( [&]()
-		{
-			m_IOService.run( );
-		} ) );
+	{
+		m_IOService.run( );
+	} ) );
 }
 
 SerialIO::~SerialIO( )
@@ -59,13 +59,35 @@ SerialIO::~SerialIO( )
 	m_Thread->join( );
 }
 
-void SerialIO::Open( const char* pszName, std::function<void(std::vector<char>)> readCallback )
+void SerialIO::Open( const char* pszName, ReadCallbackFn readCallback )
 {
-	m_strSerialPort = pszName;
+	if( !IsOpen( ) )
+	{
+		std::condition_variable condition;
+		std::mutex mutex;
 
-	m_readCallback = readCallback;
+		m_IOService.post( [&]( )
+			{
+				m_strSerialPort = pszName;
 
-	OnCheckSerialPort( true );
+				m_readCallback = readCallback;
+
+				m_serialThreadId = std::this_thread::get_id( );
+
+				OnCheckSerialPort( false );
+
+				condition.notify_one( );
+			} );
+
+
+		std::unique_lock<std::mutex> lock( mutex );
+
+		condition.wait( lock );
+	}
+	else
+	{
+		ROS_ERROR_STREAM_NAMED( "SerialIO", "Attempt to open serial port but it is already open." );
+	}
 }
 
 bool SerialIO::IsOpen( ) const
@@ -91,12 +113,7 @@ void SerialIO::SetRetryTimeout( float fRetryTimeout )
 
 void SerialIO::EnableCRC( bool bGenerateCRC )
 {
-	m_bGenerateCRC = bGenerateCRC;
-}
-
-void SerialIO::SetIncludeLength( bool bIncludeLength )
-{
-	m_bIncludeLength = bIncludeLength;
+	m_bEnableCRC = bGenerateCRC;
 }
 
 void SerialIO::SetLeadingCharacter( char cLeading )
@@ -120,11 +137,6 @@ void SerialIO::SetEscapeCharacter( char cEscape )
 	m_bHasEscape = true;
 }
 
-void SerialIO::SetEscapeCharacters( std::set<char> vecCharsToEscape )
-{
-	m_setCharsToEscape = vecCharsToEscape;
-}
-
 void SerialIO::SetFirstByteDelay( std::chrono::microseconds firstByteDelay )
 {
 	m_firstByteDelay = firstByteDelay;
@@ -140,7 +152,7 @@ void SerialIO::Write( const std::vector<char>& buffer )
 	if( IsOpen( ) )
 	{
 		// Do all data operations in serial processing thread
-		m_IOService.post( std::bind( &SerialIO::WriteInSerialThread, this, buffer, false ) );
+		m_IOService.post( std::bind( &SerialIO::WriteInSerialThread, this, buffer ) );
 	}
 	else
 	{
@@ -149,75 +161,55 @@ void SerialIO::Write( const std::vector<char>& buffer )
 	}
 }
 
-void SerialIO::WriteRaw( const std::vector<char>& buffer )
+void SerialIO::WriteInSerialThread( std::vector<char> writeBuffer )
 {
-	if( IsOpen( ) )
-	{
-		// Do all data operations in serial processing thread
-		m_IOService.post( std::bind( &SerialIO::WriteInSerialThread, this, buffer, true ) );
-	}
-	else
-	{
-		// Throw error
-		throw std::runtime_error( "port not open" );
-	}
-}
+	assert( m_serialThreadId == std::this_thread::get_id( ) );
 
-void SerialIO::WriteInSerialThread( std::vector<char> buffer, bool bIsRaw )
-{
-	uint32_t dwStartIndex = m_writeBuffer.size( );
-
-	if( !bIsRaw )
+	// Add leading character
+	if( m_bHasLeading )
 	{
-		// Add length
-		if( m_bIncludeLength )
+		m_writeBuffer.push_back( m_cLeading );
+	}
+
+	uint8_t cCRC = 0;
+
+	// Function to add an escaped char (if necessary) to the array
+	auto addEscapedCharacter =
+		[&](const char& cChar )
 		{
-			m_writeBuffer.push_back( (uint8_t)buffer.size( ) );
-		}
-	}
-
-	// Add payload data
-	m_writeBuffer.insert( m_writeBuffer.end( ), buffer.begin( ), buffer.end( ) );
-
-	if( !bIsRaw && ( m_bGenerateCRC || m_setCharsToEscape.size( ) ) )
-	{
-		uint8_t cCRC = 0;
-
-		// Escape characters and generate CRC
-		for( std::size_t dwIndex = dwStartIndex; dwIndex != m_writeBuffer.size( ); dwIndex++ )
-		{
-			cCRC += m_writeBuffer[dwIndex];
-
-			// Escape the charactem_writeBufferr
-			if( m_setCharsToEscape.find( m_writeBuffer[dwIndex] ) != m_setCharsToEscape.end( ) )
+			if( m_bHasEscape )
 			{
-				m_writeBuffer.insert( m_writeBuffer.begin( ) + dwIndex, m_cEscape );
-
-				// Skip the escaped character
-				dwIndex++;
+				if( ( cChar == m_cEscape )					 ||
+					( m_bHasLeading && cChar == m_cLeading ) ||
+					( m_bHasTerminating && cChar == m_cTerminating ) )
+				{
+					m_writeBuffer.push_back( m_cEscape );
+				}
 			}
+
+			m_writeBuffer.push_back( cChar );
 		};
 
-		// Generate CRC
-		if( m_bGenerateCRC )
-		{
-			// Escape the character
-			if( m_setCharsToEscape.find( -cCRC ) != m_setCharsToEscape.end( ) )
-			{
-				m_writeBuffer.push_back( m_cEscape );
-			}
+	for( const char& cChar : writeBuffer )
+	{
+		cCRC += cChar;
 
-			m_writeBuffer.push_back( -cCRC );
-		}
-
-		// Add terminating character
-		if( m_cTerminating )
-		{
-			m_writeBuffer.push_back( m_cTerminating );
-		}
+		addEscapedCharacter( cChar );
 	}
 
-	// If we are already trying to write, then wait until we recieve the callback
+	// Add CRC
+	if( m_bEnableCRC )
+	{
+		addEscapedCharacter( -cCRC );
+	}
+
+	// Add terminating character
+	if( m_bHasTerminating )
+	{
+		m_writeBuffer.push_back( m_cTerminating );
+	}
+
+	// If we are already trying to write, then wait until we receive the callback
 	if( !m_bIsWriting )
 	{
 		m_bIsWriting = true;
@@ -225,21 +217,23 @@ void SerialIO::WriteInSerialThread( std::vector<char> buffer, bool bIsRaw )
 		m_interByteDelay = m_firstByteDelay;
 
 		// If we have a first byte delay only write one byte
-		size_t writeSize = (m_interByteDelay == std::chrono::microseconds( )) ? m_writeBuffer.size( ) : 1 ;
+		size_t writeSize = (m_interByteDelay == std::chrono::microseconds( )) ? m_writeBuffer.size( ) : 1;
 
 		m_SerialPort.async_write_some( boost::asio::buffer( m_writeBuffer.data( ), writeSize ),
-		    std::bind( &SerialIO::OnWriteComplete, this, std::placeholders::_1, std::placeholders::_2 ) );
+			std::bind( &SerialIO::OnWriteComplete, this, std::placeholders::_1, std::placeholders::_2 ) );
 	}
 }
 
 void SerialIO::StartAsyncRead( )
 {
 	m_SerialPort.async_read_some( boost::asio::buffer( m_readBuffer, m_readBuffer.size( ) ),
-    	std::bind( &SerialIO::OnReadComplete, this, std::placeholders::_1, std::placeholders::_2 ) );
+		std::bind( &SerialIO::OnReadComplete, this, std::placeholders::_1, std::placeholders::_2 ) );
 }
 
 void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::size_t size )
 {
+	assert( m_serialThreadId == std::this_thread::get_id( ) );
+
 //	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write Complete: " <<
 //		ToHex( std::vector<char>( m_writeBuffer.begin( ), m_writeBuffer.begin( ) + size ) ) );
 
@@ -251,7 +245,7 @@ void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::siz
 
 		m_interByteDelay = m_byteDelay;
 
-		size_t writeSize = (m_interByteDelay == std::chrono::microseconds( )) ? m_writeBuffer.size( ) : 1 ;
+		size_t writeSize = (m_interByteDelay == std::chrono::microseconds( )) ? m_writeBuffer.size( ) : 1;
 
 		m_SerialPort.async_write_some( boost::asio::buffer( m_writeBuffer.data( ), writeSize ),
 			std::bind( &SerialIO::OnWriteComplete, this, std::placeholders::_1, std::placeholders::_2 ) );
@@ -264,16 +258,17 @@ void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::siz
 
 void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size_t size )
 {
+	assert( m_serialThreadId == std::this_thread::get_id( ) );
+
 	if( !error )
 	{
 		// Start with the partially parsed message
 		std::vector<char> messageData( m_readPartialData.begin( ), m_readPartialData.end( ) );
 
-//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Left over read data: " << ToHex( messageData ) );
+		// ROS_DEBUG_STREAM_NAMED( "SerialIO", "Left over read data: " << ToHex( messageData ) );
 
 		// If we do not have a leading character, then we are always in a message
-		if( m_readState == READ_STATE::DEFAULT &&
-			!m_bHasLeading )
+		if( m_readState == READ_STATE::DEFAULT && !m_bHasLeading )
 		{
 			m_readState = READ_STATE::IN_MESSAGE;
 		}
@@ -313,8 +308,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					ROS_ERROR_STREAM_NAMED( "SerialIO", "Received partial message, waiting for leading character" );
 				}
 			}
-			else if( m_readState == READ_STATE::IN_MESSAGE_ESCAPED ||
-				*iter != m_cTerminating )
+			else if( m_readState == READ_STATE::IN_MESSAGE_ESCAPED || *iter != m_cTerminating )
 			{
 				messageData.push_back( *iter );
 
@@ -330,18 +324,23 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					{
 						m_cCRC = 0;
 					}
-					else if( m_bGenerateCRC )
+					else if( m_bEnableCRC )
 					{
 						messageData.pop_back( );
 
+					}
+					else
+					{
+						// We are not using a CRC
+						m_cCRC = 0;
 					}
 
 					if( m_cCRC == 0 )
 					{
 						if( m_readCallback )
 						{
-							ROS_ERROR_STREAM_NAMED( "SerialIO", "ReadData: " <<
-								ToHex( std::vector<char>( messageData.begin( ), messageData.end( ) ) ) );
+//							ROS_ERROR_STREAM_NAMED( "SerialIO", "ReadData: " <<
+//								ToHex( std::vector<char>( messageData.begin( ), messageData.end( ) ) ) );
 
 							m_readCallback( messageData );
 						}
@@ -390,8 +389,10 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 	}
 }
 
-void SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error_code& e )
+bool SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error_code& e )
 {
+	assert( m_serialThreadId == std::this_thread::get_id( ) );
+
 	// Save current state (so we don't spam debug log on reconnect)
 	bool bIsSerialOpen = m_bIsSerialOpen;
 
@@ -417,23 +418,21 @@ void SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error
 
 			m_cCRC = 0;
 
-			StartAsyncRead( );
-
 			m_bIsSerialOpen = true;
 		}
-	    catch( const std::exception& e )
-	    {
-	    	strError = e.what( );
-	    }
-	    catch( ... )
-	    {
-	    	strError = "Unknown error";
-	    }
+		catch( const std::exception& e )
+		{
+			strError = e.what( );
+		}
+		catch( ... )
+		{
+			strError = "Unknown error";
+		}
 
 		if( !m_bIsSerialOpen && bInitialCheck )
 		{
-			ROS_DEBUG( "Error connecting to serial port (%s): %s (Retry: %.2f)", m_strSerialPort.c_str( ),
-				strError.c_str( ), m_fRetryTimeout );
+			ROS_DEBUG( "Error connecting to serial port (%s): %s (Retry: %.2f)", m_strSerialPort.c_str( ), strError.c_str( ),
+				m_fRetryTimeout );
 		}
 	}
 
@@ -450,10 +449,19 @@ void SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error
 	}
 
 	// If we failed to open the serial port keep trying
-	if( !m_bIsSerialOpen )
+	if( m_bIsSerialOpen )
 	{
-		m_oTimer->async_wait( std::bind( &SerialIO::OnCheckSerialPort, this, false, std::placeholders::_1 ) );
+		StartAsyncRead( );
 	}
+	else
+	{
+		m_oTimer->async_wait( [&]( const boost::system::error_code& e )
+			{
+				OnCheckSerialPort( false, e );
+			} );
+	}
+
+	return m_bIsSerialOpen;
 }
 
 } /* namespace srs */

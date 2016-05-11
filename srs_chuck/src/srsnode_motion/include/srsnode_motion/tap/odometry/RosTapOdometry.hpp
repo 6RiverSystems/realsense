@@ -15,9 +15,9 @@ using namespace std;
 #include <srslib_framework/ros/RosTap.hpp>
 #include <srslib_framework/math/Time.hpp>
 
-#include <srsnode_position_estimator/Configuration.hpp>
+#include <srsnode_motion/Configuration.hpp>
 
-#include <srsnode_position_estimator/tap/odometry/OdometrySensor.hpp>
+#include <srsnode_motion/tap/odometry/OdometrySensor.hpp>
 
 namespace srs {
 

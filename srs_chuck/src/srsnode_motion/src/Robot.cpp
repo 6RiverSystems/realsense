@@ -1,8 +1,8 @@
 #include <srslib_framework/math/Math.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 
-#include <srsnode_position_estimator/StatePe.hpp>
-#include <srsnode_position_estimator/CmdVelocity.hpp>
+#include <srsnode_motion/StatePe.hpp>
+#include <srsnode_motion/CmdVelocity.hpp>
 
 namespace srs {
 

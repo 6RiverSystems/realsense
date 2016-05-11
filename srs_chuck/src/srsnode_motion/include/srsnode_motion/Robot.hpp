@@ -12,7 +12,7 @@
 #include <srslib_framework/filter/Process.hpp>
 #include <srslib_framework/filter/Command.hpp>
 
-#include <srsnode_position_estimator/Configuration.hpp>
+#include <srsnode_motion/Configuration.hpp>
 
 namespace srs {
 

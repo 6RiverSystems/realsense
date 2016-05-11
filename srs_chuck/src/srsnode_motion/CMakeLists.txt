@@ -9,7 +9,30 @@ set(PROJECT_NAME srsnode_motion)
 set(PROJECT_MAIN src/motion_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
+    include/${PROJECT_NAME}/tap/aps/ApsSensor.hpp
+    include/${PROJECT_NAME}/tap/aps/RosTapAps.hpp
+
+    include/${PROJECT_NAME}/tap/brain_stem_status/RosTapBrainStemStatus.hpp
+
+    include/${PROJECT_NAME}/tap/initial_pose/RosTapInitialPose.hpp
+
+    include/${PROJECT_NAME}/tap/odometry/OdometrySensor.hpp
+    include/${PROJECT_NAME}/tap/odometry/RosTapOdometry.hpp
+
+    include/${PROJECT_NAME}/CmdVelocity.hpp
+    include/${PROJECT_NAME}/Configuration.hpp
+    include/${PROJECT_NAME}/PositionEstimator.hpp
+    include/${PROJECT_NAME}/Robot.hpp
+    include/${PROJECT_NAME}/StatePe.hpp
+
     src/Motion.cpp
+)
+
+set(${PROJECT_NAME}_TEST_SOURCES
+
+    test/Test_Motion_11ConstantSteps.cpp
+    test/Test_Motion_Diagonal.cpp
+    test/Test_Motion_Straight.cpp
 )
 
 ####################################################################################################
@@ -24,13 +47,17 @@ set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
+    tf
     srslib_framework
     srslib_test
 )
 
-include_directories(include
+find_package(OpenCV REQUIRED)
+
+include_directories(include 
     src/
     ${catkin_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS} 
     ${srslib_framework_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
 )
@@ -39,7 +66,7 @@ include_directories(include
 # Target
 
 catkin_package(
-    DEPENDS srslib_framework
+    DEPENDS opencv srslib_framework
 )
 
 add_executable(${PROJECT_NODE} 
@@ -47,10 +74,28 @@ add_executable(${PROJECT_NODE}
     ${${PROJECT_NAME}_SOURCES}
 )
 
+add_dependencies(${PROJECT_LIBRARY} ${catkin_EXPORTED_TARGETS})
+
 target_link_libraries(${PROJECT_NODE}
     ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
     ${srslib_framework_LIBRARIES}
 )
 
 ####################################################################################################
 # Tests
+
+if (CATKIN_ENABLE_TESTING)
+    catkin_add_gtest(TestSuite_Motion
+        test/TestSuite_Motion.cpp
+        ${${PROJECT_NAME}_TEST_SOURCES}
+        ${${PROJECT_NAME}_SOURCES}
+    )
+    target_link_libraries(TestSuite_Motion
+        ${catkin_LIBRARIES}
+        ${boost_LIBRARIES}
+        ${OpenCV_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+        ${srslib_framework_LIBRARIES}
+    )
+endif()

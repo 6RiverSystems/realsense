@@ -20,7 +20,7 @@ typedef SearchAction<Grid2d> SearchActionType;
 typedef SearchPosition<Grid2d> SearchPositionType;
 typedef SearchPosition<Grid2d>::LocationType LocationType;
 
-TEST(Test_Trajectory, Solution2Poses)
+TEST(Test_Trajectory, LongTrajectory)
 {
     Grid2d grid(10, 10);
 
@@ -30,51 +30,39 @@ TEST(Test_Trajectory, Solution2Poses)
 
     SolutionType SOLUTION_01 = SolutionType(
         SearchActionType(SearchActionType::FORWARD,
-            SearchPositionType(LocationType(0, 0), 90)));
+            SearchPositionType(LocationType(1, 0), 90)));
 
     SolutionType SOLUTION_02 = SolutionType(
         SearchActionType(SearchActionType::FORWARD,
-            SearchPositionType(LocationType(1, 0), 90)));
+            SearchPositionType(LocationType(2, 0), 90)));
 
     SolutionType SOLUTION_03 = SolutionType(
         SearchActionType(SearchActionType::FORWARD,
-            SearchPositionType(LocationType(2, 0), 90)));
+            SearchPositionType(LocationType(3, 0), 90)));
 
     SolutionType SOLUTION_04 = SolutionType(
         SearchActionType(SearchActionType::FORWARD,
-            SearchPositionType(LocationType(3, 0), 90)));
+            SearchPositionType(LocationType(4, 0), 90)));
 
     SolutionType SOLUTION_05 = SolutionType(
         SearchActionType(SearchActionType::FORWARD,
-            SearchPositionType(LocationType(4, 0), 90)));
+            SearchPositionType(LocationType(5, 0), 90)));
 
     SolutionType SOLUTION_06 = SolutionType(
         SearchActionType(SearchActionType::FORWARD,
-            SearchPositionType(LocationType(5, 0), 90)));
+            SearchPositionType(LocationType(6, 0), 90)));
 
     SolutionType SOLUTION_07 = SolutionType(
         SearchActionType(SearchActionType::FORWARD,
-            SearchPositionType(LocationType(6, 0), 90)));
+            SearchPositionType(LocationType(7, 0), 90)));
 
     SolutionType SOLUTION_08 = SolutionType(
         SearchActionType(SearchActionType::FORWARD,
-            SearchPositionType(LocationType(7, 0), 90)));
+            SearchPositionType(LocationType(8, 0), 90)));
 
     SolutionType SOLUTION_09 = SolutionType(
-        SearchActionType(SearchActionType::ROTATE_P90,
-            SearchPositionType(LocationType(7, 0), 270)));
-
-    SolutionType SOLUTION_10 = SolutionType(
-        SearchActionType(SearchActionType::FORWARD,
-            SearchPositionType(LocationType(8, 0), 270)));
-
-    SolutionType SOLUTION_11 = SolutionType(
-        SearchActionType(SearchActionType::FORWARD,
-            SearchPositionType(LocationType(9, 0), 270)));
-
-    SolutionType SOLUTION_12 = SolutionType(
         SearchActionType(SearchActionType::GOAL,
-            SearchPositionType(LocationType(7, 0), 90)));
+            SearchPositionType(LocationType(8, 0), 90)));
 
     // Create a sequence of commands
     vector<SolutionNode<Grid2d>> solution = {
@@ -87,20 +75,52 @@ TEST(Test_Trajectory, Solution2Poses)
         SOLUTION_06,
         SOLUTION_07,
         SOLUTION_08,
-//        SOLUTION_09,
-//        SOLUTION_10,
-//        SOLUTION_11,
-        SOLUTION_12
+        SOLUTION_09
     };
 
     Chuck chuck;
 
-    vector<srs::Velocity<>> poses;
+    vector<srs::Velocity<>> velocities;
     Trajectory trajectoryConverter(solution, chuck, 0.1);
-    trajectoryConverter.solution2velocity(Velocity<>(), poses);
+    trajectoryConverter.solution2velocity(velocities);
 
-    for (auto pose : poses)
+    for (auto command : velocities)
     {
-        cout << pose << endl;
+        cout << command << endl;
+    }
+}
+
+TEST(Test_Trajectory, ShortTrajectory)
+{
+    Grid2d grid(10, 10);
+
+    SolutionType SOLUTION_00 = SolutionType(
+        SearchActionType(SearchActionType::START,
+            SearchPositionType(LocationType(0, 0), 90)));
+
+    SolutionType SOLUTION_01 = SolutionType(
+        SearchActionType(SearchActionType::FORWARD,
+            SearchPositionType(LocationType(1, 0), 90)));
+
+    SolutionType SOLUTION_02 = SolutionType(
+        SearchActionType(SearchActionType::GOAL,
+            SearchPositionType(LocationType(1, 0), 90)));
+
+    // Create a sequence of commands
+    vector<SolutionNode<Grid2d>> solution = {
+        SOLUTION_00,
+        SOLUTION_01,
+        SOLUTION_02
+    };
+
+    Chuck chuck;
+
+    vector<srs::Velocity<>> velocities;
+    Trajectory trajectoryConverter(solution, chuck, 0.1);
+    trajectoryConverter.solution2velocity(velocities);
+
+    for (auto command : velocities)
+    {
+        cout << command << endl;
     }
 }

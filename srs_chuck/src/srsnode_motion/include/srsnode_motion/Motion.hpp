@@ -8,7 +8,24 @@
 
 #include <srslib_framework/robotics/Velocity.hpp>
 
-#include <srsnode_motion/tap/RosTapGoalPlan.hpp>
+#include <tf/transform_broadcaster.h>
+#include <std_msgs/Bool.h>
+#include <geometry_msgs/Twist.h>
+
+#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTapCmdVel.hpp>
+#include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
+
+#include <srsnode_motion/Configuration.hpp>
+#include <srsnode_motion/Robot.hpp>
+#include <srsnode_motion/StatePe.hpp>
+
+#include <srsnode_motion/tap/odometry/RosTapOdometry.hpp>
+#include <srsnode_motion/tap/brain_stem_status/RosTapBrainStemStatus.hpp>
+#include <srsnode_motion/tap/initial_pose/RosTapInitialPose.hpp>
+
+
+#include <srsnode_motion/tap/goal_plan/RosTapGoalPlan.hpp>
 
 namespace srs {
 
@@ -19,21 +36,58 @@ public:
 
     ~Motion()
     {
+        disconnectAllTaps();
     }
 
     void run();
 
 private:
-    constexpr static unsigned int REFRESH_RATE_HZ = 20;
+    constexpr static unsigned int REFRESH_RATE_HZ = 50;
+    constexpr static double ALPHA = 1.0;
+    constexpr static double BETA = 0.0;
+
+    void disconnectAllTaps();
+
+    void publishInformation();
+
+    void scanTapsForData();
+    void stepMotionController(double dT);
+    void stepUkf(double dT);
 
     vector<Velocity<>> cmdVel_;
-
-    ros::Publisher pubCmdVel_;
 
     ros::NodeHandle rosNodeHandle_;
     double executionTime_;
     int nextScheduled_;
+
+    ros::Publisher pubCmdVel_;
+    ros::Publisher pubOdom_;
+    tf::TransformBroadcaster rosTfBroadcaster_;
+
+    bool commandUpdated_;
+    CmdVelocity<> currentCommand_;
+
+    cv::Mat currentCovariance_;
+    StatePe<> currentState_;
+
+    Robot<> robot_;
+
+    RosTapBrainStemStatus tapBrainStemStatus_;
+    RosTapCmdVel<> tapCmdVel_;
+    RosTapOdometry tapOdometry_;
+    RosTapInitialPose tapInitialPose_;
     RosTapGoalPlan tapPlan_;
+
+    UnscentedKalmanFilter<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE> ukf_;
+
+    ros::Time previousTime_;
+    ros::Time currentTime_;
+
+    // TODO: Remove these variables
+    double previousTimeNs_;
+    double previousTimeS_;
+    double currentTimeNs_;
+    double currentTimeS_;
 };
 
 } // namespace srs

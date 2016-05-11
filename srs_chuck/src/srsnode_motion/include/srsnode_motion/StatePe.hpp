@@ -15,7 +15,7 @@
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
-#include <srsnode_position_estimator/Configuration.hpp>
+#include <srsnode_motion/Configuration.hpp>
 
 namespace srs {
 

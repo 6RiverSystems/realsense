@@ -50,7 +50,6 @@
     <include file="$(find srsnode_executive)/launch/node.launch" />
 
     <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
-    <include file="$(find srsnode_position_estimator)/launch/node.launch" />
 
     <!-- Launch the ros-bridge -->
     <!-- <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" /> -->

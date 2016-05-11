@@ -17,11 +17,11 @@ using namespace std;
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
 
-#include <srsnode_position_estimator/tap/odometry/OdometrySensor.hpp>
+#include <srsnode_motion/tap/odometry/OdometrySensor.hpp>
 
-#include <srsnode_position_estimator/Robot.hpp>
-#include <srsnode_position_estimator/StatePe.hpp>
-#include <srsnode_position_estimator/CmdVelocity.hpp>
+#include <srsnode_motion/Robot.hpp>
+#include <srsnode_motion/StatePe.hpp>
+#include <srsnode_motion/CmdVelocity.hpp>
 
 using namespace srs;
 
@@ -34,7 +34,7 @@ constexpr double DT = 0.5;
 
 #include "data/UkfTestData_Straight.hpp"
 
-TEST(Test_pe, Straight)
+TEST(Test_Motion, Straight)
 {
     // Create standard robot process model
     Robot<> robot;

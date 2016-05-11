@@ -16,7 +16,7 @@ using namespace std;
 #include <srslib_framework/filter/Command.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
-#include <srsnode_position_estimator/Configuration.hpp>
+#include <srsnode_motion/Configuration.hpp>
 
 namespace srs {
 

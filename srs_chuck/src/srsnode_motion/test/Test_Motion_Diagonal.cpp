@@ -16,13 +16,13 @@ using namespace std;
 #include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
+#include <srslib_framework/robotics/robot/RobotProfile.hpp>
 
-#include <srsnode_position_estimator/tap/odometry/OdometrySensor.hpp>
+#include <srsnode_motion/tap/odometry/OdometrySensor.hpp>
 
-#include <srsnode_position_estimator/RobotProfile.hpp>
-#include <srsnode_position_estimator/Robot.hpp>
-#include <srsnode_position_estimator/StatePe.hpp>
-#include <srsnode_position_estimator/CmdVelocity.hpp>
+#include <srsnode_motion/Robot.hpp>
+#include <srsnode_motion/StatePe.hpp>
+#include <srsnode_motion/CmdVelocity.hpp>
 
 using namespace srs;
 
@@ -33,9 +33,9 @@ constexpr double ALPHA = 1.0;
 constexpr double BETA = 0.0;
 constexpr double DT = 0.5;
 
-#include "data/TestData_Pe_Diagonal.hpp"
+#include "data/UkfTestData_Diagonal.hpp"
 
-TEST(Test_pe, Straight)
+TEST(Test_Motion, Diagonal)
 {
     // Create standard robot process model
     Robot<> robot;
@@ -109,11 +109,14 @@ TEST(Test_pe, Straight)
     {
         // Push the simulated measurement
         auto odometry = *measurements.at(t);
-        odometer.set(odometry.arrivalTime, odometry.linear, odometry.angular);
+        odometer.set(t * DT, odometry.velocity.linear, odometry.velocity.angular);
 
         // Run the step of the UKF
         ukf.run(t * DT, const_cast<CmdVelocity<>*>(commands.at(t)));
 
+        // TODO: Add the covariance to the test
+        // ASSERT_TRUE(test::Compare::similar<>(ukf.getCovariance(), correctCovariances[t], 2e-2)) <<
+        //      " Covariance matrix at time-step " << t;
         ASSERT_TRUE(test::Compare::similar<>(ukf.getState(), correctStates[t], 1e-1)) <<
             " State vector at time-step " << t;
     }

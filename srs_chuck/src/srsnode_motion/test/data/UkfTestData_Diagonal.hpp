@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef UKFTESTDATA_STRAIGHT_HPP_
-#define UKFTESTDATA_STRAIGHT_HPP_
+#ifndef UKFTESTDATA_DIAGONAL_HPP_
+#define UKFTESTDATA_DIAGONAL_HPP_
 
 namespace srs {
 
@@ -150,4 +150,4 @@ const static cv::Mat STATE_STEP_13 = (cv::Mat_<double>(UKF_STATE_SIZE, 1) <<
 
 } // namespace srs
 
-#endif // UKFTESTDATA_STRAIGHT_HPP_
+#endif // UKFTESTDATA_DIAGONAL_HPP_

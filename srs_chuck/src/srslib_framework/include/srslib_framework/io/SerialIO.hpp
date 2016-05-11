@@ -25,8 +25,6 @@ class SerialIO :
 {
 	typedef std::shared_ptr<boost::asio::deadline_timer> ConnectionTimer;
 
-	typedef std::function<void(std::vector<char>)> ReadCallbackFn;
-
 	enum class READ_STATE
 	{
 		DEFAULT,
@@ -40,7 +38,8 @@ public:
 
 	virtual ~SerialIO( );
 
-	void Open( const char* pszName, ReadCallbackFn readCallback );
+	void Open( const char* pszName, ConnectionCallbackFn connectionCallback,
+		ReadCallbackFn readCallback );
 
 	bool IsOpen( ) const;
 
@@ -81,6 +80,8 @@ public:
 private:
 
 	void WriteInSerialThread( std::vector<char> writeBuffer );
+
+	void StartAsyncTimer( );
 
 	void StartAsyncRead( );
 
@@ -125,7 +126,9 @@ private:
 
     std::vector<char>						m_readPartialData;
 
-    std::function<void(std::vector<char>)>	m_readCallback;
+    ConnectionCallbackFn					m_connectionCallback;
+
+    ReadCallbackFn							m_readCallback;
 
 	bool									m_bEnableCRC;
 

@@ -7,6 +7,7 @@
 #include <StarGazer.h>
 #include <srslib_framework/Aps.h>
 #include <srslib_framework/io/SerialIO.hpp>
+#include <srslib_framework/platform/Thread.hpp>
 
 namespace srs
 {
@@ -30,7 +31,6 @@ StarGazer::StarGazer( const std::string& strSerialPort, const std::string& strAp
 	m_messageProcessor.SetReadCallback(
 		std::bind( &StarGazer::ReadCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
 
-
 	std::shared_ptr<SerialIO> pSerialIO = std::dynamic_pointer_cast<SerialIO>( m_pSerialIO );
 
 	pSerialIO->SetLeadingCharacter( STARGAZER_STX );
@@ -38,8 +38,19 @@ StarGazer::StarGazer( const std::string& strSerialPort, const std::string& strAp
 	pSerialIO->SetFirstByteDelay( std::chrono::microseconds( 30000 ) );
 	pSerialIO->SetByteDelay( std::chrono::microseconds( 2000 ) );
 
-	pSerialIO->Open( strSerialPort.c_str( ), std::bind( &StarGazerMessageProcessor::ProcessStarGazerMessage,
-		&m_messageProcessor, std::placeholders::_1 ) );
+	auto processMessage = [&]( std::vector<char> buffer )
+		{
+			ExecuteInRosThread( std::bind( &StarGazerMessageProcessor::ProcessStarGazerMessage, &m_messageProcessor,
+				buffer ) );
+		};
+
+	auto connectionChanged = [&]( bool bIsConnected )
+	{
+		ExecuteInRosThread( std::bind( &StarGazer::OnConnectionChanged, this,
+				bIsConnected ) );
+	};
+
+	pSerialIO->Open( strSerialPort.c_str( ), connectionChanged, processMessage );
 }
 
 StarGazer::~StarGazer( )
@@ -52,14 +63,6 @@ void StarGazer::Run( )
 {
 	ros::Rate refreshRate( REFRESH_RATE_HZ );
 
-	Configure( );
-
-	// TODO: Set calculate height
-
-//	AutoCalculateHeight();
-
-	Start( );
-
 	while( ros::ok( ) )
 	{
 		ros::spinOnce( );
@@ -68,10 +71,18 @@ void StarGazer::Run( )
 
 		refreshRate.sleep( );
 	}
-
-	Stop( );
 }
 
+
+void StarGazer::OnConnectionChanged( bool bIsConnected )
+{
+	if( bIsConnected )
+	{
+		Configure( );
+
+		Start( );
+	}
+}
 
 void StarGazer::HardReset( )
 {
@@ -82,6 +93,8 @@ void StarGazer::HardReset( )
 
 void StarGazer::Configure( )
 {
+	m_messageProcessor.ResetState( );
+
 	Stop( );
 
 	m_messageProcessor.GetVersion( );

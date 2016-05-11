@@ -62,6 +62,16 @@ void StarGazerMessageProcessor::SetReadCallback( ReadCallbackFn readCallback )
 	m_readCallback = readCallback;
 }
 
+void StarGazerMessageProcessor::ResetState( )
+{
+	std::queue<QueuedMessage> empty;
+	std::swap( m_queueOutgoingMessages, empty );
+
+	m_mapPendingResponses.clear( );
+
+	m_bIsStarted = false;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // StarGazer Commands
 //////////////////////////////////////////////////////////////////////////

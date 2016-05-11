@@ -9,6 +9,7 @@
 #include <std_msgs/String.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <srslib_framework/io/SerialIO.hpp>
+#include <srslib_framework/platform/Thread.hpp>
 
 bool approximatively_equal(double x, double y, int ulp)
 {
@@ -47,8 +48,19 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
 	pSerialIO->SetTerminatingCharacter( '\n' );
 	pSerialIO->SetEscapeCharacter( '\\' );
 
-	pSerialIO->Open( strSerialPort.c_str( ), std::bind( &BrainStemMessageProcessor::ProcessBrainStemMessage, &m_messageProcessor,
-		std::placeholders::_1 ) );
+	auto processMessage = [&]( std::vector<char> buffer )
+	{
+		ExecuteInRosThread( std::bind( &BrainStemMessageProcessor::ProcessBrainStemMessage, &m_messageProcessor,
+				buffer ) );
+	};
+
+	auto connectionChanged = [&]( bool bIsConnected )
+	{
+		ExecuteInRosThread( std::bind( &BrainStem::OnConnectionChanged, this,
+				bIsConnected ) );
+	};
+
+	pSerialIO->Open( strSerialPort.c_str( ), connectionChanged, processMessage );
 }
 
 BrainStem::~BrainStem( )

@@ -66,16 +66,20 @@ SerialIO::~SerialIO( )
 	m_Thread->join( );
 }
 
-void SerialIO::Open( const char* pszName, ReadCallbackFn readCallback )
+void SerialIO::Open( const char* pszName, ConnectionCallbackFn connectionCallback,
+	ReadCallbackFn readCallback )
 {
 	if( !IsOpen( ) )
 	{
 		std::condition_variable condition;
+
 		std::mutex mutex;
 
 		m_IOService.post( [&]( )
 			{
 				m_strSerialPort = pszName;
+
+				m_connectionCallback = connectionCallback;
 
 				m_readCallback = readCallback;
 
@@ -104,9 +108,10 @@ bool SerialIO::IsOpen( ) const
 
 void SerialIO::Close( )
 {
-	m_SerialPort.close( );
-
-	m_strSerialPort = "";
+	if( m_SerialPort.is_open( ) )
+	{
+		m_SerialPort.close( );
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -244,6 +249,16 @@ void SerialIO::WriteInSerialThread( std::vector<char> writeBuffer )
 		m_SerialPort.async_write_some( boost::asio::buffer( m_writeBuffer.data( ), writeSize ),
 			std::bind( &SerialIO::OnWriteComplete, this, std::placeholders::_1, std::placeholders::_2 ) );
 	}
+}
+
+void SerialIO::StartAsyncTimer( )
+{
+	m_oTimer->cancel( );
+
+	m_oTimer->async_wait( [&]( const boost::system::error_code& e )
+		{
+			OnCheckSerialPort( false, e );
+		} );
 }
 
 void SerialIO::StartAsyncRead( )
@@ -476,6 +491,10 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 	{
 		StartAsyncRead( );
 	}
+	else
+	{
+		StartAsyncTimer( );
+	}
 }
 
 bool SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error_code& e )
@@ -526,8 +545,8 @@ bool SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error
 
 		if( !m_bIsSerialOpen && bInitialCheck )
 		{
-			ROS_DEBUG( "Error connecting to serial port (%s): %s (Retry: %.2f)", m_strSerialPort.c_str( ), strError.c_str( ),
-				m_fRetryTimeout );
+			ROS_DEBUG( "Error connecting to serial port (%s): %s (Will retry every %.2f seconds)", m_strSerialPort.c_str( ),
+				strError.c_str( ), m_fRetryTimeout );
 		}
 	}
 
@@ -535,11 +554,17 @@ bool SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error
 	{
 		if( m_bIsSerialOpen == true )
 		{
-			ROS_INFO( "Connected to serial port" );
+			ROS_INFO( "Connected to serial port: %s", m_strSerialPort.c_str( ) );
 		}
 		else
 		{
-			ROS_ERROR( "Disconnected from serial port: %s (Retry: %.2f)", strError.c_str( ), m_fRetryTimeout );
+			ROS_ERROR( "Disconnected from serial port (%s): %s (Will retry every %.2f seconds)", m_strSerialPort.c_str( ),
+				strError.c_str( ), m_fRetryTimeout );
+		}
+
+		if( m_connectionCallback )
+		{
+			m_connectionCallback( m_bIsSerialOpen );
 		}
 	}
 
@@ -550,10 +575,7 @@ bool SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error
 	}
 	else
 	{
-		m_oTimer->async_wait( [&]( const boost::system::error_code& e )
-			{
-				OnCheckSerialPort( false, e );
-			} );
+		StartAsyncTimer( );
 	}
 
 	return m_bIsSerialOpen;

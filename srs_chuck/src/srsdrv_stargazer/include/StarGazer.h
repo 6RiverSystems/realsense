@@ -23,6 +23,8 @@ public:
 
 	void Run( );
 
+	void OnConnectionChanged( bool bIsConnected );
+
 	void SetOdometryCallback( OdometryCallbackFn callback );
 
 	void HardReset( );

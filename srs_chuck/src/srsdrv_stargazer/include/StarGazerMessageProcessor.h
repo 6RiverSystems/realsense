@@ -89,6 +89,8 @@ public:
 
 	void SetReadCallback( ReadCallbackFn readCallback );
 
+	void ResetState( );
+
 	void HardReset( );
 
 	void CalcStop( );

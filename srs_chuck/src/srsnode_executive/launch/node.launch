@@ -6,8 +6,8 @@
   *
 -->
 <launch>
-    <node name="srsnode_highlevel_behavior"
-        pkg="srsnode_highlevel_behavior" 
-        type="srsnode_highlevel_behavior"
+    <node name="srsnode_executive"
+        pkg="srsnode_executive" 
+        type="srsnode_executive"
         output="screen" respawn="true"/>
 </launch>

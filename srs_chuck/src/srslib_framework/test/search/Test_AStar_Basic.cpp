@@ -32,7 +32,7 @@ TEST(Test_AStar, SearchCreation)
     test::Grid2dUtils::addLocationCost(grid, 4, 1, 1000, &permanentObstacle);
     test::Grid2dUtils::addRectangleCost(grid, 3, 4, 3, 7, 1000, &permanentObstacle);
 
-    AStar<Grid2d> algorithm(grid);
+    AStar<Grid2d> algorithm(&grid);
 
     Grid2d::LocationType start(0, 0);
     Grid2d::LocationType goal(GRID_SIZE - 1, GRID_SIZE - 1);

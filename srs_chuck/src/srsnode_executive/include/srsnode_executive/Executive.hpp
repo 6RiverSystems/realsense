@@ -34,8 +34,8 @@ private:
     void disconnectAllTaps();
 
     void planToGoal(Pose<> goal);
-    void publishPlan();
-    void publishPose0();
+    void publishGoal();
+    void publishInitialPose();
 
     void stepExecutiveFunctions();
 
@@ -43,11 +43,13 @@ private:
 
     Grid2d grid_;
 
-    ros::Publisher pubPlan_;
+    ros::Publisher pubGoalPlan_;
+    ros::Publisher pubGoalGoal_;
     ros::Publisher pubInitialPose_;
 
-    Pose<> robotPose_;
-    Pose<> robotPose0_;
+    Pose<> robotCurrentPose_;
+    Pose<> robotInitialPose_;
+    Pose<> currentGoal_;
 
     ros::NodeHandle rosNodeHandle_;
 

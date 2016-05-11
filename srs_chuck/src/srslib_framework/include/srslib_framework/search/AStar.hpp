@@ -28,7 +28,12 @@ public:
     typedef SearchNode<GRAPH> SearchNodeType;
     typedef SearchAction<GRAPH> SearchActionType;
 
-    AStar(const GRAPH& graph) :
+    AStar() :
+        graph_(nullptr),
+        lastNode_(nullptr)
+    {}
+
+    AStar(GRAPH* graph) :
         graph_(graph),
         lastNode_(nullptr)
     {}
@@ -75,8 +80,14 @@ public:
         return result;
     }
 
-    void search(SearchPosition<GRAPH> start, SearchPosition<GRAPH> goal)
+    bool search(SearchPosition<GRAPH> start, SearchPosition<GRAPH> goal)
     {
+        clear();
+        if (!graph_)
+        {
+            return false;
+        }
+
         SearchActionType startAction = SearchActionType(SearchActionType::START,
             start, 0, SearchPosition<GRAPH>::heuristic(start, goal));
         SearchNodeType* currentNode = new SearchNodeType(startAction, nullptr);
@@ -84,7 +95,6 @@ public:
         SearchActionType goalAction = SearchActionType(SearchActionType::NONE, goal);
         SearchNodeType goalNode = SearchNodeType(goalAction, nullptr);
 
-        clear();
         open_.push(currentNode->getTotalCost(), currentNode);
 
         while (!open_.empty())
@@ -99,7 +109,7 @@ public:
 
                 lastNode_ = new SearchNodeType(searchAction, currentNode);
 
-                break;
+                return true;
             }
 
             closed_.insert(currentNode);
@@ -119,6 +129,11 @@ public:
                 }
             }
         }
+    }
+
+    void setGraph(GRAPH* const graph)
+    {
+        graph_ = graph;
     }
 
 private:
@@ -151,7 +166,7 @@ private:
     unordered_set<SearchNodeType*> closed_;
     MappedPriorityQueue<SearchNodeType*, unsigned int> open_;
 
-    GRAPH graph_;
+    GRAPH* graph_;
     SearchNodeType* lastNode_;
 };
 

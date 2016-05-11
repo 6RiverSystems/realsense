@@ -4,13 +4,14 @@
 
 int main(int argc, char** argv)
 {
-    // Initialize ROS
-    ros::init(argc, argv, "srsnode_motion");
+    const static string NODE_NAME = "srsnode_motion";
 
-    ROS_INFO_STREAM("srsnode_motion started");
+    // Initialize ROS
+    ros::init(argc, argv, NODE_NAME);
+    ROS_INFO_STREAM(NODE_NAME << " started");
 
     // Create the estimator and run it
-    srs::Motion motion;
+    srs::Motion motion(NODE_NAME);
     motion.run();
 
     return 0;

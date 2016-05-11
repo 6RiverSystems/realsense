@@ -23,6 +23,8 @@ class RosTapCmd_Goal :
     public RosTap
 {
 public:
+    typedef typename Pose<>::BaseType BaseType;
+
     RosTapCmd_Goal(string nodeName) :
         RosTap(nodeName, "Command 'Goal' Tap")
     {}
@@ -38,6 +40,17 @@ public:
         return currentGoal_;
     }
 
+    void reset()
+    {
+        set(Time::time2number(ros::Time::now()), 0.0, 0.0, 0.0);
+    }
+
+    void set(double arrivalTime, BaseType x, BaseType y, BaseType theta)
+    {
+        currentGoal_ = Pose<>(arrivalTime, x, y, theta);
+        setNewData(true);
+    }
+
 protected:
     bool connect()
     {
@@ -48,11 +61,10 @@ protected:
 private:
     void onGoal(const geometry_msgs::PoseStampedConstPtr message)
     {
-        currentGoal_ = Pose<>(Time::time2number(message->header.stamp),
+        set(Time::time2number(message->header.stamp),
             message->pose.position.x,
             message->pose.position.y,
             tf::getYaw(message->pose.orientation));
-        setNewData(true);
     }
 
     Pose<> currentGoal_;

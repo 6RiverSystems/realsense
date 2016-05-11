@@ -32,7 +32,7 @@ struct SearchAction
     static array<ActionEnum, 5> ACTIONS;
 
     static SearchAction<GRAPH> instanceOf(ActionEnum action,
-        GRAPH& graph, SearchNode<GRAPH>* associatedNode)
+        GRAPH* graph, SearchNode<GRAPH>* associatedNode)
     {
         switch (action)
         {
@@ -75,7 +75,7 @@ private:
 
     static unordered_map<int, string> ENUM_NAMES;
 
-    static SearchAction<GRAPH> addBackward(GRAPH& graph, SearchNode<GRAPH>* associatedNode)
+    static SearchAction<GRAPH> addBackward(GRAPH* graph, SearchNode<GRAPH>* associatedNode)
     {
         SearchAction<GRAPH> action(BACKWARD);
         int currentOrientation = associatedNode->action.position.orientation;
@@ -83,14 +83,14 @@ private:
         int direction = Math::normalizeAngleDeg(currentOrientation - 180);
 
         typename GRAPH::LocationType neighbor;
-        if (graph.getNeighbor(associatedNode->action.position.location, direction, neighbor))
+        if (graph->getNeighbor(associatedNode->action.position.location, direction, neighbor))
         {
             SearchPosition<GRAPH> newPosition(neighbor, currentOrientation);
 
             SearchPositionNote* positionNote = reinterpret_cast<SearchPositionNote*>(
-                graph.getNote(neighbor));
+                graph->getNote(neighbor));
 
-            unsigned int locationCost = graph.getCost(neighbor);
+            unsigned int locationCost = graph->getCost(neighbor);
             unsigned int commandCost = getCommandCost(BACKWARD, positionNote);
             unsigned int totalCost = Math::noOverflowAdd(locationCost, commandCost);
 
@@ -104,20 +104,20 @@ private:
         return SearchAction<GRAPH>(NONE);
     }
 
-    static SearchAction<GRAPH> addForward(GRAPH& graph, SearchNode<GRAPH>* associatedNode)
+    static SearchAction<GRAPH> addForward(GRAPH* graph, SearchNode<GRAPH>* associatedNode)
     {
         SearchAction<GRAPH> action(FORWARD);
         int currentOrientation = associatedNode->action.position.orientation;
 
         typename GRAPH::LocationType neighbor;
-        if (graph.getNeighbor(associatedNode->action.position.location, currentOrientation, neighbor))
+        if (graph->getNeighbor(associatedNode->action.position.location, currentOrientation, neighbor))
         {
             SearchPosition<GRAPH> newPosition(neighbor, currentOrientation);
 
             SearchPositionNote* positionNote = reinterpret_cast<SearchPositionNote*>(
-                graph.getNote(neighbor));
+                graph->getNote(neighbor));
 
-            unsigned int locationCost = graph.getCost(neighbor);
+            unsigned int locationCost = graph->getCost(neighbor);
             unsigned int commandCost = getCommandCost(FORWARD, positionNote);
             unsigned int totalCost = Math::noOverflowAdd(locationCost, commandCost);
 
@@ -131,7 +131,7 @@ private:
         return SearchAction<GRAPH>(NONE);
     }
 
-    static SearchAction<GRAPH> addRotation(GRAPH& graph, SearchNode<GRAPH>* associatedNode,
+    static SearchAction<GRAPH> addRotation(GRAPH* graph, SearchNode<GRAPH>* associatedNode,
         ActionEnum actionEnum, int angle)
     {
         SearchAction<GRAPH> action(actionEnum);
@@ -141,7 +141,7 @@ private:
         SearchPosition<GRAPH> newPosition(associatedNode->action.position, newOrientation);
 
         SearchPositionNote* positionNote = reinterpret_cast<SearchPositionNote*>(
-            graph.getNote(associatedNode->action.position.location));
+            graph->getNote(associatedNode->action.position.location));
         unsigned int commandCost = getCommandCost(actionEnum, positionNote);
 
         action.position = newPosition;

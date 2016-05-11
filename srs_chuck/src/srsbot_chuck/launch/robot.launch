@@ -41,13 +41,13 @@
         <rosparam file="$(arg global_costmap_params)" command="load" />
         <rosparam file="$(arg global_planner_params)" command="load" />
     </node>
--->\
+-->
     <!-- Launch all the robot components -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
 
     <include file="$(find srsnode_reflexes)/launch/node.launch" />
-<!--    <include file="$(find srsnode_motion)/launch/node.launch" />  -->
-<!--    <include file="$(find srsnode_executive)/launch/node.launch" /> -->
+    <include file="$(find srsnode_motion)/launch/node.launch" />
+    <include file="$(find srsnode_executive)/launch/node.launch" />
 
     <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
     <include file="$(find srsnode_position_estimator)/launch/node.launch" />

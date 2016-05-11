@@ -54,7 +54,7 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/srsnode_executive/initial_pose", 1,
+        rosSubscriber_ = rosNodeHandle_.subscribe("/srsnode_executive/state/initial_pose", 1,
             &RosTapInitialPose::onInitialPose, this);
 
         return true;

@@ -58,6 +58,8 @@ private:
 
 	OdometryCallbackFn									m_odometryCallback;
 
+	bool												m_bIsStarted;
+
 private:
 
 	void SendNextMessage( );

@@ -18,6 +18,8 @@ namespace srs
 const char STARGAZER_STX = '~';
 const char STARGAZER_RTX = '`';
 const char STARGAZER_SEPERATOR = '|';
+const std::string STARGAZER_START( "CalcStart" );
+const std::string STARGAZER_STOP( "CalcStop" );
 
 const std::chrono::microseconds STARTGAZER_TIMEOUT( 500000 );
 

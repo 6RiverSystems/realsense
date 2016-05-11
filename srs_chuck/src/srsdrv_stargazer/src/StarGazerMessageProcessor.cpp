@@ -30,7 +30,8 @@ StarGazerMessageProcessor::StarGazerMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_mapPendingResponses( ),
 	m_odometryRegex( ),
 	m_messageRegex( ),
-	m_highrezclk( )
+	m_highrezclk( ),
+	m_bIsStarted( false )
 {
 	// Protect against odd compiler versions (boost seems to fix the regex bugs in gcc 4.8.4)
 	try
@@ -149,12 +150,12 @@ void StarGazerMessageProcessor::BaseReadCommand( std::string cmd )
 
 void StarGazerMessageProcessor::CalcStop( )
 {
-	BaseWriteCommand( "CalcStop" );
+	BaseWriteCommand( STARGAZER_STOP );
 }
 
 void StarGazerMessageProcessor::CalcStart( )
 {
-	BaseWriteCommand( "CalcStart" );
+	BaseWriteCommand( STARGAZER_START );
 }
 
 void StarGazerMessageProcessor::SetMarkType( STAR_GAZER_LANDMARK_TYPES type )
@@ -263,9 +264,16 @@ void StarGazerMessageProcessor::PumpMessageProcessor( )
 	{
 		m_mapPendingResponses.erase( expiredMsg.first );
 
-		ROS_DEBUG_STREAM_NAMED("StarGazerMessageProcessor", "ACK timeout - retransmitting " << expiredMsg.second.msg.command );
+		if( expiredMsg.first == expiredMsg.second.msg.expectedAck2 )
+		{
+			// Assume that we have already saved the value since no ack is received
+		}
+		else
+		{
+			ROS_DEBUG_STREAM_NAMED("StarGazerMessageProcessor", "ACK timeout - retransmitting " << expiredMsg.second.msg.command );
 
-		SendRawCommand( expiredMsg.second.msg );
+			SendRawCommand( expiredMsg.second.msg );
+		}
 	}
 }
 
@@ -291,48 +299,55 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 	{
 		case STAR_GAZER_MESSAGE_TYPES::POSE:
 		{
-			if( boost::regex_match( regexString, regexMatch, m_odometryRegex ) )
+			if( m_bIsStarted )
 			{
-				if( regexMatch.size( ) != 6 )
+				if( boost::regex_match( regexString, regexMatch, m_odometryRegex ) )
 				{
-					ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry with only " <<
-						regexMatch.size( ) << " fields: " << std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
-				}
-				else if( m_odometryCallback )
-				{
-					try
+					if( regexMatch.size( ) != 6 )
 					{
-						int tagID = std::stoul( regexMatch[1] );
-
-						float angle = std::stof( regexMatch[2] );
-
-						float x = std::stof( regexMatch[3] );
-
-						float y = std::stof( regexMatch[4] );
-
-						float z = std::stof( regexMatch[5] );
-
-						m_odometryCallback( tagID, x, y, z, angle );
+						ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry with only " <<
+							regexMatch.size( ) << " fields: " << std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
 					}
-					catch( const std::invalid_argument& )
+					else if( m_odometryCallback )
 					{
-						ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry has invalid parameter" );
+						try
+						{
+							int tagID = std::stoul( regexMatch[1] );
+
+							float angle = std::stof( regexMatch[2] );
+
+							float x = std::stof( regexMatch[3] );
+
+							float y = std::stof( regexMatch[4] );
+
+							float z = std::stof( regexMatch[5] );
+
+							m_odometryCallback( tagID, x, y, z, angle );
+						}
+						catch( const std::invalid_argument& )
+						{
+							ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry has invalid parameter" );
+						}
+						catch( const std::out_of_range& )
+						{
+							ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry has parameter out of range" );
+						}
 					}
-					catch( const std::out_of_range& )
+					else
 					{
-						ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry has parameter out of range" );
+						ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor",
+							"Serial port data read but no callback specified!" );
 					}
 				}
 				else
 				{
-					ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor",
-						"Serial port data read but no callback specified!" );
+					ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry with bad format: " <<
+						std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
 				}
 			}
 			else
 			{
-				ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry with bad format: " <<
-					std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
+				ROS_DEBUG_STREAM_THROTTLE_NAMED( 0.5, "StarGazerMessageProcessor", "Odometry info recieved before start, ignoring." );
 			}
 		}
 		break;
@@ -351,13 +366,13 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 			{
 				auto pendingMessage = iter->second;
 
-				ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Got ack for: " << typeStr );
+				ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Got ack for: " << typeStr );
 
 				// If we are expecting an additional ack then add it to the pending message list
 				if( pendingMessage.msg.expectedAck2.size( ) &&
 					pendingMessage.msg.expectedAck1 == typeStr )
 				{
-					ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Adding additional expected ack: " << pendingMessage.msg.expectedAck2 );
+					ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Adding additional expected ack: " << pendingMessage.msg.expectedAck2 );
 
 					m_mapPendingResponses[pendingMessage.msg.expectedAck2] = pendingMessage;
 
@@ -366,6 +381,15 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 				// If we are expecting read data, then wait for RETURN_VALUE message
 				else if( pendingMessage.msg.type != STAR_GAZER_MESSAGE_TYPES::READ )
 				{
+					if( pendingMessage.msg.command == STARGAZER_START )
+					{
+						m_bIsStarted = true;
+					}
+					else if( pendingMessage.msg.command == STARGAZER_STOP )
+					{
+						m_bIsStarted = false;
+					}
+
 					// Erase the pending ack from our expected responses
 					m_mapPendingResponses.erase( iter );
 
@@ -387,7 +411,7 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 			{
 				m_mapPendingResponses.erase( iter );
 
-				ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Got return value for: " << typeStr );
+				ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Got return value for: " << typeStr );
 
 				SendNextMessage( );
 			}

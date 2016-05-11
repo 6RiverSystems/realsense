@@ -62,7 +62,6 @@ private:
 	std::shared_ptr<IO>			m_pSerialIO;
 
 	StarGazerMessageProcessor	m_messageProcessor;
-
 };
 
 } // namespace srs

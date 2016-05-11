@@ -399,6 +399,9 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				{
 					if( messageData[0] == '<' )
 					{
+//						ROS_ERROR_STREAM_NAMED( "SerialIO", "ReadData: " <<
+//							std::string( messageData.begin( ), messageData.end( ) ) );
+
 						m_cCRC = 0;
 					}
 					else if( m_bEnableCRC )

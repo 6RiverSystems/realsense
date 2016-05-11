@@ -13,6 +13,7 @@
 #include <condition_variable>
 #include <boost/range/irange.hpp>
 #include <ros/ros.h>
+#include <boost/timer.hpp>
 
 using namespace srs;
 
@@ -114,6 +115,9 @@ public:
 		STAR_GAZER
 	};
 
+	static const char STARGAZER_LEADING = '~';
+	static const char STARGAZER_TERMINATING = '`';
+
 public:
 
 	SerialIO						m_serial1;
@@ -143,7 +147,7 @@ public:
 
 	void OpenSerialPort( SerialIO& serial, std::string strPort, CONFIG eConfig,
 		void (SerialIOTest::* callback) (std::vector<char>) )
-	{
+	{;
 		auto connectionCallback = [](bool bIsConnected) { };
 
 		auto readCallback = std::bind( callback, this, std::placeholders::_1 );
@@ -170,8 +174,8 @@ public:
 
 			case CONFIG::STAR_GAZER:
 			{
-				serial.SetLeadingCharacter( '~' );
-				serial.SetTerminatingCharacter( '`' );
+				serial.SetLeadingCharacter( STARGAZER_LEADING );
+				serial.SetTerminatingCharacter( STARGAZER_TERMINATING );
 				serial.SetFirstByteDelay( std::chrono::microseconds( 30000 ) );
 				serial.SetByteDelay( std::chrono::microseconds( 5000 ) );
 			}
@@ -221,7 +225,7 @@ public:
 	{
 		std::queue<std::vector<char>> emptyQueue;
 
-		m_readData1.swap( emptyQueue );
+		m_readData1.swap( emptyQueue );;
 
 		m_readData2.swap( emptyQueue );
 
@@ -266,7 +270,7 @@ public:
 		{
 			std::unique_lock<std::mutex> lock( mutex );
 
-			if( condition.wait_until( lock, std::chrono::steady_clock::now( ) + std::chrono::milliseconds( 500 ) ) == std::cv_status::timeout )
+			if( condition.wait_until( lock, std::chrono::steady_clock::now( ) + std::chrono::milliseconds( 1000 ) ) == std::cv_status::timeout )
 			{
 				break;
 			}
@@ -437,64 +441,95 @@ TEST_F( SerialIOTest, TestDuplexReadWrite )
 	}
 }
 
-TEST_F( SerialIOTest, TestEscapeReset )
+TEST_F( SerialIOTest, TestCarryOver )
 {
-	OpenSerialPorts( );
+	OpenSerialPort1( CONFIG::RAW );
 
-}
+	OpenSerialPort2( CONFIG::BRAIN_STEM );
 
-TEST_F( SerialIOTest, TestValidCRC )
-{
-	OpenSerialPorts( );
+	std::vector<char> data( { 'H', 'e', 'l', 'l', 'o' } );
 
+	uint32_t index = 3;
+
+	m_serial1.Write( std::vector<char>( data.begin( ), data.begin( ) + index ) );
+	m_serial1.Write( std::vector<char>( data.begin( ) + index, data.end( ) ) );
+	m_serial1.Write( std::vector<char>( { (char)-0xF4, '\n' } ) );
+
+	WaitForData2( g_vecTestData.size( ) );
+
+	ASSERT_EQ( m_readData2.size( ), 1 );
+
+	EXPECT_EQ( data, m_readData2.front( ) );
 }
 
 TEST_F( SerialIOTest, TestInvalidCRC )
 {
-	OpenSerialPorts( );
+	OpenSerialPort1( CONFIG::RAW );
 
+	OpenSerialPort2( CONFIG::BRAIN_STEM );
+
+	std::vector<char> data( { 'H', 'e', 'l', 'l', 'o' } );
+
+	uint32_t index = 3;
+
+	m_serial1.Write( std::vector<char>( data.begin( ), data.begin( ) + index ) );
+	m_serial1.Write( std::vector<char>( data.begin( ) + index, data.end( ) ) );
+	m_serial1.Write( std::vector<char>( { 'x', '\n' } ) );
+
+	WaitForData2( g_vecTestData.size( ) );
+
+	ASSERT_NE( m_readData2.size( ), 1 );
+
+	EXPECT_NE( data, m_readData2.front( ) );
 }
 
 TEST_F( SerialIOTest, TestStartInMiddleOfMessage )
 {
-	OpenSerialPorts( );
+	OpenSerialPort1( CONFIG::RAW );
 
-}
+	OpenSerialPort2( CONFIG::STAR_GAZER );
 
-TEST_F( SerialIOTest, TestLeadingAndTrailing )
-{
+	for( auto data : g_vecTestData )
+	{
+		// Garbage data to ignore
+		m_serial1.Write( data );
 
-}
+		m_serial1.Write( std::vector<char>( { STARGAZER_LEADING } ) );
 
-TEST_F( SerialIOTest, TestMultipleReadWrites )
-{
-	OpenSerialPorts( );
+		m_serial1.Write( data );
 
-}
+		m_serial1.Write( std::vector<char>( { STARGAZER_TERMINATING } ) );
+	}
 
-TEST_F( SerialIOTest, TestMultipleMessages )
-{
-	OpenSerialPorts( );
+	WaitForData2( g_vecTestData.size( ) );
+
+	for( auto data : g_vecTestData )
+	{
+		EXPECT_EQ( m_readData2.front( ), data );
+
+		m_readData2.pop( );
+	}
 }
 
 TEST_F( SerialIOTest, TestCloseWhileReadWrite )
 {
 	OpenSerialPorts( );
 
-	std::string dataLarge;
+	std::vector<char> data;
+
+	std::string str64Bytes( "1234567890123456789012345678901234567890123456789012345678901234" );
 
 	// 65k of data
 	for( int i : boost::irange( 0, 1024 ) )
 	{
-		// Add in increments of 64 bytes
-		dataLarge += "1234567890123456789012345678901234567890123456789012345678901234";
+		data.insert( data.end( ), str64Bytes.begin( ), str64Bytes.end( ) );
 	}
 
-	std::vector<char> data1( dataLarge.begin( ), dataLarge.end( ) );
+	std::vector<char> data1( data.begin( ), data.end( ) );
 
-	m_serial1.Write( data1 );
+	m_serial1.Write( data );
 
-	m_serial2.Write( data1 );
+	m_serial2.Write( data );
 
 	// Closing while reading and writing is perfectly fine
 	m_serial1.Close( );
@@ -504,7 +539,36 @@ TEST_F( SerialIOTest, TestCloseWhileReadWrite )
 
 TEST_F( SerialIOTest, TestBandwidth )
 {
+	OpenSerialPorts( );
 
+	std::vector<char> data;
+
+	std::string str64Bytes( "1234567890123456789012345678901234567890123456789012345678901234" );
+
+	// 65k of data
+	for( int i : boost::irange( 0, 1024 ) )
+	{
+		// Add in increments of 64 bytes
+		data.insert( data.end( ), str64Bytes.begin( ), str64Bytes.end( ) );
+	}
+
+	boost::timer oTimer;
+
+	m_serial1.Write( data );
+
+	WaitForData2( 1 );
+
+	double dfTime = oTimer.elapsed( );
+
+	double dfBytes = (double)data.size( );
+
+	double dfBandwidth =  dfBytes / dfTime;
+
+	EXPECT_EQ( m_readData2.front( ), data );
+
+	EXPECT_GT( dfBandwidth, 115200.0f * 0.90 );
+
+	ROS_DEBUG( "SerialIO Bandwidth: %f bytes/sec", dfBandwidth );
 }
 
 }  // namespace

@@ -421,7 +421,11 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					}
 					else if( m_bEnableCRC )
 					{
-						messageData.pop_back( );
+						// Don't remove the crc if we failed
+						if( m_cCRC == 0 )
+						{
+							messageData.pop_back( );
+						}
 					}
 					else
 					{
@@ -445,7 +449,8 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					}
 					else
 					{
-						ROS_ERROR_STREAM_NAMED( "SerialIO", "Invalid CRC (" << m_cCRC << "): " << ToHex( messageData ) );
+						ROS_ERROR_STREAM_NAMED( "SerialIO", "Invalid CRC: " << ToHex( messageData ) <<
+							"(CRC: " << ToHex( std::vector<char>( { (char)m_cCRC } ) ) << ")" );
 					}
 				}
 				else

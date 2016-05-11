@@ -122,7 +122,7 @@ private:
 
 	READ_STATE								m_readState;
 
-	uint8_t									m_cCRC = 0;
+	uint8_t									m_cCRC;
 
     std::vector<char>						m_readPartialData;
 

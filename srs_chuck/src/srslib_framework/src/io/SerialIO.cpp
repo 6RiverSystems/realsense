@@ -38,6 +38,13 @@ SerialIO::SerialIO( ) :
 	m_cEscape( 0 ),
 	m_firstByteDelay( ),
 	m_interByteDelay( )
+#if defined( ENABLE_TEST_FIXTURE )
+	,
+	m_highrezclk( ),
+	m_lastTime( std::chrono::milliseconds( 0 ) ),
+	m_messageTiming( ),
+	m_vecMessageTiming( )
+#endif
 {
 	m_oTimer.reset( new boost::asio::deadline_timer( m_IOService, boost::posix_time::seconds( 5 ) ) );
 
@@ -142,9 +149,19 @@ void SerialIO::SetFirstByteDelay( std::chrono::microseconds firstByteDelay )
 	m_firstByteDelay = firstByteDelay;
 }
 
+std::chrono::microseconds SerialIO::GetFirstByteDelay( )
+{
+	return m_firstByteDelay;
+}
+
 void SerialIO::SetByteDelay( std::chrono::microseconds byteDelay )
 {
 	m_byteDelay = byteDelay;
+}
+
+std::chrono::microseconds SerialIO::GetByteDelay( )
+{
+	return m_byteDelay;
 }
 
 void SerialIO::Write( const std::vector<char>& buffer )
@@ -217,7 +234,9 @@ void SerialIO::WriteInSerialThread( std::vector<char> writeBuffer )
 		m_interByteDelay = m_firstByteDelay;
 
 		// If we have a first byte delay only write one byte
-		size_t writeSize = (m_interByteDelay == std::chrono::microseconds( )) ? m_writeBuffer.size( ) : 1;
+		size_t writeSize = m_interByteDelay.count( ) ?  1 : m_writeBuffer.size( );
+
+//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write Bytes: " << writeSize );
 
 		m_SerialPort.async_write_some( boost::asio::buffer( m_writeBuffer.data( ), writeSize ),
 			std::bind( &SerialIO::OnWriteComplete, this, std::placeholders::_1, std::placeholders::_2 ) );
@@ -233,7 +252,7 @@ void SerialIO::StartAsyncRead( )
 void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::size_t size )
 {
 	assert( m_serialThreadId == std::this_thread::get_id( ) );
-
+//
 //	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write Complete: " <<
 //		ToHex( std::vector<char>( m_writeBuffer.begin( ), m_writeBuffer.begin( ) + size ) ) );
 
@@ -241,14 +260,35 @@ void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::siz
 
 	if( m_writeBuffer.begin( ) != m_writeBuffer.end( ) )
 	{
+//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write Bytes: sleep for " << m_interByteDelay.count( ) );
+
 		std::this_thread::sleep_for( m_interByteDelay );
 
 		m_interByteDelay = m_byteDelay;
 
-		size_t writeSize = (m_interByteDelay == std::chrono::microseconds( )) ? m_writeBuffer.size( ) : 1;
+		size_t writeSize = m_interByteDelay.count( ) ? 1 : m_writeBuffer.size( );
 
 		m_SerialPort.async_write_some( boost::asio::buffer( m_writeBuffer.data( ), writeSize ),
 			std::bind( &SerialIO::OnWriteComplete, this, std::placeholders::_1, std::placeholders::_2 ) );
+
+		// Reset the first byte delay if we encounter a start or end of message
+		if( size == 1 && m_firstByteDelay.count( ) )
+		{
+			if( m_bHasLeading )
+			{
+				if( m_cLeading == m_writeBuffer[0] )
+				{
+					m_interByteDelay = m_firstByteDelay;
+				}
+			}
+			else if( m_bHasTerminating )
+			{
+				if( m_cTerminating == m_writeBuffer[0] )
+				{
+					m_interByteDelay = m_firstByteDelay;
+				}
+			}
+		}
 	}
 	else
 	{
@@ -258,6 +298,12 @@ void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::siz
 
 void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size_t size )
 {
+	#if defined( ENABLE_TEST_FIXTURE )
+
+		auto now = m_highrezclk.now( );
+
+	#endif
+
 	assert( m_serialThreadId == std::this_thread::get_id( ) );
 
 	if( !error )
@@ -267,12 +313,47 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 
 //		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Left over read data: " << ToHex( messageData ) );
 
+		auto changeState =
+			[&]( const READ_STATE& eNewState )
+			{
+				#if defined( ENABLE_TEST_FIXTURE )
+					if( m_readState == READ_STATE::DEFAULT &&
+						eNewState == READ_STATE::IN_MESSAGE )
+					{
+//						ROS_DEBUG_NAMED( "SerialIO", "Time reset" );
+
+						m_lastTime = now;
+					}
+				#endif
+
+				m_readState = eNewState;
+			};
+
+		// Function to add an escaped char (if necessary) to the array
+		auto addCharacter =
+			[&]( const char& cChar )
+			{
+				messageData.push_back( cChar );
+
+				m_cCRC += cChar;
+			};
+
 		for( auto iter = m_readBuffer.begin( ); iter < m_readBuffer.begin( ) + size; iter++ )
 		{
+			#if defined( ENABLE_TEST_FIXTURE )
+
+//				ROS_DEBUG_NAMED( "SerialIO", "Time between reads %d: %d ", messageData.size( ), std::chrono::duration_cast<std::chrono::microseconds>(now - m_lastTime).count( ) );
+
+				m_messageTiming.push_back( std::chrono::duration_cast<std::chrono::microseconds>(now - m_lastTime) );
+
+				m_lastTime = now;
+
+			#endif
+
 			// If we do not have a leading character, then we are always in a message
 			if( m_readState == READ_STATE::DEFAULT && !m_bHasLeading )
 			{
-				m_readState = READ_STATE::IN_MESSAGE;
+				changeState( READ_STATE::IN_MESSAGE );
 			}
 
 //			ROS_ERROR_NAMED( "SerialIO", "Char: %.2x", *iter );
@@ -282,15 +363,13 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 			{
 				if( m_readState == READ_STATE::IN_MESSAGE_ESCAPED )
 				{
-					messageData.push_back( *iter );
+					addCharacter( *iter );
 
-					m_cCRC += *iter;
-
-					m_readState = READ_STATE::IN_MESSAGE;
+					changeState( READ_STATE::IN_MESSAGE );
 				}
 				else
 				{
-					m_readState = READ_STATE::IN_MESSAGE_ESCAPED;
+					changeState( READ_STATE::IN_MESSAGE_ESCAPED );
 				}
 			}
 			else if( m_readState == READ_STATE::DEFAULT )
@@ -301,20 +380,15 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				// Only start a message when we encounter a leading character
 				if( *iter == m_cLeading )
 				{
-					m_readState = READ_STATE::IN_MESSAGE;
+					changeState( READ_STATE::IN_MESSAGE );
 				}
-//				else
-//				{
-//					ROS_ERROR_STREAM_NAMED( "SerialIO", "Received partial message, waiting for leading character" );
-//				}
 			}
-			else if( m_readState == READ_STATE::IN_MESSAGE_ESCAPED || *iter != m_cTerminating )
+			else if( m_readState == READ_STATE::IN_MESSAGE_ESCAPED ||
+				*iter != m_cTerminating )
 			{
-				messageData.push_back( *iter );
+				addCharacter( *iter );
 
-				m_cCRC += *iter;
-
-				m_readState = READ_STATE::IN_MESSAGE;
+				changeState( READ_STATE::IN_MESSAGE );
 			}
 			else
 			{
@@ -327,7 +401,6 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					else if( m_bEnableCRC )
 					{
 						messageData.pop_back( );
-
 					}
 					else
 					{
@@ -363,7 +436,15 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 
 				m_cCRC = 0;
 
-				m_readState = READ_STATE::DEFAULT;
+				changeState( READ_STATE::DEFAULT );
+
+				#if defined( ENABLE_TEST_FIXTURE )
+
+					m_vecMessageTiming.push_back( m_messageTiming );
+
+					m_messageTiming.clear( );
+
+				#endif
 			}
 		}
 
@@ -419,6 +500,12 @@ bool SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error
 			m_readState = READ_STATE::DEFAULT;
 
 			m_cCRC = 0;
+
+			#if defined( ENABLE_TEST_FIXTURE )
+
+				m_vecMessageTiming.clear( );
+
+			#endif
 
 			m_bIsSerialOpen = true;
 		}

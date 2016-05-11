@@ -12,6 +12,7 @@
 #include <queue>
 #include <condition_variable>
 #include <boost/range/irange.hpp>
+#include <ros/ros.h>
 
 using namespace srs;
 
@@ -109,14 +110,8 @@ public:
 	enum class CONFIG
 	{
 		RAW,
-		TERMINATING,
-		LEADING_TERMINATING,
-		FIRST_BYTE_DELAY,
-		BYTE_DELAY,
-		STARGAZER,
 		BRAIN_STEM,
-		STAR_GAZER,
-		KITCHEN_SINK
+		STAR_GAZER
 	};
 
 public:
@@ -137,10 +132,13 @@ public:
 
 	std::condition_variable			m_condition2;
 
+	std::vector<CONFIG>				m_testConfigs;
+
 public:
 	SerialIOTest( )
 	{
-
+		m_testConfigs.push_back( CONFIG::BRAIN_STEM );
+		m_testConfigs.push_back( CONFIG::STAR_GAZER );
 	}
 
 	void OpenSerialPort( SerialIO& serial, std::string strPort, CONFIG eConfig,
@@ -157,50 +155,17 @@ public:
 			}
 			break;
 
-			case CONFIG::TERMINATING:
-			{
-				serial.SetTerminatingCharacter( '\n' );
-				serial.SetEscapeCharacter( '\\' );
-			}
-			break;
-
-			case CONFIG::LEADING_TERMINATING:
-			{
-				serial.SetLeadingCharacter( '^' );
-				serial.SetTerminatingCharacter( ']' );
-				serial.SetEscapeCharacter( '\\' );
-				serial.SetFirstByteDelay( std::chrono::microseconds( 30000 ) );
-				serial.SetByteDelay( std::chrono::microseconds( 5000 ) );
-			}
-			break;
-
-			case CONFIG::FIRST_BYTE_DELAY:
-			{
-				serial.SetTerminatingCharacter( '\n' );
-				serial.SetEscapeCharacter( '\\' );
-				serial.SetFirstByteDelay( std::chrono::microseconds( 30000 ) );
-				serial.SetByteDelay( std::chrono::microseconds( 5000 ) );
-			}
-			break;
-
-			case CONFIG::BYTE_DELAY:
-			{
-				serial.SetTerminatingCharacter( '\n' );
-				serial.SetEscapeCharacter( '\\' );
-				serial.SetFirstByteDelay( std::chrono::microseconds( 30000 ) );
-				serial.SetByteDelay( std::chrono::microseconds( 5000 ) );
-			}
-			break;
-
 			case CONFIG::BRAIN_STEM:
 			{
 				serial.EnableCRC( true );
 				serial.SetTerminatingCharacter( '\n' );
 				serial.SetEscapeCharacter( '\\' );
+				serial.SetFirstByteDelay( std::chrono::microseconds( ) );
+				serial.SetByteDelay( std::chrono::microseconds( ) );
 			}
 			break;
 
-			case CONFIG::STARGAZER:
+			case CONFIG::STAR_GAZER:
 			{
 				serial.SetLeadingCharacter( '~' );
 				serial.SetTerminatingCharacter( '`' );
@@ -209,15 +174,6 @@ public:
 			}
 			break;
 
-			case CONFIG::KITCHEN_SINK:
-			{
-				serial.EnableCRC( true );
-				serial.SetLeadingCharacter( '~' );
-				serial.SetTerminatingCharacter( '`' );
-				serial.SetFirstByteDelay( std::chrono::microseconds( 5000 ) );
-				serial.SetByteDelay( std::chrono::microseconds( 500 ) );
-			}
-			break;
 		}
 
 		EXPECT_TRUE( serial.IsOpen( ) );
@@ -235,9 +191,9 @@ public:
 
 	void OpenSerialPorts( CONFIG eConfig = CONFIG::BRAIN_STEM )
 	{
-		OpenSerialPort1( );
+		OpenSerialPort1( eConfig );
 
-		OpenSerialPort2( );
+		OpenSerialPort2( eConfig );
 	}
 
 	void CloseSerialPort( SerialIO& serial )
@@ -275,18 +231,18 @@ public:
 	{
 		m_readData2.push( buffer );
 
-		std::unique_lock<std::mutex> lock( m_mutex1 );
+		std::unique_lock<std::mutex> lock( m_mutex2 );
 
-		m_condition1.notify_one( );
+		m_condition2.notify_one( );
 	}
 
 	void ReadMessageFrom2( std::vector<char> buffer )
 	{
 		m_readData1.push( buffer );
 
-		std::unique_lock<std::mutex> lock( m_mutex2 );
+		std::unique_lock<std::mutex> lock( m_mutex1 );
 
-		m_condition2.notify_one( );
+		m_condition1.notify_one( );
 	}
 
 	void WaitForData1( size_t numberOfMessages )
@@ -300,7 +256,7 @@ public:
 	}
 
 	void WaitForData( size_t numberOfMessages, std::mutex& mutex, std::condition_variable& condition,
-		std::queue<std::vector<char>> queueData )
+		std::queue<std::vector<char>>& queueData )
 	{
 		// Wait for for messages to come in or timeout
 		while( true )
@@ -319,6 +275,42 @@ public:
 				}
 			}
 		}
+	}
+
+	void CheckTiming( SerialIO& serial )
+	{
+		std::chrono::microseconds firstByteDelay = serial.GetFirstByteDelay( );
+
+		std::chrono::microseconds byteDelay = serial.GetByteDelay( );
+
+		if( firstByteDelay == std::chrono::microseconds( ) )
+		{
+			firstByteDelay = byteDelay;
+		}
+
+		std::vector<SerialIO::MessageTiming> vecMessageTiming = serial.GetTimingInfo( );
+
+		for( auto messageTiming : vecMessageTiming )
+		{
+			for( int i = 0; i < messageTiming.size( ); i++ )
+			{
+				// Make sure time constraints are met
+				if( i == 1 )
+				{
+					ASSERT_GE( messageTiming[i].count( )*1.1, firstByteDelay.count( ) );
+				}
+				else if( i > 1)
+				{
+					ASSERT_GE( messageTiming[i].count( )*1.1, byteDelay.count( ) );
+				}
+			}
+		}
+	}
+
+	void CheckTiming( )
+	{
+		CheckTiming( m_serial1 );
+		CheckTiming( m_serial2 );
 	}
 
 	~SerialIOTest( )
@@ -385,7 +377,7 @@ TEST_F( SerialIOTest, TestClose )
 
 TEST_F( SerialIOTest, TestBasicReadWrite )
 {
-	for( auto iter : std::array<CONFIG, sizeof(CONFIG)>( ) )
+	for( auto iter : m_testConfigs )
 	{
 		OpenSerialPorts( iter );
 
@@ -395,6 +387,12 @@ TEST_F( SerialIOTest, TestBasicReadWrite )
 		}
 
 		WaitForData2( g_vecTestData.size( ) );
+
+		CloseSerialPorts( );
+
+		CheckTiming( m_serial2 );
+
+		ASSERT_EQ( g_vecTestData.size( ), m_readData2.size( ) );
 
 		for( auto data : g_vecTestData )
 		{
@@ -419,6 +417,12 @@ TEST_F( SerialIOTest, TestDuplexReadWrite )
 
 	WaitForData1( g_vecTestData.size( ) );
 	WaitForData2( g_vecTestData.size( ) );
+
+	ASSERT_EQ( g_vecTestData.size( ), m_readData2.size( ) );
+
+	CloseSerialPorts( );
+
+	CheckTiming( );
 
 	for( auto data : g_vecTestData )
 	{
@@ -468,7 +472,6 @@ TEST_F( SerialIOTest, TestMultipleReadWrites )
 TEST_F( SerialIOTest, TestMultipleMessages )
 {
 	OpenSerialPorts( );
-
 }
 
 TEST_F( SerialIOTest, TestCloseWhileReadWrite )

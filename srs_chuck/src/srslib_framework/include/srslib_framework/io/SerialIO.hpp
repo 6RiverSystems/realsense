@@ -35,6 +35,7 @@ class SerialIO :
 	};
 
 public:
+
 	SerialIO( );
 
 	virtual ~SerialIO( );
@@ -59,11 +60,23 @@ public:
 
 	void SetFirstByteDelay( std::chrono::microseconds firstByteDelay );
 
+	std::chrono::microseconds GetFirstByteDelay( );
+
 	void SetByteDelay( std::chrono::microseconds byteDelay );
+
+	std::chrono::microseconds GetByteDelay( );
 
 // Write Methods
 
 	void Write( const std::vector<char>& buffer );
+
+#if defined( ENABLE_TEST_FIXTURE )
+
+	typedef std::vector<std::chrono::microseconds> MessageTiming;
+
+	std::vector<MessageTiming> GetTimingInfo( ) { return m_vecMessageTiming; };
+
+#endif
 
 private:
 
@@ -133,6 +146,18 @@ private:
 	std::chrono::microseconds				m_byteDelay;
 
 	std::chrono::microseconds				m_interByteDelay;
+
+#if defined( ENABLE_TEST_FIXTURE )
+
+	std::chrono::high_resolution_clock				m_highrezclk;
+
+	std::chrono::high_resolution_clock::time_point	m_lastTime;
+
+	MessageTiming									m_messageTiming;
+
+	std::vector<MessageTiming>						m_vecMessageTiming;
+
+#endif
 
 };
 

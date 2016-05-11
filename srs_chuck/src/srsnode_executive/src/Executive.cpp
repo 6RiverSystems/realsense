@@ -67,7 +67,7 @@ void Executive::disconnectAllTaps()
 void Executive::planToGoal(Pose<> goal)
 {
     Grid2d::LocationType start(0, 0);
-    Grid2d::LocationType internalGoal(11, 0);
+    Grid2d::LocationType internalGoal(3, 0);
 
     algorithm_.search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(internalGoal, 0));
 }

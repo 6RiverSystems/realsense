@@ -42,6 +42,8 @@ public:
     void run();
 
 private:
+    typedef pair<Pose<>, Velocity<>> MilestoneType;
+
     constexpr static unsigned int REFRESH_RATE_HZ = 50;
     constexpr static double ALPHA = 1.0;
     constexpr static double BETA = 0.0;
@@ -54,21 +56,25 @@ private:
     void stepMotionController(double dT);
     void stepUkf(double dT);
 
-    vector<Velocity<>> cmdVel_;
+    vector<MilestoneType> trajectory_;
 
     ros::NodeHandle rosNodeHandle_;
-    double executionTime_;
-    int nextScheduled_;
-
-    ros::Publisher pubCmdVel_;
-    ros::Publisher pubOdom_;
-    tf::TransformBroadcaster rosTfBroadcaster_;
 
     bool commandUpdated_;
     CmdVelocity<> currentCommand_;
-
     cv::Mat currentCovariance_;
     StatePe<> currentState_;
+    ros::Time currentTime_;
+
+    double executionTime_;
+
+    vector<MilestoneType>::iterator nextScheduled_;
+    double nextScheduledTime_;
+
+    ros::Time previousTime_;
+    ros::Publisher pubCmdVel_;
+    ros::Publisher pubOdom_;
+    tf::TransformBroadcaster rosTfBroadcaster_;
 
     Robot<> robot_;
 
@@ -79,9 +85,6 @@ private:
     RosTapGoalPlan tapPlan_;
 
     UnscentedKalmanFilter<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE> ukf_;
-
-    ros::Time previousTime_;
-    ros::Time currentTime_;
 
     // TODO: Remove these variables
     double previousTimeNs_;

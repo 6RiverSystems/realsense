@@ -23,7 +23,7 @@ namespace srs {
 Motion::Motion(string nodeName) :
     rosNodeHandle_(nodeName),
     executionTime_(0.0),
-    nextScheduled_(-1),
+    nextScheduledTime_(-1),
     commandUpdated_(false),
     tapBrainStemStatus_(nodeName),
     tapCmdVel_(nodeName),
@@ -32,6 +32,8 @@ Motion::Motion(string nodeName) :
     tapPlan_(nodeName),
     ukf_(ALPHA, BETA, robot_)
 {
+    nextScheduled_ = trajectory_.end();
+
     currentCovariance_ = robot_.getNoiseMatrix();
     currentState_ = StatePe<>(2.0, 1.5, 0.0);
 
@@ -177,21 +179,22 @@ void Motion::scanTapsForData()
     // If there is a new plan to execute
     if (tapPlan_.newDataAvailable())
     {
-        cmdVel_.clear();
+        trajectory_.clear();
 
         Chuck chuck;
         vector<SolutionNode<Grid2d>> solution = tapPlan_.getGoalPlan();
 
         Trajectory trajectoryConverter(solution, chuck, 1.0 / REFRESH_RATE_HZ);
-        trajectoryConverter.solution2velocity(cmdVel_);
+        trajectoryConverter.solution2trajectory(trajectory_);
 
-        for (auto pose : cmdVel_)
+        for (auto milestone : trajectory_)
         {
-            cout << pose << endl;
+            ROS_DEBUG_STREAM("Executing: " << milestone.first << " - " << milestone.second);
         }
 
         executionTime_ = 0.0;
-        nextScheduled_ = 0;
+        nextScheduled_ = trajectory_.begin();
+        nextScheduledTime_ = nextScheduled_->first.arrivalTime;
     }
 }
 
@@ -209,31 +212,32 @@ void Motion::stepUkf(double dT)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::stepMotionController(double dT)
 {
-    if (nextScheduled_ > -1)
+    if (nextScheduledTime_ > -1)
     {
-        ROS_DEBUG_STREAM("[" << executionTime_ << "] Waiting for " << cmdVel_[nextScheduled_].arrivalTime);
+        ROS_DEBUG_STREAM("[" << executionTime_ << "] Waiting for " << nextScheduledTime_);
         executionTime_ += dT;
 
-        if (executionTime_ >= cmdVel_[nextScheduled_].arrivalTime)
+        if (executionTime_ >= nextScheduledTime_)
         {
-            ROS_DEBUG_STREAM("Executing: " << cmdVel_[nextScheduled_]);
+            MilestoneType milestone = *nextScheduled_;
 
-            Velocity<> currentCmdVel = cmdVel_[nextScheduled_++];
-            if (nextScheduled_ >= cmdVel_.size())
-            {
-                nextScheduled_ = -1;
-            }
+            ROS_DEBUG_STREAM("Executing: " << milestone.first << " - " << milestone.second);
 
             geometry_msgs::Twist message;
 
-            message.linear.x = currentCmdVel.linear;
+            message.linear.x = milestone.second.linear;
             message.linear.y = 0;
             message.linear.z = 0;
             message.angular.x = 0;
             message.angular.y = 0;
-            message.angular.z = currentCmdVel.angular;
+            message.angular.z = milestone.second.angular;
 
             pubCmdVel_.publish(message);
+
+            nextScheduled_++;
+            nextScheduledTime_ = nextScheduled_ != trajectory_.end() ?
+                nextScheduled_->first.arrivalTime :
+                -1;
         }
     }
 }

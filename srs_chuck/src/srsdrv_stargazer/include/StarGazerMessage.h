@@ -19,7 +19,7 @@ const char STARGAZER_STX = '~';
 const char STARGAZER_RTX = '`';
 const char STARGAZER_SEPERATOR = '|';
 
-const float STARTGAZER_TIMEOUT = 0.25;
+const float STARTGAZER_TIMEOUT = 0.50;
 
 enum class STAR_GAZER_MESSAGE_TYPES
 {

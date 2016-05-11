@@ -37,9 +37,9 @@ StarGazerMessageProcessor::StarGazerMessageProcessor( std::shared_ptr<IO> pIO ) 
 	try
 	{
 		m_odometryRegex = boost::regex(
-			"~\\^[FIZ]([0-9]*)\\|([+-][0-9]*\\.[0-9]*)\\|([+-][0-9]*\\.[0-9]*)\\|([+-][0-9]*\\.[0-9]*)\\|(-?[0-9]*\\.[0-9]*)" );
+			"\\^[FIZ]([0-9]*)\\|([+-][0-9]*\\.[0-9]*)\\|([+-][0-9]*\\.[0-9]*)\\|([+-][0-9]*\\.[0-9]*)\\|(-?[0-9]*\\.[0-9]*)" );
 
-		m_messageRegex = boost::regex( "~\\$([^\\|]*)(?:\\|([^\\`]*))?" );
+		m_messageRegex = boost::regex( "\\$([^\\|]*)(?:\\|([^\\`]*))?" );
 	}
 	catch( const boost::regex_error& e )
 	{
@@ -235,7 +235,7 @@ void StarGazerMessageProcessor::SetEnd( )
 {
 	// This writes parameters to flash and commits them.  It usually takes ~3 sec
 	// to write to flash, so we give 4 seconds before a retry.
-	BaseCommand( STAR_GAZER_MESSAGE_TYPES::WRITE, "SetEnd", FLASH_WRITE_DONE, 4 );
+	BaseCommand( STAR_GAZER_MESSAGE_TYPES::WRITE, "SetEnd", FLASH_WRITE_DONE, 10 );
 }
 
 void StarGazerMessageProcessor::HardReset( )
@@ -247,6 +247,11 @@ void StarGazerMessageProcessor::PumpMessageProcessor( )
 {
 	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(
 		m_highrezclk.now( ) - m_lastTxTime );
+
+	if( m_lastTxMessage == "!ParameterUpdate" )
+	{
+		ROS_DEBUG_STREAM_NAMED( "StarGazer", "Expecting " << m_lastAck << " took " << time_span.count( ) << " seconds. " );
+	}
 
 	if( m_lastTxMessage == m_lastAck )
 	{
@@ -287,9 +292,9 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 {
 	bool printMessage = false;
 
-	STAR_GAZER_MESSAGE_TYPES command = (STAR_GAZER_MESSAGE_TYPES) msgBuffer[1];
+	STAR_GAZER_MESSAGE_TYPES command = (STAR_GAZER_MESSAGE_TYPES) msgBuffer[0];
 
-	auto typeStart = msgBuffer.begin( ) + 2;
+	auto typeStart = msgBuffer.begin( ) + 1;
 	auto typeEnd = std::find( typeStart, msgBuffer.end( ), STARGAZER_SEPERATOR );
 
 	std::string typeStr( typeStart, typeEnd );
@@ -358,6 +363,8 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 			m_lastAck.clear( );
 			m_lastAck += (char) command;
 			m_lastAck += typeStr;
+
+			ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Got command " << m_lastAck << " Expectd: " << m_lastTxMessage );
 		}
 		break;
 

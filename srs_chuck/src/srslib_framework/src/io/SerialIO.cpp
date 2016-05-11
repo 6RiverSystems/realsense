@@ -265,16 +265,16 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 		// Start with the partially parsed message
 		std::vector<char> messageData( m_readPartialData.begin( ), m_readPartialData.end( ) );
 
-		// ROS_DEBUG_STREAM_NAMED( "SerialIO", "Left over read data: " << ToHex( messageData ) );
-
-		// If we do not have a leading character, then we are always in a message
-		if( m_readState == READ_STATE::DEFAULT && !m_bHasLeading )
-		{
-			m_readState = READ_STATE::IN_MESSAGE;
-		}
+//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Left over read data: " << ToHex( messageData ) );
 
 		for( auto iter = m_readBuffer.begin( ); iter < m_readBuffer.begin( ) + size; iter++ )
 		{
+			// If we do not have a leading character, then we are always in a message
+			if( m_readState == READ_STATE::DEFAULT && !m_bHasLeading )
+			{
+				m_readState = READ_STATE::IN_MESSAGE;
+			}
+
 //			ROS_ERROR_NAMED( "SerialIO", "Char: %.2x", *iter );
 
 			if( m_bHasEscape &&
@@ -296,17 +296,17 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 			else if( m_readState == READ_STATE::DEFAULT )
 			{
 				// Should never get into this case if we are not a leading character
-				assert( !m_bHasLeading );
+				assert( m_bHasLeading );
 
 				// Only start a message when we encounter a leading character
 				if( *iter == m_cLeading )
 				{
 					m_readState = READ_STATE::IN_MESSAGE;
 				}
-				else
-				{
-					ROS_ERROR_STREAM_NAMED( "SerialIO", "Received partial message, waiting for leading character" );
-				}
+//				else
+//				{
+//					ROS_ERROR_STREAM_NAMED( "SerialIO", "Received partial message, waiting for leading character" );
+//				}
 			}
 			else if( m_readState == READ_STATE::IN_MESSAGE_ESCAPED || *iter != m_cTerminating )
 			{
@@ -340,7 +340,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 						if( m_readCallback )
 						{
 //							ROS_ERROR_STREAM_NAMED( "SerialIO", "ReadData: " <<
-//								ToHex( std::vector<char>( messageData.begin( ), messageData.end( ) ) ) );
+//								std::string( messageData.begin( ), messageData.end( ) ) );
 
 							m_readCallback( messageData );
 						}
@@ -362,6 +362,8 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				messageData.clear( );
 
 				m_cCRC = 0;
+
+				m_readState = READ_STATE::DEFAULT;
 			}
 		}
 

@@ -160,7 +160,7 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 
 	m_rosApsPublisher.publish( msg );
 
-	ROS_DEBUG_NAMED( "StarGazer", "Tag: %04i (%2.2f, %2.2f, %2.2f) %2.2f deg\n", nTagId, fX, fY, fZ, fAngle );
+	ROS_DEBUG_NAMED( "StarGazer", "Tag: %04i (%2.2f, %2.2f, %2.2f) %2.2f deg", nTagId, fX, fY, fZ, fAngle );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

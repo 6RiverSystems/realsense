@@ -28,24 +28,27 @@ typedef std::function<void(std::string, std::string)> ReadCallbackFn;
 class StarGazerMessageProcessor {
 
 	struct QueuedMessage {
-		std::string sTxMsg;
-		std::string sRxMsg;
-		float       timeoutSec;
+		STAR_GAZER_MESSAGE_TYPES type;
+		std::string command;
+		std::string expectedAck1;
+		std::string expectedAck2;
+		std::chrono::microseconds timeout;
+	};
+
+	struct PendingAck {
+		std::chrono::high_resolution_clock::time_point timeSent;
+		QueuedMessage msg;
 	};
 
 private:
 
 	std::shared_ptr<IO>									m_pSerialIO;
 
-	std::chrono::high_resolution_clock::time_point		m_lastTxTime;
-
-	std::string											m_lastTxMessage;
-
 	std::chrono::high_resolution_clock					m_highrezclk;
 
-	std::queue<QueuedMessage>							m_txMessageQueue;
+	std::queue<QueuedMessage>							m_queueOutgoingMessages;
 
-	std::string											m_lastAck;
+	std::map<std::string, PendingAck>					m_mapPendingResponses;
 
 	boost::regex										m_odometryRegex;
 
@@ -57,9 +60,12 @@ private:
 
 private:
 
+	void SendNextMessage( );
+
 	void SendRawCommand( QueuedMessage msg );
 
-	void BaseCommand( STAR_GAZER_MESSAGE_TYPES type, std::string cmd, std::string rxExpected, float timeoutSec );
+	void BaseCommand( STAR_GAZER_MESSAGE_TYPES type, std::string cmd, std::string expectedValue,
+		std::chrono::microseconds timeout );
 
 	void BaseWriteCommand( std::string cmd );
 

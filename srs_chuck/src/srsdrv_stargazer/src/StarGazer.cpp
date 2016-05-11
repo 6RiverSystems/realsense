@@ -36,7 +36,7 @@ StarGazer::StarGazer( const std::string& strSerialPort, const std::string& strAp
 	pSerialIO->SetLeadingCharacter( STARGAZER_STX );
 	pSerialIO->SetTerminatingCharacter( STARGAZER_RTX );
 	pSerialIO->SetFirstByteDelay( std::chrono::microseconds( 30000 ) );
-	pSerialIO->SetByteDelay( std::chrono::microseconds( 5000 ) );
+	pSerialIO->SetByteDelay( std::chrono::microseconds( 100 ) );
 
 	pSerialIO->Open( strSerialPort.c_str( ), std::bind( &StarGazerMessageProcessor::ProcessStarGazerMessage,
 		&m_messageProcessor, std::placeholders::_1 ) );

@@ -132,9 +132,10 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets>
-			<target name="catkin_make brain_stem" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="catkin_make srsdrv_stargazer" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
-				<buildArguments>brain_stem -DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildArguments>srsdrv_stargazer -DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildTarget/>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>

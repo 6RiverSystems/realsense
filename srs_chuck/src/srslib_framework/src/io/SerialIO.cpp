@@ -181,6 +181,9 @@ void SerialIO::Write( const std::vector<char>& buffer )
 void SerialIO::WriteInSerialThread( std::vector<char> writeBuffer )
 {
 	assert( m_serialThreadId == std::this_thread::get_id( ) );
+//
+//	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write Complete: " <<
+//		std::string( writeBuffer.begin( ), writeBuffer.end( ) ) );
 
 	// Add leading character
 	if( m_bHasLeading )
@@ -254,7 +257,7 @@ void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::siz
 	assert( m_serialThreadId == std::this_thread::get_id( ) );
 //
 //	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write Complete: " <<
-//		ToHex( std::vector<char>( m_writeBuffer.begin( ), m_writeBuffer.begin( ) + size ) ) );
+//		std::string( m_writeBuffer.begin( ), m_writeBuffer.begin( ) + size ) );
 
 	std::vector<char>( m_writeBuffer.begin( ) + size, m_writeBuffer.end( ) ).swap( m_writeBuffer );
 

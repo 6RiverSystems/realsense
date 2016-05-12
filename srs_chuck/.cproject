@@ -135,7 +135,6 @@
 			<target name="catkin_make srsdrv_stargazer" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
 				<buildArguments>srsdrv_stargazer -DCMAKE_BUILD_TYPE=Debug</buildArguments>
-				<buildTarget/>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
@@ -143,14 +142,14 @@
 			<target name="catkin_make run_tests" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
 				<buildArguments>run_tests -DCMAKE_BUILD_TYPE=Debug</buildArguments>
-				<buildTarget/>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 			<target name="build all" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
-				<buildArguments>-DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildArguments>--pkg srsdrv_realsense DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildTarget/>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
@@ -158,7 +157,6 @@
 			<target name="tests" path="src" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
 				<buildArguments>run_tests -DCMAKE_BUILD_TYPE=Debug -k -j8</buildArguments>
-				<buildTarget/>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>

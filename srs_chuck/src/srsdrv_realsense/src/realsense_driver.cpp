@@ -2,16 +2,16 @@
 
 #include <RealsenseDriver.h>
 
-int main(int argc, char** argv)
+int main( int argc, char** argv )
 {
-    // Initialize ROS
-    ros::init(argc, argv, "srsdrv_realsense");
+	// Initialize ROS
+	ros::init( argc, argv, "srsdrv_realsense" );
 
-    ROS_INFO_STREAM("srsdrv_realsense started");
+	ROS_INFO_STREAM( "srsdrv_realsense started" );
 
-    srs::RealsenseDriver realsenseDriver;
+	srs::RealsenseDriver realsenseDriver;
 
-    realsenseDriver.run();
+	realsenseDriver.run( );
 
-    return 0;
+	return 0;
 }

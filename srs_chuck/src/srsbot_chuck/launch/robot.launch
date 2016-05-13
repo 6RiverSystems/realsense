@@ -39,6 +39,7 @@
 
     <!-- Launch all the robot components -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
+    <include file="$(find srsdrv_realsense)/launch/driver.launch" />
 
     <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
     <include file="$(find srsnode_position_estimator)/launch/node.launch" />

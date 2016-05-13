@@ -8,6 +8,7 @@
   <xacro:property name="r200_cam_rgb_px" value="0.0088"/>
   <xacro:property name="r200_cam_rgb_py" value="-0.1034"/>
   <xacro:property name="r200_cam_rgb_pz" value="0.0483"/>
+  <xacro:property name="r200_cam_y_rotation" value="0"/>
   <xacro:property name="r200_cam_depth_offset" value="0.0274"/>
 
   <!-- Also parameterised in part by the values in turtlebot_properties.urdf.xacro -->
@@ -17,7 +18,7 @@
   parent > camera_rgb_frame
   -->
 
-  <xacro:macro name="sensor_r200" params="parent r200_cam_px r200_cam_py r200_cam_pz">
+  <xacro:macro name="sensor_r200" params="parent r200_cam_y_rotation r200_cam_px r200_cam_py r200_cam_pz">
     <!--
     ==  RGB joints & links ==
     -->
@@ -46,7 +47,7 @@
     <!-- Mounting the camera at the right position -->
     <link name="camera_link">
       <visual>
-       <origin xyz="${-r200_cam_rgb_px + -r200_cam_px} ${-r200_cam_rgb_py + -r200_cam_py} ${-r200_cam_rgb_pz + -r200_cam_pz}" rpy="${M_PI/2} 0 ${M_PI/2}"/>
+       <origin xyz="${-r200_cam_rgb_px + -r200_cam_px} ${-r200_cam_rgb_py + -r200_cam_py} ${-r200_cam_rgb_pz + -r200_cam_pz}" rpy="${M_PI/2} ${r200_cam_y_rotation} ${M_PI/2}"/>
         <geometry>
          <mesh filename="package://realsense_navigation/robot_description/meshes/sensors/r200_entire.dae"/>
         </geometry>

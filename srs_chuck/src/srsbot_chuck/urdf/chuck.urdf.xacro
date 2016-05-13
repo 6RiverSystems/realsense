@@ -9,6 +9,8 @@
     <xacro:include filename="component/wheel.urdf.xacro"/>
     <xacro:include filename="component/caster.urdf.xacro"/>
 
+	<xacro:include filename="sensors/r200.urdf.xacro"/>
+
     <!-- Robot footprint -->
     <link name="base_footprint">
         <inertial>
@@ -97,6 +99,9 @@
     <!-- Castors -->
     <caster fb="front" parent="base_link" translateX="${caster_front_x_offset}" translateY="0" translateZ="${caster_z_offset}" />
     <caster fb="back" parent="base_link" translateX="${caster_back_x_offset}" translateY="0" translateZ="${caster_z_offset}" />
+
+	<!-- Realsense R200 -->
+	<sensor_r200 parent="base_link" r200_cam_y_rotation="${M_PI}" r200_cam_px="${base_x_size/2}" r200_cam_py="0" r200_cam_pz="0" />
 
     <!-- Differential drive controller  -->
     <gazebo>

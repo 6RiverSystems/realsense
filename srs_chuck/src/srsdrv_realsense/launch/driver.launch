@@ -101,9 +101,9 @@
         </rosparam>
     </node>
 
-	<node name="srsdrv_realsense" 
+	<!-- <node name="srsdrv_realsense" 
         pkg="srsdrv_realsense"
         type="srsdrv_realsense"
-        output="screen" respawn="true"/>
+        output="screen" respawn="true"/> -->
 </launch>
 

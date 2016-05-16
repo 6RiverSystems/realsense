@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef HIGHLEVELBEHAVIOR_HPP_
-#define HIGHLEVELBEHAVIOR_HPP_
+#ifndef EXECUTIVE_HPP_
+#define EXECUTIVE_HPP_
 
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
@@ -61,4 +61,4 @@ private:
 
 } // namespace srs
 
-#endif  // HIGHLEVELBEHAVIOR_HPP_
+#endif  // EXECUTIVE_HPP_

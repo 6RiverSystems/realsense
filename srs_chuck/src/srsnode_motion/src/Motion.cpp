@@ -185,7 +185,7 @@ void Motion::scanTapsForData()
         vector<SolutionNode<Grid2d>> solution = tapPlan_.getGoalPlan();
 
         Trajectory trajectoryConverter(solution, chuck, 1.0 / REFRESH_RATE_HZ);
-        trajectoryConverter.solution2trajectory(trajectory_);
+        //trajectoryConverter.solution2trajectory(trajectory_);
 
         for (auto milestone : trajectory_)
         {

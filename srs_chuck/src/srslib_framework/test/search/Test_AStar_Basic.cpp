@@ -22,15 +22,12 @@ TEST(Test_AStar, SearchCreation)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
 
-    SearchPositionNote permanentObstacle(numeric_limits<unsigned int>::max());
-    SearchPositionNote noRotationNote(true);
-
-    test::Grid2dUtils::addLocationCost(grid, 0, 0, 0, &noRotationNote);
+    test::Grid2dUtils::addLocationCost(grid, 0, 0, 0, &SearchPositionNote::NO_ROTATIONS);
     test::Grid2dUtils::addLocationCost(grid, 0, 1, 0);
 
-    test::Grid2dUtils::addRectangleCost(grid, 1, 1, 3, 2, 1000, &permanentObstacle);
-    test::Grid2dUtils::addLocationCost(grid, 4, 1, 1000, &permanentObstacle);
-    test::Grid2dUtils::addRectangleCost(grid, 3, 4, 3, 7, 1000, &permanentObstacle);
+    test::Grid2dUtils::addRectangleCost(grid, 1, 1, 3, 2, 1000, &SearchPositionNote::STATIC_OBSTACLE);
+    test::Grid2dUtils::addLocationCost(grid, 4, 1, 1000, &SearchPositionNote::STATIC_OBSTACLE);
+    test::Grid2dUtils::addRectangleCost(grid, 3, 4, 3, 7, 1000, &SearchPositionNote::STATIC_OBSTACLE);
 
     AStar<Grid2d> algorithm(&grid);
 

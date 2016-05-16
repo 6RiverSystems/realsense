@@ -25,6 +25,9 @@ namespace srs {
 class Trajectory
 {
 public:
+    typedef pair<Pose<>, Velocity<>> MilestoneType;
+    typedef vector<MilestoneType> TrajectoryType;
+
     Trajectory(vector<SolutionNode<Grid2d>>& solution, RobotProfile& robot, double dT) :
         solution_(solution),
         robot_(robot),
@@ -32,14 +35,65 @@ public:
         linearIncrement_(dT * robot.linearAccelerationTravelMax())
     {}
 
-    void solution2velocity(vector<Velocity<>>& velocities)
+    void getTrajectory(Pose<> pose0, TrajectoryType& trajectory)
     {
-        velocities.clear();
+        trajectory.clear();
+
         if (solution_.empty())
         {
             return;
         }
 
+        vector<Velocity<>> velocities;
+        generateVelocities(velocities);
+
+        vector<Pose<>> poses;
+        generatePoses(pose0, velocities, poses);
+
+        for (unsigned int i = 0; i < velocities.size(); i++)
+        {
+            MilestoneType milestone;
+            milestone.first = poses[i];
+            milestone.second = velocities[i];
+            trajectory.push_back(milestone);
+        }
+    }
+
+private:
+    void findNextAction(
+        vector<SolutionNode<Grid2d>>::iterator& fromNode,
+        vector<SolutionNode<Grid2d>>::iterator& resultNode)
+    {
+        resultNode = fromNode;
+        vector<SolutionNode<Grid2d>>::iterator cursorNode = fromNode + 1;
+
+        while (cursorNode->action.actionType == fromNode->action.actionType &&
+            cursorNode->action.actionType != SearchAction<Grid2d>::GOAL)
+        {
+            resultNode = cursorNode;
+            cursorNode++;
+        }
+    }
+
+    void generatePoses(Pose<> pose0, vector<Velocity<>>& velocities, vector<Pose<>>& poses)
+    {
+        Pose<> previousPose = pose0;
+
+        for (auto command : velocities)
+        {
+            double dT = command.arrivalTime - previousPose.arrivalTime;
+            double x = previousPose.x + command.linear * dT * cos(previousPose.theta);
+            double y = previousPose.y + command.linear * dT * sin(previousPose.theta);
+            double theta = previousPose.theta + command.angular * dT;
+
+            Pose<> newPose = Pose<>(previousPose.arrivalTime + dT, x, y, theta);
+            poses.push_back(newPose);
+            previousPose = newPose;
+        }
+    }
+
+    void generateVelocities(vector<Velocity<>>& velocities)
+    {
         vector<SolutionNode<Grid2d>>::iterator fromNode = solution_.begin();
         vector<SolutionNode<Grid2d>>::iterator nextNode;
         vector<SolutionNode<Grid2d>>::iterator toNode;
@@ -72,23 +126,7 @@ public:
         }
     }
 
-private:
-    void findNextAction(
-        vector<SolutionNode<Grid2d>>::iterator& fromNode,
-        vector<SolutionNode<Grid2d>>::iterator& resultNode)
-    {
-        resultNode = fromNode;
-        vector<SolutionNode<Grid2d>>::iterator cursorNode = fromNode + 1;
-
-        while (cursorNode->action.actionType == fromNode->action.actionType &&
-            cursorNode->action.actionType != SearchAction<Grid2d>::GOAL)
-        {
-            resultNode = cursorNode;
-            cursorNode++;
-        }
-    }
-
-    double measure(vector<SolutionNode<Grid2d>>::iterator& fromNode,
+    double measureDistance(vector<SolutionNode<Grid2d>>::iterator& fromNode,
         vector<SolutionNode<Grid2d>>::iterator& toNode)
     {
         SearchPosition<Grid2d> fromPosition = fromNode->action.position;
@@ -109,7 +147,7 @@ private:
     {
         double ar = robot_.linearAccelerationTravelMax();
 
-        double totalDistance = measure(fromNode, toNode);
+        double totalDistance = measureDistance(fromNode, toNode);
 
         // Assume that the travel velocity is maximum allowed
         double vf = robot_.linearVelocityTravelMax();

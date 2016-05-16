@@ -87,10 +87,12 @@ private:
         {
             SearchPosition<GRAPH> newPosition(neighbor, currentOrientation);
 
-            SearchPositionNote* positionNote = reinterpret_cast<SearchPositionNote*>(
+            const SearchPositionNote* positionNote = reinterpret_cast<const SearchPositionNote*>(
                 graph->getNote(neighbor));
 
             unsigned int locationCost = graph->getCost(neighbor);
+            locationCost = getLocationCost(locationCost, positionNote);
+
             unsigned int commandCost = getCommandCost(BACKWARD, positionNote);
             unsigned int totalCost = Math::noOverflowAdd(locationCost, commandCost);
 
@@ -114,10 +116,12 @@ private:
         {
             SearchPosition<GRAPH> newPosition(neighbor, currentOrientation);
 
-            SearchPositionNote* positionNote = reinterpret_cast<SearchPositionNote*>(
+            const SearchPositionNote* positionNote = reinterpret_cast<const SearchPositionNote*>(
                 graph->getNote(neighbor));
 
             unsigned int locationCost = graph->getCost(neighbor);
+            locationCost = getLocationCost(locationCost, positionNote);
+
             unsigned int commandCost = getCommandCost(FORWARD, positionNote);
             unsigned int totalCost = Math::noOverflowAdd(locationCost, commandCost);
 
@@ -140,8 +144,9 @@ private:
         int newOrientation = Math::normalizeAngleDeg(currentOrientation - angle);
         SearchPosition<GRAPH> newPosition(associatedNode->action.position, newOrientation);
 
-        SearchPositionNote* positionNote = reinterpret_cast<SearchPositionNote*>(
+        const SearchPositionNote* positionNote = reinterpret_cast<const SearchPositionNote*>(
             graph->getNote(associatedNode->action.position.location));
+
         unsigned int commandCost = getCommandCost(actionEnum, positionNote);
 
         action.position = newPosition;
@@ -151,7 +156,8 @@ private:
         return action;
     }
 
-    static unsigned int getCommandCost(ActionEnum action, SearchPositionNote* positionNote)
+    static unsigned int getCommandCost(ActionEnum action,
+        const SearchPositionNote* positionNote)
     {
         unsigned int forward = 1;
         unsigned int backward = 40;
@@ -159,12 +165,8 @@ private:
         unsigned int rotateP90 = 4;
         unsigned int rotate180 = 4;
 
-        unsigned int hazardousCost = 0;
-
         if (positionNote)
         {
-            hazardousCost = positionNote->hazardousCost;
-
             if (positionNote->noRotations)
             {
                 rotateM90 = MAX_COST;
@@ -175,12 +177,25 @@ private:
 
         switch (action)
         {
-            case FORWARD: return Math::noOverflowAdd(forward, hazardousCost);
-            case BACKWARD: return Math::noOverflowAdd(backward, hazardousCost);
-            case ROTATE_M90: return Math::noOverflowAdd(rotateM90, hazardousCost);
-            case ROTATE_P90: return Math::noOverflowAdd(rotateP90, hazardousCost);
-            case ROTATE_180: return Math::noOverflowAdd(rotate180, hazardousCost);
+            case FORWARD: return forward;
+            case BACKWARD: return backward;
+            case ROTATE_M90: return rotateM90;
+            case ROTATE_P90: return rotateP90;
+            case ROTATE_180: return rotate180;
         }
+    }
+
+    static unsigned int getLocationCost(unsigned int locationCost,
+        const SearchPositionNote* positionNote)
+    {
+        unsigned int staticObstacle = 0;
+
+        if (positionNote)
+        {
+            staticObstacle = positionNote->staticObstacle ? MAX_COST : 0;
+        }
+
+        return Math::noOverflowAdd(locationCost, staticObstacle);
     }
 };
 

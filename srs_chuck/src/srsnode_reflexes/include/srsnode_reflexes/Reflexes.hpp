@@ -6,7 +6,7 @@
 #ifndef REFLEXES_HPP_
 #define REFLEXES_HPP_
 
-#include <srslib_framework/ros/tap/RosTapJoy.hpp>
+#include <ros/ros.h>
 
 namespace srs {
 

@@ -22,8 +22,8 @@ class RosTapJoy :
     public RosTap
 {
 public:
-    RosTapJoy() :
-        RosTap("Joy Tap"),
+    RosTapJoy(string nodeName) :
+        RosTap(nodeName, "Joy Tap"),
         currentVelocity_()
     {}
 

@@ -22,8 +22,8 @@ class RosTapCmdVel :
     public RosTap
 {
 public:
-    RosTapCmdVel() :
-        RosTap("CmdVel Tap"),
+    RosTapCmdVel(string nodeName) :
+        RosTap(nodeName, "CmdVel Tap"),
         currentCmdVel_()
     {}
 

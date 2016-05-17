@@ -10,6 +10,8 @@
 #include <ros/ros.h>
 #include <StarGazerMessageProcessor.h>
 #include <srslib_framework/io/IO.hpp>
+#include <srslib_framework/localization/Anchor.hpp>
+#include "tf/tf.h"
 
 namespace srs
 {
@@ -53,17 +55,22 @@ private:
 
 	void OdometryCallback( int tagID, float x, float y, float z, float angle );
 
+	void LoadAnchors( );
+
 private:
 
-	constexpr static unsigned int REFRESH_RATE_HZ = 10;
+	constexpr static unsigned int 		REFRESH_RATE_HZ = 10;
 
-	ros::NodeHandle				m_rosNodeHandle;
+	ros::NodeHandle						m_rosNodeHandle;
 
-	ros::Publisher				m_rosApsPublisher;
+	ros::Publisher						m_rosApsPublisher;
 
-	std::shared_ptr<IO>			m_pSerialIO;
+	std::shared_ptr<IO>					m_pSerialIO;
 
-	StarGazerMessageProcessor	m_messageProcessor;
+	StarGazerMessageProcessor			m_messageProcessor;
+
+	std::map<uint32_t, tf::Transform>	m_mapAnchorTransforms;
+
 };
 
 } // namespace srs

@@ -4,13 +4,14 @@
 
 int main(int argc, char** argv)
 {
-    // Initialize ROS
-    ros::init(argc, argv, "srsnode_joystick_adapter");
+    const static string NODE_NAME = "srsnode_joystick_adapter";
 
-    ROS_INFO_STREAM("srsnode_joystick_adapter started");
+    // Initialize ROS
+    ros::init(argc, argv, NODE_NAME);
+    ROS_INFO_STREAM(NODE_NAME << " started");
 
     // Create the estimator and run it
-    srs::JoystickAdapter joystickAdapter;
+    srs::JoystickAdapter joystickAdapter(NODE_NAME);
     joystickAdapter.run();
 
     return 0;

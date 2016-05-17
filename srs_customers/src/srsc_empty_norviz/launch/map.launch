@@ -1,0 +1,14 @@
+<launch>
+    <arg name="customer_map" value="empty.yaml" />
+
+    <arg name="paused" default="false" />
+    <arg name="use_sim_time" default="true" />
+    <arg name="gui" default="true" />
+    <arg name="headless" default="false" />
+    <arg name="debug" default="true" />
+
+    <!-- Launch the robot with the specified cost parameters -->
+    <include file="$(find srsbot_chuck)/launch/robot.launch">
+        <arg name="target_map" value="$(find srsc_empty)/map/$(arg customer_map)" />
+    </include>
+</launch>

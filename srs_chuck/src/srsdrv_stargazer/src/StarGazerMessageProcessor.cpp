@@ -98,15 +98,14 @@ void StarGazerMessageProcessor::SendRawCommand( QueuedMessage msg )
 
 		m_mapPendingResponses[msg.expectedAck1] = { m_highrezclk.now( ), msg };
 
-		std::vector<char> cmdVec;
-		cmdVec.push_back( (char)msg.type );
-		cmdVec.insert( cmdVec.end( ), msg.command.begin( ), msg.command.end( ) );
-
+	if( m_pSerialIO->IsOpen( ) )
+	{
 		m_pSerialIO->Write( cmdVec );
 	}
 	else
 	{
-		ROS_DEBUG_STREAM_NAMED( "StarGazer", "Attempt to write duplicate message (already pending): " << msg.command );
+		ROS_ERROR_THROTTLE_NAMED( 60, "StarGazer",
+			"Attempt to write to the serial port, but the serial port is not open!" );
 	}
 }
 

@@ -10,23 +10,22 @@ namespace srs {
 
 struct SearchPositionNote
 {
-    SearchPositionNote(bool noRotations, unsigned int hazardousCost) :
+    const static SearchPositionNote STATIC_OBSTACLE;
+    const static SearchPositionNote GO_SLOW;
+    const static SearchPositionNote NO_ROTATIONS;
+
+    SearchPositionNote(
+            bool goSlow,
+            bool noRotations,
+            bool staticObstacle) :
+        goSlow(goSlow),
         noRotations(noRotations),
-        hazardousCost(hazardousCost)
+        staticObstacle(staticObstacle)
     {}
 
-    SearchPositionNote(bool noRotations) :
-        noRotations(noRotations),
-        hazardousCost(0)
-    {}
-
-    SearchPositionNote(unsigned int hazardousCost) :
-        noRotations(false),
-        hazardousCost(hazardousCost)
-    {}
-
-    bool noRotations;
-    int hazardousCost;
+    const bool goSlow;
+    const bool noRotations;
+    const bool staticObstacle;
 };
 
 } // namespace srs

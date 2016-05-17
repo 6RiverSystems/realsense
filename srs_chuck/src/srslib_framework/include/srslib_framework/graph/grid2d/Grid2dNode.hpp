@@ -26,7 +26,7 @@ struct Grid2dNode
         return stream;
     }
 
-    Grid2dLocation location;
+    const Grid2dLocation location;
     unsigned int cost;
     void* notes;
 };

@@ -4,13 +4,32 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 
+# Independent settings for the planner's costmap
+global_costmap:
+    publish_voxel_map: true
+    global_frame: map
+    robot_base_frame: base_footprint
+    update_frequency: 5.0
+    publish_frequency: 0.0
+    static_map: true
+    rolling_window: false
+    
+    
+    #map_type: costmap
+#transform_tolerance: 0.2
+#inflation_radius: 0.55
+
 # Robot footprint
-footprint: [[-0.5,-0.3], [-0.5,0.3], [0.5, 0.3], [0.5,-0.3]]
+#footprint: [[-0.5,-0.3], [-0.5,0.3], [0.5, 0.3], [0.5,-0.3]]
 
 # Cost factors
-inflation_radius: 3.0
-cost_scaling_factor: 5000.0
-resolution: 0.01
+#inflation_radius: 0.5
+#cost_scaling_factor: 30.0
+#resolution: 0.01
+
+
+
+
 
 # Obstacle cost shapping
 #footprint: [[-0.5,-0.3], [-0.5,0.3], [0.5, 0.3], [0.5,-0.3]]

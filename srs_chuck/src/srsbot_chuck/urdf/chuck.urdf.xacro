@@ -101,7 +101,7 @@
     <caster fb="back" parent="base_link" translateX="${caster_back_x_offset}" translateY="0" translateZ="${caster_z_offset}" />
 
 	<!-- Realsense R200 -->
-	<sensor_r200 parent="base_link" r200_cam_y_rotation="${M_PI}" r200_cam_px="${base_x_size/2}" r200_cam_py="0" r200_cam_pz="0" />
+	<sensor_r200 parent="base_link" r200_cam_y_rotation="${M_PI}" r200_cam_px="${base_x_size/2}" r200_cam_py="${-r200_cam_rgb_py/2}" r200_cam_pz="${r200_cam_rgb_pz/2}" />
 
     <!-- Differential drive controller  -->
     <gazebo>

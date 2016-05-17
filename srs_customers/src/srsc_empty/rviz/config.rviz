@@ -4,9 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
-        - /Grid1
-        - /Path1
+        - /Odometry1
       Splitter Ratio: 0.416318
     Tree Height: 880
   - Class: rviz/Selection
@@ -22,6 +20,7 @@ Panels:
   - Class: rviz/Views
     Expanded:
       - /Current View1
+      - /World View1
     Name: Views
     Splitter Ratio: 0.5
   - Class: rviz/Time
@@ -143,7 +142,7 @@ Visualization Manager:
       Draw Behind: false
       Enabled: true
       Name: Map
-      Topic: /map
+      Topic: /map_grid
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -160,6 +159,16 @@ Visualization Manager:
         Z: 0
       Topic: /srsnode_executive/state/current_goal/plan
       Unreliable: false
+      Value: true
+    - Angle Tolerance: 0.1
+      Class: rviz/Odometry
+      Color: 0; 85; 0
+      Enabled: true
+      Keep: 100
+      Length: 0.2
+      Name: Odometry
+      Position Tolerance: 0.1
+      Topic: /odom
       Value: true
   Enabled: true
   Global Options:
@@ -184,7 +193,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: 0
+      Angle: 0.0049999
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
@@ -193,11 +202,11 @@ Visualization Manager:
         Value: false
       Name: Current View
       Near Clip Distance: 0.01
-      Scale: 20.9143
+      Scale: 145.04
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
-      X: 21
-      Y: 18
+      X: 2.55876
+      Y: 3.62355
     Saved:
       - Class: rviz/ThirdPersonFollower
         Distance: 10
@@ -247,4 +256,4 @@ Window Geometry:
     collapsed: false
   Width: 2404
   X: 55
-  Y: 285
+  Y: 245

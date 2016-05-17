@@ -25,8 +25,8 @@ class RosTapGoalPlan :
     public RosTap
 {
 public:
-    RosTapGoalPlan(string nodeName) :
-        RosTap(nodeName, "Initial Pose Tap")
+    RosTapGoalPlan(ros::NodeHandle rosHandle) :
+        RosTap(rosHandle, "Initial Pose Tap")
     {}
 
     ~RosTapGoalPlan()
@@ -34,7 +34,7 @@ public:
         disconnectTap();
     }
 
-    vector<SolutionNode<Grid2d>> getGoalPlan()
+    vector<SolutionNode<Grid2d>> getPlan()
     {
         setNewData(false);
         return solution_;

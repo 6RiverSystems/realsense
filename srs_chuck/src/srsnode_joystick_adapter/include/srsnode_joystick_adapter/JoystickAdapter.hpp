@@ -33,10 +33,14 @@ private:
     constexpr static double THRESHOLD_LINEAR = 0.2;
     constexpr static double THRESHOLD_ANGULAR = 0.05;
 
-    RosTapJoy<> tapJoy_;
+    bool joystickLatched_;
+
+    ros::Publisher pubCommand_;
+    ros::Publisher pubJoystickLatched_;
 
     ros::NodeHandle rosNodeHandle_;
-    ros::Publisher rosPubCmdVel_;
+
+    RosTapJoy<> tapJoy_;
 };
 
 } // namespace srs

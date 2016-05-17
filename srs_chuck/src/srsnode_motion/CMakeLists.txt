@@ -26,6 +26,7 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/StatePe.hpp
 
     src/Motion.cpp
+    src/MotionController.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES

@@ -54,7 +54,6 @@ public:
     void load(string filename);
 
 private:
-    void loadAnchors();
     void loadConfiguration();
     void loadCosts();
 

@@ -13,5 +13,5 @@
         type="srsdrv_stargazer" 
         output="screen" respawn="true" >
         <param name="target_anchors" type="str" value="$(arg target_anchors)" />
-	</node>
+    </node>
 </launch>

@@ -16,11 +16,10 @@ namespace srs {
 class RosTap
 {
 public:
-    RosTap(string nodeName = "", string tapName = "") :
+    RosTap(ros::NodeHandle rosHandle, string tapName = "") :
         connected_(false),
         newData_(false),
-        nodeName_(nodeName),
-        rosNodeHandle_(nodeName),
+        rosNodeHandle_(rosHandle),
         tapName_(tapName)
     {}
 
@@ -37,11 +36,6 @@ public:
     {
         connected_ = disconnect();
         return connected_;
-    }
-
-    string getNodeName() const
-    {
-        return nodeName_;
     }
 
     string getTapName() const
@@ -83,7 +77,6 @@ private:
     bool connected_;
 
     bool newData_;
-    string nodeName_;
 
     string tapName_;
 };

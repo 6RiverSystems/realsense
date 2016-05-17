@@ -10,74 +10,76 @@
 #include <vector>
 using namespace std;
 
-#include <tf/transform_broadcaster.h>
-#include <std_msgs/Bool.h>
-#include <geometry_msgs/Twist.h>
-
-#include <srslib_framework/ros/RosTap.hpp>
-#include <srslib_framework/ros/tap/RosTapCmdVel.hpp>
 #include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
+#include <srslib_framework/filter/Sensor.hpp>
+#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/robotics/Velocity.hpp>
+#include <srslib_framework/ros/RosTap.hpp>
 
-#include <srsnode_position_estimator/Configuration.hpp>
-#include <srsnode_position_estimator/Robot.hpp>
-#include <srsnode_position_estimator/StatePe.hpp>
+#include <srsnode_motion/Configuration.hpp>
+#include <srsnode_motion/Robot.hpp>
+#include <srsnode_motion/StatePe.hpp>
 
-#include <srsnode_position_estimator/tap/odometry/RosTapOdometry.hpp>
-#include <srsnode_position_estimator/tap/brain_stem_status/RosTapBrainStemStatus.hpp>
-#include <srsnode_position_estimator/tap/initial_pose/RosTapInitialPose.hpp>
+#include <srsnode_motion/tap/odometry/RosTapOdometry.hpp>
+#include <srsnode_motion/tap/brain_stem_status/RosTapBrainStemStatus.hpp>
+#include <srsnode_motion/tap/initial_pose/RosTapInitialPose.hpp>
 
 namespace srs {
 
 class PositionEstimator
 {
 public:
-    PositionEstimator(string nodeName);
+    PositionEstimator() :
+        ukf_(ALPHA, BETA, robot_)
+    {}
 
     ~PositionEstimator()
+    {}
+
+    void addSensor(Sensor<>* sensor)
     {
-        disconnectAllTaps();
+        ukf_.addSensor(sensor);
     }
 
-    void run();
+    Pose<> getPose()
+    {
+        StatePe<> currentState = StatePe<>(ukf_.getState());
+        return currentState.getPose();
+    }
+
+    Velocity<> getVelocity()
+    {
+        StatePe<> currentState = StatePe<>(ukf_.getState());
+        return currentState.getVelocity();
+    }
+
+    void reset(Pose<> initialPose)
+    {
+        StatePe<> currentState = StatePe<>(initialPose);
+        cv::Mat currentCovariance = robot_.getNoiseMatrix();
+
+        ukf_.reset(currentState.getVectorForm(), currentCovariance);
+    }
+
+    void run(double dT, Velocity<>* commandVelocity)
+    {
+        CmdVelocity<> command;
+        if (commandVelocity)
+        {
+            command = CmdVelocity<>(*commandVelocity);
+        }
+
+        // Advance the state of the UKF
+        ukf_.run(dT, commandVelocity ? &command : nullptr);
+    }
 
 private:
-    constexpr static unsigned int REFRESH_RATE_HZ = 50;
     constexpr static double ALPHA = 1.0;
     constexpr static double BETA = 0.0;
 
-    void disconnectAllTaps();
-
-    void publishInformation();
-
-    void scanTapsForData();
-    void stepUkf();
-
-    bool commandUpdated_;
-    CmdVelocity<> currentCommand_;
-
-    cv::Mat currentCovariance_;
-    StatePe<> currentState_;
-
     Robot<> robot_;
-    ros::NodeHandle rosNodeHandle_;
-    ros::Publisher rosPubOdom_;
-    tf::TransformBroadcaster rosTfBroadcaster_;
-
-    RosTapBrainStemStatus tapBrainStemStatus_;
-    RosTapCmdVel<> tapCmdVel_;
-    RosTapOdometry tapOdometry_;
-    RosTapInitialPose tapInitialPose_;
 
     UnscentedKalmanFilter<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE> ukf_;
-
-    ros::Time previousTime_;
-    ros::Time currentTime_;
-
-    // TODO: Remove these variables
-    double previousTimeNs_;
-    double previousTimeS_;
-    double currentTimeNs_;
-    double currentTimeS_;
 };
 
 } // namespace srs

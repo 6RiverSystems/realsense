@@ -47,6 +47,7 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/ros/RosTap.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapJoy.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapJoyAdapter.hpp
 
     include/${PROJECT_NAME}/search/SearchAction.hpp
     include/${PROJECT_NAME}/search/SearchPosition.hpp

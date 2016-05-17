@@ -10,6 +10,7 @@
 using namespace std;
 
 #include <ros/ros.h>
+#include <tf/tf.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 #include <srslib_framework/ros/RosTap.hpp>
@@ -24,8 +25,8 @@ class RosTapInitialPose :
 public:
     typedef typename Pose<>::BaseType BaseType;
 
-    RosTapInitialPose(string nodeName) :
-        RosTap(nodeName, "Initial Pose Tap"),
+    RosTapInitialPose(ros::NodeHandle rosHandle) :
+        RosTap(rosHandle, "Initial Pose Tap"),
         initialPose_(Pose<>(2.0, 2.0, 0.0))
     {}
 
@@ -34,7 +35,7 @@ public:
         disconnectTap();
     }
 
-    Pose<> getInitialPose()
+    Pose<> getPose()
     {
         setNewData(false);
         return initialPose_;

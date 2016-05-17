@@ -22,8 +22,8 @@ class RosTapCmdVel :
     public RosTap
 {
 public:
-    RosTapCmdVel(string nodeName) :
-        RosTap(nodeName, "CmdVel Tap"),
+    RosTapCmdVel(ros::NodeHandle rosHandle) :
+        RosTap(rosHandle, "CmdVel Tap"),
         currentCmdVel_()
     {}
 
@@ -32,7 +32,7 @@ public:
         disconnectTap();
     }
 
-    Velocity<TYPE> getCurrentData()
+    Velocity<TYPE> getVelocity()
     {
         setNewData(false);
         return currentCmdVel_;

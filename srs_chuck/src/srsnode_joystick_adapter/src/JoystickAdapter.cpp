@@ -3,6 +3,7 @@
 #include <opencv2/opencv.hpp>
 
 #include <ros/ros.h>
+#include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
 
 namespace srs {
@@ -12,10 +13,12 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 JoystickAdapter::JoystickAdapter(string nodeName) :
-    rosNodeHandle_(),
-    tapJoy_(nodeName)
+    joystickLatched_(false),
+    rosNodeHandle_(nodeName),
+    tapJoy_(rosNodeHandle_)
 {
-    rosPubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 50);
+    pubCommand_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("velocity", 50);
+    pubJoystickLatched_ = rosNodeHandle_.advertise<std_msgs::Bool>("latched", 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,22 +33,40 @@ void JoystickAdapter::run()
 
         if (tapJoy_.newDataAvailable())
         {
-            Velocity<> currentVelocity = tapJoy_.getCurrentVelocity();
+            if (!tapJoy_.anyButtonPressed() && !tapJoy_.anyButtonReleased())
+            {
+                if (!joystickLatched_)
+                {
+                    joystickLatched_ = true;
+                    ROS_INFO("The joystick latch has been established");
+                }
 
-            geometry_msgs::Twist messageCmdVel;
+                Velocity<> currentVelocity = tapJoy_.getVelocity();
 
-            double linear = currentVelocity.linear * RATIO_LINEAR;
-            double angular = currentVelocity.angular * RATIO_ANGULAR;
+                double linear = currentVelocity.linear * RATIO_LINEAR;
+                double angular = currentVelocity.angular * RATIO_ANGULAR;
 
-            messageCmdVel.linear.x = abs(linear) > THRESHOLD_LINEAR ? linear : 0.0;
-            messageCmdVel.linear.y = 0.0;
-            messageCmdVel.linear.z = 0.0;
+                geometry_msgs::Twist messageVelocity;
+                messageVelocity.linear.x = abs(linear) > THRESHOLD_LINEAR ? linear : 0.0;
+                messageVelocity.linear.y = 0.0;
+                messageVelocity.linear.z = 0.0;
 
-            messageCmdVel.angular.x = 0.0;
-            messageCmdVel.angular.y = 0.0;
-            messageCmdVel.angular.z = abs(angular) > THRESHOLD_ANGULAR ? angular : 0.0;
+                messageVelocity.angular.x = 0.0;
+                messageVelocity.angular.y = 0.0;
+                messageVelocity.angular.z = abs(angular) > THRESHOLD_ANGULAR ? angular : 0.0;
 
-            rosPubCmdVel_.publish(messageCmdVel);
+                pubCommand_.publish(messageVelocity);
+            }
+            else if (tapJoy_.isButtonPressed(RosTapJoy<>::BUTTON_11) && joystickLatched_)
+            {
+                joystickLatched_ = false;
+                ROS_INFO("The joystick latch has been removed upon BUTTON_11 pressed");
+            }
+
+            std_msgs::Bool messageLatched;
+            messageLatched.data = joystickLatched_;
+
+            pubJoystickLatched_.publish(messageLatched);
         }
 
         refreshRate.sleep();

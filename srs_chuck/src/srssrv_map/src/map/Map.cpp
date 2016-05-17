@@ -12,25 +12,6 @@
 
 #include <srslib_framework/localization/Anchor.hpp>
 
-namespace YAML {
-
-template<>
-struct convert<srs::Anchor>
-{
-    static bool decode(const Node& node, srs::Anchor& anchor)
-    {
-        anchor.id = node["id"].as<string>();
-        anchor.x = node["location"][0].as<int>();
-        anchor.y = node["location"][1].as<int>();
-        anchor.z = node["location"][2].as<int>();
-        anchor.orientation = node["orientation"].as<int>();
-
-        return true;
-    }
-};
-
-} // YAML
-
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,7 +76,6 @@ void Map::load(string filename)
     if (!document_.IsNull())
     {
         loadConfiguration();
-        loadAnchors();
 
         if (grid_)
         {
@@ -113,17 +93,6 @@ void Map::load(string filename)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Map::loadAnchors()
-{
-    vector<Anchor> anchors = document_["anchors"].as<vector<Anchor>>();
-
-    for (auto anchor : anchors)
-    {
-        cout << anchor.id << endl;
-    }
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Map::loadConfiguration()

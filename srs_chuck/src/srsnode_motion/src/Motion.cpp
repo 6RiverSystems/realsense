@@ -21,38 +21,43 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Motion::Motion(string nodeName) :
-    rosNodeHandle_(nodeName),
-    executionTime_(0.0),
-    nextScheduledTime_(-1),
     commandUpdated_(false),
-    tapBrainStemStatus_(nodeName),
-    tapCmdVel_(nodeName),
-    tapOdometry_(nodeName),
-    tapInitialPose_(nodeName),
-    tapPlan_(nodeName),
-    ukf_(ALPHA, BETA, robot_)
+    currentCommand_(),
+    currentPose_(),
+    rosNodeHandle_(nodeName),
+    positionEstimator_(),
+    motionController_(),
+    tapPlan_(rosNodeHandle_),
+    tapJoyAdapter_(rosNodeHandle_),
+    tapBrainStemStatus_(rosNodeHandle_),
+    tapOdometry_(rosNodeHandle_),
+    tapInitialPose_(rosNodeHandle_)
 {
-    nextScheduled_ = trajectory_.end();
-
-    currentCovariance_ = robot_.getNoiseMatrix();
-    currentState_ = StatePe<>(2.0, 1.5, 0.0);
-
-    ukf_.addSensor(tapOdometry_.getSensor());
-    // ukf_.addSensor(tapAps_.getSensor());
-    ukf_.reset(currentState_.getVectorForm(), currentCovariance_);
-
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 100);
     pubOdom_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("/odom", 50);
+    pubPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>("pose", 10);
+
+    positionEstimator_.addSensor(tapOdometry_.getSensor());
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::reset()
+{
+    currentPose_ = tapInitialPose_.getPose();
+
+    commandUpdated_ = false;
+    currentCommand_ = Velocity<>();
+
+    positionEstimator_.reset(currentPose_);
+    motionController_.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::run()
 {
-    tapBrainStemStatus_.connectTap();
-    tapCmdVel_.connectTap();
-    tapOdometry_.connectTap();
-    tapInitialPose_.connectTap();
-    tapPlan_.connectTap();
+    connectAllTaps();
+
+    reset();
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
@@ -62,36 +67,14 @@ void Motion::run()
         previousTime_ = currentTime_;
         currentTime_ = ros::Time::now();
 
-        // Calculate how many seconds have passed from the previous update
-        previousTimeNs_ = currentTimeNs_;
-        currentTimeNs_ = static_cast<double>(currentTime_.nsec) * 1.0e-9;
-
-        previousTimeS_ = currentTimeS_;
-        currentTimeS_ = static_cast<double>(currentTime_.sec);
-
-        double dT1 = currentTimeNs_ + (currentTimeS_ - previousTimeS_) - previousTimeNs_;
-
-        double cT = Time::time2number(currentTime_);
-        double pT = Time::time2number(previousTime_);
-        double dT2 =  cT - pT;
-
-        if (abs(dT1 - dT2) > 0.1)
-        {
-            ROS_ERROR_STREAM("--------------------------------");
-            ROS_ERROR_STREAM("dT1: " << dT1);
-            ROS_ERROR_STREAM("dT2: " << dT2);
-            ROS_ERROR_STREAM("pTns: " << previousTimeNs_);
-            ROS_ERROR_STREAM("cTns: " << currentTimeNs_);
-            ROS_ERROR_STREAM("pTs: " << previousTimeS_);
-            ROS_ERROR_STREAM("cTs: " << currentTimeS_);
-            ROS_ERROR_STREAM("cT: " << cT);
-            ROS_ERROR_STREAM("pT: " << pT);
-            ROS_ERROR_STREAM("--------------------------------");
-        }
+        double dT = Time::time2number(currentTime_) - Time::time2number(previousTime_);
 
         scanTapsForData();
-        stepUkf(dT2);
-        stepMotionController(dT2);
+
+        Velocity<>* command = commandUpdated_ ? &currentCommand_ : nullptr;
+        positionEstimator_.run(dT, command);
+        motionController_.run(dT, positionEstimator_.getPose(), command);
+
         publishInformation();
 
         refreshRate.sleep();
@@ -102,19 +85,32 @@ void Motion::run()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::connectAllTaps()
+{
+    tapBrainStemStatus_.connectTap();
+    tapOdometry_.connectTap();
+    tapInitialPose_.connectTap();
+    tapPlan_.connectTap();
+    tapJoyAdapter_.connectTap();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::disconnectAllTaps()
 {
     tapBrainStemStatus_.disconnectTap();
-    tapCmdVel_.disconnectTap();
     tapOdometry_.disconnectTap();
     tapInitialPose_.disconnectTap();
     tapPlan_.disconnectTap();
+    tapJoyAdapter_.disconnectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishInformation()
 {
-    geometry_msgs::Quaternion orientation = tf::createQuaternionMsgFromYaw(currentState_.theta);
+    Pose<> currentPose = positionEstimator_.getPose();
+    Velocity<> currentVelocity = positionEstimator_.getVelocity();
+
+    geometry_msgs::Quaternion orientation = tf::createQuaternionMsgFromYaw(currentPose.theta);
 
     // Publish the TF of the pose
     geometry_msgs::TransformStamped messagePoseTf;
@@ -122,8 +118,8 @@ void Motion::publishInformation()
     messagePoseTf.child_frame_id = "base_footprint";
 
     messagePoseTf.header.stamp = currentTime_;
-    messagePoseTf.transform.translation.x = currentState_.x;
-    messagePoseTf.transform.translation.y = currentState_.y;
+    messagePoseTf.transform.translation.x = currentPose.x;
+    messagePoseTf.transform.translation.y = currentPose.y;
     messagePoseTf.transform.translation.z = 0.0;
     messagePoseTf.transform.rotation = orientation;
 
@@ -136,110 +132,85 @@ void Motion::publishInformation()
     messagePose.child_frame_id = "base_footprint";
 
     // Position
-    messagePose.pose.pose.position.x = currentState_.x;
-    messagePose.pose.pose.position.y = currentState_.y;
+    messagePose.pose.pose.position.x = currentPose.x;
+    messagePose.pose.pose.position.y = currentPose.y;
     messagePose.pose.pose.position.z = 0.0;
     messagePose.pose.pose.orientation = orientation;
 
     // Velocity
-    messagePose.twist.twist.linear.x = currentState_.v;
+    messagePose.twist.twist.linear.x = currentVelocity.linear;
     messagePose.twist.twist.linear.y = 0.0;
     messagePose.twist.twist.linear.z = 0.0;
     messagePose.twist.twist.angular.x = 0.0;
     messagePose.twist.twist.angular.y = 0.0;
-    messagePose.twist.twist.angular.z = currentState_.omega;
+    messagePose.twist.twist.angular.z = currentVelocity.angular;
 
     // Publish the Odometry
     pubOdom_.publish(messagePose);
+
+    if (motionController_.newCommandAvailable())
+    {
+        Velocity<> command = motionController_.getExecutingCommand();
+
+        geometry_msgs::Twist messageCmdVel;
+        messageCmdVel.linear.x = command.linear;
+        messageCmdVel.linear.y = 0;
+        messageCmdVel.linear.z = 0;
+        messageCmdVel.angular.x = 0;
+        messageCmdVel.angular.y = 0;
+        messageCmdVel.angular.z = command.angular;
+
+        pubCmdVel_.publish(messageCmdVel);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::scanTapsForData()
 {
-    commandUpdated_ = tapCmdVel_.newDataAvailable();
-    currentCommand_ = CmdVelocity<>(tapCmdVel_.getCurrentData());
+    // If there is another source of command velocities, follow that request
+    if (tapJoyAdapter_.newDataAvailable())
+    {
+        if (tapJoyAdapter_.getLatchState())
+        {
+            commandUpdated_ = true;
+            currentCommand_ = tapJoyAdapter_.getVelocity();
+        }
+    }
 
     // If the brain stem is disconnected, simulate odometry
     // feeding the odometer the commanded velocity
     if (!tapBrainStemStatus_.isBrainStemConnected())
     {
-        tapOdometry_.set(Time::time2number(currentTime_),
-            currentCommand_.velocity.linear,
-            currentCommand_.velocity.angular);
+        tapOdometry_.set(Time::time2number(ros::Time::now()),
+            currentCommand_.linear,
+            currentCommand_.angular);
     }
 
     if (tapInitialPose_.newDataAvailable())
     {
-        currentCovariance_ = robot_.getNoiseMatrix();
-        currentState_ = StatePe<>(tapInitialPose_.getInitialPose());
-
-        ukf_.reset(currentState_.getVectorForm(), currentCovariance_);
+        reset();
     }
 
-    // If there is a new plan to execute
-    if (tapPlan_.newDataAvailable())
-    {
-        trajectory_.clear();
-
-        Chuck chuck;
-        vector<SolutionNode<Grid2d>> solution = tapPlan_.getGoalPlan();
-
-        Trajectory trajectoryConverter(solution, chuck, 1.0 / REFRESH_RATE_HZ);
-        //trajectoryConverter.solution2trajectory(trajectory_);
-
-        for (auto milestone : trajectory_)
-        {
-            ROS_DEBUG_STREAM("Executing: " << milestone.first << " - " << milestone.second);
-        }
-
-        executionTime_ = 0.0;
-        nextScheduled_ = trajectory_.begin();
-        nextScheduledTime_ = nextScheduled_->first.arrivalTime;
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::stepUkf(double dT)
-{
-    // Advance the state of the UKF
-    ukf_.run(dT, commandUpdated_ ? &currentCommand_ : nullptr);
-
-    // Store the new state and covariance for publication
-    currentState_ = StatePe<>(ukf_.getState());
-    currentCovariance_ = ukf_.getCovariance();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::stepMotionController(double dT)
-{
-    if (nextScheduledTime_ > -1)
-    {
-        ROS_DEBUG_STREAM("[" << executionTime_ << "] Waiting for " << nextScheduledTime_);
-        executionTime_ += dT;
-
-        if (executionTime_ >= nextScheduledTime_)
-        {
-            MilestoneType milestone = *nextScheduled_;
-
-            ROS_DEBUG_STREAM("Executing: " << milestone.first << " - " << milestone.second);
-
-            geometry_msgs::Twist message;
-
-            message.linear.x = milestone.second.linear;
-            message.linear.y = 0;
-            message.linear.z = 0;
-            message.angular.x = 0;
-            message.angular.y = 0;
-            message.angular.z = milestone.second.angular;
-
-            pubCmdVel_.publish(message);
-
-            nextScheduled_++;
-            nextScheduledTime_ = nextScheduled_ != trajectory_.end() ?
-                nextScheduled_->first.arrivalTime :
-                -1;
-        }
-    }
+//    // If there is a new plan to execute
+//    if (tapPlan_.newDataAvailable())
+//    {
+//        trajectory_.clear();
+//
+//        Chuck chuck;
+//        vector<SolutionNode<Grid2d>> solution = tapPlan_.getGoalPlan();
+//
+//        Trajectory trajectoryConverter(solution, chuck, 1.0 / REFRESH_RATE_HZ);
+//        //trajectoryConverter.solution2trajectory(trajectory_);
+//
+//        for (auto milestone : trajectory_)
+//        {
+//            ROS_DEBUG_STREAM("Executing: " << milestone.first << " - " << milestone.second);
+//        }
+//
+//        executionTime_ = 0.0;
+//        nextScheduled_ = trajectory_.begin();
+//        nextScheduledTime_ = nextScheduled_->first.arrivalTime;
+//    }
 }
 
 } // namespace srs

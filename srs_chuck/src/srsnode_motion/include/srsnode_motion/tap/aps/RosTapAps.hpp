@@ -14,7 +14,7 @@ using namespace std;
 #include <srslib_framework/Aps.h>
 #include <srslib_framework/ros/RosTap.hpp>
 
-#include <srsnode_position_estimator/tap/aps/ApsSensor.hpp>
+#include <srsnode_motion/tap/aps/ApsSensor.hpp>
 
 namespace srs {
 
@@ -24,8 +24,8 @@ class RosTapAps :
 public:
     typedef typename ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>::BaseType BaseType;
 
-    RosTapAps(string nodeName) :
-        RosTap(nodeName, "Absolute Positioning System Tap")
+    RosTapAps(ros::NodeHandle rosHandle) :
+        RosTap(rosHandle, "Absolute Positioning System Tap")
     {
         sensor_ = new ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>();
     }

@@ -8,6 +8,8 @@
 
 namespace srs {
 
+using namespace std;
+
 struct Anchor
 {
 public:

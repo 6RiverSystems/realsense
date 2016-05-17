@@ -76,7 +76,15 @@ void StarGazerMessageProcessor::SendRawCommand( QueuedMessage msg )
 
 	std::vector<char> cmdVec( msg.sTxMsg.begin( ), msg.sTxMsg.end( ) );
 
-	m_pSerialIO->Write( cmdVec );
+	if( m_pSerialIO->IsOpen( ) )
+	{
+		m_pSerialIO->Write( cmdVec );
+	}
+	else
+	{
+		ROS_ERROR_THROTTLE_NAMED( 60, "StarGazer",
+			"Attempt to write to the serial port, but the serial port is not open!" );
+	}
 }
 
 void StarGazerMessageProcessor::BaseCommand(STAR_GAZER_MESSAGE_TYPES type, std::string cmd, std::string rxExpected = "", float timeoutSec = STARTGAZER_TIMEOUT)

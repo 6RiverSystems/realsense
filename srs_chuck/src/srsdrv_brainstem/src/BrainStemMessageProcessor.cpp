@@ -114,7 +114,7 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 			}
 			else
 			{
-				ROS_DEBUG_STREAM_THROTTLE_NAMED(1, "Brainstem", "%s", strMessage.c_str( ) );
+				ROS_DEBUG_STREAM_THROTTLE_NAMED(1, "Brainstem", strMessage.c_str( ) );
 			}
 		}
 		break;

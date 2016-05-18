@@ -184,10 +184,14 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 		tf::Vector3 anchorOrigin = anchorGlobal.getOrigin( );
 		tf::Quaternion anchorRotation = anchorGlobal.getRotation( );
 
+		if( fAngle < 0 )
+		{
+			fAngle += 360.0f;
+		}
+
 		double fAngleInRadians = fAngle * M_PI / 180.0f;
 
 		tf::Vector3 point( fX, fY, fZ );
-
 		tf::Quaternion orientation = tf::createQuaternionFromYaw( fAngleInRadians );
 
 		// Transform the incoming point based to the global coordinate system
@@ -204,8 +208,8 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 
 		m_rosApsPublisher.publish( msg );
 
-		ROS_DEBUG_NAMED( "StarGazer", "Anchor Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
-			nTagId, anchorOrigin.getX( ), anchorOrigin.getY( ), anchorOrigin.getZ( ), anchorRotation.getAngle( ) );
+		ROS_DEBUG_NAMED( "StarGazer", "Anchor Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad, %2.6f deg\n",
+			nTagId, anchorOrigin.getX( ), anchorOrigin.getY( ), anchorOrigin.getZ( ), anchorRotation.getAngle( ), fAngle );
 
 		ROS_DEBUG_NAMED( "StarGazer", "StarGazer (ref anchor) Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
 			nTagId, fX, fY, fZ, orientation.getAngle( ) );
@@ -243,11 +247,32 @@ void StarGazer::LoadAnchors( )
 
 					tf::Transform transform;
 
-					tf::Vector3 origin( anchor.x, anchor.y, anchor.z );
+//					tf::Pose worldPose;
+//
+//					tf::Pose anchorPose;
+//
+//					tf::Transform transform = worldPose.inverseTimes( anchorPose );
+
+					tf::Vector3 origin( anchor.x, anchor.y, -anchor.z );
 					transform.setOrigin( origin );
 
 					tf::Quaternion orientation = tf::createQuaternionFromYaw( anchor.orientation );
+
+					// Convert left hand rule of stargazer to right hand rule (ROS coordinate system)
+					orientation = tf::Quaternion( orientation.getX( ), orientation.getY( ),
+						-orientation.getZ( ), -orientation.getW( ) );
+
 					transform.setRotation( orientation );
+
+// Test changing left to right hand rule
+//					for( int i = 0; i < 360; i++ )
+//					{
+//						tf::Quaternion orientationTest = tf::createQuaternionFromYaw( (double)i * M_PI / 180.0f );
+//
+//						orientationTest = orientationTest * orientation;
+//
+//						ROS_INFO( "Angle: %d = %f", i, orientationTest.getAngle( ) * 180.0f / M_PI );
+//					}
 
 					ROS_INFO_STREAM( "Anchor: id=" << anchor.id << ", x=" << anchor.x <<
 						", y=" << anchor.y << ", z=" << anchor.z << ", orientation=" << orientation.getAngle( ) );

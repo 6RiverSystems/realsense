@@ -29,7 +29,7 @@ public:
 private:
     constexpr static unsigned int REFRESH_RATE_HZ = 5;
 
-    constexpr static double RATIO_LINEAR = 0.5;
+    constexpr static double RATIO_LINEAR = 0.7;
     constexpr static double RATIO_ANGULAR = 0.3;
     constexpr static double THRESHOLD_LINEAR = 0.2;
     constexpr static double THRESHOLD_ANGULAR = 0.05;

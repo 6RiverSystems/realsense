@@ -48,7 +48,7 @@ void JoystickAdapter::run()
                 Velocity<> currentVelocity = tapJoy_.getVelocity();
 
                 double linear = currentVelocity.linear * RATIO_LINEAR;
-                double angular = currentVelocity.angular * RATIO_ANGULAR;
+                double angular = sign(linear) * currentVelocity.angular * RATIO_ANGULAR;
 
                 geometry_msgs::Twist messageVelocity;
                 messageVelocity.linear.x = abs(linear) > THRESHOLD_LINEAR ? linear : 0.0;

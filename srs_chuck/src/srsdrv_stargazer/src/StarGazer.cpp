@@ -7,6 +7,7 @@
 #include <StarGazer.h>
 #include <srslib_framework/Aps.h>
 #include <srslib_framework/io/SerialIO.hpp>
+#include <srslib_framework/platform/Thread.hpp>
 #include <yaml-cpp/yaml.h>
 #include <string>
 #include <boost/lexical_cast.hpp>
@@ -19,10 +20,10 @@ struct convert<srs::Anchor>
     static bool decode(const Node& node, srs::Anchor& anchor)
     {
         anchor.id = node["id"].as<std::string>();
-        anchor.x = node["location"][0].as<int>();
-        anchor.y = node["location"][1].as<int>();
-        anchor.z = node["location"][2].as<int>();
-        anchor.orientation = node["orientation"].as<int>();
+        anchor.x = node["location"][0].as<double>();
+        anchor.y = node["location"][1].as<double>();
+        anchor.z = node["location"][2].as<double>();
+        anchor.orientation = node["orientation"].as<double>();
 
         return true;
     }
@@ -54,16 +55,26 @@ StarGazer::StarGazer( const std::string& strSerialPort, const std::string& strAp
 	m_messageProcessor.SetReadCallback(
 		std::bind( &StarGazer::ReadCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
 
-
 	std::shared_ptr<SerialIO> pSerialIO = std::dynamic_pointer_cast<SerialIO>( m_pSerialIO );
 
 	pSerialIO->SetLeadingCharacter( STARGAZER_STX );
 	pSerialIO->SetTerminatingCharacter( STARGAZER_RTX );
 	pSerialIO->SetFirstByteDelay( std::chrono::microseconds( 30000 ) );
-	pSerialIO->SetByteDelay( std::chrono::microseconds( 5000 ) );
+	pSerialIO->SetByteDelay( std::chrono::microseconds( 2000 ) );
 
-	pSerialIO->Open( strSerialPort.c_str( ), std::bind( &StarGazerMessageProcessor::ProcessStarGazerMessage,
-		&m_messageProcessor, std::placeholders::_1 ) );
+	auto processMessage = [&]( std::vector<char> buffer )
+		{
+			ExecuteInRosThread( std::bind( &StarGazerMessageProcessor::ProcessStarGazerMessage, &m_messageProcessor,
+				buffer ) );
+		};
+
+	auto connectionChanged = [&]( bool bIsConnected )
+	{
+		ExecuteInRosThread( std::bind( &StarGazer::OnConnectionChanged, this,
+				bIsConnected ) );
+	};
+
+	pSerialIO->Open( strSerialPort.c_str( ), connectionChanged, processMessage );
 }
 
 StarGazer::~StarGazer( )
@@ -76,10 +87,6 @@ void StarGazer::Run( )
 {
 	ros::Rate refreshRate( REFRESH_RATE_HZ );
 
-	Configure( );
-
-	Start( );
-
 	while( ros::ok( ) )
 	{
 		ros::spinOnce( );
@@ -88,10 +95,18 @@ void StarGazer::Run( )
 
 		refreshRate.sleep( );
 	}
-
-	Stop( );
 }
 
+
+void StarGazer::OnConnectionChanged( bool bIsConnected )
+{
+	if( bIsConnected )
+	{
+		Configure( );
+
+		Start( );
+	}
+}
 
 void StarGazer::HardReset( )
 {
@@ -102,6 +117,8 @@ void StarGazer::HardReset( )
 
 void StarGazer::Configure( )
 {
+	m_messageProcessor.ResetState( );
+
 	Stop( );
 
 	m_messageProcessor.GetVersion( );
@@ -114,6 +131,7 @@ void StarGazer::Configure( )
 void StarGazer::SetFixedHeight( int height_mm )
 {
 	Stop( );
+
 	m_messageProcessor.SetMarkHeight( height_mm );
 	m_messageProcessor.HightFix( true );
 	m_messageProcessor.SetEnd( );
@@ -122,6 +140,7 @@ void StarGazer::SetFixedHeight( int height_mm )
 void StarGazer::SetVariableHeight( )
 {
 	Stop( );
+
 	m_messageProcessor.HightFix( false );
 	m_messageProcessor.SetEnd( );
 }
@@ -129,6 +148,7 @@ void StarGazer::SetVariableHeight( )
 void StarGazer::AutoCalculateHeight( )
 {
 	Stop( );
+
 	m_messageProcessor.HeightCalc( );
 }
 
@@ -161,10 +181,18 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 		// The anchor transform from the origin of the map to the anchor point
 		const tf::Transform& anchorGlobal = iter->second;
 
-		tf::Vector3 point( fX, fY, fZ );
+		tf::Vector3 anchorOrigin = anchorGlobal.getOrigin( );
+		tf::Quaternion anchorRotation = anchorGlobal.getRotation( );
 
-		tf::Quaternion orientation;
-		orientation.setRPY( 0.0, 0.0, fAngle );
+		if( fAngle < 0 )
+		{
+			fAngle += 360.0f;
+		}
+
+		double fAngleInRadians = fAngle * M_PI / 180.0f;
+
+		tf::Vector3 point( fX, fY, fZ );
+		tf::Quaternion orientation = tf::createQuaternionFromYaw( fAngleInRadians );
 
 		// Transform the incoming point based to the global coordinate system
 		tf::Vector3 transformedPoint = anchorGlobal * point;
@@ -180,21 +208,18 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 
 		m_rosApsPublisher.publish( msg );
 
-		tf::Vector3 tagPoint = anchorGlobal.getOrigin( );
-		tf::Quaternion tagOrientation = anchorGlobal.getRotation( );
+		ROS_DEBUG_NAMED( "StarGazer", "Anchor Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad, %2.6f deg\n",
+			nTagId, anchorOrigin.getX( ), anchorOrigin.getY( ), anchorOrigin.getZ( ), anchorRotation.getAngle( ), fAngle );
 
-		ROS_DEBUG_NAMED( "StarGazer", "Tag Location: %04i (%2.2f, %2.2f, %2.2f) %2.2f deg\n",
-			nTagId, tagPoint.getX( ), tagPoint.getY( ), tagPoint.getZ( ), tagOrientation.getAngle( ) );
+		ROS_DEBUG_NAMED( "StarGazer", "StarGazer (ref anchor) Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
+			nTagId, fX, fY, fZ, orientation.getAngle( ) );
 
-		ROS_DEBUG_NAMED( "StarGazer", "StarGazer Location: %04i (%2.2f, %2.2f, %2.2f) %2.2f deg\n",
-			nTagId, fX, fY, fZ, fAngle );
-
-		ROS_DEBUG_NAMED( "StarGazer", "Global Location: %04i (%2.2f, %2.2f, %2.2f) %2.2f deg\n",
+		ROS_DEBUG_NAMED( "StarGazer", "StarGazer (ref global) Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
 			nTagId, msg.x, msg.y, msg.z, msg.yaw );
 	}
 	else
 	{
-		ROS_DEBUG_NAMED( "StarGazer", "Invalid or Unknown Tag: %04i (%2.2f, %2.2f, %2.2f) %2.2f deg\n",
+		ROS_INFO_NAMED( "StarGazer", "Invalid or Unknown Tag: %04i (%2.2f, %2.2f, %2.2f) %2.2f rad\n",
 			nTagId, fX, fY, fZ, fAngle );
 	}
 }
@@ -206,41 +231,68 @@ void StarGazer::LoadAnchors( )
 
 	ROS_INFO_STREAM( "Loading anchors from " << anchorsFilename );
 
-	YAML::Node document = YAML::LoadFile( anchorsFilename );
-
-	if( !document.IsNull( ) )
+	try
 	{
-		vector<Anchor> anchors = document["anchors"].as<vector<Anchor>>( );
+		YAML::Node document = YAML::LoadFile( anchorsFilename );
 
-		for( auto anchor : anchors )
+		if( !document.IsNull( ) )
 		{
-			try
+			vector<Anchor> anchors = document["anchors"].as<vector<Anchor>>( );
+
+			for( auto anchor : anchors )
 			{
-				int32_t anchorId = boost::lexical_cast<int32_t>( anchor.id );
+				try
+				{
+					int32_t anchorId = boost::lexical_cast<int32_t>( anchor.id );
 
-				tf::Transform transform;
+					tf::Transform transform;
 
-				tf::Vector3 origin( anchor.x, anchor.y, anchor.z );
-				transform.setOrigin( origin );
+//					tf::Pose worldPose;
+//
+//					tf::Pose anchorPose;
+//
+//					tf::Transform transform = worldPose.inverseTimes( anchorPose );
 
-				tf::Quaternion orientation;
-				orientation.setRPY( 0.0, 0.0, anchor.orientation );
-				transform.setRotation( orientation );
+					tf::Vector3 origin( anchor.x, anchor.y, -anchor.z );
+					transform.setOrigin( origin );
 
-				ROS_INFO_STREAM( "Anchor: id=" << anchor.id << ", x=" << anchor.x <<
-					", y=" << anchor.y << ", z=" << anchor.z << ", orientation=" << anchor.orientation );
+					tf::Quaternion orientation = tf::createQuaternionFromYaw( anchor.orientation );
 
-				m_mapAnchorTransforms[anchorId] = transform;
-			}
-			catch( const boost::bad_lexical_cast& e )
-			{
-				ROS_INFO_STREAM( "Could not convert anchor id to int: " << anchor.id << " " << e.what( ) );
+					// Convert left hand rule of stargazer to right hand rule (ROS coordinate system)
+					orientation = tf::Quaternion( orientation.getX( ), orientation.getY( ),
+						-orientation.getZ( ), -orientation.getW( ) );
+
+					transform.setRotation( orientation );
+
+// Test changing left to right hand rule
+//					for( int i = 0; i < 360; i++ )
+//					{
+//						tf::Quaternion orientationTest = tf::createQuaternionFromYaw( (double)i * M_PI / 180.0f );
+//
+//						orientationTest = orientationTest * orientation;
+//
+//						ROS_INFO( "Angle: %d = %f", i, orientationTest.getAngle( ) * 180.0f / M_PI );
+//					}
+
+					ROS_INFO_STREAM( "Anchor: id=" << anchor.id << ", x=" << anchor.x <<
+						", y=" << anchor.y << ", z=" << anchor.z << ", orientation=" << orientation.getAngle( ) );
+
+					m_mapAnchorTransforms[anchorId] = transform;
+				}
+				catch( const boost::bad_lexical_cast& e )
+				{
+					ROS_INFO_STREAM( "Could not convert anchor id to int: " << anchor.id << " " << e.what( ) );
+				}
 			}
 		}
+		else
+		{
+			ROS_ERROR_STREAM( "Configuration file not found: " << anchorsFilename );
+		}
 	}
-	else
+	catch( const std::runtime_error& e )
 	{
-		ROS_ERROR_STREAM( "Configuration file not found: " << anchorsFilename );
+		ROS_INFO_STREAM( "Could not parse yaml file for anchors: " << anchorsFilename << " " << e.what( ) );
 	}
 }
 

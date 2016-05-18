@@ -12,6 +12,8 @@
 #include <queue>
 #include <condition_variable>
 #include <boost/range/irange.hpp>
+#include <ros/ros.h>
+#include <boost/timer.hpp>
 
 using namespace srs;
 
@@ -21,6 +23,17 @@ const std::string g_strPort1 = "/tmp/pty1";
 const std::string g_strPort2 = "/tmp/pty2";
 
 typedef std::vector<char> IOBuffer;
+
+std::vector<IOBuffer> g_vecTestData =
+{
+	{ 'H', 'e', 'l', 'l', 'o' },
+	{ '6', 'R', 'i', 'v', 'e', 'r', 's' },
+	{ '\\', 'A', 'A', '\n', 'B', 'B', '"' },
+	{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F },
+	{ 'A', 'B', 'C', 'D', 'E', 'F', 'G', '\n' },
+	{ 0x01, 0x02, 0x03, 0x04 },  // Special case where CRC == '\n'
+	{ 0x10, 0x10, 0x10, 0x10, 0x10, 0x0C }  // Special case where CRC == '\\'
+};
 
 class SocatRunner
 {
@@ -93,6 +106,8 @@ public:
 
 class SerialIOTest : public ::testing::Test
 {
+public:
+
 	enum class CONFIG
 	{
 		RAW,
@@ -100,11 +115,8 @@ class SerialIOTest : public ::testing::Test
 		STAR_GAZER
 	};
 
-	enum class DATA
-	{
-		BASIC,
-		CRC
-	};
+	static const char STARGAZER_LEADING = '~';
+	static const char STARGAZER_TERMINATING = '`';
 
 public:
 
@@ -124,25 +136,23 @@ public:
 
 	std::condition_variable			m_condition2;
 
-	std::map<DATA, IOBuffer>		m_TestData;
+	std::vector<CONFIG>				m_testConfigs;
 
 public:
 	SerialIOTest( )
 	{
-		m_TestData[DATA::BASIC] = { 'H', 'e', 'l', 'l', 'o' };
-		m_TestData[DATA::BASIC] = { '6', 'R', 'i', 'v', 'e', 'r', 's' };
-		m_TestData[DATA::BASIC] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
-		m_TestData[DATA::BASIC] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', '\n' };
-		m_TestData[DATA::BASIC] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', '\r' };
-		m_TestData[DATA::CRC] = { 0x01, 0x02, 0x03, 0x04 };  // Special case where CRC == '\n'
-		m_TestData[DATA::CRC] = { 0x10, 0x10, 0x10, 0x10, 0x10, 0x0C };  // Special case where CRC == '\\'
+		m_testConfigs.push_back( CONFIG::BRAIN_STEM );
+		m_testConfigs.push_back( CONFIG::STAR_GAZER );
 	}
 
 	void OpenSerialPort( SerialIO& serial, std::string strPort, CONFIG eConfig,
 		void (SerialIOTest::* callback) (std::vector<char>) )
-	{
-		serial.Open( strPort.c_str( ), std::bind( callback, this,
-			std::placeholders::_1 ) );
+	{;
+		auto connectionCallback = [](bool bIsConnected) { };
+
+		auto readCallback = std::bind( callback, this, std::placeholders::_1 );
+
+		serial.Open( strPort.c_str( ), connectionCallback, readCallback );
 
 		switch( eConfig )
 		{
@@ -157,17 +167,20 @@ public:
 				serial.EnableCRC( true );
 				serial.SetTerminatingCharacter( '\n' );
 				serial.SetEscapeCharacter( '\\' );
+				serial.SetFirstByteDelay( std::chrono::microseconds( ) );
+				serial.SetByteDelay( std::chrono::microseconds( ) );
 			}
 			break;
 
 			case CONFIG::STAR_GAZER:
 			{
-				serial.SetLeadingCharacter( '~' );
-				serial.SetTerminatingCharacter( '`' );
+				serial.SetLeadingCharacter( STARGAZER_LEADING );
+				serial.SetTerminatingCharacter( STARGAZER_TERMINATING );
 				serial.SetFirstByteDelay( std::chrono::microseconds( 30000 ) );
 				serial.SetByteDelay( std::chrono::microseconds( 5000 ) );
 			}
 			break;
+
 		}
 
 		EXPECT_TRUE( serial.IsOpen( ) );
@@ -185,9 +198,9 @@ public:
 
 	void OpenSerialPorts( CONFIG eConfig = CONFIG::BRAIN_STEM )
 	{
-		OpenSerialPort1( );
+		OpenSerialPort1( eConfig );
 
-		OpenSerialPort2( );
+		OpenSerialPort2( eConfig );
 	}
 
 	void CloseSerialPort( SerialIO& serial )
@@ -212,7 +225,7 @@ public:
 	{
 		std::queue<std::vector<char>> emptyQueue;
 
-		m_readData1.swap( emptyQueue );
+		m_readData1.swap( emptyQueue );;
 
 		m_readData2.swap( emptyQueue );
 
@@ -221,49 +234,90 @@ public:
 		m_serial2.Close( );
 	}
 
-	bool CompareBuffers( const std::vector<char>& buffer1, const std::vector<char>& buffer2 )
-	{
-		return buffer1.size( ) == buffer2.size( ) &&
-			memcmp( buffer1.data( ), buffer2.data( ), buffer1.size( ) );
-	}
-
 	void ReadMessageFrom1( std::vector<char> buffer )
 	{
 		m_readData2.push( buffer );
-
-		std::unique_lock<std::mutex> lock( m_mutex1 );
-
-		m_condition1.notify_one( );
-	}
-
-	void ReadMessageFrom2( std::vector<char> buffer )
-	{
-		m_readData1.push( buffer );
 
 		std::unique_lock<std::mutex> lock( m_mutex2 );
 
 		m_condition2.notify_one( );
 	}
 
-	void WaitForData( size_t numberOfMessages )
+	void ReadMessageFrom2( std::vector<char> buffer )
+	{
+		m_readData1.push( buffer );
+
+		std::unique_lock<std::mutex> lock( m_mutex1 );
+
+		m_condition1.notify_one( );
+	}
+
+	void WaitForData1( size_t numberOfMessages )
+	{
+		WaitForData( numberOfMessages, m_mutex1, m_condition1, m_readData1 );
+	}
+
+	void WaitForData2( size_t numberOfMessages )
+	{
+		WaitForData( numberOfMessages, m_mutex2, m_condition2, m_readData2 );
+	}
+
+	void WaitForData( size_t numberOfMessages, std::mutex& mutex, std::condition_variable& condition,
+		std::queue<std::vector<char>>& queueData )
 	{
 		// Wait for for messages to come in or timeout
 		while( true )
 		{
-			std::unique_lock<std::mutex> lock( m_mutex1 );
+			std::unique_lock<std::mutex> lock( mutex );
 
-			if( m_condition1.wait_until( lock, std::chrono::steady_clock::now( ) + std::chrono::milliseconds( 500 ) ) == std::cv_status::timeout )
+			if( condition.wait_until( lock, std::chrono::steady_clock::now( ) + std::chrono::milliseconds( 1000 ) ) == std::cv_status::timeout )
 			{
 				break;
 			}
 			else
 			{
-				if( m_readData2.size( ) == numberOfMessages )
+				if( queueData.size( ) == numberOfMessages )
 				{
 					break;
 				}
 			}
 		}
+	}
+
+	void CheckTiming( SerialIO& serial )
+	{
+		std::chrono::microseconds firstByteDelay = serial.GetFirstByteDelay( );
+
+		std::chrono::microseconds byteDelay = serial.GetByteDelay( );
+
+		if( firstByteDelay == std::chrono::microseconds( ) )
+		{
+			firstByteDelay = byteDelay;
+		}
+
+		std::vector<SerialIO::MessageTiming> vecMessageTiming = serial.GetTimingInfo( );
+
+		for( auto messageTiming : vecMessageTiming )
+		{
+			for( int i = 0; i < messageTiming.size( ); i++ )
+			{
+				// Make sure time constraints are met
+				if( i == 1 )
+				{
+					ASSERT_GE( messageTiming[i].count( )*1.1, firstByteDelay.count( ) );
+				}
+				else if( i > 1)
+				{
+					ASSERT_GE( messageTiming[i].count( )*1.1, byteDelay.count( ) );
+				}
+			}
+		}
+	}
+
+	void CheckTiming( )
+	{
+		CheckTiming( m_serial1 );
+		CheckTiming( m_serial2 );
 	}
 
 	~SerialIOTest( )
@@ -276,8 +330,8 @@ public:
 
 TEST_F( SerialIOTest, OpenInvalidSerialPort )
 {
-	m_serial1.Open( "/foobar", std::bind( &SerialIOTest::ReadMessageFrom2, this,
-		std::placeholders::_1 ) );
+	m_serial1.Open( "/foobar", [](bool bIsConnected) { },
+		std::bind( &SerialIOTest::ReadMessageFrom2, this, std::placeholders::_1 ) );
 
 	EXPECT_FALSE( m_serial1.IsOpen( ) );
 }
@@ -287,8 +341,8 @@ TEST_F( SerialIOTest, TestSpinUntilOpen )
 	// Try once when it is closed, then spin until it connects (wait for 3 seconds)
 	for( int i : boost::irange( 0, 300 ) )
 	{
-		m_serial1.Open( g_strPort1.c_str( ), std::bind( &SerialIOTest::ReadMessageFrom2, this,
-			std::placeholders::_1 ) );
+		m_serial1.Open( g_strPort1.c_str( ), [](bool bIsConnected) { },
+			std::bind( &SerialIOTest::ReadMessageFrom2, this, std::placeholders::_1 ) );
 
 		// If we are able to open when socat is not running, we have failed
 		if( i == 0 )
@@ -328,184 +382,130 @@ TEST_F( SerialIOTest, TestClose )
 	CloseSerialPorts( );
 }
 
-TEST_F( SerialIOTest, TestSimpleReadWrite )
+TEST_F( SerialIOTest, TestBasicReadWrite )
+{
+	for( auto iter : m_testConfigs )
+	{
+		OpenSerialPorts( iter );
+
+		for( auto data : g_vecTestData )
+		{
+			m_serial1.Write( data );
+		}
+
+		WaitForData2( g_vecTestData.size( ) );
+
+		CloseSerialPorts( );
+
+		CheckTiming( m_serial2 );
+
+		ASSERT_EQ( g_vecTestData.size( ), m_readData2.size( ) );
+
+		for( auto data : g_vecTestData )
+		{
+			EXPECT_EQ( m_readData2.front( ), data );
+
+			m_readData2.pop( );
+		}
+
+		CloseSerialPorts( );
+	}
+}
+
+TEST_F( SerialIOTest, TestDuplexReadWrite )
 {
 	OpenSerialPorts( );
 
-	for( auto data : m_TestData )
+	for( auto data : g_vecTestData )
 	{
-		m_serial1.Write( data.second );
+		m_serial1.Write( data );
+		m_serial2.Write( data );
 	}
 
-	WaitForData( m_TestData.size( ) );
+	WaitForData1( g_vecTestData.size( ) );
+	WaitForData2( g_vecTestData.size( ) );
 
-	for( auto data : m_TestData )
+	ASSERT_EQ( g_vecTestData.size( ), m_readData2.size( ) );
+
+	CloseSerialPorts( );
+
+	CheckTiming( );
+
+	for( auto data : g_vecTestData )
 	{
-		EXPECT_EQ( m_readData2.front( ), data.second );
+		EXPECT_EQ( m_readData1.front( ), data );
+		EXPECT_EQ( m_readData2.front( ), data );
 
+		m_readData1.pop( );
 		m_readData2.pop( );
 	}
 }
 
-TEST_F( SerialIOTest, TestBasicEscape )
+TEST_F( SerialIOTest, TestCarryOver )
 {
-	OpenSerialPorts( );
+	OpenSerialPort1( CONFIG::RAW );
 
-	std::string string1( "\\AA\nBB\"" );
-	std::vector<char> data1( string1.begin( ), string1.end( ) );
+	OpenSerialPort2( CONFIG::BRAIN_STEM );
 
-	m_serial1.Write( data1 );
+	std::vector<char> data( { 'H', 'e', 'l', 'l', 'o' } );
 
-	WaitForData( 1 );
+	uint32_t index = 3;
 
-	EXPECT_EQ( m_readData2.front( ), data1 );
-}
+	m_serial1.Write( std::vector<char>( data.begin( ), data.begin( ) + index ) );
+	m_serial1.Write( std::vector<char>( data.begin( ) + index, data.end( ) ) );
+	m_serial1.Write( std::vector<char>( { (char)-0xF4, '\n' } ) );
 
-TEST_F( SerialIOTest, TestEscapeInCRC )
-{
-	OpenSerialPorts( );
+	WaitForData2( g_vecTestData.size( ) );
 
-	std::vector<char> data( { '\\', 'A', 'A', '\n', 'B', 'B', '"' } );
+	ASSERT_EQ( m_readData2.size( ), 1 );
 
-	m_serial1.Write( data );
-
-	WaitForData( 1 );
-
-	EXPECT_EQ( m_readData2.front( ), data );
-}
-
-TEST_F( SerialIOTest, TestEscapeCarryOver )
-{
-	OpenSerialPorts( );
-
-	std::string string1( "\\AA\nBB\"" );
-	std::vector<char> data1( string1.begin( ), string1.end( ) );
-
-	m_serial1.Write( data1 );
-
-	std::unique_lock<std::mutex> lock( m_mutex1 );
-
-	m_condition1.wait_until( lock, std::chrono::steady_clock::now( ) + std::chrono::milliseconds( 500 ) );
-
-	EXPECT_EQ( m_readData2.front( ), data1 );
-}
-
-TEST_F( SerialIOTest, TestEscapeReset )
-{
-	OpenSerialPorts( );
-
-	std::string string1( "\\AA\nBB\"" );
-	std::vector<char> data1( string1.begin( ), string1.end( ) );
-
-	m_serial1.Write( data1 );
-
-	std::unique_lock<std::mutex> lock( m_mutex1 );
-
-	m_condition1.wait_until( lock, std::chrono::steady_clock::now( ) + std::chrono::milliseconds( 500 ) );
-
-	EXPECT_EQ( m_readData2.front( ), data1 );
-}
-
-TEST_F( SerialIOTest, TestValidCRC )
-{
-
+	EXPECT_EQ( data, m_readData2.front( ) );
 }
 
 TEST_F( SerialIOTest, TestInvalidCRC )
 {
+	OpenSerialPort1( CONFIG::RAW );
 
+	OpenSerialPort2( CONFIG::BRAIN_STEM );
+
+	std::vector<char> data( { 'H', 'e', 'l', 'l', 'o' } );
+
+	uint32_t index = 3;
+
+	m_serial1.Write( std::vector<char>( data.begin( ), data.begin( ) + index ) );
+	m_serial1.Write( std::vector<char>( data.begin( ) + index, data.end( ) ) );
+	m_serial1.Write( std::vector<char>( { 'x', '\n' } ) );
+
+	WaitForData2( g_vecTestData.size( ) );
+
+	ASSERT_NE( m_readData2.size( ), 1 );
+
+	EXPECT_NE( data, m_readData2.front( ) );
 }
 
 TEST_F( SerialIOTest, TestStartInMiddleOfMessage )
 {
-	OpenSerialPorts( );
+	OpenSerialPort1( CONFIG::RAW );
 
-	std::string string1( "\\AA\nBB\"" );
-	std::vector<char> data1( string1.begin( ), string1.end( ) );
+	OpenSerialPort2( CONFIG::STAR_GAZER );
 
-	m_serial1.Write( data1 );
-
-	std::unique_lock<std::mutex> lock( m_mutex1 );
-
-	m_condition1.wait_until( lock, std::chrono::steady_clock::now( ) + std::chrono::milliseconds( 500 ) );
-
-	EXPECT_EQ( m_readData2.front( ), data1 );
-}
-
-TEST_F( SerialIOTest, TestLeadingAndTrailing )
-{
-
-}
-
-TEST_F( SerialIOTest, TestMultipleReadWrites )
-{
-	OpenSerialPorts( );
-
-	m_serial1.EnableCRC( false );
-	m_serial2.EnableCRC( false );
-
-	std::string string1( "Hello" );
-	std::vector<char> data1( string1.begin( ), string1.end( ) );
-
-	m_serial1.Write( data1 );
-	usleep( 5000 );
-	m_serial1.Write( data1 );
-	usleep( 10000 );
-	m_serial1.Write( data1 );
-	usleep( 15000 );
-
-	for( int i : boost::irange( 0, 3 ) )
+	for( auto data : g_vecTestData )
 	{
-		std::unique_lock<std::mutex> lock( m_mutex1 );
+		// Garbage data to ignore
+		m_serial1.Write( data );
 
-		// Wait for next message if necessary
-		if( m_readData2.size( ) == 0 )
-		{
-			m_condition1.wait( lock );
-		}
+		m_serial1.Write( std::vector<char>( { STARGAZER_LEADING } ) );
 
-		EXPECT_EQ( m_readData2.front( ), data1 );
+		m_serial1.Write( data );
 
-		m_readData2.pop( );
+		m_serial1.Write( std::vector<char>( { STARGAZER_TERMINATING } ) );
 	}
-}
 
-TEST_F( SerialIOTest, TestMultipleMessages )
-{
-	OpenSerialPorts( );
+	WaitForData2( g_vecTestData.size( ) );
 
-	std::string string1( "HelloHelloHelloHelloHelloHelloHelloHelloHello" );
-	std::vector<char> data1( string1.begin( ), string1.end( ) );
-
-	m_serial1.Write( data1 );
-
-	usleep( 10000 );
-
-	m_serial1.Write( data1 );
-
-	usleep( 500 );
-
-	m_serial1.Write( data1 );
-
-	usleep( 10000 );
-
-	m_serial1.Write( data1 );
-
-	usleep( 20000 );
-
-	m_serial1.Write( data1 );
-
-	for( int i : boost::irange( 0, 5 ) )
+	for( auto data : g_vecTestData )
 	{
-		std::unique_lock<std::mutex> lock( m_mutex1 );
-
-		// Wait for next message if necessary
-		if( m_readData2.size( ) == 0 )
-		{
-			m_condition1.wait( lock );
-		}
-
-		EXPECT_EQ( std::string( m_readData2.front( ).begin( ), m_readData2.front( ).end( ) ), string1 );
+		EXPECT_EQ( m_readData2.front( ), data );
 
 		m_readData2.pop( );
 	}
@@ -515,20 +515,21 @@ TEST_F( SerialIOTest, TestCloseWhileReadWrite )
 {
 	OpenSerialPorts( );
 
-	std::string dataLarge;
+	std::vector<char> data;
+
+	std::string str64Bytes( "1234567890123456789012345678901234567890123456789012345678901234" );
 
 	// 65k of data
 	for( int i : boost::irange( 0, 1024 ) )
 	{
-		// Add in increments of 64 bytes
-		dataLarge += "1234567890123456789012345678901234567890123456789012345678901234";
+		data.insert( data.end( ), str64Bytes.begin( ), str64Bytes.end( ) );
 	}
 
-	std::vector<char> data1( dataLarge.begin( ), dataLarge.end( ) );
+	std::vector<char> data1( data.begin( ), data.end( ) );
 
-	m_serial1.Write( data1 );
+	m_serial1.Write( data );
 
-	m_serial2.Write( data1 );
+	m_serial2.Write( data );
 
 	// Closing while reading and writing is perfectly fine
 	m_serial1.Close( );
@@ -538,7 +539,36 @@ TEST_F( SerialIOTest, TestCloseWhileReadWrite )
 
 TEST_F( SerialIOTest, TestBandwidth )
 {
-	// Test that our data rate is in the ballpark of what it should be (tolerance)
+	OpenSerialPorts( );
+
+	std::vector<char> data;
+
+	std::string str64Bytes( "1234567890123456789012345678901234567890123456789012345678901234" );
+
+	// 65k of data
+	for( int i : boost::irange( 0, 1024 ) )
+	{
+		// Add in increments of 64 bytes
+		data.insert( data.end( ), str64Bytes.begin( ), str64Bytes.end( ) );
+	}
+
+	boost::timer oTimer;
+
+	m_serial1.Write( data );
+
+	WaitForData2( 1 );
+
+	double dfTime = oTimer.elapsed( );
+
+	double dfBytes = (double)data.size( );
+
+	double dfBandwidth =  dfBytes / dfTime;
+
+	EXPECT_EQ( m_readData2.front( ), data );
+
+	EXPECT_GT( dfBandwidth, 115200.0f * 0.90 );
+
+	ROS_DEBUG( "SerialIO Bandwidth: %f bytes/sec", dfBandwidth );
 }
 
 }  // namespace

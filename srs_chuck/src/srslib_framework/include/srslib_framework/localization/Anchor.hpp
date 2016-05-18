@@ -30,11 +30,11 @@ public:
     {}
 
     string id;
-    unsigned int x;
-    unsigned int y;
-    unsigned int z;
+    double x;
+    double y;
+    double z;
 
-    unsigned int orientation;
+    double orientation;
 };
 
 } // namespace srs

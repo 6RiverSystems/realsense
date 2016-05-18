@@ -229,6 +229,11 @@ if (CATKIN_ENABLE_TESTING)
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_IO}
     )
+    
+    target_compile_definitions(TestSuite_Io 
+    	PRIVATE ENABLE_TEST_FIXTURE
+    )
+
     target_link_libraries(TestSuite_Io
         ${catkin_LIBRARIES}
         ${srslib_test_LIBRARIES}

@@ -5,6 +5,7 @@
  *      Author: dan
  */
 #include <functional>
+#include <vector>
 
 #ifndef SRC_IO_H_
 #define SRC_IO_H_
@@ -12,7 +13,12 @@
 namespace srs {
 
 class IO {
+
 public:
+
+	typedef std::function<void(bool)> ConnectionCallbackFn;
+
+	typedef std::function<void(std::vector<char>)> ReadCallbackFn;
 
 	virtual ~IO( ) { };
 
@@ -20,9 +26,11 @@ public:
 	    Opens the serial port
 
 	    @pszName - serial port name (e.g. /dev/malg, /dev/ttyS0, etc.)
-	    @readCallback - callback when data is read from the port (called from io thread)
+	    @connectionCallback - called when the connection state has changed
+	    @readCallback - called when data is read from the port (called from io thread)
 	*/
-	virtual void Open( const char* pszName, std::function<void(std::vector<char>)> readCallback ) = 0;
+	virtual void Open( const char* pszName, ConnectionCallbackFn connectionCallback,
+		ReadCallbackFn readCallback ) = 0;
 
 	/**
 	    Checks to see if the serial port is open

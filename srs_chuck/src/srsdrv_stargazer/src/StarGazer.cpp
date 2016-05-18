@@ -20,10 +20,10 @@ struct convert<srs::Anchor>
     static bool decode(const Node& node, srs::Anchor& anchor)
     {
         anchor.id = node["id"].as<std::string>();
-        anchor.x = node["location"][0].as<int>();
-        anchor.y = node["location"][1].as<int>();
-        anchor.z = node["location"][2].as<int>();
-        anchor.orientation = node["orientation"].as<int>();
+        anchor.x = node["location"][0].as<double>();
+        anchor.y = node["location"][1].as<double>();
+        anchor.z = node["location"][2].as<double>();
+        anchor.orientation = node["orientation"].as<double>();
 
         return true;
     }
@@ -247,7 +247,7 @@ void StarGazer::LoadAnchors( )
 				orientation.setRPY( 0.0, 0.0, anchor.orientation );
 				transform.setRotation( orientation );
 
-				ROS_INFO_STREAM( "Anchor: id=" << anchor.id << ", x=" << anchor.x <<
+				ROS_INFO_STREAM( "Anchor: id=" << std::setprecision( 6 ) << anchor.id << ", x=" << anchor.x <<
 					", y=" << anchor.y << ", z=" << anchor.z << ", orientation=" << anchor.orientation );
 
 				m_mapAnchorTransforms[anchorId] = transform;

@@ -1,10 +1,13 @@
 #include <srsnode_joystick_adapter/JoystickAdapter.hpp>
 
-#include <opencv2/opencv.hpp>
+#include <cmath>
+using namespace std;
 
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
+
+#include <srslib_framework/math/Math.hpp>
 
 namespace srs {
 
@@ -48,7 +51,7 @@ void JoystickAdapter::run()
                 Velocity<> currentVelocity = tapJoy_.getVelocity();
 
                 double linear = currentVelocity.linear * RATIO_LINEAR;
-                double angular = sign(linear) * currentVelocity.angular * RATIO_ANGULAR;
+                double angular = Math::sgn(linear) * currentVelocity.angular * RATIO_ANGULAR;
 
                 geometry_msgs::Twist messageVelocity;
                 messageVelocity.linear.x = abs(linear) > THRESHOLD_LINEAR ? linear : 0.0;

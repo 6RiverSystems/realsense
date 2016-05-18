@@ -27,12 +27,13 @@ public:
     void run();
 
 private:
-    constexpr static unsigned int REFRESH_RATE_HZ = 5;
+    constexpr static unsigned int REFRESH_RATE_HZ = 10;
 
     constexpr static double RATIO_LINEAR = 0.6;
     constexpr static double RATIO_ANGULAR = 0.3;
+
     constexpr static double THRESHOLD_LINEAR = 0.2;
-    constexpr static double THRESHOLD_ANGULAR = 0.05;
+    constexpr static double THRESHOLD_ANGULAR = 0.02;
 
     void evaluateTriggers();
 

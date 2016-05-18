@@ -8,9 +8,9 @@
 -->
 
 <package>
-    <name>srssrv_map</name>
+    <name>srsnode_map_server</name>
     <version>1.0.0</version>
-    <description>Service package: Map</description>
+    <description>Node package: Map</description>
     
     <author email="fsantini@6river.com">Fabrizio Santini</author>
     <maintainer email="fsantini@6river.com">Fabrizio Santini</maintainer>

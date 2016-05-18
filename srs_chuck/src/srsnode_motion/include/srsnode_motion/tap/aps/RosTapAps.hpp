@@ -11,6 +11,7 @@ using namespace std;
 
 #include <ros/ros.h>
 
+#include <srslib_framework/math/Time.hpp>
 #include <srslib_framework/Aps.h>
 #include <srslib_framework/ros/RosTap.hpp>
 

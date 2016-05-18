@@ -8,16 +8,17 @@
 
 #include <ros/ros.h>
 
+#include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
+
 namespace srs {
 
 class Reflexes
 {
 public:
-    Reflexes();
+    Reflexes(string nodeName);
 
     ~Reflexes()
-    {
-    }
+    {}
 
     void run();
 
@@ -25,6 +26,8 @@ private:
     constexpr static unsigned int REFRESH_RATE_HZ = 200;
 
     ros::NodeHandle rosNodeHandle_;
+
+    RosTriggerShutdown triggerShutdown_;
 };
 
 } // namespace srs

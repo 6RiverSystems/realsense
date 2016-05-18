@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSBRAINSTEMSTATUS_HPP_
-#define ROSBRAINSTEMSTATUS_HPP_
+#ifndef ROSTAPBRAINSTEMSTATUS_HPP_
+#define ROSTAPBRAINSTEMSTATUS_HPP_
 
 #include <string>
 using namespace std;
@@ -74,4 +74,4 @@ private:
 
 } // namespace srs
 
-#endif // ROSBRAINSTEMSTATUS_HPP_
+#endif // ROSTAPBRAINSTEMSTATUS_HPP_

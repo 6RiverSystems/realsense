@@ -17,16 +17,17 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-MapServer::MapServer() :
-    rosNodeHandle_()
+MapServer::MapServer(string nodeName) :
+    rosNodeHandle_(nodeName),
+    triggerShutdown_(rosNodeHandle_)
 {
     string mapFilename;
-    rosNodeHandle_.param("target_map", mapFilename, string(""));
+    rosNodeHandle_.param("/target_map", mapFilename, string(""));
 
     ROS_INFO_STREAM("Target map: " << mapFilename);
 
     string frame_id;
-    rosNodeHandle_.param("frame_id", frame_id, string("map"));
+    rosNodeHandle_.param("/frame_id", frame_id, string("map"));
 
     map_.load(mapFilename);
 
@@ -34,15 +35,13 @@ MapServer::MapServer() :
     pubMapGrid_ = rosNodeHandle_.advertise<nav_msgs::OccupancyGrid>("map_grid", 1, true);
 }
 
-MapServer::~MapServer()
-{
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MapServer::run()
 {
+    triggerShutdown_.connectService();
+
     ros::Rate refreshRate(REFRESH_RATE_HZ);
-    while (ros::ok())
+    while (ros::ok() && !triggerShutdown_.isShutdownRequested())
     {
         ros::spinOnce();
 

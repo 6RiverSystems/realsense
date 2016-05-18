@@ -9,6 +9,7 @@
 #include <string>
 using namespace std;
 
+#include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
 #include <srslib_framework/ros/tap/RosTapJoy.hpp>
 
 namespace srs {
@@ -41,6 +42,7 @@ private:
     ros::NodeHandle rosNodeHandle_;
 
     RosTapJoy<> tapJoy_;
+    RosTriggerShutdown triggerShutdown_;
 };
 
 } // namespace srs

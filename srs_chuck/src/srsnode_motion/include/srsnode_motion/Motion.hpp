@@ -7,10 +7,14 @@
 #define MOTION_HPP_
 
 #include <ros/ros.h>
+#include <std_srvs/Empty.h>
 #include <tf/transform_broadcaster.h>
 
 #include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
+#include <srslib_framework/ros/service/RosServiceTrigger.hpp>
+#include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
 
+#include <srsnode_motion/tap/aps/RosTapAps.hpp>
 #include <srsnode_motion/tap/goal_plan/RosTapGoalPlan.hpp>
 #include <srsnode_motion/PositionEstimator.hpp>
 #include <srsnode_motion/MotionController.hpp>
@@ -57,6 +61,10 @@ private:
     ros::NodeHandle rosNodeHandle_;
     tf::TransformBroadcaster rosTfBroadcaster_;
 
+    RosServiceTrigger triggerStop_;
+    RosTriggerShutdown triggerShutdown_;
+
+    RosTapAps tapAps_;
     RosTapGoalPlan tapPlan_;
     RosTapJoyAdapter<> tapJoyAdapter_;
     RosTapBrainStemStatus tapBrainStemStatus_;

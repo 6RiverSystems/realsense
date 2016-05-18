@@ -30,7 +30,7 @@
     </include>
 -->
     <!-- Launch all the robot nodes -->
-    <include file="$(find srssrv_map)/launch/service.launch">
+    <include file="$(find srsnode_map_server)/launch/node.launch">
         <arg name="target_map" value="$(arg target_map)" />
     </include>
     <include file="$(find srsnode_reflexes)/launch/node.launch" />

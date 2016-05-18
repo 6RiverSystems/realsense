@@ -11,7 +11,9 @@
 #include <srslib_framework/search/AStar.hpp>
 
 #include <srsnode_executive/tap/RosTapCmd_Goal.hpp>
-#include <srsnode_executive/tap/RosTapCmd_YouAreHere.hpp>
+#include <srsnode_executive/tap/RosTapCmd_InitialPose.hpp>
+#include <srsnode_executive/tap/RosTapCmd_Pause.hpp>
+#include <srsnode_executive/tap/RosTapCmd_Shutdown.hpp>
 
 namespace srs {
 
@@ -31,9 +33,15 @@ private:
     constexpr static unsigned int REFRESH_RATE_HZ = 5;
     constexpr static int GRID_SIZE = 60;
 
+    void connectAllTaps();
+
     void disconnectAllTaps();
 
-    void planToGoal(Pose<> goal);
+    void executeInitialPose(Pose<> initialPose);
+    void executePause();
+    void executePlanToGoal(Pose<> goal);
+    void executeShutdown();
+
     void publishGoal();
     void publishInitialPose();
 
@@ -53,8 +61,10 @@ private:
 
     ros::NodeHandle rosNodeHandle_;
 
-    RosTapCmd_Goal tapGoal_;
-    RosTapCmd_YouAreHere tapYouAreHere_;
+    RosTapCmd_Goal tapCmdGoal_;
+    RosTapCmd_InitialPose tapCmdInitialPose_;
+    RosTapCmd_Pause tapCmdPause_;
+    RosTapCmd_Shutdown tapCmdShutdown_;
 
     int inc_;
 };

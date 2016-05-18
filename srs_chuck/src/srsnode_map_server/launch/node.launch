@@ -8,10 +8,10 @@
 <launch>
     <arg name="target_map" />
 
-    <node name="srssrv_map"
-        pkg="srssrv_map" 
-        type="srssrv_map"
-        output="screen" respawn="true">
+    <node name="srsnode_map_server"
+        pkg="srsnode_map_server" 
+        type="srsnode_map_server"
+        output="screen">
         <param name="target_map" type="str" value="$(arg target_map)" />
     </node>
 </launch>

@@ -11,7 +11,11 @@ set(${PROJECT_NAME}_SOURCES
 
     src/Executive.cpp
     include/${PROJECT_NAME}/tap/RosTapCmd_Goal.hpp
-    include/${PROJECT_NAME}/tap/RosTapCmd_YouAreHere.hpp
+    include/${PROJECT_NAME}/tap/RosTapCmd_InitialPose.hpp
+    include/${PROJECT_NAME}/tap/RosTapCmd_Pause.hpp
+    include/${PROJECT_NAME}/tap/RosTapCmd_Shutdown.hpp
+
+    src/tap/RosTapMap.cpp
 )
 
 ####################################################################################################

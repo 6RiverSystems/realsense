@@ -9,5 +9,5 @@
     <node name="srsnode_executive"
         pkg="srsnode_executive" 
         type="srsnode_executive"
-        output="screen" respawn="true"/>
+        output="screen" required="true" />
 </launch>

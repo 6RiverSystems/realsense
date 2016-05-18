@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPYOUAREHERE_HPP_
-#define ROSTAPYOUAREHERE_HPP_
+#ifndef ROSTAPCMD_INITIALPOSE_HPP_
+#define ROSTAPCMD_INITIALPOSE_HPP_
 
 #include <string>
 using namespace std;
@@ -18,17 +18,17 @@ using namespace std;
 
 namespace srs {
 
-class RosTapCmd_YouAreHere :
+class RosTapCmd_InitialPose :
     public RosTap
 {
 public:
     typedef typename Pose<>::BaseType BaseType;
 
-    RosTapCmd_YouAreHere(string nodeName) :
-        RosTap(nodeName, "Command 'You Are Here' Tap")
+    RosTapCmd_InitialPose(ros::NodeHandle rosHandle) :
+        RosTap(rosHandle, "Command 'Initial Pose' Tap")
     {}
 
-    ~RosTapCmd_YouAreHere()
+    ~RosTapCmd_InitialPose()
     {
         disconnectTap();
     }
@@ -53,8 +53,8 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe("cmd/you_are_here", 10,
-            &RosTapCmd_YouAreHere::onYouAreHere, this);
+        rosSubscriber_ = rosNodeHandle_.subscribe("/cmd/initial_pose", 10,
+            &RosTapCmd_InitialPose::onYouAreHere, this);
         return true;
     }
 
@@ -72,4 +72,4 @@ private:
 
 } // namespace srs
 
-#endif // ROSTAPYOUAREHERE_HPP_
+#endif // ROSTAPCMD_INITIALPOSE_HPP_

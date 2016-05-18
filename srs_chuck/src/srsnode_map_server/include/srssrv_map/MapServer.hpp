@@ -11,6 +11,8 @@ using namespace std;
 
 #include <ros/ros.h>
 
+#include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
+
 #include <srssrv_map/map/Map.hpp>
 
 namespace srs {
@@ -18,8 +20,9 @@ namespace srs {
 class MapServer
 {
 public:
-    MapServer();
-    ~MapServer();
+    MapServer(string nodeName);
+    ~MapServer()
+    {}
 
     void run();
 
@@ -34,6 +37,8 @@ private:
     ros::Publisher pubMapGrid_;
 
     ros::NodeHandle rosNodeHandle_;
+
+    RosTriggerShutdown triggerShutdown_;
 };
 
 } // namespace srs

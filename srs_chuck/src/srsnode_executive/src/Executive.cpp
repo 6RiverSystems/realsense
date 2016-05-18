@@ -16,16 +16,18 @@ Executive::Executive(string nodeName) :
     currentGoal_(),
     grid_(GRID_SIZE),
     inc_(0),
-    rosNodeHandle_("srsnode_executive"),
+    rosNodeHandle_(nodeName),
     robotCurrentPose_(),
     robotInitialPose_(),
-    tapGoal_(nodeName),
-    tapYouAreHere_(nodeName)
+    tapCmdGoal_(rosNodeHandle_),
+    tapCmdInitialPose_(rosNodeHandle_),
+    tapCmdPause_(rosNodeHandle_),
+    tapCmdShutdown_(rosNodeHandle_)
 {
-    pubGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>("state/current_goal/plan", 1);
-    pubGoalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>("state/current_goal/goal", 1);
+    pubGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>("current_goal/plan", 1);
+    pubGoalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>("current_goal/goal", 1);
     pubInitialPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseWithCovarianceStamped>(
-        "state/initial_pose", 1);
+        "initial_pose", 1);
 
     algorithm_.setGraph(&grid_);
 
@@ -36,8 +38,7 @@ Executive::Executive(string nodeName) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::run()
 {
-    tapGoal_.connectTap();
-    tapYouAreHere_.connectTap();
+    connectAllTaps();
 
     publishGoal();
     publishInitialPose();
@@ -57,19 +58,49 @@ void Executive::run()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Executive::disconnectAllTaps()
+void Executive::connectAllTaps()
 {
-    tapGoal_.disconnectTap();
-    tapYouAreHere_.disconnectTap();
+    tapCmdGoal_.connectTap();
+    tapCmdInitialPose_.connectTap();
+    tapCmdPause_.connectTap();
+    tapCmdShutdown_.connectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Executive::planToGoal(Pose<> goal)
+void Executive::disconnectAllTaps()
 {
+    tapCmdGoal_.disconnectTap();
+    tapCmdInitialPose_.disconnectTap();
+    tapCmdPause_.disconnectTap();
+    tapCmdShutdown_.disconnectTap();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::executeInitialPose(Pose<> initialPose)
+{
+    robotInitialPose_ = tapCmdInitialPose_.getRobotPose();
+    inc_ = 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::executePause()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::executePlanToGoal(Pose<> goal)
+{
+    currentGoal_ = goal;
+
     Grid2d::LocationType start(0, 0);
     Grid2d::LocationType internalGoal(3, 0);
 
     algorithm_.search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(internalGoal, 0));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::executeShutdown()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -148,19 +179,27 @@ void Executive::publishInitialPose()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::stepExecutiveFunctions()
 {
-    // If there is a new goal to reach
-    if (tapGoal_.newDataAvailable())
+    if (tapCmdShutdown_.isShutdownRequested())
     {
-        currentGoal_ = tapGoal_.getCurrentGoal();
-        planToGoal(currentGoal_);
+        executeShutdown();
+    }
+
+    // If there is a new goal to reach
+    if (tapCmdGoal_.newDataAvailable())
+    {
+        executePlanToGoal(tapCmdGoal_.getGoal());
         publishGoal();
     }
 
-    if (tapYouAreHere_.newDataAvailable())
+    if (tapCmdInitialPose_.newDataAvailable())
     {
-        robotInitialPose_ = tapYouAreHere_.getRobotPose();
+        executeInitialPose(tapCmdInitialPose_.getRobotPose());
         publishInitialPose();
-        inc_ = 0;
+    }
+
+    if (tapCmdPause_.isPauseRequested())
+    {
+        executePause();
     }
 }
 

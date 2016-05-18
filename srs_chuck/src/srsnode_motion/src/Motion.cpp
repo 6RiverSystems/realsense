@@ -31,13 +31,17 @@ Motion::Motion(string nodeName) :
     tapJoyAdapter_(rosNodeHandle_),
     tapBrainStemStatus_(rosNodeHandle_),
     tapOdometry_(rosNodeHandle_),
-    tapInitialPose_(rosNodeHandle_)
+    tapInitialPose_(rosNodeHandle_),
+    tapAps_(rosNodeHandle_),
+    triggerShutdown_(rosNodeHandle_),
+    triggerStop_(rosNodeHandle_, "Trigger: Stop", "trg/stop")
 {
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 100);
     pubOdom_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("/odom", 50);
     pubPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>("pose", 10);
 
     positionEstimator_.addSensor(tapOdometry_.getSensor());
+    positionEstimator_.addSensor(tapAps_.getSensor());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +64,7 @@ void Motion::run()
     reset();
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
-    while (ros::ok())
+    while (ros::ok() && !triggerShutdown_.isShutdownRequested())
     {
         ros::spinOnce();
 
@@ -92,6 +96,10 @@ void Motion::connectAllTaps()
     tapInitialPose_.connectTap();
     tapPlan_.connectTap();
     tapJoyAdapter_.connectTap();
+    tapAps_.connectTap();
+
+    triggerStop_.connectService();
+    triggerShutdown_.connectService();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,6 +110,7 @@ void Motion::disconnectAllTaps()
     tapInitialPose_.disconnectTap();
     tapPlan_.disconnectTap();
     tapJoyAdapter_.disconnectTap();
+    tapAps_.disconnectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

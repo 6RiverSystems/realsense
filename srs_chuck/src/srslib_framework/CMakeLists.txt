@@ -45,6 +45,9 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/robotics/controller/KanayamaController.hpp
 
     include/${PROJECT_NAME}/ros/RosTap.hpp
+    include/${PROJECT_NAME}/ros/RosService.hpp
+    include/${PROJECT_NAME}/ros/service/RosServiceTrigger.hpp
+    include/${PROJECT_NAME}/ros/service/RosTriggerShutdown.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapJoy.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapJoyAdapter.hpp

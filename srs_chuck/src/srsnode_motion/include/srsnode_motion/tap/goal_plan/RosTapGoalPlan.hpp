@@ -45,16 +45,10 @@ public:
         solution_.clear();
     }
 
-//    void set(double arrivalTime, BaseType x, BaseType y, BaseType theta)
-//    {
-//        initialPose_ = Pose<>(arrivalTime, x, y, theta);
-//        setNewData(true);
-//    }
-
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/srsnode_executive/state/current_goal/plan", 1,
+        rosSubscriber_ = rosNodeHandle_.subscribe("/srsnode_executive/current_goal/plan", 1,
             &RosTapGoalPlan::onGoalPlan, this);
 
         return true;

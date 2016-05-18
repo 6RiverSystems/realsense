@@ -15,7 +15,8 @@ namespace srs {
 JoystickAdapter::JoystickAdapter(string nodeName) :
     joystickLatched_(false),
     rosNodeHandle_(nodeName),
-    tapJoy_(rosNodeHandle_)
+    tapJoy_(rosNodeHandle_),
+    triggerShutdown_(rosNodeHandle_)
 {
     pubCommand_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("velocity", 50);
     pubJoystickLatched_ = rosNodeHandle_.advertise<std_msgs::Bool>("latched", 1);
@@ -25,9 +26,10 @@ JoystickAdapter::JoystickAdapter(string nodeName) :
 void JoystickAdapter::run()
 {
     tapJoy_.connectTap();
+    triggerShutdown_.connectService();
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
-    while (ros::ok())
+    while (ros::ok() && !triggerShutdown_.isShutdownRequested())
     {
         ros::spinOnce();
 
@@ -60,7 +62,7 @@ void JoystickAdapter::run()
             else if (tapJoy_.isButtonPressed(RosTapJoy<>::BUTTON_11) && joystickLatched_)
             {
                 joystickLatched_ = false;
-                ROS_INFO("The joystick latch has been removed upon BUTTON_11 pressed");
+                ROS_INFO("The joystick latch has been removed");
             }
 
             std_msgs::Bool messageLatched;

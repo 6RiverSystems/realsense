@@ -21,18 +21,11 @@ class RosTapMap :
     public RosTap
 {
 public:
-    RosTapMap(string nodeName);
+    RosTapMap(ros::NodeHandle rosHandle);
 
     ~RosTapMap()
     {
         disconnectTap();
-        delete currentMap_;
-    }
-
-    Grid2d* getCurrentMap()
-    {
-        setNewData(false);
-        return currentMap_;
     }
 
 protected:
@@ -43,10 +36,6 @@ protected:
     }
 
 private:
-    //Grid2d* currentMap_;
-
-    Grid2d* convertArrayToGrid(int width, int height, unsigned char& array[]);
-
     void onMap(const nav_msgs::OccupancyGridConstPtr& message);
 };
 

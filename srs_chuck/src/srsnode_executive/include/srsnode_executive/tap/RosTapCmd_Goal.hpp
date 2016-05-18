@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPGOAL_HPP_
-#define ROSTAPGOAL_HPP_
+#ifndef ROSTAPCMD_GOAL_HPP_
+#define ROSTAPCMD_GOAL_HPP_
 
 #include <string>
 using namespace std;
@@ -25,8 +25,8 @@ class RosTapCmd_Goal :
 public:
     typedef typename Pose<>::BaseType BaseType;
 
-    RosTapCmd_Goal(string nodeName) :
-        RosTap(nodeName, "Command 'Goal' Tap")
+    RosTapCmd_Goal(ros::NodeHandle rosHandle) :
+        RosTap(rosHandle, "Command 'Goal' Tap")
     {}
 
     ~RosTapCmd_Goal()
@@ -34,7 +34,7 @@ public:
         disconnectTap();
     }
 
-    Pose<> getCurrentGoal()
+    Pose<> getGoal()
     {
         setNewData(false);
         return currentGoal_;
@@ -54,7 +54,7 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe("cmd/goal", 10, &RosTapCmd_Goal::onGoal, this);
+        rosSubscriber_ = rosNodeHandle_.subscribe("/cmd/goal", 10, &RosTapCmd_Goal::onGoal, this);
         return true;
     }
 
@@ -72,4 +72,4 @@ private:
 
 } // namespace srs
 
-#endif // ROSTAPGOAL_HPP_
+#endif // ROSTAPCMD_GOAL_HPP_

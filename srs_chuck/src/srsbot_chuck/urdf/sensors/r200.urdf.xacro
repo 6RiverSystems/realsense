@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 
 <robot name="sensor_r200" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_gazebo.urdf.xacro"/>
-  <xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_properties.urdf.xacro"/>
+  <xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_gazebo.urdf.xacro" />
+  <xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_properties.urdf.xacro" />
 
   <!-- Following values measured on the 3d model -->
-  <xacro:property name="r200_cam_rgb_px" value="0.0088"/>
-  <xacro:property name="r200_cam_rgb_py" value="-0.1034"/>
-  <xacro:property name="r200_cam_rgb_pz" value="0.0483"/>
-  <xacro:property name="r200_cam_depth_offset" value="0.0274"/>
+  <xacro:property name="r200_cam_rgb_px" value="0.0088" />
+  <xacro:property name="r200_cam_rgb_py" value="-0.1034" />
+  <xacro:property name="r200_cam_rgb_pz" value="0.0483" />
+  <xacro:property name="r200_cam_depth_offset" value="0.0274" />
 
   <!-- Also parameterised in part by the values in turtlebot_properties.urdf.xacro -->
 
@@ -23,38 +23,38 @@
     -->
 
     <joint name="camera_rgb_joint" type="fixed">
-      <origin xyz="${r200_cam_rgb_px + r200_cam_px} ${r200_cam_rgb_py + r200_cam_py} ${r200_cam_rgb_pz + r200_cam_pz}" rpy="0 0 0"/>
-      <parent link="${parent}"/>
+      <origin xyz="${r200_cam_rgb_px + r200_cam_px} ${r200_cam_rgb_py + r200_cam_py} ${r200_cam_rgb_pz + r200_cam_pz}" rpy="0 0 0" />
+      <parent link="${parent}" />
       <child link="camera_rgb_frame" />
     </joint>
-    <link name="camera_rgb_frame"/>
+    <link name="camera_rgb_frame" />
 
     <joint name="camera_rgb_optical_joint" type="fixed">
       <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
       <parent link="camera_rgb_frame" />
       <child link="camera_rgb_optical_frame" />
     </joint>
-    <link name="camera_rgb_optical_frame"/>
+    <link name="camera_rgb_optical_frame" />
 
     <!-- Placing the camera joint -->
     <joint name="camera_joint" type="fixed">
-      <origin xyz="${r200_cam_px} ${r200_cam_py} ${r200_cam_pz}" rpy="${cam_or} ${cam_op} ${cam_oy}"/>
-      <parent link="camera_rgb_frame"/>
-      <child link="camera_link"/>
+      <origin xyz="${r200_cam_px} ${r200_cam_py} ${r200_cam_pz}" rpy="${cam_or} ${cam_op} ${cam_oy}" />
+      <parent link="camera_rgb_frame" />
+      <child link="camera_link" />
     </joint>
 
     <!-- Mounting the camera at the right position -->
     <link name="camera_link">
       <visual>
-       <origin xyz="${-r200_cam_rgb_px + -r200_cam_px} ${-r200_cam_rgb_py + -r200_cam_py} ${-r200_cam_rgb_pz + -r200_cam_pz}" rpy="${M_PI/2} 0 ${M_PI/2}"/>
+       <origin xyz="${-r200_cam_rgb_px + -r200_cam_px} ${-r200_cam_rgb_py + -r200_cam_py} ${-r200_cam_rgb_pz + -r200_cam_pz}" rpy="${M_PI/2} 0 ${M_PI/2}" />
         <geometry>
-         <mesh filename="package://realsense_navigation/robot_description/meshes/sensors/r200_entire.dae"/>
+         <mesh filename="package://realsense_navigation/robot_description/meshes/sensors/r200_entire.dae" />
         </geometry>
       </visual>
       <collision>
-        <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
         <geometry>
-          <box size="0.130 0.567 0.118"/>
+          <box size="0.130 0.567 0.118" />
         </geometry>
       </collision>
       <!-- This inertial field needs doesn't contain reliable data!! -->
@@ -76,14 +76,14 @@
   	  <parent link="camera_rgb_frame" />
   	  <child link="camera_depth_frame" />
   	</joint>
-  	<link name="camera_depth_frame"/>
+  	<link name="camera_depth_frame" />
 
   	<joint name="camera_depth_optical_joint" type="fixed">
   	  <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
   	  <parent link="camera_depth_frame" />
   	  <child link="camera_depth_optical_frame" />
   	</joint>
-  	<link name="camera_depth_optical_frame"/>
+  	<link name="camera_depth_optical_frame" />
   	
   	<turtlebot_sim_3dsensor/>
   </xacro:macro>

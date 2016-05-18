@@ -5,8 +5,8 @@
 #
 cmake_minimum_required(VERSION 2.8.3)
 
-set(PROJECT_NAME srssrv_map)
-set(PROJECT_MAIN src/map_service.cpp)
+set(PROJECT_NAME srsnode_map_server)
+set(PROJECT_MAIN src/map_server.cpp)
 set(${PROJECT_NAME}_SOURCES
 
     src/map/Map.cpp

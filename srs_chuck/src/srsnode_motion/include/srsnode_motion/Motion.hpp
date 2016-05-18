@@ -41,6 +41,8 @@ private:
 
     void disconnectAllTaps();
 
+    void evaluateTriggers();
+
     void publishInformation();
 
     void scanTapsForData();

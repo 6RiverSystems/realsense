@@ -29,9 +29,11 @@ void JoystickAdapter::run()
     triggerShutdown_.connectService();
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
-    while (ros::ok() && !triggerShutdown_.isShutdownRequested())
+    while (ros::ok())
     {
         ros::spinOnce();
+
+        evaluateTriggers();
 
         if (tapJoy_.newDataAvailable())
         {
@@ -77,5 +79,14 @@ void JoystickAdapter::run()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void JoystickAdapter::evaluateTriggers()
+{
+    if (triggerShutdown_.isShutdownRequested())
+    {
+        ros::shutdown();
+    }
+}
 
 } // namespace srs

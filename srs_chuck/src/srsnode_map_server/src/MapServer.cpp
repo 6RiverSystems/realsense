@@ -41,11 +41,13 @@ void MapServer::run()
     triggerShutdown_.connectService();
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
-    while (ros::ok() && !triggerShutdown_.isShutdownRequested())
+    while (ros::ok())
     {
         ros::spinOnce();
 
+        evaluateTriggers();
         publishMap();
+
         refreshRate.sleep();
     }
 }
@@ -53,6 +55,16 @@ void MapServer::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void MapServer::evaluateTriggers()
+{
+    if (triggerShutdown_.isShutdownRequested())
+    {
+        ros::shutdown();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void MapServer::publishMap()
 {
     nav_msgs::MapMetaData metadataMessage;

@@ -23,9 +23,11 @@ void Reflexes::run()
     triggerShutdown_.connectService();
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
-    while (ros::ok() && !triggerShutdown_.isShutdownRequested())
+    while (ros::ok())
     {
         ros::spinOnce();
+
+        evaluateTriggers();
 
         refreshRate.sleep();
     }
@@ -33,5 +35,14 @@ void Reflexes::run()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Reflexes::evaluateTriggers()
+{
+    if (triggerShutdown_.isShutdownRequested())
+    {
+        ros::shutdown();
+    }
+}
 
 } // namespace srs

@@ -25,6 +25,8 @@ public:
 private:
     constexpr static unsigned int REFRESH_RATE_HZ = 200;
 
+    void evaluateTriggers();
+
     ros::NodeHandle rosNodeHandle_;
 
     RosTriggerShutdown triggerShutdown_;

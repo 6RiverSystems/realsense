@@ -34,6 +34,8 @@ private:
     constexpr static double THRESHOLD_LINEAR = 0.2;
     constexpr static double THRESHOLD_ANGULAR = 0.05;
 
+    void evaluateTriggers();
+
     bool joystickLatched_;
 
     ros::Publisher pubCommand_;

@@ -3,6 +3,7 @@
 #include <ros/ros.h>
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <std_srvs/Empty.h>
 
 #include <srslib_framework/math/Math.hpp>
 
@@ -101,6 +102,52 @@ void Executive::executePlanToGoal(Pose<> goal)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::executeShutdown()
 {
+    vector<string> nodes;
+    findActiveNodes(nodes);
+
+    for (auto node : nodes)
+    {
+        string fullServiceName = node + "/trg/shutdown";
+
+        ros::ServiceClient client = rosNodeHandle_.serviceClient<std_srvs::Empty>(fullServiceName);
+        std_srvs::Empty::Request req;
+        std_srvs::Empty::Response resp;
+
+        if (client.call(req, resp))
+        {
+            ROS_INFO_STREAM("The node " << node << " responded to a shutdown request.");
+        }
+        else
+        {
+            ROS_ERROR_STREAM("The node " << node << " did not responded to a shutdown request.");
+        }
+    }
+
+    ros::shutdown();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::findActiveNodes(vector<string>& nodes)
+{
+    nodes.clear();
+
+    ros::V_string rosMasterNodes;
+    ros::master::getNodes(rosMasterNodes);
+
+    string nameSpace = rosNodeHandle_.getNamespace();
+
+    cout << nameSpace << endl;
+
+    for (auto node : rosMasterNodes)
+    {
+        cout << node << endl;
+        if (node.find("srsnode") != string::npos &&
+            node.find(nameSpace) == string::npos)
+        {
+            nodes.push_back(node);
+            ROS_INFO_STREAM(node);
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

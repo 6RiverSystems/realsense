@@ -29,6 +29,8 @@ public:
 private:
     constexpr static double REFRESH_RATE_HZ = 1;
 
+    void evaluateTriggers();
+
     void publishMap();
 
     Map map_;

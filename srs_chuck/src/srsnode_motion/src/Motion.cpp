@@ -64,7 +64,7 @@ void Motion::run()
     reset();
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
-    while (ros::ok() && !triggerShutdown_.isShutdownRequested())
+    while (ros::ok())
     {
         ros::spinOnce();
 
@@ -73,6 +73,7 @@ void Motion::run()
 
         double dT = Time::time2number(currentTime_) - Time::time2number(previousTime_);
 
+        evaluateTriggers();
         scanTapsForData();
 
         Velocity<>* command = commandUpdated_ ? &currentCommand_ : nullptr;
@@ -111,6 +112,15 @@ void Motion::disconnectAllTaps()
     tapPlan_.disconnectTap();
     tapJoyAdapter_.disconnectTap();
     tapAps_.disconnectTap();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::evaluateTriggers()
+{
+    if (triggerShutdown_.isShutdownRequested())
+    {
+        ros::shutdown();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

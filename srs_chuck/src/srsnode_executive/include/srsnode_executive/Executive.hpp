@@ -37,6 +37,8 @@ private:
 
     void disconnectAllTaps();
 
+    void findActiveNodes(vector<string>& nodes);
+
     void executeInitialPose(Pose<> initialPose);
     void executePause();
     void executePlanToGoal(Pose<> goal);

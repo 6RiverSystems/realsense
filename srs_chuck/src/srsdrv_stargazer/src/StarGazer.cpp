@@ -181,10 +181,14 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 		// The anchor transform from the origin of the map to the anchor point
 		const tf::Transform& anchorGlobal = iter->second;
 
+		tf::Vector3 anchorOrigin = anchorGlobal.getOrigin( );
+		tf::Quaternion anchorRotation = anchorGlobal.getRotation( );
+
+		double fAngleInRadians = fAngle * M_PI / 180.0f;
+
 		tf::Vector3 point( fX, fY, fZ );
 
-		tf::Quaternion orientation;
-		orientation.setRPY( 0.0, 0.0, fAngle );
+		tf::Quaternion orientation = tf::createQuaternionFromYaw( fAngleInRadians );
 
 		// Transform the incoming point based to the global coordinate system
 		tf::Vector3 transformedPoint = anchorGlobal * point;
@@ -200,21 +204,18 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 
 		m_rosApsPublisher.publish( msg );
 
-		tf::Vector3 tagPoint = anchorGlobal.getOrigin( );
-		tf::Quaternion tagOrientation = anchorGlobal.getRotation( );
+		ROS_DEBUG_NAMED( "StarGazer", "Anchor Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
+			nTagId, anchorOrigin.getX( ), anchorOrigin.getY( ), anchorOrigin.getZ( ), anchorRotation.getAngle( ) );
 
-		ROS_DEBUG_NAMED( "StarGazer", "Tag Location: %04i (%2.2f, %2.2f, %2.2f) %2.2f deg\n",
-			nTagId, tagPoint.getX( ), tagPoint.getY( ), tagPoint.getZ( ), tagOrientation.getAngle( ) );
+		ROS_DEBUG_NAMED( "StarGazer", "StarGazer (ref anchor) Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
+			nTagId, fX, fY, fZ, orientation.getAngle( ) );
 
-		ROS_DEBUG_NAMED( "StarGazer", "StarGazer Location: %04i (%2.2f, %2.2f, %2.2f) %2.2f deg\n",
-			nTagId, fX, fY, fZ, fAngle );
-
-		ROS_DEBUG_NAMED( "StarGazer", "Global Location: %04i (%2.2f, %2.2f, %2.2f) %2.2f deg\n",
+		ROS_DEBUG_NAMED( "StarGazer", "StarGazer (ref global) Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
 			nTagId, msg.x, msg.y, msg.z, msg.yaw );
 	}
 	else
 	{
-		ROS_DEBUG_NAMED( "StarGazer", "Invalid or Unknown Tag: %04i (%2.2f, %2.2f, %2.2f) %2.2f deg\n",
+		ROS_INFO_NAMED( "StarGazer", "Invalid or Unknown Tag: %04i (%2.2f, %2.2f, %2.2f) %2.2f rad\n",
 			nTagId, fX, fY, fZ, fAngle );
 	}
 }
@@ -226,41 +227,47 @@ void StarGazer::LoadAnchors( )
 
 	ROS_INFO_STREAM( "Loading anchors from " << anchorsFilename );
 
-	YAML::Node document = YAML::LoadFile( anchorsFilename );
-
-	if( !document.IsNull( ) )
+	try
 	{
-		vector<Anchor> anchors = document["anchors"].as<vector<Anchor>>( );
+		YAML::Node document = YAML::LoadFile( anchorsFilename );
 
-		for( auto anchor : anchors )
+		if( !document.IsNull( ) )
 		{
-			try
+			vector<Anchor> anchors = document["anchors"].as<vector<Anchor>>( );
+
+			for( auto anchor : anchors )
 			{
-				int32_t anchorId = boost::lexical_cast<int32_t>( anchor.id );
+				try
+				{
+					int32_t anchorId = boost::lexical_cast<int32_t>( anchor.id );
 
-				tf::Transform transform;
+					tf::Transform transform;
 
-				tf::Vector3 origin( anchor.x, anchor.y, anchor.z );
-				transform.setOrigin( origin );
+					tf::Vector3 origin( anchor.x, anchor.y, anchor.z );
+					transform.setOrigin( origin );
 
-				tf::Quaternion orientation;
-				orientation.setRPY( 0.0, 0.0, anchor.orientation );
-				transform.setRotation( orientation );
+					tf::Quaternion orientation = tf::createQuaternionFromYaw( anchor.orientation );
+					transform.setRotation( orientation );
 
-				ROS_INFO_STREAM( "Anchor: id=" << std::setprecision( 6 ) << anchor.id << ", x=" << anchor.x <<
-					", y=" << anchor.y << ", z=" << anchor.z << ", orientation=" << anchor.orientation );
+					ROS_INFO_STREAM( "Anchor: id=" << anchor.id << ", x=" << anchor.x <<
+						", y=" << anchor.y << ", z=" << anchor.z << ", orientation=" << orientation.getAngle( ) );
 
-				m_mapAnchorTransforms[anchorId] = transform;
-			}
-			catch( const boost::bad_lexical_cast& e )
-			{
-				ROS_INFO_STREAM( "Could not convert anchor id to int: " << anchor.id << " " << e.what( ) );
+					m_mapAnchorTransforms[anchorId] = transform;
+				}
+				catch( const boost::bad_lexical_cast& e )
+				{
+					ROS_INFO_STREAM( "Could not convert anchor id to int: " << anchor.id << " " << e.what( ) );
+				}
 			}
 		}
+		else
+		{
+			ROS_ERROR_STREAM( "Configuration file not found: " << anchorsFilename );
+		}
 	}
-	else
+	catch( const std::runtime_error& e )
 	{
-		ROS_ERROR_STREAM( "Configuration file not found: " << anchorsFilename );
+		ROS_INFO_STREAM( "Could not parse yaml file for anchors: " << anchorsFilename << " " << e.what( ) );
 	}
 }
 

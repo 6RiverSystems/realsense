@@ -40,8 +40,9 @@ namespace srs
 // TODO: Pass in serial port and #define
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-StarGazer::StarGazer( const std::string& strSerialPort, const std::string& strApsTopic ) :
-	m_rosNodeHandle( ),
+StarGazer::StarGazer( const std::string& strNodeName, const std::string& strSerialPort,
+	const std::string& strApsTopic ) :
+	m_rosNodeHandle( strNodeName ),
 	m_rosApsPublisher( m_rosNodeHandle.advertise<srslib_framework::Aps>( strApsTopic, 1000 ) ),
 	m_pSerialIO( new SerialIO( ) ),
 	m_messageProcessor( m_pSerialIO )
@@ -100,10 +101,10 @@ void StarGazer::Run( )
 
 void StarGazer::OnConnectionChanged( bool bIsConnected )
 {
+	ROS_DEBUG_STREAM_NAMED( "StarGazer", "Connected" );
+
 	if( bIsConnected )
 	{
-		HardReset( );
-
 		Configure( );
 
 		Start( );

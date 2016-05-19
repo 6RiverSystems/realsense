@@ -13,13 +13,15 @@ const std::string g_strApsTopic( "/sensors/aps/raw" );
 
 int main( int argc, char** argv )
 {
-	// Initialize ROS
-	ros::init( argc, argv, "srsdrv_stargazer" );
+    const static std::string NODE_NAME = "srsdrv_stargazer";
 
-	ROS_INFO_STREAM( "srsdrv_stargazer started" );
+	// Initialize ROS
+	ros::init( argc, argv, NODE_NAME );
+
+	ROS_INFO_STREAM( NODE_NAME << " started" );
 
 	// Create the StarGazer node and run it
-	srs::StarGazer StarGazer( g_SerialPort, g_strApsTopic );
+	srs::StarGazer StarGazer( NODE_NAME, g_SerialPort, g_strApsTopic );
 
 	StarGazer.Run( );
 

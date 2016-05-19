@@ -102,6 +102,8 @@ void StarGazer::OnConnectionChanged( bool bIsConnected )
 {
 	if( bIsConnected )
 	{
+		HardReset( );
+
 		Configure( );
 
 		Start( );
@@ -191,10 +193,14 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 
 		double fAngleInRadians = fAngle * M_PI / 180.0f;
 
+		double dfOffset = 14.0f;
+
+		fX -= (dfOffset * cos( fAngleInRadians ));
+		fY += (dfOffset * sin( fAngleInRadians ));
+
 		tf::Vector3 point( fX, fY, fZ );
 		tf::Quaternion orientation = tf::createQuaternionFromYaw( fAngleInRadians );
 
-		// Transform the incoming point based to the global coordinate system
 		tf::Vector3 transformedPoint = anchorGlobal * point;
 		tf::Quaternion transformedOrientation = anchorGlobal * orientation;
 
@@ -204,18 +210,15 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 		msg.x = transformedPoint.getX( );
 		msg.y = transformedPoint.getY( );
 		msg.z = transformedPoint.getZ( );
-		msg.yaw = orientation.getAngle( );
+		msg.yaw = transformedOrientation.getAngle( );
 
 		m_rosApsPublisher.publish( msg );
 
-		ROS_DEBUG_NAMED( "StarGazer", "Anchor Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad, %2.6f deg\n",
-			nTagId, anchorOrigin.getX( ), anchorOrigin.getY( ), anchorOrigin.getZ( ), anchorRotation.getAngle( ), fAngle );
+		ROS_DEBUG_NAMED( "StarGazer", "Anchor Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
+			nTagId, anchorOrigin.getX( ), anchorOrigin.getY( ), anchorOrigin.getZ( ), anchorRotation.getAngle( ) );
 
-		ROS_DEBUG_NAMED( "StarGazer", "StarGazer (ref anchor) Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
-			nTagId, fX, fY, fZ, orientation.getAngle( ) );
-
-		ROS_DEBUG_NAMED( "StarGazer", "StarGazer (ref global) Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
-			nTagId, msg.x, msg.y, msg.z, msg.yaw );
+		ROS_DEBUG_NAMED( "StarGazer", "%04i, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f",
+			nTagId, point.getX( ), point.getY( ), point.getZ( ), fAngleInRadians, msg.x, msg.y, msg.z, msg.yaw );
 	}
 	else
 	{
@@ -259,10 +262,10 @@ void StarGazer::LoadAnchors( )
 					tf::Quaternion orientation = tf::createQuaternionFromYaw( anchor.orientation );
 
 					// Convert left hand rule of stargazer to right hand rule (ROS coordinate system)
-					orientation = tf::Quaternion( orientation.getX( ), orientation.getY( ),
+					tf::Quaternion rightHandOrientation = tf::Quaternion( orientation.getX( ), orientation.getY( ),
 						-orientation.getZ( ), -orientation.getW( ) );
 
-					transform.setRotation( orientation );
+					transform.setRotation( rightHandOrientation );
 
 // Test changing left to right hand rule
 //					for( int i = 0; i < 360; i++ )
@@ -275,7 +278,7 @@ void StarGazer::LoadAnchors( )
 //					}
 
 					ROS_INFO_STREAM( "Anchor: id=" << anchor.id << ", x=" << anchor.x <<
-						", y=" << anchor.y << ", z=" << anchor.z << ", orientation=" << orientation.getAngle( ) );
+						", y=" << anchor.y << ", z=" << anchor.z << ", orientation=" << rightHandOrientation.getAngle( ) );
 
 					m_mapAnchorTransforms[anchorId] = transform;
 				}

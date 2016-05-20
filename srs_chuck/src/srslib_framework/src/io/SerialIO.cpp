@@ -46,7 +46,7 @@ SerialIO::SerialIO( ) :
 	m_vecMessageTiming( )
 #endif
 {
-	m_oTimer.reset( new boost::asio::deadline_timer( m_IOService, boost::posix_time::seconds( 5 ) ) );
+	m_oTimer.reset( new boost::asio::deadline_timer( m_IOService ) );
 
 	// Spin up the thread
 	m_Thread.reset( new std::thread( [&]()
@@ -254,6 +254,8 @@ void SerialIO::WriteInSerialThread( std::vector<char> writeBuffer )
 void SerialIO::StartAsyncTimer( )
 {
 	m_oTimer->cancel( );
+
+	m_oTimer->expires_from_now( boost::posix_time::seconds( m_fRetryTimeout ) );
 
 	m_oTimer->async_wait( [&]( const boost::system::error_code& e )
 		{

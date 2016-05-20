@@ -155,6 +155,12 @@ struct Math
         return TYPE(180 / M_PI) * rad;
     }
 
+    template <typename TYPE = double>
+    constexpr inline static int sgn(TYPE value)
+    {
+        return (TYPE(0) < value) - (value < TYPE(0));
+    }
+
     static cv::Mat zeros(const cv::Mat original)
     {
         return cv::Mat::zeros(original.rows, original.cols, original.type());

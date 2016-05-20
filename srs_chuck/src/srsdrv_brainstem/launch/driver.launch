@@ -9,5 +9,5 @@
     <node name="srsdrv_brainstem"
         pkg="srsdrv_brainstem"
         type="srsdrv_brainstem" 
-        output="screen" respawn="true"/>
+        output="screen" />
 </launch>

@@ -8,25 +8,65 @@
 
 namespace srs {
 
-struct SearchPositionNote
+class SearchPositionNote
 {
-    SearchPositionNote(bool noRotations, unsigned int hazardousCost) :
-        noRotations(noRotations),
-        hazardousCost(hazardousCost)
+public:
+    const static SearchPositionNote DISABLE_OD;
+    const static SearchPositionNote ENABLE_OD;
+    const static SearchPositionNote GO_SLOW;
+    const static SearchPositionNote NO_ROTATIONS;
+    const static SearchPositionNote STATIC_OBSTACLE;
+
+    SearchPositionNote() :
+        od_(true),
+        goSlow_(false),
+        noRotations_(false),
+        staticObstacle_(false)
     {}
 
-    SearchPositionNote(bool noRotations) :
-        noRotations(noRotations),
-        hazardousCost(0)
+    SearchPositionNote(bool od,
+            bool goSlow,
+            bool noRotations,
+            bool staticObstacle) :
+        od_(od),
+        goSlow_(goSlow),
+        noRotations_(noRotations),
+        staticObstacle_(staticObstacle)
     {}
 
-    SearchPositionNote(unsigned int hazardousCost) :
-        noRotations(false),
-        hazardousCost(hazardousCost)
-    {}
+    void add(const SearchPositionNote& note)
+    {
+        goSlow_ |= note.goSlow_;
+        noRotations_ |= note.noRotations_;
+        od_ |= note.od_;
+        staticObstacle_ |= note.staticObstacle_;
+    }
 
-    bool noRotations;
-    int hazardousCost;
+    inline bool goSlow() const
+    {
+        return goSlow_;
+    }
+
+    inline bool od() const
+    {
+        return od_;
+    }
+
+    inline bool noRotations() const
+    {
+        return noRotations_;
+    }
+
+    inline bool staticObstacle() const
+    {
+        return staticObstacle_;
+    }
+
+private:
+    bool goSlow_;
+    bool noRotations_;
+    bool od_;
+    bool staticObstacle_;
 };
 
 } // namespace srs

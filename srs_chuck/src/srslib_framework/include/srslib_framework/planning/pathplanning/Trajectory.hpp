@@ -25,6 +25,9 @@ namespace srs {
 class Trajectory
 {
 public:
+    typedef pair<Pose<>, Velocity<>> MilestoneType;
+    typedef vector<MilestoneType> TrajectoryType;
+
     Trajectory(vector<SolutionNode<Grid2d>>& solution, RobotProfile& robot, double dT) :
         solution_(solution),
         robot_(robot),
@@ -32,25 +35,81 @@ public:
         linearIncrement_(dT * robot.linearAccelerationTravelMax())
     {}
 
-    void solution2velocity(Velocity<> v0, vector<Velocity<>>& velocities)
+    void getTrajectory(Pose<> pose0, TrajectoryType& trajectory)
     {
-        velocities.clear();
+        trajectory.clear();
+
         if (solution_.empty())
         {
             return;
         }
 
-        vector<SolutionNode<Grid2d>>::iterator currentNode = solution_.begin();
+        vector<Velocity<>> velocities;
+        generateVelocities(velocities);
 
-        while (currentNode != solution_.end())
+        vector<Pose<>> poses;
+        generatePoses(pose0, velocities, poses);
+
+        for (unsigned int i = 0; i < velocities.size(); i++)
         {
-            switch (currentNode->action.actionType)
+            MilestoneType milestone;
+            milestone.first = poses[i];
+            milestone.second = velocities[i];
+            trajectory.push_back(milestone);
+        }
+    }
+
+private:
+    void findNextAction(
+        vector<SolutionNode<Grid2d>>::iterator& fromNode,
+        vector<SolutionNode<Grid2d>>::iterator& resultNode)
+    {
+        resultNode = fromNode;
+        vector<SolutionNode<Grid2d>>::iterator cursorNode = fromNode + 1;
+
+        while (cursorNode->action.actionType == fromNode->action.actionType &&
+            cursorNode->action.actionType != SearchAction<Grid2d>::GOAL)
+        {
+            resultNode = cursorNode;
+            cursorNode++;
+        }
+    }
+
+    void generatePoses(Pose<> pose0, vector<Velocity<>>& velocities, vector<Pose<>>& poses)
+    {
+        Pose<> previousPose = pose0;
+
+        for (auto command : velocities)
+        {
+            double dT = command.arrivalTime - previousPose.arrivalTime;
+            double x = previousPose.x + command.linear * dT * cos(previousPose.theta);
+            double y = previousPose.y + command.linear * dT * sin(previousPose.theta);
+            double theta = previousPose.theta + command.angular * dT;
+
+            Pose<> newPose = Pose<>(previousPose.arrivalTime + dT, x, y, theta);
+            poses.push_back(newPose);
+            previousPose = newPose;
+        }
+    }
+
+    void generateVelocities(vector<Velocity<>>& velocities)
+    {
+        vector<SolutionNode<Grid2d>>::iterator fromNode = solution_.begin();
+        vector<SolutionNode<Grid2d>>::iterator nextNode;
+        vector<SolutionNode<Grid2d>>::iterator toNode;
+
+        while (fromNode != solution_.end())
+        {
+            nextNode = fromNode + 1;
+            findNextAction(nextNode, toNode);
+
+            switch (nextNode->action.actionType)
             {
                 case SearchAction<Grid2d>::BACKWARD:
                     break;
 
                 case SearchAction<Grid2d>::FORWARD:
-                    moveForward(currentNode, v0, velocities);
+                    moveForward(fromNode, toNode, velocities);
                     break;
 
                 case SearchAction<Grid2d>::ROTATE_180:
@@ -61,33 +120,13 @@ public:
 
                 case SearchAction<Grid2d>::ROTATE_P90:
                     break;
-
-                case SearchAction<Grid2d>::START:
-                    // Ignore the start action
-                    break;
             }
 
-            currentNode++;
+            fromNode = toNode;
         }
     }
 
-private:
-    void findNextAction(vector<SolutionNode<Grid2d>>::iterator& fromNode,
-        vector<SolutionNode<Grid2d>>::iterator& toNode)
-    {
-        toNode = fromNode;
-        SearchAction<Grid2d>::ActionEnum previousAction = toNode->action.actionType;
-        toNode++;
-
-        while (toNode->action.actionType == previousAction &&
-            toNode->action.actionType != SearchAction<Grid2d>::GOAL)
-        {
-            previousAction = toNode->action.actionType;
-            toNode++;
-        }
-    }
-
-    double measure(vector<SolutionNode<Grid2d>>::iterator& fromNode,
+    double measureDistance(vector<SolutionNode<Grid2d>>::iterator& fromNode,
         vector<SolutionNode<Grid2d>>::iterator& toNode)
     {
         SearchPosition<Grid2d> fromPosition = fromNode->action.position;
@@ -101,51 +140,76 @@ private:
             static_cast<double>(toPosition.location.y));
     }
 
-    void moveForward(vector<SolutionNode<Grid2d>>::iterator& fromNode,
-        Velocity<>& v0,
+    void moveForward(
+        vector<SolutionNode<Grid2d>>::iterator& fromNode,
+        vector<SolutionNode<Grid2d>>::iterator& toNode,
         vector<Velocity<>>& velocities)
     {
-        vector<SolutionNode<Grid2d>>::iterator toNode;
-        findNextAction(fromNode, toNode);
+        double ar = robot_.linearAccelerationTravelMax();
 
-        double distance = measure(fromNode, toNode);
-        fromNode = toNode;
+        double totalDistance = measureDistance(fromNode, toNode);
 
-        double targetVelocity = robot_.linearVelocityTravelMax();
+        // Assume that the travel velocity is maximum allowed
+        double vf = robot_.linearVelocityTravelMax();
+        unsigned int intervals = calculateIntervals(vf, ar);
+        double rampDistance = 0.5 * intervals * dT_ * vf;
+
+        bool coasting = true;
+        if (totalDistance < (2 * rampDistance))
+        {
+            // Recalculate the maximum achievable velocity
+            // with the given acceleration
+            vf = sqrt(totalDistance * robot_.linearAccelerationTravelMax());
+            intervals = calculateIntervals(vf, ar);
+            coasting = false;
+        }
+
         double t = 0;
-        double velocity = v0.linear;
 
-        unsigned int accelerationIntervals = static_cast<unsigned int>(targetVelocity / linearIncrement_);
-
-        if (distance > 0)
+        // Acceleration
+        vector<double> acceleration;
+        acceleration.push_back(0.0);
+        generateRamp(0.0, vf, intervals, acceleration);
+        for (auto vt : acceleration)
         {
-            // Acceleration
-            for (unsigned int interval = accelerationIntervals; interval > 0; interval--)
-            {
-                velocity += linearIncrement_;
-                t += dT_;
-                velocities.push_back(Velocity<>(t, velocity, 0));
-            }
-
-            double distanceTraveled = (targetVelocity * t) / 2;
-
-            // Coast
-            distance -= 2 * distanceTraveled;
-            double deltaT = distance / targetVelocity;
-            t += deltaT;
-
-            // Deceleration
-            for (unsigned int interval = accelerationIntervals; interval > 0; interval--)
-            {
-                velocity -= linearIncrement_;
-                t += dT_;
-                velocities.push_back(Velocity<>(t, velocity, 0));
-            }
+            velocities.push_back(Velocity<>(t, vt, 0));
+            t += dT_;
         }
-        else
+
+        // Coast
+        if (coasting)
         {
-            //
+            t += (totalDistance - 2 * rampDistance) / vf;
         }
+
+        // Deceleration
+        vector<double> deceleration;
+        generateRamp(vf, 0.0, intervals, deceleration);
+        for (auto vt : deceleration)
+        {
+            velocities.push_back(Velocity<>(t, vt, 0));
+            t += dT_;
+        }
+
+        fromNode = toNode;
+    }
+
+    unsigned int calculateIntervals(double velocity, double ar)
+    {
+        return static_cast<unsigned int>(velocity / (dT_ * ar));
+    }
+
+    void generateRamp(double startValue, double endValue, unsigned int n, vector<double>& values)
+    {
+        double delta = (endValue - startValue) / n;
+
+        for (unsigned int i = 1; i < n; i++)
+        {
+            double v = startValue + delta * i;
+            v = abs(v) > 1e-4 ? v : 0.0;
+            values.push_back(v);
+        }
+        values.push_back(endValue);
     }
 
     vector<SolutionNode<Grid2d>>& solution_;

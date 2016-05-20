@@ -33,10 +33,37 @@ public:
         height_(height)
     {}
 
-    void addValue(const Grid2dLocation location, const unsigned int cost, void* notes = nullptr)
+    void addNote(const Grid2dLocation location, void* notes = nullptr)
     {
-        Grid2dNode* newNode = new Grid2dNode(location, cost, notes);
-        grid_[location] = newNode;
+        auto found = grid_.find(location);
+
+        if (found != grid_.end())
+        {
+            Grid2dNode* node = found->second;
+            node->notes = notes;
+        }
+        else
+        {
+            grid_[location] = new Grid2dNode(location, 0, notes);
+        }
+    }
+
+    void addValue(const Grid2dLocation location,
+        unsigned int cost = 0,
+        void* notes = nullptr)
+    {
+        auto found = grid_.find(location);
+
+        if (found != grid_.end())
+        {
+            Grid2dNode* node = found->second;
+            node->cost = cost;
+            node->notes = notes;
+        }
+        else
+        {
+            grid_[location] = new Grid2dNode(location, cost, notes);
+        }
     }
 
     void clear()
@@ -65,31 +92,25 @@ public:
 
     unsigned int getCost(Grid2dLocation location) const
     {
-        if (!isWithinBounds(location))
+        auto found = grid_.find(location);
+
+        if (found != grid_.end())
         {
-            throw;
+            return found->second->cost;
         }
 
-        auto node = grid_.find(location);
-        if (node != grid_.end())
-        {
-            return node->second->cost;
-        }
         return 0;
     }
 
     void* getNote(Grid2dLocation location) const
     {
-        if (!isWithinBounds(location))
+        auto found = grid_.find(location);
+
+        if (found != grid_.end())
         {
-            throw;
+            return found->second->notes;
         }
 
-        auto node = grid_.find(location);
-        if (node != grid_.end())
-        {
-            return node->second->notes;
-        }
         return nullptr;
     }
 

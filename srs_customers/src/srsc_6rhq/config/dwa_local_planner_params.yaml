@@ -19,12 +19,12 @@ DWAPlannerROS:
   
   acc_lim_x: 0.65
   acc_lim_theta: 0.65
-  acc_limit_trans: 0.65
+#  acc_limit_trans: 0.65
 
 # Goal Tolerance Parameters
   yaw_goal_tolerance: 0.3
   xy_goal_tolerance: 0.15
-  latch_xy_goal_tolerance: false
+  latch_xy_goal_tolerance: true
 
 # Forward Simulation Parameters
 #  sim_time: 1.7
@@ -33,16 +33,16 @@ DWAPlannerROS:
 #  vtheta_samples: 20
 
 # Trajectory Scoring Parameters
-#  path_distance_bias: 64.0     # weighting for how much it should stick to the global path plan
+#  path_distance_bias: 640.0     # weighting for how much it should stick to the global path plan
 #  goal_distance_bias: 32.0       # wighting for how much it should attempt to reach its goal
-  occdist_scale: 0.5           # weighting for how much the controller should avoid obstacles
+#  occdist_scale: 100.0           # weighting for how much the controller should avoid obstacles
 #  forward_point_distance: 1.0   # how far along to place an additional scoring point
 #  stop_time_buffer: 0.2         # amount of time a robot must stop in before colliding for a valid traj.
 #  scaling_speed: 0.0            # absolute velocity at which to start scaling the robot's footprint
-#  max_scaling_factor: 0.0       # how much to scale the robot's footprint when at speed.
+#  max_scaling_factor: 1.0       # how much to scale the robot's footprint when at speed.
 
 # Oscillation Prevention Parameters
-  oscillation_reset_dist: 0.05  # how far to travel before resetting oscillation flags
+  oscillation_reset_dist: 0.01  # how far to travel before resetting oscillation flags
 
 # Debugging
   publish_traj_pc : true
@@ -50,7 +50,7 @@ DWAPlannerROS:
 
 # Differential-drive robot configuration
   holonomic_robot: false
-  max_vel_y: 0.0
-  min_vel_y: 0.0
-  acc_lim_y: 0.0
-  vy_samples: 1
+#  max_vel_y: 0.0
+#  min_vel_y: 0.0
+#  acc_lim_y: 0.0
+#  vy_samples: 1

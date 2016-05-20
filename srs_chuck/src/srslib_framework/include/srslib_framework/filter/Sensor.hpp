@@ -23,16 +23,28 @@ public:
 
     Sensor(BaseType noiseValue = BaseType()) :
             Model<STATE_SIZE, TYPE>(noiseValue),
+            enabled_(true),
             newData_(false)
     {}
 
     Sensor(cv::Mat noiseMatrix) :
         Model<STATE_SIZE, TYPE>(noiseMatrix),
+        enabled_(true),
         newData_(false)
     {}
 
     virtual ~Sensor()
     {}
+
+    void enable(bool newState)
+    {
+        enabled_ = newState;
+    }
+
+    bool isEnabled() const
+    {
+        return enabled_;
+    }
 
     bool newDataAvailable() const
     {
@@ -49,6 +61,7 @@ protected:
     }
 
 private:
+    bool enabled_;
     bool newData_;
 };
 

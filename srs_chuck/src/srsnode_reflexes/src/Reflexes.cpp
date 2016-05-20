@@ -11,18 +11,23 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Reflexes::Reflexes() :
-    rosNodeHandle_()
+Reflexes::Reflexes(string nodeName) :
+    rosNodeHandle_(nodeName),
+    triggerShutdown_(rosNodeHandle_)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Reflexes::run()
 {
+    triggerShutdown_.connectService();
+
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
     {
         ros::spinOnce();
+
+        evaluateTriggers();
 
         refreshRate.sleep();
     }
@@ -30,5 +35,14 @@ void Reflexes::run()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Reflexes::evaluateTriggers()
+{
+    if (triggerShutdown_.isShutdownRequested())
+    {
+        ros::shutdown();
+    }
+}
 
 } // namespace srs

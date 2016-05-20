@@ -6,8 +6,12 @@
   *
 -->
 <launch>
+    <arg name="target_anchors" />
+
     <node name="srsdrv_stargazer"
         pkg="srsdrv_stargazer"
         type="srsdrv_stargazer" 
-        output="screen" respawn="true"/>
+        output="screen" respawn="true" >
+        <param name="target_anchors" type="str" value="$(arg target_anchors)" />
+    </node>
 </launch>

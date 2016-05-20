@@ -5,6 +5,7 @@
  *      Author: dan
  */
 #include <functional>
+#include <vector>
 
 #ifndef SRC_IO_H_
 #define SRC_IO_H_

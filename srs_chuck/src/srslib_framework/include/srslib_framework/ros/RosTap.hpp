@@ -16,11 +16,11 @@ namespace srs {
 class RosTap
 {
 public:
-    RosTap(string name) :
+    RosTap(ros::NodeHandle rosHandle, string tapName = "") :
         connected_(false),
-        name_(name),
-        newData_(false)/*,
-        timestamp_(0)*/
+        newData_(false),
+        rosNodeHandle_(rosHandle),
+        tapName_(tapName)
     {}
 
     virtual ~RosTap()
@@ -38,15 +38,10 @@ public:
         return connected_;
     }
 
-    string getName() const
+    string getTapName() const
     {
-        return name_;
+        return tapName_;
     }
-
-//    double getTimestamp() const
-//    {
-//        return timestamp_;
-//    }
 
     bool isTapConnected() const
     {
@@ -73,17 +68,17 @@ protected:
         return true;
     }
 
-    void setNewData(bool newValue/*, double timestamp*/)
+    void setNewData(bool newValue)
     {
         newData_ = newValue;
-        // timestamp_ = timestamp;
     }
 
 private:
     bool connected_;
-    string name_;
+
     bool newData_;
-    // double timestamp_;
+
+    string tapName_;
 };
 
 } // namespace srs

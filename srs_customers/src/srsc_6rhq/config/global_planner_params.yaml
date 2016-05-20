@@ -5,3 +5,4 @@
 #
 
 use_grid_path: true
+visualize_potential: true

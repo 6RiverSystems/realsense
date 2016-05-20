@@ -27,27 +27,40 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/io/SerialIO.hpp
     src/io/SerialIO.cpp
 
-    include/${PROJECT_NAME}/platform/Object.hpp
-    include/${PROJECT_NAME}/platform/Thread.hpp
+    include/${PROJECT_NAME}/localization/Anchor.hpp
 
     include/${PROJECT_NAME}/math/Math.hpp
     include/${PROJECT_NAME}/math/Time.hpp
+    include/${PROJECT_NAME}/math/PoseMath.hpp
 
     include/${PROJECT_NAME}/planning/pathplanning/Trajectory.hpp
+
+    include/${PROJECT_NAME}/platform/Object.hpp
+    include/${PROJECT_NAME}/platform/Thread.hpp
 
     include/${PROJECT_NAME}/robotics/Pose.hpp
     include/${PROJECT_NAME}/robotics/Odometry.hpp
     include/${PROJECT_NAME}/robotics/Velocity.hpp
 
+    include/${PROJECT_NAME}/robotics/controller/KanayamaController.hpp
+
     include/${PROJECT_NAME}/ros/RosTap.hpp
+    include/${PROJECT_NAME}/ros/RosService.hpp
+    include/${PROJECT_NAME}/ros/service/RosServiceTrigger.hpp
+    include/${PROJECT_NAME}/ros/service/RosTriggerShutdown.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapJoy.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapJoyAdapter.hpp
 
+    include/${PROJECT_NAME}/search/SearchAction.hpp
+    include/${PROJECT_NAME}/search/SearchPosition.hpp
     include/${PROJECT_NAME}/search/SolutionNode.hpp
     include/${PROJECT_NAME}/search/SearchNode.hpp
     include/${PROJECT_NAME}/search/AStar.hpp
+    src/search/SearchPositionNote.cpp
 
     include/${PROJECT_NAME}/utils/Ocv2Base.hpp
+    include/${PROJECT_NAME}/utils/Filesystem.hpp
 )
 
 set(${PROJECT_NAME}_MSGS
@@ -73,6 +86,7 @@ set(TEST_SOURCES_PLANNING
 
 set(TEST_SOURCES_ROBOTICS
     test/robotics/robot/Test_Chuck.cpp
+    test/robotics/controller/Test_Kanayama.cpp
 )
 
 set(TEST_SOURCES_SEARCH

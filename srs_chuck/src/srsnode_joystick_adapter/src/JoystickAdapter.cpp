@@ -1,9 +1,14 @@
 #include <srsnode_joystick_adapter/JoystickAdapter.hpp>
 
-#include <opencv2/opencv.hpp>
+#include <cmath>
+using namespace std;
 
 #include <ros/ros.h>
+#include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
+#include <dynamic_reconfigure/server.h>
+
+#include <srslib_framework/math/Math.hpp>
 
 namespace srs {
 
@@ -11,40 +16,74 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-JoystickAdapter::JoystickAdapter() :
-    rosNodeHandle_()
+JoystickAdapter::JoystickAdapter(string nodeName) :
+    joystickLatched_(false),
+    rosNodeHandle_(nodeName),
+    tapJoy_(rosNodeHandle_),
+    triggerShutdown_(rosNodeHandle_)
 {
-    rosPubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 50);
+    pubCommand_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("velocity", 50);
+    pubJoystickLatched_ = rosNodeHandle_.advertise<std_msgs::Bool>("latched", 1);
+
+    configServer_.setCallback(boost::bind(&JoystickAdapter::onConfigChange, this, _1, _2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void JoystickAdapter::run()
 {
     tapJoy_.connectTap();
+    triggerShutdown_.connectService();
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
     {
         ros::spinOnce();
 
+        evaluateTriggers();
+
         if (tapJoy_.newDataAvailable())
         {
-            Velocity<> currentVelocity = tapJoy_.getCurrentVelocity();
+            if (!tapJoy_.anyButtonPressed() && !tapJoy_.anyButtonReleased())
+            {
+                if (!joystickLatched_)
+                {
+                    joystickLatched_ = true;
+                    ROS_INFO("The joystick latch has been established");
+                }
 
-            geometry_msgs::Twist messageCmdVel;
+                Velocity<> currentVelocity = tapJoy_.getVelocity();
+                double linear = configuration_.ratio_linear * currentVelocity.linear;
+                double angular = configuration_.ratio_angular * currentVelocity.angular;
 
-            double linear = currentVelocity.linear * RATIO_LINEAR;
-            double angular = currentVelocity.angular * RATIO_ANGULAR;
+                // If the robot is moving backward and at the same time
+                // rotating, invert the direction of rotation. No transformation
+                // is performed if the robot is rotating in place (linear = 0)
+                angular *= linear < 0 ? -1 : 1;
 
-            messageCmdVel.linear.x = abs(linear) > THRESHOLD_LINEAR ? linear : 0.0;
-            messageCmdVel.linear.y = 0.0;
-            messageCmdVel.linear.z = 0.0;
+                geometry_msgs::Twist messageVelocity;
+                messageVelocity.linear.x = abs(linear) > configuration_.threshold_linear ? linear : 0.0;
+                messageVelocity.linear.y = 0.0;
+                messageVelocity.linear.z = 0.0;
 
-            messageCmdVel.angular.x = 0.0;
-            messageCmdVel.angular.y = 0.0;
-            messageCmdVel.angular.z = abs(angular) > THRESHOLD_ANGULAR ? angular : 0.0;
+                messageVelocity.angular.x = 0.0;
+                messageVelocity.angular.y = 0.0;
+                messageVelocity.angular.z = abs(angular) > configuration_.threshold_angular ? angular : 0.0;
 
-            rosPubCmdVel_.publish(messageCmdVel);
+                ROS_DEBUG_STREAM("l: " << linear << ", a: " << angular);
+                ROS_DEBUG_STREAM(messageVelocity);
+
+                pubCommand_.publish(messageVelocity);
+            }
+            else if (tapJoy_.isButtonPressed(RosTapJoy<>::BUTTON_11) && joystickLatched_)
+            {
+                joystickLatched_ = false;
+                ROS_INFO("The joystick latch has been removed");
+            }
+
+            std_msgs::Bool messageLatched;
+            messageLatched.data = joystickLatched_;
+
+            pubJoystickLatched_.publish(messageLatched);
         }
 
         refreshRate.sleep();
@@ -53,5 +92,24 @@ void JoystickAdapter::run()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void JoystickAdapter::evaluateTriggers()
+{
+    if (triggerShutdown_.isShutdownRequested())
+    {
+        ros::shutdown();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void JoystickAdapter::onConfigChange(DynamicConfig& config, uint32_t level)
+{
+    configuration_ = config;
+
+    ROS_INFO_STREAM("New configuration: (" <<
+        configuration_.ratio_linear << ", " << configuration_.ratio_angular <<
+        configuration_.threshold_linear << ", " << configuration_.threshold_angular << ")");
+}
 
 } // namespace srs

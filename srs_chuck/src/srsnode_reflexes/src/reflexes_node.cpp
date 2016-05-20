@@ -4,13 +4,14 @@
 
 int main(int argc, char** argv)
 {
-    // Initialize ROS
-    ros::init(argc, argv, "srsnode_reflexes");
+    const static string NODE_NAME = "srsnode_reflexes";
 
-    ROS_INFO_STREAM("srsnode_reflexes started");
+    // Initialize ROS
+    ros::init(argc, argv, NODE_NAME);
+    ROS_INFO_STREAM(NODE_NAME << " started");
 
     // Create the estimator and run it
-    srs::Reflexes reflexes;
+    srs::Reflexes reflexes(NODE_NAME);
     reflexes.run();
 
     return 0;

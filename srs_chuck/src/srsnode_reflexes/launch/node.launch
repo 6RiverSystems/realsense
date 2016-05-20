@@ -9,5 +9,5 @@
     <node name="srsnode_reflexes"
         pkg="srsnode_reflexes" 
         type="srsnode_reflexes"
-        output="screen" respawn="true"/>
+        output="screen" />
 </launch>

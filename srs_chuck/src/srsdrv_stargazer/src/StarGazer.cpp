@@ -216,9 +216,9 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 		srslib_framework::Aps msg;
 
 		msg.tagId = nTagId;
-		msg.x = transformedPoint.getX( ) * 10.0f;
-		msg.y = transformedPoint.getY( ) * 10.0f;
-		msg.z = transformedPoint.getZ( ) * 10.0f;
+		msg.x = transformedPoint.getX( ) / 100.0f;
+		msg.y = transformedPoint.getY( ) / 100.0f;
+		msg.z = transformedPoint.getZ( ) / 100.0f;
 		msg.yaw = transformedOrientation.getAngle( );
 
 		m_rosApsPublisher.publish( msg );

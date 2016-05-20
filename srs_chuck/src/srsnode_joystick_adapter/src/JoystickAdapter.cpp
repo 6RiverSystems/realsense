@@ -6,6 +6,7 @@ using namespace std;
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
+#include <dynamic_reconfigure/server.h>
 
 #include <srslib_framework/math/Math.hpp>
 
@@ -23,6 +24,8 @@ JoystickAdapter::JoystickAdapter(string nodeName) :
 {
     pubCommand_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("velocity", 50);
     pubJoystickLatched_ = rosNodeHandle_.advertise<std_msgs::Bool>("latched", 1);
+
+    configServer_.setCallback(boost::bind(&JoystickAdapter::onConfigChange, this, _1, _2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,9 +52,8 @@ void JoystickAdapter::run()
                 }
 
                 Velocity<> currentVelocity = tapJoy_.getVelocity();
-
-                double linear = currentVelocity.linear * RATIO_LINEAR;
-                double angular = currentVelocity.angular * RATIO_ANGULAR;
+                double linear = configuration_.ratio_linear * currentVelocity.linear;
+                double angular = configuration_.ratio_angular * currentVelocity.angular;
 
                 // If the robot is moving backward and at the same time
                 // rotating, invert the direction of rotation. No transformation
@@ -59,13 +61,13 @@ void JoystickAdapter::run()
                 angular *= linear < 0 ? -1 : 1;
 
                 geometry_msgs::Twist messageVelocity;
-                messageVelocity.linear.x = abs(linear) > THRESHOLD_LINEAR ? linear : 0.0;
+                messageVelocity.linear.x = abs(linear) > configuration_.threshold_linear ? linear : 0.0;
                 messageVelocity.linear.y = 0.0;
                 messageVelocity.linear.z = 0.0;
 
                 messageVelocity.angular.x = 0.0;
                 messageVelocity.angular.y = 0.0;
-                messageVelocity.angular.z = abs(angular) > THRESHOLD_ANGULAR ? angular : 0.0;
+                messageVelocity.angular.z = abs(angular) > configuration_.threshold_angular ? angular : 0.0;
 
                 ROS_DEBUG_STREAM("l: " << linear << ", a: " << angular);
                 ROS_DEBUG_STREAM(messageVelocity);
@@ -98,6 +100,16 @@ void JoystickAdapter::evaluateTriggers()
     {
         ros::shutdown();
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void JoystickAdapter::onConfigChange(DynamicConfig& config, uint32_t level)
+{
+    configuration_ = config;
+
+    ROS_INFO_STREAM("New configuration: (" <<
+        configuration_.ratio_linear << ", " << configuration_.ratio_angular <<
+        configuration_.threshold_linear << ", " << configuration_.threshold_angular << ")");
 }
 
 } // namespace srs

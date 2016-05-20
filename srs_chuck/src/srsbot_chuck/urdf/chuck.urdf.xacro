@@ -115,8 +115,8 @@
             <wheelTorque>30</wheelTorque>
             <wheelAcceleration>1.8</wheelAcceleration>
             <commandTopic>cmd_vel</commandTopic>
-            <odometryFrame>odom</odometryFrame> 
-            <odometryTopic>odom</odometryTopic> 
+            <odometryFrame>srsnode_motion/odometry</odometryFrame> 
+            <odometryTopic>srsnode_motion/odometry</odometryTopic> 
             <robotBaseFrame>base_link</robotBaseFrame>
         </plugin>
         <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so" />

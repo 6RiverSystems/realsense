@@ -10,6 +10,11 @@
 #include <std_srvs/Empty.h>
 #include <tf/transform_broadcaster.h>
 
+#include <srsnode_motion/DynamicConfig.h>
+using namespace srsnode_motion;
+
+#include <dynamic_reconfigure/server.h>
+
 #include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
 #include <srslib_framework/ros/service/RosServiceTrigger.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
@@ -43,11 +48,15 @@ private:
 
     void evaluateTriggers();
 
+    void onConfigChange(DynamicConfig& config, uint32_t level);
+
     void publishInformation();
 
     void scanTapsForData();
 
     bool commandUpdated_;
+    DynamicConfig configuration_;
+    dynamic_reconfigure::Server<DynamicConfig> configServer_;
     Velocity<> currentCommand_;
     Pose<> currentPose_;
     ros::Time currentTime_;
@@ -57,8 +66,7 @@ private:
     PositionEstimator positionEstimator_;
     ros::Time previousTime_;
     ros::Publisher pubCmdVel_;
-    ros::Publisher pubOdom_;
-    ros::Publisher pubPose_;
+    ros::Publisher pubOdometry_;
 
     ros::NodeHandle rosNodeHandle_;
     tf::TransformBroadcaster rosTfBroadcaster_;

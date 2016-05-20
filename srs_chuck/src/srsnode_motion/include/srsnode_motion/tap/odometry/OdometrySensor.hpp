@@ -40,8 +40,11 @@ public:
 
     void set(double arrivalTime, BaseType linear, BaseType angular)
     {
-        currentData_ = Odometry<BaseType>(arrivalTime, linear, angular);
-        Sensor<STATE_SIZE, TYPE>::setNewData(true);
+        if (Sensor<STATE_SIZE, TYPE>::isEnabled())
+        {
+            currentData_ = Odometry<BaseType>(arrivalTime, linear, angular);
+            Sensor<STATE_SIZE, TYPE>::setNewData(true);
+        }
     }
 
     virtual cv::Mat transformWithH(const cv::Mat stateVector);

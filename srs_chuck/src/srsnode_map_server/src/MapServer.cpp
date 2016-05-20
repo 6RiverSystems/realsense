@@ -18,6 +18,7 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 MapServer::MapServer(string nodeName) :
+    occupancyGrid_(),
     rosNodeHandle_(nodeName),
     triggerShutdown_(rosNodeHandle_)
 {
@@ -30,9 +31,11 @@ MapServer::MapServer(string nodeName) :
     rosNodeHandle_.param("/frame_id", frame_id, string("map"));
 
     map_.load(mapFilename);
+    map_.getOccupancyGrid(occupancyGrid_);
 
     pubMapMetadata_ = rosNodeHandle_.advertise<nav_msgs::MapMetaData>("map_metadata", 1, true);
     pubMapGrid_ = rosNodeHandle_.advertise<nav_msgs::OccupancyGrid>("map_grid", 1, true);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +95,7 @@ void MapServer::publishMap()
 
     occupancyMessage.header.stamp = ros::Time::now();
     occupancyMessage.info = metadataMessage;
-    map_.getOccupancyGrid(occupancyMessage.data);
+    occupancyMessage.data = occupancyGrid_;
 
     pubMapGrid_.publish(occupancyMessage);
 }

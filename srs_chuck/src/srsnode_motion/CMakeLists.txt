@@ -48,6 +48,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
+    dynamic_reconfigure
     tf
     srslib_framework
     srslib_test
@@ -55,9 +56,17 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(OpenCV REQUIRED)
 
-include_directories(include 
-    src/
+generate_dynamic_reconfigure_options(
+    cfg/dynamic-config.cfg
+)
+
+include_directories(
+    INCLUDE_DIRS
+    LIBRARIES
+    include
+    src
     ${catkin_INCLUDE_DIRS}
+    ${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake
     ${OpenCV_INCLUDE_DIRS} 
     ${srslib_framework_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
@@ -75,7 +84,11 @@ add_executable(${PROJECT_NODE}
     ${${PROJECT_NAME}_SOURCES}
 )
 
-add_dependencies(${PROJECT_LIBRARY} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NODE}
+    ${PROJECT_NAME}_gencfg
+)
+
+#add_dependencies(${PROJECT_LIBRARY} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(${PROJECT_NODE}
     ${catkin_LIBRARIES}

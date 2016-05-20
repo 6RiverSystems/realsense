@@ -27,13 +27,14 @@ public:
     void run();
 
 private:
-    constexpr static double REFRESH_RATE_HZ = 1;
+    constexpr static double REFRESH_RATE_HZ = 1.0;
 
     void evaluateTriggers();
 
     void publishMap();
 
     Map map_;
+    vector<int8_t> occupancyGrid_;
 
     ros::Publisher pubMapMetadata_;
     ros::Publisher pubMapGrid_;

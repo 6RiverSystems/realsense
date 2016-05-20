@@ -57,6 +57,11 @@ public:
     void set(double arrivalTime, BaseType linear, BaseType angular)
     {
         sensor_->set(arrivalTime, linear, angular);
+
+        if (!sensor_->isEnabled())
+        {
+            ROS_DEBUG_STREAM("Odometry sensor disabled. Ignoring readings.");
+        }
     }
 
 protected:

@@ -37,11 +37,12 @@ Motion::Motion(string nodeName) :
     triggerStop_(rosNodeHandle_, "Trigger: Stop", "trg/stop")
 {
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 100);
-    pubOdom_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("/odom", 50);
-    pubPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>("pose", 10);
+    pubOdometry_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("odometry", 50);
 
     positionEstimator_.addSensor(tapOdometry_.getSensor());
     positionEstimator_.addSensor(tapAps_.getSensor());
+
+    configServer_.setCallback(boost::bind(&Motion::onConfigChange, this, _1, _2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +125,18 @@ void Motion::evaluateTriggers()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::onConfigChange(DynamicConfig& config, uint32_t level)
+{
+    configuration_ = config;
+
+    tapOdometry_.getSensor()->enable(configuration_.odometry_enabled);
+    ROS_INFO_STREAM("Odometry sensor enabled: " << configuration_.odometry_enabled);
+
+    tapAps_.getSensor()->enable(configuration_.aps_enabled);
+    ROS_INFO_STREAM("APS sensor enabled: " << configuration_.aps_enabled);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishInformation()
 {
     Pose<> currentPose = positionEstimator_.getPose();
@@ -133,7 +146,7 @@ void Motion::publishInformation()
 
     // Publish the TF of the pose
     geometry_msgs::TransformStamped messagePoseTf;
-    messagePoseTf.header.frame_id = "odom";
+    messagePoseTf.header.frame_id = "srsnode_motion/odometry";
     messagePoseTf.child_frame_id = "base_footprint";
 
     messagePoseTf.header.stamp = currentTime_;
@@ -145,27 +158,27 @@ void Motion::publishInformation()
     rosTfBroadcaster_.sendTransform(messagePoseTf);
 
     // Publish the required odometry for the planners
-    nav_msgs::Odometry messagePose;
-    messagePose.header.stamp = currentTime_;
-    messagePose.header.frame_id = "odom";
-    messagePose.child_frame_id = "base_footprint";
+    nav_msgs::Odometry messageOdometry;
+    messageOdometry.header.stamp = currentTime_;
+    messageOdometry.header.frame_id = "srsnode_motion/odometry";
+    messageOdometry.child_frame_id = "base_footprint";
 
     // Position
-    messagePose.pose.pose.position.x = currentPose.x;
-    messagePose.pose.pose.position.y = currentPose.y;
-    messagePose.pose.pose.position.z = 0.0;
-    messagePose.pose.pose.orientation = orientation;
+    messageOdometry.pose.pose.position.x = currentPose.x;
+    messageOdometry.pose.pose.position.y = currentPose.y;
+    messageOdometry.pose.pose.position.z = 0.0;
+    messageOdometry.pose.pose.orientation = orientation;
 
     // Velocity
-    messagePose.twist.twist.linear.x = currentVelocity.linear;
-    messagePose.twist.twist.linear.y = 0.0;
-    messagePose.twist.twist.linear.z = 0.0;
-    messagePose.twist.twist.angular.x = 0.0;
-    messagePose.twist.twist.angular.y = 0.0;
-    messagePose.twist.twist.angular.z = currentVelocity.angular;
+    messageOdometry.twist.twist.linear.x = currentVelocity.linear;
+    messageOdometry.twist.twist.linear.y = 0.0;
+    messageOdometry.twist.twist.linear.z = 0.0;
+    messageOdometry.twist.twist.angular.x = 0.0;
+    messageOdometry.twist.twist.angular.y = 0.0;
+    messageOdometry.twist.twist.angular.z = currentVelocity.angular;
 
     // Publish the Odometry
-    pubOdom_.publish(messagePose);
+    pubOdometry_.publish(messageOdometry);
 
     if (motionController_.newCommandAvailable())
     {

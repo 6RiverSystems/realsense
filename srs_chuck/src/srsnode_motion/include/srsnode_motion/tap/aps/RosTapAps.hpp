@@ -55,6 +55,11 @@ public:
     void set(double arrivalTime, BaseType x, BaseType y, BaseType yaw)
     {
         sensor_->set(arrivalTime, x, y, yaw);
+
+        if (!sensor_->isEnabled())
+        {
+            ROS_DEBUG_STREAM("APS sensor disabled. Ignoring readings.");
+        }
     }
 
 protected:

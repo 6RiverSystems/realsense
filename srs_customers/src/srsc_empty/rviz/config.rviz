@@ -5,7 +5,6 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Map1
-        - /Path1
         - /Odometry1
       Splitter Ratio: 0.416318
     Tree Height: 880
@@ -114,9 +113,9 @@ Visualization Manager:
           Value: true
         map:
           Value: true
-        odom:
-          Value: true
         right_wheel:
+          Value: true
+        srsnode_motion/odometry:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -125,7 +124,7 @@ Visualization Manager:
       Show Names: true
       Tree:
         map:
-          odom:
+          srsnode_motion/odometry:
             base_footprint:
               base_link:
                 back_caster:
@@ -170,7 +169,7 @@ Visualization Manager:
       Length: 0.2
       Name: Odometry
       Position Tolerance: 0.1
-      Topic: /odom
+      Topic: /srsnode_motion/odometry
       Value: true
   Enabled: true
   Global Options:
@@ -257,5 +256,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 2404
-  X: 66
-  Y: 84
+  X: 56
+  Y: 74

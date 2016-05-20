@@ -114,7 +114,7 @@ Visualization Manager:
           Value: true
         map:
           Value: true
-        odom:
+        srsnode_motion/odometry:
           Value: true
         right_wheel:
           Value: true
@@ -125,7 +125,7 @@ Visualization Manager:
       Show Names: true
       Tree:
         map:
-          odom:
+          srsnode_motion/odometry:
             base_footprint:
               base_link:
                 back_caster:
@@ -170,7 +170,7 @@ Visualization Manager:
       Length: 0.2
       Name: Odometry
       Position Tolerance: 0.1
-      Topic: /odom
+      Topic: /srsnode_motion/odometry
       Value: true
   Enabled: true
   Global Options:

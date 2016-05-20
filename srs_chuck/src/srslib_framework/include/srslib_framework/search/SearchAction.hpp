@@ -167,7 +167,7 @@ private:
 
         if (positionNote)
         {
-            if (positionNote->noRotations)
+            if (positionNote->noRotations())
             {
                 rotateM90 = MAX_COST;
                 rotateP90 = MAX_COST;
@@ -192,7 +192,7 @@ private:
 
         if (positionNote)
         {
-            staticObstacle = positionNote->staticObstacle ? MAX_COST : 0;
+            staticObstacle = positionNote->staticObstacle() ? MAX_COST : 0;
         }
 
         return Math::noOverflowAdd(locationCost, staticObstacle);

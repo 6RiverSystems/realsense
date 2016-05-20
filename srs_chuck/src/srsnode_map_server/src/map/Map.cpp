@@ -176,18 +176,31 @@ void Map::loadCosts()
             unsigned char alpha = *(pixel + 3);
 
             Grid2dLocation location = Grid2dLocation(col, height_ - row - 1);
-            SearchPositionNote* note = nullptr;
+            SearchPositionNote* note = new SearchPositionNote();
 
-            if (green == 255)
+            if (green & FLAG_GO_SLOW)
             {
-                note = const_cast<SearchPositionNote*>(&SearchPositionNote::GO_SLOW);
+                note->add(SearchPositionNote::GO_SLOW);
+            }
+
+            if (green & FLAG_NO_ROTATIONS)
+            {
+                note->add(SearchPositionNote::NO_ROTATIONS);
+            }
+
+            if (green & FLAG_OD)
+            {
+                note->add(SearchPositionNote::ENABLE_OD);
+            }
+            else
+            {
+                note->add(SearchPositionNote::DISABLE_OD);
             }
 
             // Static obstacles have priority on every other note.
-            // TODO: Add a multi-note mechanism
             if (red > 0)
             {
-                note = const_cast<SearchPositionNote*>(&SearchPositionNote::STATIC_OBSTACLE);
+                note->add(SearchPositionNote::STATIC_OBSTACLE);
             }
 
             grid_->addValue(location, static_cast<unsigned int>(blue), note);

@@ -54,6 +54,10 @@ public:
     void load(string filename);
 
 private:
+    const unsigned char FLAG_OD = 0x80;
+    const unsigned char FLAG_GO_SLOW = 0x40;
+    const unsigned char FLAG_NO_ROTATIONS = 0x20;
+
     void loadConfiguration();
     void loadCosts();
 

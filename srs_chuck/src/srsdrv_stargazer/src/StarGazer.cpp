@@ -12,9 +12,9 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 
-//#include <boost/accumulators/accumulators.hpp>
-//#include <boost/accumulators/statistics/stats.hpp>
-//#include <boost/accumulators/statistics/median.hpp>
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/median.hpp>
 
 namespace YAML {
 
@@ -179,9 +179,9 @@ void StarGazer::ReadCallback( std::string strType, std::string strValue )
 	ROS_DEBUG_STREAM_NAMED( "StarGazer", strType << " = " << strValue );
 }
 
-//using namespace boost::accumulators;
-//
-//typedef accumulator_set<double, stats<tag::median > > double_acc;
+using namespace boost::accumulators;
+
+typedef accumulator_set<double, stats<tag::median > > double_acc;
 
 void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, float fAngle )
 {
@@ -223,50 +223,50 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 
 		m_rosApsPublisher.publish( msg );
 
-//		static uint32_t sCount = 0;
-//
-//		static double_acc accLocalX;
-//		static double_acc accLocalY;
-//		static double_acc accLocalZ;
-//		static double_acc accLocalRotation;
-//
-//		static double_acc accGlobalX;
-//		static double_acc accGlobalY;
-//		static double_acc accGlobalZ;
-//		static double_acc accGlobalRotation;
-//
-//		accLocalX( point.getX( ) );
-//		accLocalY( point.getY( ) );
-//		accLocalZ( point.getZ( ) );
-//		accLocalRotation( orientation.getAngle( ) );
-//
-//		accGlobalX( msg.x );
-//		accGlobalY( msg.y );
-//		accGlobalZ( msg.z );
-//		accGlobalRotation( msg.yaw );
-//
-//		if( sCount++ == 50 )
-//		{
-//			ROS_DEBUG_NAMED( "StarGazer", "Anchor Location (median): %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
-//				nTagId, anchorOrigin.getX( ), anchorOrigin.getY( ), anchorOrigin.getZ( ), anchorRotation.getAngle( ) );
-//
-//			ROS_DEBUG_NAMED( "StarGazer", "%04i, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f",
-//				nTagId, median( accLocalX ), median( accLocalY ), median( accLocalZ ), median( accLocalRotation ),
-//				median( accGlobalX ), median( accGlobalY ), median( accGlobalZ ), median( accGlobalRotation ) );
-//
-//			// reset accumulators
-//			accLocalX = double_acc( );
-//			accLocalY = double_acc( );
-//			accLocalZ = double_acc( );
-//			accLocalRotation = double_acc( );
-//
-//			accGlobalX = double_acc( );
-//			accGlobalY = double_acc( );
-//			accGlobalZ = double_acc( );
-//			accGlobalRotation = double_acc( );
-//
-//			sCount = 0;
-//		}
+		static uint32_t sCount = 0;
+
+		static double_acc accLocalX;
+		static double_acc accLocalY;
+		static double_acc accLocalZ;
+		static double_acc accLocalRotation;
+
+		static double_acc accGlobalX;
+		static double_acc accGlobalY;
+		static double_acc accGlobalZ;
+		static double_acc accGlobalRotation;
+
+		accLocalX( point.getX( ) );
+		accLocalY( point.getY( ) );
+		accLocalZ( point.getZ( ) );
+		accLocalRotation( orientation.getAngle( ) );
+
+		accGlobalX( msg.x );
+		accGlobalY( msg.y );
+		accGlobalZ( msg.z );
+		accGlobalRotation( msg.yaw );
+
+		if( sCount++ == 50 )
+		{
+			ROS_DEBUG_NAMED( "StarGazer", "Anchor Location (median): %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
+				nTagId, anchorOrigin.getX( ), anchorOrigin.getY( ), anchorOrigin.getZ( ), anchorRotation.getAngle( ) );
+
+			ROS_DEBUG_NAMED( "StarGazer", "%04i, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f",
+				nTagId, median( accLocalX ), median( accLocalY ), median( accLocalZ ), median( accLocalRotation ),
+				median( accGlobalX ), median( accGlobalY ), median( accGlobalZ ), median( accGlobalRotation ) );
+
+			// reset accumulators
+			accLocalX = double_acc( );
+			accLocalY = double_acc( );
+			accLocalZ = double_acc( );
+			accLocalRotation = double_acc( );
+
+			accGlobalX = double_acc( );
+			accGlobalY = double_acc( );
+			accGlobalZ = double_acc( );
+			accGlobalRotation = double_acc( );
+
+			sCount = 0;
+		}
 	}
 	else
 	{

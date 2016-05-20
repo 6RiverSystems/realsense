@@ -1,3 +1,6 @@
 anchors:
-    - {id: "052", location: [646.853885, 555.88497067, 460], orientation: 1.5721926 }
-    - {id: "098", location: [1621.43815125, 516.896893625, 460], orientation: 1.5978489 }
+# Original - {id: "052", location: [630.3, 534.495, 460], orientation: 1.5721926 }
+    - {id: "052", location: [613.746115, 513.10502933, 460], orientation: 1.5721926 }
+# Original - {id: "098", location: [1637.82, 514.255, 460], orientation: 1.5978489 }
+    - {id: "098", location: [1654.20184875, 511.613106375, 460], orientation: 1.5978489 }
+    

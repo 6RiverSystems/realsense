@@ -1,0 +1,45 @@
+#
+# (c) Copyright 2015-2016 River Systems, all rights reserved.
+#
+# This is proprietary software, unauthorized distribution is not permitted.
+#
+
+#Independent settings for the local costmap
+local_costmap:
+    publish_voxel_map: true
+    global_frame: odom
+    robot_base_frame: base_footprint
+    update_frequency: 20.0
+    publish_frequency: 20.0
+    static_map: false
+    rolling_window: true
+    width: 10.0
+    height: 10.0
+    resolution: 0.025
+    origin_x: 0.0
+    origin_y: 0.0
+    obstacle_range: 2.5
+    raytrace_range: 3.0
+
+
+    
+    
+    
+#    local_costmap:
+#    global_frame: /odom
+#    robot_base_frame: /base_footprint
+#    update_frequency: 1.0
+#    publish_frequency: 1.0
+#    static_map: true
+#    rolling_window: false
+
+
+
+
+#    local_costmap:
+#  global_frame: /odom
+#  robot_base_frame: /base_footprint
+#  update_frequency: 1.0
+#  publish_frequency: 1.0
+#  static_map: true
+#  rolling_window: false

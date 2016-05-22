@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef REFLEXES_HPP_
-#define REFLEXES_HPP_
+#ifndef MIDBRAIN_HPP_
+#define MIDBRAIN_HPP_
 
 #include <ros/ros.h>
 
@@ -12,12 +12,12 @@
 
 namespace srs {
 
-class Reflexes
+class Midbrain
 {
 public:
-    Reflexes(string nodeName);
+    Midbrain(string nodeName);
 
-    ~Reflexes()
+    ~Midbrain()
     {}
 
     void run();
@@ -34,4 +34,4 @@ private:
 
 } // namespace srs
 
-#endif  // REFLEXES_HPP_
+#endif  // MIDBRAIN_HPP_

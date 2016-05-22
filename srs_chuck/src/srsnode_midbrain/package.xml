@@ -8,9 +8,9 @@
 -->
 
 <package>
-    <name>srsnode_reflexes</name>
+    <name>srsnode_midbrain</name>
     <version>1.0.0</version>
-    <description>Node package: Reflexes</description>
+    <description>Node package: Midbrain</description>
     
     <author email="fsantini@6river.com">Fabrizio Santini</author>
     <maintainer email="fsantini@6river.com">Fabrizio Santini</maintainer>

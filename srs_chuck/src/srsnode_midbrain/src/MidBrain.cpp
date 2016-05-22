@@ -1,6 +1,4 @@
-#include <srsnode_reflexes/Reflexes.hpp>
-
-#include <opencv2/opencv.hpp>
+#include <srsnode_midbrain/Midbrain.hpp>
 
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
@@ -11,14 +9,14 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Reflexes::Reflexes(string nodeName) :
+Midbrain::Midbrain(string nodeName) :
     rosNodeHandle_(nodeName),
     triggerShutdown_(rosNodeHandle_)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Reflexes::run()
+void Midbrain::run()
 {
     triggerShutdown_.connectService();
 
@@ -37,7 +35,7 @@ void Reflexes::run()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Reflexes::evaluateTriggers()
+void Midbrain::evaluateTriggers()
 {
     if (triggerShutdown_.isShutdownRequested())
     {

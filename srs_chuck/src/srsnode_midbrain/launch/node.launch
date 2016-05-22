@@ -6,8 +6,7 @@
   *
 -->
 <launch>
-    <node name="srsnode_reflexes"
-        pkg="srsnode_reflexes" 
-        type="srsnode_reflexes"
+    <node name="srsnode_midbrain"
+        pkg="srsnode_midbrain" type="srsnode_midbrain"
         output="screen" />
 </launch>

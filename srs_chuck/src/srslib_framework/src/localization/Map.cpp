@@ -1,4 +1,4 @@
-#include <srssrv_map/map/Map.hpp>
+#include <srslib_framework/localization/Map.hpp>
 
 #include <SDL/SDL_image.h>
 #include <limits>
@@ -8,7 +8,6 @@
 
 #include <srslib_framework/utils/Filesystem.hpp>
 #include <srslib_framework/graph/grid2d/Grid2dLocation.hpp>
-#include <srslib_framework/search/SearchPositionNote.hpp>
 
 #include <srslib_framework/localization/Anchor.hpp>
 
@@ -20,11 +19,26 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Map::Map() :
     grid_(nullptr),
-    height_(0),
+    heightC_(0),
+    heightM_(0),
     mapImageFilename_(""),
     resolution_(0.0),
-    width_(0)
+    widthC_(0),
+    widthM_(0)
 {
+}
+
+Map::Map(double widthMeters, double heightMeters, double resolution) :
+        grid_(nullptr),
+        heightC_(0),
+        heightM_(heightMeters),
+        mapImageFilename_(""),
+        resolution_(resolution),
+        widthC_(0),
+        widthM_(widthMeters)
+{
+    getMapCoordinates(widthMeters, heightMeters, widthC_, heightC_);
+    grid_ = new Grid2d(widthC_, heightC_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,17 +51,24 @@ Map::~Map()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Map::getOccupancyGrid(vector<int8_t>& occupancyGrid)
+void Map::getMapCoordinates(double x, double y, int c, int r)
 {
-    occupancyGrid.clear();
+    c = static_cast<int>(floor(x / resolution_));
+    r = static_cast<int>(floor(y / resolution_));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Map::getCostsGrid(vector<int8_t>& costGrid)
+{
+    costGrid.clear();
 
     if (grid_)
     {
         int8_t maxValue = numeric_limits<int8_t>::max();
 
-        for (unsigned int row = 0; row < height_; row++)
+        for (int row = 0; row < grid_->getHeight(); row++)
         {
-            for (unsigned int col = 0; col < width_; col++)
+            for (int col = 0; col < grid_->getWidth(); col++)
             {
                 Grid2dLocation location = Grid2dLocation(col, row);
                 float cost = (static_cast<float>(grid_->getCost(location)) / maxValue) * 100.0;
@@ -55,12 +76,50 @@ void Map::getOccupancyGrid(vector<int8_t>& occupancyGrid)
                 SearchPositionNote* note = reinterpret_cast<SearchPositionNote*>(
                     grid_->getNote(location));
 
-                if (note == &SearchPositionNote::STATIC_OBSTACLE)
+                if (note->staticObstacle())
                 {
-                    cost = maxValue;
+                    cost = 100;
                 }
 
-                occupancyGrid.push_back(maxValue - static_cast<int8_t>(cost));
+                costGrid.push_back(static_cast<int8_t>(cost));
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Map::getNotesGrid(vector<int8_t>& notesGrid)
+{
+    notesGrid.clear();
+
+    if (grid_)
+    {
+        for (int row = 0; row < grid_->getHeight(); row++)
+        {
+            for (int col = 0; col < grid_->getWidth(); col++)
+            {
+                Grid2dLocation location = Grid2dLocation(col, row);
+
+                int8_t notes = 0;
+                SearchPositionNote* note = reinterpret_cast<SearchPositionNote*>(
+                    grid_->getNote(location));
+
+                if (note->od())
+                {
+                    notes |= FLAG_OD;
+                }
+
+                if (note->noRotations())
+                {
+                    notes |= FLAG_NO_ROTATIONS;
+                }
+
+                if (note->goSlow())
+                {
+                    notes |= FLAG_GO_SLOW;
+                }
+
+                notesGrid.push_back(notes);
             }
         }
     }
@@ -76,13 +135,6 @@ void Map::load(string filename)
     if (!document_.IsNull())
     {
         loadConfiguration();
-
-        if (grid_)
-        {
-            delete grid_;
-        }
-        grid_ = new Grid2d(width_, height_);
-
         loadCosts();
     }
     else
@@ -92,7 +144,63 @@ void Map::load(string filename)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void Map::setGrid(vector<int8_t>& costGrid, vector<int8_t>& notesGrid)
+{
+    if (grid_)
+    {
+        for (int row = 0; row < grid_->getHeight(); row++)
+        {
+            for (int col = 0; col < grid_->getWidth(); col++)
+            {
+                Grid2dLocation location = Grid2dLocation(col, row);
+                int index = row * grid_->getHeight() + col;
+
+                int8_t cost = costGrid[index];
+                int8_t noteFlags = notesGrid[index];
+
+                SearchPositionNote* note = reinterpret_cast<SearchPositionNote*>(
+                    grid_->getNote(location));
+
+                note = createNote(noteFlags, note);
+                grid_->addValue(location, cost, note);
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+SearchPositionNote* Map::createNote(unsigned char flags, SearchPositionNote* note)
+{
+    if (!note)
+    {
+        note = new SearchPositionNote();
+    }
+    note->reset();
+
+    if (flags & FLAG_GO_SLOW)
+    {
+        note->add(SearchPositionNote::GO_SLOW);
+    }
+
+    if (flags & FLAG_NO_ROTATIONS)
+    {
+        note->add(SearchPositionNote::NO_ROTATIONS);
+    }
+
+    if (flags & FLAG_OD)
+    {
+        note->add(SearchPositionNote::ENABLE_OD);
+    }
+    else
+    {
+        note->add(SearchPositionNote::DISABLE_OD);
+    }
+
+    return note;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Map::loadConfiguration()
@@ -151,8 +259,16 @@ void Map::loadCosts()
     }
 
     // Copy the image data into the map structure
-    width_ = image->w;
-    height_ = image->h;
+    widthC_ = image->w;
+    heightC_ = image->h;
+    widthM_ = widthC_ * resolution_;
+    heightM_ = heightC_ * resolution_;
+
+    if (grid_)
+    {
+        delete grid_;
+    }
+    grid_ = new Grid2d(widthC_, heightC_);
 
     int pitch = image->pitch;
     int channels = image->format->BytesPerPixel;
@@ -162,10 +278,12 @@ void Map::loadCosts()
         exit(-1);
     }
 
+    int8_t maxValue = numeric_limits<int8_t>::max();
+
     unsigned char* imagePixels = (unsigned char*)(image->pixels);
-    for (unsigned int row = 0; row < height_; row++)
+    for (unsigned int row = 0; row < heightC_; row++)
     {
-        for (unsigned int col = 0; col < width_; col++)
+        for (unsigned int col = 0; col < widthC_; col++)
         {
             // Compute mean of RGB for this pixel
             unsigned char* pixel = imagePixels + row * pitch + col * channels;
@@ -175,27 +293,8 @@ void Map::loadCosts()
             unsigned char blue = *(pixel + 2);
             unsigned char alpha = *(pixel + 3);
 
-            Grid2dLocation location = Grid2dLocation(col, height_ - row - 1);
-            SearchPositionNote* note = new SearchPositionNote();
-
-            if (green & FLAG_GO_SLOW)
-            {
-                note->add(SearchPositionNote::GO_SLOW);
-            }
-
-            if (green & FLAG_NO_ROTATIONS)
-            {
-                note->add(SearchPositionNote::NO_ROTATIONS);
-            }
-
-            if (green & FLAG_OD)
-            {
-                note->add(SearchPositionNote::ENABLE_OD);
-            }
-            else
-            {
-                note->add(SearchPositionNote::DISABLE_OD);
-            }
+            Grid2dLocation location = Grid2dLocation(col, heightC_ - row - 1);
+            SearchPositionNote* note = createNote(green);
 
             // Static obstacles have priority on every other note.
             if (red > 0)

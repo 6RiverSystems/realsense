@@ -11,9 +11,10 @@ using namespace std;
 
 #include <ros/ros.h>
 
+#include <srslib_framework/localization/Map.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
-
-#include <srssrv_map/map/Map.hpp>
+#include <srslib_framework/MapCoordinates.h>
+using namespace srslib_framework;
 
 namespace srs {
 
@@ -27,17 +28,23 @@ public:
     void run();
 
 private:
-    constexpr static double REFRESH_RATE_HZ = 1.0;
+    constexpr static double REFRESH_RATE_HZ = 1.0 / 10.0;
 
     void evaluateTriggers();
+
+    bool onMapCoordinatesRequested(MapCoordinates::Request& req, MapCoordinates::Response& resp);
 
     void publishMap();
 
     Map map_;
-    vector<int8_t> occupancyGrid_;
+    vector<int8_t> costsGrid_;
+    vector<int8_t> notesGrid_;
 
     ros::Publisher pubMapMetadata_;
-    ros::Publisher pubMapGrid_;
+    ros::Publisher pubMapOccupancyGrid_;
+    ros::Publisher pubMapCompleteMap_;
+
+    ros::ServiceServer srvMapCoordinates_;
 
     ros::NodeHandle rosNodeHandle_;
 

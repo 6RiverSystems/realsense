@@ -15,6 +15,8 @@
 #include <srsnode_executive/tap/RosTapCmd_Pause.hpp>
 #include <srsnode_executive/tap/RosTapCmd_Shutdown.hpp>
 
+#include <srsnode_executive/tap/RosTapMap.hpp>
+
 namespace srs {
 
 class Executive
@@ -51,8 +53,6 @@ private:
 
     AStar<Grid2d> algorithm_;
 
-    Grid2d grid_;
-
     ros::Publisher pubGoalPlan_;
     ros::Publisher pubGoalGoal_;
     ros::Publisher pubInitialPose_;
@@ -67,6 +67,8 @@ private:
     RosTapCmd_InitialPose tapCmdInitialPose_;
     RosTapCmd_Pause tapCmdPause_;
     RosTapCmd_Shutdown tapCmdShutdown_;
+
+    RosTapMap tapMap_;
 
     int inc_;
 };

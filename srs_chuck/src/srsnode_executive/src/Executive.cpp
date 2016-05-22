@@ -6,6 +6,8 @@
 #include <std_srvs/Empty.h>
 
 #include <srslib_framework/math/Math.hpp>
+#include <srslib_framework/MapCoordinates.h>
+using namespace srslib_framework;
 
 namespace srs {
 
@@ -15,7 +17,6 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Executive::Executive(string nodeName) :
     currentGoal_(),
-    grid_(GRID_SIZE),
     inc_(0),
     rosNodeHandle_(nodeName),
     robotCurrentPose_(),
@@ -23,14 +24,13 @@ Executive::Executive(string nodeName) :
     tapCmdGoal_(rosNodeHandle_),
     tapCmdInitialPose_(rosNodeHandle_),
     tapCmdPause_(rosNodeHandle_),
-    tapCmdShutdown_(rosNodeHandle_)
+    tapCmdShutdown_(rosNodeHandle_),
+    tapMap_(rosNodeHandle_)
 {
     pubGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>("current_goal/plan", 1);
     pubGoalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>("current_goal/goal", 1);
     pubInitialPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseWithCovarianceStamped>(
         "initial_pose", 1);
-
-    algorithm_.setGraph(&grid_);
 
     robotInitialPose_ = Pose<>(0, 2.0, 2.0, 0);
     robotCurrentPose_ = robotInitialPose_;
@@ -65,6 +65,8 @@ void Executive::connectAllTaps()
     tapCmdInitialPose_.connectTap();
     tapCmdPause_.connectTap();
     tapCmdShutdown_.connectTap();
+
+    tapMap_.connectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,6 +76,8 @@ void Executive::disconnectAllTaps()
     tapCmdInitialPose_.disconnectTap();
     tapCmdPause_.disconnectTap();
     tapCmdShutdown_.disconnectTap();
+
+    tapMap_.disconnectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,10 +97,20 @@ void Executive::executePlanToGoal(Pose<> goal)
 {
     currentGoal_ = goal;
 
-    Grid2d::LocationType start(0, 0);
-    Grid2d::LocationType internalGoal(3, 0);
+    algorithm_.setGraph(tapMap_.getMap()->getGrid());
 
-    algorithm_.search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(internalGoal, 0));
+    unsigned int r = 0;
+    unsigned int c = 0;
+
+    tapMap_.getMap()->getMapCoordinates(robotCurrentPose_.x, robotCurrentPose_.y, c, r);
+    Grid2d::LocationType internalStart(c, r);
+
+    tapMap_.getMap()->getMapCoordinates(goal.x, goal.y, c, r);
+    Grid2d::LocationType internalGoal(c, r);
+
+    algorithm_.search(
+        SearchPosition<Grid2d>(internalStart, 0),
+        SearchPosition<Grid2d>(internalGoal, 0));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

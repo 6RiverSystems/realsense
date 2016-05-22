@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 
-#include <srssrv_map/MapServer.hpp>
+#include <srsnode_map_server/MapServer.hpp>
 
 int main(int argc, char** argv)
 {

@@ -3,10 +3,10 @@
 namespace srs {
 
 const SearchPositionNote SearchPositionNote::DISABLE_OD =
-    SearchPositionNote(false, false, false, true);
+    SearchPositionNote(false, false, false, false);
 
 const SearchPositionNote SearchPositionNote::ENABLE_OD =
-    SearchPositionNote(true, false, false, true);
+    SearchPositionNote(true, false, false, false);
 
 const SearchPositionNote SearchPositionNote::GO_SLOW =
     SearchPositionNote(false, true, false, false);

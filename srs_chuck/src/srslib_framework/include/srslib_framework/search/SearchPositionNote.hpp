@@ -18,7 +18,7 @@ public:
     const static SearchPositionNote STATIC_OBSTACLE;
 
     SearchPositionNote() :
-        od_(true),
+        od_(false),
         goSlow_(false),
         noRotations_(false),
         staticObstacle_(false)
@@ -55,6 +55,14 @@ public:
     inline bool noRotations() const
     {
         return noRotations_;
+    }
+
+    inline void reset()
+    {
+        goSlow_ = false;
+        noRotations_ = false;
+        od_ = false;
+        staticObstacle_ = false;
     }
 
     inline bool staticObstacle() const

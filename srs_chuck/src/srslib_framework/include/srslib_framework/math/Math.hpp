@@ -103,7 +103,7 @@ struct Math
     template<typename TYPE = double>
     constexpr inline static TYPE deg2rad(TYPE deg)
     {
-        return TYPE(M_PI / 180) * deg;
+        return deg * TYPE(M_PI) / TYPE(180);
     }
 
     template<typename TYPE = double>
@@ -166,7 +166,7 @@ struct Math
     template<typename TYPE = double>
     constexpr inline static TYPE rad2deg(TYPE rad)
     {
-        return TYPE(180 / M_PI) * rad;
+        return rad * TYPE(180) / TYPE(M_PI);
     }
 
     template <typename TYPE = double>

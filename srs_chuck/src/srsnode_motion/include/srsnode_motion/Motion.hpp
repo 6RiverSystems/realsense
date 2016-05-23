@@ -60,7 +60,6 @@ private:
     DynamicConfig configuration_;
     dynamic_reconfigure::Server<DynamicConfig> configServer_;
     Velocity<> currentCommand_;
-    Pose<> currentPose_;
     ros::Time currentTime_;
 
     MotionController motionController_;
@@ -79,7 +78,7 @@ private:
     RosTapJoyAdapter<> tapJoyAdapter_;
     RosTapBrainStemStatus tapBrainStemStatus_;
     RosTapOdometry tapOdometry_;
-    RosTapInitialPose tapInitialPose_;
+    RosTapInitialPose tapInitialPose_; // TODO: This should be a command (trigger) passed down by Executive
     Trajectory trajectoryConverter_;
     RosTriggerStop triggerStop_;
     RosTriggerShutdown triggerShutdown_;

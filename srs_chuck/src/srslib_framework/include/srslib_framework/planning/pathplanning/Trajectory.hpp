@@ -52,7 +52,7 @@ public:
         Pose<> pose0 = Pose<>(
             firstNode.action.position.location.x,
             firstNode.action.position.location.y,
-            Math::deg2rad(firstNode.action.position.orientation));
+            Math::deg2rad<double>(firstNode.action.position.orientation));
 
         vector<Pose<>> poses;
         generatePoses(pose0, velocities, poses);

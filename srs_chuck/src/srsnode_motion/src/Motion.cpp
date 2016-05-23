@@ -22,7 +22,6 @@ namespace srs {
 Motion::Motion(string nodeName) :
     commandUpdated_(false),
     currentCommand_(),
-    currentPose_(),
     rosNodeHandle_(nodeName),
     positionEstimator_(),
     motionController_(),
@@ -50,12 +49,10 @@ Motion::Motion(string nodeName) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::reset()
 {
-    currentPose_ = tapInitialPose_.getPose();
-
     commandUpdated_ = false;
     currentCommand_ = Velocity<>();
 
-    positionEstimator_.reset(currentPose_);
+    positionEstimator_.reset(tapInitialPose_.getPose());
     motionController_.reset();
 }
 

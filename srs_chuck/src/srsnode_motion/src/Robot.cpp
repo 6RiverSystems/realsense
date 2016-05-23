@@ -11,7 +11,7 @@ const cv::Mat Robot<TYPE>::Q = (
     cv::Mat_<Robot<TYPE>::BaseType>(1, STATIC_UKF_STATE_VECTOR_SIZE) <<
         0.01, // [m]
         0.01, // [m]
-        Math::deg2rad(1), // [rad]
+        Math::deg2rad<double>(1.0), // [rad]
         0.006, // [m/s]
         0.006 // [m/s]
 );

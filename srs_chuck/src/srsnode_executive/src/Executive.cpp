@@ -83,7 +83,7 @@ void Executive::disconnectAllTaps()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::executeInitialPose(Pose<> initialPose)
 {
-    robotInitialPose_ = tapCmdInitialPose_.getRobotPose();
+    robotInitialPose_ = initialPose;
     //inc_ = 0;
 }
 
@@ -121,7 +121,7 @@ void Executive::executeShutdown()
 
     for (auto node : nodes)
     {
-        string fullServiceName = node + "/trg/shutdown";
+        string fullServiceName = node + "/trigger/shutdown";
 
         ros::ServiceClient client = rosNodeHandle_.serviceClient<std_srvs::Empty>(fullServiceName);
         std_srvs::Empty::Request req;

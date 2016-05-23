@@ -216,6 +216,7 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 		srslib_framework::Aps msg;
 
 		msg.tagId = nTagId;
+		msg.header.stamp = ros::Time::now( );
 		msg.x = transformedPoint.getX( ) / 100.0f;
 		msg.y = transformedPoint.getY( ) / 100.0f;
 		msg.z = transformedPoint.getZ( ) / 100.0f;

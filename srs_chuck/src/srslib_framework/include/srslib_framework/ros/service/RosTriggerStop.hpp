@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTRIGGERSHUTDOWN_HPP_
-#define ROSTRIGGERSHUTDOWN_HPP_
+#ifndef ROSTRIGGERSTOP_HPP_
+#define ROSTRIGGERSTOP_HPP_
 
 #include <string>
 using namespace std;
@@ -16,12 +16,12 @@ using namespace std;
 
 namespace srs {
 
-class RosTriggerShutdown :
+class RosTriggerStop :
     public RosServiceTrigger
 {
 public:
-    RosTriggerShutdown(ros::NodeHandle rosHandle) :
-        RosServiceTrigger(rosHandle, "Trigger: Shutdown", "shutdown")
+    RosTriggerStop(ros::NodeHandle rosHandle) :
+        RosServiceTrigger(rosHandle, "Trigger: Stop", "stop")
     {}
 };
 

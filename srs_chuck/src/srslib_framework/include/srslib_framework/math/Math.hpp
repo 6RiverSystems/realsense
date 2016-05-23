@@ -92,6 +92,10 @@ struct Math
                 {
                     *element = maxReplacement;
                 }
+                else if (isNan(*element))
+                {
+                    *element = minReplacement;
+                }
             }
         }
     }
@@ -120,6 +124,16 @@ struct Math
     constexpr inline static TYPE inch2mm(TYPE inch)
     {
         return TYPE(25.4) * inch;
+    }
+
+    constexpr inline static bool isNan(double value)
+    {
+        return value != value;
+    }
+
+    constexpr inline static bool isNan(float value)
+    {
+        return value != value;
     }
 
     template<typename TYPE = double>
@@ -156,9 +170,9 @@ struct Math
     }
 
     template <typename TYPE = double>
-    constexpr inline static int sgn(TYPE value)
+    constexpr inline static TYPE sgn(TYPE value)
     {
-        return (TYPE(0) < value) - (value < TYPE(0));
+        return TYPE((TYPE(0) < value) - (value < TYPE(0)));
     }
 
     static cv::Mat zeros(const cv::Mat original)

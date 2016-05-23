@@ -1,4 +1,4 @@
-function map = mm_addBorder(map, thickness)
+function map = mm_addOuterBorder(map, thickness)
 
     % Top border
     map = mm_addStaticObstacle(map, ...

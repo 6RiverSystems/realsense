@@ -43,7 +43,7 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/robotics/Odometry.hpp
     include/${PROJECT_NAME}/robotics/Velocity.hpp
 
-    include/${PROJECT_NAME}/robotics/controller/KanayamaController.hpp
+    include/${PROJECT_NAME}/robotics/controller/YoshizawaController.hpp
 
     include/${PROJECT_NAME}/ros/RosTap.hpp
     include/${PROJECT_NAME}/ros/RosService.hpp
@@ -92,7 +92,7 @@ set(TEST_SOURCES_PLANNING
 
 set(TEST_SOURCES_ROBOTICS
     test/robotics/robot/Test_Chuck.cpp
-    test/robotics/controller/Test_Kanayama.cpp
+    test/robotics/controller/Test_Yoshizawa.cpp
 )
 
 set(TEST_SOURCES_SEARCH

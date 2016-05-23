@@ -28,24 +28,31 @@ public:
     typedef pair<Pose<>, Velocity<>> MilestoneType;
     typedef vector<MilestoneType> TrajectoryType;
 
-    Trajectory(vector<SolutionNode<Grid2d>>& solution, RobotProfile& robot, double dT) :
-        solution_(solution),
-        robot_(robot),
+    Trajectory(RobotProfile& robot, double dT, double minVelocity = 0.3) :
         dT_(dT),
-        linearIncrement_(dT * robot.linearAccelerationTravelMax())
+        linearIncrement_(dT * robot.linearAccelerationTravelMax()),
+        minVelocity_(minVelocity),
+        robot_(robot)
     {}
 
-    void getTrajectory(Pose<> pose0, TrajectoryType& trajectory)
+    void getTrajectory(vector<SolutionNode<Grid2d>>& solution, TrajectoryType& trajectory)
     {
         trajectory.clear();
 
-        if (solution_.empty())
+        if (solution.empty())
         {
             return;
         }
 
         vector<Velocity<>> velocities;
-        generateVelocities(velocities);
+        generateVelocities(solution, velocities);
+
+        // TODO: Make sure that this pose and the orientation of the solution match in units (rad vs deg)
+        SolutionNode<Grid2d> firstNode = solution[0];
+        Pose<> pose0 = Pose<>(
+            firstNode.action.position.location.x,
+            firstNode.action.position.location.y,
+            Math::deg2rad(firstNode.action.position.orientation));
 
         vector<Pose<>> poses;
         generatePoses(pose0, velocities, poses);
@@ -57,6 +64,11 @@ public:
             milestone.second = velocities[i];
             trajectory.push_back(milestone);
         }
+    }
+
+    void setMinimumVelocity(double newValue)
+    {
+        minVelocity_ = newValue;
     }
 
 private:
@@ -92,24 +104,37 @@ private:
         }
     }
 
-    void generateVelocities(vector<Velocity<>>& velocities)
+    void generateVelocities(vector<SolutionNode<Grid2d>>& solution, vector<Velocity<>>& velocities)
     {
-        vector<SolutionNode<Grid2d>>::iterator fromNode = solution_.begin();
-        vector<SolutionNode<Grid2d>>::iterator nextNode;
+        vector<SolutionNode<Grid2d>>::iterator fromNode = solution.begin();
+        vector<SolutionNode<Grid2d>>::iterator node;
         vector<SolutionNode<Grid2d>>::iterator toNode;
 
-        while (fromNode != solution_.end())
-        {
-            nextNode = fromNode + 1;
-            findNextAction(nextNode, toNode);
+        double v0 = 0.0;
+        double vf = 0.0;
 
-            switch (nextNode->action.actionType)
+        SearchAction<Grid2d>::ActionEnum nextAction;
+        bool lastAction = false;
+
+        while (!lastAction)
+        {
+            node = fromNode + 1;
+            nextAction = node->action.actionType;
+            findNextAction(node, toNode);
+
+            node = toNode + 1;
+            lastAction = node->action.actionType == SearchAction<Grid2d>::GOAL;
+
+            v0 = vf;
+            vf = lastAction ? 0.0 : minVelocity_;
+
+            switch (nextAction)
             {
                 case SearchAction<Grid2d>::BACKWARD:
                     break;
 
                 case SearchAction<Grid2d>::FORWARD:
-                    moveForward(fromNode, toNode, velocities);
+                    moveForward(fromNode, v0, toNode, vf, velocities);
                     break;
 
                 case SearchAction<Grid2d>::ROTATE_180:
@@ -126,7 +151,8 @@ private:
         }
     }
 
-    double measureDistance(vector<SolutionNode<Grid2d>>::iterator& fromNode,
+    double measureDistance(
+        vector<SolutionNode<Grid2d>>::iterator& fromNode,
         vector<SolutionNode<Grid2d>>::iterator& toNode)
     {
         SearchPosition<Grid2d> fromPosition = fromNode->action.position;
@@ -141,8 +167,8 @@ private:
     }
 
     void moveForward(
-        vector<SolutionNode<Grid2d>>::iterator& fromNode,
-        vector<SolutionNode<Grid2d>>::iterator& toNode,
+        vector<SolutionNode<Grid2d>>::iterator& fromNode, double initialV,
+        vector<SolutionNode<Grid2d>>::iterator& toNode, double finalV,
         vector<Velocity<>>& velocities)
     {
         double ar = robot_.linearAccelerationTravelMax();
@@ -150,17 +176,18 @@ private:
         double totalDistance = measureDistance(fromNode, toNode);
 
         // Assume that the travel velocity is maximum allowed
-        double vf = robot_.linearVelocityTravelMax();
-        unsigned int intervals = calculateIntervals(vf, ar);
-        double rampDistance = 0.5 * intervals * dT_ * vf;
+        double coastV = robot_.linearVelocityTravelMax();
+
+        unsigned int intervals = calculateIntervals(coastV, ar);
+        double rampDistance = 0.5 * intervals * dT_ * coastV;
 
         bool coasting = true;
         if (totalDistance < (2 * rampDistance))
         {
             // Recalculate the maximum achievable velocity
             // with the given acceleration
-            vf = sqrt(totalDistance * robot_.linearAccelerationTravelMax());
-            intervals = calculateIntervals(vf, ar);
+            coastV = sqrt(totalDistance * robot_.linearAccelerationTravelMax());
+            intervals = calculateIntervals(coastV, ar);
             coasting = false;
         }
 
@@ -168,8 +195,8 @@ private:
 
         // Acceleration
         vector<double> acceleration;
-        acceleration.push_back(0.0);
-        generateRamp(0.0, vf, intervals, acceleration);
+        // acceleration.push_back(initialV);
+        generateRamp(initialV, coastV, intervals, acceleration);
         for (auto vt : acceleration)
         {
             velocities.push_back(Velocity<>(t, vt, 0));
@@ -179,12 +206,17 @@ private:
         // Coast
         if (coasting)
         {
-            t += (totalDistance - 2 * rampDistance) / vf;
+            double tf = t + (totalDistance - 2 * rampDistance) / coastV;
+            while (t < tf)
+            {
+                velocities.push_back(Velocity<>(t, coastV, 0));
+                t += dT_;
+            }
         }
 
         // Deceleration
         vector<double> deceleration;
-        generateRamp(vf, 0.0, intervals, deceleration);
+        generateRamp(coastV, finalV, intervals, deceleration);
         for (auto vt : deceleration)
         {
             velocities.push_back(Velocity<>(t, vt, 0));
@@ -212,44 +244,15 @@ private:
         values.push_back(endValue);
     }
 
-    vector<SolutionNode<Grid2d>>& solution_;
-    RobotProfile& robot_;
     double dT_;
 
     double linearIncrement_;
+
+    double minVelocity_;
+
+    RobotProfile& robot_;
 };
 
 } // namespace srs
 
 #endif // TRAJECTORY_HPP_
-
-
-//static void solution2Pose(vector<SolutionNode<Grid2d>>& solution, vector<Pose<>>& poses)
-//{
-//    poses.clear();
-//
-//    // Remove the start solution node
-//    auto node = solution.begin();
-//    node++;
-//
-//    while (node != solution.end())
-//    {
-//        SearchPosition<Grid2d> position = node->action.position;
-//
-//        switch (node->action.actionType)
-//        {
-//            case SearchAction<Grid2d>::BACKWARD:
-//            case SearchAction<Grid2d>::FORWARD:
-//                poses.push_back(Pose<>(position.location.x, position.location.y, position.orientation));
-//                break;
-//
-//            case SearchAction<Grid2d>::ROTATE_180:
-//            case SearchAction<Grid2d>::ROTATE_M90:
-//            case SearchAction<Grid2d>::ROTATE_P90:
-//                break;
-//        }
-//
-//        node++;
-//    }
-//}
-

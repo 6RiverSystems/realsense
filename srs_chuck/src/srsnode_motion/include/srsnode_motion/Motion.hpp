@@ -15,9 +15,10 @@ using namespace srsnode_motion;
 
 #include <dynamic_reconfigure/server.h>
 
+#include <srslib_framework/planning/pathplanning/Trajectory.hpp>
 #include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
-#include <srslib_framework/ros/service/RosServiceTrigger.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
+#include <srslib_framework/ros/service/RosTriggerStop.hpp>
 
 #include <srsnode_motion/tap/aps/RosTapAps.hpp>
 #include <srsnode_motion/tap/goal_plan/RosTapGoalPlan.hpp>
@@ -53,6 +54,7 @@ private:
     void publishInformation();
 
     void scanTapsForData();
+    void sendVelocityCommand(Velocity<> command);
 
     bool commandUpdated_;
     DynamicConfig configuration_;
@@ -70,9 +72,7 @@ private:
 
     ros::NodeHandle rosNodeHandle_;
     tf::TransformBroadcaster rosTfBroadcaster_;
-
-    RosServiceTrigger triggerStop_;
-    RosTriggerShutdown triggerShutdown_;
+    Chuck robot_;
 
     RosTapAps tapAps_;
     RosTapGoalPlan tapPlan_;
@@ -80,6 +80,10 @@ private:
     RosTapBrainStemStatus tapBrainStemStatus_;
     RosTapOdometry tapOdometry_;
     RosTapInitialPose tapInitialPose_;
+    Trajectory trajectoryConverter_;
+    RosTriggerStop triggerStop_;
+    RosTriggerShutdown triggerShutdown_;
+
 };
 
 } // namespace srs

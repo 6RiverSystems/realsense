@@ -23,6 +23,7 @@ struct Grid2dUtils
         {
             for (int y = y1; y <= y2; ++y)
             {
+                // TODO: Fix this to match the new mechanism of notes
                 grid.addValue(Grid2d::LocationType(x, y), cost, const_cast<void*>(notes));
             }
         }

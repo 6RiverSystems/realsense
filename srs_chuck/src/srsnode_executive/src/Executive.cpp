@@ -106,7 +106,7 @@ void Executive::executePlanToGoal(Pose<> goal)
     Grid2d::LocationType internalStart(c, r);
 
     // tapMap_.getMap()->getMapCoordinates(goal.x, goal.y, c, r);
-    Grid2d::LocationType internalGoal(c + 1, r);
+    Grid2d::LocationType internalGoal(c + 10, r);
 
     algorithm_.search(
         SearchPosition<Grid2d>(internalStart, 0),

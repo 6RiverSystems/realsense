@@ -13,7 +13,7 @@ using namespace std;
 #include <srslib_framework/search/SolutionNode.hpp>
 #include <srslib_framework/planning/pathplanning/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
-#include <srslib_framework/robotics/controller/KanayamaController.hpp>
+#include <srslib_framework/robotics/controller/YoshizawaController.hpp>
 using namespace srs;
 
 typedef SolutionNode<Grid2d> SolutionType;
@@ -21,7 +21,7 @@ typedef SearchAction<Grid2d> SearchActionType;
 typedef SearchPosition<Grid2d> SearchPositionType;
 typedef SearchPosition<Grid2d>::LocationType LocationType;
 
-TEST(Test_Kanayama, Usage)
+TEST(Test_Yoshizawa, Usage)
 {
     Grid2d grid(10, 10);
 
@@ -48,24 +48,22 @@ TEST(Test_Kanayama, Usage)
 
     Trajectory::TrajectoryType trajectory;
 
-    Trajectory trajectoryConverter(solution, chuck, 0.1);
-    trajectoryConverter.getTrajectory(Pose<>(), trajectory);
+    Trajectory trajectoryConverter(chuck, 0.1);
+    trajectoryConverter.getTrajectory(solution, trajectory);
 
     for (auto milestone : trajectory)
     {
         cout << milestone.first << milestone.second << endl;
     }
 
-    KanayamaController controller(10, 6.4e-3, 0.16);
+    YoshizawaController controller(0.1, 0.9);
 
     Trajectory::MilestoneType milestone = *(trajectory.begin() + 1);
-    controller.setReference(milestone.first, milestone.second);
+    controller.setReference(milestone.first);
 
     Pose<> pose(0, 0, 0.1, 0);
     Velocity<> velocity;
 
-    //controller.step(pose, velocity);
-    Velocity<> command = controller.getCommand();
-
-    cout << command << endl;
+//    Velocity<> command = controller.step(pose);
+//    cout << command << endl;
 }

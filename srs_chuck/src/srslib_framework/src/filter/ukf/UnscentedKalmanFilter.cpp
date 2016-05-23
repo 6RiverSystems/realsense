@@ -43,6 +43,7 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::run(BaseType dT,
     update();
 
     Math::checkRange(state_, UNDERFLOW_THRESHOLD, BaseType());
+    Math::checkRange(covariance_, UNDERFLOW_THRESHOLD, BaseType());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

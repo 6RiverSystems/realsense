@@ -73,7 +73,7 @@ void MapServer::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MapServer::evaluateTriggers()
 {
-    if (triggerShutdown_.isShutdownRequested())
+    if (triggerShutdown_.isTriggerRequested())
     {
         ros::shutdown();
     }

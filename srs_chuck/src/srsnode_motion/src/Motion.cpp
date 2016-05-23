@@ -11,7 +11,6 @@
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
 #include <srslib_framework/search/SolutionNode.hpp>
-#include <srslib_framework/planning/pathplanning/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 
 namespace srs {
@@ -27,6 +26,7 @@ Motion::Motion(string nodeName) :
     rosNodeHandle_(nodeName),
     positionEstimator_(),
     motionController_(),
+    robot_(),
     tapPlan_(rosNodeHandle_),
     tapJoyAdapter_(rosNodeHandle_),
     tapBrainStemStatus_(rosNodeHandle_),
@@ -34,7 +34,9 @@ Motion::Motion(string nodeName) :
     tapInitialPose_(rosNodeHandle_),
     tapAps_(rosNodeHandle_),
     triggerShutdown_(rosNodeHandle_),
-    triggerStop_(rosNodeHandle_, "Trigger: Stop", "trg/stop")
+    triggerStop_(rosNodeHandle_),
+    trajectoryConverter_(robot_, 1.0 / REFRESH_RATE_HZ)
+
 {
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 100);
     pubOdometry_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("odometry", 50);
@@ -77,9 +79,23 @@ void Motion::run()
         evaluateTriggers();
         scanTapsForData();
 
+        // TODO: For now the position estimator ignores the command
         Velocity<>* command = commandUpdated_ ? &currentCommand_ : nullptr;
-        positionEstimator_.run(dT, command);
-        motionController_.run(dT, positionEstimator_.getPose(), command);
+        positionEstimator_.run(dT, nullptr);
+
+        if (!triggerStop_.isTriggerRequested())
+        {
+            motionController_.run(dT, positionEstimator_.getPose());
+        }
+        else
+        {
+            motionController_.stop(0);
+        }
+
+        if (motionController_.newCommandAvailable())
+        {
+            sendVelocityCommand(motionController_.getExecutingCommand());
+        }
 
         publishInformation();
 
@@ -118,7 +134,7 @@ void Motion::disconnectAllTaps()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::evaluateTriggers()
 {
-    if (triggerShutdown_.isShutdownRequested())
+    if (triggerShutdown_.isTriggerRequested())
     {
         ros::shutdown();
     }
@@ -129,11 +145,17 @@ void Motion::onConfigChange(DynamicConfig& config, uint32_t level)
 {
     configuration_ = config;
 
+    tapAps_.getSensor()->enable(configuration_.aps_enabled);
+    ROS_INFO_STREAM("APS sensor enabled: " << configuration_.aps_enabled);
+
     tapOdometry_.getSensor()->enable(configuration_.odometry_enabled);
     ROS_INFO_STREAM("Odometry sensor enabled: " << configuration_.odometry_enabled);
 
-    tapAps_.getSensor()->enable(configuration_.aps_enabled);
-    ROS_INFO_STREAM("APS sensor enabled: " << configuration_.aps_enabled);
+    motionController_.setLookAhead(configuration_.look_ahead);
+    ROS_INFO_STREAM("Motion controller look-ahead: " << configuration_.look_ahead);
+
+    trajectoryConverter_.setMinimumVelocity(configuration_.min_velocity);
+    ROS_INFO_STREAM("Motion controller minimum velocity: " << configuration_.min_velocity);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,21 +201,21 @@ void Motion::publishInformation()
 
     // Publish the Odometry
     pubOdometry_.publish(messageOdometry);
+}
 
-    if (motionController_.newCommandAvailable())
-    {
-        Velocity<> command = motionController_.getExecutingCommand();
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::sendVelocityCommand(Velocity<> command)
+{
+    geometry_msgs::Twist messageTwist;
 
-        geometry_msgs::Twist messageCmdVel;
-        messageCmdVel.linear.x = command.linear;
-        messageCmdVel.linear.y = 0;
-        messageCmdVel.linear.z = 0;
-        messageCmdVel.angular.x = 0;
-        messageCmdVel.angular.y = 0;
-        messageCmdVel.angular.z = command.angular;
+    messageTwist.linear.x = command.linear;
+    messageTwist.linear.y = 0;
+    messageTwist.linear.z = 0;
+    messageTwist.angular.x = 0;
+    messageTwist.angular.y = 0;
+    messageTwist.angular.z = command.angular;
 
-        pubCmdVel_.publish(messageCmdVel);
-    }
+    pubCmdVel_.publish(messageTwist);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,26 +245,15 @@ void Motion::scanTapsForData()
         reset();
     }
 
-//    // If there is a new plan to execute
-//    if (tapPlan_.newDataAvailable())
-//    {
-//        trajectory_.clear();
-//
-//        Chuck chuck;
-//        vector<SolutionNode<Grid2d>> solution = tapPlan_.getGoalPlan();
-//
-//        Trajectory trajectoryConverter(solution, chuck, 1.0 / REFRESH_RATE_HZ);
-//        //trajectoryConverter.solution2trajectory(trajectory_);
-//
-//        for (auto milestone : trajectory_)
-//        {
-//            ROS_DEBUG_STREAM("Executing: " << milestone.first << " - " << milestone.second);
-//        }
-//
-//        executionTime_ = 0.0;
-//        nextScheduled_ = trajectory_.begin();
-//        nextScheduledTime_ = nextScheduled_->first.arrivalTime;
-//    }
+    // If there is a new plan to execute
+    if (tapPlan_.newDataAvailable())
+    {
+        vector<SolutionNode<Grid2d>> solution = tapPlan_.getPlan();
+        Trajectory::TrajectoryType currentTrajectory_;
+
+        trajectoryConverter_.getTrajectory(solution, currentTrajectory_);
+        motionController_.setTrajectory(currentTrajectory_);
+    }
 }
 
 } // namespace srs

@@ -27,6 +27,8 @@ struct SolutionNode
         return stream << " (" << solutionNode.action << ") ";
     }
 
+    // TODO: Separate the solution from search action
+    // TODO: Should the solution be in radians instead of the degrees of the search action?
     SearchAction<GRAPH> action;
 };
 

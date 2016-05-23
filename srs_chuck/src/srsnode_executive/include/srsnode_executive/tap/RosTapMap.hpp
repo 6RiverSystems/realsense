@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPJOY_HPP_
-#define ROSTAPJOY_HPP_
+#ifndef ROSTAPMAP_HPP_
+#define ROSTAPMAP_HPP_
 
 #include <string>
 using namespace std;
@@ -56,4 +56,4 @@ private:
 
 } // namespace srs
 
-#endif // ROSTAPJOY_HPP_
+#endif // ROSTAPMAP_HPP_

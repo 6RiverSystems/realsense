@@ -41,7 +41,7 @@ public:
         return grid_;
     }
 
-    void getMapCoordinates(double x, double y, int c, int r);
+    void getMapCoordinates(double x, double y, int& c, int& r);
     void getCostsGrid(vector<int8_t>& costGrid);
     void getNotesGrid(vector<int8_t>& notesGrid);
 
@@ -72,7 +72,7 @@ public:
 
     void load(string filename);
 
-    void setGrid(vector<int8_t>& costGrid, vector<int8_t>& notesGrid);
+    void setGrid(const vector<int8_t>& costGrid, const vector<int8_t>& notesGrid);
 
 private:
     const unsigned char FLAG_OD = 0x80;

@@ -37,7 +37,9 @@ Map::Map(double widthMeters, double heightMeters, double resolution) :
         widthC_(0),
         widthM_(widthMeters)
 {
-    getMapCoordinates(widthMeters, heightMeters, widthC_, heightC_);
+    widthC_ = static_cast<int>(ceil(widthMeters / resolution_));
+    heightC_ = static_cast<int>(ceil(heightMeters / resolution_));
+
     grid_ = new Grid2d(widthC_, heightC_);
 }
 
@@ -51,7 +53,7 @@ Map::~Map()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Map::getMapCoordinates(double x, double y, int c, int r)
+void Map::getMapCoordinates(double x, double y, int& c, int& r)
 {
     c = static_cast<int>(floor(x / resolution_));
     r = static_cast<int>(floor(y / resolution_));
@@ -144,25 +146,32 @@ void Map::load(string filename)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Map::setGrid(vector<int8_t>& costGrid, vector<int8_t>& notesGrid)
+void Map::setGrid(const vector<int8_t>& costGrid, const vector<int8_t>& notesGrid)
 {
     if (grid_)
     {
+        auto costsIterator = costGrid.begin();
+        auto notesIterator = notesGrid.begin();
+
+        int counter = 0;
+
         for (int row = 0; row < grid_->getHeight(); row++)
         {
             for (int col = 0; col < grid_->getWidth(); col++)
             {
                 Grid2dLocation location = Grid2dLocation(col, row);
-                int index = row * grid_->getHeight() + col;
-
-                int8_t cost = costGrid[index];
-                int8_t noteFlags = notesGrid[index];
 
                 SearchPositionNote* note = reinterpret_cast<SearchPositionNote*>(
                     grid_->getNote(location));
 
-                note = createNote(noteFlags, note);
+                unsigned char notes = static_cast<unsigned char>(*notesIterator);
+                unsigned int cost = static_cast<unsigned int>(*costsIterator);
+
+                note = createNote(notes, note);
                 grid_->addValue(location, cost, note);
+
+                costsIterator++;
+                notesIterator++;
             }
         }
     }

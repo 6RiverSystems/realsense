@@ -70,7 +70,7 @@ private:
 
     RosTapMap tapMap_;
 
-    int inc_;
+    //int inc_;
 };
 
 } // namespace srs

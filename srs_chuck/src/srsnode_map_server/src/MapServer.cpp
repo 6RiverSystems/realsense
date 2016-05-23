@@ -51,14 +51,15 @@ void MapServer::run()
 {
     triggerShutdown_.connectService();
 
+    // TODO: For not the map is published only once and latched. There should be
+    // a more intelligent way to publish the map only when things change
+    ros::spinOnce();
+    publishMap();
+
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
     {
         ros::spinOnce();
-
-        // TODO: For not the map is published only once and latched. There should be
-        // a more intelligent way to publish the map only when things change
-        publishMap();
 
         evaluateTriggers();
 
@@ -82,7 +83,14 @@ void MapServer::evaluateTriggers()
 bool MapServer::onMapCoordinatesRequested(MapCoordinates::Request& req,
     MapCoordinates::Response& resp)
 {
-    map_.getMapCoordinates(req.x, req.y, resp.c, resp.r);
+    int r = 0;
+    int c = 0;
+
+    map_.getMapCoordinates(req.x, req.y, c, r);
+
+    resp.c = c;
+    resp.r = r;
+
     return true;
 }
 

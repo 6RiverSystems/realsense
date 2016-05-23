@@ -17,7 +17,7 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Executive::Executive(string nodeName) :
     currentGoal_(),
-    inc_(0),
+    //inc_(0),
     rosNodeHandle_(nodeName),
     robotCurrentPose_(),
     robotInitialPose_(),
@@ -84,7 +84,7 @@ void Executive::disconnectAllTaps()
 void Executive::executeInitialPose(Pose<> initialPose)
 {
     robotInitialPose_ = tapCmdInitialPose_.getRobotPose();
-    inc_ = 0;
+    //inc_ = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,14 +99,14 @@ void Executive::executePlanToGoal(Pose<> goal)
 
     algorithm_.setGraph(tapMap_.getMap()->getGrid());
 
-    unsigned int r = 0;
-    unsigned int c = 0;
+    int r = 0;
+    int c = 0;
 
     tapMap_.getMap()->getMapCoordinates(robotCurrentPose_.x, robotCurrentPose_.y, c, r);
     Grid2d::LocationType internalStart(c, r);
 
-    tapMap_.getMap()->getMapCoordinates(goal.x, goal.y, c, r);
-    Grid2d::LocationType internalGoal(c, r);
+    // tapMap_.getMap()->getMapCoordinates(goal.x, goal.y, c, r);
+    Grid2d::LocationType internalGoal(c + 1, r);
 
     algorithm_.search(
         SearchPosition<Grid2d>(internalStart, 0),
@@ -167,7 +167,7 @@ void Executive::findActiveNodes(vector<string>& nodes)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::publishGoal()
 {
-    inc_++;
+    //inc_++;
 
     vector<SolutionNode<Grid2d>> path = algorithm_.getPath();
 
@@ -190,8 +190,8 @@ void Executive::publishGoal()
         geometry_msgs::PoseStamped poseStamped;
         tf::Quaternion quaternion = tf::createQuaternionFromYaw(node.action.position.orientation);
 
-        poseStamped.pose.position.x = 2.0 + node.action.position.location.x;
-        poseStamped.pose.position.y = inc_ + node.action.position.location.y;
+        poseStamped.pose.position.x = /*2.0 + */node.action.position.location.x;
+        poseStamped.pose.position.y = /*inc_ + */node.action.position.location.y;
         poseStamped.pose.position.z = 0.0;
         poseStamped.pose.orientation.x = quaternion.x();
         poseStamped.pose.orientation.y = quaternion.y();

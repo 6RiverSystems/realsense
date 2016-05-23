@@ -9,6 +9,7 @@
 #include <ros/ros.h>
 
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
+#include <srslib_framework/ros/service/RosTriggerPause.hpp>
 
 namespace srs {
 
@@ -30,6 +31,7 @@ private:
     ros::NodeHandle rosNodeHandle_;
 
     RosTriggerShutdown triggerShutdown_;
+    RosTriggerPause triggerPause_;
 };
 
 } // namespace srs

@@ -83,7 +83,7 @@ void Motion::run()
 	        Velocity<>* command = commandUpdated_ ? &currentCommand_ : nullptr;
 	        positionEstimator_.run(dT, command);
 	        motionController_.run(dT, positionEstimator_.getPose());
-			sendVelocityCommand(motionController_.getExecutingCommand());
+			sendVelocityCommand(*command);
 		}
 		else
 		{

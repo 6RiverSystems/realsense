@@ -21,30 +21,38 @@ class MappedPriorityQueue
 {
 public:
     // TODO: Implement begin() and end() for foreach operations
+    // TODO: Recycle the empty buckets to improve performance and memory management
 
     bool empty() const
     {
-        return itemsMap_.empty();
+        return indexMap_.empty();
     }
 
     void erase(TYPE item)
     {
-        PRIORITY priority = itemsMap_[item];
-        itemsMap_.erase(item);
+        PRIORITY priority = indexMap_[item];
+        indexMap_.erase(item);
 
-        BucketType& bucket = priorityQueue_[priority];
-        bucket.erase(item);
+        BucketType* bucket = priorityQueue_[priority];
+        bucket->erase(item);
+
+        if (bucket->empty())
+        {
+            priorityQueue_.erase(priority);
+            delete bucket;
+        }
     }
 
     bool exists(TYPE item)
     {
-        return itemsMap_.count(item);
+        auto result = indexMap_.find(item);
+        return result != indexMap_.end();
     }
 
     TYPE find(TYPE item)
     {
-        auto result = itemsMap_.find(item);
-        if (result == itemsMap_.end())
+        auto result = indexMap_.find(item);
+        if (result == indexMap_.end())
         {
             return TYPE();
         }
@@ -63,23 +71,21 @@ public:
         }
 
 //        stream << "MappedPriorityQueue {" << '\n';
-//        for (auto bucket : queue.priorityQueue_)
+//        stream << "Buckets" << endl;
+//        for (auto bucketIterator : queue.priorityQueue_)
 //        {
-//            stream << bucket.first << ": {" << endl;
-//            for (auto item : bucket.second)
+//            stream << bucketIterator.first << ": {" << endl;
+//            for (auto item : *bucketIterator.second)
 //            {
 //                stream << item << '\n';
 //            }
 //            stream << "}" << '\n';
 //        }
 //
-//        stream << "Items map" << endl;
-//        for (auto item : queue.itemsMap_)
+//        stream << "Index map" << endl;
+//        for (auto item : queue.indexMap_)
 //        {
-//            stream << "(\n" <<
-//                item.first << '\n' <<
-//                "priority: " << item.second << "\n" <<
-//                ")\n";
+//            stream << "(" << item.first << "  priority: " << item.second << ")\n";
 //        }
 //
 //        stream << "}";
@@ -89,41 +95,58 @@ public:
 
     bool pop(TYPE& item)
     {
-        if (itemsMap_.empty())
+        if (indexMap_.empty())
         {
             return false;
         }
 
-        auto mapIter = priorityQueue_.begin();
-        BucketType& bucket = mapIter->second;
+        auto lowestBucketIterator = priorityQueue_.begin();
+        BucketType* bucket = lowestBucketIterator->second;
+        PRIORITY key = lowestBucketIterator->first;
 
-        auto bucketIter = bucket.begin();
-        item = *bucketIter;
+        auto itemIterator = bucket->begin();
 
-        bucket.erase(bucketIter);
-        itemsMap_.erase(item);
-        if (bucket.empty())
+        item = *itemIterator;
+        bucket->erase(itemIterator);
+
+        if (bucket->empty())
         {
-            priorityQueue_.erase(mapIter);
+            priorityQueue_.erase(key);
+            delete bucket;
         }
+
+        indexMap_.erase(item);
 
         return true;
     }
 
     void push(PRIORITY priority, TYPE item)
     {
-        BucketType& bucket = priorityQueue_[priority];
-        bucket.insert(item);
+        auto bucketIterator = priorityQueue_.find(priority);
 
-        itemsMap_[item] = priority;
+        BucketType* bucket;
+
+        if (bucketIterator != priorityQueue_.end())
+        {
+            bucket = bucketIterator->second;
+        }
+        else
+        {
+            bucket = new BucketType();
+        }
+
+        bucket->insert(item);
+
+        priorityQueue_[priority] = bucket;
+        indexMap_[item] = priority;
     }
 
 private:
     typedef unordered_set<TYPE> BucketType;
-    typedef map<PRIORITY, BucketType, less<PRIORITY>> MapType;
+    typedef map<PRIORITY, BucketType*, less<PRIORITY>> MapType;
 
     MapType priorityQueue_;
-    unordered_map<TYPE, PRIORITY, HASH> itemsMap_;
+    unordered_map<TYPE, PRIORITY, HASH> indexMap_;
 };
 
 } // namespace srs

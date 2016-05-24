@@ -64,7 +64,7 @@ struct equal_to<srs::SearchNode<GRAPH>*>
 {
     bool operator()(const srs::SearchNode<GRAPH>* lhs, const srs::SearchNode<GRAPH>* rhs) const
     {
-        return lhs->action.position == rhs->action.position;
+        return (lhs == rhs) || (lhs->action.position == rhs->action.position);
     }
 };
 

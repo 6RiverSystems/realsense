@@ -135,9 +135,6 @@ public:
 
         while (!open_.empty())
         {
-
-            cout << open_ << endl;
-
             open_.pop(currentNode);
             if (*currentNode == goalNode)
             {
@@ -152,8 +149,6 @@ public:
             }
 
             closed_.insert(currentNode);
-
-            cout << "c: " << currentNode << endl;
 
             for (auto action : SearchAction<GRAPH>::ACTIONS)
             {

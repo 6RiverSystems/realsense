@@ -227,7 +227,7 @@ void Motion::sendVelocityCommand(Velocity<> command)
 void Motion::scanTapsForData()
 {
     // If APS has reported a position and it is the first time that Motion
-    // get it, make sure that the Position Estimator knows of it.
+    // gets it, make sure that the Position Estimator knows of it.
     if (!tapAps_.hasNeverReported() && firstLocalization_)
     {
         positionEstimator_.reset(tapAps_.getPose());
@@ -257,7 +257,11 @@ void Motion::scanTapsForData()
 
     if (tapInitialPose_.newDataAvailable())
     {
+        // If we are given an initial position,
+        // we won't need to wait for a first localization
+        firstLocalization_ = false;
         reset();
+
     }
 
 //    // If there is a new plan to execute
@@ -274,7 +278,7 @@ void Motion::scanTapsForData()
     // If there is a new goal to reach
     if (tapCmdGoal_.newDataAvailable())
     {
-//        executePlanToGoal(tapCmdGoal_.getGoal());
+        executePlanToGoal(tapCmdGoal_.getGoal());
     }
 }
 

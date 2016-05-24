@@ -34,7 +34,7 @@
       </gazebo>
  
     <joint name="base_footprint_joint" type="fixed">
-        <origin xyz="0 0 ${base_y_offset + base_z_size/2}" rpy="0 0 0" />
+        <origin xyz="0 0 ${base_z_offset + base_z_size/2}" rpy="0 0 0" />
         <parent link="base_footprint" />
         <child link="base_link" />
     </joint>
@@ -101,7 +101,8 @@
     <caster fb="back" parent="base_link" translateX="${caster_back_x_offset}" translateY="0" translateZ="${caster_z_offset}" />
 
 	<!-- Realsense R200 -->
-	<sensor_r200 parent="base_link" r200_cam_y_rotation="${M_PI}" r200_cam_px="${base_x_size/2}" r200_cam_py="${-r200_cam_rgb_py/2}" r200_cam_pz="${r200_cam_rgb_pz/2}" />
+	
+	<sensor_r200 parent="base_link" r200_cam_y_rotation="${M_PI}" r200_cam_px="${base_x_size/2}" r200_cam_py="${r200_cam_y_size/2}" r200_cam_pz="${r200_cam_z_size + realsense_z_offset}" />
 
     <!-- Differential drive controller  -->
     <gazebo>

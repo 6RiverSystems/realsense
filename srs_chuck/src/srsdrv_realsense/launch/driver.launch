@@ -49,30 +49,38 @@
         <remap from="~input" to="/camera/depth/points" />
         <rosparam>
             filter_field_name: z
-            filter_limit_min: 0.01
-            filter_limit_max: 1.5
-            filter_limit_negative: True
-            leaf_size: 0.01
+            filter_limit_min: -0.1
+            filter_limit_max: 1000
+            filter_limit_negative: False
+            leaf_size: 0.025
         </rosparam>
-    </node>
+ 	</node>
 
-	<node pkg="nodelet" type="nodelet" name="PassThrough" args="load pcl/PassThrough pcl_manager" output="screen">
-        <remap from="~input" to="/VoxelGrid/output"/>
+   <!-- <node pkg="nodelet" type="nodelet" name="PassThrough" args="load pcl/PassThrough pcl_manager" output="screen">
+        <remap from="~input" to="/camera/depth/points"/>
         <rosparam>
             filter_field_name: z
-            filter_limit_min: 0.3
+            filter_limit_min: 0.02
             filter_limit_max: 3.5
             filter_limit_negative: False
         </rosparam>
-	</node>
+	</node> -->
 
 	<node pkg="nodelet" type="nodelet" name="StatisticalOutlier" args="load pcl/StatisticalOutlierRemoval pcl_manager" output="screen">
-        <remap from="~input" to="/PassThrough/output"/>
+        <remap from="~input" to="/VoxelGrid/output"/>
         <rosparam>
                mean_k: 10
-               stddev: 0.01
+               stddev: 0.05
         </rosparam>
 	</node>
+
+	<!-- <node pkg="nodelet" type="nodelet" name="RadiusOutlier" args="load pcl/RadiusOutlierRemoval pcl_manager" output="screen">
+        <remap from="~input" to="/VoxelGrid/output"/>
+        <rosparam>
+               radius_search: 0.05
+               min_neighbors: 20
+        </rosparam>
+	</node> -->
     
     <!-- push pointcloud_to_laserscan nodelet into sensor's nodelet manager-->
     <node pkg="nodelet" type="nodelet" name="pointcloud_to_laserscan" args="load pointcloud_to_laserscan/pointcloud_to_laserscan_nodelet standalone_nodelet">
@@ -82,7 +90,7 @@
         <rosparam>
             target_frame: map # Leave disabled to output scan in pointcloud frame
             transform_tolerance: 0.01
-            min_height: 0.0
+            min_height: 0.05
             max_height: 1.0
 
             angle_min: -1.5708 # -M_PI/2

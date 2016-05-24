@@ -8,6 +8,10 @@
     <arg name="headless" default="false" />
     <arg name="debug" default="true" />
 
+    <!-- Launch visualization in rviz -->
+    <node name="rviz" pkg="rviz" type="rviz" 
+        args="-d $(find srsc_6rhq)/rviz/config.rviz" 
+        required="true" />
 
     <!-- Spawn a robot into Gazebo -->
     <!-- 

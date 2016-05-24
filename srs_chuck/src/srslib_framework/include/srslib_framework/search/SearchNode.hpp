@@ -31,7 +31,7 @@ struct SearchNode
     {
         stream << hex << reinterpret_cast<long>(searchNode) << dec;
         stream << " (g: " << searchNode->action.g << ", h: " << searchNode->action.h << ") ";
-        stream << searchNode->position;
+        stream << searchNode->action.position;
 
         return stream;
     }

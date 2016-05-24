@@ -8,34 +8,30 @@
 #include <vector>
 using namespace std;
 
+#include <srslib_framework/math/Math.hpp>
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
-#include <srslib_framework/search/SolutionNode.hpp>
+#include <srslib_framework/planning/pathplanning/SolutionNode.hpp>
 #include <srslib_framework/planning/pathplanning/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 #include <srslib_framework/robotics/controller/YoshizawaController.hpp>
 using namespace srs;
 
 typedef SolutionNode<Grid2d> SolutionType;
-typedef SearchAction<Grid2d> SearchActionType;
-typedef SearchPosition<Grid2d> SearchPositionType;
-typedef SearchPosition<Grid2d>::LocationType LocationType;
+typedef SolutionNode<Grid2d>::LocationType LocationType;
 
 TEST(Test_Yoshizawa, Usage)
 {
     Grid2d grid(10, 10);
 
-    SolutionType SOLUTION_00 = SolutionType(
-        SearchActionType(SearchActionType::START,
-            SearchPositionType(LocationType(0, 0), 90)));
+    SolutionType SOLUTION_00 = SolutionType(SolutionType::START,
+        LocationType(0, 0), Math::deg2rad<double>(90), 0);
 
-    SolutionType SOLUTION_01 = SolutionType(
-        SearchActionType(SearchActionType::FORWARD,
-            SearchPositionType(LocationType(1, 0), 90)));
+    SolutionType SOLUTION_01 = SolutionType(SolutionType::FORWARD,
+        LocationType(1, 0),  Math::deg2rad<double>(90), 0);
 
-    SolutionType SOLUTION_02 = SolutionType(
-        SearchActionType(SearchActionType::GOAL,
-            SearchPositionType(LocationType(1, 0), 90)));
+    SolutionType SOLUTION_02 = SolutionType(SolutionType::GOAL,
+        LocationType(1, 0),  Math::deg2rad<double>(90), 0);
 
     // Create a sequence of commands
     vector<SolutionNode<Grid2d>> solution = {
@@ -48,8 +44,9 @@ TEST(Test_Yoshizawa, Usage)
 
     Trajectory::TrajectoryType trajectory;
 
-    Trajectory trajectoryConverter(chuck, 0.1);
-    trajectoryConverter.getTrajectory(solution, trajectory);
+    Trajectory trajectoryConverter(chuck, 1, 0.1);
+    trajectoryConverter.calculateTrajectory(solution);
+    trajectoryConverter.getTrajectory(trajectory);
 
     for (auto milestone : trajectory)
     {

@@ -35,6 +35,7 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/math/PoseMath.hpp
 
     include/${PROJECT_NAME}/planning/pathplanning/Trajectory.hpp
+    include/${PROJECT_NAME}/planning/pathplanning/SolutionNode.hpp
 
     include/${PROJECT_NAME}/platform/Object.hpp
     include/${PROJECT_NAME}/platform/Thread.hpp
@@ -52,10 +53,10 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapJoy.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapJoyAdapter.hpp
+    src/ros/tap/RosTapMap.cpp
 
     include/${PROJECT_NAME}/search/SearchAction.hpp
     include/${PROJECT_NAME}/search/SearchPosition.hpp
-    include/${PROJECT_NAME}/search/SolutionNode.hpp
     include/${PROJECT_NAME}/search/SearchNode.hpp
     include/${PROJECT_NAME}/search/AStar.hpp
     src/search/SearchPositionNote.cpp

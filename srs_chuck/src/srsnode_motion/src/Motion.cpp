@@ -10,7 +10,7 @@
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
-#include <srslib_framework/search/SolutionNode.hpp>
+#include <srslib_framework/planning/pathplanning/SolutionNode.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 
 namespace srs {
@@ -26,7 +26,7 @@ Motion::Motion(string nodeName) :
     positionEstimator_(),
     motionController_(),
     robot_(),
-    tapPlan_(rosNodeHandle_),
+    // tapPlan_(rosNodeHandle_),
     tapJoyAdapter_(rosNodeHandle_),
     tapBrainStemStatus_(rosNodeHandle_),
     tapOdometry_(rosNodeHandle_),
@@ -34,8 +34,9 @@ Motion::Motion(string nodeName) :
     tapAps_(rosNodeHandle_),
     triggerShutdown_(rosNodeHandle_),
     triggerStop_(rosNodeHandle_),
-    trajectoryConverter_(robot_, 1.0 / REFRESH_RATE_HZ)
-
+    trajectoryConverter_(robot_, 1.0 / REFRESH_RATE_HZ),
+    tapCmdGoal_(rosNodeHandle_),
+    tapMap_(rosNodeHandle_)
 {
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 100);
     pubOdometry_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("odometry", 50);
@@ -109,12 +110,15 @@ void Motion::connectAllTaps()
     tapBrainStemStatus_.connectTap();
     tapOdometry_.connectTap();
     tapInitialPose_.connectTap();
-    tapPlan_.connectTap();
+    //tapPlan_.connectTap();
     tapJoyAdapter_.connectTap();
     tapAps_.connectTap();
 
     triggerStop_.connectService();
     triggerShutdown_.connectService();
+
+    tapCmdGoal_.connectTap();
+    tapMap_.connectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,9 +127,12 @@ void Motion::disconnectAllTaps()
     tapBrainStemStatus_.disconnectTap();
     tapOdometry_.disconnectTap();
     tapInitialPose_.disconnectTap();
-    tapPlan_.disconnectTap();
+    //tapPlan_.disconnectTap();
     tapJoyAdapter_.disconnectTap();
     tapAps_.disconnectTap();
+
+    tapCmdGoal_.disconnectTap();
+    tapMap_.disconnectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,15 +249,51 @@ void Motion::scanTapsForData()
         reset();
     }
 
-    // If there is a new plan to execute
-    if (tapPlan_.newDataAvailable())
-    {
-        vector<SolutionNode<Grid2d>> solution = tapPlan_.getPlan();
-        Trajectory::TrajectoryType currentTrajectory_;
+//    // If there is a new plan to execute
+//    if (tapPlan_.newDataAvailable())
+//    {
+//        vector<SolutionNode<Grid2d>> solution = tapPlan_.getPlan();
+//        Trajectory::TrajectoryType currentTrajectory_;
+//
+//        trajectoryConverter_.calculateTrajectory(solution);
+//        trajectoryConverter_.getTrajectory(currentTrajectory_);
+//        motionController_.setTrajectory(currentTrajectory_);
+//    }
 
-        trajectoryConverter_.getTrajectory(solution, currentTrajectory_);
-        motionController_.setTrajectory(currentTrajectory_);
+    // If there is a new goal to reach
+    if (tapCmdGoal_.newDataAvailable())
+    {
+//        executePlanToGoal(tapCmdGoal_.getGoal());
     }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// TODO: This should be in Executive
+void Motion::executePlanToGoal(Pose<> goal)
+{
+     algorithm_.setGraph(tapMap_.getMap()->getGrid());
+
+    int r = 0;
+    int c = 0;
+
+    Pose<> currentPose = positionEstimator_.getPose();
+    tapMap_.getMap()->getMapCoordinates(currentPose.x, currentPose.y, c, r);
+    Grid2d::LocationType internalStart(c, r);
+
+    // tapMap_.getMap()->getMapCoordinates(goal.x, goal.y, c, r);
+    Grid2d::LocationType internalGoal(c + 10, r);
+
+    algorithm_.search(
+        SearchPosition<Grid2d>(internalStart, 0),
+        SearchPosition<Grid2d>(internalGoal, 0));
+
+    vector<SolutionNode<Grid2d>> solution = algorithm_.getPath(tapMap_.getMap()->getResolution());
+    Trajectory::TrajectoryType currentTrajectory_;
+
+    trajectoryConverter_.calculateTrajectory(solution);
+    trajectoryConverter_.getTrajectory(currentTrajectory_);
+    motionController_.setTrajectory(currentTrajectory_);
 }
 
 } // namespace srs

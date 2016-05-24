@@ -22,10 +22,11 @@ namespace srs {
 Motion::Motion(string nodeName) :
     commandUpdated_(false),
     currentCommand_(),
-    rosNodeHandle_(nodeName),
+    firstLocalization_(true),
     positionEstimator_(),
     motionController_(),
     robot_(),
+    rosNodeHandle_(nodeName),
     // tapPlan_(rosNodeHandle_),
     tapJoyAdapter_(rosNodeHandle_),
     tapBrainStemStatus_(rosNodeHandle_),
@@ -225,6 +226,14 @@ void Motion::sendVelocityCommand(Velocity<> command)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::scanTapsForData()
 {
+    // If APS has reported a position and it is the first time that Motion
+    // get it, make sure that the Position Estimator knows of it.
+    if (!tapAps_.hasNeverReported() && firstLocalization_)
+    {
+        positionEstimator_.reset(tapAps_.getPose());
+        firstLocalization_ = false;
+    }
+
     // If there is another source of command velocities, follow that request
     if (tapJoyAdapter_.newDataAvailable())
     {

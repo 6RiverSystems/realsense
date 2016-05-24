@@ -71,6 +71,8 @@ private:
     Velocity<> currentCommand_;
     ros::Time currentTime_;
 
+    bool firstLocalization_;
+
     MotionController motionController_;
 
     PositionEstimator positionEstimator_;

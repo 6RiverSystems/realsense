@@ -37,6 +37,11 @@ public:
         delete sensor_;
     }
 
+    Pose<> getPose()
+    {
+        return sensor_->getPose();
+    }
+
     ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* getSensor() const
     {
         return sensor_;

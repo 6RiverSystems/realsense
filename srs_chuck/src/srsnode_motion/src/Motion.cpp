@@ -78,23 +78,31 @@ void Motion::run()
         evaluateTriggers();
         scanTapsForData();
 
-        // TODO: For now the position estimator ignores the command
-        Velocity<>* command = commandUpdated_ ? &currentCommand_ : nullptr;
-        positionEstimator_.run(dT, nullptr);
+        if (tapJoyAdapter_.getLatchState())
+		{
+	        Velocity<>* command = commandUpdated_ ? &currentCommand_ : nullptr;
+	        positionEstimator_.run(dT, command);
+	        motionController_.run(dT, positionEstimator_.getPose());
+			sendVelocityCommand(motionController_.getExecutingCommand());
+		}
+		else
+		{
+			positionEstimator_.run(dT, nullptr);
 
-        if (!triggerStop_.isTriggerRequested())
-        {
-            motionController_.run(dT, positionEstimator_.getPose());
-        }
-        else
-        {
-            motionController_.stop(0);
-        }
+			if (!triggerStop_.isTriggerRequested())
+			{
+				motionController_.run(dT, positionEstimator_.getPose());
+			}
+			else
+			{
+				motionController_.stop(0);
+			}
 
-        if (motionController_.newCommandAvailable())
-        {
-            sendVelocityCommand(motionController_.getExecutingCommand());
-        }
+			if (motionController_.newCommandAvailable())
+			{
+				sendVelocityCommand(motionController_.getExecutingCommand());
+			}
+		}
 
         publishInformation();
 

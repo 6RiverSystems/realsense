@@ -30,13 +30,16 @@
     </include>
 
     <!-- Launch all the robot nodes -->
+    <include file="$(find srsnode_joystick_adapter)/launch/node.launch" /> 
+
     <include file="$(find srsnode_map_server)/launch/node.launch">
         <arg name="target_map" value="$(arg target_map)" />
     </include>
-    <include file="$(find srsnode_reflexes)/launch/node.launch" />
+<!--
     <include file="$(find srsnode_motion)/launch/node.launch" />
+-->
+    <include file="$(find srsnode_midbrain)/launch/node.launch" />
     <include file="$(find srsnode_executive)/launch/node.launch" />
-    <include file="$(find srsnode_joystick_adapter)/launch/node.launch" /> 
 
     <!-- Launch the ros-bridge -->
     <!-- <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" /> -->

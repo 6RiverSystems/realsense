@@ -9,7 +9,6 @@ set(PROJECT_NAME srsnode_map_server)
 set(PROJECT_MAIN src/map_server.cpp)
 set(${PROJECT_NAME}_SOURCES
 
-    src/map/Map.cpp
     src/MapServer.cpp
 )
 
@@ -29,14 +28,11 @@ find_package(catkin REQUIRED COMPONENTS
     srslib_test
 )
 
-find_package(PkgConfig)
-pkg_check_modules(NEW_YAMLCPP yaml-cpp>=0.5)
-if(NEW_YAMLCPP_FOUND)
-add_definitions(-DHAVE_NEW_YAMLCPP)
-endif(NEW_YAMLCPP_FOUND)
-
-include_directories(include
+include_directories(
+    include/
     src/
+    test/
+    ${roscpp_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
     ${srslib_framework_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
@@ -55,8 +51,6 @@ add_executable(${PROJECT_NODE}
 )
 
 target_link_libraries(${PROJECT_NODE}
-    yaml-cpp
-    SDL SDL_image
     ${catkin_LIBRARIES}
     ${srslib_framework_LIBRARIES}
 )

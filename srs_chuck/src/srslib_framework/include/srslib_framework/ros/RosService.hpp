@@ -17,6 +17,7 @@ class RosService
 {
 public:
     RosService(ros::NodeHandle rosHandle, string serviceName = "") :
+        connected_(false),
         newRequestPending_(false),
         rosNodeHandle_(rosHandle),
         serviceName_(serviceName)

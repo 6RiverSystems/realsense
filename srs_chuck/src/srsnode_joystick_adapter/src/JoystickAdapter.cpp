@@ -96,7 +96,7 @@ void JoystickAdapter::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void JoystickAdapter::evaluateTriggers()
 {
-    if (triggerShutdown_.isShutdownRequested())
+    if (triggerShutdown_.isTriggerRequested())
     {
         ros::shutdown();
     }

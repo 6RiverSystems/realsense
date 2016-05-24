@@ -92,6 +92,10 @@ struct Math
                 {
                     *element = maxReplacement;
                 }
+                else if (isNan(*element))
+                {
+                    *element = minReplacement;
+                }
             }
         }
     }
@@ -99,7 +103,7 @@ struct Math
     template<typename TYPE = double>
     constexpr inline static TYPE deg2rad(TYPE deg)
     {
-        return TYPE(M_PI / 180) * deg;
+        return deg * TYPE(M_PI) / TYPE(180);
     }
 
     template<typename TYPE = double>
@@ -120,6 +124,16 @@ struct Math
     constexpr inline static TYPE inch2mm(TYPE inch)
     {
         return TYPE(25.4) * inch;
+    }
+
+    constexpr inline static bool isNan(double value)
+    {
+        return value != value;
+    }
+
+    constexpr inline static bool isNan(float value)
+    {
+        return value != value;
     }
 
     template<typename TYPE = double>
@@ -152,13 +166,13 @@ struct Math
     template<typename TYPE = double>
     constexpr inline static TYPE rad2deg(TYPE rad)
     {
-        return TYPE(180 / M_PI) * rad;
+        return rad * TYPE(180) / TYPE(M_PI);
     }
 
     template <typename TYPE = double>
-    constexpr inline static int sgn(TYPE value)
+    constexpr inline static TYPE sgn(TYPE value)
     {
-        return (TYPE(0) < value) - (value < TYPE(0));
+        return TYPE((TYPE(0) < value) - (value < TYPE(0)));
     }
 
     static cv::Mat zeros(const cv::Mat original)

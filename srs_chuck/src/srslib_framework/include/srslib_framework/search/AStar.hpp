@@ -14,7 +14,7 @@ using namespace std;
 
 #include <srslib_framework/datastructure/MappedPriorityQueue.hpp>
 
-#include <srslib_framework/search/SolutionNode.hpp>
+#include <srslib_framework/planning/pathplanning/SolutionNode.hpp>
 #include <srslib_framework/search/SearchNode.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
 
@@ -63,7 +63,7 @@ public:
         lastNode_ = nullptr;
     }
 
-    vector<SolutionNode<GRAPH>> getPath()
+    vector<SolutionNode<GRAPH>> getPath(double graphResolution = 1.0)
     {
         vector<SolutionNode<GRAPH>> result;
 
@@ -71,7 +71,43 @@ public:
         while (cursor)
         {
             SolutionNode<GRAPH> node;
-            node.action = cursor->action;
+
+            switch (cursor->action.actionType)
+            {
+                case SearchAction<GRAPH>::NONE:
+                    node.actionType = SolutionNode<GRAPH>::NONE;
+                    break;
+                case SearchAction<GRAPH>::START:
+                    node.actionType = SolutionNode<GRAPH>::START;
+                    break;
+                case SearchAction<GRAPH>::GOAL:
+                    node.actionType = SolutionNode<GRAPH>::GOAL;
+                    break;
+                case SearchAction<GRAPH>::FORWARD:
+                    node.actionType = SolutionNode<GRAPH>::FORWARD;
+                    break;
+                case SearchAction<GRAPH>::BACKWARD:
+                    node.actionType = SolutionNode<GRAPH>::BACKWARD;
+                    break;
+                case SearchAction<GRAPH>::ROTATE_M90:
+                    node.actionType = SolutionNode<GRAPH>::ROTATE_M90;
+                    break;
+                case SearchAction<GRAPH>::ROTATE_P90:
+                    node.actionType = SolutionNode<GRAPH>::ROTATE_P90;
+                    break;
+                case SearchAction<GRAPH>::ROTATE_180:
+                    node.actionType = SolutionNode<GRAPH>::ROTATE_180;
+                    break;
+            }
+
+            typename  SolutionNode<GRAPH>::LocationType location(
+                cursor->action.position.location.x * graphResolution,
+                cursor->action.position.location.y * graphResolution);
+
+            node.location = location;
+            node.orientation = Math::deg2rad<double>(cursor->action.position.orientation);
+
+            node.cost = cursor->action.getTotalCost();
 
             result.insert(result.begin(), node);
             cursor = cursor->parent;
@@ -99,6 +135,9 @@ public:
 
         while (!open_.empty())
         {
+
+            cout << open_ << endl;
+
             open_.pop(currentNode);
             if (*currentNode == goalNode)
             {
@@ -113,6 +152,8 @@ public:
             }
 
             closed_.insert(currentNode);
+
+            cout << "c: " << currentNode << endl;
 
             for (auto action : SearchAction<GRAPH>::ACTIONS)
             {
@@ -129,6 +170,8 @@ public:
                 }
             }
         }
+
+        return false;
     }
 
     void setGraph(GRAPH* const graph)

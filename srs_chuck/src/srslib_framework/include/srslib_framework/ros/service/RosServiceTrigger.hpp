@@ -22,7 +22,7 @@ class RosServiceTrigger :
 public:
     RosServiceTrigger(ros::NodeHandle rosHandle, string serviceName, string triggerName) :
         RosService(rosHandle, serviceName),
-        triggerName_(triggerName),
+        triggerName_("trigger/" + triggerName),
         triggerRequested_(false)
     {
     }
@@ -32,8 +32,12 @@ public:
 
     bool isTriggerRequested()
     {
-        setNewRequest(false);
-        return triggerRequested_;
+        if (newRequestPending())
+        {
+            setNewRequest(false);
+            return triggerRequested_;
+        }
+        return false;
     }
 
 protected:

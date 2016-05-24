@@ -16,6 +16,7 @@ set(${PROJECT_NAME}_SOURCES
 
     include/${PROJECT_NAME}/tap/initial_pose/RosTapInitialPose.hpp
 
+    include/${PROJECT_NAME}/tap/RosTapCmd_Goal.hpp
     include/${PROJECT_NAME}/tap/odometry/OdometrySensor.hpp
     include/${PROJECT_NAME}/tap/odometry/RosTapOdometry.hpp
 

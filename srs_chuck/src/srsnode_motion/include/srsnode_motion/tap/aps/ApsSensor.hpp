@@ -32,6 +32,11 @@ public:
 
     virtual cv::Mat getCurrentData();
 
+    Pose<BaseType> getPose()
+    {
+        return currentData_;
+    }
+
     void reset()
     {
         currentData_ = Pose<BaseType>(0, 0, 0);

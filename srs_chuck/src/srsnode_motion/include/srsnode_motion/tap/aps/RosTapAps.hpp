@@ -79,6 +79,8 @@ protected:
 private:
     void onAps(srslib_framework::ApsConstPtr message)
     {
+        ROS_INFO_STREAM("APS tap received data.");
+
         set(Time::time2number(message->header.stamp),
             static_cast<double>(message->x),
             static_cast<double>(message->y),

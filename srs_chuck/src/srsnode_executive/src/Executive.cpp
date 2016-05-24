@@ -32,7 +32,7 @@ Executive::Executive(string nodeName) :
     pubInitialPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseWithCovarianceStamped>(
         "initial_pose", 1);
 
-    robotInitialPose_ = Pose<>(0, 2.0, 2.0, 0);
+    robotInitialPose_ = Pose<>(0, 3.0, 2.0, 0);
     robotCurrentPose_ = robotInitialPose_;
 }
 
@@ -97,20 +97,20 @@ void Executive::executePlanToGoal(Pose<> goal)
 {
     currentGoal_ = goal;
 
-    algorithm_.setGraph(tapMap_.getMap()->getGrid());
-
-    int r = 0;
-    int c = 0;
-
-    tapMap_.getMap()->getMapCoordinates(robotCurrentPose_.x, robotCurrentPose_.y, c, r);
-    Grid2d::LocationType internalStart(c, r);
-
-    // tapMap_.getMap()->getMapCoordinates(goal.x, goal.y, c, r);
-    Grid2d::LocationType internalGoal(c + 10, r);
-
-    algorithm_.search(
-        SearchPosition<Grid2d>(internalStart, 0),
-        SearchPosition<Grid2d>(internalGoal, 0));
+//    algorithm_.setGraph(tapMap_.getMap()->getGrid());
+//
+//    int r = 0;
+//    int c = 0;
+//
+//    tapMap_.getMap()->getMapCoordinates(robotCurrentPose_.x, robotCurrentPose_.y, c, r);
+//    Grid2d::LocationType internalStart(c, r);
+//
+//    // tapMap_.getMap()->getMapCoordinates(goal.x, goal.y, c, r);
+//    Grid2d::LocationType internalGoal(c + 10, r);
+//
+//    algorithm_.search(
+//        SearchPosition<Grid2d>(internalStart, 0),
+//        SearchPosition<Grid2d>(internalGoal, 0));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -188,10 +188,10 @@ void Executive::publishGoal()
     for (auto node : path)
     {
         geometry_msgs::PoseStamped poseStamped;
-        tf::Quaternion quaternion = tf::createQuaternionFromYaw(node.action.position.orientation);
+        tf::Quaternion quaternion = tf::createQuaternionFromYaw(node.orientation);
 
-        poseStamped.pose.position.x = /*2.0 + */node.action.position.location.x;
-        poseStamped.pose.position.y = /*inc_ + */node.action.position.location.y;
+        poseStamped.pose.position.x = /*2.0 + */node.location.x;
+        poseStamped.pose.position.y = /*inc_ + */node.location.y;
         poseStamped.pose.position.z = 0.0;
         poseStamped.pose.orientation.x = quaternion.x();
         poseStamped.pose.orientation.y = quaternion.y();

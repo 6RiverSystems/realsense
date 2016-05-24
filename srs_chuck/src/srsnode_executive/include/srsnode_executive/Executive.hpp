@@ -9,13 +9,12 @@
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/AStar.hpp>
+#include <srslib_framework/ros/tap/RosTapMap.hpp>
 
 #include <srsnode_executive/tap/RosTapCmd_Goal.hpp>
 #include <srsnode_executive/tap/RosTapCmd_InitialPose.hpp>
 #include <srsnode_executive/tap/RosTapCmd_Pause.hpp>
 #include <srsnode_executive/tap/RosTapCmd_Shutdown.hpp>
-
-#include <srsnode_executive/tap/RosTapMap.hpp>
 
 namespace srs {
 

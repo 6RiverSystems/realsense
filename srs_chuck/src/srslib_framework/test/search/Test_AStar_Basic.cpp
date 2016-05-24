@@ -22,6 +22,7 @@ TEST(Test_AStar, SearchCreation)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
 
+    // TODO: Add something to the map: fix the following
 //    test::Grid2dUtils::addLocationCost(grid, 0, 0, 0, &SearchPositionNote::NO_ROTATIONS);
 //    test::Grid2dUtils::addLocationCost(grid, 0, 1, 0);
 //
@@ -34,7 +35,7 @@ TEST(Test_AStar, SearchCreation)
     Grid2d::LocationType start(0, 0);
     Grid2d::LocationType goal(GRID_SIZE - 1, GRID_SIZE - 1);
 
-    algorithm.search(SearchPosition<Grid2d>(start, 180), SearchPosition<Grid2d>(goal, 270));
+    algorithm.search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 0));
     vector<SolutionNode<Grid2d>> path = algorithm.getPath();
 
     for (auto node : path)

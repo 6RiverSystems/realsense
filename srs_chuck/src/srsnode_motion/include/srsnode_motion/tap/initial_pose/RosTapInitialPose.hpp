@@ -27,7 +27,7 @@ public:
 
     RosTapInitialPose(ros::NodeHandle rosHandle) :
         RosTap(rosHandle, "Initial Pose Tap"),
-        initialPose_(Pose<>(2.0, 2.0, 0.0))
+        initialPose_(Pose<>(3.0, 2.0, 0.0))
     {}
 
     ~RosTapInitialPose()

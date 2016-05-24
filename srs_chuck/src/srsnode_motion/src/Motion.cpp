@@ -232,6 +232,8 @@ void Motion::scanTapsForData()
     {
         positionEstimator_.reset(tapAps_.getPose());
         firstLocalization_ = false;
+
+        ROS_INFO_STREAM("Reporting its first position " << tapAps_.getPose());
     }
 
     // If there is another source of command velocities, follow that request

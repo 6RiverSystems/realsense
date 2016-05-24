@@ -55,6 +55,8 @@ public:
     void reset()
     {
         sensor_->reset();
+
+        RosTap::reset();
     }
 
     void set(double arrivalTime, BaseType x, BaseType y, BaseType yaw)
@@ -65,6 +67,8 @@ public:
         {
             ROS_DEBUG_STREAM("APS sensor disabled. Ignoring readings.");
         }
+
+        setNewData(true);
     }
 
 protected:

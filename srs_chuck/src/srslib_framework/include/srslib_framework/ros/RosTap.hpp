@@ -60,7 +60,9 @@ public:
     }
 
     virtual void reset()
-    {}
+    {
+    	setNewData(false);
+    }
 
 protected:
     ros::NodeHandle rosNodeHandle_;

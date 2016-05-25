@@ -62,11 +62,11 @@ public:
 
     friend ostream& operator<<(ostream& stream, const MappedPriorityQueue& queue)
     {
-        for (auto bucket : queue.priorityQueue_)
+        for (auto bucketIterator : queue.priorityQueue_)
         {
-            for (auto item : bucket.second)
+            for (auto item : *bucketIterator.second)
             {
-                stream << bucket.first << ": " << item << '\n';
+                stream << bucketIterator.first << ": " << item << '\n';
             }
         }
 

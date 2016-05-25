@@ -1,10 +1,10 @@
 function map = mm_addStaticObstacle(map, x1, y1, x2, y2, envelope, costEnvelope)
 
     if nargin < 7
-        costEnvelope = 0;
+        costEnvelope = 255;
     end
     if nargin < 6
-        envelope = 0;
+        envelope = 0.8;
     end
     
     % Add the static obstacle

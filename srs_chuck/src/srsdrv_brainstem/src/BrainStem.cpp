@@ -24,7 +24,7 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
 	m_VelocitySubscriber( m_rosNodeHandle.subscribe<geometry_msgs::Twist>( "/cmd_vel", 100,
 		std::bind( &BrainStem::OnChangeVelocity, this, std::placeholders::_1 ) ) ),
 	m_OdometryRawPublisher( m_rosNodeHandle.advertise<geometry_msgs::TwistStamped>( "/sensors/odometry/raw", 1000 ) ),
-	m_ConnectedPublisher( m_rosNodeHandle.advertise<std_msgs::Bool>( "/brain_stem/connected", 1 ) ),
+	m_ConnectedPublisher( m_rosNodeHandle.advertise<std_msgs::Bool>( "/brain_stem/connected", 1, true) ),
 	m_llcmdSubscriber( m_rosNodeHandle.subscribe<std_msgs::String>( "/cmd_ll", 1000,
 		std::bind( &BrainStem::OnRosCallback, this, std::placeholders::_1 ) ) ),
 	m_llEventPublisher( m_rosNodeHandle.advertise<std_msgs::String>( "/ll_event", 50 ) ),

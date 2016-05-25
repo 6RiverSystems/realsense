@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 
 <robot name="sensor_r200" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_gazebo.urdf.xacro" />
-  <xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_properties.urdf.xacro" />
 
   <!-- Following values measured on the 3d model -->
   <xacro:property name="r200_cam_x_size" value="0.00759" />
@@ -108,7 +106,6 @@
   	  <child link="camera_depth_optical_frame" />
   	</joint>
   	<link name="camera_depth_optical_frame"/>
-  	
-  	<turtlebot_sim_3dsensor/>
+
   </xacro:macro>
 </robot>

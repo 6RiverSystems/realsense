@@ -29,6 +29,9 @@ cv::Mat OdometrySensor<STATE_SIZE, TYPE>::getCurrentData()
     state.v = currentData_.velocity.linear;
     state.omega = currentData_.velocity.angular;
 
+    //ROS_INFO_STREAM("getCurrentData Odometry: v: " << state.v
+    //	<< ", omega: " << state.omega);
+
     return state.getVectorForm();
 }
 

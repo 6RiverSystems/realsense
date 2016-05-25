@@ -256,12 +256,12 @@ void Motion::scanTapsForData()
 
     // If the brain stem is disconnected, simulate odometry
     // feeding the odometer the commanded velocity
-    if (!tapBrainStemStatus_.isBrainStemConnected())
-    {
-        tapOdometry_.set(Time::time2number(ros::Time::now()),
-            currentCommand_.linear,
-            currentCommand_.angular);
-    }
+//    if (!tapBrainStemStatus_.isBrainStemConnected())
+//    {
+//        tapOdometry_.set(Time::time2number(ros::Time::now()),
+//            currentCommand_.linear,
+//            currentCommand_.angular);
+//    }
 
     if (tapInitialPose_.newDataAvailable())
     {

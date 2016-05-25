@@ -70,7 +70,7 @@ public:
         }
 
         // Advance the state of the UKF
-        ukf_.run(dT, /*commandVelocity ? &command : */nullptr);
+        ukf_.run(dT, commandVelocity ? &command : nullptr);
     }
 
 private:

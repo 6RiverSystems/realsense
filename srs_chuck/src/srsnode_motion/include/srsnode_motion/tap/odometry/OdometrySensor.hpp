@@ -42,6 +42,9 @@ public:
     {
         if (Sensor<STATE_SIZE, TYPE>::isEnabled())
         {
+            //ROS_INFO_STREAM("set called on odometry: v: " << linear
+            //	<< ", omega: " << angular);
+
             currentData_ = Odometry<BaseType>(arrivalTime, linear, angular);
             Sensor<STATE_SIZE, TYPE>::setNewData(true);
         }

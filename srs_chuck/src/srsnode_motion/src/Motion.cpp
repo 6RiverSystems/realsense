@@ -78,23 +78,31 @@ void Motion::run()
         evaluateTriggers();
         scanTapsForData();
 
-        // TODO: For now the position estimator ignores the command
-        Velocity<>* command = commandUpdated_ ? &currentCommand_ : nullptr;
-        positionEstimator_.run(dT, nullptr);
+        if (tapJoyAdapter_.getLatchState())
+		{
+	        Velocity<>* command = commandUpdated_ ? &currentCommand_ : nullptr;
+	        positionEstimator_.run(dT, command);
+	        motionController_.run(dT, positionEstimator_.getPose());
+			sendVelocityCommand(*command);
+		}
+		else
+		{
+			positionEstimator_.run(dT, nullptr);
 
-        if (!triggerStop_.isTriggerRequested())
-        {
-            motionController_.run(dT, positionEstimator_.getPose());
-        }
-        else
-        {
-            motionController_.stop(0);
-        }
+			if (!triggerStop_.isTriggerRequested())
+			{
+				motionController_.run(dT, positionEstimator_.getPose());
+			}
+			else
+			{
+				motionController_.stop(0);
+			}
 
-        if (motionController_.newCommandAvailable())
-        {
-            sendVelocityCommand(motionController_.getExecutingCommand());
-        }
+			if (motionController_.newCommandAvailable())
+			{
+				sendVelocityCommand(motionController_.getExecutingCommand());
+			}
+		}
 
         publishInformation();
 
@@ -146,7 +154,7 @@ void Motion::evaluateTriggers()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::onConfigChange(DynamicConfig& config, uint32_t level)
+void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 {
     configuration_ = config;
 
@@ -248,12 +256,12 @@ void Motion::scanTapsForData()
 
     // If the brain stem is disconnected, simulate odometry
     // feeding the odometer the commanded velocity
-    if (!tapBrainStemStatus_.isBrainStemConnected())
-    {
-        tapOdometry_.set(Time::time2number(ros::Time::now()),
-            currentCommand_.linear,
-            currentCommand_.angular);
-    }
+//    if (!tapBrainStemStatus_.isBrainStemConnected())
+//    {
+//        tapOdometry_.set(Time::time2number(ros::Time::now()),
+//            currentCommand_.linear,
+//            currentCommand_.angular);
+//    }
 
     if (tapInitialPose_.newDataAvailable())
     {

@@ -103,7 +103,7 @@ void JoystickAdapter::evaluateTriggers()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void JoystickAdapter::onConfigChange(DynamicConfig& config, uint32_t level)
+void JoystickAdapter::onConfigChange(JoystickConfig& config, uint32_t level)
 {
     configuration_ = config;
 

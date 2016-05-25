@@ -58,7 +58,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(OpenCV REQUIRED)
 
 generate_dynamic_reconfigure_options(
-    cfg/dynamic-config.cfg
+    cfg/Motion.cfg
 )
 
 include_directories(

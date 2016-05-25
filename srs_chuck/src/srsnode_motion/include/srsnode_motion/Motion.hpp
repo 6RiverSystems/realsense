@@ -10,7 +10,7 @@
 #include <std_srvs/Empty.h>
 #include <tf/transform_broadcaster.h>
 
-#include <srsnode_motion/DynamicConfig.h>
+#include <srsnode_motion/MotionConfig.h>
 using namespace srsnode_motion;
 
 #include <dynamic_reconfigure/server.h>
@@ -56,7 +56,7 @@ private:
 
     void evaluateTriggers();
 
-    void onConfigChange(DynamicConfig& config, uint32_t level);
+    void onConfigChange(MotionConfig& config, uint32_t level);
 
     void publishInformation();
 
@@ -66,8 +66,8 @@ private:
     AStar<Grid2d> algorithm_; // TODO: Remove
 
     bool commandUpdated_;
-    DynamicConfig configuration_;
-    dynamic_reconfigure::Server<DynamicConfig> configServer_;
+    MotionConfig configuration_;
+    dynamic_reconfigure::Server<MotionConfig> configServer_;
     Velocity<> currentCommand_;
     ros::Time currentTime_;
 

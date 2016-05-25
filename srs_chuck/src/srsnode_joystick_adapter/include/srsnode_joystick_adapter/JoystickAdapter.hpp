@@ -9,7 +9,7 @@
 #include <string>
 using namespace std;
 
-#include <srsnode_joystick_adapter/DynamicConfig.h>
+#include <srsnode_joystick_adapter/JoystickConfig.h>
 using namespace srsnode_joystick_adapter;
 
 #include <dynamic_reconfigure/server.h>
@@ -36,10 +36,10 @@ private:
 
     void evaluateTriggers();
 
-    void onConfigChange(DynamicConfig& config, uint32_t level);
+    void onConfigChange(JoystickConfig& config, uint32_t level);
 
-    DynamicConfig configuration_;
-    dynamic_reconfigure::Server<DynamicConfig> configServer_;
+    JoystickConfig configuration_;
+    dynamic_reconfigure::Server<JoystickConfig> configServer_;
 
     bool joystickLatched_;
 

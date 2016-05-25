@@ -30,7 +30,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 generate_dynamic_reconfigure_options(
-    cfg/dynamic-config.cfg
+    cfg/Joystick.cfg
 )
 
 include_directories(

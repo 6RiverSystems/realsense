@@ -154,7 +154,7 @@ void Motion::evaluateTriggers()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::onConfigChange(DynamicConfig& config, uint32_t level)
+void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 {
     configuration_ = config;
 

@@ -63,7 +63,9 @@ public:
         lastNode_ = nullptr;
     }
 
-    vector<SolutionNode<GRAPH>> getPath(double graphResolution = 1.0)
+    // TODO: Instead of passing the resolution an object with the map coordinate transformation
+    // should be passed
+    vector<SolutionNode<GRAPH>> getPath(double graphResolution)
     {
         vector<SolutionNode<GRAPH>> result;
 
@@ -100,13 +102,13 @@ public:
                     break;
             }
 
-            typename  SolutionNode<GRAPH>::LocationType location(
-                cursor->action.position.location.x * graphResolution,
-                cursor->action.position.location.y * graphResolution);
+            double x = 0;
+            double y = 0;
+            getWorldCoordinates(graphResolution,
+                cursor->action.position.location.x, cursor->action.position.location.y,
+                x, y);
 
-            node.location = location;
-            node.orientation = Math::deg2rad<double>(cursor->action.position.orientation);
-
+            node.pose = Pose<>(x, y, Math::deg2rad<double>(cursor->action.position.orientation));
             node.cost = cursor->action.getTotalCost();
 
             result.insert(result.begin(), node);
@@ -175,6 +177,13 @@ public:
     }
 
 private:
+    // TODO: This should be in the map
+    void getWorldCoordinates(double resolution, int c, int r, double& x, double& y)
+    {
+        x = static_cast<double>(c) * resolution;
+        y = static_cast<double>(r) * resolution;
+    }
+
     void pushSearchNode(SearchNodeType* node)
     {
         if (!closed_.count(node))

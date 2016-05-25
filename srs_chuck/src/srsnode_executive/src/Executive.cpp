@@ -1,8 +1,6 @@
 #include <srsnode_executive/Executive.hpp>
 
 #include <ros/ros.h>
-#include <nav_msgs/Path.h>
-#include <geometry_msgs/PoseStamped.h>
 #include <std_srvs/Empty.h>
 
 #include <srslib_framework/math/Math.hpp>
@@ -27,8 +25,6 @@ Executive::Executive(string nodeName) :
     tapCmdShutdown_(rosNodeHandle_),
     tapMap_(rosNodeHandle_)
 {
-    pubGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>("current_goal/plan", 1);
-    pubGoalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>("current_goal/goal", 1);
     pubInitialPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseWithCovarianceStamped>(
         "initial_pose", 1);
 
@@ -41,7 +37,6 @@ void Executive::run()
 {
     connectAllTaps();
 
-    publishGoal();
     publishInitialPose();
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
@@ -165,61 +160,6 @@ void Executive::findActiveNodes(vector<string>& nodes)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Executive::publishGoal()
-{
-    //inc_++;
-
-    vector<SolutionNode<Grid2d>> path = algorithm_.getPath();
-
-    ros::Time planningTime = ros::Time::now();
-
-    cout << "=================== " << planningTime << endl;
-    for (auto node : path) {
-        cout << node << endl;
-    }
-    cout << endl;
-
-    nav_msgs::Path messageGoalPlan;
-    messageGoalPlan.header.frame_id = "map";
-    messageGoalPlan.header.stamp = planningTime;
-
-    vector<geometry_msgs::PoseStamped> planPoses;
-
-    for (auto node : path)
-    {
-        geometry_msgs::PoseStamped poseStamped;
-        tf::Quaternion quaternion = tf::createQuaternionFromYaw(node.orientation);
-
-        poseStamped.pose.position.x = /*2.0 + */node.location.x;
-        poseStamped.pose.position.y = /*inc_ + */node.location.y;
-        poseStamped.pose.position.z = 0.0;
-        poseStamped.pose.orientation.x = quaternion.x();
-        poseStamped.pose.orientation.y = quaternion.y();
-        poseStamped.pose.orientation.z = quaternion.z();
-        poseStamped.pose.orientation.w = quaternion.w();
-
-        planPoses.push_back(poseStamped);
-    }
-
-    messageGoalPlan.poses = planPoses;
-
-    geometry_msgs::PoseStamped messageGoal;
-    tf::Quaternion quaternion = tf::createQuaternionFromYaw(currentGoal_.theta);
-
-    messageGoal.header.stamp = planningTime;
-    messageGoal.pose.position.x = currentGoal_.x;
-    messageGoal.pose.position.y = currentGoal_.y;
-    messageGoal.pose.position.z = 0.0;
-    messageGoal.pose.orientation.x = quaternion.x();
-    messageGoal.pose.orientation.y = quaternion.y();
-    messageGoal.pose.orientation.z = quaternion.z();
-    messageGoal.pose.orientation.w = quaternion.w();
-
-    pubGoalGoal_.publish(messageGoal);
-    pubGoalPlan_.publish(messageGoalPlan);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::publishInitialPose()
 {
     geometry_msgs::PoseWithCovarianceStamped message;
@@ -249,7 +189,6 @@ void Executive::stepExecutiveFunctions()
     if (tapCmdGoal_.newDataAvailable())
     {
         executePlanToGoal(tapCmdGoal_.getGoal());
-        publishGoal();
     }
 
     if (tapCmdInitialPose_.newDataAvailable())

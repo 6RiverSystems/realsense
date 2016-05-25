@@ -48,12 +48,10 @@ struct Pose : public Object
 
     friend ostream& operator<<(ostream& stream, const Pose& pose)
     {
-        stream << "Pose {";
-        stream << "  arrivalTime: " << pose.arrivalTime << endl;
-        stream << "       x: " << pose.x << endl;
-        stream << "       y: " << pose.y << endl;
-        stream << "   theta: " << pose.theta << endl;
-        stream << "}" << endl;
+        stream << "Pose {a: " << pose.arrivalTime <<
+            ", x: " << pose.x <<
+            ", y: " << pose.y <<
+            ", t: " << pose.theta << "}";
 
         return stream;
     }

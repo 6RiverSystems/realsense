@@ -4,6 +4,8 @@
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
+#include <nav_msgs/Path.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <tf/transform_broadcaster.h>
 
 #include <srslib_framework/math/Time.hpp>
@@ -36,8 +38,10 @@ Motion::Motion(string nodeName) :
     triggerShutdown_(rosNodeHandle_),
     triggerStop_(rosNodeHandle_),
     trajectoryConverter_(robot_, 1.0 / REFRESH_RATE_HZ),
+
     tapCmdGoal_(rosNodeHandle_),
-    tapMap_(rosNodeHandle_)
+    tapMap_(rosNodeHandle_),
+    currentGoal_()
 {
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 100);
     pubOdometry_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("odometry", 50);
@@ -46,6 +50,9 @@ Motion::Motion(string nodeName) :
     positionEstimator_.addSensor(tapAps_.getSensor());
 
     configServer_.setCallback(boost::bind(&Motion::onConfigChange, this, _1, _2));
+
+    pubGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>("current_goal/plan", 1);
+    pubGoalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>("current_goal/goal", 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,30 +86,30 @@ void Motion::run()
         scanTapsForData();
 
         if (tapJoyAdapter_.getLatchState())
-		{
-	        Velocity<>* command = commandUpdated_ ? &currentCommand_ : nullptr;
-	        positionEstimator_.run(dT, command);
-	        motionController_.run(dT, positionEstimator_.getPose());
-			sendVelocityCommand(*command);
-		}
-		else
-		{
-			positionEstimator_.run(dT, nullptr);
+        {
+            Velocity<>* command = commandUpdated_ ? &currentCommand_ : nullptr;
+            positionEstimator_.run(dT, command);
+            motionController_.run(dT, positionEstimator_.getPose());
+            sendVelocityCommand(*command);
+        }
+        else
+        {
+            positionEstimator_.run(dT, nullptr);
 
-			if (!triggerStop_.isTriggerRequested())
-			{
-				motionController_.run(dT, positionEstimator_.getPose());
-			}
-			else
-			{
-				motionController_.stop(0);
-			}
+            if (!triggerStop_.isTriggerRequested())
+            {
+                motionController_.run(dT, positionEstimator_.getPose());
+            }
+            else
+            {
+                motionController_.stop(0);
+            }
 
-			if (motionController_.newCommandAvailable())
-			{
-				sendVelocityCommand(motionController_.getExecutingCommand());
-			}
-		}
+            if (motionController_.newCommandAvailable())
+            {
+                sendVelocityCommand(motionController_.getExecutingCommand());
+            }
+        }
 
         publishInformation();
 
@@ -287,6 +294,7 @@ void Motion::scanTapsForData()
     if (tapCmdGoal_.newDataAvailable())
     {
         executePlanToGoal(tapCmdGoal_.getGoal());
+        publishGoal();
     }
 }
 
@@ -295,28 +303,89 @@ void Motion::scanTapsForData()
 // TODO: This should be in Executive
 void Motion::executePlanToGoal(Pose<> goal)
 {
-     algorithm_.setGraph(tapMap_.getMap()->getGrid());
+    currentGoal_ = goal;
+    algorithm_.setGraph(tapMap_.getMap()->getGrid());
 
-    int r = 0;
-    int c = 0;
-
+    int r1;
+    int c1;
     Pose<> currentPose = positionEstimator_.getPose();
-    tapMap_.getMap()->getMapCoordinates(currentPose.x, currentPose.y, c, r);
-    Grid2d::LocationType internalStart(c, r);
+    tapMap_.getMap()->getMapCoordinates(currentPose.x, currentPose.y, c1, r1);
+    Grid2d::LocationType internalStart(c1, r1);
+    int startAngle = Math::normalizeRad2deg90(currentPose.theta);
 
-    // tapMap_.getMap()->getMapCoordinates(goal.x, goal.y, c, r);
-    Grid2d::LocationType internalGoal(c + 10, r);
+    int r2;
+    int c2;
+    tapMap_.getMap()->getMapCoordinates(goal.x, goal.y, c2, r2);
+    Grid2d::LocationType internalGoal(c2, r2);
+    int goalAngle = Math::normalizeRad2deg90(goal.theta);
 
     algorithm_.search(
-        SearchPosition<Grid2d>(internalStart, 0),
-        SearchPosition<Grid2d>(internalGoal, 0));
+        SearchPosition<Grid2d>(internalStart, startAngle),
+        SearchPosition<Grid2d>(internalGoal, goalAngle));
 
     vector<SolutionNode<Grid2d>> solution = algorithm_.getPath(tapMap_.getMap()->getResolution());
-    Trajectory::TrajectoryType currentTrajectory_;
 
-    trajectoryConverter_.calculateTrajectory(solution);
-    trajectoryConverter_.getTrajectory(currentTrajectory_);
-    motionController_.setTrajectory(currentTrajectory_);
+    if (!solution.empty())
+    {
+        Trajectory::TrajectoryType currentTrajectory_;
+
+        trajectoryConverter_.calculateTrajectory(solution);
+        trajectoryConverter_.getTrajectory(currentTrajectory_);
+        motionController_.setTrajectory(currentTrajectory_);
+    }
+    else
+    {
+        ROS_INFO_STREAM("Path not found between " << currentPose << " (" <<
+            c1 << "," << r1 << "," << startAngle
+            << ") and " << goal << " (" << c2 << "," << r2 << "," << goalAngle << ")");
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::publishGoal()
+{
+    vector<SolutionNode<Grid2d>> path = algorithm_.getPath(tapMap_.getMap()->getResolution());
+
+    ros::Time planningTime = ros::Time::now();
+
+    nav_msgs::Path messageGoalPlan;
+    messageGoalPlan.header.frame_id = "map";
+    messageGoalPlan.header.stamp = planningTime;
+
+    vector<geometry_msgs::PoseStamped> planPoses;
+
+    for (auto node : path)
+    {
+        geometry_msgs::PoseStamped poseStamped;
+        tf::Quaternion quaternion = tf::createQuaternionFromYaw(node.pose.theta);
+
+        poseStamped.pose.position.x = node.pose.x;
+        poseStamped.pose.position.y = node.pose.y;
+        poseStamped.pose.position.z = 0.0;
+        poseStamped.pose.orientation.x = quaternion.x();
+        poseStamped.pose.orientation.y = quaternion.y();
+        poseStamped.pose.orientation.z = quaternion.z();
+        poseStamped.pose.orientation.w = quaternion.w();
+
+        planPoses.push_back(poseStamped);
+    }
+
+    messageGoalPlan.poses = planPoses;
+
+    geometry_msgs::PoseStamped messageGoal;
+    tf::Quaternion quaternion = tf::createQuaternionFromYaw(currentGoal_.theta);
+
+    messageGoal.header.stamp = planningTime;
+    messageGoal.pose.position.x = currentGoal_.x;
+    messageGoal.pose.position.y = currentGoal_.y;
+    messageGoal.pose.position.z = 0.0;
+    messageGoal.pose.orientation.x = quaternion.x();
+    messageGoal.pose.orientation.y = quaternion.y();
+    messageGoal.pose.orientation.z = quaternion.z();
+    messageGoal.pose.orientation.w = quaternion.w();
+
+    pubGoalGoal_.publish(messageGoal);
+    pubGoalPlan_.publish(messageGoalPlan);
 }
 
 } // namespace srs

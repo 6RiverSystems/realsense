@@ -96,8 +96,13 @@ private:
 
     // TODO: remove this tap from Motion. It should be in Executive
     RosTapCmd_Goal tapCmdGoal_;
-    void executePlanToGoal(Pose<> goal);
     RosTapMap tapMap_;
+    ros::Publisher pubGoalPlan_;
+    ros::Publisher pubGoalGoal_;
+    Pose<> currentGoal_;
+
+    void executePlanToGoal(Pose<> goal);
+    void publishGoal();
 };
 
 } // namespace srs

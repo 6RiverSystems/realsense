@@ -16,19 +16,6 @@ using namespace std;
 #include <srslib_framework/search/SearchPosition.hpp>
 using namespace srs;
 
-//111: {
-//bcd540 (g: 101, h: 10) <30, 19, 0>
-//}
-//115: {
-//bcd830 (g: 105, h: 10) <28, 19, 180>
-//}
-//150: {
-//bc7d20 (g: 140, h: 10) <28, 19, 0>
-//}
-//154: {
-//bcdb10 (g: 144, h: 10) <30, 19, 180>
-//}
-
 TEST(Test_MappedPriorityQueue, UserDefinedKey)
 {
     typedef typename Grid2d::LocationType LocationType;

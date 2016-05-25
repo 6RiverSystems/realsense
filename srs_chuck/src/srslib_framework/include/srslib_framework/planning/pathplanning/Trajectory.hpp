@@ -41,6 +41,11 @@ public:
         velocities_.clear();
         poses_.clear();
 
+        if (solution.empty())
+        {
+            return;
+        }
+
         vector<SolutionNode<Grid2d>>::iterator fromNode = solution.begin();
         vector<SolutionNode<Grid2d>>::iterator node;
         vector<SolutionNode<Grid2d>>::iterator toNode;
@@ -134,14 +139,15 @@ private:
         vector<SolutionNode<Grid2d>>::iterator& fromNode,
         vector<SolutionNode<Grid2d>>::iterator& toNode)
     {
-        SolutionNode<Grid2d>::LocationType fromLocation = fromNode->location;
-        SolutionNode<Grid2d>::LocationType toLocation = toNode->location;
+        Pose<> fromPose = fromNode->pose;
+        Pose<> toPose = toNode->pose;
 
+        // TODO: Add an euclidean for Pose
         return Math::euclidean<double>(
-            static_cast<double>(fromLocation.x),
-            static_cast<double>(fromLocation.y),
-            static_cast<double>(toLocation.x),
-            static_cast<double>(toLocation.y));
+            static_cast<double>(fromPose.x),
+            static_cast<double>(fromPose.y),
+            static_cast<double>(toPose.x),
+            static_cast<double>(toPose.y));
     }
 
     void moveForward(
@@ -168,7 +174,7 @@ private:
             // with the given acceleration
         }
 
-        Pose<> pose = Pose<>(t_, fromNode->location.x, fromNode->location.y, fromNode->orientation);
+        Pose<> pose = Pose<>(t_, fromNode->pose.x, fromNode->pose.y, fromNode->pose.theta);
 
         // Acceleration
         double vt = initialV;

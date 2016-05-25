@@ -36,7 +36,7 @@ TEST(Test_AStar, SearchCreation)
     Grid2d::LocationType goal(GRID_SIZE - 1, GRID_SIZE - 1);
 
     algorithm.search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 0));
-    vector<SolutionNode<Grid2d>> path = algorithm.getPath();
+    vector<SolutionNode<Grid2d>> path = algorithm.getPath(1.0);
 
     for (auto node : path)
     {

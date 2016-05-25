@@ -28,17 +28,17 @@ Map::Map() :
 {
 }
 
-Map::Map(double widthMeters, double heightMeters, double resolution) :
+Map::Map(double widthC, double heightC, double resolution) :
         grid_(nullptr),
-        heightC_(0),
-        heightM_(heightMeters),
+        heightC_(heightC),
+        heightM_(0),
         mapImageFilename_(""),
         resolution_(resolution),
-        widthC_(0),
-        widthM_(widthMeters)
+        widthC_(widthC),
+        widthM_(0)
 {
-    widthC_ = static_cast<int>(ceil(widthMeters / resolution_));
-    heightC_ = static_cast<int>(ceil(heightMeters / resolution_));
+    widthM_ = widthC_* resolution_;
+    heightM_ = heightC_ * resolution_;
 
     grid_ = new Grid2d(widthC_, heightC_);
 }
@@ -121,7 +121,7 @@ void Map::getNotesGrid(vector<int8_t>& notesGrid)
                     notes |= FLAG_GO_SLOW;
                 }
 
-                notesGrid.push_back(notes);
+                notesGrid.push_back(static_cast<int8_t>(notes));
             }
         }
     }
@@ -153,8 +153,6 @@ void Map::setGrid(const vector<int8_t>& costGrid, const vector<int8_t>& notesGri
         auto costsIterator = costGrid.begin();
         auto notesIterator = notesGrid.begin();
 
-        int counter = 0;
-
         for (int row = 0; row < grid_->getHeight(); row++)
         {
             for (int col = 0; col < grid_->getWidth(); col++)
@@ -164,8 +162,8 @@ void Map::setGrid(const vector<int8_t>& costGrid, const vector<int8_t>& notesGri
                 SearchPositionNote* note = reinterpret_cast<SearchPositionNote*>(
                     grid_->getNote(location));
 
-                unsigned char notes = static_cast<unsigned char>(*notesIterator);
-                unsigned int cost = static_cast<unsigned int>(*costsIterator);
+                char notes = *notesIterator;
+                char cost = *costsIterator;
 
                 note = createNote(notes, note);
                 grid_->addValue(location, cost, note);
@@ -311,7 +309,8 @@ void Map::loadCosts()
                 note->add(SearchPositionNote::STATIC_OBSTACLE);
             }
 
-            grid_->addValue(location, static_cast<unsigned int>(blue), note);
+            unsigned int cost = static_cast<unsigned int>(blue);
+            grid_->addValue(location, cost, note);
         }
     }
 

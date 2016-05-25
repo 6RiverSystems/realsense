@@ -27,7 +27,7 @@ MapServer::MapServer(string nodeName) :
 {
     string mapFilename;
     rosNodeHandle_.param("/target_map", mapFilename, string(""));
-    mapFilename = "/home/fsantini/projects/repos/ros/srs_sites/src/srsc_6rhq/map/6rhq.yaml";
+    // mapFilename = "/home/fsantini/projects/repos/ros/srs_sites/src/srsc_6rhq/map/6rhq.yaml";
 
     ROS_INFO_STREAM("Target map: " << mapFilename);
 

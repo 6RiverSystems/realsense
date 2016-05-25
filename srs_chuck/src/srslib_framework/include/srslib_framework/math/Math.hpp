@@ -157,6 +157,17 @@ struct Math
         return deg < 0 ? 360 - (abs(deg) % 360) : deg % 360;
     }
 
+    inline static unsigned int normalizeRad2deg90(double rad)
+    {
+        double angle = Math::rad2deg<double>(rad);
+        double ratio = angle / 90.0;
+        double upper = ceil(ratio) * 90.0;
+        double lower = floor(ratio) * 90.0;
+
+        angle = (upper - angle) > (angle - lower) ? lower : upper;
+        return Math::normalizeAngleDeg(static_cast<int>(angle));
+    }
+
     template<typename TYPE = double>
     constexpr inline static TYPE normalizeAngleRad(TYPE rad)
     {

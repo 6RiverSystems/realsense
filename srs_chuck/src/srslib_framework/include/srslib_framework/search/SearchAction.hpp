@@ -141,7 +141,7 @@ private:
         SearchAction<GRAPH> action(actionEnum);
         int currentOrientation = associatedNode->action.position.orientation;
 
-        int newOrientation = Math::normalizeAngleDeg(currentOrientation - angle);
+        int newOrientation = Math::normalizeAngleDeg(currentOrientation + angle);
         SearchPosition<GRAPH> newPosition(associatedNode->action.position, newOrientation);
 
         const SearchPositionNote* positionNote = reinterpret_cast<const SearchPositionNote*>(

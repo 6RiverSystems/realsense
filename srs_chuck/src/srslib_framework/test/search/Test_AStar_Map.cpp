@@ -27,14 +27,13 @@ TEST(Test_AStar, WithMap)
     AStar<Grid2d> algorithm(map.getGrid());
 
     Grid2d::LocationType start(29, 19);
-    Grid2d::LocationType goal(58, 28);
+    Grid2d::LocationType goal(52, 151);
 
     algorithm.search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 90));
 
-    vector<SolutionNode<Grid2d>> path = algorithm.getPath(1.0);
-    for (auto node : path)
+    vector<SolutionNode<Grid2d>> solution = algorithm.getPath(0.1);
+    for (auto node : solution)
     {
         cout << node << endl;
     }
-    cout << endl;
 }

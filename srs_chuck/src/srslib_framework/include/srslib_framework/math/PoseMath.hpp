@@ -30,6 +30,14 @@ struct PoseMath
 
         return R;
     }
+
+    template<typename TYPE = double>
+    inline static TYPE euclidean(Pose<TYPE> p1, Pose<TYPE> p2)
+    {
+        TYPE deltaX = p1.x - p2.x;
+        TYPE deltaY = p1.y - p2.y;
+        return sqrt(deltaX * deltaX + deltaY * deltaY);
+    }
 };
 
 } // namespace srs

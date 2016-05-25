@@ -6,17 +6,22 @@
 #ifndef MOTIONCONTROLLER_HPP_
 #define MOTIONCONTROLLER_HPP_
 
+#include <vector>
+using namespace std;
+
 #include <srslib_framework/planning/pathplanning/Trajectory.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 #include <srslib_framework/ros/RosTap.hpp>
+
+#include <srslib_framework/robotics/controller/YoshizawaController.hpp>
 
 namespace srs {
 
 class MotionController
 {
 public:
-    MotionController(unsigned int lookAhead = 30);
+    MotionController(unsigned int lookAhead = 50);
 
     ~MotionController()
     {}
@@ -25,6 +30,11 @@ public:
     {
         newCommandAvailable_ = false;
         return executingCommand_;
+    }
+
+    bool isGoalReached()
+    {
+        return goalReached_;
     }
 
     bool isMoving()
@@ -42,18 +52,19 @@ public:
 
     void setLookAhead(unsigned int newValue)
     {
-        lookAhead_ = newValue;
-        if (isMoving())
-        {
-            stop();
-        }
+// ########
+//        lookAhead_ = newValue;
+//        if (isMoving())
+//        {
+//            stop();
+//        }
     }
 
     void setTrajectory(Trajectory::TrajectoryType& trajectory);
     void stop(double stopDistance = 0);
 
 private:
-    void determineReferencePose();
+    void determineNextReferencePose();
 
     void sendVelocityCommand(Velocity<> command);
 
@@ -66,17 +77,25 @@ private:
         return abs(lhv.linear - rhv.linear) < 0.01 && abs(lhv.angular - rhv.angular) < 0.002;
     }
 
+    void stepLLController(Pose<> robotPose);
+
     Trajectory::TrajectoryType currentTrajectory_;
 
     Velocity<> executingCommand_;
     double executionTime_;
 
+    Pose<> goal_;
+    bool goalReached_;
+
     unsigned int lookAhead_;
-    Pose<> referencePose_;
+    YoshizawaController lowLevelController_;
 
     bool newCommandAvailable_;
     vector<Trajectory::MilestoneType>::iterator nextScheduled_;
     double nextScheduledTime_;
+
+    Pose<> referencePose_;
+    int referenceIndex_;
 };
 
 } // namespace srs

@@ -47,7 +47,7 @@ public:
     void run();
 
 private:
-    constexpr static unsigned int REFRESH_RATE_HZ = 50;
+    constexpr static unsigned int REFRESH_RATE_HZ = 60;
 
     void connectAllTaps();
 

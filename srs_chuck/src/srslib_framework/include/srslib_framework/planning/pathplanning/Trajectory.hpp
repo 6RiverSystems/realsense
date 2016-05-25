@@ -111,13 +111,13 @@ public:
     }
 
 private:
-    Pose<> calculateNextPose(double t, Pose<> previousPose, double vt, double dT)
+    Pose<> calculateNextPose(double dT, Pose<> previousPose, double vt)
     {
         double x = previousPose.x + vt * dT * cos(previousPose.theta);
         double y = previousPose.y + vt * dT * sin(previousPose.theta);
         double theta = previousPose.theta;
 
-        return Pose<>(t, x, y, theta);
+        return Pose<>(dT, x, y, theta);
     }
 
     void findNextAction(
@@ -174,21 +174,17 @@ private:
             // with the given acceleration
         }
 
-        Pose<> pose = Pose<>(t_, fromNode->pose.x, fromNode->pose.y, fromNode->pose.theta);
+        Pose<> pose = Pose<>(dT_, fromNode->pose.x, fromNode->pose.y, fromNode->pose.theta);
 
         // Acceleration
         double vt = initialV;
         while (vt < coastV)
         {
-            pose = calculateNextPose(t_, pose, vt, dT_);
+            pose = calculateNextPose(dT_, pose, vt);
             poses_.push_back(pose);
 
             vt += forwardA * dT_;
-            velocities_.push_back(Velocity<>(t_, vt, 0));
-
-            cout << pose;
-            cout << vt << endl;
-
+            velocities_.push_back(Velocity<>(dT_, vt, 0));
             t_ += dT_;
         }
 
@@ -198,14 +194,10 @@ private:
             double tf = ti + tUp + (totalDistance - 2 * max(rampDistanceUp, rampDistanceDown)) / coastV;
             while (t_ < tf)
             {
-                pose = calculateNextPose(t_, pose, coastV, dT_);
+                pose = calculateNextPose(dT_, pose, coastV);
                 poses_.push_back(pose);
 
-                velocities_.push_back(Velocity<>(t_, coastV, 0));
-
-                cout << pose;
-                cout << coastV << endl;
-
+                velocities_.push_back(Velocity<>(dT_, coastV, 0));
                 t_ += dT_;
             }
         }
@@ -214,16 +206,12 @@ private:
         vt = coastV;
         while (vt > finalV)
         {
-            pose = calculateNextPose(t_, pose, vt, dT_);
+            pose = calculateNextPose(dT_, pose, vt);
             poses_.push_back(pose);
 
             vt -= forwardA * dT_;
             vt = abs(vt - finalV) > 1e-4 ? vt : 0.0;
-            velocities_.push_back(Velocity<>(t_, vt, 0));
-
-            cout << pose;
-            cout << vt << endl;
-
+            velocities_.push_back(Velocity<>(dT_, vt, 0));
             t_ += dT_;
         }
 

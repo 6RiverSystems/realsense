@@ -22,7 +22,6 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Motion::Motion(string nodeName) :
-    commandUpdated_(false),
     currentCommand_(),
     firstLocalization_(true),
     positionEstimator_(),
@@ -56,21 +55,11 @@ Motion::Motion(string nodeName) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::reset()
-{
-    commandUpdated_ = false;
-    currentCommand_ = Velocity<>();
-
-    positionEstimator_.reset(tapInitialPose_.getPose());
-    motionController_.reset();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::run()
 {
     connectAllTaps();
 
-    reset();
+    reset(tapInitialPose_.getPose());
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
@@ -80,37 +69,9 @@ void Motion::run()
         previousTime_ = currentTime_;
         currentTime_ = ros::Time::now();
 
-        double dT = Time::time2number(currentTime_) - Time::time2number(previousTime_);
-
         evaluateTriggers();
         scanTapsForData();
-
-        if (tapJoyAdapter_.getLatchState())
-        {
-            Velocity<>* command = commandUpdated_ ? &currentCommand_ : nullptr;
-            positionEstimator_.run(dT, command);
-            motionController_.run(dT, positionEstimator_.getPose());
-            sendVelocityCommand(*command);
-        }
-        else
-        {
-            positionEstimator_.run(dT, nullptr);
-
-            if (!triggerStop_.isTriggerRequested())
-            {
-                motionController_.run(dT, positionEstimator_.getPose());
-            }
-            else
-            {
-                motionController_.stop(0);
-            }
-
-            if (motionController_.newCommandAvailable())
-            {
-                sendVelocityCommand(motionController_.getExecutingCommand());
-            }
-        }
-
+        stepNode();
         publishInformation();
 
         refreshRate.sleep();
@@ -179,6 +140,21 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::outputVelocityCommand(Velocity<> outputCommand)
+{
+    geometry_msgs::Twist messageTwist;
+
+    messageTwist.linear.x = outputCommand.linear;
+    messageTwist.linear.y = 0;
+    messageTwist.linear.z = 0;
+    messageTwist.angular.x = 0;
+    messageTwist.angular.y = 0;
+    messageTwist.angular.z = outputCommand.angular;
+
+    pubCmdVel_.publish(messageTwist);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishInformation()
 {
     Pose<> currentPose = positionEstimator_.getPose();
@@ -224,59 +200,34 @@ void Motion::publishInformation()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::sendVelocityCommand(Velocity<> command)
-{
-    geometry_msgs::Twist messageTwist;
-
-    messageTwist.linear.x = command.linear;
-    messageTwist.linear.y = 0;
-    messageTwist.linear.z = 0;
-    messageTwist.angular.x = 0;
-    messageTwist.angular.y = 0;
-    messageTwist.angular.z = command.angular;
-
-    pubCmdVel_.publish(messageTwist);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::scanTapsForData()
 {
     // If APS has reported a position and it is the first time that Motion
     // gets it, make sure that the Position Estimator knows of it.
     if (!tapAps_.hasNeverReported() && firstLocalization_)
     {
-        positionEstimator_.reset(tapAps_.getPose());
+        ROS_INFO_STREAM("Reporting its first position: " << tapAps_.getPose());
+
+        reset(tapAps_.getPose());
         firstLocalization_ = false;
-
-        ROS_INFO_STREAM("Reporting its first position " << tapAps_.getPose());
     }
-
-    // If there is another source of command velocities, follow that request
-    if (tapJoyAdapter_.newDataAvailable())
-    {
-        if (tapJoyAdapter_.getLatchState())
-        {
-            commandUpdated_ = true;
-            currentCommand_ = tapJoyAdapter_.getVelocity();
-        }
-    }
-
-    // If the brain stem is disconnected, simulate odometry
-    // feeding the odometer the commanded velocity
-//    if (!tapBrainStemStatus_.isBrainStemConnected())
-//    {
-//        tapOdometry_.set(Time::time2number(ros::Time::now()),
-//            currentCommand_.linear,
-//            currentCommand_.angular);
-//    }
 
     if (tapInitialPose_.newDataAvailable())
     {
-        // If we are given an initial position,
-        // we won't need to wait for a first localization
-        firstLocalization_ = false;
-        reset();
+        ROS_INFO_STREAM("Received initial pose: " << tapInitialPose_.getPose());
 
+        reset(tapInitialPose_.getPose());
+        firstLocalization_ = false;
+    }
+
+    // If there is a new goal to reach
+    if (tapCmdGoal_.newDataAvailable())
+    {
+        if (!tapJoyAdapter_.getLatchState())
+        {
+            executePlanToGoal(tapCmdGoal_.getGoal());
+            publishGoal();
+        }
     }
 
 //    // If there is a new plan to execute
@@ -289,15 +240,65 @@ void Motion::scanTapsForData()
 //        trajectoryConverter_.getTrajectory(currentTrajectory_);
 //        motionController_.setTrajectory(currentTrajectory_);
 //    }
-
-    // If there is a new goal to reach
-    if (tapCmdGoal_.newDataAvailable())
-    {
-        executePlanToGoal(tapCmdGoal_.getGoal());
-        publishGoal();
-    }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::reset(Pose<> pose0)
+{
+    positionEstimator_.reset(pose0);
+    motionController_.reset();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::stepNode()
+{
+    bool commandGenerated = false;
+
+    // Calculate the elapsed time
+    double dT = Time::time2number(currentTime_) - Time::time2number(previousTime_);
+
+    // If the joystick was touched, we know that we are latched
+    if (tapJoyAdapter_.newDataAvailable())
+    {
+        // Stop the motion controller from whatever it was doing
+        motionController_.stop(0);
+
+        commandGenerated = true;
+        currentCommand_ = tapJoyAdapter_.getVelocity();
+
+        ROS_DEBUG_STREAM_NAMED(rosNodeHandle_.getNamespace().c_str(),
+            "Receiving command from joystick: " << currentCommand_);
+
+        // If the brain stem is disconnected, simulate odometry
+        // feeding the odometer the commanded velocity
+//        if (!tapBrainStemStatus_.isBrainStemConnected())
+//        {
+//            tapOdometry_.set(Time::time2number(ros::Time::now()),
+//                currentCommand_.linear,
+//                currentCommand_.angular);
+//        }
+    }
+    else {
+        // Run the motion controller with the current pose estimate
+        // only if the joystick is not latched
+        if (!tapJoyAdapter_.getLatchState())
+        {
+            motionController_.run(dT, positionEstimator_.getPose());
+            if (motionController_.newCommandAvailable())
+            {
+                currentCommand_ = motionController_.getExecutingCommand();
+                commandGenerated = true;
+            }
+        }
+    }
+
+    // Output the velocity command to the brainstem
+    outputVelocityCommand(currentCommand_);
+
+    // Provide the command to the position estimator
+    Velocity<>* peCommand = commandGenerated ? &currentCommand_ : nullptr;
+    positionEstimator_.run(dT, peCommand);
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // TODO: This should be in Executive

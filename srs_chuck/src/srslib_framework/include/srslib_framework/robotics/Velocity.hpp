@@ -44,11 +44,9 @@ struct Velocity : public Object
 
     friend ostream& operator<<(ostream& stream, const Velocity& velocity)
     {
-        stream << "Velocity {";
-        stream << "  arrivalTime: " << velocity.arrivalTime << endl;
-        stream << "       linear: " << velocity.linear << endl;
-        stream << "      angular: " << velocity.angular << endl;
-        stream << "}" << endl;
+        stream << "Velocity {at: " << velocity.arrivalTime <<
+            ", l: " << velocity.linear <<
+            ", a: " << velocity.angular << "}";
 
         return stream;
     }

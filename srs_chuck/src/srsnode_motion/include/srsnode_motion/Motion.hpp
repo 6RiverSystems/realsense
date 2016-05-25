@@ -44,7 +44,6 @@ public:
         disconnectAllTaps();
     }
 
-    void reset();
     void run();
 
 private:
@@ -57,15 +56,17 @@ private:
     void evaluateTriggers();
 
     void onConfigChange(MotionConfig& config, uint32_t level);
+    void outputVelocityCommand(Velocity<> outputCommand);
 
     void publishInformation();
 
+    void reset(Pose<> pose0);
+
     void scanTapsForData();
-    void sendVelocityCommand(Velocity<> command);
+    void stepNode();
 
     AStar<Grid2d> algorithm_; // TODO: Remove
 
-    bool commandUpdated_;
     MotionConfig configuration_;
     dynamic_reconfigure::Server<MotionConfig> configServer_;
     Velocity<> currentCommand_;

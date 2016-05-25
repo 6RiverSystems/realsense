@@ -19,10 +19,12 @@ RealsenseDriver::RealsenseDriver( ) :
 	rosNodeHandle_( ),
 	infrared1Subscriber_( rosNodeHandle_, "/camera/infrared1/image_raw", 10 ),
 	infrared2Subscriber_( rosNodeHandle_, "/camera/infrared2/image_raw", 10 ),
-	laserScanSubscriber_( rosNodeHandle_, "/camera/scan", 10 ),
+	laserScanSubscriber_( rosNodeHandle_, "/camera/depth/scan", 10 ),
 	infrared1Publisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/infrared1/image_near", 10 ) ),
 	infrared2Publisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/infrared2/image_near", 10 ) ),
 	infraredPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/infrared/image_near", 10 ) ),
+	infraredScanPublisher_( rosNodeHandle_.advertise<sensor_msgs::LaserScan>( "/camera/infrared/scan", 10 ) ),
+	combinedScanPublisher_( rosNodeHandle_.advertise<sensor_msgs::LaserScan>( "/camera/scan", 10 ) ),
 	synchronizer_( new ImageSyncronizer( laserScanSubscriber_, infrared1Subscriber_, infrared2Subscriber_, 10 ) )
 {
 	synchronizer_->registerCallback(
@@ -52,15 +54,15 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan,
 	cv::Mat combinedImages;
 	CombineImages( cvImage1->image, cvImage2->image, combinedImages );
 
-	//ThresholdImage( cvImage1->image );
+	ThresholdImage( cvImage1->image );
 
 	infrared1Publisher_.publish( cvImage1->toImageMsg( ) );
 
-	//ThresholdImage( cvImage2->image );
+	ThresholdImage( cvImage2->image );
 
 	infrared2Publisher_.publish( cvImage2->toImageMsg( ) );
 
-	//ThresholdImage( combinedImages );
+	ThresholdImage( combinedImages );
 
 	cv_bridge::CvImage combinedMsg;
 	combinedMsg.header   = infraredImage2->header;
@@ -68,6 +70,73 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan,
 	combinedMsg.image    = combinedImages;
 
 	infraredPublisher_.publish( combinedMsg );
+
+	sensor_msgs::LaserScan irScan;
+	irScan.header			= scan->header;
+	irScan.angle_min		= scan->angle_min;
+	irScan.angle_max		= scan->angle_max;
+	irScan.angle_increment	= scan->angle_increment;
+	irScan.time_increment	= scan->time_increment;
+	irScan.scan_time		= scan->scan_time;
+	irScan.range_min		= 0.0f;
+	irScan.range_max		= 1.0f;
+
+	const uint32_t numberOfScans = scan->ranges.size( );
+
+	irScan.ranges.assign( numberOfScans, std::numeric_limits<double>::infinity( ) );
+
+	const uint32_t xDiff = combinedImages.cols - numberOfScans;
+
+	// TODO:  We currently have a problem if the image is than the number of scans
+	const uint32_t xStart = xDiff/2;
+
+	const double distanceFromBot = 0.300;
+	const double robotHalfWidth = 0.310 / 2.0f;
+
+	for( int x = 0; x < numberOfScans; x++ )
+	{
+		double angle = (x * irScan.angle_increment) + irScan.angle_min;
+
+		for( int y = 0; y < combinedImages.rows; y++ )
+		{
+			if( combinedImages.at<uint8_t>(y, x + xStart) == 128 )
+			{
+				double xDistance = distanceFromBot / cos( angle );
+				double yDistance = abs( distanceFromBot * sin( angle ) );
+
+				// Only include data within the footprint (width) of the robot
+				if( yDistance <= robotHalfWidth )
+				{
+					if( irScan.ranges[x] == std::numeric_limits<double>::infinity( ) )
+					{
+						irScan.ranges[x] = xDistance;
+					}
+					else
+					{
+						irScan.ranges[x] = xDistance > irScan.ranges[x] ? xDistance : irScan.ranges[x];
+					}
+				}
+			}
+		}
+	}
+
+	infraredScanPublisher_.publish( irScan );
+
+	for( int x = 0; x < numberOfScans; x++ )
+	{
+		if( irScan.ranges[x] == std::numeric_limits<double>::infinity( ) )
+		{
+			// Use the depth scan
+			irScan.ranges[x] = scan->ranges[x];
+		}
+		else if( scan->ranges[x] != std::numeric_limits<double>::infinity( ) )
+		{
+			// If the depth scan is valid then pick the closest scan
+			irScan.ranges[x] = std::min( scan->ranges[x], scan->ranges[x] );
+		}
+	}
+
+	combinedScanPublisher_.publish( irScan );
 }
 
 cv_bridge::CvImagePtr RealsenseDriver::GetCvImage( const sensor_msgs::Image::ConstPtr& image ) const
@@ -108,100 +177,6 @@ void RealsenseDriver::CombineImages( cv::Mat& image1, cv::Mat& image2, cv::Mat& 
 		result = combined;
 	}
 }
-
-//void RealsenseDriver::onInfrared2( const sensor_msgs::Image& infraredImage2 )
-//{
-//	cv_bridge::CvImagePtr cv_ptr;
-//	try {
-//		cv_ptr = cv_bridge::toCvCopy(infraredImage2, sensor_msgs::image_encodings::TYPE_8UC1);
-//	} catch (cv_bridge::Exception& e) {
-//		ROS_ERROR("cv_bridge exception: %s", e.what());
-//		return;
-//	}
-//
-//	// Apply a binary threshold filter to remove all but the saturated pixels
-//	cv::threshold( cv_ptr->image, cv_ptr->image, 254, 128, cv::THRESH_BINARY );
-//
-//	infrared2Publisher_.publish( cv_ptr->toImageMsg( ) );
-//}
-//
-//void RealsenseDriver::onPointCloud( const sensor_msgs::PointCloud2ConstPtr& cloud_msg )
-//{
-////	// build laserscan output
-////	sensor_msgs::LaserScan output;
-////	output.header = cloud_msg->header;
-////
-////	output.angle_min = angle_min_;
-////	output.angle_max = angle_max_;
-////	output.angle_increment = angle_increment_;
-////	output.time_increment = 0.0;
-////	output.scan_time = scan_time_;
-////	output.range_min = range_min_;
-////	output.range_max = range_max_;
-////
-////	//determine amount of rays to create
-////	uint32_t ranges_size = std::ceil((output.angle_max - output.angle_min) / output.angle_increment);
-////
-////	//determine if laserscan rays with no obstacle data will evaluate to infinity or max_range
-////	if (use_inf_)
-////	{
-////	  output.ranges.assign(ranges_size, std::numeric_limits<double>::infinity());
-////	}
-////	else
-////	{
-////	  output.ranges.assign(ranges_size, output.range_max + 1.0);
-////	}
-////
-////	sensor_msgs::PointCloud2ConstPtr cloud_out;
-////	sensor_msgs::PointCloud2Ptr cloud;
-////
-////	// Iterate through pointcloud
-////	for (sensor_msgs::PointCloud2ConstIterator<float>
-////			  iter_x(*cloud_out, "x"), iter_y(*cloud_out, "y"), iter_z(*cloud_out, "z");
-////			  iter_x != iter_x.end();
-////			  ++iter_x, ++iter_y, ++iter_z)
-////	{
-////
-////	  if (std::isnan(*iter_x) || std::isnan(*iter_y) || std::isnan(*iter_z))
-////	  {
-////		ROS_DEBUG("rejected for nan in point(%f, %f, %f)\n", *iter_x, *iter_y, *iter_z);
-////		continue;
-////	  }
-////
-////	  if (*iter_z > max_height_ || *iter_z < min_height_)
-////	  {
-////		  ROS_DEBUG("rejected for height %f not in range (%f, %f)\n", *iter_z, min_height_, max_height_);
-////		continue;
-////	  }
-////
-////	  double range = hypot(*iter_x, *iter_y);
-////	  if (range < range_min_)
-////	  {
-////		  ROS_DEBUG("rejected for range %f below minimum value %f. Point: (%f, %f, %f)", range, range_min_, *iter_x, *iter_y,
-////					  *iter_z);
-////		continue;
-////	  }
-////
-////	  // http://stackoverflow.com/questions/5254838/calculating-distance-between-a-point-and-a-rectangular-box-nearest-point
-////
-////	  double angle = atan2(*iter_y, *iter_x);
-////	  if (angle < output.angle_min || angle > output.angle_max)
-////	  {
-////		  ROS_DEBUG("rejected for angle %f not in range (%f, %f)\n", angle, output.angle_min, output.angle_max);
-////		continue;
-////	  }
-////
-////	  //overwrite range at laserscan ray if new range is smaller
-////	  int index = (angle - output.angle_min) / output.angle_increment;
-////	  if (range < output.ranges[index])
-////	  {
-////		output.ranges[index] = range;
-////	  }
-////
-////	}
-////	pub_.publish(output);
-////  }
-//}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods

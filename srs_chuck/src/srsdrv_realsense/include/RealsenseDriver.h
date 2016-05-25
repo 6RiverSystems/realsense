@@ -62,6 +62,10 @@ private:
 
     ros::Publisher 										infraredPublisher_;
 
+    ros::Publisher 										infraredScanPublisher_;
+
+    ros::Publisher 										combinedScanPublisher_;
+
     ImageSyncronizerPtr									synchronizer_;
 
 };

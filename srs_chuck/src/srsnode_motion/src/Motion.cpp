@@ -273,12 +273,12 @@ void Motion::stepNode()
         // feeding the odometer the commanded velocity
         if (!tapBrainStemStatus_.isBrainStemConnected())
         {
-            ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
-                "Brainstem disconnected. Using simulated odometry");
-
-            tapOdometry_.set(Time::time2number(ros::Time::now()),
-                currentCommand_.linear,
-                currentCommand_.angular);
+//            ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
+//                "Brainstem disconnected. Using simulated odometry");
+//
+//            tapOdometry_.set(Time::time2number(ros::Time::now()),
+//                currentCommand_.linear,
+//                currentCommand_.angular);
         }
     }
     else {
@@ -299,7 +299,7 @@ void Motion::stepNode()
     outputVelocityCommand(currentCommand_);
 
     // Provide the command to the position estimator
-    Velocity<>* peCommand = commandGenerated ? &currentCommand_ : nullptr;
+    Velocity<>* peCommand = /*commandGenerated ? &currentCommand_ : */nullptr;
     positionEstimator_.run(dT, peCommand);
 }
 

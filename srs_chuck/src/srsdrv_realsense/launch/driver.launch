@@ -21,7 +21,7 @@
 	<arg name="enable_tf" default="false" />
 	<arg name="depth_fps" default="30" />
 	<arg name="color_fps" default="30" />	
-	<arg name="r200_lr_gain" default="100" />	
+	<arg name="r200_lr_gain" default="100" />
 
     <node pkg="nodelet" type="nodelet" name="RealsenseNodelet"
         args="load realsense_camera/RealsenseNodelet standalone_nodelet">
@@ -86,9 +86,9 @@
     <node pkg="nodelet" type="nodelet" name="pointcloud_to_laserscan" args="load pointcloud_to_laserscan/pointcloud_to_laserscan_nodelet standalone_nodelet">
 
         <remap from="cloud_in" to="/StatisticalOutlier/output"/>
-        <remap from="scan" to="/camera/scan"/>
+        <remap from="scan" to="/camera/depth/scan"/>
         <rosparam>
-            target_frame: map # Leave disabled to output scan in pointcloud frame
+            target_frame: camera_link # Leave disabled to output scan in pointcloud frame
             transform_tolerance: 0.01
             min_height: 0.05
             max_height: 1.0

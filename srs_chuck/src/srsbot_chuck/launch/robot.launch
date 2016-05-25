@@ -24,6 +24,7 @@
 
     <!-- Launch all the robot drivers -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
+    <include file="$(find srsdrv_realsense)/launch/driver.launch" />
 
     <include file="$(find srsdrv_stargazer)/launch/driver.launch">
         <arg name="target_anchors" value="$(arg target_anchors)" />

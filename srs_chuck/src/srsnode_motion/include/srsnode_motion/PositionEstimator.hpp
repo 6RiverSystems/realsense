@@ -61,16 +61,17 @@ public:
         ukf_.reset(currentState.getVectorForm(), currentCovariance);
     }
 
-    void run(double dT, Velocity<>* commandVelocity)
+    void run(double dT, Velocity<>* velocity)
     {
+        // Transform a velocity point into a command
         CmdVelocity<> command;
-        if (commandVelocity)
+        if (velocity)
         {
-            command = CmdVelocity<>(*commandVelocity);
+            command = CmdVelocity<>(*velocity);
         }
 
         // Advance the state of the UKF
-        ukf_.run(dT, commandVelocity ? &command : nullptr);
+        ukf_.run(dT, velocity ? &command : nullptr);
     }
 
 private:

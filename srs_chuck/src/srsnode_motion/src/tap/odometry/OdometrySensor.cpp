@@ -5,16 +5,19 @@
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Const definition
+// Constant initialization
 
+// Covariance vector of the odometry sensor
 template<unsigned int STATE_SIZE, int TYPE>
 const cv::Mat OdometrySensor<STATE_SIZE, TYPE>::R = (
     cv::Mat_<OdometrySensor<STATE_SIZE, TYPE>::BaseType>(1, STATE_SIZE) <<
         0,
         0,
         0,
-        0.004, // [m/s]
-        0.004 // [m/s]
+        OdometrySensor<STATE_SIZE, TYPE>::ERROR_LINEAR_VELOCITY *
+            OdometrySensor<STATE_SIZE, TYPE>::ERROR_LINEAR_VELOCITY, // [m^2/s^2]
+        OdometrySensor<STATE_SIZE, TYPE>::ERROR_LINEAR_VELOCITY *
+            OdometrySensor<STATE_SIZE, TYPE>::ERROR_LINEAR_VELOCITY // [m^2/s^2]
 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

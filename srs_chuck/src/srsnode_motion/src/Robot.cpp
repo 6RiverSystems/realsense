@@ -6,14 +6,18 @@
 
 namespace srs {
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Constant initialization
+
+// Covariance vector of the robot process
 template<int TYPE>
 const cv::Mat Robot<TYPE>::Q = (
     cv::Mat_<Robot<TYPE>::BaseType>(1, STATIC_UKF_STATE_VECTOR_SIZE) <<
-        0.01, // [m]
-        0.01, // [m]
-        Math::deg2rad<double>(1.0), // [rad]
-        0.006, // [m/s]
-        0.006 // [m/s]
+        Robot<TYPE>::ERROR_LOCATION * Robot<TYPE>::ERROR_LOCATION, // [m^2]
+        Robot<TYPE>::ERROR_LOCATION * Robot<TYPE>::ERROR_LOCATION, // [m^2]
+        Robot<TYPE>::ERROR_HEADING * Robot<TYPE>::ERROR_HEADING, // [rad^2]
+        Robot<TYPE>::ERROR_LINEAR_VELOCITY * Robot<TYPE>::ERROR_LINEAR_VELOCITY, // [m^2/s^2]
+        Robot<TYPE>::ERROR_ANGULAR_VELOCITY * Robot<TYPE>::ERROR_ANGULAR_VELOCITY // [m^2/s^2]
 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

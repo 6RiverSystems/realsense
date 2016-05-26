@@ -18,6 +18,10 @@ class OdometrySensor :
     public Sensor<STATE_SIZE, TYPE>
 {
 public:
+    // Standard deviation values for the odometry sensor
+    constexpr static double ERROR_LINEAR_VELOCITY = 0.004; // [m/s]
+    constexpr static double ERROR_ANGULAR_VELOCITY = 0.004; // [m/s]
+
     typedef typename Sensor<STATE_SIZE, TYPE>::BaseType BaseType;
 
     OdometrySensor() :
@@ -31,6 +35,11 @@ public:
     {}
 
     virtual cv::Mat getCurrentData();
+
+    Odometry<BaseType> getOdometry()
+    {
+        return currentData_;
+    }
 
     void reset()
     {

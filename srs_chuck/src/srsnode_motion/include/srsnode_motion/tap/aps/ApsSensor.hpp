@@ -18,6 +18,10 @@ class ApsSensor :
     public Sensor<STATE_SIZE, TYPE>
 {
 public:
+    // Standard deviation values for the APS sensor process
+    constexpr static double ERROR_LOCATION = 0.01; // [m]
+    constexpr static double ERROR_HEADING = Math::deg2rad<double>(0.1); // [rad]
+
     typedef typename Sensor<STATE_SIZE, TYPE>::BaseType BaseType;
 
     ApsSensor() :

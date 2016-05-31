@@ -61,12 +61,12 @@ public:
         ukf_.reset(currentState.getVectorForm(), currentCovariance);
     }
 
-    void run(double dT, Velocity<>* commandVelocity)
+    void run(double dT, Velocity<>* velocity)
     {
         cout << "odometry: " << *velocity << endl;
 
         // Transform a velocity point into a command
-        CmdVelocity<> command = CmdVelocity<>(*commandVelocity);
+        CmdVelocity<> command = CmdVelocity<>(*velocity);
 
         // Advance the state of the UKF
         ukf_.run(dT, &command);

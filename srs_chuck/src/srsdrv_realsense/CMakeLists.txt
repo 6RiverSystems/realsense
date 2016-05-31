@@ -26,6 +26,8 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
     cv_bridge
+    sensor_msgs
+    message_filters
 )
 
 find_package(OpenCV 1.7 REQUIRED)

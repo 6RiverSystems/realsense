@@ -21,16 +21,8 @@ class RosTriggerShutdown :
 {
 public:
     RosTriggerShutdown(ros::NodeHandle rosHandle) :
-        RosServiceTrigger(rosHandle, "Trigger: Shutdown", "trg/shutdown")
+        RosServiceTrigger(rosHandle, "Trigger: Shutdown", "shutdown")
     {}
-
-    ~RosTriggerShutdown()
-    {}
-
-    bool isShutdownRequested()
-    {
-        return newRequestPending() && isTriggerRequested();
-    }
 };
 
 } // namespace srs

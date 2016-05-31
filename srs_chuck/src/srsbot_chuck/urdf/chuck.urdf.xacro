@@ -9,6 +9,8 @@
     <xacro:include filename="component/wheel.urdf.xacro" />
     <xacro:include filename="component/caster.urdf.xacro" />
 
+	<xacro:include filename="sensors/r200.urdf.xacro"/>
+
     <!-- Robot footprint -->
     <link name="base_footprint">
         <inertial>
@@ -32,7 +34,7 @@
       </gazebo>
  
     <joint name="base_footprint_joint" type="fixed">
-        <origin xyz="0 0 ${base_y_offset + base_z_size/2}" rpy="0 0 0" />
+        <origin xyz="0 0 ${base_z_offset + base_z_size/2}" rpy="0 0 0" />
         <parent link="base_footprint" />
         <child link="base_link" />
     </joint>
@@ -98,6 +100,10 @@
     <caster fb="front" parent="base_link" translateX="${caster_front_x_offset}" translateY="0" translateZ="${caster_z_offset}" />
     <caster fb="back" parent="base_link" translateX="${caster_back_x_offset}" translateY="0" translateZ="${caster_z_offset}" />
 
+	<!-- Realsense R200 -->
+	
+	<sensor_r200 parent="base_link" r200_cam_y_rotation="${M_PI}" r200_cam_px="${base_x_size/2}" r200_cam_py="${r200_cam_y_size/2}" r200_cam_pz="${r200_cam_z_size + realsense_z_offset}" />
+
     <!-- Differential drive controller  -->
     <gazebo>
         <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
@@ -115,8 +121,8 @@
             <wheelTorque>30</wheelTorque>
             <wheelAcceleration>1.8</wheelAcceleration>
             <commandTopic>cmd_vel</commandTopic>
-            <odometryFrame>odom</odometryFrame> 
-            <odometryTopic>odom</odometryTopic> 
+            <odometryFrame>srsnode_motion/odometry</odometryFrame> 
+            <odometryTopic>srsnode_motion/odometry</odometryTopic> 
             <robotBaseFrame>base_link</robotBaseFrame>
         </plugin>
         <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so" />

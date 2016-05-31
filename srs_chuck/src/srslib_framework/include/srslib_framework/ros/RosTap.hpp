@@ -18,6 +18,7 @@ class RosTap
 public:
     RosTap(ros::NodeHandle rosHandle, string tapName = "") :
         connected_(false),
+        neverReported_(true),
         newData_(false),
         rosNodeHandle_(rosHandle),
         tapName_(tapName)
@@ -43,6 +44,11 @@ public:
         return tapName_;
     }
 
+    bool hasNeverReported() const
+    {
+        return neverReported_;
+    }
+
     bool isTapConnected() const
     {
         return connected_;
@@ -54,7 +60,9 @@ public:
     }
 
     virtual void reset()
-    {}
+    {
+    	setNewData(false);
+    }
 
 protected:
     ros::NodeHandle rosNodeHandle_;
@@ -71,11 +79,13 @@ protected:
     void setNewData(bool newValue)
     {
         newData_ = newValue;
+        neverReported_ = false;
     }
 
 private:
     bool connected_;
 
+    bool neverReported_;
     bool newData_;
 
     string tapName_;

@@ -15,7 +15,7 @@ using namespace std;
 #include <nav_msgs/Path.h>
 
 #include <srslib_framework/ros/RosTap.hpp>
-#include <srslib_framework/search/SolutionNode.hpp>
+#include <srslib_framework/planning/pathplanning/SolutionNode.hpp>
 #include <srslib_framework/math/Time.hpp>
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 
@@ -26,7 +26,7 @@ class RosTapGoalPlan :
 {
 public:
     RosTapGoalPlan(ros::NodeHandle rosHandle) :
-        RosTap(rosHandle, "Initial Pose Tap")
+        RosTap(rosHandle, "Goal Plan Tap")
     {}
 
     ~RosTapGoalPlan()
@@ -61,26 +61,27 @@ private:
 
         for (auto node : message->poses)
         {
-            SearchAction<Grid2d> action(SearchAction<Grid2d>::FORWARD);
+            SolutionNode<Grid2d> node;
+
             geometry_msgs::Quaternion quaternion =  node.pose.orientation;
 
-            action.position.location = SearchPosition<Grid2d>::LocationType(
-                node.pose.position.x,
-                node.pose.position.y);
-            action.position.orientation = tf::getYaw(quaternion);
-
-            solution_.push_back(SolutionNode<Grid2d>(action));
+//            action.position.location = SearchPosition<Grid2d>::LocationType(
+//                node.pose.position.x,
+//                node.pose.position.y);
+//            action.position.orientation = tf::getYaw(quaternion);
+//
+//            solution_.push_back(SolutionNode<Grid2d>(action));
         }
-
-        auto goal = solution_.end() - 1;
-
-        SearchAction<Grid2d> action(SearchAction<Grid2d>::GOAL);
-        action.position.location = SearchPosition<Grid2d>::LocationType(
-            goal->action.position.location.x,
-            goal->action.position.location.y);
-        action.position.orientation = goal->action.position.orientation;
-
-        solution_.push_back(SolutionNode<Grid2d>(action));
+//
+//        auto goal = solution_.end() - 1;
+//
+//        SearchAction<Grid2d> action(SearchAction<Grid2d>::GOAL);
+//        action.position.location = SearchPosition<Grid2d>::LocationType(
+//            goal->action.position.location.x,
+//            goal->action.position.location.y);
+//        action.position.orientation = goal->action.position.orientation;
+//
+//        solution_.push_back(SolutionNode<Grid2d>(action));
 
         setNewData(true);
     }

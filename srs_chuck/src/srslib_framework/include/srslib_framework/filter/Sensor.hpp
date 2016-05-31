@@ -29,6 +29,7 @@ public:
 
     Sensor(cv::Mat noiseMatrix) :
         Model<STATE_SIZE, TYPE>(noiseMatrix),
+        enabled_(true),
         newData_(false)
     {}
 
@@ -65,6 +66,7 @@ protected:
     }
 
 private:
+    bool enabled_;
     bool newData_;
 };
 

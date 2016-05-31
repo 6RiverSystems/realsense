@@ -19,7 +19,8 @@ namespace srs
 class StarGazer
 {
 public:
-	StarGazer( const std::string& strSerialPort, const std::string& strApsTopic );
+	StarGazer( const std::string& strNodeName, const std::string& strSerialPort,
+		const std::string& strApsTopic );
 
 	virtual ~StarGazer( );
 

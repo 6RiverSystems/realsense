@@ -18,28 +18,28 @@
     <param name="robot_description" command="$(find xacro)/xacro.py $(find srsbot_chuck)/urdf/chuck.urdf.xacro" />
 
     <!-- Joint and robot state publishers -->
-    <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
+    <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /srsnode_motion/odometry 100" />
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 
     <!-- Launch all the robot drivers -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
-<!--
+<!--<include file="$(find srsdrv_realsense)/launch/driver.launch" /> -->
     <include file="$(find srsdrv_stargazer)/launch/driver.launch">
         <arg name="target_anchors" value="$(arg target_anchors)" />
     </include>
--->
+
     <!-- Launch all the robot nodes -->
+    <include file="$(find srsnode_joystick_adapter)/launch/node.launch" /> 
+
     <include file="$(find srsnode_map_server)/launch/node.launch">
         <arg name="target_map" value="$(arg target_map)" />
     </include>
 
     <include file="$(find srsnode_motion)/launch/node.launch" />
     <include file="$(find srsnode_midbrain)/launch/node.launch" />
-
     <include file="$(find srsnode_executive)/launch/node.launch" />
-    <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
 
     <!-- Launch the ros-bridge -->
-    <!-- <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" /> -->
+<!--<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" /> -->
 </launch>

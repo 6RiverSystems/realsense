@@ -14,7 +14,7 @@ using namespace std;
 
 #include <srslib_framework/datastructure/MappedPriorityQueue.hpp>
 
-#include <srslib_framework/search/SolutionNode.hpp>
+#include <srslib_framework/planning/pathplanning/SolutionNode.hpp>
 #include <srslib_framework/search/SearchNode.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
 
@@ -63,7 +63,9 @@ public:
         lastNode_ = nullptr;
     }
 
-    vector<SolutionNode<GRAPH>> getPath()
+    // TODO: Instead of passing the resolution an object with the map coordinate transformation
+    // should be passed
+    vector<SolutionNode<GRAPH>> getPath(double graphResolution)
     {
         vector<SolutionNode<GRAPH>> result;
 
@@ -71,7 +73,43 @@ public:
         while (cursor)
         {
             SolutionNode<GRAPH> node;
-            node.action = cursor->action;
+
+            switch (cursor->action.actionType)
+            {
+                case SearchAction<GRAPH>::NONE:
+                    node.actionType = SolutionNode<GRAPH>::NONE;
+                    break;
+                case SearchAction<GRAPH>::START:
+                    node.actionType = SolutionNode<GRAPH>::START;
+                    break;
+                case SearchAction<GRAPH>::GOAL:
+                    node.actionType = SolutionNode<GRAPH>::GOAL;
+                    break;
+                case SearchAction<GRAPH>::FORWARD:
+                    node.actionType = SolutionNode<GRAPH>::FORWARD;
+                    break;
+                case SearchAction<GRAPH>::BACKWARD:
+                    node.actionType = SolutionNode<GRAPH>::BACKWARD;
+                    break;
+                case SearchAction<GRAPH>::ROTATE_M90:
+                    node.actionType = SolutionNode<GRAPH>::ROTATE_M90;
+                    break;
+                case SearchAction<GRAPH>::ROTATE_P90:
+                    node.actionType = SolutionNode<GRAPH>::ROTATE_P90;
+                    break;
+                case SearchAction<GRAPH>::ROTATE_180:
+                    node.actionType = SolutionNode<GRAPH>::ROTATE_180;
+                    break;
+            }
+
+            double x = 0;
+            double y = 0;
+            getWorldCoordinates(graphResolution,
+                cursor->action.position.location.x, cursor->action.position.location.y,
+                x, y);
+
+            node.pose = Pose<>(x, y, Math::deg2rad<double>(cursor->action.position.orientation));
+            node.cost = cursor->action.getTotalCost();
 
             result.insert(result.begin(), node);
             cursor = cursor->parent;
@@ -129,6 +167,8 @@ public:
                 }
             }
         }
+
+        return false;
     }
 
     void setGraph(GRAPH* const graph)
@@ -137,6 +177,13 @@ public:
     }
 
 private:
+    // TODO: This should be in the map
+    void getWorldCoordinates(double resolution, int c, int r, double& x, double& y)
+    {
+        x = static_cast<double>(c) * resolution;
+        y = static_cast<double>(r) * resolution;
+    }
+
     void pushSearchNode(SearchNodeType* node)
     {
         if (!closed_.count(node))

@@ -57,7 +57,14 @@ public:
     void set(double arrivalTime, BaseType linear, BaseType angular)
     {
         sensor_->set(arrivalTime, linear, angular);
-    }
+
+        if (!sensor_->isEnabled())
+        {
+            ROS_DEBUG_STREAM("Odometry sensor disabled. Ignoring readings.");
+        }
+
+        setNewData(true);
+   }
 
 protected:
     bool connect()
@@ -71,6 +78,8 @@ protected:
 private:
     void onSensorsOdometryRaw(geometry_msgs::TwistStampedConstPtr message)
     {
+        //ROS_INFO_STREAM("onSensorsOdometryRaw: v: " << message->twist.linear.x
+        //	<< ", omega: " << message->twist.angular.z);
         set(Time::time2number(message->header.stamp),
             static_cast<double>(message->twist.linear.x),
             static_cast<double>(message->twist.angular.z));

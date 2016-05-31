@@ -27,7 +27,7 @@ public:
 
     RosTapInitialPose(ros::NodeHandle rosHandle) :
         RosTap(rosHandle, "Initial Pose Tap"),
-        initialPose_(Pose<>(2.0, 2.0, 0.0))
+        initialPose_(Pose<>(3.0, 2.0, 0.0))
     {}
 
     ~RosTapInitialPose()
@@ -43,7 +43,7 @@ public:
 
     void reset()
     {
-        set(Time::time2number(ros::Time::now()), 2.0, 2.0, 0.0);
+        set(Time::time2number(ros::Time::now()), 3.0, 2.0, 0.0);
     }
 
     void set(double arrivalTime, BaseType x, BaseType y, BaseType theta)

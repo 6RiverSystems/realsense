@@ -16,6 +16,8 @@ using namespace std;
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/RosTap.hpp>
 
+#include <tf/tf.h>
+
 namespace srs {
 
 class RosTapCmd_InitialPose :
@@ -54,12 +56,12 @@ protected:
     bool connect()
     {
         rosSubscriber_ = rosNodeHandle_.subscribe("/cmd/initial_pose", 10,
-            &RosTapCmd_InitialPose::onYouAreHere, this);
+            &RosTapCmd_InitialPose::onInitialPose, this);
         return true;
     }
 
 private:
-    void onYouAreHere(geometry_msgs::PoseWithCovarianceStampedConstPtr message)
+    void onInitialPose(geometry_msgs::PoseWithCovarianceStampedConstPtr message)
     {
         set(Time::time2number(message->header.stamp),
             message->pose.pose.position.x,

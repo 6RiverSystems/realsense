@@ -12,6 +12,10 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/median.hpp>
+
 namespace YAML {
 
 template<>
@@ -40,8 +44,9 @@ namespace srs
 // TODO: Pass in serial port and #define
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-StarGazer::StarGazer( const std::string& strSerialPort, const std::string& strApsTopic ) :
-	m_rosNodeHandle( ),
+StarGazer::StarGazer( const std::string& strNodeName, const std::string& strSerialPort,
+	const std::string& strApsTopic ) :
+	m_rosNodeHandle( strNodeName ),
 	m_rosApsPublisher( m_rosNodeHandle.advertise<srslib_framework::Aps>( strApsTopic, 1000 ) ),
 	m_pSerialIO( new SerialIO( ) ),
 	m_messageProcessor( m_pSerialIO )
@@ -100,6 +105,8 @@ void StarGazer::Run( )
 
 void StarGazer::OnConnectionChanged( bool bIsConnected )
 {
+	ROS_DEBUG_STREAM_NAMED( "StarGazer", "Connected" );
+
 	if( bIsConnected )
 	{
 		Configure( );
@@ -172,6 +179,10 @@ void StarGazer::ReadCallback( std::string strType, std::string strValue )
 	ROS_DEBUG_STREAM_NAMED( "StarGazer", strType << " = " << strValue );
 }
 
+using namespace boost::accumulators;
+
+typedef accumulator_set<double, stats<tag::median > > double_acc;
+
 void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, float fAngle )
 {
 	auto iter = m_mapAnchorTransforms.find( nTagId );
@@ -191,31 +202,72 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 
 		double fAngleInRadians = fAngle * M_PI / 180.0f;
 
+		double dfOffset = 14.0f;
+
+		fX -= (dfOffset * cos( fAngleInRadians ));
+		fY += (dfOffset * sin( fAngleInRadians ));
+
 		tf::Vector3 point( fX, fY, fZ );
 		tf::Quaternion orientation = tf::createQuaternionFromYaw( fAngleInRadians );
 
-		// Transform the incoming point based to the global coordinate system
 		tf::Vector3 transformedPoint = anchorGlobal * point;
 		tf::Quaternion transformedOrientation = anchorGlobal * orientation;
 
 		srslib_framework::Aps msg;
 
 		msg.tagId = nTagId;
-		msg.x = transformedPoint.getX( );
-		msg.y = transformedPoint.getY( );
-		msg.z = transformedPoint.getZ( );
-		msg.yaw = orientation.getAngle( );
+		msg.header.stamp = ros::Time::now( );
+		msg.x = transformedPoint.getX( ) / 100.0f;
+		msg.y = transformedPoint.getY( ) / 100.0f;
+		msg.z = transformedPoint.getZ( ) / 100.0f;
+		msg.yaw = transformedOrientation.getAngle( );
 
 		m_rosApsPublisher.publish( msg );
 
-		ROS_DEBUG_NAMED( "StarGazer", "Anchor Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad, %2.6f deg\n",
-			nTagId, anchorOrigin.getX( ), anchorOrigin.getY( ), anchorOrigin.getZ( ), anchorRotation.getAngle( ), fAngle );
+		static uint32_t sCount = 0;
 
-		ROS_DEBUG_NAMED( "StarGazer", "StarGazer (ref anchor) Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
-			nTagId, fX, fY, fZ, orientation.getAngle( ) );
+		static double_acc accLocalX;
+		static double_acc accLocalY;
+		static double_acc accLocalZ;
+		static double_acc accLocalRotation;
 
-		ROS_DEBUG_NAMED( "StarGazer", "StarGazer (ref global) Location: %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
-			nTagId, msg.x, msg.y, msg.z, msg.yaw );
+		static double_acc accGlobalX;
+		static double_acc accGlobalY;
+		static double_acc accGlobalZ;
+		static double_acc accGlobalRotation;
+
+		accLocalX( point.getX( ) );
+		accLocalY( point.getY( ) );
+		accLocalZ( point.getZ( ) );
+		accLocalRotation( orientation.getAngle( ) );
+
+		accGlobalX( msg.x );
+		accGlobalY( msg.y );
+		accGlobalZ( msg.z );
+		accGlobalRotation( msg.yaw );
+
+		if( sCount++ == 50 )
+		{
+			ROS_DEBUG_NAMED( "StarGazer", "Anchor Location (median): %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
+				nTagId, anchorOrigin.getX( ), anchorOrigin.getY( ), anchorOrigin.getZ( ), anchorRotation.getAngle( ) );
+
+			ROS_DEBUG_NAMED( "StarGazer", "%04i, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f",
+				nTagId, median( accLocalX ), median( accLocalY ), median( accLocalZ ), median( accLocalRotation ),
+				median( accGlobalX ), median( accGlobalY ), median( accGlobalZ ), median( accGlobalRotation ) );
+
+			// reset accumulators
+			accLocalX = double_acc( );
+			accLocalY = double_acc( );
+			accLocalZ = double_acc( );
+			accLocalRotation = double_acc( );
+
+			accGlobalX = double_acc( );
+			accGlobalY = double_acc( );
+			accGlobalZ = double_acc( );
+			accGlobalRotation = double_acc( );
+
+			sCount = 0;
+		}
 	}
 	else
 	{
@@ -259,10 +311,10 @@ void StarGazer::LoadAnchors( )
 					tf::Quaternion orientation = tf::createQuaternionFromYaw( anchor.orientation );
 
 					// Convert left hand rule of stargazer to right hand rule (ROS coordinate system)
-					orientation = tf::Quaternion( orientation.getX( ), orientation.getY( ),
+					tf::Quaternion rightHandOrientation = tf::Quaternion( orientation.getX( ), orientation.getY( ),
 						-orientation.getZ( ), -orientation.getW( ) );
 
-					transform.setRotation( orientation );
+					transform.setRotation( rightHandOrientation );
 
 // Test changing left to right hand rule
 //					for( int i = 0; i < 360; i++ )
@@ -275,7 +327,7 @@ void StarGazer::LoadAnchors( )
 //					}
 
 					ROS_INFO_STREAM( "Anchor: id=" << anchor.id << ", x=" << anchor.x <<
-						", y=" << anchor.y << ", z=" << anchor.z << ", orientation=" << orientation.getAngle( ) );
+						", y=" << anchor.y << ", z=" << anchor.z << ", orientation=" << rightHandOrientation.getAngle( ) );
 
 					m_mapAnchorTransforms[anchorId] = transform;
 				}

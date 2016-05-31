@@ -123,7 +123,7 @@ public:
                 break;
 
             case 90:
-                result = Grid2dLocation(location.x, location.y - 1);
+                result = Grid2dLocation(location.x, location.y + 1);
                 break;
 
             case 180:
@@ -131,7 +131,7 @@ public:
                 break;
 
             case 270:
-                result = Grid2dLocation(location.x, location.y + 1);
+                result = Grid2dLocation(location.x, location.y - 1);
                 break;
         }
 

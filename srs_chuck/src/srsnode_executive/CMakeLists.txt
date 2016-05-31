@@ -14,8 +14,6 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/tap/RosTapCmd_InitialPose.hpp
     include/${PROJECT_NAME}/tap/RosTapCmd_Pause.hpp
     include/${PROJECT_NAME}/tap/RosTapCmd_Shutdown.hpp
-
-    src/tap/RosTapMap.cpp
 )
 
 ####################################################################################################

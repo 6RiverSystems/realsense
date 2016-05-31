@@ -9,6 +9,7 @@
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/AStar.hpp>
+#include <srslib_framework/ros/tap/RosTapMap.hpp>
 
 #include <srsnode_executive/tap/RosTapCmd_Goal.hpp>
 #include <srsnode_executive/tap/RosTapCmd_InitialPose.hpp>
@@ -44,17 +45,12 @@ private:
     void executePlanToGoal(Pose<> goal);
     void executeShutdown();
 
-    void publishGoal();
     void publishInitialPose();
 
     void stepExecutiveFunctions();
 
     AStar<Grid2d> algorithm_;
 
-    Grid2d grid_;
-
-    ros::Publisher pubGoalPlan_;
-    ros::Publisher pubGoalGoal_;
     ros::Publisher pubInitialPose_;
 
     Pose<> robotCurrentPose_;
@@ -68,7 +64,9 @@ private:
     RosTapCmd_Pause tapCmdPause_;
     RosTapCmd_Shutdown tapCmdShutdown_;
 
-    int inc_;
+    RosTapMap tapMap_;
+
+    //int inc_;
 };
 
 } // namespace srs

@@ -24,13 +24,21 @@ set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
+    dynamic_reconfigure
     srslib_framework
     srslib_test
 )
 
-include_directories(include
-    src/
+generate_dynamic_reconfigure_options(
+    cfg/Joystick.cfg
+)
+
+include_directories(
+    INCLUDE_DIRS
+    LIBRARIES
+    include
     ${catkin_INCLUDE_DIRS}
+    ${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake
     ${srslib_framework_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
 )
@@ -45,6 +53,10 @@ catkin_package(
 add_executable(${PROJECT_NODE} 
     ${PROJECT_MAIN}
     ${${PROJECT_NAME}_SOURCES}
+)
+
+add_dependencies(${PROJECT_NODE}
+    ${PROJECT_NAME}_gencfg
 )
 
 target_link_libraries(${PROJECT_NODE}

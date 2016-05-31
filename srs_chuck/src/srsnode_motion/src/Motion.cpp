@@ -4,14 +4,15 @@
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
+#include <nav_msgs/Path.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <tf/transform_broadcaster.h>
 
 #include <srslib_framework/math/Time.hpp>
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
-#include <srslib_framework/search/SolutionNode.hpp>
-#include <srslib_framework/planning/pathplanning/Trajectory.hpp>
+#include <srslib_framework/planning/pathplanning/SolutionNode.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
 
@@ -22,39 +23,36 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Motion::Motion(string nodeName) :
-    commandUpdated_(false),
     currentCommand_(),
-    currentPose_(),
-    rosNodeHandle_(nodeName),
+    firstLocalization_(true),
     positionEstimator_(),
     motionController_(),
-    tapPlan_(rosNodeHandle_),
+    robot_(),
+    rosNodeHandle_(nodeName),
+    // tapPlan_(rosNodeHandle_),
     tapJoyAdapter_(rosNodeHandle_),
     tapBrainStemStatus_(rosNodeHandle_),
     tapOdometry_(rosNodeHandle_),
     tapInitialPose_(rosNodeHandle_),
     tapAps_(rosNodeHandle_),
     triggerShutdown_(rosNodeHandle_),
-    triggerStop_(rosNodeHandle_, "Trigger: Stop", "trg/stop")
+    triggerStop_(rosNodeHandle_),
+    trajectoryConverter_(robot_, 1.0 / 20.0 /*REFRESH_RATE_HZ*/), // #################
+
+    tapCmdGoal_(rosNodeHandle_),
+    tapMap_(rosNodeHandle_),
+    currentGoal_()
 {
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 100);
-    pubOdom_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("/odom", 50);
-    pubPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>("pose", 10);
+    pubOdometry_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("odometry", 50);
 
     positionEstimator_.addSensor(tapOdometry_.getSensor());
     positionEstimator_.addSensor(tapAps_.getSensor());
-}
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::reset()
-{
-    currentPose_ = tapInitialPose_.getPose();
+    configServer_.setCallback(boost::bind(&Motion::onConfigChange, this, _1, _2));
 
-    commandUpdated_ = false;
-    currentCommand_ = Velocity<>();
-
-    positionEstimator_.reset(currentPose_);
-    motionController_.reset();
+    pubGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>("current_goal/plan", 1);
+    pubGoalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>("current_goal/goal", 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +60,7 @@ void Motion::run()
 {
     connectAllTaps();
 
-    reset();
+    reset(tapInitialPose_.getPose());
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
@@ -72,15 +70,9 @@ void Motion::run()
         previousTime_ = currentTime_;
         currentTime_ = ros::Time::now();
 
-        double dT = Time::time2number(currentTime_) - Time::time2number(previousTime_);
-
         evaluateTriggers();
         scanTapsForData();
-
-        Velocity<>* command = commandUpdated_ ? &currentCommand_ : nullptr;
-        positionEstimator_.run(dT, command);
-        motionController_.run(dT, positionEstimator_.getPose(), command);
-
+        stepNode();
         publishInformation();
 
         refreshRate.sleep();
@@ -96,12 +88,15 @@ void Motion::connectAllTaps()
     tapBrainStemStatus_.connectTap();
     tapOdometry_.connectTap();
     tapInitialPose_.connectTap();
-    tapPlan_.connectTap();
+    //tapPlan_.connectTap();
     tapJoyAdapter_.connectTap();
     tapAps_.connectTap();
 
     triggerStop_.connectService();
     triggerShutdown_.connectService();
+
+    tapCmdGoal_.connectTap();
+    tapMap_.connectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,18 +105,54 @@ void Motion::disconnectAllTaps()
     tapBrainStemStatus_.disconnectTap();
     tapOdometry_.disconnectTap();
     tapInitialPose_.disconnectTap();
-    tapPlan_.disconnectTap();
+    //tapPlan_.disconnectTap();
     tapJoyAdapter_.disconnectTap();
     tapAps_.disconnectTap();
+
+    tapCmdGoal_.disconnectTap();
+    tapMap_.disconnectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::evaluateTriggers()
 {
-    if (triggerShutdown_.isShutdownRequested())
+    if (triggerShutdown_.isTriggerRequested())
     {
         ros::shutdown();
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::onConfigChange(MotionConfig& config, uint32_t level)
+{
+    configuration_ = config;
+
+    tapAps_.getSensor()->enable(configuration_.aps_enabled);
+    ROS_INFO_STREAM("APS sensor enabled: " << configuration_.aps_enabled);
+
+    tapOdometry_.getSensor()->enable(configuration_.odometry_enabled);
+    ROS_INFO_STREAM("Odometry sensor enabled: " << configuration_.odometry_enabled);
+
+    motionController_.setLookAhead(configuration_.look_ahead);
+    ROS_INFO_STREAM("Motion controller look-ahead: " << configuration_.look_ahead);
+
+    trajectoryConverter_.setMinimumVelocity(configuration_.min_velocity);
+    ROS_INFO_STREAM("Motion controller minimum velocity: " << configuration_.min_velocity);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::outputVelocityCommand(Velocity<> outputCommand)
+{
+    geometry_msgs::Twist messageTwist;
+
+    messageTwist.linear.x = outputCommand.linear;
+    messageTwist.linear.y = 0;
+    messageTwist.linear.z = 0;
+    messageTwist.angular.x = 0;
+    messageTwist.angular.y = 0;
+    messageTwist.angular.z = 0/*outputCommand.angular*/; // #######
+
+    pubCmdVel_.publish(messageTwist);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,7 +165,7 @@ void Motion::publishInformation()
 
     // Publish the TF of the pose
     geometry_msgs::TransformStamped messagePoseTf;
-    messagePoseTf.header.frame_id = "odom";
+    messagePoseTf.header.frame_id = "srsnode_motion/odometry";
     messagePoseTf.child_frame_id = "base_footprint";
 
     messagePoseTf.header.stamp = currentTime_;
@@ -146,46 +177,81 @@ void Motion::publishInformation()
     rosTfBroadcaster_.sendTransform(messagePoseTf);
 
     // Publish the required odometry for the planners
-    nav_msgs::Odometry messagePose;
-    messagePose.header.stamp = currentTime_;
-    messagePose.header.frame_id = "odom";
-    messagePose.child_frame_id = "base_footprint";
+    nav_msgs::Odometry messageOdometry;
+    messageOdometry.header.stamp = currentTime_;
+    messageOdometry.header.frame_id = "srsnode_motion/odometry";
+    messageOdometry.child_frame_id = "base_footprint";
 
     // Position
-    messagePose.pose.pose.position.x = currentPose.x;
-    messagePose.pose.pose.position.y = currentPose.y;
-    messagePose.pose.pose.position.z = 0.0;
-    messagePose.pose.pose.orientation = orientation;
+    messageOdometry.pose.pose.position.x = currentPose.x;
+    messageOdometry.pose.pose.position.y = currentPose.y;
+    messageOdometry.pose.pose.position.z = 0.0;
+    messageOdometry.pose.pose.orientation = orientation;
 
     // Velocity
-    messagePose.twist.twist.linear.x = currentVelocity.linear;
-    messagePose.twist.twist.linear.y = 0.0;
-    messagePose.twist.twist.linear.z = 0.0;
-    messagePose.twist.twist.angular.x = 0.0;
-    messagePose.twist.twist.angular.y = 0.0;
-    messagePose.twist.twist.angular.z = currentVelocity.angular;
+    messageOdometry.twist.twist.linear.x = currentVelocity.linear;
+    messageOdometry.twist.twist.linear.y = 0.0;
+    messageOdometry.twist.twist.linear.z = 0.0;
+    messageOdometry.twist.twist.angular.x = 0.0;
+    messageOdometry.twist.twist.angular.y = 0.0;
+    messageOdometry.twist.twist.angular.z = currentVelocity.angular;
 
     // Publish the Odometry
-    pubOdom_.publish(messagePose);
-
-    if (motionController_.newCommandAvailable())
-    {
-        Velocity<> command = motionController_.getExecutingCommand();
-
-        geometry_msgs::Twist messageCmdVel;
-        messageCmdVel.linear.x = command.linear;
-        messageCmdVel.linear.y = 0;
-        messageCmdVel.linear.z = 0;
-        messageCmdVel.angular.x = 0;
-        messageCmdVel.angular.y = 0;
-        messageCmdVel.angular.z = command.angular;
-
-        pubCmdVel_.publish(messageCmdVel);
-    }
+    pubOdometry_.publish(messageOdometry);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::scanTapsForData()
+{
+    // If APS has reported a position and it is the first time that Motion
+    // gets it, make sure that the Position Estimator knows of it.
+    if (!tapAps_.hasNeverReported() && firstLocalization_)
+    {
+        ROS_INFO_STREAM("Reporting its first position: " << tapAps_.getPose());
+
+        reset(tapAps_.getPose());
+        firstLocalization_ = false;
+    }
+
+    if (tapInitialPose_.newDataAvailable())
+    {
+        ROS_INFO_STREAM("Received initial pose: " << tapInitialPose_.getPose());
+
+        reset(tapInitialPose_.getPose());
+        firstLocalization_ = false;
+    }
+
+    // If there is a new goal to reach
+    if (tapCmdGoal_.newDataAvailable())
+    {
+        if (!tapJoyAdapter_.getLatchState())
+        {
+            executePlanToGoal(tapCmdGoal_.getGoal());
+            publishGoal();
+        }
+    }
+
+//    // If there is a new plan to execute
+//    if (tapPlan_.newDataAvailable())
+//    {
+//        vector<SolutionNode<Grid2d>> solution = tapPlan_.getPlan();
+//        Trajectory::TrajectoryType currentTrajectory_;
+//
+//        trajectoryConverter_.calculateTrajectory(solution);
+//        trajectoryConverter_.getTrajectory(currentTrajectory_);
+//        motionController_.setTrajectory(currentTrajectory_);
+//    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::reset(Pose<> pose0)
+{
+    positionEstimator_.reset(pose0);
+    motionController_.reset();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::stepNode()
 {
     bool commandGenerated = false;
 
@@ -201,10 +267,27 @@ void Motion::scanTapsForData()
     // If the joystick was touched, we know that we are latched
     if (tapJoyAdapter_.newDataAvailable())
     {
-        if (tapJoyAdapter_.getLatchState())
+        // Stop the motion controller from whatever it was doing
+        motionController_.stop(0);
+
+        commandGenerated = true;
+        currentCommand_ = tapJoyAdapter_.getVelocity();
+
+        ROS_DEBUG_STREAM_NAMED(rosNodeHandle_.getNamespace().c_str(),
+            "Receiving command from joystick: " << currentCommand_);
+    }
+    else {
+        // Run the motion controller with the current pose estimate
+        // only if the joystick is not latched
+        if (!tapJoyAdapter_.getLatchState())
         {
-            commandUpdated_ = true;
-            currentCommand_ = tapJoyAdapter_.getVelocity();
+            motionController_.run(dT, positionEstimator_.getPose());
+
+            if (motionController_.newCommandAvailable())
+            {
+                currentCommand_ = motionController_.getExecutingCommand();
+                commandGenerated = true;
+            }
         }
     }
 
@@ -235,32 +318,99 @@ void Motion::scanTapsForData()
         ROS_INFO_STREAM("Sending command: " << currentCommand_);
         outputVelocityCommand(currentCommand_);
     }
+}
 
-    if (tapInitialPose_.newDataAvailable())
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// TODO: This should be in Executive
+void Motion::executePlanToGoal(Pose<> goal)
+{
+    currentGoal_ = goal;
+    algorithm_.setGraph(tapMap_.getMap()->getGrid());
+
+    int r1 = 19;
+    int c1 = 29;
+    Pose<> currentPose = positionEstimator_.getPose();
+    //tapMap_.getMap()->getMapCoordinates(currentPose.x, currentPose.y, c1, r1);
+    Grid2d::LocationType internalStart(c1, r1);
+    int startAngle = Math::normalizeRad2deg90(currentPose.theta);
+
+    int r2 = 19; //151;
+    int c2 = 49; //52;
+    //tapMap_.getMap()->getMapCoordinates(goal.x, goal.y, c2, r2);
+    Grid2d::LocationType internalGoal(c2, r2);
+    int goalAngle = Math::normalizeRad2deg90(goal.theta);
+
+    ROS_INFO_STREAM("Looking for a path between " << currentPose << " (" <<
+        c1 << "," << r1 << "," << startAngle
+        << ") and " << goal << " (" << c2 << "," << r2 << "," << goalAngle << ")");
+
+    algorithm_.search(
+        SearchPosition<Grid2d>(internalStart, startAngle),
+        SearchPosition<Grid2d>(internalGoal, goalAngle));
+
+    vector<SolutionNode<Grid2d>> solution = algorithm_.getPath(tapMap_.getMap()->getResolution());
+
+    if (!solution.empty())
     {
-        reset();
+        Trajectory::TrajectoryType currentTrajectory_;
+
+        trajectoryConverter_.calculateTrajectory(solution);
+        trajectoryConverter_.getTrajectory(currentTrajectory_);
+        motionController_.setTrajectory(currentTrajectory_);
+    }
+    else
+    {
+        ROS_INFO_STREAM("Path not found between " << currentPose << " (" <<
+            c1 << "," << r1 << "," << startAngle
+            << ") and " << goal << " (" << c2 << "," << r2 << "," << goalAngle << ")");
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::publishGoal()
+{
+    vector<SolutionNode<Grid2d>> path = algorithm_.getPath(tapMap_.getMap()->getResolution());
+
+    ros::Time planningTime = ros::Time::now();
+
+    nav_msgs::Path messageGoalPlan;
+    messageGoalPlan.header.frame_id = "map";
+    messageGoalPlan.header.stamp = planningTime;
+
+    vector<geometry_msgs::PoseStamped> planPoses;
+
+    for (auto node : path)
+    {
+        geometry_msgs::PoseStamped poseStamped;
+        tf::Quaternion quaternion = tf::createQuaternionFromYaw(node.pose.theta);
+
+        poseStamped.pose.position.x = node.pose.x;
+        poseStamped.pose.position.y = node.pose.y;
+        poseStamped.pose.position.z = 0.0;
+        poseStamped.pose.orientation.x = quaternion.x();
+        poseStamped.pose.orientation.y = quaternion.y();
+        poseStamped.pose.orientation.z = quaternion.z();
+        poseStamped.pose.orientation.w = quaternion.w();
+
+        planPoses.push_back(poseStamped);
     }
 
-//    // If there is a new plan to execute
-//    if (tapPlan_.newDataAvailable())
-//    {
-//        trajectory_.clear();
-//
-//        Chuck chuck;
-//        vector<SolutionNode<Grid2d>> solution = tapPlan_.getGoalPlan();
-//
-//        Trajectory trajectoryConverter(solution, chuck, 1.0 / REFRESH_RATE_HZ);
-//        //trajectoryConverter.solution2trajectory(trajectory_);
-//
-//        for (auto milestone : trajectory_)
-//        {
-//            ROS_DEBUG_STREAM("Executing: " << milestone.first << " - " << milestone.second);
-//        }
-//
-//        executionTime_ = 0.0;
-//        nextScheduled_ = trajectory_.begin();
-//        nextScheduledTime_ = nextScheduled_->first.arrivalTime;
-//    }
+    messageGoalPlan.poses = planPoses;
+
+    geometry_msgs::PoseStamped messageGoal;
+    tf::Quaternion quaternion = tf::createQuaternionFromYaw(currentGoal_.theta);
+
+    messageGoal.header.stamp = planningTime;
+    messageGoal.pose.position.x = currentGoal_.x;
+    messageGoal.pose.position.y = currentGoal_.y;
+    messageGoal.pose.position.z = 0.0;
+    messageGoal.pose.orientation.x = quaternion.x();
+    messageGoal.pose.orientation.y = quaternion.y();
+    messageGoal.pose.orientation.z = quaternion.z();
+    messageGoal.pose.orientation.w = quaternion.w();
+
+    pubGoalGoal_.publish(messageGoal);
+    pubGoalPlan_.publish(messageGoalPlan);
 }
 
 } // namespace srs

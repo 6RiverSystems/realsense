@@ -141,7 +141,7 @@ private:
         SearchAction<GRAPH> action(actionEnum);
         int currentOrientation = associatedNode->action.position.orientation;
 
-        int newOrientation = Math::normalizeAngleDeg(currentOrientation - angle);
+        int newOrientation = Math::normalizeAngleDeg(currentOrientation + angle);
         SearchPosition<GRAPH> newPosition(associatedNode->action.position, newOrientation);
 
         const SearchPositionNote* positionNote = reinterpret_cast<const SearchPositionNote*>(
@@ -167,7 +167,7 @@ private:
 
         if (positionNote)
         {
-            if (positionNote->noRotations)
+            if (positionNote->noRotations())
             {
                 rotateM90 = MAX_COST;
                 rotateP90 = MAX_COST;
@@ -192,7 +192,7 @@ private:
 
         if (positionNote)
         {
-            staticObstacle = positionNote->staticObstacle ? MAX_COST : 0;
+            staticObstacle = positionNote->staticObstacle() ? MAX_COST : 0;
         }
 
         return Math::noOverflowAdd(locationCost, staticObstacle);

@@ -37,6 +37,11 @@ public:
         delete sensor_;
     }
 
+    Pose<> getPose()
+    {
+        return sensor_->getPose();
+    }
+
     ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* getSensor() const
     {
         return sensor_;
@@ -50,11 +55,20 @@ public:
     void reset()
     {
         sensor_->reset();
+
+        RosTap::reset();
     }
 
     void set(double arrivalTime, BaseType x, BaseType y, BaseType yaw)
     {
         sensor_->set(arrivalTime, x, y, yaw);
+
+        if (!sensor_->isEnabled())
+        {
+            ROS_DEBUG_STREAM("APS sensor disabled. Ignoring readings.");
+        }
+
+        setNewData(true);
     }
 
 protected:
@@ -69,6 +83,8 @@ protected:
 private:
     void onAps(srslib_framework::ApsConstPtr message)
     {
+        ROS_INFO_STREAM("APS tap received data.");
+
         set(Time::time2number(message->header.stamp),
             static_cast<double>(message->x),
             static_cast<double>(message->y),

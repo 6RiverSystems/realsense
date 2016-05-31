@@ -23,6 +23,7 @@ class RosTapJoy :
     public RosTap
 {
 public:
+    // TODO Rename the buttons with PS3 names
     enum ButtonEnum {
         BUTTON_FIRE = 0,
         BUTTON_2 = 1,

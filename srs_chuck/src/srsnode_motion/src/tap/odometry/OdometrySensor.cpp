@@ -5,16 +5,19 @@
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Const definition
+// Constant initialization
 
+// Covariance vector of the odometry sensor
 template<unsigned int STATE_SIZE, int TYPE>
 const cv::Mat OdometrySensor<STATE_SIZE, TYPE>::R = (
     cv::Mat_<OdometrySensor<STATE_SIZE, TYPE>::BaseType>(1, STATE_SIZE) <<
         0,
         0,
         0,
-        0.1,
-        0.1
+        OdometrySensor<STATE_SIZE, TYPE>::ERROR_LINEAR_VELOCITY *
+            OdometrySensor<STATE_SIZE, TYPE>::ERROR_LINEAR_VELOCITY, // [m^2/s^2]
+        OdometrySensor<STATE_SIZE, TYPE>::ERROR_LINEAR_VELOCITY *
+            OdometrySensor<STATE_SIZE, TYPE>::ERROR_LINEAR_VELOCITY // [m^2/s^2]
 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,6 +31,9 @@ cv::Mat OdometrySensor<STATE_SIZE, TYPE>::getCurrentData()
     StatePe<TYPE> state = StatePe<TYPE>();
     state.v = currentData_.velocity.linear;
     state.omega = currentData_.velocity.angular;
+
+    //ROS_INFO_STREAM("getCurrentData Odometry: v: " << state.v
+    //	<< ", omega: " << state.omega);
 
     return state.getVectorForm();
 }

@@ -9,6 +9,11 @@
 #include <string>
 using namespace std;
 
+#include <srsnode_joystick_adapter/JoystickConfig.h>
+using namespace srsnode_joystick_adapter;
+
+#include <dynamic_reconfigure/server.h>
+
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
 #include <srslib_framework/ros/tap/RosTapJoy.hpp>
 
@@ -29,13 +34,12 @@ public:
 private:
     constexpr static unsigned int REFRESH_RATE_HZ = 10;
 
-    constexpr static double RATIO_LINEAR = 0.6;
-    constexpr static double RATIO_ANGULAR = 0.3;
-
-    constexpr static double THRESHOLD_LINEAR = 0.2;
-    constexpr static double THRESHOLD_ANGULAR = 0.02;
-
     void evaluateTriggers();
+
+    void onConfigChange(JoystickConfig& config, uint32_t level);
+
+    JoystickConfig configuration_;
+    dynamic_reconfigure::Server<JoystickConfig> configServer_;
 
     bool joystickLatched_;
 

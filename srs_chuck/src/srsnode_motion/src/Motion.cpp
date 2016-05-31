@@ -273,8 +273,8 @@ void Motion::stepNode()
         commandGenerated = true;
         currentCommand_ = tapJoyAdapter_.getVelocity();
 
-        ROS_DEBUG_STREAM_NAMED(rosNodeHandle_.getNamespace().c_str(),
-            "Receiving command from joystick: " << currentCommand_);
+//        ROS_DEBUG_STREAM_NAMED(rosNodeHandle_.getNamespace().c_str(),
+//            "Receiving command from joystick: " << currentCommand_);
     }
     else {
         // Run the motion controller with the current pose estimate
@@ -315,7 +315,8 @@ void Motion::stepNode()
                 currentCommand_.angular);
         }
 
-        ROS_INFO_STREAM("Sending command: " << currentCommand_);
+        cout << "Command: " << currentCommand_ << endl;
+//        ROS_INFO_STREAM("Sending command: " << currentCommand_);
         outputVelocityCommand(currentCommand_);
     }
 }

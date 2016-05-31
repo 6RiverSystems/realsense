@@ -60,6 +60,8 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::predict(BaseType dT,
 template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
 void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::update()
 {
+    return;
+
     for (auto sensor : BaseKFType::sensors_)
     {
         if (sensor->newDataAvailable())

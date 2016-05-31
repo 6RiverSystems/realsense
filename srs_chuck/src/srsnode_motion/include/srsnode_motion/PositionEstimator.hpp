@@ -30,7 +30,7 @@ class PositionEstimator
 {
 public:
     PositionEstimator() :
-        ukf_(ALPHA, BETA, robot_)
+        ukf_(robot_, ALPHA, BETA)
     {}
 
     ~PositionEstimator()
@@ -43,39 +43,38 @@ public:
 
     Pose<> getPose()
     {
-        StatePe<> currentState = StatePe<>(ukf_.getState());
+        StatePe<> currentState = StatePe<>(ukf_.getX());
         return currentState.getPose();
     }
 
     Velocity<> getVelocity()
     {
-        StatePe<> currentState = StatePe<>(ukf_.getState());
+        StatePe<> currentState = StatePe<>(ukf_.getX());
         return currentState.getVelocity();
     }
 
     void reset(Pose<> initialPose)
     {
         StatePe<> currentState = StatePe<>(initialPose);
-        cv::Mat currentCovariance = robot_.getNoiseMatrix();
+        cv::Mat currentCovariance = robot_.getQ();
 
         ukf_.reset(currentState.getVectorForm(), currentCovariance);
     }
 
     void run(double dT, Velocity<>* commandVelocity)
     {
-        CmdVelocity<> command;
-        if (commandVelocity)
-        {
-            command = CmdVelocity<>(*commandVelocity);
-        }
+        cout << "odometry: " << *velocity << endl;
+
+        // Transform a velocity point into a command
+        CmdVelocity<> command = CmdVelocity<>(*commandVelocity);
 
         // Advance the state of the UKF
-        ukf_.run(dT, commandVelocity ? &command : nullptr);
+        ukf_.run(dT, &command);
     }
 
 private:
-    constexpr static double ALPHA = 1.0;
-    constexpr static double BETA = 0.0;
+    constexpr static double ALPHA = 0.5;
+    constexpr static double BETA = 2.0;
 
     Robot<> robot_;
 

@@ -12,6 +12,7 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/datastructure/ThreadSafeQueue.hpp
     include/${PROJECT_NAME}/datastructure/MappedPriorityQueue.hpp
 
+    include/${PROJECT_NAME}/filter/BaseKalmanFilter.hpp
     include/${PROJECT_NAME}/filter/Command.hpp
     include/${PROJECT_NAME}/filter/FilterState.hpp
     include/${PROJECT_NAME}/filter/Measurement.hpp

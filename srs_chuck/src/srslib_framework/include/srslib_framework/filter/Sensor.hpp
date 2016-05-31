@@ -21,8 +21,9 @@ class Sensor : public Model<STATE_SIZE, TYPE>
 public:
     typedef typename Ocv2Base<TYPE>::BaseType BaseType;
 
-    Sensor(BaseType noiseValue = BaseType()) :
-            Model<STATE_SIZE, TYPE>(noiseValue),
+    Sensor(BaseType R = BaseType()) :
+            Model<STATE_SIZE, TYPE>(R),
+            enabled_(true),
             newData_(false)
     {}
 
@@ -34,13 +35,28 @@ public:
     virtual ~Sensor()
     {}
 
+    void enable(bool newState)
+    {
+        enabled_ = newState;
+    }
+
+    cv::Mat getR()
+    {
+        return Model<STATE_SIZE, TYPE>::noiseMatrix_;
+    }
+
+    bool isEnabled() const
+    {
+        return enabled_;
+    }
+
     bool newDataAvailable() const
     {
         return newData_;
     }
 
     virtual cv::Mat getCurrentData() = 0;
-    virtual cv::Mat transformWithH(const cv::Mat stateVector) = 0;
+    virtual cv::Mat H(const cv::Mat stateVector) = 0;
 
 protected:
     void setNewData(bool newValue)

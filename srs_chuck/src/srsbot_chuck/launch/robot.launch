@@ -33,8 +33,10 @@
     <include file="$(find srsnode_map_server)/launch/node.launch">
         <arg name="target_map" value="$(arg target_map)" />
     </include>
-    <include file="$(find srsnode_reflexes)/launch/node.launch" />
+
     <include file="$(find srsnode_motion)/launch/node.launch" />
+    <include file="$(find srsnode_midbrain)/launch/node.launch" />
+
     <include file="$(find srsnode_executive)/launch/node.launch" />
     <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
 

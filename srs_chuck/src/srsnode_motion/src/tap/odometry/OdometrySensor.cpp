@@ -34,7 +34,7 @@ cv::Mat OdometrySensor<STATE_SIZE, TYPE>::getCurrentData()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, int TYPE>
-cv::Mat OdometrySensor<STATE_SIZE, TYPE>::transformWithH(const cv::Mat stateVector)
+cv::Mat OdometrySensor<STATE_SIZE, TYPE>::H(const cv::Mat stateVector)
 {
     StatePe<TYPE> state = StatePe<TYPE>(stateVector);
 

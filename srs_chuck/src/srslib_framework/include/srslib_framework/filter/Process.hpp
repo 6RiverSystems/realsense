@@ -33,7 +33,13 @@ public:
     virtual ~Process()
     {}
 
-    virtual cv::Mat transformWithAB(const cv::Mat stateVector,
+    cv::Mat getQ()
+    {
+        return Model<STATE_SIZE, TYPE>::noiseMatrix_;
+    }
+
+    virtual cv::Mat FB(
+        const cv::Mat stateVector,
         Command<COMMAND_SIZE, TYPE>* const command,
         BaseType dT) = 0;
 };

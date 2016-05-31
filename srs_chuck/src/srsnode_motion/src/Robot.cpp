@@ -21,12 +21,32 @@ const cv::Mat Robot<TYPE>::Q = (
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<int TYPE>
-cv::Mat Robot<TYPE>::transformWithAB(const cv::Mat stateVector,
+cv::Mat Robot<TYPE>::FB(
+    const cv::Mat stateVector,
     Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>* const command,
     BaseType dT)
 {
     StatePe<TYPE> state(stateVector);
 
+    BaseType v = reinterpret_cast<CmdVelocity<>*>(command)->velocity.linear;
+    BaseType w = reinterpret_cast<CmdVelocity<>*>(command)->velocity.angular;
+
+    if (abs(w) > 0.01)
+    {
+        double r = v / w;
+
+        state.x = state.x + r * sin(state.theta + w * dT) - r * sin(state.theta);
+        state.y = state.y + r * cos(state.theta) - r * cos(state.theta + w * dT);
+        state.theta = state.theta + w * dT;
+    }
+    else
+    {
+        state.x = state.x + v * dT * cos(state.theta);
+        state.y = state.y + v * dT * sin(state.theta);
+        // theta does not change
+    }
+
+/*
     // x = x + v * DT * cos(theta);
     // y = y + v * DT * sin(theta);
     // theta = theta + omega * DT;
@@ -43,6 +63,7 @@ cv::Mat Robot<TYPE>::transformWithAB(const cv::Mat stateVector,
         state.v = reinterpret_cast<CmdVelocity<>*>(command)->velocity.linear;
         state.omega = reinterpret_cast<CmdVelocity<>*>(command)->velocity.angular;
     }
+*/
 
     return state.getVectorForm();
 }

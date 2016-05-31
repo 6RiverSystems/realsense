@@ -28,8 +28,6 @@ using namespace srs;
 constexpr unsigned int UKF_STATE_SIZE = 5;
 constexpr unsigned int UKF_COMMAND_SIZE = 2;
 
-constexpr double ALPHA = 1.0;
-constexpr double BETA = 0.0;
 constexpr double DT = 0.5;
 
 #include "data/UkfTestData_Straight.hpp"
@@ -40,7 +38,7 @@ TEST(Test_Motion, Straight)
     Robot<> robot;
     OdometrySensor<UKF_STATE_SIZE, CV_64F> odometer;
 
-    UnscentedKalmanFilter<UKF_STATE_SIZE> ukf(ALPHA, BETA, robot);
+    UnscentedKalmanFilter<UKF_STATE_SIZE> ukf(robot);
     ukf.addSensor(&odometer);
 
     // Create a sequence of commands
@@ -101,7 +99,7 @@ TEST(Test_Motion, Straight)
     pose0.setThetaDegrees(90.0);
 
     StatePe<> stateT0(pose0);
-    cv::Mat covarianceT0 = robot.getNoiseMatrix();
+    cv::Mat covarianceT0 = robot.getQ();
     ukf.reset(stateT0.getVectorForm(), covarianceT0);
 
     for (unsigned int t = 0; t < measurements.size(); ++t)
@@ -113,7 +111,7 @@ TEST(Test_Motion, Straight)
         // Run the step of the UKF
         ukf.run(t * DT, const_cast<CmdVelocity<>*>(commands.at(t)));
 
-        ASSERT_TRUE(test::Compare::similar<>(ukf.getState(), correctStates[t], 1e-1)) <<
+        ASSERT_TRUE(test::Compare::similar<>(ukf.getX(), correctStates[t], 1e-1)) <<
             " State vector at time-step " << t;
     }
 }

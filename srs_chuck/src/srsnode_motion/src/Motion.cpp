@@ -13,6 +13,7 @@
 #include <srslib_framework/search/SolutionNode.hpp>
 #include <srslib_framework/planning/pathplanning/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
+#include <srslib_framework/robotics/Odometry.hpp>
 
 namespace srs {
 
@@ -186,7 +187,18 @@ void Motion::publishInformation()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::scanTapsForData()
 {
-    // If there is another source of command velocities, follow that request
+    bool commandGenerated = false;
+
+    // Calculate the elapsed time
+    double dT = Time::time2number(currentTime_) - Time::time2number(previousTime_);
+
+    if (dT > 10 * (1.0/REFRESH_RATE_HZ))
+    {
+        ROS_INFO_STREAM("Skip to current time. Delta: " << dT);
+        dT = 1.0 / REFRESH_RATE_HZ;
+    }
+
+    // If the joystick was touched, we know that we are latched
     if (tapJoyAdapter_.newDataAvailable())
     {
         if (tapJoyAdapter_.getLatchState())
@@ -196,13 +208,32 @@ void Motion::scanTapsForData()
         }
     }
 
-    // If the brain stem is disconnected, simulate odometry
-    // feeding the odometer the commanded velocity
-    if (!tapBrainStemStatus_.isBrainStemConnected())
+    // Provide the command to the position estimator
+    if (tapOdometry_.newDataAvailable())
     {
-        tapOdometry_.set(Time::time2number(ros::Time::now()),
-            currentCommand_.linear,
-            currentCommand_.angular);
+        // Odometry<> odometry = tapOdometry_.getSensor()->getOdometry().velocity;
+        Velocity<> velocity = tapOdometry_.getSensor()->getOdometry().velocity;
+
+        positionEstimator_.run(dT, &velocity);
+    }
+
+    // Output the velocity command to the brainstem
+    if (commandGenerated)
+    {
+        // If the brain stem is disconnected, simulate odometry
+        // feeding the odometer the commanded velocity
+        if (!tapBrainStemStatus_.isBrainStemConnected())
+        {
+            ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
+                "Brainstem disconnected. Using simulated odometry");
+
+            tapOdometry_.set(Time::time2number(ros::Time::now()),
+                currentCommand_.linear,
+                currentCommand_.angular);
+        }
+
+        ROS_INFO_STREAM("Sending command: " << currentCommand_);
+        outputVelocityCommand(currentCommand_);
     }
 
     if (tapInitialPose_.newDataAvailable())

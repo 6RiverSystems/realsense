@@ -44,7 +44,7 @@ public:
         Sensor<STATE_SIZE, TYPE>::setNewData(true);
     }
 
-    virtual cv::Mat transformWithH(const cv::Mat stateVector);
+    virtual cv::Mat H(const cv::Mat stateVector);
 
 private:
     const static cv::Mat R;

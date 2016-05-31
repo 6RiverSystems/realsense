@@ -60,8 +60,6 @@ public:
 
     void run(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command)
     {
-        cout << "dT: " << dT << endl;
-
         predict(dT, command);
         update();
 

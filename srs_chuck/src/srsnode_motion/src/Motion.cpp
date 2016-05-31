@@ -62,6 +62,8 @@ void Motion::run()
 
     reset(tapInitialPose_.getPose());
 
+    currentUkfTime_ = ros::Time::now();
+
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
     {
@@ -258,12 +260,6 @@ void Motion::stepNode()
     // Calculate the elapsed time
     double dT = Time::time2number(currentTime_) - Time::time2number(previousTime_);
 
-    if (dT > 10 * (1.0/REFRESH_RATE_HZ))
-    {
-        ROS_INFO_STREAM("Skip to current time. Delta: " << dT);
-        dT = 1.0 / REFRESH_RATE_HZ;
-    }
-
     // If the joystick was touched, we know that we are latched
     if (tapJoyAdapter_.newDataAvailable())
     {
@@ -294,10 +290,20 @@ void Motion::stepNode()
     // Provide the command to the position estimator
     if (tapOdometry_.newDataAvailable())
     {
+        previousUkfTime_ = currentUkfTime_;
+        currentUkfTime_ = ros::Time::now();
+        double dTUkf = Time::time2number(currentUkfTime_) - Time::time2number(previousUkfTime_);
+
+        if (abs(dTUkf - 1.0 / 50.0) >= 0.01)
+        {
+            cout << "################### ";
+        }
+        cout << "dTUkf: " << dTUkf << endl;
+
         // Odometry<> odometry = tapOdometry_.getSensor()->getOdometry().velocity;
         Velocity<> velocity = tapOdometry_.getSensor()->getOdometry().velocity;
 
-        positionEstimator_.run(dT, &velocity);
+        positionEstimator_.run(dTUkf, &velocity);
     }
 
     // Output the velocity command to the brainstem

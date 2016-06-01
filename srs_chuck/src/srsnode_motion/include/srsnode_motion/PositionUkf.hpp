@@ -48,7 +48,7 @@ public:
     }
 
 protected:
-    virtual void averageTransform(const cv::Mat Y, cv::Mat& Ybar);
+    //virtual void averageTransform(const cv::Mat Y, cv::Mat& Ybar);
 };
 
 } // namespace srs

@@ -28,6 +28,7 @@ set(${PROJECT_NAME}_SOURCES
 
     src/Motion.cpp
     src/MotionController.cpp
+    src/PositionUkf.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES

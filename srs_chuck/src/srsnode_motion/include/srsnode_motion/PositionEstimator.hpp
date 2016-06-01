@@ -10,7 +10,7 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
+//#include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
 #include <srslib_framework/filter/Sensor.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
@@ -23,15 +23,17 @@ using namespace std;
 #include <srsnode_motion/tap/odometry/RosTapOdometry.hpp>
 #include <srsnode_motion/tap/brain_stem_status/RosTapBrainStemStatus.hpp>
 #include <srsnode_motion/tap/initial_pose/RosTapInitialPose.hpp>
+#include <srsnode_motion/PositionUkf.hpp>
 
 namespace srs {
 
 class PositionEstimator
 {
 public:
-    PositionEstimator() :
-        ukf_(robot_, ALPHA, BETA),
-        previousTime_(-1.0)
+    PositionEstimator(double refreshRate) :
+        refreshRate_(refreshRate),
+        ukf_(robot_),
+        previousReadingTime_(-1.0)
     {}
 
     ~PositionEstimator()
@@ -66,31 +68,25 @@ public:
     {
         ROS_INFO_STREAM_NAMED("PositionEstimator", "Position Estimator Odometry: " << odometry);
 
-        // #######
+        // Calculate the elapsed time between odometry readings
         double currentTime = odometry.velocity.arrivalTime;
-        double dT = currentTime - previousTime_;
-        if (previousTime_ < 0.0)
+        double dT = currentTime - previousReadingTime_;
+        if (previousReadingTime_ < 0.0)
         {
-            dT = 1.0 / 50.0;
+            dT = 1.0 / refreshRate_;
         }
-        previousTime_ = currentTime;
+        previousReadingTime_ = currentTime;
 
-        // Transform a velocity point into a command
-        CmdVelocity<> command = CmdVelocity<>(odometry.velocity);
-
-        // Advance the state of the UKF
-        ukf_.run(dT, &command);
+        ukf_.run(dT, odometry);
     }
 
 private:
-    constexpr static double ALPHA = 0.5;
-    constexpr static double BETA = 2.0;
+    double previousReadingTime_;
 
+    double refreshRate_;
     Robot<> robot_;
 
-    double previousTime_;
-
-    UnscentedKalmanFilter<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE> ukf_;
+    PositionUkf ukf_;
 };
 
 } // namespace srs

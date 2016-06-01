@@ -28,19 +28,25 @@ public:
     typedef typename BaseKFType::BaseType BaseType;
 
     UnscentedKalmanFilter(Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process,
-        BaseType alpha = 0.01, BaseType beta = 2.0);
+        BaseType alpha, BaseType beta);
 
     ~UnscentedKalmanFilter()
     {}
 
 protected:
+    constexpr static BaseType UNDERFLOW_THRESHOLD = BaseType(1.0e-5);
+
+    void averageTransform(const cv::Mat Y, cv::Mat& Ybar);
+
+    cv::Mat calculateSigmaPoints(cv::Mat M, cv::Mat P);
+
+    void initializeWeights();
 
     void predict(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command);
 
+    void unscentedTransform(const cv::Mat X, const cv::Mat Y, const cv::Mat CHI,
+        cv::Mat& Ybar, cv::Mat& S, cv::Mat& C);
     void update();
-
-private:
-    constexpr static BaseType UNDERFLOW_THRESHOLD = BaseType(1.0e-5);
 
     BaseType alpha_;
     BaseType beta_;
@@ -50,13 +56,6 @@ private:
 
     cv::Mat WM_;
     cv::Mat WC_;
-
-    cv::Mat calculateSigmaPoints(cv::Mat M, cv::Mat P);
-
-    void initializeWeights();
-
-    void unscentedTransform(const cv::Mat X, const cv::Mat Y, const cv::Mat CHI,
-        cv::Mat& Ybar, cv::Mat& S, cv::Mat& C);
 };
 
 } // namespace srs

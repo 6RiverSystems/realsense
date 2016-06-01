@@ -32,42 +32,24 @@ cv::Mat Robot<TYPE>::FB(
 {
     StatePe<TYPE> state(stateVector);
 
-    BaseType v = reinterpret_cast<CmdVelocity<>*>(command)->velocity.linear;
-    BaseType w = reinterpret_cast<CmdVelocity<>*>(command)->velocity.angular;
+    state.v = reinterpret_cast<CmdVelocity<>*>(command)->velocity.linear;
+    state.omega = reinterpret_cast<CmdVelocity<>*>(command)->velocity.angular;
 
-    if (abs(w) > 0.01)
+    // Check for the special case in which omega is 0 (the robot is moving straight)
+    if (abs(state.omega) > ANGULAR_VELOCITY_EPSILON)
     {
-        double r = v / w;
+        double r = state.v / state.omega;
 
-        state.x = state.x + r * sin(state.theta + w * dT) - r * sin(state.theta);
-        state.y = state.y + r * cos(state.theta) - r * cos(state.theta + w * dT);
-        state.theta = state.theta + w * dT;
+        state.x = state.x + r * sin(state.theta + state.omega * dT) - r * sin(state.theta);
+        state.y = state.y + r * cos(state.theta) - r * cos(state.theta + state.omega * dT);
+        state.theta = state.theta + state.omega * dT;
     }
     else
     {
-        state.x = state.x + v * dT * cos(state.theta);
-        state.y = state.y + v * dT * sin(state.theta);
+        state.x = state.x + state.v * dT * cos(state.theta);
+        state.y = state.y + state.v * dT * sin(state.theta);
         // theta does not change
     }
-
-/*
-    // x = x + v * DT * cos(theta);
-    // y = y + v * DT * sin(theta);
-    // theta = theta + omega * DT;
-    state.x = state.x + state.v * dT * cos(state.theta);
-    state.y = state.y + state.v * dT * sin(state.theta);
-    state.theta = state.theta + state.omega * dT;
-
-    // if command.valid
-    //     v = command.velocity.linear;
-    //     omega = command.velocity.angular;
-    // end
-    if (command)
-    {
-        state.v = reinterpret_cast<CmdVelocity<>*>(command)->velocity.linear;
-        state.omega = reinterpret_cast<CmdVelocity<>*>(command)->velocity.angular;
-    }
-*/
 
     return state.getVectorForm();
 }

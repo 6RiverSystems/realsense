@@ -150,7 +150,7 @@ void Motion::outputVelocityCommand(Velocity<> outputCommand)
     messageTwist.linear.z = 0;
     messageTwist.angular.x = 0;
     messageTwist.angular.y = 0;
-    messageTwist.angular.z = outputCommand.angular;
+    messageTwist.angular.z = 0.0; // outputCommand.angular;
 
     pubCmdVel_.publish(messageTwist);
 }

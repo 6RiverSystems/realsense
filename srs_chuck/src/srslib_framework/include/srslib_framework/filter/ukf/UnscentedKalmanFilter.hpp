@@ -28,7 +28,7 @@ public:
     typedef typename BaseKFType::BaseType BaseType;
 
     UnscentedKalmanFilter(Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process,
-        BaseType alpha = 0.5, BaseType beta = 2.0);
+        BaseType alpha = 0.01, BaseType beta = 2.0);
 
     ~UnscentedKalmanFilter()
     {}

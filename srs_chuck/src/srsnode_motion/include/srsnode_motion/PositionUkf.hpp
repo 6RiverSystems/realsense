@@ -36,7 +36,7 @@ public:
         UnscentedKalmanFilter(process, alpha, beta)
     {}
 
-    ~PositionUkf()
+    virtual ~PositionUkf()
     {}
 
     void run(double dT, Odometry<> odometry)
@@ -48,7 +48,7 @@ public:
     }
 
 protected:
-    //virtual void averageTransform(const cv::Mat Y, cv::Mat& Ybar);
+    virtual void averageTransform(const cv::Mat Y, cv::Mat& Ybar);
 };
 
 } // namespace srs

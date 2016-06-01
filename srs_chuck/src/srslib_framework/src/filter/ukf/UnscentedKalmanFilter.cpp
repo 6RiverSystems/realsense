@@ -134,11 +134,11 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::unscentedTransform(
     // for i = 1 : size(CHI, 2)
     //     Ybar = Ybar + o.WM(i) * Y(:, i);
     // end
-    Ybar = Math::zeros(X);
 
     // Perform the average of the sigma points. The function
     // isolated so that it's possible to define a specific
     // function that depends on the type of data in the sigma points
+    Ybar = Math::zeros(X);
     averageTransform(Y, Ybar);
 
     // Calculate the predicted covariance matrix
@@ -212,7 +212,7 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::update()
     }
 
     Math::checkRange(BaseKFType::x_, UNDERFLOW_THRESHOLD, BaseType());
-    Math::checkRange(BaseKFType::P_, UNDERFLOW_THRESHOLD, BaseType());
+    Math::checkDiagonal(BaseKFType::P_, UNDERFLOW_THRESHOLD, UNDERFLOW_THRESHOLD);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

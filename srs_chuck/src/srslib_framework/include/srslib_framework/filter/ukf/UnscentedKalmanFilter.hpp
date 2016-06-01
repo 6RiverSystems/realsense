@@ -34,7 +34,7 @@ public:
     {}
 
 protected:
-    constexpr static BaseType UNDERFLOW_THRESHOLD = BaseType(1.0e-5);
+    constexpr static BaseType UNDERFLOW_THRESHOLD = BaseType(1.0e-8);
 
     virtual void averageTransform(const cv::Mat Y, cv::Mat& Ybar);
 

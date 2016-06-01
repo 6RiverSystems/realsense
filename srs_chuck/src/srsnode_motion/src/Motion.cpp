@@ -62,8 +62,6 @@ void Motion::run()
 
     reset(tapInitialPose_.getPose());
 
-    currentUkfTime_ = ros::Time::now();
-
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
     {
@@ -290,35 +288,23 @@ void Motion::stepNode()
     // Provide the command to the position estimator
     if (tapOdometry_.newDataAvailable())
     {
-        previousUkfTime_ = currentUkfTime_;
-        currentUkfTime_ = ros::Time::now();
-        double dTUkf = Time::time2number(currentUkfTime_) - Time::time2number(previousUkfTime_);
-
-        if (abs(dTUkf - 1.0 / 50.0) >= 0.01)
-        {
-            ROS_INFO_STREAM_NAMED("Motion", "################### ");
-        }
-        ROS_INFO_STREAM_NAMED("Motion", "dTUkf: " << dTUkf);
-
-        Velocity<> velocity = tapOdometry_.getSensor()->getOdometry().velocity;
-
-        positionEstimator_.run(dTUkf, &velocity);
+        positionEstimator_.run(tapOdometry_.getSensor()->getOdometry());
     }
 
     // Output the velocity command to the brainstem
     if (commandGenerated)
     {
-        // If the brain stem is disconnected, simulate odometry
-        // feeding the odometer the commanded velocity
-        if (!tapBrainStemStatus_.isBrainStemConnected())
-        {
-            ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
-                "Brainstem disconnected. Using simulated odometry");
-
-            tapOdometry_.set(Time::time2number(ros::Time::now()),
-                currentCommand_.linear,
-                currentCommand_.angular);
-        }
+//        // If the brain stem is disconnected, simulate odometry
+//        // feeding the odometer the commanded velocity
+//        if (!tapBrainStemStatus_.isBrainStemConnected())
+//        {
+//            ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
+//                "Brainstem disconnected. Using simulated odometry");
+//
+//            tapOdometry_.set(Time::time2number(ros::Time::now()),
+//                currentCommand_.linear,
+//                currentCommand_.angular);
+//        }
 
         ROS_INFO_STREAM_NAMED("Motion", "Sending command: " << currentCommand_);
         outputVelocityCommand(currentCommand_);

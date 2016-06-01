@@ -38,6 +38,7 @@ public:
 
     Odometry<BaseType> getOdometry()
     {
+        Sensor<STATE_SIZE, TYPE>::setNewData(false);
         return currentData_;
     }
 

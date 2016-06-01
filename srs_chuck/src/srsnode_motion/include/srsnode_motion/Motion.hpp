@@ -72,9 +72,6 @@ private:
     Velocity<> currentCommand_;
     ros::Time currentTime_;
 
-    ros::Time currentUkfTime_;
-    ros::Time previousUkfTime_;
-
     bool firstLocalization_;
 
     MotionController motionController_;

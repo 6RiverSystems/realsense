@@ -30,7 +30,8 @@ class PositionEstimator
 {
 public:
     PositionEstimator() :
-        ukf_(robot_, ALPHA, BETA)
+        ukf_(robot_, ALPHA, BETA),
+        previousTime_(-1.0)
     {}
 
     ~PositionEstimator()
@@ -61,12 +62,21 @@ public:
         ukf_.reset(currentState.getVectorForm(), currentCovariance);
     }
 
-    void run(double dT, Velocity<>* velocity)
+    void run(Odometry<> odometry)
     {
-        ROS_INFO_STREAM_NAMED("PositionEstimator", "Position Estimator Odometry: " << *velocity);
+        ROS_INFO_STREAM_NAMED("PositionEstimator", "Position Estimator Odometry: " << odometry);
+
+        // #######
+        double currentTime = odometry.velocity.arrivalTime;
+        double dT = currentTime - previousTime_;
+        if (previousTime_ < 0.0)
+        {
+            dT = 1.0 / 50.0;
+        }
+        previousTime_ = currentTime;
 
         // Transform a velocity point into a command
-        CmdVelocity<> command = CmdVelocity<>(*velocity);
+        CmdVelocity<> command = CmdVelocity<>(odometry.velocity);
 
         // Advance the state of the UKF
         ukf_.run(dT, &command);
@@ -77,6 +87,8 @@ private:
     constexpr static double BETA = 2.0;
 
     Robot<> robot_;
+
+    double previousTime_;
 
     UnscentedKalmanFilter<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE> ukf_;
 };

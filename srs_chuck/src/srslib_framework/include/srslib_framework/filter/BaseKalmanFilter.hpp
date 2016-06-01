@@ -10,6 +10,7 @@
 using namespace std;
 
 #include <opencv2/opencv.hpp>
+#include <ros/ros.h>
 
 #include <srslib_framework/utils/Ocv2Base.hpp>
 #include <srslib_framework/filter/Process.hpp>
@@ -63,8 +64,9 @@ public:
         predict(dT, command);
         update();
 
-        test::Print::print(x_, "x_");
-        test::Print::print(P_, "P_");
+        ROS_INFO_STREAM_NAMED("BaseKalmanFilter", "Current state: ");
+        ROS_INFO_STREAM_NAMED("BaseKalmanFilter", test::Print::printToString(x_, "x_"));
+        ROS_INFO_STREAM_NAMED("BaseKalmanFilter", test::Print::printToString(P_, "P_"));
     }
 
 protected:

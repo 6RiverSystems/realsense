@@ -63,7 +63,7 @@ public:
 
     void run(double dT, Velocity<>* velocity)
     {
-        cout << "odometry: " << *velocity << endl;
+        ROS_INFO_STREAM_NAMED("PositionEstimator", "Position Estimator Odometry: " << *velocity);
 
         // Transform a velocity point into a command
         CmdVelocity<> command = CmdVelocity<>(*velocity);

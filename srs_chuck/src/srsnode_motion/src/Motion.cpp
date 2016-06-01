@@ -296,11 +296,10 @@ void Motion::stepNode()
 
         if (abs(dTUkf - 1.0 / 50.0) >= 0.01)
         {
-            cout << "################### ";
+            ROS_INFO_STREAM_NAMED("Motion", "################### ");
         }
-        cout << "dTUkf: " << dTUkf << endl;
+        ROS_INFO_STREAM_NAMED("Motion", "dTUkf: " << dTUkf);
 
-        // Odometry<> odometry = tapOdometry_.getSensor()->getOdometry().velocity;
         Velocity<> velocity = tapOdometry_.getSensor()->getOdometry().velocity;
 
         positionEstimator_.run(dTUkf, &velocity);
@@ -321,8 +320,7 @@ void Motion::stepNode()
                 currentCommand_.angular);
         }
 
-        cout << "Command: " << currentCommand_ << endl;
-//        ROS_INFO_STREAM("Sending command: " << currentCommand_);
+        ROS_INFO_STREAM_NAMED("Motion", "Sending command: " << currentCommand_);
         outputVelocityCommand(currentCommand_);
     }
 }

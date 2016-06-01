@@ -30,13 +30,13 @@ public:
     UnscentedKalmanFilter(Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process,
         BaseType alpha, BaseType beta);
 
-    ~UnscentedKalmanFilter()
+    virtual ~UnscentedKalmanFilter()
     {}
 
 protected:
     constexpr static BaseType UNDERFLOW_THRESHOLD = BaseType(1.0e-5);
 
-    void averageTransform(const cv::Mat Y, cv::Mat& Ybar);
+    virtual void averageTransform(const cv::Mat Y, cv::Mat& Ybar);
 
     cv::Mat calculateSigmaPoints(cv::Mat M, cv::Mat P);
 

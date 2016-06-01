@@ -8,4 +8,15 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // protected methods
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void PositionUkf::averageTransform(const cv::Mat Y, cv::Mat& Ybar)
+{
+    cout << "active ##########################################################" << endl;
+    for (unsigned int i = 0; i < Y.cols; ++i)
+    {
+        Ybar += WM_.at<BaseType>(i) * Y.col(i);
+    }
+}
+
+
 } // namespace srs

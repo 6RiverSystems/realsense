@@ -46,6 +46,9 @@ public:
         CmdVelocity<> command = CmdVelocity<>(odometry.velocity);
         UkfType::run(dT, &command);
     }
+
+protected:
+    virtual void averageTransform(const cv::Mat Y, cv::Mat& Ybar);
 };
 
 } // namespace srs

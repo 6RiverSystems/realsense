@@ -39,7 +39,7 @@ struct Odometry : public Measurement
 
     friend ostream& operator<<(ostream& stream, const Odometry& odometry)
     {
-        return stream << "Odometry {v: " << odometry.velocity << "}";
+        return stream << "Odometry {" << odometry.velocity << "}";
     }
 
     Velocity<TYPE> velocity;

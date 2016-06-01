@@ -294,17 +294,17 @@ void Motion::stepNode()
     // Output the velocity command to the brainstem
     if (commandGenerated)
     {
-//        // If the brain stem is disconnected, simulate odometry
-//        // feeding the odometer the commanded velocity
-//        if (!tapBrainStemStatus_.isBrainStemConnected())
-//        {
-//            ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
-//                "Brainstem disconnected. Using simulated odometry");
-//
-//            tapOdometry_.set(Time::time2number(ros::Time::now()),
-//                currentCommand_.linear,
-//                currentCommand_.angular);
-//        }
+        // If the brain stem is disconnected, simulate odometry
+        // feeding the odometer the commanded velocity
+        if (!tapBrainStemStatus_.isBrainStemConnected())
+        {
+            ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
+                "Brainstem disconnected. Using simulated odometry");
+
+            tapOdometry_.set(Time::time2number(ros::Time::now()),
+                currentCommand_.linear,
+                currentCommand_.angular);
+        }
 
         ROS_INFO_STREAM_NAMED("Motion", "Sending command: " << currentCommand_);
         outputVelocityCommand(currentCommand_);

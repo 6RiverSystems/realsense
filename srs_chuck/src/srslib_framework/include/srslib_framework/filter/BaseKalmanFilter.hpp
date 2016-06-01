@@ -66,7 +66,7 @@ public:
 
         ROS_INFO_STREAM_NAMED("BaseKalmanFilter", "Current state: ");
         ROS_INFO_STREAM_NAMED("BaseKalmanFilter", test::Print::printToString(x_, "x_"));
-        ROS_INFO_STREAM_NAMED("BaseKalmanFilter", test::Print::printToString(P_, "P_"));
+        // ROS_INFO_STREAM_NAMED("BaseKalmanFilter", test::Print::printToString(P_, "P_"));
     }
 
 protected:

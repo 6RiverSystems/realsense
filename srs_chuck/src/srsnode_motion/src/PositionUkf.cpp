@@ -28,8 +28,8 @@ cv::Mat PositionUkf::addWeighted(const cv::Mat W, const cv::Mat X)
         s +=  weight * sin(theta);
     }
 
-    BaseType at = atan2(s / X.cols, c / X.cols);
-    R.at<BaseType>(StatePe<>::STATE_THETA) = at;
+//    BaseType at = atan2(s / X.cols, c / X.cols);
+//    R.at<BaseType>(StatePe<>::STATE_THETA) = at;
 
     return R;
 }
@@ -38,8 +38,8 @@ cv::Mat PositionUkf::addWeighted(const cv::Mat W, const cv::Mat X)
 cv::Mat PositionUkf::residual(const cv::Mat A, const cv::Mat B)
 {
     cv::Mat R = A - B;
-    R.at<BaseType>(StatePe<>::STATE_THETA) = Math::normalizeAngleRad(
-        R.at<BaseType>(StatePe<>::STATE_THETA));
+//    R.at<BaseType>(StatePe<>::STATE_THETA) = Math::normalizeAngleRad(
+//        R.at<BaseType>(StatePe<>::STATE_THETA));
 
     return R;
 }

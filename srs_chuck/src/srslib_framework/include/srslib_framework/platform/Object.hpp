@@ -22,10 +22,9 @@ public:
 
     virtual string toString()
     {
-        char buffer[10];
-        sprintf(buffer, "Object %p", this);
-
-        return string(buffer);
+		std::ostringstream stringStream;
+		stringStream << "Object: " << this;
+        return stringStream.str();
     }
 };
 

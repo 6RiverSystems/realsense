@@ -552,7 +552,7 @@ bool SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error
 
 		if( !m_bIsSerialOpen && bInitialCheck )
 		{
-			ROS_DEBUG( "Error connecting to serial port (%s): %s (Will retry every %.2f seconds)", m_strSerialPort.c_str( ),
+			ROS_DEBUG_NAMED( "SerialIO", "Error connecting to serial port (%s): %s (Will retry every %.2f seconds)", m_strSerialPort.c_str( ),
 				strError.c_str( ), m_fRetryTimeout );
 		}
 	}
@@ -561,11 +561,11 @@ bool SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error
 	{
 		if( m_bIsSerialOpen == true )
 		{
-			ROS_INFO( "Connected to serial port: %s", m_strSerialPort.c_str( ) );
+			ROS_INFO_NAMED( "SerialIO", "Connected to serial port: %s", m_strSerialPort.c_str( ) );
 		}
 		else
 		{
-			ROS_ERROR( "Disconnected from serial port (%s): %s (Will retry every %.2f seconds)", m_strSerialPort.c_str( ),
+			ROS_ERROR_NAMED( "SerialIO", "Disconnected from serial port (%s): %s (Will retry every %.2f seconds)", m_strSerialPort.c_str( ),
 				strError.c_str( ), m_fRetryTimeout );
 		}
 

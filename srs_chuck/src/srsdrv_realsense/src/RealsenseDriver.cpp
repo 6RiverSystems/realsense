@@ -51,8 +51,8 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan,
 
 	cv_bridge::CvImagePtr cvImage2 = GetCvImage( infraredImage2 );
 
-	cv::Mat combinedImages;
-	CombineImages( cvImage1->image, cvImage2->image, combinedImages );
+	cv::Mat combinedIRImage;
+	CombineImages( cvImage1->image, cvImage2->image, combinedIRImage );
 
 	ThresholdImage( cvImage1->image );
 
@@ -62,14 +62,25 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan,
 
 	infrared2Publisher_.publish( cvImage2->toImageMsg( ) );
 
-	ThresholdImage( combinedImages );
+	ThresholdImage( combinedIRImage );
 
 	cv_bridge::CvImage combinedMsg;
 	combinedMsg.header   = infraredImage2->header;
 	combinedMsg.encoding = infraredImage2->encoding;
-	combinedMsg.image    = combinedImages;
+	combinedMsg.image    = combinedIRImage;
 
 	infraredPublisher_.publish( combinedMsg );
+
+	const uint32_t numberOfScans = scan->ranges.size( );
+
+	const uint32_t xDiff = combinedIRImage.cols - numberOfScans;
+
+	// TODO:  We currently have a problem if the image is than the number of scans
+	const uint32_t xStart = xDiff/2;
+
+	const double distanceFromBot = 0.300;
+	const double robotHalfWidth = 0.310 / 2.0f;
+	const double irMaxHeight = 0.5f; // 50%
 
 	sensor_msgs::LaserScan irScan;
 	irScan.header			= scan->header;
@@ -79,41 +90,41 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan,
 	irScan.time_increment	= scan->time_increment;
 	irScan.scan_time		= scan->scan_time;
 	irScan.range_min		= 0.0f;
-	irScan.range_max		= 1.0f;
-
-	const uint32_t numberOfScans = scan->ranges.size( );
-
+	// Max distance should be the hypotenuse of the triangle
+	irScan.range_max		= sqrt((robotHalfWidth*robotHalfWidth)+(distanceFromBot*distanceFromBot));
 	irScan.ranges.assign( numberOfScans, std::numeric_limits<double>::infinity( ) );
 
-	const uint32_t xDiff = combinedImages.cols - numberOfScans;
-
-	// TODO:  We currently have a problem if the image is than the number of scans
-	const uint32_t xStart = xDiff/2;
-
-	const double distanceFromBot = 0.300;
-	const double robotHalfWidth = 0.310 / 2.0f;
+	int maxHeight = combinedIRImage.rows / 2;
 
 	for( int x = 0; x < numberOfScans; x++ )
 	{
-		double angle = (x * irScan.angle_increment) + irScan.angle_min;
+		double angle = ((double)x * irScan.angle_increment) + irScan.angle_min;
 
-		for( int y = 0; y < combinedImages.rows; y++ )
+		for( int y = 0; y < maxHeight; y++ )
 		{
-			if( combinedImages.at<uint8_t>(y, x + xStart) == 128 )
+			if( combinedIRImage.at<uint8_t>(y, x + xStart) == 128 )
 			{
-				double xDistance = distanceFromBot / cos( angle );
-				double yDistance = abs( distanceFromBot * sin( angle ) );
+				//            y Offset
+				//             ------
+				//             \    |
+				//              \   |
+				// scan distance \  | Distance from bot
+				//                \0|
+				//                 \|
+
+				double scanDistance = distanceFromBot / cos( angle );
+				double yOffset = abs( distanceFromBot * sin( angle ) );
 
 				// Only include data within the footprint (width) of the robot
-				if( yDistance <= robotHalfWidth )
+				if( yOffset <= robotHalfWidth )
 				{
 					if( irScan.ranges[x] == std::numeric_limits<double>::infinity( ) )
 					{
-						irScan.ranges[x] = xDistance;
+						irScan.ranges[x] = scanDistance;
 					}
 					else
 					{
-						irScan.ranges[x] = xDistance > irScan.ranges[x] ? xDistance : irScan.ranges[x];
+						irScan.ranges[x] = scanDistance > irScan.ranges[x] ? scanDistance : irScan.ranges[x];
 					}
 				}
 			}
@@ -122,21 +133,37 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan,
 
 	infraredScanPublisher_.publish( irScan );
 
+	sensor_msgs::LaserScan irCombined;
+	irCombined.header			= scan->header;
+	irCombined.angle_min		= scan->angle_min;
+	irCombined.angle_max		= scan->angle_max;
+	irCombined.angle_increment	= scan->angle_increment;
+	irCombined.time_increment	= scan->time_increment;
+	irCombined.scan_time		= scan->scan_time;
+	irCombined.range_min		= std::min( irScan.range_min, scan->range_min );
+	irCombined.range_max		= std::max( irScan.range_max, scan->range_max );
+	irCombined.ranges.assign( numberOfScans, std::numeric_limits<double>::infinity( ) );
+
 	for( int x = 0; x < numberOfScans; x++ )
 	{
 		if( irScan.ranges[x] == std::numeric_limits<double>::infinity( ) )
 		{
 			// Use the depth scan
-			irScan.ranges[x] = scan->ranges[x];
+			irCombined.ranges[x] = scan->ranges[x];
 		}
-		else if( scan->ranges[x] != std::numeric_limits<double>::infinity( ) )
+		else if( scan->ranges[x] == std::numeric_limits<double>::infinity( ) )
 		{
-			// If the depth scan is valid then pick the closest scan
-			irScan.ranges[x] = std::min( scan->ranges[x], scan->ranges[x] );
+			// Use the ir scan
+			irCombined.ranges[x] = irScan.ranges[x];
+		}
+		else
+		{
+			// Use the closests range
+			irCombined.ranges[x] = std::min( scan->ranges[x], irScan.ranges[x] );
 		}
 	}
 
-	combinedScanPublisher_.publish( irScan );
+	combinedScanPublisher_.publish( irCombined );
 }
 
 cv_bridge::CvImagePtr RealsenseDriver::GetCvImage( const sensor_msgs::Image::ConstPtr& image ) const

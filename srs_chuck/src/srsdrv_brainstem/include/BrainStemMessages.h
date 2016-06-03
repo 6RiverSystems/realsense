@@ -14,46 +14,33 @@ namespace srs {
 
 enum class BRAIN_STEM_MSG
 {
-	MESSAGE		= '<',
-	STOP		= 'S',
-	BUTTON		= 'B',
-	ODOMETRY	= 'O',
-	PID			= 'P',
+	MESSAGE				= 0x3C, // '<'
+	STOP				= 0x53, // 'S'
+	BUTTON				= 0x42, // 'B',
+	HARDWARE_INFO		= 0x59, // 'Y',
+	ODOMETRY_VELOCITY	= 0x4f, // 'O',
+	OPERATIONAL_STATE	= 0x47, // 'G',
+	SYSTEM_VOLTAGE		= 0x56, // 'V',
 	UNKNOWN
 };
 
 enum class BRAIN_STEM_CMD
 {
-	FORWARD = 'f',
-	BACKWARD = 'b',
-	RIGHT = 'r',
-	LEFT = 'l',
-	FORWARD_TIMED = 't',
-	BACKWARD_TIMED = 'u',
-	LEFT_TIMED = 'z',
-	RIGHT_TIMED = 'e',
-	CAM = 'v',
-	CAM_RELEASE = 'w',
-	CAM_HORIZ_SET = 'm',
-	STOP = 's',
-	HARD_STOP = 'h',
-	GET_VERSION = 'y',
-	GET_FIRMWARE = 'x',
-	FWD_FLOOD_LIGHT = 'q',
-	REAR_FLOOD_LIGHT = 'o',
-	SET_PID = 'p',
-	ODOMETRY_START = 'i',
-	ODOMETRY_STOP = 'j',
-	ODOMETRY_REPORT = 'k',
-	PING = 'c',
-	DISTANCE = 'd',
-	LIGHT_UPDATE = '7',
-	ROTATE = '0',
-	STARTUP = '8',
-	SLINGSHOT_RIGHT = '6',
-	SLINGSHOT_LEFT = '5',
-	SUSPEND_UPDATE_STATE = '4',
-	SET_VELOCITY = 'v',
+	CLEAR_MOTION_STATUS	= 0x31, // '1'
+	GET_VERSION			= 0x79, // 'y'
+	GET_STATE			= 0x67, // 'g'
+	HARD_STOP			= 0x68, // 'h'
+	PING				= 0x63, // 'c'
+	RESET_BATTERY_HOURS	= 0x62, // 'b'
+	RESET_WHEEL_METERS	= 0x77, // 'w'
+	LIGHT_UPDATE		= 0x37, // '7'
+	SET_CONFIGURATION	= 0x66, // 'f'
+	SET_MOTION_STATUS	= 0x32, // '2'
+	SET_SUSPEND_STATE	= 0x34, // '4'
+	SET_TOTE_LIGHTS		= 0x39, // '9'
+	SET_VELOCITY		= 0x76, // 'v'
+	STARTUP				= 0x38, // '8'
+	SHUTDOWN			= 0x78, // 'x'
 	UNKNOWN
 };
 

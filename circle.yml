@@ -1,0 +1,22 @@
+dependencies:
+  cache_directories:
+    - "~/.apt-cache"
+  pre:
+    - sudo rm -rf /var/cache/apt/archives && sudo ln -s ~/.apt-cache /var/cache/apt/archives && mkdir -p ~/.apt-cache/partial
+    - gpg --keyserver pgp.mit.edu --recv-keys 749D6EEC0353B12C
+    - gpg --export --armor 749D6EEC0353B12C | sudo apt-key add -
+    - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+    - sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 0xB01FA116
+    - sudo apt-get update
+    - sudo apt-get install ros-indigo-desktop-full
+    - sudo rosdep init
+    - rosdep update
+    - echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
+    - cd ~/ros/srs_chuck/src && catkin_init_workspace
+    - sudo apt-get install socat
+    - sudo apt-get install python-gevent=1.0-1ubuntu1
+    - echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:${PYTHONPATH}" >> ~/.bashrc
+
+test:
+  override:
+    - cd ~/ros/srs_chuck && catkin_make run_tests

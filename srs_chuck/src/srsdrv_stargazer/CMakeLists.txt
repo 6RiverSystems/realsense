@@ -9,6 +9,7 @@ set(PROJECT_NAME srsdrv_stargazer)
 
 set(${PROJECT_NAME}_SOURCES
 	src/StarGazerMessageProcessor.cpp
+    src/StarGazerFilter.cpp
     src/StarGazer.cpp
 )
 
@@ -29,6 +30,7 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
     tf
+    tf2_sensor_msgs
     srslib_framework
     srslib_test
 )

@@ -13,6 +13,8 @@
     <xacro:property name="base_z_size" value="0.3010916" />
     <xacro:property name="base_z_offset" value="0.01905" />
     <xacro:property name="base_mass" value="86.1826" />
+    
+	<xacro:property name="base_footprint_z_offset" value="${base_z_offset + base_z_size/2}" />
 
     <!-- Tray support -->
     <xacro:property name="support_x_size" value="0.050" />
@@ -53,7 +55,20 @@
     <xacro:property name="caster_back_x_offset" value="-0.3564382" />
     <xacro:property name="caster_z_offset" value="${wheel_z_offset - (wheel_radius - caster_radius) + 0.0001 }" />
     
+    <!-- Realsense Position (relative to base_link) -->
+    <xacro:property name="r200_x_offset" value="${base_x_size/2}" />
+    <xacro:property name="r200_y_offset" value="${r200_cam_y_size/2}" />
+    <xacro:property name="r200_z_offset" value="${r200_cam_z_size + realsense_z_offset}" />
+    
     <!-- Sensors -->
+    
+    <!-- Realsense -->
 	<xacro:property name="realsense_z_offset" value="0.0641858" />
+    
+    <!-- Stargazer -->
+    <!-- All measurements made from base_link -> bottom left corner of stargazer -->
+	<xacro:property name="stargazer_x_offset" value="-0.4217162" />
+	<xacro:property name="stargazer_y_offset" value="-0.0352552" />
+	<xacro:property name="stargazer_z_offset" value="0.998982" />
     
 </robot>

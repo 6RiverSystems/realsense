@@ -21,6 +21,8 @@ using namespace std;
 
 namespace srs {
 
+// TODO Remove the sensor definition from Odometry
+
 class RosTapOdometry :
     public RosTap
 {

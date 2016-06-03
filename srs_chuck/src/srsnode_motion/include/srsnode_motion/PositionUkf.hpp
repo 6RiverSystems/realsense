@@ -7,18 +7,11 @@
 #define POSITIONUKF_HPP_
 
 #include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
-#include <srslib_framework/filter/Sensor.hpp>
-#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/robotics/Odometry.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
-#include <srslib_framework/ros/RosTap.hpp>
 
 #include <srsnode_motion/Configuration.hpp>
-#include <srsnode_motion/Robot.hpp>
-#include <srsnode_motion/StatePe.hpp>
-
-#include <srsnode_motion/tap/odometry/RosTapOdometry.hpp>
-#include <srsnode_motion/tap/brain_stem_status/RosTapBrainStemStatus.hpp>
-#include <srsnode_motion/tap/initial_pose/RosTapInitialPose.hpp>
+#include <srsnode_motion/CmdVelocity.hpp>
 
 namespace srs {
 
@@ -48,7 +41,9 @@ public:
     }
 
 protected:
-    virtual void averageTransform(const cv::Mat Y, cv::Mat& Ybar);
+    cv::Mat averageTransform(const cv::Mat W, const cv::Mat X);
+
+    cv::Mat residualTransform(const cv::Mat A, const cv::Mat B);
 };
 
 } // namespace srs

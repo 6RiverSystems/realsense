@@ -10,19 +10,18 @@
 #include <vector>
 using namespace std;
 
-//#include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
 #include <srslib_framework/filter/Sensor.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 #include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTapBrainStem.hpp>
+#include <srslib_framework/ros/tap/RosTapInitialPose.hpp>
 
 #include <srsnode_motion/Configuration.hpp>
 #include <srsnode_motion/Robot.hpp>
 #include <srsnode_motion/StatePe.hpp>
 
 #include <srsnode_motion/tap/odometry/RosTapOdometry.hpp>
-#include <srsnode_motion/tap/brain_stem_status/RosTapBrainStemStatus.hpp>
-#include <srsnode_motion/tap/initial_pose/RosTapInitialPose.hpp>
 #include <srsnode_motion/PositionUkf.hpp>
 
 namespace srs {

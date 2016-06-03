@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPBRAINSTEMSTATUS_HPP_
-#define ROSTAPBRAINSTEMSTATUS_HPP_
+#ifndef ROSTAPBRAINSTEM_HPP_
+#define ROSTAPBRAINSTEM_HPP_
 
 #include <string>
 using namespace std;
@@ -16,18 +16,18 @@ using namespace std;
 
 namespace srs {
 
-class RosTapBrainStemStatus :
+class RosTapBrainStem :
     public RosTap
 {
 public:
-    RosTapBrainStemStatus(ros::NodeHandle rosHandle) :
+    RosTapBrainStem(ros::NodeHandle rosHandle) :
         RosTap(rosHandle, "Brain Stem Status Tap"),
         connectionStateChanged_(false),
         isBrainStemConnected_(false),
         prevBrainStemConnected_(false)
     {}
 
-    ~RosTapBrainStemStatus()
+    ~RosTapBrainStem()
     {
         disconnectTap();
     }
@@ -46,7 +46,7 @@ protected:
     bool connect()
     {
         rosSubscriber_ = rosNodeHandle_.subscribe("/brain_stem/connected", 100,
-            &RosTapBrainStemStatus::onBrainStemConnected, this);
+            &RosTapBrainStem::onBrainStemConnected, this);
 
         return true;
     }
@@ -74,4 +74,4 @@ private:
 
 } // namespace srs
 
-#endif // ROSTAPBRAINSTEMSTATUS_HPP_
+#endif // ROSTAPBRAINSTEM_HPP_

@@ -51,9 +51,14 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/ros/RosService.hpp
     include/${PROJECT_NAME}/ros/service/RosServiceTrigger.hpp
     include/${PROJECT_NAME}/ros/service/RosTriggerShutdown.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapBrainStem.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapGoalPlan.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapInitialPose.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapJoy.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapJoyAdapter.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapMap.hpp
     src/ros/tap/RosTapMap.cpp
 
     include/${PROJECT_NAME}/search/SearchAction.hpp

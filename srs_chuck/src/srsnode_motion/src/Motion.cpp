@@ -31,7 +31,7 @@ Motion::Motion(string nodeName) :
     rosNodeHandle_(nodeName),
     // tapPlan_(rosNodeHandle_),
     tapJoyAdapter_(rosNodeHandle_),
-    tapBrainStemStatus_(rosNodeHandle_),
+    tapBrainStem_(rosNodeHandle_),
     tapOdometry_(rosNodeHandle_),
     tapInitialPose_(rosNodeHandle_),
     tapAps_(rosNodeHandle_),
@@ -85,7 +85,7 @@ void Motion::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::connectAllTaps()
 {
-    tapBrainStemStatus_.connectTap();
+    tapBrainStem_.connectTap();
     tapOdometry_.connectTap();
     tapInitialPose_.connectTap();
     //tapPlan_.connectTap();
@@ -102,7 +102,7 @@ void Motion::connectAllTaps()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::disconnectAllTaps()
 {
-    tapBrainStemStatus_.disconnectTap();
+    tapBrainStem_.disconnectTap();
     tapOdometry_.disconnectTap();
     tapInitialPose_.disconnectTap();
     //tapPlan_.disconnectTap();
@@ -296,7 +296,7 @@ void Motion::stepNode()
     {
         // If the brain stem is disconnected, simulate odometry
         // feeding the odometer the commanded velocity
-        if (!tapBrainStemStatus_.isBrainStemConnected())
+        if (!tapBrainStem_.isBrainStemConnected())
         {
             ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
                 "Brainstem disconnected. Using simulated odometry");

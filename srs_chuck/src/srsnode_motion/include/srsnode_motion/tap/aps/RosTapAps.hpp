@@ -12,10 +12,10 @@ using namespace std;
 #include <ros/ros.h>
 
 #include <srslib_framework/math/Time.hpp>
-#include <srslib_framework/Aps.h>
+#include <srsnode_motion/tap/aps/ApsSensor.hpp>
 #include <srslib_framework/ros/RosTap.hpp>
 
-#include <srsnode_motion/tap/aps/ApsSensor.hpp>
+#include <geometry_msgs/PoseStamped.h>
 
 namespace srs {
 
@@ -81,14 +81,12 @@ protected:
     }
 
 private:
-    void onAps(srslib_framework::ApsConstPtr message)
+    void onAps(const geometry_msgs::PoseStampedPtr& message)
     {
-        ROS_INFO_STREAM("APS tap received data.");
-
         set(Time::time2number(message->header.stamp),
-            static_cast<double>(message->x),
-            static_cast<double>(message->y),
-            static_cast<double>(message->yaw));
+            static_cast<double>(message->pose.position.x),
+            static_cast<double>(message->pose.position.y),
+            static_cast<double>(tf::getYaw(message->pose.orientation)));
     }
 
     ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensor_;

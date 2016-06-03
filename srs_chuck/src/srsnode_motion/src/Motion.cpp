@@ -14,6 +14,7 @@
 #include <srslib_framework/search/SearchPosition.hpp>
 #include <srslib_framework/planning/pathplanning/SolutionNode.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
+#include <srslib_framework/robotics/Odometry.hpp>
 
 namespace srs {
 
@@ -24,13 +25,13 @@ namespace srs {
 Motion::Motion(string nodeName) :
     currentCommand_(),
     firstLocalization_(true),
-    positionEstimator_(),
+    positionEstimator_(REFRESH_RATE_HZ),
     motionController_(),
     robot_(),
     rosNodeHandle_(nodeName),
     // tapPlan_(rosNodeHandle_),
     tapJoyAdapter_(rosNodeHandle_),
-    tapBrainStemStatus_(rosNodeHandle_),
+    tapBrainStem_(rosNodeHandle_),
     tapOdometry_(rosNodeHandle_),
     tapInitialPose_(rosNodeHandle_),
     tapAps_(rosNodeHandle_),
@@ -84,7 +85,7 @@ void Motion::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::connectAllTaps()
 {
-    tapBrainStemStatus_.connectTap();
+    tapBrainStem_.connectTap();
     tapOdometry_.connectTap();
     tapInitialPose_.connectTap();
     //tapPlan_.connectTap();
@@ -101,7 +102,7 @@ void Motion::connectAllTaps()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::disconnectAllTaps()
 {
-    tapBrainStemStatus_.disconnectTap();
+    tapBrainStem_.disconnectTap();
     tapOdometry_.disconnectTap();
     tapInitialPose_.disconnectTap();
     //tapPlan_.disconnectTap();
@@ -149,7 +150,7 @@ void Motion::outputVelocityCommand(Velocity<> outputCommand)
     messageTwist.linear.z = 0;
     messageTwist.angular.x = 0;
     messageTwist.angular.y = 0;
-    messageTwist.angular.z = 0/*outputCommand.angular*/; // #######
+    messageTwist.angular.z = outputCommand.angular;
 
     pubCmdVel_.publish(messageTwist);
 }
@@ -257,14 +258,6 @@ void Motion::stepNode()
     // Calculate the elapsed time
     double dT = Time::time2number(currentTime_) - Time::time2number(previousTime_);
 
-    if (dT > 10 * (1.0/REFRESH_RATE_HZ))
-    {
-        ROS_INFO_STREAM("Skip to current time. Delta: " << dT);
-        dT = 1.0 / REFRESH_RATE_HZ;
-    }
-
-    ROS_INFO_STREAM("Delta: " << dT); // ########
-
     // If the joystick was touched, we know that we are latched
     if (tapJoyAdapter_.newDataAvailable())
     {
@@ -274,8 +267,8 @@ void Motion::stepNode()
         commandGenerated = true;
         currentCommand_ = tapJoyAdapter_.getVelocity();
 
-        ROS_DEBUG_STREAM_NAMED(rosNodeHandle_.getNamespace().c_str(),
-            "Receiving command from joystick: " << currentCommand_);
+//        ROS_DEBUG_STREAM_NAMED(rosNodeHandle_.getNamespace().c_str(),
+//            "Receiving command from joystick: " << currentCommand_);
     }
     else {
         // Run the motion controller with the current pose estimate
@@ -293,25 +286,27 @@ void Motion::stepNode()
     }
 
     // Provide the command to the position estimator
-    Velocity<>* peCommand = /*commandGenerated ? &currentCommand_ : */nullptr; // #######
-    positionEstimator_.run(dT, peCommand);
+    if (tapOdometry_.newDataAvailable())
+    {
+        positionEstimator_.run(tapOdometry_.getSensor()->getOdometry());
+    }
 
     // Output the velocity command to the brainstem
     if (commandGenerated)
     {
         // If the brain stem is disconnected, simulate odometry
         // feeding the odometer the commanded velocity
-        if (!tapBrainStemStatus_.isBrainStemConnected())
+        if (!tapBrainStem_.isBrainStemConnected())
         {
             ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
                 "Brainstem disconnected. Using simulated odometry");
 
             tapOdometry_.set(Time::time2number(ros::Time::now()),
                 currentCommand_.linear,
-                0/*currentCommand_.angular*/); // #######
+                currentCommand_.angular);
         }
 
-        ROS_INFO_STREAM("Sending command: " << currentCommand_);
+        ROS_INFO_STREAM_NAMED("Motion", "Sending command: " << currentCommand_);
         outputVelocityCommand(currentCommand_);
     }
 }

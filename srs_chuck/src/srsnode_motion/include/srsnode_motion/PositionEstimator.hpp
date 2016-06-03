@@ -10,27 +10,29 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
 #include <srslib_framework/filter/Sensor.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 #include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTapBrainStem.hpp>
+#include <srslib_framework/ros/tap/RosTapInitialPose.hpp>
 
 #include <srsnode_motion/Configuration.hpp>
 #include <srsnode_motion/Robot.hpp>
 #include <srsnode_motion/StatePe.hpp>
 
 #include <srsnode_motion/tap/odometry/RosTapOdometry.hpp>
-#include <srsnode_motion/tap/brain_stem_status/RosTapBrainStemStatus.hpp>
-#include <srsnode_motion/tap/initial_pose/RosTapInitialPose.hpp>
+#include <srsnode_motion/PositionUkf.hpp>
 
 namespace srs {
 
 class PositionEstimator
 {
 public:
-    PositionEstimator() :
-        ukf_(ALPHA, BETA, robot_)
+    PositionEstimator(double refreshRate) :
+        refreshRate_(refreshRate),
+        ukf_(robot_),
+        previousReadingTime_(-1.0)
     {}
 
     ~PositionEstimator()
@@ -43,44 +45,47 @@ public:
 
     Pose<> getPose()
     {
-        StatePe<> currentState = StatePe<>(ukf_.getState());
+        StatePe<> currentState = StatePe<>(ukf_.getX());
         return currentState.getPose();
     }
 
     Velocity<> getVelocity()
     {
-        StatePe<> currentState = StatePe<>(ukf_.getState());
+        StatePe<> currentState = StatePe<>(ukf_.getX());
         return currentState.getVelocity();
     }
 
     void reset(Pose<> initialPose)
     {
         StatePe<> currentState = StatePe<>(initialPose);
-        cv::Mat currentCovariance = robot_.getNoiseMatrix();
+        cv::Mat currentCovariance = robot_.getQ();
 
         ukf_.reset(currentState.getVectorForm(), currentCovariance);
     }
 
-    void run(double dT, Velocity<>* velocity)
+    void run(Odometry<> odometry)
     {
-        // Transform a velocity point into a command
-        CmdVelocity<> command;
-        if (velocity)
-        {
-            command = CmdVelocity<>(*velocity);
-        }
+        ROS_INFO_STREAM_NAMED("PositionEstimator", "Position Estimator Odometry: " << odometry);
 
-        // Advance the state of the UKF
-        ukf_.run(dT, velocity ? &command : nullptr);
+        // Calculate the elapsed time between odometry readings
+        double currentTime = odometry.velocity.arrivalTime;
+        double dT = currentTime - previousReadingTime_;
+        if (previousReadingTime_ < 0.0)
+        {
+            dT = 1.0 / refreshRate_;
+        }
+        previousReadingTime_ = currentTime;
+
+        ukf_.run(dT, odometry);
     }
 
 private:
-    constexpr static double ALPHA = 1.0;
-    constexpr static double BETA = 0.0;
+    double previousReadingTime_;
 
+    double refreshRate_;
     Robot<> robot_;
 
-    UnscentedKalmanFilter<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE> ukf_;
+    PositionUkf ukf_;
 };
 
 } // namespace srs

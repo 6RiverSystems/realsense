@@ -168,6 +168,14 @@ struct Math
         return Math::normalizeAngleDeg(static_cast<int>(angle));
     }
 
+    /**
+     * @brief Normalize the specified angle [rad] to a [-pi, pi) range.
+     *
+     * @tparam TYPE Basic type of the operation
+     * @param rad Angle to normalize
+     *
+     * @return normalized angle to a [-pi, pi) range
+     */
     template<typename TYPE = double>
     constexpr inline static TYPE normalizeAngleRad(TYPE rad)
     {

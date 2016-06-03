@@ -88,7 +88,7 @@ private:
     RosTapAps tapAps_;
     // RosTapGoalPlan tapPlan_;
     RosTapJoyAdapter<> tapJoyAdapter_;
-    RosTapBrainStemStatus tapBrainStemStatus_;
+    RosTapBrainStem tapBrainStem_;
     RosTapOdometry tapOdometry_;
     RosTapInitialPose tapInitialPose_; // TODO: This should be a command (trigger) passed down by Executive
     Trajectory trajectoryConverter_;

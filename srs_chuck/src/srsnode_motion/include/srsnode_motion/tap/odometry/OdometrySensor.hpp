@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ODOMETER_HPP_
-#define ODOMETER_HPP_
+#ifndef ODOMETRYSENSOR_HPP_
+#define ODOMETRYSENSOR_HPP_
 
 #include <ros/ros.h>
 
@@ -38,6 +38,7 @@ public:
 
     Odometry<BaseType> getOdometry()
     {
+        Sensor<STATE_SIZE, TYPE>::setNewData(false);
         return currentData_;
     }
 
@@ -51,15 +52,14 @@ public:
     {
         if (Sensor<STATE_SIZE, TYPE>::isEnabled())
         {
-            //ROS_INFO_STREAM("set called on odometry: v: " << linear
-            //	<< ", omega: " << angular);
+            ROS_INFO_STREAM_NAMED("OdometrySensor", "l:" << linear << ", a: " << angular);
 
             currentData_ = Odometry<BaseType>(arrivalTime, linear, angular);
             Sensor<STATE_SIZE, TYPE>::setNewData(true);
         }
     }
 
-    virtual cv::Mat transformWithH(const cv::Mat stateVector);
+    virtual cv::Mat H(const cv::Mat stateVector);
 
 private:
     const static cv::Mat R;
@@ -70,4 +70,4 @@ private:
 
 #include <tap/odometry/OdometrySensor.cpp>
 
-#endif // ODOMETER_HPP_
+#endif // ODOMETRYSENSOR_HPP_

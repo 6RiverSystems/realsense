@@ -12,6 +12,7 @@ using namespace std;
 #include <opencv2/opencv.hpp>
 
 #include <srslib_framework/utils/Ocv2Base.hpp>
+#include <srslib_framework/filter/BaseKalmanFilter.hpp>
 #include <srslib_framework/filter/Process.hpp>
 #include <srslib_framework/filter/FilterState.hpp>
 #include <srslib_framework/filter/Command.hpp>
@@ -20,39 +21,34 @@ using namespace std;
 namespace srs {
 
 template<unsigned int STATE_SIZE = 5, unsigned int COMMAND_SIZE = 2, int TYPE = CV_64F>
-class UnscentedKalmanFilter
+class UnscentedKalmanFilter : public BaseKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>
 {
 public:
-    typedef typename Ocv2Base<TYPE>::BaseType BaseType;
+    typedef BaseKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE> BaseKFType;
+    typedef typename BaseKFType::BaseType BaseType;
 
-    UnscentedKalmanFilter(BaseType alpha, BaseType beta,
-        Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process);
+    UnscentedKalmanFilter(Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process,
+        BaseType alpha, BaseType beta);
 
-    ~UnscentedKalmanFilter()
+    virtual ~UnscentedKalmanFilter()
     {}
 
-    void addSensor(Sensor<STATE_SIZE, TYPE>* sensor)
-    {
-        sensors_.push_back(sensor);
-    }
+protected:
+    constexpr static BaseType UNDERFLOW_THRESHOLD = BaseType(1.0e-8);
 
-    cv::Mat getState()
-    {
-        return state_;
-    }
+    virtual cv::Mat addWeighted(const cv::Mat W, const cv::Mat X);
 
-    cv::Mat getCovariance()
-    {
-        return covariance_;
-    }
+    cv::Mat calculateSigmaPoints(cv::Mat M, cv::Mat P);
 
-    void reset(cv::Mat stateT0, cv::Mat covarianceT0);
-    void run(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command);
+    void initializeWeights();
 
-private:
-    constexpr static BaseType UNDERFLOW_THRESHOLD = BaseType(1.0e-5);
+    void predict(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command);
 
-    vector<Sensor<STATE_SIZE, TYPE>*> sensors_;
+    virtual cv::Mat residual(const cv::Mat A, const cv::Mat B);
+
+    void unscentedTransform(const cv::Mat X, const cv::Mat Y, const cv::Mat CHI,
+        cv::Mat& Ybar, cv::Mat& S, cv::Mat& C);
+    void update();
 
     BaseType alpha_;
     BaseType beta_;
@@ -62,21 +58,6 @@ private:
 
     cv::Mat WM_;
     cv::Mat WC_;
-
-    Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process_;
-    cv::Mat covariance_;
-    cv::Mat state_;
-
-    cv::Mat calculateSigmaPoints(cv::Mat M, cv::Mat P);
-
-    void initializeWeights();
-
-    void predict(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command);
-
-    void unscentedTransform(
-        const cv::Mat X, const cv::Mat Y, const cv::Mat CHI,
-        cv::Mat& Ybar, cv::Mat& S, cv::Mat& C);
-    void update();
 };
 
 } // namespace srs

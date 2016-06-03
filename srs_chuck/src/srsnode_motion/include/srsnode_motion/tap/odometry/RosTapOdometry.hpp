@@ -21,6 +21,8 @@ using namespace std;
 
 namespace srs {
 
+// TODO Remove the sensor definition from Odometry
+
 class RosTapOdometry :
     public RosTap
 {
@@ -78,8 +80,6 @@ protected:
 private:
     void onSensorsOdometryRaw(geometry_msgs::TwistStampedConstPtr message)
     {
-        //ROS_INFO_STREAM("onSensorsOdometryRaw: v: " << message->twist.linear.x
-        //	<< ", omega: " << message->twist.angular.z);
         set(Time::time2number(message->header.stamp),
             static_cast<double>(message->twist.linear.x),
             static_cast<double>(message->twist.angular.z));

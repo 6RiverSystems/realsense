@@ -33,12 +33,7 @@ public:
     virtual ~Model()
     {}
 
-    cv::Mat getNoiseMatrix()
-    {
-        return noiseMatrix_;
-    }
-
-private:
+protected:
     cv::Mat noiseMatrix_;
 };
 

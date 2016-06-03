@@ -32,15 +32,14 @@ cv::Mat OdometrySensor<STATE_SIZE, TYPE>::getCurrentData()
     state.v = currentData_.velocity.linear;
     state.omega = currentData_.velocity.angular;
 
-    //ROS_INFO_STREAM("getCurrentData Odometry: v: " << state.v
-    //	<< ", omega: " << state.omega);
+    Sensor<STATE_SIZE, TYPE>::setNewData(false);
 
     return state.getVectorForm();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, int TYPE>
-cv::Mat OdometrySensor<STATE_SIZE, TYPE>::transformWithH(const cv::Mat stateVector)
+cv::Mat OdometrySensor<STATE_SIZE, TYPE>::H(const cv::Mat stateVector)
 {
     StatePe<TYPE> state = StatePe<TYPE>(stateVector);
 

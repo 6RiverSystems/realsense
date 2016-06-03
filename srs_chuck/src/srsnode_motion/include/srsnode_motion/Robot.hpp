@@ -20,13 +20,15 @@ template<int TYPE = CV_64F>
 class Robot : public Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>
 {
 public:
+    typedef typename Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>::BaseType BaseType;
+
     // Standard deviation values for the robot process
-    constexpr static double ERROR_LOCATION = 0.01; // [m]
+    constexpr static double ERROR_LOCATION = 0.001; // [m]
     constexpr static double ERROR_HEADING = Math::deg2rad<double>(1.0); // [rad]
     constexpr static double ERROR_LINEAR_VELOCITY = 0.006; // [m/s]
     constexpr static double ERROR_ANGULAR_VELOCITY = 0.006; // [m/s]
 
-    typedef typename Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>::BaseType BaseType;
+    constexpr static double ANGULAR_VELOCITY_EPSILON = 0.001; // [rad/s] (0.0573 [deg/s])
 
     Robot() :
         Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>(cv::Mat::diag(Q))
@@ -35,7 +37,8 @@ public:
     virtual ~Robot()
     {}
 
-    virtual cv::Mat transformWithAB(const cv::Mat stateVector,
+    virtual cv::Mat FB(
+        const cv::Mat stateVector,
         Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>* const command,
         BaseType dT);
 

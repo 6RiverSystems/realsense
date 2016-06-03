@@ -22,11 +22,19 @@ struct Print
     template<unsigned int PRECISION = 6, typename TYPE = double>
     static void print(cv::Mat matrix, string name = "")
     {
+        cout << printToString(matrix, name) << endl;
+    }
+
+    template<unsigned int PRECISION = 6, typename TYPE = double>
+    static string printToString(cv::Mat matrix, string name = "")
+    {
+        ostringstream output;
+
         if (!name.empty())
         {
-            cout << name << " ";
+            output << name << " ";
         }
-        cout << "(" << matrix.rows << "x" << matrix.cols << ") {" << endl;
+        output << "(" << matrix.rows << "x" << matrix.cols << ") {" << endl;
 
         TYPE threshold = pow(TYPE(10.0), -TYPE(PRECISION));
         for (unsigned int r = 0; r < matrix.rows; ++r)
@@ -36,18 +44,21 @@ struct Print
                 TYPE value = matrix.at<TYPE>(r, c);
                 if (abs(value) > threshold)
                 {
-                    cout << setfill(' ') << setw(PRECISION + 5) << scientific <<
+                    output << setfill(' ') << setw(PRECISION + 5) << scientific <<
                         setprecision(PRECISION - 3) << value;
                 }
                 else
                 {
-                    cout << setfill(' ') << setw(PRECISION + 5) << "0";
+                    output << setfill(' ') << setw(PRECISION + 5) << "0";
                 }
             }
-            cout << endl;
+            output << endl;
         }
-        cout << "}" << endl;
+        output << "}";
+
+        return output.str();
     }
+
 };
 
 } // namespace test

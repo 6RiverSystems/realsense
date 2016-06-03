@@ -25,27 +25,30 @@ const cv::Mat Robot<TYPE>::Q = (
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<int TYPE>
-cv::Mat Robot<TYPE>::transformWithAB(const cv::Mat stateVector,
+cv::Mat Robot<TYPE>::FB(
+    const cv::Mat stateVector,
     Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>* const command,
     BaseType dT)
 {
     StatePe<TYPE> state(stateVector);
 
-    // x = x + v * DT * cos(theta);
-    // y = y + v * DT * sin(theta);
-    // theta = theta + omega * DT;
-    state.x = state.x + state.v * dT * cos(state.theta);
-    state.y = state.y + state.v * dT * sin(state.theta);
-    state.theta = state.theta + state.omega * dT;
+    state.v = reinterpret_cast<CmdVelocity<>*>(command)->velocity.linear;
+    state.omega = reinterpret_cast<CmdVelocity<>*>(command)->velocity.angular;
 
-    // if command.valid
-    //     v = command.velocity.linear;
-    //     omega = command.velocity.angular;
-    // end
-    if (command)
+    // Check for the special case in which omega is 0 (the robot is moving straight)
+    if (abs(state.omega) > ANGULAR_VELOCITY_EPSILON)
     {
-        state.v = reinterpret_cast<CmdVelocity<>*>(command)->velocity.linear;
-        state.omega = reinterpret_cast<CmdVelocity<>*>(command)->velocity.angular;
+        double r = state.v / state.omega;
+
+        state.x = state.x + r * sin(state.theta + state.omega * dT) - r * sin(state.theta);
+        state.y = state.y + r * cos(state.theta) - r * cos(state.theta + state.omega * dT);
+        state.theta = state.theta + state.omega * dT;
+    }
+    else
+    {
+        state.x = state.x + state.v * dT * cos(state.theta);
+        state.y = state.y + state.v * dT * sin(state.theta);
+        // theta does not change
     }
 
     return state.getVectorForm();

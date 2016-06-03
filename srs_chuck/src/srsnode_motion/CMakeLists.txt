@@ -12,11 +12,6 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/tap/aps/ApsSensor.hpp
     include/${PROJECT_NAME}/tap/aps/RosTapAps.hpp
 
-    include/${PROJECT_NAME}/tap/brain_stem_status/RosTapBrainStemStatus.hpp
-
-    include/${PROJECT_NAME}/tap/initial_pose/RosTapInitialPose.hpp
-
-    include/${PROJECT_NAME}/tap/RosTapCmd_Goal.hpp
     include/${PROJECT_NAME}/tap/odometry/OdometrySensor.hpp
     include/${PROJECT_NAME}/tap/odometry/RosTapOdometry.hpp
 
@@ -28,6 +23,7 @@ set(${PROJECT_NAME}_SOURCES
 
     src/Motion.cpp
     src/MotionController.cpp
+    src/PositionUkf.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES

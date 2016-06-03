@@ -18,7 +18,7 @@ namespace srs {
 class PositionUkf : public UnscentedKalmanFilter<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE>
 {
 public:
-    constexpr static double ALPHA = 0.1;
+    constexpr static double ALPHA = 0.0001;
     constexpr static double BETA = 2.0;
 
     typedef UnscentedKalmanFilter<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE> UkfType;

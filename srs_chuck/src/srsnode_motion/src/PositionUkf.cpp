@@ -20,16 +20,15 @@ cv::Mat PositionUkf::addWeighted(const cv::Mat W, const cv::Mat X)
 
     for (unsigned int i = 0; i < X.cols; ++i)
     {
-        double weight = W.at<BaseType>(i);
+        BaseType weight = W.at<BaseType>(i);
         R += weight * X.col(i);
 
-        double theta = X.at<BaseType>(i, StatePe<>::STATE_THETA);
+        BaseType theta = X.at<BaseType>(StatePe<>::STATE_THETA, i);
         c +=  weight * cos(theta);
         s +=  weight * sin(theta);
     }
 
-//    BaseType at = atan2(s / X.cols, c / X.cols);
-//    R.at<BaseType>(StatePe<>::STATE_THETA) = at;
+    R.at<BaseType>(StatePe<>::STATE_THETA) = atan2(s, c);
 
     return R;
 }
@@ -38,8 +37,8 @@ cv::Mat PositionUkf::addWeighted(const cv::Mat W, const cv::Mat X)
 cv::Mat PositionUkf::residual(const cv::Mat A, const cv::Mat B)
 {
     cv::Mat R = A - B;
-//    R.at<BaseType>(StatePe<>::STATE_THETA) = Math::normalizeAngleRad(
-//        R.at<BaseType>(StatePe<>::STATE_THETA));
+    R.at<BaseType>(StatePe<>::STATE_THETA) = Math::normalizeAngleRad(
+        R.at<BaseType>(StatePe<>::STATE_THETA));
 
     return R;
 }

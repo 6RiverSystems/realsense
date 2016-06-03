@@ -24,7 +24,7 @@ public:
 
     // Standard deviation values for the robot process
     constexpr static double ERROR_LOCATION = 0.001; // [m]
-    constexpr static double ERROR_HEADING = Math::deg2rad<double>(0.1); // [rad]
+    constexpr static double ERROR_HEADING = Math::deg2rad<double>(1.0); // [rad]
     constexpr static double ERROR_LINEAR_VELOCITY = 0.006; // [m/s]
     constexpr static double ERROR_ANGULAR_VELOCITY = 0.006; // [m/s]
 

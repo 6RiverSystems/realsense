@@ -11,14 +11,12 @@ namespace srs {
 // protected methods
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-cv::Mat PositionUkf::averageTransform(const cv::Mat W, const cv::Mat X)
+cv::Mat PositionUkf::addWeighted(const cv::Mat W, const cv::Mat X)
 {
-    cout << "active ##########################################################" << endl;
-
     double c = 0.0;
     double s = 0.0;
 
-    cv::Mat R = Math::zeros(X);
+    cv::Mat R = Math::zeros(X.col(1));
 
     for (unsigned int i = 0; i < X.cols; ++i)
     {
@@ -30,25 +28,18 @@ cv::Mat PositionUkf::averageTransform(const cv::Mat W, const cv::Mat X)
         s +=  weight * sin(theta);
     }
 
-    R.at<BaseType>(StatePe<>::STATE_THETA) = atan2(s, c);
+    BaseType at = atan2(s / X.cols, c / X.cols);
+    R.at<BaseType>(StatePe<>::STATE_THETA) = at;
 
     return R;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-cv::Mat PositionUkf::residualTransform(const cv::Mat A, const cv::Mat B)
+cv::Mat PositionUkf::residual(const cv::Mat A, const cv::Mat B)
 {
     cv::Mat R = A - B;
-
-    double theta = A.at<BaseType>(StatePe<>::STATE_THETA);
-    double c = cos(theta);
-    double s = sin(theta);
-
-    theta = B.at<BaseType>(StatePe<>::STATE_THETA);
-    c +=  cos(theta);
-    s +=  sin(theta);
-
-    R.at<BaseType>(StatePe<>::STATE_THETA) = atan2(s, c);
+    R.at<BaseType>(StatePe<>::STATE_THETA) = Math::normalizeAngleRad(
+        R.at<BaseType>(StatePe<>::STATE_THETA));
 
     return R;
 }

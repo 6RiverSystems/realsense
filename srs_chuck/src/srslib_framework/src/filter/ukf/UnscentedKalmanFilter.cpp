@@ -27,6 +27,21 @@ UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::UnscentedKalmanFilter(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
+cv::Mat UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::addWeighted(
+    const cv::Mat W, const cv::Mat X)
+{
+    cv::Mat R = Math::zeros(X);
+
+    for (unsigned int i = 0; i < X.cols; ++i)
+    {
+        R += W.at<BaseType>(i) * X.col(i);
+    }
+
+    return R;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
 cv::Mat UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::calculateSigmaPoints(
     cv::Mat X, cv::Mat P)
 {
@@ -52,10 +67,12 @@ cv::Mat UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::calculateSigmaPoi
 template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
 void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::initializeWeights()
 {
+    BaseType alpha2 = pow(alpha_, BaseType(2.0));
+
     // o.kappa = 3 - o.n;
     // o.lambda = o.alpha ^ 2 * (o.n + o.kappa) - o.n;
     kappa_ = BaseType(3.0) - STATE_SIZE;
-    lambda_ = pow(alpha_, BaseType(2.0)) * (STATE_SIZE + kappa_) - STATE_SIZE;
+    lambda_ = alpha2 * (STATE_SIZE + kappa_) - STATE_SIZE;
 
     // o.WM = zeros(2 * o.n + 1, 1);
     // o.WC = zeros(2 * o.n + 1, 1);
@@ -72,8 +89,9 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::initializeWeights()
     WM_ = cv::Mat(size, 1, TYPE, value);
     WC_ = cv::Mat(size, 1, TYPE, value);
 
-    WM_.at<BaseType>(0) = lambda_ / (STATE_SIZE + lambda_);
-    WC_.at<BaseType>(0) = WM_.at<BaseType>(0) + (BaseType(1.0) - pow(alpha_, 2.0) + beta_);
+    BaseType zeroValue = lambda_ / (STATE_SIZE + lambda_);
+    WM_.at<BaseType>(0) = zeroValue;
+    WC_.at<BaseType>(0) = zeroValue + (BaseType(1.0) - alpha2 + beta_);
 
     // o.c = o.n + o.lambda;
     c_ = sqrt(STATE_SIZE + lambda_);
@@ -110,25 +128,9 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::predict(BaseType dT,
     BaseKFType::P_ += BaseKFType::process_.getQ();
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
-cv::Mat UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::averageTransform(
-    const cv::Mat W, const cv::Mat X)
-{
-    cv::Mat R = Math::zeros(X);
-
-    for (unsigned int i = 0; i < X.cols; ++i)
-    {
-        R += W.at<BaseType>(i) * X.col(i);
-    }
-
-    return R;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
-cv::Mat UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::residualTransform(
+cv::Mat UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::residual(
     const cv::Mat A, const cv::Mat B)
 {
     return A - B;
@@ -150,7 +152,7 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::unscentedTransform(
     // Perform the average of the sigma points. The function
     // isolated so that it's possible to define a specific
     // function that depends on the type of data in the sigma points
-    Ybar = averageTransform(WM_, Y);
+    Ybar = addWeighted(WM_, Y);
 
     // Calculate the predicted covariance matrix
     //
@@ -166,8 +168,8 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::unscentedTransform(
     for (unsigned int i = 0; i < Y.cols; ++i)
     {
         double weight = WC_.at<BaseType>(i);
-        S += weight * residualTransform(Y.col(i), Ybar) * residualTransform(Y.col(i), Ybar).t();
-        C += weight * residualTransform(CHI.col(i), X) * residualTransform(Y.col(i), Ybar).t();
+        S += weight * residual(Y.col(i), Ybar) * residual(Y.col(i), Ybar).t();
+        C += weight * residual(CHI.col(i), X) * residual(Y.col(i), Ybar).t();
     }
 }
 
@@ -216,7 +218,7 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::update()
             cv::Mat K = C * S.inv();
 
             // XX = XX + K * (z - Ybar);
-            BaseKFType::x_ += K * residualTransform(z, Ybar);
+            BaseKFType::x_ += K * residual(z, Ybar);
 
             // P = P - K * S * K';
             BaseKFType::P_ -= K * S * K.t();

@@ -36,7 +36,7 @@ public:
 protected:
     constexpr static BaseType UNDERFLOW_THRESHOLD = BaseType(1.0e-8);
 
-    virtual cv::Mat averageTransform(const cv::Mat W, const cv::Mat X);
+    virtual cv::Mat addWeighted(const cv::Mat W, const cv::Mat X);
 
     cv::Mat calculateSigmaPoints(cv::Mat M, cv::Mat P);
 
@@ -44,7 +44,7 @@ protected:
 
     void predict(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command);
 
-    virtual cv::Mat residualTransform(const cv::Mat A, const cv::Mat B);
+    virtual cv::Mat residual(const cv::Mat A, const cv::Mat B);
 
     void unscentedTransform(const cv::Mat X, const cv::Mat Y, const cv::Mat CHI,
         cv::Mat& Ybar, cv::Mat& S, cv::Mat& C);

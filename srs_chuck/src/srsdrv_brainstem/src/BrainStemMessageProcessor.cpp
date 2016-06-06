@@ -133,7 +133,7 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 		}
 		break;
 
-		case BRAIN_STEM_MSG::ODOMETRY:
+		case BRAIN_STEM_MSG::ODOMETRY_VELOCITY:
 		{
 			ODOMETRY_DATA* pOdometry = reinterpret_cast<ODOMETRY_DATA*>( buffer.data( ) );
 
@@ -295,7 +295,7 @@ void BrainStemMessageProcessor::OnPause( std::vector<std::string> vecParams )
 {
 	std::string& strPaused = vecParams[0];
 
-	SUSPEND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SUSPEND_UPDATE_STATE ),
+	SUSPEND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SET_SUSPEND_STATE ),
 		strPaused == "OFF" ? false : true };
 
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );

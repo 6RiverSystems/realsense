@@ -20,7 +20,7 @@ using namespace srs;
 namespace srs {
 
 template<typename TYPE = double>
-struct Trajectory : public Object
+class Trajectory : public Object
 {
 public:
     typedef TYPE BaseType;
@@ -38,17 +38,22 @@ public:
         return trajectory_.empty();
     }
 
-    int findClosestPose(Pose<BaseType> toPose, int from = 0, int to = -1)
+    int findClosestPose(Pose<BaseType> toPose, int fromIndex = 0, double distance = -1)
     {
-        if (to == -1 || to > trajectory_.size())
+        int toIndex = trajectory_.size() - 1;
+        if (distance > -1)
         {
-            to = trajectory_.size();
+            toIndex = fromIndex + 2 * round(distance / calculateTrajectoryStep());
+            if (toIndex > trajectory_.size())
+            {
+                toIndex = trajectory_.size() - 1;
+            }
         }
 
         BaseType minimum = numeric_limits<double>::max();
         int minimumIndex = -1;
 
-        for (int i = from; i < to; i++)
+        for (int i = fromIndex; i < toIndex; i++)
         {
             Pose<BaseType> current = trajectory_[i].first;
             BaseType distance = PoseMath::euclidean(current, toPose);
@@ -60,6 +65,18 @@ public:
         }
 
         return minimumIndex;
+    }
+
+    int findWaypointAtDistance(int fromIndex, double distance)
+    {
+        int deltaTo = round(distance / calculateTrajectoryStep());
+        int toIndex = fromIndex + deltaTo;
+        if (toIndex > trajectory_.size())
+        {
+            toIndex = trajectory_.size() - 1;
+        }
+
+        return toIndex;
     }
 
     bool getGoal(Pose<BaseType> goal)
@@ -137,6 +154,11 @@ public:
 
 private:
     typedef pair<Pose<>, Velocity<>> NodeType;
+
+    double calculateTrajectoryStep()
+    {
+        return PoseMath::euclidean(trajectory_[0].first, trajectory_[1].first);
+    }
 
     vector<NodeType> trajectory_;
 };

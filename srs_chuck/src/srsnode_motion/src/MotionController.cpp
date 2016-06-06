@@ -116,28 +116,11 @@ void MotionController::stop(double stopDistance)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::updateProjectionIndex()
 {
-    int deltaIndex = round(lookAheadDistance_ / trajectory_.getDeltaDistance());
-    int trajectorySize = trajectory_.size();
-
-    int searchIndex = projectionIndex_ + 2 * deltaIndex;
-    if (searchIndex > trajectorySize)
-    {
-        searchIndex = trajectorySize - 1;
-    }
-
-    projectionIndex_ = trajectory_.findClosestPose(currentRobotPose_,
-        projectionIndex_, searchIndex);
-
-    referenceIndex_ = projectionIndex_ + deltaIndex;
-    if (referenceIndex_ > trajectorySize)
-    {
-        referenceIndex_ = trajectorySize - 1;
-    }
+    projectionIndex_ = trajectory_.findClosestPose(currentRobotPose_, projectionIndex_, lookAheadDistance_);
+    referenceIndex_ = trajectory_.findWaypointAtDistance(projectionIndex_, lookAheadDistance_);
 
     trajectory_.getPose(referenceIndex_, referencePose_);
     lowLevelController_.setReference(referencePose_);
-
-    ROS_INFO_STREAM("Switching to reference pose [" << referenceIndex_ << "] " << referencePose_);
 }
 
 } // namespace srs

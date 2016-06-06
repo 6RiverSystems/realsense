@@ -21,6 +21,8 @@ using namespace std;
 #include <srsnode_motion/Robot.hpp>
 #include <srsnode_motion/StatePe.hpp>
 
+#include <srslib_test/utils/Print.hpp>
+
 #include <srsnode_motion/tap/odometry/RosTapOdometry.hpp>
 #include <srsnode_motion/PositionUkf.hpp>
 
@@ -45,8 +47,13 @@ public:
 
     Pose<> getPose()
     {
-        StatePe<> currentState = StatePe<>(ukf_.getX());
-        return currentState.getPose();
+        cv::Mat state = ukf_.getX();
+        test::Print::print(state, "State");
+
+        StatePe<> currentState = StatePe<>(state);
+
+        Pose<> pose = currentState.getPose();
+        return pose;
     }
 
     Velocity<> getVelocity()

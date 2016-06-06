@@ -41,30 +41,33 @@ void MotionController::run(double dT, Pose<> robotPose)
     currentRobotPose_ = robotPose;
     ROS_INFO_STREAM("Reported pose: " << currentRobotPose_);
 
-    updateProjectionIndex();
-
-    Velocity<> nextVelocity;
-
-    double distance = PoseMath::euclidean(currentRobotPose_, goal_);
-    if (distance < distanceToGoal_)
+    if (moving_)
     {
-        goalReached_ = true;
-        ROS_INFO_STREAM("Goal reached: " << goal_);
+        updateProjectionIndex();
 
-        stop(0.0);
-    }
-    else
-    {
-        distance = PoseMath::euclidean(currentRobotPose_, referencePose_);
-        ROS_INFO_STREAM("Distance to reference: " << distance);
+        Velocity<> nextVelocity;
 
-        // Find the desired velocity command
-        trajectory_.getVelocity(projectionIndex_, nextVelocity);
+        double distance = PoseMath::euclidean(currentRobotPose_, goal_);
+        if (distance < distanceToGoal_)
+        {
+            goalReached_ = true;
+            ROS_INFO_STREAM("Goal reached: " << goal_);
 
-        // Ask the low-level controller to modulate the desired velocity
-        nextVelocity = lowLevelController_.step(currentRobotPose_, nextVelocity);
+            stop(0.0);
+        }
+        else
+        {
+            distance = PoseMath::euclidean(currentRobotPose_, referencePose_);
+            ROS_INFO_STREAM("Distance to reference: " << distance);
 
-        setExecutingCommand(nextVelocity);
+            // Find the desired velocity command
+            trajectory_.getVelocity(projectionIndex_, nextVelocity);
+
+            // Ask the low-level controller to modulate the desired velocity
+            nextVelocity = lowLevelController_.step(currentRobotPose_, nextVelocity);
+
+            setExecutingCommand(nextVelocity);
+        }
     }
 }
 

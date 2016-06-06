@@ -37,8 +37,7 @@ Motion::Motion(string nodeName) :
     tapAps_(rosNodeHandle_),
     triggerShutdown_(rosNodeHandle_),
     triggerStop_(rosNodeHandle_),
-    solutionConverter_(robot_, 1.0 / 20.0 /*REFRESH_RATE_HZ*/), // #################
-
+    solutionConverter_(robot_),
     tapCmdGoal_(rosNodeHandle_),
     tapMap_(rosNodeHandle_),
     currentGoal_()
@@ -60,6 +59,8 @@ void Motion::run()
 {
     connectAllTaps();
 
+    // Establish an acceptable initial position
+    tapInitialPose_.set(0, 3.0, 3.0, 0);
     reset(tapInitialPose_.getPose());
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
@@ -136,8 +137,9 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     motionController_.setLookAheadDistance(configuration_.look_ahead_distance);
     ROS_INFO_STREAM("Motion controller look-ahead: " << configuration_.look_ahead_distance);
 
-    solutionConverter_.setMinimumVelocity(configuration_.min_velocity);
-    ROS_INFO_STREAM("Motion controller minimum velocity: " << configuration_.min_velocity);
+    // ####
+    // solutionConverter_.setMinimumVelocity(configuration_.min_velocity);
+    // ROS_INFO_STREAM("Motion controller minimum velocity: " << configuration_.min_velocity);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -315,25 +317,31 @@ void Motion::stepNode()
 // TODO: This should be in Executive
 void Motion::executePlanToGoal(Pose<> goal)
 {
+    goal.x = 5.0; // ####
+    goal.y = 3.0;
     currentGoal_ = goal;
+
+    Pose<> currentPose = positionEstimator_.getPose();
+    currentPose.x = 3.0; // ####
+    currentPose.y = 3.0;
+
     algorithm_.setGraph(tapMap_.getMap()->getGrid());
 
-    int r1 = 19;
-    int c1 = 29;
-    Pose<> currentPose = positionEstimator_.getPose();
-    //tapMap_.getMap()->getMapCoordinates(currentPose.x, currentPose.y, c1, r1);
+    int r1 = 0;
+    int c1 = 0;
+    tapMap_.getMap()->getMapCoordinates(currentPose.x, currentPose.y, c1, r1);
     Grid2d::LocationType internalStart(c1, r1);
     int startAngle = Math::normalizeRad2deg90(currentPose.theta);
 
-    int r2 = 19; //151;
-    int c2 = 49; //52;
-    //tapMap_.getMap()->getMapCoordinates(goal.x, goal.y, c2, r2);
+    int r2 = 0;
+    int c2 = 0;
+    tapMap_.getMap()->getMapCoordinates(currentGoal_.x, currentGoal_.y, c2, r2);
     Grid2d::LocationType internalGoal(c2, r2);
-    int goalAngle = Math::normalizeRad2deg90(goal.theta);
+    int goalAngle = Math::normalizeRad2deg90(currentGoal_.theta);
 
     ROS_INFO_STREAM("Looking for a path between " << currentPose << " (" <<
         c1 << "," << r1 << "," << startAngle
-        << ") and " << goal << " (" << c2 << "," << r2 << "," << goalAngle << ")");
+        << ") and " << currentGoal_ << " (" << c2 << "," << r2 << "," << goalAngle << ")");
 
     algorithm_.search(
         SearchPosition<Grid2d>(internalStart, startAngle),
@@ -348,6 +356,8 @@ void Motion::executePlanToGoal(Pose<> goal)
         solutionConverter_.calculateTrajectory(solution);
         solutionConverter_.getTrajectory(trajectory);
         motionController_.setTrajectory(trajectory);
+
+        cout << trajectory << endl;
     }
     else
     {

@@ -62,11 +62,6 @@ public:
         return minimumIndex;
     }
 
-    double getDeltaDistance()
-    {
-        return 0;
-    }
-
     bool getGoal(Pose<BaseType> goal)
     {
         if (trajectory_.empty())

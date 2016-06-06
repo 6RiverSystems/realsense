@@ -15,7 +15,8 @@ using namespace srsnode_motion;
 
 #include <dynamic_reconfigure/server.h>
 
-#include <srslib_framework/planning/pathplanning/Trajectory.hpp>
+#include <srslib_framework/planning/pathplanning/SolutionConverter.hpp>
+
 #include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
 #include <srslib_framework/ros/tap/RosTapMap.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
@@ -91,7 +92,7 @@ private:
     RosTapBrainStem tapBrainStem_;
     RosTapOdometry tapOdometry_;
     RosTapInitialPose tapInitialPose_; // TODO: This should be a command (trigger) passed down by Executive
-    Trajectory trajectoryConverter_;
+    SolutionConverter solutionConverter_;
     RosTriggerStop triggerStop_;
     RosTriggerShutdown triggerShutdown_;
 

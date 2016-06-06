@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef TRAJECTORY_HPP_
-#define TRAJECTORY_HPP_
+#ifndef SOLUTIONCONVERTER_HPP_
+#define SOLUTIONCONVERTER_HPP_
 
 #include <vector>
 using namespace std;
@@ -17,18 +17,16 @@ using namespace std;
 
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
+#include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/RobotProfile.hpp>
 using namespace srs;
 
 namespace srs {
 
-class Trajectory
+class SolutionConverter
 {
 public:
-    typedef pair<Pose<>, Velocity<>> MilestoneType;
-    typedef vector<MilestoneType> TrajectoryType;
-
-    Trajectory(RobotProfile& robot, double dT, double minVelocity = 0.3) :
+    SolutionConverter(RobotProfile& robot, double dT, double minVelocity = 0.3) :
         dT_(dT),
         linearIncrement_(dT * robot.linearAccelerationTravelMax()),
         minVelocity_(minVelocity),
@@ -88,7 +86,7 @@ public:
         }
     }
 
-    void getTrajectory(TrajectoryType& trajectory)
+    void getTrajectory(Trajectory<>& trajectory)
     {
         trajectory.clear();
         if (velocities_.empty())
@@ -98,10 +96,7 @@ public:
 
         for (unsigned int i = 0; i < velocities_.size(); i++)
         {
-            MilestoneType milestone;
-            milestone.first = poses_[i];
-            milestone.second = velocities_[i];
-            trajectory.push_back(milestone);
+            trajectory.push_back(poses_[i], velocities_[i]);
         }
     }
 
@@ -135,21 +130,6 @@ private:
         }
     }
 
-    double measureDistance(
-        vector<SolutionNode<Grid2d>>::iterator& fromNode,
-        vector<SolutionNode<Grid2d>>::iterator& toNode)
-    {
-        Pose<> fromPose = fromNode->pose;
-        Pose<> toPose = toNode->pose;
-
-        // TODO: Add an euclidean for Pose
-        return Math::euclidean<double>(
-            static_cast<double>(fromPose.x),
-            static_cast<double>(fromPose.y),
-            static_cast<double>(toPose.x),
-            static_cast<double>(toPose.y));
-    }
-
     void moveForward(
         vector<SolutionNode<Grid2d>>::iterator& fromNode, double initialV,
         vector<SolutionNode<Grid2d>>::iterator& toNode, double finalV)
@@ -157,7 +137,7 @@ private:
         double forwardA = robot_.linearAccelerationTravelMax();
         double coastV = robot_.linearVelocityTravelMax();
 
-        double totalDistance = measureDistance(fromNode, toNode);
+        double totalDistance = PoseMath::euclidean(fromNode->pose, toNode->pose);
 
         double tUp = (coastV - initialV) / forwardA;
         double rampDistanceUp = 0.5 * forwardA * tUp * tUp;
@@ -235,4 +215,4 @@ private:
 
 } // namespace srs
 
-#endif // TRAJECTORY_HPP_
+#endif // SOLUTIONCONVERTER_HPP_

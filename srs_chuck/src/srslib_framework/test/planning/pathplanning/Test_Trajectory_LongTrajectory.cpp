@@ -12,7 +12,7 @@ using namespace std;
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
 #include <srslib_framework/planning/pathplanning/SolutionNode.hpp>
-#include <srslib_framework/planning/pathplanning/Trajectory.hpp>
+#include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 using namespace srs;
 
@@ -67,15 +67,15 @@ TEST(Test_Trajectory, LongTrajectory)
     };
 
     Chuck chuck;
-    Trajectory::TrajectoryType trajectory;
-
-    Trajectory trajectoryConverter(chuck, 0.1);
-    trajectoryConverter.calculateTrajectory(solution);
-    trajectoryConverter.getTrajectory(trajectory);
-
-    for (auto milestone : trajectory)
-    {
-        cout << "-------------------------------" << endl;
-        cout << milestone.first << milestone.second << endl;
-    }
+//    Trajectory::TrajectoryType trajectory;
+//
+//    Trajectory trajectoryConverter(chuck, 0.1);
+//    trajectoryConverter.calculateTrajectory(solution);
+//    trajectoryConverter.getTrajectory(trajectory);
+//
+//    for (auto milestone : trajectory)
+//    {
+//        cout << "-------------------------------" << endl;
+//        cout << milestone.first << milestone.second << endl;
+//    }
 }

@@ -35,7 +35,6 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/math/Time.hpp
     include/${PROJECT_NAME}/math/PoseMath.hpp
 
-    include/${PROJECT_NAME}/planning/pathplanning/Trajectory.hpp
     include/${PROJECT_NAME}/planning/pathplanning/SolutionNode.hpp
 
     include/${PROJECT_NAME}/platform/Object.hpp
@@ -44,8 +43,10 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/robotics/Pose.hpp
     include/${PROJECT_NAME}/robotics/Odometry.hpp
     include/${PROJECT_NAME}/robotics/Velocity.hpp
+    include/${PROJECT_NAME}/robotics/Trajectory.hpp
 
-    include/${PROJECT_NAME}/robotics/controller/YoshizawaController.hpp
+    include/${PROJECT_NAME}/robotics/lowlevel_controller/YoshizawaController.hpp
+    include/${PROJECT_NAME}/robotics/lowlevel_controller/SimpleController.hpp
 
     include/${PROJECT_NAME}/ros/RosTap.hpp
     include/${PROJECT_NAME}/ros/RosService.hpp
@@ -94,9 +95,9 @@ set(TEST_SOURCES_GRAPH
 )
 
 set(TEST_SOURCES_PLANNING
-    test/planning/pathplanning/Test_Trajectory_LongTrajectory.cpp
+    # test/planning/pathplanning/Test_Trajectory_LongTrajectory.cpp
     test/planning/pathplanning/Test_Trajectory_ShortStraight.cpp
-    test/planning/pathplanning/Test_Trajectory_ShortTrajectory.cpp
+    # test/planning/pathplanning/Test_Trajectory_ShortTrajectory.cpp
 )
 
 set(TEST_SOURCES_ROBOTICS

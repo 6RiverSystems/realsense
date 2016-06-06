@@ -12,10 +12,10 @@ using namespace std;
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
 #include <srslib_framework/planning/pathplanning/SolutionNode.hpp>
-#include <srslib_framework/planning/pathplanning/Trajectory.hpp>
+#include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/robotics/controller/YoshizawaController.hpp>
+#include <srslib_framework/robotics/lowlevel_controller/YoshizawaController.hpp>
 using namespace srs;
 
 typedef SolutionNode<Grid2d> SolutionType;
@@ -42,24 +42,24 @@ TEST(Test_Yoshizawa, Usage)
 
     Chuck chuck;
 
-    Trajectory::TrajectoryType trajectory;
-
-    Trajectory trajectoryConverter(chuck, 1, 0.1);
-    trajectoryConverter.calculateTrajectory(solution);
-    trajectoryConverter.getTrajectory(trajectory);
-
-    for (auto milestone : trajectory)
-    {
-        cout << milestone.first << milestone.second << endl;
-    }
-
-    YoshizawaController controller(0.1, 0.9);
-
-    Trajectory::MilestoneType milestone = *(trajectory.begin() + 1);
-    controller.setReference(milestone.first);
-
-    Pose<> pose(0, 0, 0.1, 0);
-    Velocity<> velocity;
+//    Trajectory::TrajectoryType trajectory;
+//
+//    Trajectory trajectoryConverter(chuck, 1, 0.1);
+//    trajectoryConverter.calculateTrajectory(solution);
+//    trajectoryConverter.getTrajectory(trajectory);
+//
+//    for (auto milestone : trajectory)
+//    {
+//        cout << milestone.first << milestone.second << endl;
+//    }
+//
+//    YoshizawaController controller(0.1, 0.9);
+//
+//    Trajectory::MilestoneType milestone = *(trajectory.begin() + 1);
+//    controller.setReference(milestone.first);
+//
+//    Pose<> pose(0, 0, 0.1, 0);
+//    Velocity<> velocity;
 
 //    Velocity<> command = controller.step(pose);
 //    cout << command << endl;

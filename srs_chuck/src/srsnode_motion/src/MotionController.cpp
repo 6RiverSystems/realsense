@@ -1,5 +1,7 @@
 #include <srsnode_motion/MotionController.hpp>
 
+#include <ros/ros.h>
+
 #include <srslib_framework/math/PoseMath.hpp>
 
 namespace srs {
@@ -8,17 +10,10 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-MotionController::MotionController(unsigned int lookAhead) :
-    currentTrajectory_(),
-    executionTime_(0.0),
-    executingCommand_(Velocity<>()),
-    goal_(Pose<>()),
-    goalReached_(false),
-    lookAhead_(50),  // (lookAhead) #############
-    lowLevelController_(0.0, 0.9),
-    newCommandAvailable_(false),
-    nextScheduledTime_(-1),
-    referencePose_(Pose<>())
+MotionController::MotionController(double lookAheadDistance, double distanceToGoal) :
+    distanceToGoal_(distanceToGoal),
+    lookAheadDistance_(lookAheadDistance),
+    lowLevelController_(1, 1)
 {
     reset();
 }
@@ -26,15 +21,15 @@ MotionController::MotionController(unsigned int lookAhead) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::reset()
 {
-    nextScheduledTime_ = -1;
-    nextScheduled_ = currentTrajectory_.end();
-
-    executionTime_ = 0.0;
+    moving_ = false;
     newCommandAvailable_ = false;
     executingCommand_ = Velocity<>();
 
+    currentRobotPose_ = Pose<>();
+    projectionIndex_ = -1;
+
     referencePose_ = Pose<>();
-    referenceIndex_ = 0;
+    referenceIndex_ = -1;
 
     goal_ = Pose<>();
     goalReached_ = false;
@@ -43,59 +38,44 @@ void MotionController::reset()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::run(double dT, Pose<> robotPose)
 {
-    if (nextScheduledTime_ > -1)
+    currentRobotPose_ = robotPose;
+    ROS_INFO_STREAM("Reported pose: " << currentRobotPose_);
+
+    updateProjectionIndex();
+
+    Velocity<> nextVelocity;
+
+    double distance = PoseMath::euclidean(currentRobotPose_, goal_);
+    if (distance < distanceToGoal_)
     {
-        ROS_INFO_STREAM("[" << executionTime_ << "] Waiting for " << nextScheduledTime_);
-        executionTime_ += dT;
+        goalReached_ = true;
+        ROS_INFO_STREAM("Goal reached: " << goal_);
 
-        if (executionTime_ >= nextScheduledTime_)
-        {
-            Trajectory::MilestoneType milestone = *nextScheduled_;
-            Velocity<> prospectiveCommand = milestone.second;
+        stop(0.0);
+    }
+    else
+    {
+        distance = PoseMath::euclidean(currentRobotPose_, referencePose_);
+        ROS_INFO_STREAM("Distance to reference: " << distance);
 
-            ROS_INFO_STREAM("Executing: " << milestone.first << " - " << prospectiveCommand);
+        // Find the desired velocity command
+        trajectory_.getVelocity(projectionIndex_, nextVelocity);
 
-            // If the two velocities are similar, there is no need to send a
-            // new command. However the cursor of the milestone is advanced anyway.
-            if (!similarVelocities(executingCommand_, prospectiveCommand))
-            {
-                executingCommand_ = prospectiveCommand;
-                newCommandAvailable_ = true;
-            }
+        // Ask the low-level controller to modulate the desired velocity
+        nextVelocity = lowLevelController_.step(currentRobotPose_, nextVelocity);
 
-            if (newCommandAvailable_)
-            {
-                // Pass the executing command to the low level controller
-                // to modulate linear and angular velocity
-                stepLLController(robotPose);
-            }
-
-            nextScheduled_++;
-            if (nextScheduled_ != currentTrajectory_.end())
-            {
-                nextScheduledTime_ = executionTime_ + nextScheduled_->first.arrivalTime;
-            }
-            else
-            {
-                // All done. The motion controller can be reset.
-                reset();
-            }
-        }
+        setExecutingCommand(nextVelocity);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MotionController::setTrajectory(Trajectory::TrajectoryType& trajectory)
+void MotionController::setTrajectory(Trajectory<> trajectory)
 {
-    currentTrajectory_ = trajectory;
+    trajectory_ = trajectory;
 
-    if (!currentTrajectory_.empty())
+    if (!trajectory_.empty())
     {
-        int count = 0;
-        for (auto milestone : currentTrajectory_)
-        {
-            ROS_INFO_STREAM(count++ << ": " << milestone.first << " - " << milestone.second);
-        }
+        cout << trajectory_ << endl;
 
         if (isMoving())
         {
@@ -103,12 +83,17 @@ void MotionController::setTrajectory(Trajectory::TrajectoryType& trajectory)
         }
         reset();
 
-        nextScheduled_ = currentTrajectory_.begin();
-        nextScheduledTime_ = nextScheduled_->first.arrivalTime;
+        // Find the goal of the trajectory
+        trajectory_.getGoal(goal_);
 
-        goal_ = currentTrajectory_[currentTrajectory_.size() - 1].first;
+        // Find the first reference point on the given trajectory
+        referenceIndex_ = trajectory_.findClosestPose(currentRobotPose_);
+        trajectory_.getPose(referenceIndex_, referencePose_);
 
-        determineNextReferencePose();
+        // Set the reference in the low-level controller
+        lowLevelController_.setReference(referencePose_);
+
+        moving_ = true;
     }
 }
 
@@ -118,52 +103,38 @@ void MotionController::stop(double stopDistance)
     // TODO: Make the stop command function with the stop distance
     newCommandAvailable_ = true;
     executingCommand_ = Velocity<>();
+
+    moving_ = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
-void MotionController::determineNextReferencePose()
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void MotionController::updateProjectionIndex()
 {
-    int trajectorySize = currentTrajectory_.size();
+    int deltaIndex = round(lookAheadDistance_ / trajectory_.getDeltaDistance());
+    int trajectorySize = trajectory_.size();
 
-    referenceIndex_ += lookAhead_;
+    int searchIndex = projectionIndex_ + 2 * deltaIndex;
+    if (searchIndex > trajectorySize)
+    {
+        searchIndex = trajectorySize - 1;
+    }
+
+    projectionIndex_ = trajectory_.findClosestPose(currentRobotPose_,
+        projectionIndex_, searchIndex);
+
+    referenceIndex_ = projectionIndex_ + deltaIndex;
     if (referenceIndex_ > trajectorySize)
     {
         referenceIndex_ = trajectorySize - 1;
     }
 
-    referencePose_ = currentTrajectory_[referenceIndex_].first;
+    trajectory_.getPose(referenceIndex_, referencePose_);
     lowLevelController_.setReference(referencePose_);
 
     ROS_INFO_STREAM("Switching to reference pose [" << referenceIndex_ << "] " << referencePose_);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void MotionController::stepLLController(Pose<> robotPose)
-{
-    ROS_INFO_STREAM("Reported pose: " << robotPose);
-    double d = PoseMath::euclidean(robotPose, goal_);
-
-    ROS_INFO_STREAM("Distance to goal: " << d);
-    if (d < 0.2)
-    {
-        goalReached_ = true;
-        ROS_INFO_STREAM("Goal reached: " << goal_);
-        stop(0.0);
-    }
-    else
-    {
-        d = PoseMath::euclidean(robotPose, referencePose_);
-        ROS_INFO_STREAM("Distance to reference: " << d);
-
-        if (d < 0.5)
-        {
-            determineNextReferencePose();
-        }
-
-        executingCommand_ = lowLevelController_.step(robotPose, executingCommand_);
-    }
 }
 
 } // namespace srs

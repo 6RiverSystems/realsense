@@ -37,7 +37,7 @@ Motion::Motion(string nodeName) :
     tapAps_(rosNodeHandle_),
     triggerShutdown_(rosNodeHandle_),
     triggerStop_(rosNodeHandle_),
-    trajectoryConverter_(robot_, 1.0 / 20.0 /*REFRESH_RATE_HZ*/), // #################
+    solutionConverter_(robot_, 1.0 / 20.0 /*REFRESH_RATE_HZ*/), // #################
 
     tapCmdGoal_(rosNodeHandle_),
     tapMap_(rosNodeHandle_),
@@ -133,10 +133,10 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     tapOdometry_.getSensor()->enable(configuration_.odometry_enabled);
     ROS_INFO_STREAM("Odometry sensor enabled: " << configuration_.odometry_enabled);
 
-    motionController_.setLookAhead(configuration_.look_ahead);
-    ROS_INFO_STREAM("Motion controller look-ahead: " << configuration_.look_ahead);
+    motionController_.setLookAheadDistance(configuration_.look_ahead_distance);
+    ROS_INFO_STREAM("Motion controller look-ahead: " << configuration_.look_ahead_distance);
 
-    trajectoryConverter_.setMinimumVelocity(configuration_.min_velocity);
+    solutionConverter_.setMinimumVelocity(configuration_.min_velocity);
     ROS_INFO_STREAM("Motion controller minimum velocity: " << configuration_.min_velocity);
 }
 
@@ -343,11 +343,11 @@ void Motion::executePlanToGoal(Pose<> goal)
 
     if (!solution.empty())
     {
-        Trajectory::TrajectoryType currentTrajectory_;
+        Trajectory<> trajectory;
 
-        trajectoryConverter_.calculateTrajectory(solution);
-        trajectoryConverter_.getTrajectory(currentTrajectory_);
-        motionController_.setTrajectory(currentTrajectory_);
+        solutionConverter_.calculateTrajectory(solution);
+        solutionConverter_.getTrajectory(trajectory);
+        motionController_.setTrajectory(trajectory);
     }
     else
     {

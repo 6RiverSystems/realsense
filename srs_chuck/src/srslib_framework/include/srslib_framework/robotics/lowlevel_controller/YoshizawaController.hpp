@@ -8,18 +8,15 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <srslib_framework/math/PoseMath.hpp>
-#include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/robotics/Velocity.hpp>
+#include <srslib_framework/robotics/lowlevel_controller/BaseController.hpp>
 
 namespace srs {
 
-class YoshizawaController
+class YoshizawaController : public BaseController
 {
 public:
     YoshizawaController(double Kv, double Kw) :
-        Kv_(Kv),
-        Kw_(Kw)
+        BaseController(Kv, Kw)
     {}
 
     ~YoshizawaController()
@@ -47,17 +44,6 @@ public:
 
         return Velocity<>(linear, angular);
     }
-
-    void setReference(Pose<> referencePose)
-    {
-        referencePose_ = referencePose;
-    }
-
-private:
-    double Kv_;
-    double Kw_;
-
-    Pose<> referencePose_;
 };
 
 } // namespace srs

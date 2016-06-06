@@ -9,19 +9,19 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/planning/pathplanning/Trajectory.hpp>
+#include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
-#include <srslib_framework/ros/RosTap.hpp>
 
-#include <srslib_framework/robotics/controller/YoshizawaController.hpp>
+#include <srslib_framework/robotics/lowlevel_controller/YoshizawaController.hpp>
+#include <srslib_framework/robotics/lowlevel_controller/SimpleController.hpp>
 
 namespace srs {
 
 class MotionController
 {
 public:
-    MotionController(unsigned int lookAhead = 50);
+    MotionController(double lookAheadDistance = 0.50, double distanceToGoal = 0.1);
 
     ~MotionController()
     {}
@@ -39,7 +39,7 @@ public:
 
     bool isMoving()
     {
-        return executionTime_ > -1;
+        return moving_;
     }
 
     bool newCommandAvailable()
@@ -50,25 +50,33 @@ public:
     void reset();
     void run(double dT, Pose<> robotPose);
 
-    void setLookAhead(unsigned int newValue)
+    void setLookAheadDistance(double newDistance)
     {
-// ########
-//        lookAhead_ = newValue;
-//        if (isMoving())
-//        {
-//            stop();
-//        }
+        lookAheadDistance_ = newDistance;
+        lowLevelController_.setLookAheadDistance(newDistance);
     }
 
-    void setTrajectory(Trajectory::TrajectoryType& trajectory);
+    void setRobotPose(Pose<> robotPose)
+    {
+        currentRobotPose_ = robotPose;
+    }
+
+    void setTrajectory(Trajectory<> trajectory);
     void stop(double stopDistance = 0);
 
 private:
-    void determineNextReferencePose();
+    void setExecutingCommand(Velocity<> command)
+    {
+        // If the two velocities are similar, there is no need to send a
+        // new command. However the cursor of the milestone is advanced anyway.
+        if (!similarVelocities(executingCommand_, command))
+        {
+            executingCommand_ = command;
+            newCommandAvailable_ = true;
+        }
+    }
 
-    void sendVelocityCommand(Velocity<> command);
-
-    // TODO: find a better place for it
+    // TODO: find a better place for this
     bool similarVelocities(const Velocity<>& lhv, const Velocity<>& rhv)
     {
         // The two velocities to be similar must:
@@ -77,25 +85,29 @@ private:
         return abs(lhv.linear - rhv.linear) < 0.01 && abs(lhv.angular - rhv.angular) < 0.002;
     }
 
-    void stepLLController(Pose<> robotPose);
+    void updateProjectionIndex();
 
-    Trajectory::TrajectoryType currentTrajectory_;
+    Pose<> currentRobotPose_;
+    double distanceToGoal_;
 
     Velocity<> executingCommand_;
-    double executionTime_;
 
     Pose<> goal_;
     bool goalReached_;
 
-    unsigned int lookAhead_;
-    YoshizawaController lowLevelController_;
+    double lookAheadDistance_;
+    SimpleController lowLevelController_;
+
+    bool moving_;
 
     bool newCommandAvailable_;
-    vector<Trajectory::MilestoneType>::iterator nextScheduled_;
-    double nextScheduledTime_;
+
+    int projectionIndex_;
 
     Pose<> referencePose_;
     int referenceIndex_;
+
+    Trajectory<> trajectory_;
 };
 
 } // namespace srs

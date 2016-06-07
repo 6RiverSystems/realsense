@@ -65,7 +65,7 @@ public:
 
     // TODO: Instead of passing the resolution an object with the map coordinate transformation
     // should be passed
-    Solution<GRAPH> getPath(double graphResolution)
+    Solution<GRAPH> getSolution(double graphResolution)
     {
         Solution<GRAPH> result;
 

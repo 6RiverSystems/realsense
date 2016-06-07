@@ -14,7 +14,7 @@ using namespace std;
 #include <tf/LinearMath/Quaternion.h>
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
-#include <srslib_framework/search/SearchPositionNote.hpp>
+#include <srslib_framework/localization/MapNote.hpp>
 
 namespace srs {
 
@@ -79,7 +79,7 @@ private:
     const unsigned char FLAG_GO_SLOW = 0x40;
     const unsigned char FLAG_NO_ROTATIONS = 0x20;
 
-    SearchPositionNote* createNote(unsigned char flags, SearchPositionNote* note = nullptr);
+    MapNote* createNote(unsigned char flags, MapNote* note = nullptr);
 
     void loadConfiguration();
     void loadCosts();

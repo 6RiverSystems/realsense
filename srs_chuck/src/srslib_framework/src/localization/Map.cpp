@@ -75,7 +75,7 @@ void Map::getCostsGrid(vector<int8_t>& costGrid)
                 Grid2dLocation location = Grid2dLocation(col, row);
                 float cost = (static_cast<float>(grid_->getCost(location)) / maxValue) * 100.0;
 
-                SearchPositionNote* note = reinterpret_cast<SearchPositionNote*>(
+                MapNote* note = reinterpret_cast<MapNote*>(
                     grid_->getNote(location));
 
                 if (note->staticObstacle())
@@ -103,7 +103,7 @@ void Map::getNotesGrid(vector<int8_t>& notesGrid)
                 Grid2dLocation location = Grid2dLocation(col, row);
 
                 int8_t notes = 0;
-                SearchPositionNote* note = reinterpret_cast<SearchPositionNote*>(
+                MapNote* note = reinterpret_cast<MapNote*>(
                     grid_->getNote(location));
 
                 if (note->od())
@@ -159,7 +159,7 @@ void Map::setGrid(const vector<int8_t>& costGrid, const vector<int8_t>& notesGri
             {
                 Grid2dLocation location = Grid2dLocation(col, row);
 
-                SearchPositionNote* note = reinterpret_cast<SearchPositionNote*>(
+                MapNote* note = reinterpret_cast<MapNote*>(
                     grid_->getNote(location));
 
                 char notes = *notesIterator;
@@ -179,31 +179,31 @@ void Map::setGrid(const vector<int8_t>& costGrid, const vector<int8_t>& notesGri
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-SearchPositionNote* Map::createNote(unsigned char flags, SearchPositionNote* note)
+MapNote* Map::createNote(unsigned char flags, MapNote* note)
 {
     if (!note)
     {
-        note = new SearchPositionNote();
+        note = new MapNote();
     }
     note->reset();
 
     if (flags & FLAG_GO_SLOW)
     {
-        note->add(SearchPositionNote::GO_SLOW);
+        note->add(MapNote::GO_SLOW);
     }
 
     if (flags & FLAG_NO_ROTATIONS)
     {
-        note->add(SearchPositionNote::NO_ROTATIONS);
+        note->add(MapNote::NO_ROTATIONS);
     }
 
     if (flags & FLAG_OD)
     {
-        note->add(SearchPositionNote::ENABLE_OD);
+        note->add(MapNote::ENABLE_OD);
     }
     else
     {
-        note->add(SearchPositionNote::DISABLE_OD);
+        note->add(MapNote::DISABLE_OD);
     }
 
     return note;
@@ -301,12 +301,12 @@ void Map::loadCosts()
             unsigned char alpha = *(pixel + 3);
 
             Grid2dLocation location = Grid2dLocation(col, heightC_ - row - 1);
-            SearchPositionNote* note = createNote(green);
+            MapNote* note = createNote(green);
 
             // Static obstacles have priority on every other note.
             if (red > 0)
             {
-                note->add(SearchPositionNote::STATIC_OBSTACLE);
+                note->add(MapNote::STATIC_OBSTACLE);
             }
 
             unsigned int cost = static_cast<unsigned int>(blue);

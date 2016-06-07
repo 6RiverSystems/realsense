@@ -30,6 +30,7 @@ set(${PROJECT_NAME}_SOURCES
 
     include/${PROJECT_NAME}/localization/Anchor.hpp
     src/localization/Map.cpp
+    src/localization/MapNote.cpp
     
     include/${PROJECT_NAME}/math/Math.hpp
     include/${PROJECT_NAME}/math/Time.hpp
@@ -50,8 +51,10 @@ set(${PROJECT_NAME}_SOURCES
 
     include/${PROJECT_NAME}/ros/RosTap.hpp
     include/${PROJECT_NAME}/ros/RosService.hpp
+    
     include/${PROJECT_NAME}/ros/service/RosServiceTrigger.hpp
     include/${PROJECT_NAME}/ros/service/RosTriggerShutdown.hpp
+    
     include/${PROJECT_NAME}/ros/tap/RosTapBrainStem.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
@@ -59,14 +62,13 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/ros/tap/RosTapInitialPose.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapJoy.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapJoyAdapter.hpp
-    include/${PROJECT_NAME}/ros/tap/RosTapMap.hpp
+
     src/ros/tap/RosTapMap.cpp
 
     include/${PROJECT_NAME}/search/SearchAction.hpp
     include/${PROJECT_NAME}/search/SearchPosition.hpp
     include/${PROJECT_NAME}/search/SearchNode.hpp
     include/${PROJECT_NAME}/search/AStar.hpp
-    src/search/SearchPositionNote.cpp
 
     include/${PROJECT_NAME}/utils/Ocv2Base.hpp
     include/${PROJECT_NAME}/utils/Filesystem.hpp
@@ -95,8 +97,9 @@ set(TEST_SOURCES_GRAPH
 )
 
 set(TEST_SOURCES_PLANNING
+    test/planning/pathplanning/Test_Trajectory_180ShortTrajectory.cpp
     # test/planning/pathplanning/Test_Trajectory_LongTrajectory.cpp
-    test/planning/pathplanning/Test_Trajectory_ShortStraight.cpp
+    # test/planning/pathplanning/Test_Trajectory_ShortStraight.cpp
     # test/planning/pathplanning/Test_Trajectory_ShortTrajectory.cpp
 )
 

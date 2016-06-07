@@ -11,7 +11,7 @@ using namespace std;
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/Map.hpp>
 #include <srslib_framework/search/AStar.hpp>
-#include <srslib_framework/search/SearchPositionNote.hpp>
+#include <srslib_framework/localization/MapNote.hpp>
 
 #include <srslib_test/utils/Print.hpp>
 #include <srslib_test/graph/grid2d/Grid2dUtils.hpp>
@@ -31,9 +31,6 @@ TEST(Test_AStar, WithMap)
 
     algorithm.search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 90));
 
-    vector<SolutionNode<Grid2d>> solution = algorithm.getPath(0.1);
-    for (auto node : solution)
-    {
-        cout << node << endl;
-    }
+    Solution<Grid2d> solution = algorithm.getSolution(0.1);
+    cout << solution << endl;
 }

@@ -367,7 +367,7 @@ void Motion::executePlanToGoal(Pose<> goalPose)
         SearchPosition<Grid2d>(internalStart, startAngle),
         SearchPosition<Grid2d>(internalGoal, goalAngle));
 
-    Solution<Grid2d> solution = algorithm_.getPath(tapMap_.getMap()->getResolution());
+    Solution<Grid2d> solution = algorithm_.getSolution(tapMap_.getMap()->getResolution());
 
     if (!solution.empty())
     {
@@ -395,7 +395,7 @@ void Motion::publishGoal()
 {
     Pose<> goal = motionController_.getGoal();
 
-    vector<SolutionNode<Grid2d>> path = algorithm_.getPath(tapMap_.getMap()->getResolution());
+    vector<SolutionNode<Grid2d>> path = algorithm_.getSolution(tapMap_.getMap()->getResolution());
 
     ros::Time planningTime = ros::Time::now();
 

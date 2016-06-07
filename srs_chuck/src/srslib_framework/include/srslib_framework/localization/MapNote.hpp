@@ -3,28 +3,28 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef SEARCHPOSITIONNOTE_HPP_
-#define SEARCHPOSITIONNOTE_HPP_
+#ifndef MAPNOTE_HPP_
+#define MAPNOTE_HPP_
 
 namespace srs {
 
-class SearchPositionNote
+class MapNote
 {
 public:
-    const static SearchPositionNote DISABLE_OD;
-    const static SearchPositionNote ENABLE_OD;
-    const static SearchPositionNote GO_SLOW;
-    const static SearchPositionNote NO_ROTATIONS;
-    const static SearchPositionNote STATIC_OBSTACLE;
+    const static MapNote DISABLE_OD;
+    const static MapNote ENABLE_OD;
+    const static MapNote GO_SLOW;
+    const static MapNote NO_ROTATIONS;
+    const static MapNote STATIC_OBSTACLE;
 
-    SearchPositionNote() :
+    MapNote() :
         od_(false),
         goSlow_(false),
         noRotations_(false),
         staticObstacle_(false)
     {}
 
-    SearchPositionNote(bool od,
+    MapNote(bool od,
             bool goSlow,
             bool noRotations,
             bool staticObstacle) :
@@ -34,7 +34,7 @@ public:
         staticObstacle_(staticObstacle)
     {}
 
-    void add(const SearchPositionNote& note)
+    void add(const MapNote& note)
     {
         goSlow_ |= note.goSlow_;
         noRotations_ |= note.noRotations_;
@@ -79,4 +79,4 @@ private:
 
 } // namespace srs
 
-#endif // SEARCHPOSITIONNOTE_HPP_
+#endif // MAPNOTE_HPP_

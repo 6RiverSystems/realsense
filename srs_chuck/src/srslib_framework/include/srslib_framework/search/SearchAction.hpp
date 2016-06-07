@@ -15,7 +15,7 @@ using namespace std;
 #include <srslib_framework/math/Math.hpp>
 
 #include <srslib_framework/search/SearchPosition.hpp>
-#include <srslib_framework/search/SearchPositionNote.hpp>
+#include <srslib_framework/localization/MapNote.hpp>
 
 namespace srs {
 
@@ -87,13 +87,12 @@ private:
         {
             SearchPosition<GRAPH> newPosition(neighbor, currentOrientation);
 
-            const SearchPositionNote* positionNote = reinterpret_cast<const SearchPositionNote*>(
-                graph->getNote(neighbor));
+            const MapNote* note = reinterpret_cast<const MapNote*>(graph->getNote(neighbor));
 
             unsigned int locationCost = graph->getCost(neighbor);
-            locationCost = getLocationCost(locationCost, positionNote);
+            locationCost = getLocationCost(locationCost, note);
 
-            unsigned int commandCost = getCommandCost(BACKWARD, positionNote);
+            unsigned int commandCost = getCommandCost(BACKWARD, note);
             unsigned int totalCost = Math::noOverflowAdd(locationCost, commandCost);
 
             action.position = newPosition;
@@ -116,13 +115,12 @@ private:
         {
             SearchPosition<GRAPH> newPosition(neighbor, currentOrientation);
 
-            const SearchPositionNote* positionNote = reinterpret_cast<const SearchPositionNote*>(
-                graph->getNote(neighbor));
+            const MapNote* note = reinterpret_cast<const MapNote*>(graph->getNote(neighbor));
 
             unsigned int locationCost = graph->getCost(neighbor);
-            locationCost = getLocationCost(locationCost, positionNote);
+            locationCost = getLocationCost(locationCost, note);
 
-            unsigned int commandCost = getCommandCost(FORWARD, positionNote);
+            unsigned int commandCost = getCommandCost(FORWARD, note);
             unsigned int totalCost = Math::noOverflowAdd(locationCost, commandCost);
 
             action.position = newPosition;
@@ -144,10 +142,10 @@ private:
         int newOrientation = Math::normalizeAngleDeg(currentOrientation + angle);
         SearchPosition<GRAPH> newPosition(associatedNode->action.position, newOrientation);
 
-        const SearchPositionNote* positionNote = reinterpret_cast<const SearchPositionNote*>(
+        const MapNote* note = reinterpret_cast<const MapNote*>(
             graph->getNote(associatedNode->action.position.location));
 
-        unsigned int commandCost = getCommandCost(actionEnum, positionNote);
+        unsigned int commandCost = getCommandCost(actionEnum, note);
 
         action.position = newPosition;
         action.g = Math::noOverflowAdd(associatedNode->action.g, commandCost);
@@ -157,7 +155,7 @@ private:
     }
 
     static unsigned int getCommandCost(ActionEnum action,
-        const SearchPositionNote* positionNote)
+        const MapNote* MapNote)
     {
         unsigned int forward = 1;
         unsigned int backward = 40;
@@ -165,9 +163,9 @@ private:
         unsigned int rotateP90 = 4;
         unsigned int rotate180 = 4;
 
-        if (positionNote)
+        if (MapNote)
         {
-            if (positionNote->noRotations())
+            if (MapNote->noRotations())
             {
                 rotateM90 = MAX_COST;
                 rotateP90 = MAX_COST;
@@ -186,13 +184,13 @@ private:
     }
 
     static unsigned int getLocationCost(unsigned int locationCost,
-        const SearchPositionNote* positionNote)
+        const MapNote* MapNote)
     {
         unsigned int staticObstacle = 0;
 
-        if (positionNote)
+        if (MapNote)
         {
-            staticObstacle = positionNote->staticObstacle() ? MAX_COST : 0;
+            staticObstacle = MapNote->staticObstacle() ? MAX_COST : 0;
         }
 
         return Math::noOverflowAdd(locationCost, staticObstacle);

@@ -20,35 +20,25 @@ using namespace srs;
 
 namespace srs {
 
-// TODO: Make Trajectory like Solution (descendant of a vector)
 template<typename TYPE = double>
-class Trajectory : public Object
+class Trajectory : public vector<pair<Pose<TYPE>, Velocity<TYPE>>>
 {
 public:
     typedef TYPE BaseType;
+    typedef pair<Pose<BaseType>, Velocity<BaseType>> NodeType;
 
     Trajectory()
     {}
 
-    void clear()
-    {
-        trajectory_.clear();
-    }
-
-    bool empty()
-    {
-        return trajectory_.empty();
-    }
-
     int findClosestPose(Pose<BaseType> toPose, int fromIndex = 0, double searchDistance = -1)
     {
-        int toIndex = trajectory_.size() - 1;
+        int toIndex = this->size() - 1;
         if (searchDistance > -1)
         {
             toIndex = fromIndex + 2 * round(searchDistance / calculateTrajectoryStep());
-            if (toIndex > trajectory_.size())
+            if (toIndex > this->size())
             {
-                toIndex = trajectory_.size() - 1;
+                toIndex = this->size() - 1;
             }
         }
 
@@ -57,7 +47,7 @@ public:
 
         for (int i = fromIndex; i < toIndex; i++)
         {
-            Pose<BaseType> current = trajectory_[i].first;
+            Pose<BaseType> current = this->at(i).first;
             BaseType distance = PoseMath::euclidean(current, toPose);
             if (distance < minimum)
             {
@@ -73,9 +63,9 @@ public:
     {
         int deltaTo = round(distance / calculateTrajectoryStep());
         int toIndex = fromIndex + deltaTo;
-        if (toIndex > trajectory_.size())
+        if (toIndex > this->size())
         {
-            toIndex = trajectory_.size() - 1;
+            toIndex = this->size() - 1;
         }
 
         return toIndex;
@@ -84,9 +74,9 @@ public:
     Pose<BaseType> getGoal()
     {
         // TODO: Implement exception?
-        if (!trajectory_.empty())
+        if (!this->empty())
         {
-            return trajectory_.back().first;
+            return this->back().first;
         }
 
         return Pose<BaseType>();
@@ -94,9 +84,9 @@ public:
 
     Pose<BaseType> getPose(int position)
     {
-        if (position >= 0 && position < trajectory_.size())
+        if (position >= 0 && position < this->size())
         {
-            return trajectory_[position].first;
+            return this->at(position).first;
         }
 
         // TODO: An exception should be thrown
@@ -105,13 +95,10 @@ public:
 
     Velocity<BaseType> getVelocity(int position)
     {
-        if (position >= 0 && position < trajectory_.size())
+        if (position >= 0 && position < this->size())
         {
-            NodeType node = trajectory_[position];
-            Velocity<BaseType> v = node.second;
-            cout << v << endl;
-
-            return v;
+            NodeType node = this->at(position);
+            return node.second;
         }
 
         // TODO: An exception should thrown
@@ -120,9 +107,9 @@ public:
 
     void getWaypoint(int position, Pose<BaseType>& pose, Velocity<BaseType>& velocity)
     {
-        if (position >= 0 && position < trajectory_.size())
+        if (position >= 0 && position < this->size())
         {
-            NodeType node = trajectory_[position];
+            NodeType node = this[position];
             pose = node.first;
             velocity = node.second;
 
@@ -137,7 +124,7 @@ public:
         int counter = 0;
 
         stream << "Trajectory {" << endl;
-        for (auto waypoint : trajectory.trajectory_)
+        for (auto waypoint : trajectory)
         {
             stream << setw(4) << counter++ << ": " << waypoint.first << ", " << waypoint.second << endl;
         }
@@ -147,23 +134,15 @@ public:
 
     void push_back(Pose<BaseType> pose, Velocity<BaseType> velocity)
     {
-        trajectory_.push_back(NodeType(pose, velocity));
-    }
-
-    int size()
-    {
-        return trajectory_.size();
+        this->vector<NodeType>::push_back(NodeType(pose, velocity));
     }
 
 private:
-    typedef pair<Pose<>, Velocity<>> NodeType;
 
     double calculateTrajectoryStep()
     {
-        return PoseMath::euclidean(trajectory_[0].first, trajectory_[1].first);
+        return PoseMath::euclidean(this->at(0).first, this->at(1).first);
     }
-
-    vector<NodeType> trajectory_;
 };
 
 } // namespace srs

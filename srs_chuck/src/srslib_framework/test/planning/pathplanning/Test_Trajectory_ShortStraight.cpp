@@ -10,7 +10,7 @@ using namespace std;
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 
-#include <srslib_framework/planning/pathplanning/SolutionNode.hpp>
+#include <srslib_framework/planning/pathplanning/Solution.hpp>
 #include <srslib_framework/planning/pathplanning/SimpleSolutionConverter.hpp>
 
 #include <srslib_framework/robotics/Trajectory.hpp>
@@ -22,28 +22,22 @@ typedef SolutionNode<Grid2d> SolutionNodeType;
 TEST(Test_Trajectory, ShortStraight)
 {
     SolutionNodeType SOLUTION_00 = SolutionNodeType(SolutionNodeType::START,
-        Pose<>(2, 1, 0));
+        Pose<>(3, 3, 0));
 
     SolutionNodeType SOLUTION_01 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(2, 2, 0));
+        Pose<>(3, 4, 0));
 
     SolutionNodeType SOLUTION_02 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(2, 3, 0));
+        Pose<>(3, 5, 0));
 
-    SolutionNodeType SOLUTION_03 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(2, 4, 0));
+    SolutionNodeType SOLUTION_03 = SolutionNodeType(SolutionNodeType::GOAL,
+        Pose<>(3, 5, 0));
 
-    SolutionNodeType SOLUTION_04 = SolutionNodeType(SolutionNodeType::GOAL,
-        Pose<>(2, 4, 0));
-
-    // Create a sequence of commands
-    vector<SolutionNodeType> solution = {
-        SOLUTION_00,
-        SOLUTION_01,
-        SOLUTION_02,
-        SOLUTION_03,
-        SOLUTION_04
-    };
+    Solution<Grid2d> solution;
+    solution.push_back(SOLUTION_00);
+    solution.push_back(SOLUTION_01);
+    solution.push_back(SOLUTION_02);
+    solution.push_back(SOLUTION_03);
 
     Chuck chuck;
     Trajectory<> trajectory;
@@ -52,5 +46,6 @@ TEST(Test_Trajectory, ShortStraight)
     solutionConverter.calculateTrajectory(solution);
     solutionConverter.getTrajectory(trajectory);
 
+    cout << solution << endl;
     cout << trajectory << endl;
 }

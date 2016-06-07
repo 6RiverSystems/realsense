@@ -47,13 +47,8 @@ public:
 
     Pose<> getPose()
     {
-        cv::Mat state = ukf_.getX();
-        test::Print::print(state, "State");
-
-        StatePe<> currentState = StatePe<>(state);
-
-        Pose<> pose = currentState.getPose();
-        return pose;
+        StatePe<> currentState = StatePe<>(ukf_.getX());
+        return currentState.getPose();
     }
 
     Velocity<> getVelocity()
@@ -77,12 +72,13 @@ public:
         // Calculate the elapsed time between odometry readings
         double currentTime = odometry.velocity.arrivalTime;
         double dT = currentTime - previousReadingTime_;
-        if (previousReadingTime_ < 0.0)
+        if (previousReadingTime_ < 0 || dT < 0)
         {
-            dT = 1.0 / refreshRate_;
+            dT = 0.0;
         }
         previousReadingTime_ = currentTime;
 
+        ROS_INFO_STREAM_NAMED("PositionEstimator", "dT: " << dT);
         ukf_.run(dT, odometry);
     }
 

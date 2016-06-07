@@ -13,44 +13,27 @@ namespace srs {
 
 struct Chuck : RobotProfile
 {
+    Chuck() :
+        RobotProfile()
+    {
+        bodyWidth = Math::inch2m<double>(24.375); // [m]
+        bodyDepth = Math::inch2m<double>(38.474); // [m]
+        goalReachedDistance = 0.1; // [m]
+        lookAheadDistance = 1.1; // [m]
+        maxAngularAcceleration = 2.6; // [rad/s^2]
+        maxAngularVelocity = 9.7; // [rad/s]
+        maxLinearAcceleration = 0.7; // [m/s^2]
+        maxLinearVelocity = 2.6; // [m/s]
+        travelAngularAcceleration = 0.5; // [rad/s^2]
+        travelAngularVelocity = 2.0; // [rad/s]
+        travelLinearAcceleration =  0.65; // [m/s^2]
+        travelLinearVelocity = 1.0; // [m/s]
+        wheelDiameter = Math::inch2m<double>(8); // [m]
+        wheelDistance = Math::inch2m<double>(20.915); // [m]
+    }
+
     virtual ~Chuck()
     {}
-
-    double bodyWidth() // [m]
-    {
-        return Math::inch2m<double>(24.375);
-    }
-
-    double bodyDepth() // [m]
-    {
-        return Math::inch2m<double>(38.474);
-    }
-
-    double linearAccelerationTravelMax() // [m/s^2]
-    {
-        return 1.0;
-    }
-
-    double linearVelocityTravelMax() // [m/s]
-    {
-        return 1.0;
-    }
-
-    virtual double wheelDiameter() // [m]
-    {
-        return Math::inch2m<double>(8);
-    }
-
-    virtual double wheelDistance() // [m]
-    {
-        return Math::inch2m<double>(20.915);
-    }
-
-//    MAX_OMEGA = deg2rad(120.0); % [rad/s]
-//    TRAVEL_OMEGA = deg2rad(90.0); % [rad/s]
-//
-//    MAX_ALPHA = deg2rad(120.0); % [rad/s^2]
-//    TRAVEL_ALPHA = deg2rad(90.0); % [rad/s^2]
 };
 
 } // namespace srs

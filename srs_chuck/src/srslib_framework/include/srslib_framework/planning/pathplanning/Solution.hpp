@@ -3,9 +3,10 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef SOLUTIONNODE_HPP_
-#define SOLUTIONNODE_HPP_
+#ifndef SOLUTION_HPP_
+#define SOLUTION_HPP_
 
+#include <iomanip>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
@@ -48,6 +49,29 @@ private:
 };
 
 template<typename GRAPH>
+class Solution : public vector<SolutionNode<GRAPH>>
+{
+public:
+    typedef SolutionNode<GRAPH> NodeType;
+
+    Solution()
+    {}
+
+    friend ostream& operator<<(ostream& stream, const Solution& solution)
+    {
+        int counter = 0;
+
+        stream << "Solution {" << endl;
+        for (auto node : solution)
+        {
+            stream << setw(4) << counter++ << ": " << node << endl;
+        }
+
+        return stream << "}";
+    }
+};
+
+template<typename GRAPH>
 unordered_map<int, string> SolutionNode<GRAPH>::ENUM_NAMES = {
     {SolutionNode<GRAPH>::NONE, "NONE"},
     {SolutionNode<GRAPH>::START, "START"},
@@ -61,4 +85,4 @@ unordered_map<int, string> SolutionNode<GRAPH>::ENUM_NAMES = {
 
 } // namespace srs
 
-#endif // SOLUTIONNODE_HPP_
+#endif // SOLUTION_HPP_

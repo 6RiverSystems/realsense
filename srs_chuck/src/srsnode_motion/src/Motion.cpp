@@ -12,7 +12,7 @@
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
-#include <srslib_framework/planning/pathplanning/SolutionNode.hpp>
+#include <srslib_framework/planning/pathplanning/Solution.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
 
@@ -23,11 +23,10 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Motion::Motion(string nodeName) :
+    robot_(),
     currentCommand_(),
     firstLocalization_(true),
     positionEstimator_(REFRESH_RATE_HZ),
-    motionController_(),
-    robot_(),
     rosNodeHandle_(nodeName),
     // tapPlan_(rosNodeHandle_),
     tapJoyAdapter_(rosNodeHandle_),
@@ -39,13 +38,13 @@ Motion::Motion(string nodeName) :
     triggerStop_(rosNodeHandle_),
     solutionConverter_(robot_),
     tapCmdGoal_(rosNodeHandle_),
-    tapMap_(rosNodeHandle_),
-    currentGoal_()
+    tapMap_(rosNodeHandle_)
 {
+    motionController_.setRobot(robot_);
+
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 100);
     pubOdometry_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("odometry", 50);
 
-    positionEstimator_.addSensor(tapOdometry_.getSensor());
     positionEstimator_.addSensor(tapAps_.getSensor());
 
     configServer_.setCallback(boost::bind(&Motion::onConfigChange, this, _1, _2));
@@ -59,7 +58,7 @@ void Motion::run()
 {
     connectAllTaps();
 
-    // Establish an acceptable initial position
+    // Establish an "acceptable" initial position
     tapInitialPose_.set(0, 3.0, 3.0, 0);
     reset(tapInitialPose_.getPose());
 
@@ -131,15 +130,38 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     tapAps_.getSensor()->enable(configuration_.aps_enabled);
     ROS_INFO_STREAM("APS sensor enabled: " << configuration_.aps_enabled);
 
+    robot_.goalReachedDistance = configuration_.goal_reached_distance;
+    ROS_INFO_STREAM("Goal reached distance [m]: " << configuration_.goal_reached_distance);
+
+    robot_.lookAheadDistance = configuration_.look_ahead_distance;
+    ROS_INFO_STREAM("Look-ahead distance [m]: " << configuration_.look_ahead_distance);
+
+    robot_.maxAngularAcceleration = configuration_.max_angular_acceleration;
+    ROS_INFO_STREAM("Max angular acceleration [m/s^2]: " << configuration_.max_angular_acceleration);
+
+    robot_. maxAngularVelocity = configuration_.max_angular_velocity;
+    ROS_INFO_STREAM("Max angular velocity [m/s]: " << configuration_.max_angular_velocity);
+
+    robot_.maxLinearAcceleration = configuration_.max_linear_acceleration;
+    ROS_INFO_STREAM("Max linear acceleration [m/s^2]: " << configuration_.max_linear_acceleration);
+
+    robot_.maxLinearVelocity = configuration_.max_linear_velocity;
+    ROS_INFO_STREAM("Max linear velocity [m/s]: " << configuration_.max_linear_velocity);
+
+    robot_.travelAngularAcceleration = configuration_.travel_angular_acceleration;
+    ROS_INFO_STREAM("Travel angular acceleration [rad/s^2]: " << configuration_.travel_angular_acceleration);
+
+    robot_.travelAngularVelocity = configuration_.travel_angular_velocity;
+    ROS_INFO_STREAM("Travel angular velocity [rad/s]: " << configuration_.travel_angular_velocity);
+
+    robot_.travelLinearAcceleration = configuration_.travel_linear_acceleration;
+    ROS_INFO_STREAM("Travel linear acceleration [m/s^2]: " << configuration_.travel_linear_acceleration);
+
+    robot_.travelLinearVelocity = configuration_.travel_linear_velocity;
+    ROS_INFO_STREAM("Travel linear velocity [m/s]: " << configuration_.travel_linear_velocity);
+
     tapOdometry_.getSensor()->enable(configuration_.odometry_enabled);
     ROS_INFO_STREAM("Odometry sensor enabled: " << configuration_.odometry_enabled);
-
-    motionController_.setLookAheadDistance(configuration_.look_ahead_distance);
-    ROS_INFO_STREAM("Motion controller look-ahead: " << configuration_.look_ahead_distance);
-
-    // ####
-    // solutionConverter_.setMinimumVelocity(configuration_.min_velocity);
-    // ROS_INFO_STREAM("Motion controller minimum velocity: " << configuration_.min_velocity);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,6 +245,12 @@ void Motion::scanTapsForData()
         firstLocalization_ = false;
     }
 
+    // if (!motionController_.isMoving() && tapMap_.getMap() && !motionController_.isGoalReached())
+    // {
+    //     executePlanToGoal(tapCmdGoal_.getGoal());
+    //     publishGoal();
+    // }
+
     // If there is a new goal to reach
     if (tapCmdGoal_.newDataAvailable())
     {
@@ -249,16 +277,13 @@ void Motion::scanTapsForData()
 void Motion::reset(Pose<> pose0)
 {
     positionEstimator_.reset(pose0);
-    motionController_.reset();
+    motionController_.reset(pose0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::stepNode()
 {
     bool commandGenerated = false;
-
-    // Calculate the elapsed time
-    double dT = Time::time2number(currentTime_) - Time::time2number(previousTime_);
 
     // If the joystick was touched, we know that we are latched
     if (tapJoyAdapter_.newDataAvailable())
@@ -268,15 +293,15 @@ void Motion::stepNode()
 
         commandGenerated = true;
         currentCommand_ = tapJoyAdapter_.getVelocity();
-
-//        ROS_DEBUG_STREAM_NAMED(rosNodeHandle_.getNamespace().c_str(),
-//            "Receiving command from joystick: " << currentCommand_);
     }
     else {
         // Run the motion controller with the current pose estimate
         // only if the joystick is not latched
         if (!tapJoyAdapter_.getLatchState())
         {
+            // Calculate the elapsed time
+            double dT = Time::time2number(currentTime_) - Time::time2number(previousTime_);
+
             motionController_.run(dT, positionEstimator_.getPose());
 
             if (motionController_.newCommandAvailable())
@@ -296,58 +321,53 @@ void Motion::stepNode()
     // Output the velocity command to the brainstem
     if (commandGenerated)
     {
-        // If the brain stem is disconnected, simulate odometry
-        // feeding the odometer the commanded velocity
-        if (!tapBrainStem_.isBrainStemConnected())
-        {
-            ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
-                "Brainstem disconnected. Using simulated odometry");
-
-            tapOdometry_.set(Time::time2number(ros::Time::now()),
-                currentCommand_.linear,
-                currentCommand_.angular);
-        }
-
         ROS_INFO_STREAM_NAMED("Motion", "Sending command: " << currentCommand_);
         outputVelocityCommand(currentCommand_);
+    }
+
+    // If the brain stem is disconnected and the motion controller is moving, simulate odometry
+    // feeding the odometer with the commanded velocity
+    if (motionController_.isMoving() && !tapBrainStem_.isBrainStemConnected())
+    {
+        ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
+            "Brainstem disconnected. Using simulated odometry");
+
+        simulatedT_ += 1.0 / REFRESH_RATE_HZ;
+        tapOdometry_.set(simulatedT_,
+            currentCommand_.linear,
+            currentCommand_.angular);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // TODO: This should be in Executive
-void Motion::executePlanToGoal(Pose<> goal)
+void Motion::executePlanToGoal(Pose<> goalPose)
 {
-    goal.x = 5.0; // ####
-    goal.y = 3.0;
-    currentGoal_ = goal;
-
-    Pose<> currentPose = positionEstimator_.getPose();
-    currentPose.x = 3.0; // ####
-    currentPose.y = 3.0;
+    Pose<> robotPose = positionEstimator_.getPose();
 
     algorithm_.setGraph(tapMap_.getMap()->getGrid());
 
     int r1 = 0;
     int c1 = 0;
-    tapMap_.getMap()->getMapCoordinates(currentPose.x, currentPose.y, c1, r1);
+    tapMap_.getMap()->getMapCoordinates(robotPose.x, robotPose.y, c1, r1);
     Grid2d::LocationType internalStart(c1, r1);
-    int startAngle = Math::normalizeRad2deg90(currentPose.theta);
+    int startAngle = Math::normalizeRad2deg90(robotPose.theta);
 
     int r2 = 0;
     int c2 = 0;
-    tapMap_.getMap()->getMapCoordinates(currentGoal_.x, currentGoal_.y, c2, r2);
+    tapMap_.getMap()->getMapCoordinates(goalPose.x, goalPose.y, c2, r2);
     Grid2d::LocationType internalGoal(c2, r2);
-    int goalAngle = Math::normalizeRad2deg90(currentGoal_.theta);
+    int goalAngle = Math::normalizeRad2deg90(goalPose.theta);
 
-    ROS_INFO_STREAM("Looking for a path between " << currentPose << " (" <<
+    ROS_INFO_STREAM("Looking for a path between " << robotPose << " (" <<
         c1 << "," << r1 << "," << startAngle
-        << ") and " << currentGoal_ << " (" << c2 << "," << r2 << "," << goalAngle << ")");
+        << ") and " << goalPose << " (" << c2 << "," << r2 << "," << goalAngle << ")");
 
     algorithm_.search(
         SearchPosition<Grid2d>(internalStart, startAngle),
         SearchPosition<Grid2d>(internalGoal, goalAngle));
 
-    vector<SolutionNode<Grid2d>> solution = algorithm_.getPath(tapMap_.getMap()->getResolution());
+    Solution<Grid2d> solution = algorithm_.getPath(tapMap_.getMap()->getResolution());
 
     if (!solution.empty())
     {
@@ -357,19 +377,24 @@ void Motion::executePlanToGoal(Pose<> goal)
         solutionConverter_.getTrajectory(trajectory);
         motionController_.setTrajectory(trajectory);
 
+        cout << solution << endl;
         cout << trajectory << endl;
+
+        simulatedT_ = 0.0;
     }
     else
     {
-        ROS_INFO_STREAM("Path not found between " << currentPose << " (" <<
+        ROS_INFO_STREAM("Path not found between " << robotPose << " (" <<
             c1 << "," << r1 << "," << startAngle
-            << ") and " << goal << " (" << c2 << "," << r2 << "," << goalAngle << ")");
+            << ") and " << goalPose << " (" << c2 << "," << r2 << "," << goalAngle << ")");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishGoal()
 {
+    Pose<> goal = motionController_.getGoal();
+
     vector<SolutionNode<Grid2d>> path = algorithm_.getPath(tapMap_.getMap()->getResolution());
 
     ros::Time planningTime = ros::Time::now();
@@ -399,11 +424,11 @@ void Motion::publishGoal()
     messageGoalPlan.poses = planPoses;
 
     geometry_msgs::PoseStamped messageGoal;
-    tf::Quaternion quaternion = tf::createQuaternionFromYaw(currentGoal_.theta);
+    tf::Quaternion quaternion = tf::createQuaternionFromYaw(goal.theta);
 
     messageGoal.header.stamp = planningTime;
-    messageGoal.pose.position.x = currentGoal_.x;
-    messageGoal.pose.position.y = currentGoal_.y;
+    messageGoal.pose.position.x = goal.x;
+    messageGoal.pose.position.y = goal.y;
     messageGoal.pose.position.z = 0.0;
     messageGoal.pose.orientation.x = quaternion.x();
     messageGoal.pose.orientation.y = quaternion.y();

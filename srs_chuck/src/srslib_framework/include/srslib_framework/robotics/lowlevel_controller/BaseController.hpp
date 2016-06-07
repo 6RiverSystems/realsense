@@ -20,8 +20,8 @@ public:
         Kw_(Kw),
         maxAngular_(0.0),
         maxLinear_(0.0),
-        normalAngular_(0.0),
-        normalLinear_(0.0)
+        travelAngular_(0.0),
+        travelLinear_(0.0)
     {}
 
     virtual ~BaseController()
@@ -29,24 +29,24 @@ public:
 
     virtual Velocity<> step(Pose<> currentPose, Velocity<> command) = 0;
 
-    void setMaxAngular(double value)
+    void setMaxAngularVelocity(double value)
     {
         maxAngular_ = value;
     }
 
-    void setMaxLinear(double value)
+    void setMaxLinearVelocity(double value)
     {
         maxLinear_ = value;
     }
 
-    void setNormalAngular(double value)
+    void setTravelAngularVelocity(double value)
     {
-        normalAngular_ = value;
+        travelAngular_ = value;
     }
 
-    void setNormalLinear(double value)
+    void setTravelLinearVelocity(double value)
     {
-        normalLinear_ = value;
+        travelLinear_ = value;
     }
 
     void setReference(Pose<> referencePose)
@@ -66,8 +66,8 @@ protected:
     double maxAngular_;
     double maxLinear_;
 
-    double normalAngular_;
-    double normalLinear_;
+    double travelAngular_;
+    double travelLinear_;
 
     Pose<> referencePose_;
 };

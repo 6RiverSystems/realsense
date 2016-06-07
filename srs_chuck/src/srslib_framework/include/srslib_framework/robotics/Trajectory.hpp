@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <limits>
+#include <iomanip>
 using namespace std;
 
 #include <srslib_framework/math/Math.hpp>
@@ -19,6 +20,7 @@ using namespace srs;
 
 namespace srs {
 
+// TODO: Make Trajectory like Solution (descendant of a vector)
 template<typename TYPE = double>
 class Trajectory : public Object
 {
@@ -38,12 +40,12 @@ public:
         return trajectory_.empty();
     }
 
-    int findClosestPose(Pose<BaseType> toPose, int fromIndex = 0, double distance = -1)
+    int findClosestPose(Pose<BaseType> toPose, int fromIndex = 0, double searchDistance = -1)
     {
         int toIndex = trajectory_.size() - 1;
-        if (distance > -1)
+        if (searchDistance > -1)
         {
-            toIndex = fromIndex + 2 * round(distance / calculateTrajectoryStep());
+            toIndex = fromIndex + 2 * round(searchDistance / calculateTrajectoryStep());
             if (toIndex > trajectory_.size())
             {
                 toIndex = trajectory_.size() - 1;
@@ -79,55 +81,55 @@ public:
         return toIndex;
     }
 
-    bool getGoal(Pose<BaseType> goal)
+    Pose<BaseType> getGoal()
     {
-        if (trajectory_.empty())
+        // TODO: Implement exception?
+        if (!trajectory_.empty())
         {
-            return false;
+            return trajectory_.back().first;
         }
 
-        goal = trajectory_.back().first;
-        return true;
+        return Pose<BaseType>();
     }
 
-    bool getPose(int position, Pose<BaseType>& pose)
+    Pose<BaseType> getPose(int position)
+    {
+        if (position >= 0 && position < trajectory_.size())
+        {
+            return trajectory_[position].first;
+        }
+
+        // TODO: An exception should be thrown
+        return Pose<BaseType>();
+    }
+
+    Velocity<BaseType> getVelocity(int position)
+    {
+        if (position >= 0 && position < trajectory_.size())
+        {
+            NodeType node = trajectory_[position];
+            Velocity<BaseType> v = node.second;
+            cout << v << endl;
+
+            return v;
+        }
+
+        // TODO: An exception should thrown
+        return Velocity<BaseType>();
+    }
+
+    void getWaypoint(int position, Pose<BaseType>& pose, Velocity<BaseType>& velocity)
     {
         if (position >= 0 && position < trajectory_.size())
         {
             NodeType node = trajectory_[position];
             pose = node.first;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    bool getVelocity(int position, Velocity<BaseType>& velocity)
-    {
-        if (position >= 0 && position < trajectory_.size())
-        {
-            NodeType node = trajectory_[position];
             velocity = node.second;
 
-            return true;
+            return;
         }
 
-        return false;
-    }
-
-    bool getWaypoint(int position, Pose<BaseType>& pose, Velocity<BaseType>& velocity)
-    {
-        if (position >= 0 && position < trajectory_.size())
-        {
-            NodeType node = trajectory_[position];
-            pose = node.first;
-            velocity = node.second;
-
-            return true;
-        }
-
-        return false;
+        // TODO: An exception should be thrown
     }
 
     friend ostream& operator<<(ostream& stream, const Trajectory& trajectory)
@@ -137,8 +139,9 @@ public:
         stream << "Trajectory {" << endl;
         for (auto waypoint : trajectory.trajectory_)
         {
-            stream << counter++ << ": " << waypoint.first << ", " << waypoint.second << endl;
+            stream << setw(4) << counter++ << ": " << waypoint.first << ", " << waypoint.second << endl;
         }
+
         return stream << "}";
     }
 

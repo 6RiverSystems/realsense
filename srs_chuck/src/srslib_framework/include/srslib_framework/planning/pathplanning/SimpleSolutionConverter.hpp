@@ -13,7 +13,7 @@ using namespace std;
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 
-#include <srslib_framework/planning/pathplanning/SolutionNode.hpp>
+#include <srslib_framework/planning/pathplanning/Solution.hpp>
 
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
@@ -31,7 +31,7 @@ public:
         t_(0.0)
     {}
 
-    void calculateTrajectory(vector<SolutionNode<Grid2d>>& solution)
+    void calculateTrajectory(Solution<Grid2d>& solution)
     {
         trajectory_.clear();
         waypoints_.clear();
@@ -70,6 +70,11 @@ public:
     }
 
 private:
+    double calculateDirection(double from, double to)
+    {
+        return Math::sgn<double>(to - from);
+    }
+
     void calculateMinMaxMean(vector<Pose<>>& waypoints,
         double& minDistance, double& maxDistance, double& meanDistance)
     {
@@ -103,7 +108,7 @@ private:
         meanDistance /= meanCount;
     }
 
-    void findWaypoints(vector<SolutionNode<Grid2d>>& solution)
+    void findWaypoints(Solution<Grid2d>& solution)
     {
         waypoints_.clear();
 
@@ -141,29 +146,33 @@ private:
 
         while (toWaypoint != waypoints.end())
         {
-            trajectory_.push_back(*fromWaypoint, Velocity<>());
+            currentVelocity = Velocity<>(robot_.travelLinearVelocity, 0.0);
+
+            trajectory_.push_back(*fromWaypoint, currentVelocity);
 
             double d = PoseMath::euclidean(*fromWaypoint, *toWaypoint);
             int totalWaypoints = ceil(d / spacing) - 1;
             double delta  = d / totalWaypoints;
 
-            currentVelocity = Velocity<>(robot_.linearVelocityTravelMax(), 0.0);
-
             if (movingAlongX(*fromWaypoint, *toWaypoint))
             {
+                double direction = calculateDirection(fromWaypoint->x, toWaypoint->x);
+
                 Pose<> waypoint = *fromWaypoint;
                 for (int p = 0; p < totalWaypoints; p++)
                 {
-                    waypoint.x += delta;
+                    waypoint.x += direction * delta;
                     trajectory_.push_back(waypoint, currentVelocity);
                 }
             }
             else if (movingAlongY(*fromWaypoint, *toWaypoint))
             {
+                double direction = calculateDirection(fromWaypoint->y, toWaypoint->y);
+
                 Pose<> waypoint = *fromWaypoint;
                 for (int p = 0; p < totalWaypoints; p++)
                 {
-                    waypoint.y += delta;
+                    waypoint.y += direction * delta;
                     trajectory_.push_back(waypoint, currentVelocity);
                 }
             }

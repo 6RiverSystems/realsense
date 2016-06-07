@@ -14,7 +14,7 @@ using namespace std;
 
 #include <srslib_framework/datastructure/MappedPriorityQueue.hpp>
 
-#include <srslib_framework/planning/pathplanning/SolutionNode.hpp>
+#include <srslib_framework/planning/pathplanning/Solution.hpp>
 #include <srslib_framework/search/SearchNode.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
 
@@ -65,9 +65,9 @@ public:
 
     // TODO: Instead of passing the resolution an object with the map coordinate transformation
     // should be passed
-    vector<SolutionNode<GRAPH>> getPath(double graphResolution)
+    Solution<GRAPH> getPath(double graphResolution)
     {
-        vector<SolutionNode<GRAPH>> result;
+        Solution<GRAPH> result;
 
         SearchNode<GRAPH>* cursor = lastNode_;
         while (cursor)
@@ -180,8 +180,12 @@ private:
     // TODO: This should be in the map
     void getWorldCoordinates(double resolution, int c, int r, double& x, double& y)
     {
-        x = static_cast<double>(c) * resolution;
-        y = static_cast<double>(r) * resolution;
+        x = static_cast<double>(c + 1) * resolution;
+        y = static_cast<double>(r + 1) * resolution;
+
+        // The precision is down to 1mm
+        x = round(x * 1000) / 1000;
+        y = round(y * 1000) / 1000;
     }
 
     void pushSearchNode(SearchNodeType* node)

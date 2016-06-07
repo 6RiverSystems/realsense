@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef SIMPLECONTROLLER_HPP_
-#define SIMPLECONTROLLER_HPP_
+#ifndef CMUCONTROLLER_HPP_
+#define CMUCONTROLLER_HPP_
 
 #include <srslib_framework/math/Math.hpp>
 
@@ -12,15 +12,15 @@
 
 namespace srs {
 
-class SimpleController: public BaseController
+class CMUController: public BaseController
 {
 public:
-    SimpleController(double Kv, double Kw) :
+    CMUController(double Kv, double Kw) :
         BaseController(Kv, Kw),
-        lookAheadDistance_(0.5)
+        lookAheadDistance_(1.5)
     {}
 
-    ~SimpleController()
+    ~CMUController()
     {}
 
     void setLookAheadDistance(double lookAheadDistance)
@@ -30,19 +30,14 @@ public:
 
     Velocity<> step(Pose<> currentPose, Velocity<> command)
     {
-        double slope = atan2(referencePose_.y - currentPose.y,
-            referencePose_.x - currentPose.x);
-
-        double alpha = Math::normalizeAngleRad(currentPose.theta - slope);
+        double slope = atan2(referencePose_.y - currentPose.y, referencePose_.x - currentPose.x);
+        double alpha = Math::normalizeAngleRad(slope - currentPose.theta);
 
         double angular = 2 * sin(alpha) / lookAheadDistance_;
-        if (abs(abs(alpha) - M_PI) < 1e-8)
-        {
-            angular = Math::sgn(angular) * normalAngular_;
-        }
         angular = saturate(angular, maxAngular_);
 
         double linear = command.linear;
+        linear = saturate(linear, maxLinear_);
 
         return Velocity<>(linear, angular);
     }
@@ -53,4 +48,4 @@ private:
 
 } // namespace srs
 
-#endif // SIMPLECONTROLLER_HPP_
+#endif // CMUCONTROLLER_HPP_

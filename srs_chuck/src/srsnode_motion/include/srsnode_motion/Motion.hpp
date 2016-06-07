@@ -101,10 +101,11 @@ private:
     RosTapMap tapMap_;
     ros::Publisher pubGoalPlan_;
     ros::Publisher pubGoalGoal_;
-    Pose<> currentGoal_;
 
     void executePlanToGoal(Pose<> goal);
     void publishGoal();
+
+    double simulatedT_;
 };
 
 } // namespace srs

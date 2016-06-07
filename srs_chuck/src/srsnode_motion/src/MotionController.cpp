@@ -10,22 +10,21 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-MotionController::MotionController(double lookAheadDistance, double distanceToGoal) :
-    distanceToGoal_(distanceToGoal),
-    lookAheadDistance_(lookAheadDistance),
+MotionController::MotionController() :
+    robot_(),
     lowLevelController_(1, 1)
 {
-    reset();
+    reset(Pose<>());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MotionController::reset()
+void MotionController::reset(Pose<> robotPose)
 {
     moving_ = false;
     newCommandAvailable_ = false;
     executingCommand_ = Velocity<>();
 
-    currentRobotPose_ = Pose<>();
+    currentRobotPose_ = robotPose;
     projectionIndex_ = -1;
 
     referencePose_ = Pose<>();
@@ -45,10 +44,12 @@ void MotionController::run(double dT, Pose<> robotPose)
     {
         updateProjectionIndex();
 
-        Velocity<> nextVelocity;
+        Velocity<> nextCommand;
 
         double distance = PoseMath::euclidean(currentRobotPose_, goal_);
-        if (distance < distanceToGoal_)
+        ROS_INFO_STREAM("Distance to goal: " << distance);
+
+        if (distance < robot_.goalReachedDistance)
         {
             goalReached_ = true;
             ROS_INFO_STREAM("Goal reached: " << goal_);
@@ -61,14 +62,32 @@ void MotionController::run(double dT, Pose<> robotPose)
             ROS_INFO_STREAM("Distance to reference: " << distance);
 
             // Find the desired velocity command
-            trajectory_.getVelocity(projectionIndex_, nextVelocity);
+            nextCommand = trajectory_.getVelocity(projectionIndex_);
 
             // Ask the low-level controller to modulate the desired velocity
-            nextVelocity = lowLevelController_.step(currentRobotPose_, nextVelocity);
+            nextCommand = lowLevelController_.step(currentRobotPose_, nextCommand);
 
-            setExecutingCommand(nextVelocity);
+            // If the two velocities are similar, there is no need to send a
+            // new command (if requested).
+            if (!similarVelocities(executingCommand_, nextCommand))
+            {
+                executingCommand_ = nextCommand;
+                newCommandAvailable_ = true;
+            }
         }
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void MotionController::setRobot(RobotProfile robot)
+{
+    robot_ = robot;
+
+    lowLevelController_.setLookAheadDistance(robot_.lookAheadDistance);
+    lowLevelController_.setMaxAngularVelocity(robot_.maxAngularVelocity);
+    lowLevelController_.setMaxLinearVelocity(robot_.maxLinearVelocity);
+    lowLevelController_.setTravelAngularVelocity(robot_.travelAngularVelocity);
+    lowLevelController_.setTravelLinearVelocity(robot_.travelLinearVelocity);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,23 +97,27 @@ void MotionController::setTrajectory(Trajectory<> trajectory)
 
     if (!trajectory_.empty())
     {
-        cout << trajectory_ << endl;
-
         if (isMoving())
         {
             stop(0.0);
         }
-        reset();
+        reset(currentRobotPose_);
+
+        cout << currentRobotPose_ << endl;
 
         // Find the goal of the trajectory
-        trajectory_.getGoal(goal_);
+        goal_ = trajectory_.getGoal();
 
         // Find the first reference point on the given trajectory
         referenceIndex_ = trajectory_.findClosestPose(currentRobotPose_);
-        trajectory_.getPose(referenceIndex_, referencePose_);
+        referencePose_ = trajectory_.getPose(referenceIndex_);
 
         // Set the reference in the low-level controller
         lowLevelController_.setReference(referencePose_);
+
+        // Find the projection of the current robot pose onto the trajectory
+        projectionIndex_ = trajectory_.findClosestPose(currentRobotPose_,
+            0, robot_.lookAheadDistance);
 
         moving_ = true;
     }
@@ -116,10 +139,12 @@ void MotionController::stop(double stopDistance)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::updateProjectionIndex()
 {
-    projectionIndex_ = trajectory_.findClosestPose(currentRobotPose_, projectionIndex_, lookAheadDistance_);
-    referenceIndex_ = trajectory_.findWaypointAtDistance(projectionIndex_, lookAheadDistance_);
+    projectionIndex_ = trajectory_.findClosestPose(currentRobotPose_,
+        projectionIndex_, robot_.lookAheadDistance);
+    referenceIndex_ = trajectory_.findWaypointAtDistance(projectionIndex_,
+        robot_.lookAheadDistance);
 
-    trajectory_.getPose(referenceIndex_, referencePose_);
+    referencePose_ = trajectory_.getPose(referenceIndex_);
     lowLevelController_.setReference(referencePose_);
 }
 

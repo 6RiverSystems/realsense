@@ -35,7 +35,7 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/math/Time.hpp
     include/${PROJECT_NAME}/math/PoseMath.hpp
 
-    include/${PROJECT_NAME}/planning/pathplanning/SolutionNode.hpp
+    include/${PROJECT_NAME}/planning/pathplanning/Solution.hpp
 
     include/${PROJECT_NAME}/platform/Object.hpp
     include/${PROJECT_NAME}/platform/Thread.hpp
@@ -46,7 +46,7 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/robotics/Trajectory.hpp
 
     include/${PROJECT_NAME}/robotics/lowlevel_controller/YoshizawaController.hpp
-    include/${PROJECT_NAME}/robotics/lowlevel_controller/SimpleController.hpp
+    include/${PROJECT_NAME}/robotics/lowlevel_controller/CMUController.hpp
 
     include/${PROJECT_NAME}/ros/RosTap.hpp
     include/${PROJECT_NAME}/ros/RosService.hpp

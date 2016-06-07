@@ -22,8 +22,9 @@ public:
 
     virtual string toString()
     {
-		std::ostringstream stringStream;
-		stringStream << "Object: " << this;
+        std::ostringstream stringStream;
+        stringStream << "Object: " << this;
+
         return stringStream.str();
     }
 };

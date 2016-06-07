@@ -14,14 +14,16 @@ using namespace std;
 #include <srslib_framework/robotics/Velocity.hpp>
 
 #include <srslib_framework/robotics/lowlevel_controller/YoshizawaController.hpp>
-#include <srslib_framework/robotics/lowlevel_controller/SimpleController.hpp>
+#include <srslib_framework/robotics/lowlevel_controller/CMUController.hpp>
+
+#include <srslib_framework/robotics/robot/RobotProfile.hpp>
 
 namespace srs {
 
 class MotionController
 {
 public:
-    MotionController(double lookAheadDistance = 0.50, double distanceToGoal = 0.1);
+    MotionController();
 
     ~MotionController()
     {}
@@ -30,6 +32,11 @@ public:
     {
         newCommandAvailable_ = false;
         return executingCommand_;
+    }
+
+    Pose<> getGoal()
+    {
+        return goal_;
     }
 
     bool isGoalReached()
@@ -47,35 +54,20 @@ public:
         return newCommandAvailable_;
     }
 
-    void reset();
+    void reset(Pose<> robotPose);
     void run(double dT, Pose<> robotPose);
-
-    void setLookAheadDistance(double newDistance)
-    {
-        lookAheadDistance_ = newDistance;
-        lowLevelController_.setLookAheadDistance(newDistance);
-    }
 
     void setRobotPose(Pose<> robotPose)
     {
         currentRobotPose_ = robotPose;
     }
 
+    void setRobot(RobotProfile robot);
+
     void setTrajectory(Trajectory<> trajectory);
     void stop(double stopDistance = 0);
 
 private:
-    void setExecutingCommand(Velocity<> command)
-    {
-        // If the two velocities are similar, there is no need to send a
-        // new command. However the cursor of the milestone is advanced anyway.
-        if (!similarVelocities(executingCommand_, command))
-        {
-            executingCommand_ = command;
-            newCommandAvailable_ = true;
-        }
-    }
-
     // TODO: find a better place for this
     bool similarVelocities(const Velocity<>& lhv, const Velocity<>& rhv)
     {
@@ -88,15 +80,13 @@ private:
     void updateProjectionIndex();
 
     Pose<> currentRobotPose_;
-    double distanceToGoal_;
 
     Velocity<> executingCommand_;
 
     Pose<> goal_;
     bool goalReached_;
 
-    double lookAheadDistance_;
-    SimpleController lowLevelController_;
+    CMUController lowLevelController_;
 
     bool moving_;
 
@@ -106,6 +96,7 @@ private:
 
     Pose<> referencePose_;
     int referenceIndex_;
+    RobotProfile robot_;
 
     Trajectory<> trajectory_;
 };

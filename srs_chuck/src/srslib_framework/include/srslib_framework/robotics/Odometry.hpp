@@ -26,7 +26,7 @@ struct Odometry : public Measurement
         velocity(arrivalTime, linear, angular)
     {}
 
-    Odometry(BaseType linear, BaseType angular) :
+    Odometry(BaseType linear = BaseType(), BaseType angular = BaseType()) :
         velocity(linear, angular)
     {}
 

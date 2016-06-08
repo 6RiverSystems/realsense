@@ -8,7 +8,7 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <srslib_framework/robotics/lowlevel_controller/BaseController.hpp>
+#include <srslib_framework/robotics/controller/BaseController.hpp>
 
 namespace srs {
 

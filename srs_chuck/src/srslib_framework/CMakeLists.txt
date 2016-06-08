@@ -46,8 +46,8 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/robotics/Velocity.hpp
     include/${PROJECT_NAME}/robotics/Trajectory.hpp
 
-    include/${PROJECT_NAME}/robotics/lowlevel_controller/YoshizawaController.hpp
-    include/${PROJECT_NAME}/robotics/lowlevel_controller/CMUController.hpp
+    include/${PROJECT_NAME}/robotics/controller/YoshizawaController.hpp
+    include/${PROJECT_NAME}/robotics/controller/CMUPathFollower.hpp
 
     include/${PROJECT_NAME}/ros/RosTap.hpp
     include/${PROJECT_NAME}/ros/RosService.hpp

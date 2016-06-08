@@ -36,7 +36,6 @@ Motion::Motion(string nodeName) :
     tapAps_(rosNodeHandle_),
     triggerShutdown_(rosNodeHandle_),
     triggerStop_(rosNodeHandle_),
-    solutionConverter_(robot_),
     tapCmdGoal_(rosNodeHandle_),
     tapMap_(rosNodeHandle_)
 {
@@ -162,6 +161,8 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 
     tapOdometry_.getSensor()->enable(configuration_.odometry_enabled);
     ROS_INFO_STREAM("Odometry sensor enabled: " << configuration_.odometry_enabled);
+
+    //motionController_.setRobot(robot_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -277,19 +278,22 @@ void Motion::scanTapsForData()
 void Motion::reset(Pose<> pose0)
 {
     positionEstimator_.reset(pose0);
-    motionController_.reset(pose0);
+    motionController_.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::stepNode()
 {
+    bool odometryAvailable = tapOdometry_.newDataAvailable();
+    Odometry<> odometry = tapOdometry_.getSensor()->getOdometry();
+
     bool commandGenerated = false;
 
     // If the joystick was touched, we know that we are latched
     if (tapJoyAdapter_.newDataAvailable())
     {
         // Stop the motion controller from whatever it was doing
-        motionController_.stop(0);
+        motionController_.normalStop();
 
         commandGenerated = true;
         currentCommand_ = tapJoyAdapter_.getVelocity();
@@ -299,10 +303,7 @@ void Motion::stepNode()
         // only if the joystick is not latched
         if (!tapJoyAdapter_.getLatchState())
         {
-            // Calculate the elapsed time
-            double dT = Time::time2number(currentTime_) - Time::time2number(previousTime_);
-
-            motionController_.run(dT, positionEstimator_.getPose());
+            motionController_.run(positionEstimator_.getPose(), odometry);
 
             if (motionController_.newCommandAvailable())
             {
@@ -313,9 +314,9 @@ void Motion::stepNode()
     }
 
     // Provide the command to the position estimator
-    if (tapOdometry_.newDataAvailable())
+    if (odometryAvailable)
     {
-        positionEstimator_.run(tapOdometry_.getSensor()->getOdometry());
+        positionEstimator_.run(odometry);
     }
 
     // Output the velocity command to the brainstem
@@ -371,15 +372,7 @@ void Motion::executePlanToGoal(Pose<> goalPose)
 
     if (!solution.empty())
     {
-        Trajectory<> trajectory;
-
-        solutionConverter_.calculateTrajectory(solution);
-        solutionConverter_.getTrajectory(trajectory);
-        motionController_.setTrajectory(trajectory);
-
-        cout << solution << endl;
-        cout << trajectory << endl;
-
+        motionController_.execute(solution);
         simulatedT_ = 0.0;
     }
     else
@@ -395,7 +388,7 @@ void Motion::publishGoal()
 {
     Pose<> goal = motionController_.getGoal();
 
-    vector<SolutionNode<Grid2d>> path = algorithm_.getSolution(tapMap_.getMap()->getResolution());
+    Solution<Grid2d> solution = algorithm_.getSolution(tapMap_.getMap()->getResolution());
 
     ros::Time planningTime = ros::Time::now();
 
@@ -405,7 +398,7 @@ void Motion::publishGoal()
 
     vector<geometry_msgs::PoseStamped> planPoses;
 
-    for (auto node : path)
+    for (auto node : solution)
     {
         geometry_msgs::PoseStamped poseStamped;
         tf::Quaternion quaternion = tf::createQuaternionFromYaw(node.pose.theta);

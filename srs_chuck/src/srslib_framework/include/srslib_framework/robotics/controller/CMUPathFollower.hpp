@@ -3,24 +3,29 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef CMUCONTROLLER_HPP_
-#define CMUCONTROLLER_HPP_
+#ifndef CMUPATHFOLLOWER_HPP_
+#define CMUPATHFOLLOWER_HPP_
 
 #include <srslib_framework/math/Math.hpp>
 
-#include <srslib_framework/robotics/lowlevel_controller/BaseController.hpp>
+#include <srslib_framework/robotics/controller/BaseController.hpp>
 
 namespace srs {
 
-class CMUController: public BaseController
+/**
+ * J. M. Snider, "Automatic Steering Methods for Autonomous
+ * Automobile Path Tracking", Robotics Institute, Carnegie Mellon
+ * University, Pittsburgh, PA, USA, Tech. Report CMU-RI-TR-09-08, Feb. 2009
+ */
+class CMUPathFollower: public BaseController
 {
 public:
-    CMUController(double Kv, double Kw) :
+    CMUPathFollower(double Kv, double Kw) :
         BaseController(Kv, Kw),
         lookAheadDistance_(1.5)
     {}
 
-    ~CMUController()
+    ~CMUPathFollower()
     {}
 
     void setLookAheadDistance(double lookAheadDistance)
@@ -30,14 +35,14 @@ public:
 
     Velocity<> step(Pose<> currentPose, Velocity<> command)
     {
+        double linear = Kv_ * command.linear;
+        linear = saturate(linear, maxLinear_);
+
         double slope = atan2(referencePose_.y - currentPose.y, referencePose_.x - currentPose.x);
         double alpha = Math::normalizeAngleRad(slope - currentPose.theta);
 
-        double angular = 2 * sin(alpha) / lookAheadDistance_;
+        double angular = Kw_ * 2 * sin(alpha) / lookAheadDistance_;
         angular = saturate(angular, maxAngular_);
-
-        double linear = command.linear;
-        linear = saturate(linear, maxLinear_);
 
         return Velocity<>(linear, angular);
     }
@@ -48,4 +53,4 @@ private:
 
 } // namespace srs
 
-#endif // CMUCONTROLLER_HPP_
+#endif // CMUPATHFOLLOWER_HPP_

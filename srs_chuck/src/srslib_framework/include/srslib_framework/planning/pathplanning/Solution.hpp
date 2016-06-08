@@ -57,6 +57,16 @@ public:
     Solution()
     {}
 
+    NodeType afterStart()
+    {
+        return *(vector<NodeType>::begin() + 1);
+    }
+
+    NodeType beforeGoal()
+    {
+        return *(vector<NodeType>::end() - 2);
+    }
+
     friend ostream& operator<<(ostream& stream, const Solution& solution)
     {
         int counter = 0;

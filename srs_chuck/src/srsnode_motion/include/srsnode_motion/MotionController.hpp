@@ -6,15 +6,18 @@
 #ifndef MOTIONCONTROLLER_HPP_
 #define MOTIONCONTROLLER_HPP_
 
-#include <vector>
+#include <queue>
 using namespace std;
 
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
+#include <srslib_framework/robotics/Odometry.hpp>
 
-#include <srslib_framework/robotics/lowlevel_controller/YoshizawaController.hpp>
-#include <srslib_framework/robotics/lowlevel_controller/CMUController.hpp>
+#include <srslib_framework/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/planning/pathplanning/Solution.hpp>
+
+#include <srslib_framework/robotics/controller/CMUPathFollower.hpp>
 
 #include <srslib_framework/robotics/robot/RobotProfile.hpp>
 
@@ -23,10 +26,21 @@ namespace srs {
 class MotionController
 {
 public:
-    MotionController();
+    MotionController() :
+        pathFollower_(1, 1)
+    {
+        reset();
+    }
 
     ~MotionController()
     {}
+
+    void emergencyStop()
+    {
+        nextTask(TaskEnum::EMERGENCY_STOP);
+    }
+
+    void execute(Solution<Grid2d> solution);
 
     Velocity<> getExecutingCommand()
     {
@@ -46,7 +60,7 @@ public:
 
     bool isMoving()
     {
-        return moving_;
+        return currentState_ != StateEnum::STANDING;
     }
 
     bool newCommandAvailable()
@@ -54,20 +68,43 @@ public:
         return newCommandAvailable_;
     }
 
-    void reset(Pose<> robotPose);
-    void run(double dT, Pose<> robotPose);
-
-    void setRobotPose(Pose<> robotPose)
+    void normalStop()
     {
-        currentRobotPose_ = robotPose;
+        nextTask(TaskEnum::NORMAL_STOP);
     }
+
+    void reset();
+    void run(Pose<> robotPose, Odometry<> odometry);
 
     void setRobot(RobotProfile robot);
 
-    void setTrajectory(Trajectory<> trajectory);
-    void stop(double stopDistance = 0);
-
 private:
+    enum TaskEnum {NIL, EMERGENCY_STOP, FOLLOW, NORMAL_STOP, ROTATE, STAND};
+    enum StateEnum {NONE, STANDING, FOLLOWING, ROTATING, STOPPING};
+
+    void checkForWork();
+
+    void executeCommand(Velocity<> command)
+    {
+        newCommandAvailable_ = true;
+        executingCommand_ = command;
+    }
+
+    void nextSolution(Solution<Grid2d> nextSolution)
+    {
+        nextSolution_ = nextSolution;
+    }
+
+    void nextState(StateEnum nextState)
+    {
+        nextState_ = nextState;
+    }
+
+    void nextTask(TaskEnum nextTask)
+    {
+        nextTask_ = nextTask;
+    }
+
     // TODO: find a better place for this
     bool similarVelocities(const Velocity<>& lhv, const Velocity<>& rhv)
     {
@@ -77,20 +114,37 @@ private:
         return abs(lhv.linear - rhv.linear) < 0.01 && abs(lhv.angular - rhv.angular) < 0.002;
     }
 
+    void stateFollowing();
+    void stateStanding();
+    void stateStopping();
+
+    void taskEmergencyStop();
+    void taskFollow();
+    void taskNormalStop();
+    void taskRotate();
+    void taskStand();
+
     void updateProjectionIndex();
 
+    Odometry<> currentOdometry_;
     Pose<> currentRobotPose_;
+    Solution<Grid2d> currentSolution_;
+    StateEnum currentState_;
+    TaskEnum currentTask_;
+    Trajectory<> currentTrajectory_;
 
+    bool emergencyDeclared_;
     Velocity<> executingCommand_;
 
     Pose<> goal_;
     bool goalReached_;
 
-    CMUController lowLevelController_;
-
-    bool moving_;
+    CMUPathFollower pathFollower_;
 
     bool newCommandAvailable_;
+    Solution<Grid2d> nextSolution_;
+    StateEnum nextState_;
+    TaskEnum nextTask_;
 
     int projectionIndex_;
 
@@ -98,7 +152,7 @@ private:
     int referenceIndex_;
     RobotProfile robot_;
 
-    Trajectory<> trajectory_;
+    queue<pair<int, Solution<Grid2d>>> solutions_;
 };
 
 } // namespace srs

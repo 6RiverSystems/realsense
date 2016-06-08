@@ -15,7 +15,7 @@ using namespace std;
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/robotics/lowlevel_controller/YoshizawaController.hpp>
+#include <srslib_framework/robotics/controller/YoshizawaController.hpp>
 using namespace srs;
 
 typedef SolutionNode<Grid2d> SolutionType;

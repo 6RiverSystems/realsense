@@ -10,7 +10,6 @@ using namespace std;
 
 #include <srslib_framework/math/Math.hpp>
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
-//#include <srslib_framework/search/SearchPosition.hpp>
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>

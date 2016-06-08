@@ -92,7 +92,6 @@ private:
     RosTapBrainStem tapBrainStem_;
     RosTapOdometry tapOdometry_;
     RosTapInitialPose tapInitialPose_; // TODO: This should be a command (trigger) passed down by Executive
-    SimpleSolutionConverter solutionConverter_;
     RosTriggerStop triggerStop_;
     RosTriggerShutdown triggerShutdown_;
 

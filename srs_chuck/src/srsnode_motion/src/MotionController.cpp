@@ -192,6 +192,11 @@ void MotionController::stateFollowing()
         goalReached_ = true;
         ROS_INFO_STREAM_NAMED("MotionController", "Goal reached: " << goal_);
 
+        // Temporary fix to stop the robot when arriving to the goal
+        // It must be removed when the velocities in the trajectory
+        // are correct
+        executeCommand(Velocity<>());
+
         nextState(StateEnum::STANDING);
     }
     else
@@ -209,8 +214,7 @@ void MotionController::stateFollowing()
         // new command (if requested).
         if (!similarVelocities(executingCommand_, nextCommand))
         {
-            executingCommand_ = nextCommand;
-            newCommandAvailable_ = true;
+            executeCommand(nextCommand);
         }
 
         nextState(StateEnum::FOLLOWING);

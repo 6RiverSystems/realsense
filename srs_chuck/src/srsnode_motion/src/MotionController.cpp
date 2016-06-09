@@ -3,7 +3,7 @@
 #include <ros/ros.h>
 
 #include <srslib_framework/math/PoseMath.hpp>
-#include <srslib_framework/planning/pathplanning/SimpleSolutionConverter.hpp>
+#include <srslib_framework/planning/pathplanning/TrajectoryGenerator.hpp>
 
 namespace srs {
 
@@ -63,6 +63,8 @@ void MotionController::reset()
         solutions_.pop();
     }
     currentTrajectory_.clear();
+
+    normalStop();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -238,7 +240,6 @@ void MotionController::taskEmergencyStop()
 {
     emergencyDeclared_ = true;
 
-    // TODO: Make the stop command function with the stop distance
     executeCommand(Velocity<>());
 }
 
@@ -247,8 +248,8 @@ void MotionController::taskFollow()
 {
     Trajectory<> trajectory;
 
-    SimpleSolutionConverter converter(robot_);
-    converter.calculateTrajectory(nextSolution_);
+    TrajectoryGenerator converter(robot_);
+    converter.fromSolution(nextSolution_);
     converter.getTrajectory(trajectory);
 
     cout << nextSolution_ << endl;
@@ -281,6 +282,7 @@ void MotionController::taskFollow()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::taskNormalStop()
 {
+    executeCommand(Velocity<>());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

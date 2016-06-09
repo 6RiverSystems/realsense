@@ -1,4 +1,3 @@
-#include <srslib_framework/math/Math.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 
 #include <srsnode_motion/StatePe.hpp>
@@ -32,23 +31,27 @@ cv::Mat Robot<TYPE>::FB(
 {
     StatePe<TYPE> state(stateVector);
 
-    state.v = reinterpret_cast<CmdVelocity<>*>(command)->velocity.linear;
-    state.omega = reinterpret_cast<CmdVelocity<>*>(command)->velocity.angular;
+    state.velocity = reinterpret_cast<CmdVelocity<>*>(command)->velocity;
+
+    double v = state.velocity.linear;
+    double w = state.velocity.angular;
 
     // Check for the special case in which omega is 0 (the robot is moving straight)
-    if (abs(state.omega) > ANGULAR_VELOCITY_EPSILON)
+    if (abs(w) > ANGULAR_VELOCITY_EPSILON)
     {
-        double r = state.v / state.omega;
+        double r = v / w;
 
-        state.x = state.x + r * sin(state.theta + state.omega * dT) - r * sin(state.theta);
-        state.y = state.y + r * cos(state.theta) - r * cos(state.theta + state.omega * dT);
-        state.theta = state.theta + state.omega * dT;
+        state.pose = Pose<>(
+            state.pose.x + r * sin(state.pose.theta + w * dT) - r * sin(state.pose.theta),
+            state.pose.y + r * cos(state.pose.theta) - r * cos(state.pose.theta + w * dT),
+            state.pose.theta + w * dT);
     }
     else
     {
-        state.x = state.x + state.v * dT * cos(state.theta);
-        state.y = state.y + state.v * dT * sin(state.theta);
-        // theta does not change
+        state.pose = Pose<>(
+            state.pose.x + v * dT * cos(state.pose.theta),
+            state.pose.y + v * dT * sin(state.pose.theta),
+            state.pose.theta);
     }
 
     return state.getVectorForm();

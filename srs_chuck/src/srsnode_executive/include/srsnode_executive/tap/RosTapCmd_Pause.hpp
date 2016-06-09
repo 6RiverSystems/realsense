@@ -12,7 +12,7 @@ using namespace std;
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 
-#include <srslib_framework/math/Time.hpp>
+#include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/ros/RosTap.hpp>
 
 namespace srs {
@@ -44,7 +44,7 @@ public:
 
     void reset()
     {
-        set(Time::time2number(ros::Time::now()), false);
+        set(TimeMath::time2number(ros::Time::now()), false);
     }
 
     void set(double arrivalTime, bool pause)
@@ -63,7 +63,7 @@ protected:
 private:
     void onPause(const std_msgs::BoolConstPtr message)
     {
-        set(Time::time2number(ros::Time::now()), message->data);
+        set(TimeMath::time2number(ros::Time::now()), message->data);
     }
 
     bool currentPause_;
@@ -71,4 +71,4 @@ private:
 
 } // namespace srs
 
-#endif // ROSTAPCMD_GOAL_HPP_
+#endif // ROSTAPCMD_PAUSE_HPP_

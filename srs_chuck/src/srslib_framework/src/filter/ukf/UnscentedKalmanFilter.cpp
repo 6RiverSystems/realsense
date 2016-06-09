@@ -1,7 +1,7 @@
 #include <iostream>
 #include <functional>
 
-#include <srslib_framework/math/Math.hpp>
+#include <srslib_framework/math/MatrixMath.hpp>
 
 namespace srs {
 
@@ -30,7 +30,7 @@ template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
 cv::Mat UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::addWeighted(
     const cv::Mat W, const cv::Mat X)
 {
-    cv::Mat R = Math::zeros(X);
+    cv::Mat R = MatrixMath::zeros(X);
 
     for (unsigned int i = 0; i < X.cols; ++i)
     {
@@ -46,11 +46,11 @@ cv::Mat UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::calculateSigmaPoi
     cv::Mat X, cv::Mat P)
 {
     // A = chol(P)';
-    cv::Mat A = Math::cholesky(P);
+    cv::Mat A = MatrixMath::cholesky(P);
 
     // CHI = [zeros(size(X)) A -A];
     cv::Mat CHI;
-    cv::Mat zM = Math::zeros(X);
+    cv::Mat zM = MatrixMath::zeros(X);
     cv::Mat array[] = {zM, A, -A};
     cv::hconcat(array, 3, CHI);
 
@@ -113,7 +113,7 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::predict(BaseType dT,
     // for i = 1:size(CHI, 2);
     //     Y(:, i) = gFunction(CHI(:, i), gParams);
     // end
-    cv::Mat Y = Math::zeros(CHI);
+    cv::Mat Y = MatrixMath::zeros(CHI);
     for (unsigned int i = 0; i < CHI.cols; ++i)
     {
         cv::Mat T = BaseKFType::process_.FB(CHI.col(i), command, dT);
@@ -121,7 +121,7 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::predict(BaseType dT,
     }
 
     // [XX, S] = o.utTransform(XX, Y, CHI);
-    cv::Mat C = Math::zeros(BaseKFType::P_);
+    cv::Mat C = MatrixMath::zeros(BaseKFType::P_);
     unscentedTransform(BaseKFType::x_, Y, CHI, BaseKFType::x_, BaseKFType::P_, C);
 
     // S = S + o.robot.getProfile().Q;
@@ -192,7 +192,7 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::update()
             // for i = 1:size(CHI, 2);
             //     Y(:, i) = hFunction(CHI(:, i));
             // end
-            cv::Mat Y = Math::zeros(CHI);
+            cv::Mat Y = MatrixMath::zeros(CHI);
             for (unsigned int i = 0; i < CHI.cols; ++i)
             {
                 cv::Mat T = sensor->H(CHI.col(i));
@@ -200,16 +200,16 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::update()
             }
 
             // [Ybar, S, C] = o.utTransform(XX, Y, CHI);
-            cv::Mat Ybar = Math::zeros(BaseKFType::x_);
-            cv::Mat S = Math::zeros(BaseKFType::P_);
-            cv::Mat C = Math::zeros(BaseKFType::P_);
+            cv::Mat Ybar = MatrixMath::zeros(BaseKFType::x_);
+            cv::Mat S = MatrixMath::zeros(BaseKFType::P_);
+            cv::Mat C = MatrixMath::zeros(BaseKFType::P_);
             unscentedTransform(BaseKFType::x_, Y, CHI, Ybar, S, C);
 
             // S = S + sensor.getR();
             S += sensor->getR();
 
             // S = o.checkUnderflow(S);
-            Math::checkDiagonal(S, UNDERFLOW_THRESHOLD, UNDERFLOW_THRESHOLD);
+            MatrixMath::checkDiagonal(S, UNDERFLOW_THRESHOLD, UNDERFLOW_THRESHOLD);
 
             // z = sensor.measurement2state(measurement);
             cv::Mat z = sensor->getCurrentData();
@@ -225,8 +225,8 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::update()
         }
     }
 
-    Math::checkRange(BaseKFType::x_, UNDERFLOW_THRESHOLD, BaseType());
-    Math::checkDiagonal(BaseKFType::P_, UNDERFLOW_THRESHOLD, UNDERFLOW_THRESHOLD);
+    MatrixMath::checkRange(BaseKFType::x_, UNDERFLOW_THRESHOLD, BaseType());
+    MatrixMath::checkDiagonal(BaseKFType::P_, UNDERFLOW_THRESHOLD, UNDERFLOW_THRESHOLD);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

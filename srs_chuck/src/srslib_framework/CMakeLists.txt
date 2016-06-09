@@ -32,9 +32,13 @@ set(${PROJECT_NAME}_SOURCES
     src/localization/Map.cpp
     src/localization/MapNote.cpp
     
-    include/${PROJECT_NAME}/math/Math.hpp
-    include/${PROJECT_NAME}/math/Time.hpp
+    include/${PROJECT_NAME}/math/AngleMath.hpp
+    include/${PROJECT_NAME}/math/BasicMath.hpp
+    include/${PROJECT_NAME}/math/MatrixMath.hpp
+    include/${PROJECT_NAME}/math/MeasurementMath.hpp
+    include/${PROJECT_NAME}/math/Ocv2Base.hpp
     include/${PROJECT_NAME}/math/PoseMath.hpp
+    include/${PROJECT_NAME}/math/TimeMath.hpp
 
     include/${PROJECT_NAME}/planning/pathplanning/Solution.hpp
 
@@ -70,7 +74,6 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/search/SearchNode.hpp
     include/${PROJECT_NAME}/search/AStar.hpp
 
-    include/${PROJECT_NAME}/utils/Ocv2Base.hpp
     include/${PROJECT_NAME}/utils/Filesystem.hpp
 )
 

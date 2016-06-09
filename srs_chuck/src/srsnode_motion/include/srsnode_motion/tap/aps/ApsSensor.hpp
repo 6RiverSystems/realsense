@@ -9,6 +9,7 @@
 #include <ros/ros.h>
 
 #include <srslib_framework/filter/Sensor.hpp>
+#include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
@@ -20,7 +21,7 @@ class ApsSensor :
 public:
     // Standard deviation values for the APS sensor process
     constexpr static double ERROR_LOCATION = 0.01; // [m]
-    constexpr static double ERROR_HEADING = Math::deg2rad<double>(0.1); // [rad]
+    constexpr static double ERROR_HEADING = AngleMath::deg2rad<double>(0.1); // [rad]
 
     typedef typename Sensor<STATE_SIZE, TYPE>::BaseType BaseType;
 

@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef TIME_HPP_
-#define TIME_HPP_
+#ifndef TIMEMATH_HPP_
+#define TIMEMATH_HPP_
 
 #include <cmath>
 #include <limits>
@@ -14,7 +14,7 @@ using namespace std;
 
 namespace srs {
 
-struct Time
+struct TimeMath
 {
     template<typename TYPE = double>
     inline static TYPE time2number(ros::Time& time)
@@ -31,4 +31,4 @@ struct Time
 
 } // namespace srs
 
-#endif // TIME_HPP_
+#endif // TIMEMATH_HPP_

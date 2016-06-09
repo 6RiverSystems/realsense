@@ -3,7 +3,6 @@
 #include <ros/ros.h>
 #include <std_srvs/Empty.h>
 
-#include <srslib_framework/math/Math.hpp>
 #include <srslib_framework/MapCoordinates.h>
 using namespace srslib_framework;
 

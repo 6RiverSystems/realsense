@@ -8,7 +8,7 @@ using namespace std;
 #include <geometry_msgs/Twist.h>
 #include <dynamic_reconfigure/server.h>
 
-#include <srslib_framework/math/Math.hpp>
+#include <srslib_framework/math/BasicMath.hpp>
 
 namespace srs {
 
@@ -58,16 +58,19 @@ void JoystickAdapter::run()
                 // If the robot is moving backward and at the same time
                 // rotating, invert the direction of rotation. No transformation
                 // is performed if the robot is rotating in place (linear = 0)
-                angular *= linear < 0 ? -1 : 1;
+                angular *= BasicMath::sgn(linear);
 
                 geometry_msgs::Twist messageVelocity;
-                messageVelocity.linear.x = abs(linear) > configuration_.threshold_linear ? linear : 0.0;
+
+                messageVelocity.linear.x = BasicMath::threshold(linear,
+                    configuration_.threshold_linear, 0.0);
                 messageVelocity.linear.y = 0.0;
                 messageVelocity.linear.z = 0.0;
 
                 messageVelocity.angular.x = 0.0;
                 messageVelocity.angular.y = 0.0;
-                messageVelocity.angular.z = abs(angular) > configuration_.threshold_angular ? angular : 0.0;
+                messageVelocity.angular.z = BasicMath::threshold(angular,
+                    configuration_.threshold_angular, 0.0);
 
                 ROS_DEBUG_STREAM("l: " << linear << ", a: " << angular);
                 ROS_DEBUG_STREAM(messageVelocity);

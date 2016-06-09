@@ -6,7 +6,7 @@
 #ifndef BASECONTROLLER_HPP_
 #define BASECONTROLLER_HPP_
 
-#include <srslib_framework/math/PoseMath.hpp>
+#include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
@@ -55,11 +55,6 @@ public:
     }
 
 protected:
-    double saturate(double value, double max)
-    {
-        return abs(value) > max ? Math::sgn(value) * max : value;
-    }
-
     double Kv_;
     double Kw_;
 

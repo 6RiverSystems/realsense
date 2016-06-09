@@ -12,6 +12,8 @@
 #include <unordered_set>
 using namespace std;
 
+#include <srslib_framework/math/AngleMath.hpp>
+
 #include <srslib_framework/datastructure/MappedPriorityQueue.hpp>
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
@@ -108,7 +110,7 @@ public:
                 cursor->action.position.location.x, cursor->action.position.location.y,
                 x, y);
 
-            node.pose = Pose<>(x, y, Math::deg2rad<double>(cursor->action.position.orientation));
+            node.pose = Pose<>(x, y, AngleMath::deg2rad<double>(cursor->action.position.orientation));
             node.cost = cursor->action.getTotalCost();
 
             result.insert(result.begin(), node);

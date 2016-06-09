@@ -1,5 +1,8 @@
 #include <srsnode_motion/PositionUkf.hpp>
 
+#include <srslib_framework/math/AngleMath.hpp>
+#include <srslib_framework/math/MatrixMath.hpp>
+
 #include <srsnode_motion/StatePe.hpp>
 
 namespace srs {
@@ -16,7 +19,7 @@ cv::Mat PositionUkf::addWeighted(const cv::Mat W, const cv::Mat X)
     double c = 0.0;
     double s = 0.0;
 
-    cv::Mat R = Math::zeros(X.col(1));
+    cv::Mat R = MatrixMath::zeros(X.col(1));
 
     for (unsigned int i = 0; i < X.cols; ++i)
     {
@@ -37,7 +40,7 @@ cv::Mat PositionUkf::addWeighted(const cv::Mat W, const cv::Mat X)
 cv::Mat PositionUkf::residual(const cv::Mat A, const cv::Mat B)
 {
     cv::Mat R = A - B;
-    R.at<BaseType>(StatePe<>::STATE_THETA) = Math::normalizeAngleRad(
+    R.at<BaseType>(StatePe<>::STATE_THETA) = AngleMath::normalizeAngleRad(
         R.at<BaseType>(StatePe<>::STATE_THETA));
 
     return R;

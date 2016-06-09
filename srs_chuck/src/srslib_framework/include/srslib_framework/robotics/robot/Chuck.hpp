@@ -6,7 +6,7 @@
 #ifndef CHUCK_HPP_
 #define CHUCK_HPP_
 
-#include <srslib_framework/math/Math.hpp>
+#include <srslib_framework/math/MeasurementMath.hpp>
 #include <srslib_framework/robotics/robot/RobotProfile.hpp>
 
 namespace srs {
@@ -16,10 +16,10 @@ struct Chuck : RobotProfile
     Chuck() :
         RobotProfile()
     {
-        bodyWidth = Math::inch2m<double>(24.375); // [m]
-        bodyDepth = Math::inch2m<double>(38.474); // [m]
+        bodyWidth = MeasurementMath::inch2m<double>(24.375); // [m]
+        bodyDepth = MeasurementMath::inch2m<double>(38.474); // [m]
         goalReachedDistance = 0.1; // [m]
-        lookAheadDistance = 0.8; // [m]
+        lookAheadDistance = 0.8; // [m] ###FS
         maxAngularAcceleration = 2.6; // [rad/s^2]
         maxAngularVelocity = 9.7; // [rad/s]
         maxLinearAcceleration = 0.7; // [m/s^2]
@@ -27,9 +27,9 @@ struct Chuck : RobotProfile
         travelAngularAcceleration = 0.5; // [rad/s^2]
         travelAngularVelocity = 2.0; // [rad/s]
         travelLinearAcceleration =  0.65; // [m/s^2]
-        travelLinearVelocity = 0.5; // [m/s] // 1.0
-        wheelDiameter = Math::inch2m<double>(8); // [m]
-        wheelDistance = Math::inch2m<double>(20.915); // [m]
+        travelLinearVelocity = 0.5; // [m/s] // 1.0 ###FS
+        wheelDiameter = MeasurementMath::inch2m<double>(8); // [m]
+        wheelDistance = MeasurementMath::inch2m<double>(20.915); // [m]
     }
 
     virtual ~Chuck()

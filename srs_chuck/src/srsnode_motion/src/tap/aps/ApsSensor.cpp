@@ -1,6 +1,6 @@
-#include <srslib_framework/math/Math.hpp>
-
 #include <srsnode_motion/StatePe.hpp>
+
+#include <srslib_framework/math/MatrixMath.hpp>
 
 namespace srs {
 
@@ -27,9 +27,7 @@ cv::Mat ApsSensor<STATE_SIZE, TYPE>::getCurrentData()
 {
     // Transfer the value that the odometer care about to the new state
     StatePe<TYPE> state = StatePe<TYPE>();
-    state.x = currentData_.x;
-    state.y = currentData_.y;
-    state.theta = currentData_.theta;
+    state.pose = currentData_;
 
     return state.getVectorForm();
 }
@@ -41,10 +39,10 @@ cv::Mat ApsSensor<STATE_SIZE, TYPE>::H(const cv::Mat stateVector)
     StatePe<TYPE> state = StatePe<TYPE>(stateVector);
 
     // Transfer the value that the odometer care about to the new state
-    cv::Mat result = Math::zeros(stateVector);
-    result.at<BaseType>(StatePe<TYPE>::STATE_X) = state.x;
-    result.at<BaseType>(StatePe<TYPE>::STATE_Y) = state.y;
-    result.at<BaseType>(StatePe<TYPE>::STATE_THETA) = state.theta;
+    cv::Mat result = MatrixMath::zeros(stateVector);
+    result.at<BaseType>(StatePe<TYPE>::STATE_X) = state.pose.x;
+    result.at<BaseType>(StatePe<TYPE>::STATE_Y) = state.pose.y;
+    result.at<BaseType>(StatePe<TYPE>::STATE_THETA) = state.pose.theta;
 
     return result;
 }

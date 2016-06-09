@@ -6,6 +6,8 @@
 #ifndef POSITIONUKF_HPP_
 #define POSITIONUKF_HPP_
 
+#include <opencv2/opencv.hpp>
+
 #include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>

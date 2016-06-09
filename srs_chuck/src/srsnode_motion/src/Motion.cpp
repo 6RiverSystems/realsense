@@ -8,7 +8,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <tf/transform_broadcaster.h>
 
-#include <srslib_framework/math/Time.hpp>
+#include <srslib_framework/math/AngleMath.hpp>
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
@@ -352,13 +352,13 @@ void Motion::executePlanToGoal(Pose<> goalPose)
     int c1 = 0;
     tapMap_.getMap()->getMapCoordinates(robotPose.x, robotPose.y, c1, r1);
     Grid2d::LocationType internalStart(c1, r1);
-    int startAngle = Math::normalizeRad2deg90(robotPose.theta);
+    int startAngle = AngleMath::normalizeRad2deg90(robotPose.theta);
 
     int r2 = 0;
     int c2 = 0;
     tapMap_.getMap()->getMapCoordinates(goalPose.x, goalPose.y, c2, r2);
     Grid2d::LocationType internalGoal(c2, r2);
-    int goalAngle = Math::normalizeRad2deg90(goalPose.theta);
+    int goalAngle = AngleMath::normalizeRad2deg90(goalPose.theta);
 
     ROS_INFO_STREAM("Looking for a path between " << robotPose << " (" <<
         c1 << "," << r1 << "," << startAngle

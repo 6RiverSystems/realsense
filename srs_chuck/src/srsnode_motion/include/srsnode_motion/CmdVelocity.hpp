@@ -11,9 +11,9 @@ using namespace std;
 
 #include <opencv2/opencv.hpp>
 
-#include <srslib_framework/platform/Object.hpp>
-#include <srslib_framework/utils/Ocv2Base.hpp>
 #include <srslib_framework/filter/Command.hpp>
+#include <srslib_framework/math/Ocv2Base.hpp>
+#include <srslib_framework/platform/Object.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
 #include <srsnode_motion/Configuration.hpp>
@@ -43,15 +43,9 @@ struct CmdVelocity : public Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>
     ~CmdVelocity()
     {}
 
-    string toString()
+    friend ostream& operator<<(ostream& stream, const CmdVelocity& cmdVelocity)
     {
-        ostringstream output;
-        output << "VelCmd {" << endl;
-        output << "  linear: " << velocity.linear << endl;
-        output << " angular: " << velocity.angular << endl;
-        output << "}" << endl;
-
-        return output.str();
+        return "CmdVelocity {" << cmdVelocity.velocity << "}";
     }
 
     Velocity<BaseType> velocity;

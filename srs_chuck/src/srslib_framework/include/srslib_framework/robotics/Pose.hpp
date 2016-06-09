@@ -13,7 +13,7 @@ using namespace std;
 #include <opencv2/opencv.hpp>
 
 #include <srslib_framework/platform/Object.hpp>
-#include <srslib_framework/math/Math.hpp>
+#include <srslib_framework/math/AngleMath.hpp>
 
 namespace srs {
 
@@ -58,7 +58,7 @@ struct Pose : public Object
 
     void setThetaDegrees(BaseType deg)
     {
-        theta = Math::deg2rad<TYPE>(deg);
+        theta = AngleMath::deg2rad<TYPE>(deg);
     }
 
     double arrivalTime;

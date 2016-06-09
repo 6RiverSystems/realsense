@@ -3,13 +3,14 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef SIMPLESOLUTIONCONVERTER_HPP_
-#define SIMPLESOLUTIONCONVERTER_HPP_
+#ifndef TRAJECTORYGENERATOR_HPP_
+#define TRAJECTORYGENERATOR_HPP_
 
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/math/Math.hpp>
+#include <srslib_framework/math/BasicMath.hpp>
+#include <srslib_framework/math/PoseMath.hpp>
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 
@@ -23,15 +24,28 @@ using namespace srs;
 
 namespace srs {
 
-class SimpleSolutionConverter
+class TrajectoryGenerator
 {
 public:
-    SimpleSolutionConverter(RobotProfile& robot) :
+    TrajectoryGenerator(RobotProfile& robot) :
         robot_(robot),
         t_(0.0)
     {}
 
-    void calculateTrajectory(Solution<Grid2d>& solution)
+    void fromRamp(Pose<> pose, double v0, double vf, double acceleration)
+    {
+        trajectory_.clear();
+        waypoints_.clear();
+        filteredWaypoints_.clear();
+        t_ = 0.0;
+
+        if (BasicMath::fpEqual<double>(v0, vf))
+        {
+            return;
+        }
+    }
+
+    void fromSolution(Solution<Grid2d>& solution)
     {
         trajectory_.clear();
         waypoints_.clear();
@@ -72,7 +86,7 @@ public:
 private:
     double calculateDirection(double from, double to)
     {
-        return Math::sgn<double>(to - from);
+        return BasicMath::sgn<double>(to - from);
     }
 
     void calculateMinMaxMean(vector<Pose<>>& waypoints,
@@ -154,8 +168,9 @@ private:
             int totalWaypoints = ceil(d / spacing) - 1;
             double delta  = d / totalWaypoints;
 
-            if (movingAlongX(*fromWaypoint, *toWaypoint))
+            if (BasicMath::fpEqual<double>(fromWaypoint->y, toWaypoint->y, 0.002))
             {
+                // If the trajectory is moving along the x axis
                 double direction = calculateDirection(fromWaypoint->x, toWaypoint->x);
 
                 Pose<> waypoint = *fromWaypoint;
@@ -165,8 +180,9 @@ private:
                     trajectory_.push_back(waypoint, currentVelocity);
                 }
             }
-            else if (movingAlongY(*fromWaypoint, *toWaypoint))
+            else if (BasicMath::fpEqual<double>(fromWaypoint->x, toWaypoint->x, 0.002))
             {
+                // If the trajectory is moving along the y axis
                 double direction = calculateDirection(fromWaypoint->y, toWaypoint->y);
 
                 Pose<> waypoint = *fromWaypoint;
@@ -184,16 +200,6 @@ private:
             fromWaypoint++;
             toWaypoint++;
         }
-    }
-
-    bool movingAlongX(Pose<> from, Pose<> to)
-    {
-        return abs(from.y - to.y) < 0.001;
-    }
-
-    bool movingAlongY(Pose<> from, Pose<> to)
-    {
-        return abs(from.x - to.x) < 0.001;
     }
 
     void removeWaypoints(vector<Pose<>>& waypoints, double minDistance, vector<Pose<>>& result)
@@ -225,4 +231,4 @@ private:
 
 } // namespace srs
 
-#endif // SIMPLESOLUTIONCONVERTER_HPP_
+#endif // TRAJECTORYGENERATOR_HPP_

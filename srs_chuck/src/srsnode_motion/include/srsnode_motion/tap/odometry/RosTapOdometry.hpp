@@ -13,7 +13,7 @@ using namespace std;
 #include <geometry_msgs/TwistStamped.h>
 
 #include <srslib_framework/ros/RosTap.hpp>
-#include <srslib_framework/math/Time.hpp>
+#include <srslib_framework/math/TimeMath.hpp>
 
 #include <srsnode_motion/Configuration.hpp>
 
@@ -80,7 +80,7 @@ protected:
 private:
     void onSensorsOdometryRaw(geometry_msgs::TwistStampedConstPtr message)
     {
-        set(Time::time2number(message->header.stamp),
+        set(TimeMath::time2number(message->header.stamp),
             static_cast<double>(message->twist.linear.x),
             static_cast<double>(message->twist.angular.z));
     }

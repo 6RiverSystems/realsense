@@ -11,9 +11,9 @@ using namespace std;
 
 #include <ros/ros.h>
 
-#include <srslib_framework/math/Time.hpp>
-#include <srsnode_motion/tap/aps/ApsSensor.hpp>
+#include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/ros/RosTap.hpp>
+#include <srsnode_motion/tap/aps/ApsSensor.hpp>
 
 #include <geometry_msgs/PoseStamped.h>
 
@@ -83,7 +83,7 @@ protected:
 private:
     void onAps(const geometry_msgs::PoseStampedPtr& message)
     {
-        set(Time::time2number(message->header.stamp),
+        set(TimeMath::time2number(message->header.stamp),
             static_cast<double>(message->pose.position.x),
             static_cast<double>(message->pose.position.y),
             static_cast<double>(tf::getYaw(message->pose.orientation)));

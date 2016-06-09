@@ -6,7 +6,6 @@
 #ifndef SEARCHNODE_HPP_
 #define SEARCHNODE_HPP_
 
-#include <srslib_framework/math/Math.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
 #include <srslib_framework/search/SearchAction.hpp>
 

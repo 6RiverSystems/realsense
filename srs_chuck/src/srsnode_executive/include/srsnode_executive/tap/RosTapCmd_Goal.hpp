@@ -13,7 +13,7 @@ using namespace std;
 #include <tf/transform_broadcaster.h>
 #include <geometry_msgs/PoseStamped.h>
 
-#include <srslib_framework/math/Time.hpp>
+#include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/RosTap.hpp>
 
@@ -42,7 +42,7 @@ public:
 
     void reset()
     {
-        set(Time::time2number(ros::Time::now()), 0.0, 0.0, 0.0);
+        set(TimeMath::time2number(ros::Time::now()), 0.0, 0.0, 0.0);
     }
 
     void set(double arrivalTime, BaseType x, BaseType y, BaseType theta)
@@ -61,7 +61,7 @@ protected:
 private:
     void onGoal(const geometry_msgs::PoseStampedConstPtr message)
     {
-        set(Time::time2number(message->header.stamp),
+        set(TimeMath::time2number(message->header.stamp),
             message->pose.position.x,
             message->pose.position.y,
             tf::getYaw(message->pose.orientation));

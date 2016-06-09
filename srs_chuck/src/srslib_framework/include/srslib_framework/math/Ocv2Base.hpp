@@ -9,8 +9,6 @@
 #include <limits>
 using namespace std;
 
-#include <opencv2/opencv.hpp>
-
 namespace srs {
 
 template<int OPENCV_TYPE>

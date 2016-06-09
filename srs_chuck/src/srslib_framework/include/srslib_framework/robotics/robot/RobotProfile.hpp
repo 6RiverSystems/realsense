@@ -6,8 +6,6 @@
 #ifndef ROBOTPROFILE_HPP_
 #define ROBOTPROFILE_HPP_
 
-#include <srslib_framework/math/Math.hpp>
-
 namespace srs {
 
 struct RobotProfile

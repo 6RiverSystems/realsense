@@ -15,7 +15,7 @@ using namespace srsnode_motion;
 
 #include <dynamic_reconfigure/server.h>
 
-#include <srslib_framework/planning/pathplanning/SimpleSolutionConverter.hpp>
+#include <srslib_framework/planning/pathplanning/TrajectoryGenerator.hpp>
 
 #include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
 #include <srslib_framework/ros/tap/RosTapMap.hpp>

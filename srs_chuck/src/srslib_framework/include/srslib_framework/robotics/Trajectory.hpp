@@ -11,7 +11,6 @@
 #include <iomanip>
 using namespace std;
 
-#include <srslib_framework/math/Math.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 
 #include <srslib_framework/robotics/Pose.hpp>

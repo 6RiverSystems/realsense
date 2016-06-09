@@ -8,9 +8,9 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <srslib_framework/math/Math.hpp>
 #include <srslib_framework/filter/Process.hpp>
 #include <srslib_framework/filter/Command.hpp>
+#include <srslib_framework/math/AngleMath.hpp>
 
 #include <srsnode_motion/Configuration.hpp>
 
@@ -24,7 +24,7 @@ public:
 
     // Standard deviation values for the robot process
     constexpr static double ERROR_LOCATION = 0.001; // [m]
-    constexpr static double ERROR_HEADING = Math::deg2rad<double>(0.1); // [rad]
+    constexpr static double ERROR_HEADING = AngleMath::deg2rad<double>(0.1); // [rad]
     constexpr static double ERROR_LINEAR_VELOCITY = 0.006; // [m/s]
     constexpr static double ERROR_ANGULAR_VELOCITY = 0.006; // [m/s]
 

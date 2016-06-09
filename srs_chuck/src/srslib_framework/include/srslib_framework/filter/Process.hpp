@@ -8,11 +8,9 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <srslib_framework/platform/Object.hpp>
-#include <srslib_framework/utils/Ocv2Base.hpp>
-
-#include "Model.hpp"
-#include "Command.hpp"
+#include <srslib_framework/filter/Command.hpp>
+#include <srslib_framework/filter/Model.hpp>
+#include <srslib_framework/math/Ocv2Base.hpp>
 
 namespace srs {
 

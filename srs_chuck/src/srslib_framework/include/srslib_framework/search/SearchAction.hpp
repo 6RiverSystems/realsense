@@ -12,7 +12,8 @@
 #include <limits>
 using namespace std;
 
-#include <srslib_framework/math/Math.hpp>
+#include <srslib_framework/math/BasicMath.hpp>
+#include <srslib_framework/math/AngleMath.hpp>
 
 #include <srslib_framework/search/SearchPosition.hpp>
 #include <srslib_framework/localization/MapNote.hpp>
@@ -58,7 +59,7 @@ struct SearchAction
 
     unsigned int getTotalCost()
     {
-        return Math::noOverflowAdd(g, h);
+        return BasicMath::noOverflowAdd(g, h);
     }
 
     friend ostream& operator<<(ostream& stream, const SearchAction& searchAction)
@@ -80,7 +81,7 @@ private:
         SearchAction<GRAPH> action(BACKWARD);
         int currentOrientation = associatedNode->action.position.orientation;
 
-        int direction = Math::normalizeAngleDeg(currentOrientation - 180);
+        int direction = AngleMath::normalizeAngleDeg(currentOrientation - 180);
 
         typename GRAPH::LocationType neighbor;
         if (graph->getNeighbor(associatedNode->action.position.location, direction, neighbor))
@@ -93,10 +94,10 @@ private:
             locationCost = getLocationCost(locationCost, note);
 
             unsigned int commandCost = getCommandCost(BACKWARD, note);
-            unsigned int totalCost = Math::noOverflowAdd(locationCost, commandCost);
+            unsigned int totalCost = BasicMath::noOverflowAdd(locationCost, commandCost);
 
             action.position = newPosition;
-            action.g = Math::noOverflowAdd(associatedNode->action.g, totalCost);
+            action.g = BasicMath::noOverflowAdd(associatedNode->action.g, totalCost);
             action.h = associatedNode->action.h;
 
             return action;
@@ -121,10 +122,10 @@ private:
             locationCost = getLocationCost(locationCost, note);
 
             unsigned int commandCost = getCommandCost(FORWARD, note);
-            unsigned int totalCost = Math::noOverflowAdd(locationCost, commandCost);
+            unsigned int totalCost = BasicMath::noOverflowAdd(locationCost, commandCost);
 
             action.position = newPosition;
-            action.g = Math::noOverflowAdd(associatedNode->action.g, totalCost);
+            action.g = BasicMath::noOverflowAdd(associatedNode->action.g, totalCost);
             action.h = associatedNode->action.h;
 
             return action;
@@ -139,7 +140,7 @@ private:
         SearchAction<GRAPH> action(actionEnum);
         int currentOrientation = associatedNode->action.position.orientation;
 
-        int newOrientation = Math::normalizeAngleDeg(currentOrientation + angle);
+        int newOrientation = AngleMath::normalizeAngleDeg(currentOrientation + angle);
         SearchPosition<GRAPH> newPosition(associatedNode->action.position, newOrientation);
 
         const MapNote* note = reinterpret_cast<const MapNote*>(
@@ -148,7 +149,7 @@ private:
         unsigned int commandCost = getCommandCost(actionEnum, note);
 
         action.position = newPosition;
-        action.g = Math::noOverflowAdd(associatedNode->action.g, commandCost);
+        action.g = BasicMath::noOverflowAdd(associatedNode->action.g, commandCost);
         action.h = associatedNode->action.h;
 
         return action;
@@ -193,7 +194,7 @@ private:
             staticObstacle = MapNote->staticObstacle() ? MAX_COST : 0;
         }
 
-        return Math::noOverflowAdd(locationCost, staticObstacle);
+        return BasicMath::noOverflowAdd(locationCost, staticObstacle);
     }
 };
 

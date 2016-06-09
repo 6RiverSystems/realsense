@@ -6,7 +6,8 @@
 #ifndef CMUPATHFOLLOWER_HPP_
 #define CMUPATHFOLLOWER_HPP_
 
-#include <srslib_framework/math/Math.hpp>
+#include <srslib_framework/math/AngleMath.hpp>
+#include <srslib_framework/math/BasicMath.hpp>
 
 #include <srslib_framework/robotics/controller/BaseController.hpp>
 
@@ -22,7 +23,7 @@ class CMUPathFollower: public BaseController
 public:
     CMUPathFollower(double Kv, double Kw) :
         BaseController(Kv, Kw),
-        lookAheadDistance_(1.5)
+        lookAheadDistance_(0.5)
     {}
 
     ~CMUPathFollower()
@@ -36,13 +37,13 @@ public:
     Velocity<> step(Pose<> currentPose, Velocity<> command)
     {
         double linear = Kv_ * command.linear;
-        linear = saturate(linear, maxLinear_);
+        linear = BasicMath::saturate<double>(linear, maxLinear_, -maxLinear_);
 
         double slope = atan2(referencePose_.y - currentPose.y, referencePose_.x - currentPose.x);
-        double alpha = Math::normalizeAngleRad(slope - currentPose.theta);
+        double alpha = AngleMath::normalizeAngleRad(slope - currentPose.theta);
 
         double angular = Kw_ * 2 * sin(alpha) / lookAheadDistance_;
-        angular = saturate(angular, maxAngular_);
+        angular = BasicMath::saturate<double>(angular, maxAngular_, -maxAngular_);
 
         return Velocity<>(linear, angular);
     }

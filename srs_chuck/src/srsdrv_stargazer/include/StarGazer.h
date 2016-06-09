@@ -91,6 +91,8 @@ private:
 
 	tf::TransformListener				m_listener;
 
+	tf::StampedTransform				m_stargazerTransform;
+
 	tf::StampedTransform				m_baseFootprintTransform;
 
 	tf::Transform						m_rotationTransform;

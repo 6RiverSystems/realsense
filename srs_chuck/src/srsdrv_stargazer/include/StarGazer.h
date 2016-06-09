@@ -63,6 +63,10 @@ private:
 
 	void LoadAnchors( );
 
+	void LoadFootprintTransform( );
+
+	void LoadCalibrationTransform( );
+
 	std::string GetAnchorFrame( int tagID ) const;
 
 private:

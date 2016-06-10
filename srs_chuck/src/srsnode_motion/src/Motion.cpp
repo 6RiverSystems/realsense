@@ -387,7 +387,7 @@ void Motion::executePlanToGoal(Pose<> goalPose)
     }
     else
     {
-        ROS_ERROR_NAMED("Motion", "Path not found between " <<
+        ROS_ERROR_STREAM_NAMED("Motion", "Path not found between " <<
             robotPose << " (" << c1 << "," << r1 << "," << startAngle << ") and " <<
             goalPose << " (" << c2 << "," << r2 << "," << goalAngle << ")");
     }

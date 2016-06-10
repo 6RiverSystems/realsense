@@ -48,6 +48,23 @@ Map::~Map()
 {
     if (grid_)
     {
+        // Find the map notes and remove them first, because Grid will not
+        // do it for us
+        for (int row = 0; row < grid_->getHeight(); row++)
+        {
+            for (int col = 0; col < grid_->getWidth(); col++)
+            {
+                Grid2dLocation location = Grid2dLocation(col, row);
+                MapNote* note = reinterpret_cast<MapNote*>(grid_->getNote(location));
+
+                if (note)
+                {
+                    delete note;
+                }
+            }
+        }
+
+        // Now deallocate the grid
         delete grid_;
     }
 }

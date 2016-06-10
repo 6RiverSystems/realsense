@@ -16,8 +16,8 @@ TEST(Test_Map, Reconstruction)
 {
     Map* map = new Map();
     map->load("/home/fsantini/projects/repos/ros/srs_sites/src/srsc_empty/map/empty.yaml");
-    map->print();
 
+    map->print();
     cout << map->getGrid()->getCost(Grid2dLocation(1, 0)) << endl;
     cout << *(reinterpret_cast<MapNote*>(map->getGrid()->getNote(Grid2dLocation(1, 0)))) << endl;
 
@@ -35,8 +35,8 @@ TEST(Test_Map, Reconstruction)
 
     map = new Map(widthCells, heightCells, resolution);
     map->setGrid(costGrid, notesGrid);
-    map->print();
 
+    map->print();
     cout << map->getGrid()->getCost(Grid2dLocation(1, 0)) << endl;
     cout << *(reinterpret_cast<MapNote*>(map->getGrid()->getNote(Grid2dLocation(1, 0)))) << endl;
 }

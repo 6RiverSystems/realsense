@@ -33,6 +33,11 @@ public:
         height_(height)
     {}
 
+    ~Grid2d()
+    {
+        clear();
+    }
+
     void addNote(const Grid2dLocation location, void* notes = nullptr)
     {
         auto found = grid_.find(location);

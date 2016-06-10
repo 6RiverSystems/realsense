@@ -1,4 +1,4 @@
-#include <RealsenseDriver.h>
+#include "../../srsnode_realsense_to_laserscan/include/RealsenseDriver.h"
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>

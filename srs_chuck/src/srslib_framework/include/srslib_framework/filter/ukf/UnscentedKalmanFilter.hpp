@@ -11,7 +11,7 @@ using namespace std;
 
 #include <opencv2/opencv.hpp>
 
-#include <srslib_framework/Math/Ocv2Base.hpp>
+#include <srslib_framework/math/Ocv2Base.hpp>
 #include <srslib_framework/filter/BaseKalmanFilter.hpp>
 #include <srslib_framework/filter/Process.hpp>
 #include <srslib_framework/filter/FilterState.hpp>

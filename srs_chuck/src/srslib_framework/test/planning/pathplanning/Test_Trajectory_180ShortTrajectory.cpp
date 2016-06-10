@@ -16,32 +16,32 @@ using namespace std;
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 using namespace srs;
 
-typedef SolutionNode<Grid2d> SolutionType;
+typedef SolutionNode<Grid2d> SolutionNodeType;
 
 TEST(Test_Trajectory, 180ShortTrajectory)
 {
     Grid2d grid(10, 10);
 
-    SolutionType SOLUTION_00 = SolutionType(SolutionType::START,
+    SolutionNodeType SOLUTION_00 = SolutionNodeType(SolutionNodeType::START,
         Pose<>(18, 7, AngleMath::deg2rad<double>(90)));
 
-    SolutionType SOLUTION_01 = SolutionType(SolutionType::FORWARD,
+    SolutionNodeType SOLUTION_01 = SolutionNodeType(SolutionNodeType::FORWARD,
         Pose<>(18, 7.1, AngleMath::deg2rad<double>(90)));
 
-    SolutionType SOLUTION_02 = SolutionType(SolutionType::FORWARD,
+    SolutionNodeType SOLUTION_02 = SolutionNodeType(SolutionNodeType::FORWARD,
         Pose<>(18, 7.2, AngleMath::deg2rad<double>(90)));
 
-    SolutionType SOLUTION_03 = SolutionType(SolutionType::ROTATE_P90,
+    SolutionNodeType SOLUTION_03 = SolutionNodeType(SolutionNodeType::ROTATE_P90,
         Pose<>(18, 7.2, AngleMath::deg2rad<double>(180)));
 
-    SolutionType SOLUTION_04 = SolutionType(SolutionType::FORWARD,
-        Pose<>(17.9, 7.2,  AngleMath::deg2rad<double>(180)));
+    SolutionNodeType SOLUTION_04 = SolutionNodeType(SolutionNodeType::FORWARD,
+        Pose<>(17.9, 7.2, AngleMath::deg2rad<double>(180)));
 
-    SolutionType SOLUTION_05 = SolutionType(SolutionType::FORWARD,
-        Pose<>(17.8, 7.2,  AngleMath::deg2rad<double>(180)));
+    SolutionNodeType SOLUTION_05 = SolutionNodeType(SolutionNodeType::FORWARD,
+        Pose<>(17.8, 7.2, AngleMath::deg2rad<double>(180)));
 
-    SolutionType SOLUTION_06 = SolutionType(SolutionType::GOAL,
-        Pose<>(17.8, 7.2,  AngleMath::deg2rad<double>(180)));
+    SolutionNodeType SOLUTION_06 = SolutionNodeType(SolutionNodeType::GOAL,
+        Pose<>(17.8, 7.2, AngleMath::deg2rad<double>(180)));
 
     Solution<Grid2d> solution;
     solution.push_back(SOLUTION_00);
@@ -56,7 +56,7 @@ TEST(Test_Trajectory, 180ShortTrajectory)
     Trajectory<> trajectory;
 
     TrajectoryGenerator solutionConverter(chuck);
-    solutionConverter.fromSolution(solution);
+    solutionConverter.fromSolution(solution, 0.1);
     solutionConverter.getTrajectory(trajectory);
 
     cout << solution << endl;

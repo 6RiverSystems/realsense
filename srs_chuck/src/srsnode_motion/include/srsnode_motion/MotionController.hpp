@@ -26,7 +26,8 @@ namespace srs {
 class MotionController
 {
 public:
-    MotionController() :
+    MotionController(double dT) :
+        dT_(dT),
         pathFollower_(1, 1)
     {
         reset();
@@ -132,6 +133,9 @@ private:
     StateEnum currentState_;
     TaskEnum currentTask_;
     Trajectory<> currentTrajectory_;
+
+    double dynamicLookAheadDistance_;
+    double dT_;
 
     bool emergencyDeclared_;
     Velocity<> executingCommand_;

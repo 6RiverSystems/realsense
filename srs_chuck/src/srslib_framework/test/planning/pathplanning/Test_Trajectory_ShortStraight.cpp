@@ -9,12 +9,12 @@
 using namespace std;
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
-
+#include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
-#include <srslib_framework/planning/pathplanning/SimpleSolutionConverter.hpp>
-
+#include <srslib_framework/planning/pathplanning/TrajectoryGenerator.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
+#include <srslib_framework/search/SearchPosition.hpp>
 using namespace srs;
 
 typedef SolutionNode<Grid2d> SolutionNodeType;
@@ -42,8 +42,8 @@ TEST(Test_Trajectory, ShortStraight)
     Chuck chuck;
     Trajectory<> trajectory;
 
-    SimpleSolutionConverter solutionConverter(chuck);
-    solutionConverter.calculateTrajectory(solution);
+    TrajectoryGenerator solutionConverter(chuck);
+    solutionConverter.fromSolution(solution, 0.1);
     solutionConverter.getTrajectory(trajectory);
 
     cout << solution << endl;

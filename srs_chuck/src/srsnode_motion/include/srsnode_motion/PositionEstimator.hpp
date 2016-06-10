@@ -31,8 +31,8 @@ namespace srs {
 class PositionEstimator
 {
 public:
-    PositionEstimator(double refreshRate) :
-        refreshRate_(refreshRate),
+    PositionEstimator(double dT) :
+        dT_(dT),
         ukf_(robot_),
         previousReadingTime_(-1.0)
     {}
@@ -74,7 +74,7 @@ public:
         double dT = currentTime - previousReadingTime_;
         if (previousReadingTime_ < 0 || dT < 0)
         {
-            dT = 0.0;
+            dT = dT_;
         }
         previousReadingTime_ = currentTime;
 
@@ -83,9 +83,10 @@ public:
     }
 
 private:
+    double dT_;
+
     double previousReadingTime_;
 
-    double refreshRate_;
     Robot<> robot_;
 
     PositionUkf ukf_;

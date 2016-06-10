@@ -26,7 +26,8 @@ Motion::Motion(string nodeName) :
     robot_(),
     currentCommand_(),
     firstLocalization_(true),
-    positionEstimator_(REFRESH_RATE_HZ),
+    positionEstimator_(1.0 / REFRESH_RATE_HZ),
+    motionController_(1.0 / REFRESH_RATE_HZ),
     rosNodeHandle_(nodeName),
     // tapPlan_(rosNodeHandle_),
     tapJoyAdapter_(rosNodeHandle_),
@@ -132,9 +133,6 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     robot_.goalReachedDistance = configuration_.goal_reached_distance;
     ROS_INFO_STREAM("Goal reached distance [m]: " << configuration_.goal_reached_distance);
 
-    robot_.lookAheadDistance = configuration_.look_ahead_distance;
-    ROS_INFO_STREAM("Look-ahead distance [m]: " << configuration_.look_ahead_distance);
-
     robot_.maxAngularAcceleration = configuration_.max_angular_acceleration;
     ROS_INFO_STREAM("Max angular acceleration [m/s^2]: " << configuration_.max_angular_acceleration);
 
@@ -146,6 +144,15 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 
     robot_.maxLinearVelocity = configuration_.max_linear_velocity;
     ROS_INFO_STREAM("Max linear velocity [m/s]: " << configuration_.max_linear_velocity);
+
+    robot_.maxLookAheadDistance = configuration_.max_look_ahead_distance;
+    ROS_INFO_STREAM("Max look-ahead distance [m]: " << configuration_.max_look_ahead_distance);
+
+    robot_.minLookAheadDistance = configuration_.min_look_ahead_distance;
+    ROS_INFO_STREAM("Min look-ahead distance [m]: " << configuration_.min_look_ahead_distance);
+
+    robot_.ratioLookAheadDistance = configuration_.ratio_look_ahead_distance;
+    ROS_INFO_STREAM("Ratio look-ahead distance []: " << configuration_.ratio_look_ahead_distance);
 
     robot_.travelAngularAcceleration = configuration_.travel_angular_acceleration;
     ROS_INFO_STREAM("Travel angular acceleration [rad/s^2]: " << configuration_.travel_angular_acceleration);

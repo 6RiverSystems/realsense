@@ -42,7 +42,7 @@ public:
         }
 
         BaseType minimum = numeric_limits<double>::max();
-        int minimumIndex = -1;
+        int minimumIndex = toIndex;
 
         for (int i = fromIndex; i < toIndex; i++)
         {
@@ -62,7 +62,7 @@ public:
     {
         int deltaTo = round(distance / calculateTrajectoryStep());
         int toIndex = fromIndex + deltaTo;
-        if (toIndex > this->size())
+        if (toIndex >= this->size())
         {
             toIndex = this->size() - 1;
         }

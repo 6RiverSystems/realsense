@@ -11,68 +11,59 @@ using namespace std;
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
-#include <srslib_framework/planning/pathplanning/TrajectoryGenerator.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
+#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/robotics/controller/YoshizawaController.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>
 using namespace srs;
 
 typedef SolutionNode<Grid2d> SolutionNodeType;
 
-TEST(Test_Trajectory, LongTrajectory)
+TEST(Test_CMUPathFollower, Usage)
 {
     Grid2d grid(10, 10);
 
     SolutionNodeType SOLUTION_00 = SolutionNodeType(SolutionNodeType::START,
-        Pose<>(0, 0, 0));
-
+        Pose<>(3, 3, 0));
     SolutionNodeType SOLUTION_01 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(1, 0, 0));
-
+        Pose<>(3.1, 3, 0));
     SolutionNodeType SOLUTION_02 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(2, 0, 0));
-
+        Pose<>(3.2, 3, 0));
     SolutionNodeType SOLUTION_03 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(3, 0, 0));
-
+        Pose<>(3.3, 3, 0));
     SolutionNodeType SOLUTION_04 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(4, 0, 0));
-
+        Pose<>(3.4, 3, 0));
     SolutionNodeType SOLUTION_05 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(5, 0, 0));
-
+        Pose<>(3.5, 3, 0));
     SolutionNodeType SOLUTION_06 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(6, 0, 0));
-
+        Pose<>(3.6, 3, 0));
     SolutionNodeType SOLUTION_07 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(7, 0, 0));
-
+        Pose<>(3.7, 3, 0));
     SolutionNodeType SOLUTION_08 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 0, 0));
-
-    SolutionNodeType SOLUTION_09 = SolutionNodeType(SolutionNodeType::ROTATE_P90,
-        Pose<>(8, 0, AngleMath::deg2rad<double>(90)));
-
+        Pose<>(3.8, 3, 0));
+    SolutionNodeType SOLUTION_09 = SolutionNodeType(SolutionNodeType::FORWARD,
+        Pose<>(3.9, 3, 0));
     SolutionNodeType SOLUTION_10 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 1, AngleMath::deg2rad<double>(90)));
-
+        Pose<>(4, 3, 0));
     SolutionNodeType SOLUTION_11 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 2, AngleMath::deg2rad<double>(90)));
-
+        Pose<>(4.1, 3, 0));
     SolutionNodeType SOLUTION_12 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 3, AngleMath::deg2rad<double>(90)));
-
+        Pose<>(4.2, 3, 0));
     SolutionNodeType SOLUTION_13 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 4, AngleMath::deg2rad<double>(90)));
-
+        Pose<>(4.3, 3, 0));
     SolutionNodeType SOLUTION_14 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 5, AngleMath::deg2rad<double>(90)));
-
+        Pose<>(4.4, 3, 0));
     SolutionNodeType SOLUTION_15 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 6, AngleMath::deg2rad<double>(90)));
-
-    SolutionNodeType SOLUTION_16 = SolutionNodeType(SolutionNodeType::GOAL,
-        Pose<>(8, 7, AngleMath::deg2rad<double>(90)));
+        Pose<>(4.5, 3, 0));
+    SolutionNodeType SOLUTION_16 = SolutionNodeType(SolutionNodeType::FORWARD,
+        Pose<>(4.6, 3, 0));
+    SolutionNodeType SOLUTION_17 = SolutionNodeType(SolutionNodeType::FORWARD,
+        Pose<>(4.7, 3, 0));
+    SolutionNodeType SOLUTION_18 = SolutionNodeType(SolutionNodeType::FORWARD,
+        Pose<>(4.8, 3, 0));
+    SolutionNodeType SOLUTION_19 = SolutionNodeType(SolutionNodeType::GOAL,
+        Pose<>(4.8, 3, 0));
 
     Solution<Grid2d> solution;
     solution.push_back(SOLUTION_00);
@@ -92,6 +83,11 @@ TEST(Test_Trajectory, LongTrajectory)
     solution.push_back(SOLUTION_14);
     solution.push_back(SOLUTION_15);
     solution.push_back(SOLUTION_16);
+    solution.push_back(SOLUTION_17);
+    solution.push_back(SOLUTION_18);
+    solution.push_back(SOLUTION_19);
+
+    Chuck chuck;
 
     Chuck chuck;
     Trajectory<> trajectory;
@@ -102,4 +98,16 @@ TEST(Test_Trajectory, LongTrajectory)
 
     cout << solution << endl;
     cout << trajectory << endl;
+
+//    CMUPathFollower controller(1.0, 1.0);
+
+//
+//    Trajectory::MilestoneType milestone = *(trajectory.begin() + 1);
+//    controller.setReference(milestone.first);
+//
+//    Pose<> pose(0, 0, 0.1, 0);
+//    Velocity<> velocity;
+
+//    Velocity<> command = controller.step(pose);
+//    cout << command << endl;
 }

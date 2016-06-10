@@ -14,15 +14,20 @@ struct RobotProfile
         bodyWidth(),
         bodyDepth(),
         goalReachedDistance(),
-        lookAheadDistance(),
 
         maxAngularAcceleration(),
         maxAngularVelocity(),
         maxLinearAcceleration(),
         maxLinearVelocity(),
+        maxLookAheadDistance(),
+        minLookAheadDistance(),
+
+        ratioLookAheadDistance(),
 
         travelAngularAcceleration(),
         travelAngularVelocity(),
+        travelCurveZoneRadius(),
+        travelCurvingVelocity(),
         travelLinearAcceleration(),
         travelLinearVelocity(),
 
@@ -38,15 +43,20 @@ struct RobotProfile
 
     double goalReachedDistance; // [m]
 
-    double lookAheadDistance; // [m]
-
     double maxAngularAcceleration; // [rad/s^2]
     double maxAngularVelocity; // [rad/s]
     double maxLinearAcceleration; // [m/s^2]
     double maxLinearVelocity; // [m/s]
+    double maxLookAheadDistance; // [m]
+    double minLookAheadDistance; // [m]
+
+    double ratioLookAheadDistance; // []
 
     double travelAngularAcceleration; // [rad/s^2]
     double travelAngularVelocity; // [rad/s]
+    double travelCurveZoneRadius; // [m]
+
+    double travelCurvingVelocity; // [m/s]
     double travelLinearAcceleration; // [m/s^2]
     double travelLinearVelocity; // [m/s]
 

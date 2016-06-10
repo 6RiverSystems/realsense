@@ -2,6 +2,7 @@
 
 #include <ros/ros.h>
 
+#include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/planning/pathplanning/TrajectoryGenerator.hpp>
 
@@ -17,23 +18,24 @@ void MotionController::execute(Solution<Grid2d> solution)
     // split the solution in two parts and give the rotation to
     // the appropriate controller
 
-    // TODO: Make sure that it can handle multiple rotations (is there a use case like that??)
-    SolutionNode<Grid2d> firstNode = solution.afterStart();
-    if (firstNode.actionType == SolutionNode<Grid2d>::ROTATE_180 ||
-        firstNode.actionType == SolutionNode<Grid2d>::ROTATE_M90 ||
-        firstNode.actionType == SolutionNode<Grid2d>::ROTATE_P90)
-    {
+    solutions_.push(pair<int, Solution<Grid2d>>(FOLLOW, solution));
+
+//    // TODO: Make sure that it can handle multiple rotations (is there a use case like that??)
+//    SolutionNode<Grid2d> firstNode = solution.afterStart();
+//    if (firstNode.actionType == SolutionNode<Grid2d>::ROTATE_180 ||
+//        firstNode.actionType == SolutionNode<Grid2d>::ROTATE_M90 ||
+//        firstNode.actionType == SolutionNode<Grid2d>::ROTATE_P90)
+//    {
 //        Solution<Grid2d> rotation;
 //        Solution<Grid2d> path;
 //        solution.split(1, rotation, path);
 //
 //        solutions_.push(pair<int, Solution<Grid2d>>(ROTATE, rotation));
 //        solutions_.push(pair<int, Solution<Grid2d>>(FOLLOW, path));
-    }
-    else
-    {
-        solutions_.push(pair<int, Solution<Grid2d>>(FOLLOW, solution));
-    }
+//    }
+//    else
+//    {
+//    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,6 +44,8 @@ void MotionController::reset()
     currentOdometry_ = Odometry<>();
     currentState_ = StateEnum::NONE;
     currentTask_ = TaskEnum::STAND;
+
+    dynamicLookAheadDistance_ = robot_.maxLookAheadDistance;
 
     emergencyDeclared_ = false;
     executingCommand_ = Velocity<>();
@@ -148,7 +152,7 @@ void MotionController::setRobot(RobotProfile robot)
 {
     robot_ = robot;
 
-    pathFollower_.setLookAheadDistance(robot_.lookAheadDistance);
+    pathFollower_.setLookAheadDistance(robot_.maxLookAheadDistance);
     pathFollower_.setMaxAngularVelocity(robot_.maxAngularVelocity);
     pathFollower_.setMaxLinearVelocity(robot_.maxLinearVelocity);
     pathFollower_.setTravelAngularVelocity(robot_.travelAngularVelocity);
@@ -184,33 +188,43 @@ void MotionController::stateFollowing()
 {
     updateProjectionIndex();
 
-    Velocity<> nextCommand;
+    double distanceToGoal = PoseMath::euclidean(currentRobotPose_, goal_);
+    ROS_INFO_STREAM_NAMED("MotionController", "Distance to goal: " << distanceToGoal);
 
-    double distance = PoseMath::euclidean(currentRobotPose_, goal_);
-    ROS_INFO_STREAM_NAMED("MotionController", "Distance to goal: " << distance);
-
-    if (distance < robot_.goalReachedDistance)
+    if (distanceToGoal < robot_.goalReachedDistance)
     {
         goalReached_ = true;
         ROS_INFO_STREAM_NAMED("MotionController", "Goal reached: " << goal_);
 
         // Temporary fix to stop the robot when arriving to the goal
-        // It must be removed when the velocities in the trajectory
-        // are correct
+        // It should be removed when the velocities in the trajectory
+        // are correctly calculated
         executeCommand(Velocity<>());
 
         nextState(StateEnum::STANDING);
     }
     else
     {
-        distance = PoseMath::euclidean(currentRobotPose_, referencePose_);
-        ROS_INFO_STREAM_NAMED("MotionController", "Distance to reference: " << distance);
+        Velocity<> nextCommand;
+
+        double distanceToReference = PoseMath::euclidean(currentRobotPose_, referencePose_);
+        ROS_INFO_STREAM_NAMED("MotionController", "Distance to reference: " << distanceToReference);
 
         // Find the desired velocity command
         nextCommand = currentTrajectory_.getVelocity(projectionIndex_);
 
         // Ask the low-level controller to modulate the desired velocity
         nextCommand = pathFollower_.step(currentRobotPose_, nextCommand);
+
+        // Recalculate the look-ahead distance based roughly on the velocity
+        dynamicLookAheadDistance_ = BasicMath::saturate(
+            nextCommand.linear * robot_.ratioLookAheadDistance,
+            robot_.maxLookAheadDistance, robot_.minLookAheadDistance);
+
+        ROS_INFO_STREAM_NAMED("MotionController", "Look-ahead distance: " <<
+            dynamicLookAheadDistance_);
+
+        pathFollower_.setLookAheadDistance(dynamicLookAheadDistance_);
 
         // If the two velocities are similar, there is no need to send a
         // new command (if requested).
@@ -246,21 +260,14 @@ void MotionController::taskEmergencyStop()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::taskFollow()
 {
-    Trajectory<> trajectory;
+    currentSolution_ = nextSolution_;
 
     TrajectoryGenerator converter(robot_);
-    converter.fromSolution(nextSolution_);
-    converter.getTrajectory(trajectory);
-
-    cout << nextSolution_ << endl;
-    cout << trajectory << endl;
-
-    currentTrajectory_ = trajectory;
+    converter.fromSolution(currentSolution_, dT_);
+    converter.getTrajectory(currentTrajectory_);
 
     if (!currentTrajectory_.empty())
     {
-        currentSolution_ = nextSolution_;
-
         // Find the goal of the trajectory
         goal_ = currentTrajectory_.getGoal();
 
@@ -273,7 +280,7 @@ void MotionController::taskFollow()
 
         // Find the projection of the current robot pose onto the trajectory
         projectionIndex_ = currentTrajectory_.findClosestPose(currentRobotPose_,
-            0, robot_.lookAheadDistance);
+            0, robot_.maxLookAheadDistance);
     }
 
     nextState(StateEnum::FOLLOWING);
@@ -299,10 +306,13 @@ void MotionController::taskStand()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::updateProjectionIndex()
 {
-    projectionIndex_ = currentTrajectory_.findClosestPose(currentRobotPose_,
-        projectionIndex_, robot_.lookAheadDistance);
-    referenceIndex_ = currentTrajectory_.findWaypointAtDistance(projectionIndex_,
-        robot_.lookAheadDistance);
+    projectionIndex_ = currentTrajectory_.findClosestPose(
+        currentRobotPose_,
+        projectionIndex_, dynamicLookAheadDistance_);
+
+    referenceIndex_ = currentTrajectory_.findWaypointAtDistance(
+        projectionIndex_,
+        dynamicLookAheadDistance_);
 
     referencePose_ = currentTrajectory_.getPose(referenceIndex_);
     pathFollower_.setReference(referencePose_);

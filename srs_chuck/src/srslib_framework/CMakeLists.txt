@@ -100,8 +100,9 @@ set(TEST_SOURCES_GRAPH
 )
 
 set(TEST_SOURCES_PLANNING
-    test/planning/pathplanning/Test_Trajectory_180ShortTrajectory.cpp
-    # test/planning/pathplanning/Test_Trajectory_LongTrajectory.cpp
+    # test/planning/pathplanning/Test_Trajectory_180ShortTrajectory.cpp
+    # test/planning/pathplanning/Test_Trajectory_LongStraight.cpp
+    test/planning/pathplanning/Test_Trajectory_LongTrajectory.cpp
     # test/planning/pathplanning/Test_Trajectory_ShortStraight.cpp
     # test/planning/pathplanning/Test_Trajectory_ShortTrajectory.cpp
 )

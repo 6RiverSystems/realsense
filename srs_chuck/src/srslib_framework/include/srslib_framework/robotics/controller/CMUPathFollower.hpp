@@ -36,13 +36,23 @@ public:
 
     Velocity<> step(Pose<> currentPose, Velocity<> command)
     {
+        // Calculate the linear portion of the command
         double linear = Kv_ * command.linear;
         linear = BasicMath::saturate<double>(linear, maxLinear_, -maxLinear_);
 
+        // Calculate the angular portion of the command
         double slope = atan2(referencePose_.y - currentPose.y, referencePose_.x - currentPose.x);
         double alpha = AngleMath::normalizeAngleRad(slope - currentPose.theta);
 
         double angular = Kw_ * 2 * sin(alpha) / lookAheadDistance_;
+
+        // If the robot is facing the opposite direction of the path
+        // choose directly the maximum angular velocity
+        if (abs(abs(alpha) - M_PI) < 1e-12)
+        {
+            angular = BasicMath::sgn(angular) * (maxAngular_ / 2);
+        }
+
         angular = BasicMath::saturate<double>(angular, maxAngular_, -maxAngular_);
 
         return Velocity<>(linear, angular);

@@ -11,28 +11,29 @@ namespace srs {
 struct RobotProfile
 {
     RobotProfile() :
-        bodyWidth(),
-        bodyDepth(),
-        goalReachedDistance(),
+        bodyWidth(0.0),
+        bodyDepth(0.0),
+        goalReachedDistance(0.0),
 
-        maxAngularAcceleration(),
-        maxAngularVelocity(),
-        maxLinearAcceleration(),
-        maxLinearVelocity(),
-        maxLookAheadDistance(),
-        minLookAheadDistance(),
+        maxAngularAcceleration(0.0),
+        maxAngularVelocity(0.0),
+        maxLinearAcceleration(0.0),
+        maxLinearVelocity(0.0),
+        maxLookAheadDistance(0.0),
+        minLookAheadDistance(0.0),
 
-        ratioLookAheadDistance(),
+        ratioLookAheadDistance(0.0),
 
-        travelAngularAcceleration(),
-        travelAngularVelocity(),
-        travelCurveZoneRadius(),
-        travelCurvingVelocity(),
-        travelLinearAcceleration(),
-        travelLinearVelocity(),
+        travelAngularAcceleration(0.0),
+        travelAngularVelocity(0.0),
+        travelCurveZoneRadius(0.0),
+        travelCurvingVelocity(0.0),
+        travelLinearAcceleration(0.0),
+        travelLinearVelocity(0.0),
+        travelRotationVelocity(0.0),
 
-        wheelDiameter(),
-        wheelDistance()
+        wheelDiameter(0.0),
+        wheelDistance(0.0)
     {}
 
     virtual ~RobotProfile()
@@ -59,6 +60,7 @@ struct RobotProfile
     double travelCurvingVelocity; // [m/s]
     double travelLinearAcceleration; // [m/s^2]
     double travelLinearVelocity; // [m/s]
+    double travelRotationVelocity; // [rad/s]
 
     double wheelDiameter; // [m]
     double wheelDistance; // [m]

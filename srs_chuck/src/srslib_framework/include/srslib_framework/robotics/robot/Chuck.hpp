@@ -36,6 +36,7 @@ struct Chuck : RobotProfile
         travelCurvingVelocity = 0.3; // [m/s]
         travelLinearAcceleration =  0.65; // [m/s^2]
         travelLinearVelocity = 1.0; // [m/s]
+        travelRotationVelocity = 0.2; // [rad/s]
 
         wheelDiameter = MeasurementMath::inch2m<double>(8); // [m]
         wheelDistance = MeasurementMath::inch2m<double>(20.915); // [m]

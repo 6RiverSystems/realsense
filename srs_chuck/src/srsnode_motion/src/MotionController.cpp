@@ -157,6 +157,7 @@ void MotionController::setRobot(RobotProfile robot)
     pathFollower_.setMaxLinearVelocity(robot_.maxLinearVelocity);
     pathFollower_.setTravelAngularVelocity(robot_.travelAngularVelocity);
     pathFollower_.setTravelLinearVelocity(robot_.travelLinearVelocity);
+    pathFollower_.setTravelRotationVelocity(robot_.travelRotationVelocity);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -166,6 +166,9 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     robot_.travelLinearVelocity = configuration_.travel_linear_velocity;
     ROS_INFO_STREAM("Travel linear velocity [m/s]: " << configuration_.travel_linear_velocity);
 
+    robot_.travelRotationVelocity = configuration_.travel_rotation_velocity;
+    ROS_INFO_STREAM("Travel rotation velocity [rad/s]: " << configuration_.travel_rotation_velocity);
+
     tapOdometry_.getSensor()->enable(configuration_.odometry_enabled);
     ROS_INFO_STREAM("Odometry sensor enabled: " << configuration_.odometry_enabled);
 

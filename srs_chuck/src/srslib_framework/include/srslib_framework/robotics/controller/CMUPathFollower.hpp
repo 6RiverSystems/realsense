@@ -23,7 +23,8 @@ class CMUPathFollower: public BaseController
 public:
     CMUPathFollower(double Kv, double Kw) :
         BaseController(Kv, Kw),
-        lookAheadDistance_(0.5)
+        lookAheadDistance_(0.5),
+        travelRotationVelocity_(0.1)
     {}
 
     ~CMUPathFollower()
@@ -32,6 +33,11 @@ public:
     void setLookAheadDistance(double lookAheadDistance)
     {
         lookAheadDistance_ = lookAheadDistance;
+    }
+
+    void setTravelRotationVelocity(double value)
+    {
+        travelRotationVelocity_ = value;
     }
 
     Velocity<> step(Pose<> currentPose, Velocity<> command)
@@ -46,11 +52,10 @@ public:
 
         double angular = Kw_ * 2 * sin(alpha) / lookAheadDistance_;
 
-        // If the robot is facing the opposite direction of the path
-        // choose directly the maximum angular velocity
-        if (abs(abs(alpha) - M_PI) < 1e-12)
+        // If the robot angle is greater than 45deg, use a different rotation velocity
+        if (abs(alpha) > M_PI / 4)
         {
-            angular = BasicMath::sgn(angular) * (maxAngular_ / 2);
+            angular = BasicMath::sgn(angular) * travelRotationVelocity_;
         }
 
         angular = BasicMath::saturate<double>(angular, maxAngular_, -maxAngular_);
@@ -60,6 +65,7 @@ public:
 
 private:
     double lookAheadDistance_;
+    double travelRotationVelocity_;
 };
 
 } // namespace srs

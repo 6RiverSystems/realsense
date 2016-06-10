@@ -87,6 +87,12 @@ void BrainStem::OnConnectionChanged( bool bIsConnected )
 	m_ConnectedPublisher.publish( msg );
 
 	m_rosOdomTime = ros::Time( );
+
+	// Get the hardware information
+	GetHardwareInformation( );
+
+	// Get the operational state
+	GetOperationalState( );
 }
 
 void BrainStem::OnArrived( )
@@ -99,7 +105,7 @@ void BrainStem::OnArrived( )
 	m_llEventPublisher.publish( msg );
 }
 
-void BrainStem::OnButtonEvent( ENTITIES eButtonId )
+void BrainStem::OnButtonEvent( LED_ENTITIES eButtonId )
 {
 	std::string strEntity = m_messageProcessor.GetButtonName( eButtonId );
 
@@ -172,6 +178,16 @@ void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, 
 	m_dwLastOdomTime = dwTimeStamp;
 
 	sLastTime = currentTime;
+}
+
+void BrainStem::GetOperationalState( )
+{
+	m_messageProcessor.GetOperationalState( );
+}
+
+void BrainStem::GetHardwareInformation( )
+{
+	m_messageProcessor.GetHardwareInformation( );
 }
 
 void BrainStem::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity )

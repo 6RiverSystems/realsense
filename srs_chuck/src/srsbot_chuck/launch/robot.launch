@@ -9,6 +9,7 @@
     <!-- Declare the parameters passed by the main launch file -->
     <arg name="target_map" />
     <arg name="target_anchors" />
+    <arg name="robot_configuration" />
 
     <rosparam param="target_map" subst_value="True">
         $(arg target_map)
@@ -24,9 +25,10 @@
 
     <!-- Launch all the robot drivers -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
-<!--    <include file="$(find srsdrv_realsense)/launch/driver.launch" /> -->
+	<include file="$(find srsdrv_realsense)/launch/driver.launch" />
 
     <include file="$(find srsdrv_stargazer)/launch/driver.launch">
+        <arg name="robot_configuration" value="$(arg robot_configuration)" />
         <arg name="target_anchors" value="$(arg target_anchors)" />
     </include>
 

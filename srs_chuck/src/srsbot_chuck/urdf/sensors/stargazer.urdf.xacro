@@ -7,6 +7,7 @@
   <xacro:property name="stargazer_z_size" value="0.053" />
 
   <xacro:property name="stargazer_optical_x_offset" value="-0.14" />
+  <xacro:property name="stargazer_optical_y_offset" value="0.0" />
   <xacro:property name="stargazer_optical_y_offset" value="${stargazer_y_size/2}" />
   <xacro:property name="stargazer_optical_z_offset" value="${stargazer_z_size}" />
 
@@ -28,10 +29,28 @@
       </visual>
     </link>
 
-    <joint name="stargazer_optical_joint" type="fixed">
+    <joint name="stargazer_camera_joint" type="fixed">
       <parent link="stargazer_link" />
+      <child link="stargazer_camera_frame" />
+      <origin xyz="${stargazer_x_size/2} ${-stargazer_y_size/2} ${stargazer_z_size}" rpy="0 0 0" />
+    </joint>
+    
+	<link name="stargazer_camera_frame">
+  	  <visual>
+       <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+         <sphere radius="0.005"/>
+        </geometry>
+        <material name="blue">
+          <color rgba="0 0 1 1"/>
+        </material>
+      </visual>
+    </link>
+
+    <joint name="stargazer_optical_joint" type="fixed">
+      <parent link="stargazer_camera_frame" />
       <child link="stargazer_optical_frame" />
-      <origin xyz="${stargazer_optical_x_offset + stargazer_x_size/2} ${-stargazer_y_size/2} ${stargazer_z_size}" rpy="0 0 0" />
+      <origin xyz="${stargazer_optical_x_offset} 0 0" rpy="0 0 0" />
     </joint>
     
 	<link name="stargazer_optical_frame">

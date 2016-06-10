@@ -7,4 +7,7 @@
 **/src/CMakeLists.txt
 **/devel
 **/build
+**/install
+**/logs
 **/.ptp*
+.catkin_tools

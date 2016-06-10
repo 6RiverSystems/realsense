@@ -63,6 +63,10 @@ private:
 
 	void LoadAnchors( );
 
+	void LoadFootprintTransform( );
+
+	void LoadCalibrationTransform( );
+
 	std::string GetAnchorFrame( int tagID ) const;
 
 private:
@@ -90,6 +94,8 @@ private:
 	std::map<int, tf::Transform>		m_mapTransforms;
 
 	tf::TransformListener				m_listener;
+
+	tf::StampedTransform				m_stargazerTransform;
 
 	tf::StampedTransform				m_baseFootprintTransform;
 

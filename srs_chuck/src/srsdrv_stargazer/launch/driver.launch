@@ -7,11 +7,13 @@
 -->
 <launch>
     <arg name="target_anchors" />
+    <arg name="robot_configuration" />
 
     <node name="srsdrv_stargazer"
         pkg="srsdrv_stargazer"
         type="srsdrv_stargazer" 
         output="screen" respawn="true" >
         <param name="target_anchors" type="str" value="$(arg target_anchors)" />
+        <param name="robot_configuration" type="str" value="$(arg robot_configuration)" />
     </node>
 </launch>

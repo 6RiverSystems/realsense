@@ -1,5 +1,5 @@
 anchors:
-    - {id: "052", location: [6.47603, 5.34495, 4.60], orientation: 1.5721926 }
-    - {id: "098", location: [16.22811, 5.5558497, 4.60], orientation: 1.5978489 }
+    - {id: "052", location: [6.47603, 5.34495, 6.2217396], orientation: 1.5721926 }
+    - {id: "098", location: [16.22811, 5.5558497, 6.2217396], orientation: 1.5978489 }
 
-target_frame: /map
+target_frame: map

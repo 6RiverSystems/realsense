@@ -110,7 +110,7 @@ void JoystickAdapter::onConfigChange(JoystickConfig& config, uint32_t level)
 {
     configuration_ = config;
 
-    ROS_INFO_STREAM("New configuration: (" <<
+    ROS_INFO_STREAM("Joystick configuration changed: (" <<
         configuration_.ratio_linear << ", " << configuration_.ratio_angular <<
         configuration_.threshold_linear << ", " << configuration_.threshold_angular << ")");
 }

@@ -7,11 +7,11 @@
 #include <StarGazer.h>
 #include <srslib_framework/io/SerialIO.hpp>
 #include <srslib_framework/platform/Thread.hpp>
+#include <srslib_framework/robotics/Pose.hpp>
 #include <yaml-cpp/yaml.h>
 #include <string>
 #include <iostream>
 #include <boost/lexical_cast.hpp>
-
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/median.hpp>
@@ -59,10 +59,15 @@ StarGazer::StarGazer( const std::string& strNodeName, const std::string& strSeri
 	m_sleeper( REFRESH_RATE_HZ / 1000.0 ),
 	m_mapTransformSenders( ),
 	m_listener( ),
+	m_stargazerTransform( ),
 	m_baseFootprintTransform( ),
 	m_rotationTransform( tf::createQuaternionFromRPY( M_PI, 0.0f, 0.0 ) )
 {
 	LoadAnchors( );
+
+	LoadFootprintTransform( );
+
+	LoadCalibrationTransform( );
 
 	m_messageProcessor.SetOdometryCallback(
 		std::bind( &StarGazer::OdometryCallback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
@@ -202,51 +207,50 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 	{
 		if( m_filter.unfilterStargazerData( nTagId, fX, fY, fZ ) )
 		{
+			// The anchor transform from the origin of the map to the anchor point
+			const tf::Transform& anchorGlobal = iter->second;
+
 			std::string strAnchorFrame = GetAnchorFrame( nTagId );
 
-			// Transform to map coordinate system (right hand rule)
-			tf::Quaternion anchorRotation( m_rotationTransform * tf::createQuaternionFromYaw( fAngle * M_PI / 180.0f ) );
+			double dfAngleInRadians = fAngle * M_PI / 180.0f;
 
-			// Add the stargazer orientation
-			tf::Quaternion mapRotation( tf::createQuaternionFromYaw(
-				tf::getYaw( anchorRotation ) + tf::getYaw( iter->second.getRotation( ) ) ) );
+			// Transform to map coordinate system (right hand rule)
+			tf::Quaternion anchorRotation( m_rotationTransform * tf::createQuaternionFromYaw( dfAngleInRadians ) );
+
+			tf::Vector3 stargazerOffset( fX / 100.0f, fY / 100.0f, fZ / 100.0f );
 
 			// Rotated around map origin
-			tf::Pose poseFootprintRotated( mapRotation );
+			tf::Pose poseFootprintRotated( anchorRotation, stargazerOffset );
 
-			// Foot print offset is the footprint transform around the current rotation
-			tf::Pose poseFootprint = poseFootprintRotated * m_baseFootprintTransform;
+			// Translate by optical -> camera
+			tf::Pose poseCamera = poseFootprintRotated * m_stargazerTransform;
 
-			// Offset in non rotated space from the anchor
-			tf::Pose poseStargazerRotated( iter->second.getRotation( ) );
-			tf::Vector3 stargazerOffset( fX / 100.0f, fY / 100.0f, fZ / 100.0f );
-			tf::Transform stargazerTranslation( tf::Quaternion::getIdentity( ), stargazerOffset );
+			tf::Vector3 cameraOrigin = poseCamera.getOrigin( );
 
-			tf::Pose poseStargazer = poseStargazerRotated * stargazerTranslation;
+			// Translate by camera -> base footprint
+			tf::Pose poseBaseFootprint = poseCamera * m_baseFootprintTransform;
 
-			tf::Vector3 mapOffset = iter->second.getOrigin( );
+			tf::Vector3 footprintOrigin = poseBaseFootprint.getOrigin( );
 
-			tf::Vector3 stargazerOffsetMap = poseStargazer.getOrigin( );
+			tf::Vector3 chuckOrigin = anchorGlobal * footprintOrigin;
 
-			tf::Vector3 footprintOffsetMap = poseFootprint.getOrigin( );
+			tf::Quaternion chuckOrientation = anchorGlobal * anchorRotation;
 
-			// Transform to map
-			tf::Pose poseMap( mapRotation, mapOffset + stargazerOffsetMap + footprintOffsetMap );
-
-			std::ostringstream stream;
-			stream << "Stargazer Data: " <<
-				tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
-				tf::getYaw( mapRotation ) * 180.0f / M_PI << ", " <<
-				mapOffset.getX( ) << ", " << mapOffset.getY( ) << ", " << mapOffset.getZ( ) << ", " <<
-				stargazerOffset.getX( ) << ", " << stargazerOffset.getY( ) << ", " << stargazerOffset.getZ( ) << ", " <<
-				stargazerOffsetMap.getX( ) << ", " << stargazerOffsetMap.getY( ) << ", " << stargazerOffsetMap.getZ( ) << ", " <<
-				footprintOffsetMap.getX( ) << ", " << footprintOffsetMap.getY( ) << ", " << footprintOffsetMap.getZ( ) << ", " <<
-				poseMap.getOrigin( ).getX( ) << ", " << poseMap.getOrigin( ).getY( ) << ", " <<
-				poseMap.getOrigin( ).getZ( ) << ", " << tf::getYaw( poseMap.getRotation( ) ) * 180 / M_PI << std::endl;
-
-			std::string strData =  stream.str( );
-
-			ROS_DEBUG_NAMED( "StarGazer", "%s", strData.c_str( ) );
+			tf::Pose poseMap( chuckOrientation, chuckOrigin);
+//
+//			std::ostringstream stream;
+//
+//			stream << "Stargazer Data: " << std::fixed <<  endl <<
+//				tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
+//				stargazerOffset.getX( ) << ", " << stargazerOffset.getY( ) << ", " << stargazerOffset.getZ( ) << ", " <<
+//				cameraOrigin.getX( ) << ", " << cameraOrigin.getY( ) << ", " << cameraOrigin.getZ( ) << ", " <<
+//				footprintOrigin.getX( ) << ", " << footprintOrigin.getY( ) << ", " << footprintOrigin.getZ( ) << ", " <<
+//				chuckOrigin.getX( ) << ", " << chuckOrigin.getY( ) << ", " << chuckOrigin.getZ( ) << ", " <<
+//				tf::getYaw( chuckOrientation ) * 180.0f / M_PI << ", " << endl;
+//
+//			std::string strData =  stream.str( );
+//
+//			ROS_DEBUG_NAMED( "StarGazer", "%s", strData.c_str( ) );
 
 			tf::Stamped<tf::Pose> stampedPose( poseMap, now, m_strPoseTargetFrame );
 
@@ -261,41 +265,71 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 			static double_acc accLocalZ;
 			static double_acc accLocalRotation;
 
-			static double_acc accGlobalX;
-			static double_acc accGlobalY;
-			static double_acc accGlobalZ;
-			static double_acc accGlobalRotation;
+			static double_acc accCameraX;
+			static double_acc accCameraY;
+			static double_acc accCameraZ;
+			static double_acc accCameraRotation;
 
-			accLocalX( fX );
-			accLocalY( fY );
-			accLocalZ( fZ );
-			accLocalRotation( fAngle );
+			static double_acc accFootprintX;
+			static double_acc accFootprintY;
+			static double_acc accFootprintZ;
 
-			accGlobalX( msg.pose.position.x );
-			accGlobalY( msg.pose.position.y );
-			accGlobalZ( msg.pose.position.z );
-			accGlobalRotation( tf::getYaw( msg.pose.orientation ) );
+			static double_acc accChuckX;
+			static double_acc accChuckY;
+			static double_acc accChuckZ;
+			static double_acc accChuckRotation;
+
+			accLocalX( stargazerOffset.getX( ) );
+			accLocalY( stargazerOffset.getY( ) );
+			accLocalZ( stargazerOffset.getZ( ) );
+
+			accCameraX( cameraOrigin.getX( ) );
+			accCameraY( cameraOrigin.getY( ) );
+			accCameraZ( cameraOrigin.getZ( ) );
+
+			accFootprintX( footprintOrigin.getX( ) );
+			accFootprintY( footprintOrigin.getY( ) );
+			accFootprintZ( footprintOrigin.getZ( ) );
+
+			accChuckX( msg.pose.position.x );
+			accChuckY( msg.pose.position.y );
+			accChuckZ( msg.pose.position.z );
+			accChuckRotation( tf::getYaw( msg.pose.orientation ) * 180.0f / M_PI );
 
 			static int sCount = 0;
 			if( sCount++ == 50 )
 			{
-				//			ROS_DEBUG_NAMED( "StarGazer", "Anchor Location (median): %04i (%2.6f, %2.6f, %2.6f) %2.6f rad\n",
-				//				nTagId, anchorOrigin.getX( ), anchorOrigin.getY( ), anchorOrigin.getZ( ), anchorRotation.getAngle( ) );
-				//
-				//			ROS_DEBUG_NAMED( "StarGazer", "%04i, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f, %2.6f",
-				//				nTagId, median( accLocalX ), median( accLocalY ), median( accLocalZ ), median( accLocalRotation ),
-				//				median( accGlobalX ), median( accGlobalY ), median( accGlobalZ ), median( accGlobalRotation ) );
+				std::ostringstream stream;
+
+				stream << "Stargazer Data: " << std::fixed <<  endl <<
+					tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
+					median( accLocalX ) << ", " << median( accLocalY ) << ", " << median( accLocalZ ) << ", " <<
+					median( accCameraX ) << ", " << median( accCameraY ) << ", " << median( accCameraZ ) << ", " <<
+					median( accFootprintX ) << ", " << median( accFootprintY ) << ", " << median( accFootprintZ ) << ", " <<
+					median( accChuckX ) << ", " << median( accChuckY ) << ", " << median( accChuckZ ) << ", " <<
+					median( accChuckRotation ) << endl;
+
+				std::string strData =  stream.str( );
+
+				ROS_ERROR_NAMED( "StarGazer", "%s", strData.c_str( ) );
 
 				// reset accumulators
 				accLocalX = double_acc( );
 				accLocalY = double_acc( );
 				accLocalZ = double_acc( );
-				accLocalRotation = double_acc( );
 
-				accGlobalX = double_acc( );
-				accGlobalY = double_acc( );
-				accGlobalZ = double_acc( );
-				accGlobalRotation = double_acc( );
+				accCameraX = double_acc( );
+				accCameraY = double_acc( );
+				accCameraZ = double_acc( );
+
+				accFootprintX = double_acc( );
+				accFootprintY = double_acc( );
+				accFootprintZ = double_acc( );
+
+				accChuckX = double_acc( );
+				accChuckY = double_acc( );
+				accChuckZ = double_acc( );
+				accChuckRotation = double_acc( );
 
 				sCount = 0;
 			}
@@ -316,32 +350,8 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 
 void StarGazer::LoadAnchors( )
 {
-	try
-	{
-		ros::Time now = ros::Time( 0 );
-
-		std::string strStargazerOptical( "/stargazer_optical_frame" );
-		std::string strFootprint( "/base_footprint" );
-
-		m_listener.waitForTransform( strStargazerOptical, strFootprint, now, ros::Duration( 10.0 ) );
-		m_listener.lookupTransform( strStargazerOptical, strFootprint, now, m_baseFootprintTransform );
-
-		tf::Vector3 origin = m_baseFootprintTransform.getOrigin( );
-		tf::Quaternion rotation = m_baseFootprintTransform.getRotation( );
-
-		ROS_INFO_STREAM( "/stargazer_optical_frame -> /base_footprint: " << "x=" << origin.getX( ) <<
-			", y=" << origin.getY( ) << ", z=" << origin.getZ( ) <<
-			", orientation=" << rotation.getAngle( ) );
-	}
-	catch( const tf::TransformException& ex )
-	{
-		ROS_ERROR( "%s", ex.what( ) );
-	}
-
 	string anchorsFilename;
 	m_rosNodeHandle.param( "target_anchors", anchorsFilename, string( "" ) );
-
-	ROS_INFO_STREAM( "Loading anchors from " << anchorsFilename );
 
 	try
 	{
@@ -354,27 +364,13 @@ void StarGazer::LoadAnchors( )
 			if( !m_strPoseTargetFrame.length( ) )
 			{
 				m_strPoseTargetFrame = "/map";
+			}
 
-				ROS_ERROR_STREAM( "Stargazer *pose* target frame not set, defaulting to \"" << m_strPoseTargetFrame << "\"" );
-			}
-			else
-			{
-				ROS_INFO_STREAM( "Stargazer *pose* target frame: " << m_strPoseTargetFrame );
-			}
+			ROS_INFO_STREAM( "Stargazer pose target frame: " << m_strPoseTargetFrame );
 
 			vector<Anchor> anchors = document["anchors"].as<vector<Anchor>>( );
-			m_strAnchorTargetFrame = document["target_frame"].as<std::string>( );
 
-			if( !m_strAnchorTargetFrame.length( ) )
-			{
-				m_strAnchorTargetFrame = "/map";
-
-				ROS_ERROR_STREAM( "Stargazer *anchor* target frame not set, defaulting to \"" << m_strAnchorTargetFrame << "\"" );
-			}
-			else
-			{
-				ROS_INFO_STREAM( "Stargazer *anchor* target frame: " << m_strAnchorTargetFrame );
-			}
+			m_strAnchorTargetFrame = "/map";
 
 			for( auto anchor : anchors )
 			{
@@ -386,9 +382,6 @@ void StarGazer::LoadAnchors( )
 					tf::Quaternion orientation = tf::createQuaternionFromYaw( anchor.orientation );
 
 					tf::Transform transform( orientation, origin );
-
-					ROS_INFO_STREAM( "Anchor: id=" << anchor.id << ", x=" << anchor.x <<
-						", y=" << anchor.y << ", z=" << anchor.z << ", orientation=" << tf::getYaw( orientation ) * 180 / M_PI );
 
 					m_mapTransforms[anchorId] = transform;
 
@@ -408,7 +401,7 @@ void StarGazer::LoadAnchors( )
 					staticTransformStamped.transform.rotation.z = orientation.getZ( );
 					staticTransformStamped.transform.rotation.w = orientation.getW( );
 
-					ROS_INFO_STREAM( "Anchor: " << "id=" << anchor.id <<
+					ROS_INFO_STREAM( "Stargazer anchor: " << "id=" << anchor.id <<
 						", frame_id=" << staticTransformStamped.header.frame_id <<
 						", child_frame_id=" << staticTransformStamped.child_frame_id <<
 						", x=" << staticTransformStamped.transform.translation.x <<
@@ -423,7 +416,7 @@ void StarGazer::LoadAnchors( )
 				}
 				catch( const boost::bad_lexical_cast& e )
 				{
-					ROS_INFO_STREAM( "Could not convert anchor id to int: " << anchor.id << " " << e.what( ) );
+					ROS_ERROR_STREAM( "Could not convert anchor id to int: " << anchor.id << " " << e.what( ) );
 				}
 			}
 		}
@@ -434,7 +427,64 @@ void StarGazer::LoadAnchors( )
 	}
 	catch( const std::runtime_error& e )
 	{
-		ROS_INFO_STREAM( "Could not parse yaml file for anchors: " << anchorsFilename << " " << e.what( ) );
+		ROS_ERROR_STREAM( "Could not parse yaml file for anchors: " << anchorsFilename << " " << e.what( ) );
+	}
+}
+
+void StarGazer::LoadCalibrationTransform( )
+{
+	string configurationFilename;
+	m_rosNodeHandle.param( "robot_configuration", configurationFilename, string( "" ) );
+
+	try
+	{
+		YAML::Node document = YAML::LoadFile( configurationFilename );
+
+		if( !document.IsNull( ) )
+		{
+			tf::Vector3 translation(
+				document["stargazer_offset"]["x"].as<double>( ),
+				document["stargazer_offset"]["y"].as<double>( ),
+				0.0f
+			);
+
+			m_stargazerTransform.setRotation( tf::Quaternion::getIdentity( ) );
+			m_stargazerTransform.setOrigin( translation );
+
+			ROS_INFO_STREAM( "Stargazer calibration: x=" << translation.getX( ) << ", y=" << translation.getY( ) );
+		}
+		else
+		{
+			ROS_ERROR_STREAM( "Stargazer calibration file not found: " << configurationFilename );
+		}
+	}
+	catch( const std::runtime_error& e )
+	{
+		ROS_ERROR_STREAM( "Could not parse yaml file for Stargazer calibration: " << configurationFilename << " " << e.what( ) );
+	}
+}
+
+void StarGazer::LoadFootprintTransform( )
+{
+	try
+	{
+		ros::Time now = ros::Time( 0 );
+
+		std::string strStargazerLink( "/stargazer_camera_frame" );
+		std::string strFootprint( "/base_footprint" );
+
+		m_listener.waitForTransform( strStargazerLink, strFootprint, now, ros::Duration( 10.0 ) );
+		m_listener.lookupTransform( strStargazerLink, strFootprint, now, m_baseFootprintTransform );
+
+		tf::Vector3 footprintOffset = m_baseFootprintTransform.getOrigin( );
+		tf::Quaternion rotationFootprint = m_baseFootprintTransform.getRotation( );
+
+		ROS_INFO_STREAM( "Stargazer base footprint offset: " << "x=" << footprintOffset.getX( ) <<
+			", y=" << footprintOffset.getY( ) << ", z=" << footprintOffset.getZ( ) << ", angle=" << tf::getYaw( rotationFootprint ) );
+	}
+	catch( const tf::TransformException& ex )
+	{
+		ROS_ERROR( "%s", ex.what( ) );
 	}
 }
 
@@ -446,7 +496,6 @@ std::string StarGazer::GetAnchorFrame( int tagID ) const
 
 	return std::move( stringStream.str( ) );
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods

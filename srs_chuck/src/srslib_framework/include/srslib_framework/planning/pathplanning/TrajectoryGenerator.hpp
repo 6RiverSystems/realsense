@@ -297,8 +297,6 @@ private:
             // velocity of the stretch)
             currentVelocity = BasicMath::saturate(currentVelocity, coastV, downVf);
 
-            cout << p << ": " << waypoint << ", " << Velocity<>(currentVelocity, 0.0) << endl;
-
             // Add the middle point and the velocity command to the trajectory
             trajectory_.push_back(waypoint, Velocity<>(currentVelocity, 0.0));
         }

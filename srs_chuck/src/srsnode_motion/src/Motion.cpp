@@ -332,7 +332,7 @@ void Motion::stepNode()
     // Output the velocity command to the brainstem
     if (commandGenerated)
     {
-        ROS_INFO_STREAM_NAMED("Motion", "Sending command: " << currentCommand_);
+        ROS_DEBUG_STREAM_NAMED("Motion", "Sending command: " << currentCommand_);
         outputVelocityCommand(currentCommand_);
     }
 
@@ -370,7 +370,7 @@ void Motion::executePlanToGoal(Pose<> goalPose)
     Grid2d::LocationType internalGoal(c2, r2);
     int goalAngle = AngleMath::normalizeRad2deg90(goalPose.theta);
 
-    ROS_INFO_STREAM("Looking for a path between " << robotPose << " (" <<
+    ROS_DEBUG_STREAM_NAMED("Motion", "Looking for a path between " << robotPose << " (" <<
         c1 << "," << r1 << "," << startAngle
         << ") and " << goalPose << " (" << c2 << "," << r2 << "," << goalAngle << ")");
 
@@ -387,9 +387,9 @@ void Motion::executePlanToGoal(Pose<> goalPose)
     }
     else
     {
-        ROS_INFO_STREAM("Path not found between " << robotPose << " (" <<
-            c1 << "," << r1 << "," << startAngle
-            << ") and " << goalPose << " (" << c2 << "," << r2 << "," << goalAngle << ")");
+        ROS_ERROR_NAMED("Motion", "Path not found between " <<
+            robotPose << " (" << c1 << "," << r1 << "," << startAngle << ") and " <<
+            goalPose << " (" << c2 << "," << r2 << "," << goalAngle << ")");
     }
 }
 

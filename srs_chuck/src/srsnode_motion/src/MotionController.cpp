@@ -76,25 +76,25 @@ void MotionController::run(Pose<> robotPose, Odometry<> odometry)
 {
     currentRobotPose_ = robotPose;
     currentOdometry_ = odometry;
-    ROS_INFO_STREAM_NAMED("MotionController", "Reported robot pose: " << currentRobotPose_);
-    ROS_INFO_STREAM_NAMED("MotionController", "Reported odometry: " << currentOdometry_);
+    ROS_DEBUG_STREAM_NAMED("MotionController", "Reported robot pose: " << currentRobotPose_);
+    ROS_DEBUG_STREAM_NAMED("MotionController", "Reported odometry: " << currentOdometry_);
 
     // Handle the current state
     currentState_ = nextState_;
     switch (currentState_)
     {
         case StateEnum::FOLLOWING:
-            ROS_INFO_STREAM_NAMED("MotionController", "State: FOLLOWING");
+            ROS_DEBUG_STREAM_NAMED("MotionController", "State: FOLLOWING");
             stateFollowing();
             break;
 
         case StateEnum::STANDING:
-            ROS_INFO_STREAM_NAMED("MotionController", "State: STANDING");
+            ROS_DEBUG_STREAM_NAMED("MotionController", "State: STANDING");
             stateStanding();
             break;
 
         case StateEnum::STOPPING:
-            ROS_INFO_STREAM_NAMED("MotionController", "State: STOPPING");
+            ROS_DEBUG_STREAM_NAMED("MotionController", "State: STOPPING");
             stateStopping();
             break;
 
@@ -115,27 +115,27 @@ void MotionController::run(Pose<> robotPose, Odometry<> odometry)
             switch (currentTask_)
             {
                 case TaskEnum::EMERGENCY_STOP:
-                    ROS_INFO_STREAM_NAMED("MotionController", "Requested task: EMERGENCY_STOP");
+                    ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: EMERGENCY_STOP");
                     taskEmergencyStop();
                     break;
 
                 case TaskEnum::FOLLOW:
-                    ROS_INFO_STREAM_NAMED("MotionController", "Requested task: FOLLOW");
+                    ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: FOLLOW");
                     taskFollow();
                     break;
 
                 case TaskEnum::NORMAL_STOP:
-                    ROS_INFO_STREAM_NAMED("MotionController", "Requested task: NORMAL_STOP");
+                    ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: NORMAL_STOP");
                     taskNormalStop();
                     break;
 
                 case TaskEnum::ROTATE:
-                    ROS_INFO_STREAM_NAMED("MotionController", "Requested task: ROTATE");
+                    ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: ROTATE");
                     taskRotate();
                     break;
 
                 case TaskEnum::STAND:
-                    ROS_INFO_STREAM_NAMED("MotionController", "Requested task: STAND");
+                    ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: STAND");
                     taskStand();
                     break;
 
@@ -190,12 +190,12 @@ void MotionController::stateFollowing()
     updateProjectionIndex();
 
     double distanceToGoal = PoseMath::euclidean(currentRobotPose_, goal_);
-    ROS_INFO_STREAM_NAMED("MotionController", "Distance to goal: " << distanceToGoal);
+    ROS_DEBUG_STREAM_NAMED("MotionController", "Distance to goal: " << distanceToGoal);
 
     if (distanceToGoal < robot_.goalReachedDistance)
     {
         goalReached_ = true;
-        ROS_INFO_STREAM_NAMED("MotionController", "Goal reached: " << goal_);
+        ROS_DEBUG_STREAM_NAMED("MotionController", "Goal reached: " << goal_);
 
         // Temporary fix to stop the robot when arriving to the goal
         // It should be removed when the velocities in the trajectory
@@ -209,7 +209,7 @@ void MotionController::stateFollowing()
         Velocity<> nextCommand;
 
         double distanceToReference = PoseMath::euclidean(currentRobotPose_, referencePose_);
-        ROS_INFO_STREAM_NAMED("MotionController", "Distance to reference: " << distanceToReference);
+        ROS_DEBUG_STREAM_NAMED("MotionController", "Distance to reference: " << distanceToReference);
 
         // Find the desired velocity command
         nextCommand = currentTrajectory_.getVelocity(projectionIndex_);
@@ -222,7 +222,7 @@ void MotionController::stateFollowing()
             nextCommand.linear * robot_.ratioLookAheadDistance,
             robot_.maxLookAheadDistance, robot_.minLookAheadDistance);
 
-        ROS_INFO_STREAM_NAMED("MotionController", "Look-ahead distance: " <<
+        ROS_DEBUG_STREAM_NAMED("MotionController", "Look-ahead distance: " <<
             dynamicLookAheadDistance_);
 
         pathFollower_.setLookAheadDistance(dynamicLookAheadDistance_);

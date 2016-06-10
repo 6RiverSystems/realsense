@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 
-#include <RealsenseDriver.h>
+#include "../../srsnode_realsense_to_laserscan/include/RealsenseDriver.h"
 
 int main( int argc, char** argv )
 {

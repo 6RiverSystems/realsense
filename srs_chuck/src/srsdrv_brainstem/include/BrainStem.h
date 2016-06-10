@@ -31,11 +31,15 @@ public:
 
 	void OnArrived( );
 
-	void OnButtonEvent( ENTITIES eButtonId );
+	void OnButtonEvent( LED_ENTITIES eButtonId );
 
 	void OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, float fAngularVelocity );
 
 private:
+
+	void GetHardwareInformation( );
+
+	void GetOperationalState( );
 
 	void OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity );
 

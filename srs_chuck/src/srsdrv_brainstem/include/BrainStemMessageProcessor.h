@@ -32,19 +32,17 @@ class BrainStemMessageProcessor {
 
 	typedef std::function<void()> ArrivedCallbackFn;
 
-	typedef std::function<void(ENTITIES)> ButtonCallbackFn;
+	typedef std::function<void(LED_ENTITIES)> ButtonCallbackFn;
 
 	typedef std::function<void(uint32_t, float, float)> OdometryCallbackFn;
 
 private:
 
-	bool							m_bControllerFault;
-
 	std::shared_ptr<IO>				m_pIO;
 
-	std::map<ENTITIES, std::string>	m_mapEntityButton;
+	std::map<LED_ENTITIES, std::string>	m_mapEntityButton;
 
-	std::map<std::string, ENTITIES>	m_mapButtonEntity;
+	std::map<std::string, LED_ENTITIES>	m_mapButtonEntity;
 
 	std::map<std::string, LED_MODE>	m_mapLedMode;
 
@@ -80,35 +78,41 @@ public:
 
 	void ProcessRosMessage( const std::string& strMessage );
 
+	void GetOperationalState( );
+
+	void GetHardwareInformation( );
+
 	void SetVelocity( double dfLinear, double dfAngular );
 
 	void SetConnected( bool bIsConnected );
 
+	void Shutdown( );
+
 // Helper
 
-	std::string GetButtonName( ENTITIES eButtonId ) const;
+	std::string GetButtonName( LED_ENTITIES eButtonId ) const;
 
 private:
 
 // Bridge Callbacks
 
-	void OnUI( std::vector<std::string> vecParams );
+	void OnClearMotionStatus( MOTION_STATUS eMotionStatus );
 
-	void OnStartup( std::vector<std::string> vecParams );
+	void OnHardStop( );
 
-	void OnDistance( std::vector<std::string> vecParams );
+	void OnPing( );
 
-	void OnRotate( std::vector<std::string> vecParams );
+	void OnResetBatteryHours( );
 
-	void OnStop( std::vector<std::string> vecParams );
+	void OnResetWheelMeters( );
 
-	void OnTurn( std::vector<std::string> vecParams );
+	void OnSetConfiguration( uint32_t configuration );
 
-	void OnVersion( std::vector<std::string> vecParams );
+	void OnUpdateLights( std::vector<std::string> vecParams );
 
 	void OnPause( std::vector<std::string> vecParams );
 
-	void OnReEnable( std::vector<std::string> vecParams );
+	void OnStartup( std::vector<std::string> vecParams );
 
 // Helper Methods
 

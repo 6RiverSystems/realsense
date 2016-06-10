@@ -5,7 +5,7 @@
 #
 cmake_minimum_required(VERSION 2.8.3)
 
-set(PROJECT_NAME srsdrv_realsense)
+set(PROJECT_NAME srsnode_realsense_to_laserscan)
 set(PROJECT_MAIN src/realsense_driver.cpp)
 set(${PROJECT_NAME}_SOURCES
     src/RealsenseDriver.cpp

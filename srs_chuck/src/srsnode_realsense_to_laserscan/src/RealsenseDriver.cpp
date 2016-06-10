@@ -78,8 +78,11 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan,
 	// TODO:  We currently have a problem if the image is than the number of scans
 	const uint32_t xStart = xDiff/2;
 
-	const double distanceFromBot = 0.300;
-	const double robotHalfWidth = 0.310 / 2.0f;
+	const double irRange = 0.3f;
+	const double distanceFromBot = 0.3f;
+	const double cameraFOV = 70.0f;
+	// Calculate the maximum FOV width based on the ir range
+	const double cameraMaxYOffset = irRange * tan( cameraFOV / 2.0f * M_PI / 180.0f );
 	const double irMaxHeight = 0.5f; // 50%
 
 	sensor_msgs::LaserScan irScan;
@@ -91,7 +94,7 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan,
 	irScan.scan_time		= scan->scan_time;
 	irScan.range_min		= 0.0f;
 	// Max distance should be the hypotenuse of the triangle
-	irScan.range_max		= sqrt((robotHalfWidth*robotHalfWidth)+(distanceFromBot*distanceFromBot));
+	irScan.range_max		= sqrt((cameraMaxYOffset*cameraMaxYOffset)+(distanceFromBot*distanceFromBot));
 	irScan.ranges.assign( numberOfScans, std::numeric_limits<double>::infinity( ) );
 
 	int maxHeight = combinedIRImage.rows / 2;
@@ -115,8 +118,8 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan,
 				double scanDistance = distanceFromBot / cos( angle );
 				double yOffset = abs( distanceFromBot * sin( angle ) );
 
-				// Only include data within the footprint (width) of the robot
-				if( yOffset <= robotHalfWidth )
+				// Only include data within the FOV of the camera
+				if( yOffset <= cameraMaxYOffset )
 				{
 					if( irScan.ranges[x] == std::numeric_limits<double>::infinity( ) )
 					{

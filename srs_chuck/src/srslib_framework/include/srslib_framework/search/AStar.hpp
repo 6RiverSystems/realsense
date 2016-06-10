@@ -76,7 +76,7 @@ public:
         {
             SolutionNode<GRAPH> node;
 
-            switch (cursor->action.actionType)
+            switch (cursor->action->actionType)
             {
                 case SearchAction<GRAPH>::NONE:
                     node.actionType = SolutionNode<GRAPH>::NONE;
@@ -107,11 +107,12 @@ public:
             double x = 0;
             double y = 0;
             getWorldCoordinates(graphResolution,
-                cursor->action.position.location.x, cursor->action.position.location.y,
+                cursor->action->position.location.x, cursor->action->position.location.y,
                 x, y);
 
-            node.pose = Pose<>(x, y, AngleMath::deg2rad<double>(cursor->action.position.orientation));
-            node.cost = cursor->action.getTotalCost();
+            node.pose = Pose<>(x, y,
+                AngleMath::deg2rad<double>(cursor->action->position.orientation));
+            node.cost = cursor->action->getTotalCost();
 
             result.insert(result.begin(), node);
             cursor = cursor->parent;
@@ -128,21 +129,25 @@ public:
             return false;
         }
 
-        SearchActionType startAction = SearchActionType(SearchActionType::START,
-            start, 0, SearchPosition<GRAPH>::heuristic(start, goal));
+        SearchActionType* startAction = SearchActionType::instanceOf(SearchActionType::START,
+            graph_, start, SearchPosition<GRAPH>::heuristic(start, goal));
         SearchNodeType* currentNode = new SearchNodeType(startAction, nullptr);
 
-        SearchActionType goalAction = SearchActionType(SearchActionType::NONE, goal);
-        SearchNodeType goalNode = SearchNodeType(goalAction, nullptr);
+        SearchActionType* goalAction = SearchActionType::instanceOf(SearchActionType::GOAL,
+            graph_, goal);
+        SearchNodeType* goalNode = new SearchNodeType(goalAction, nullptr);
 
         open_.push(currentNode->getTotalCost(), currentNode);
 
         while (!open_.empty())
         {
             open_.pop(currentNode);
-            if (*currentNode == goalNode)
+
+            if (*currentNode == *goalNode)
             {
-                SearchAction<GRAPH> searchAction = SearchAction<GRAPH>::instanceOf(
+                delete goalAction;
+
+                SearchActionType* searchAction = SearchActionType::instanceOf(
                     SearchActionType::GOAL,
                     graph_,
                     currentNode);
@@ -154,15 +159,15 @@ public:
 
             closed_.insert(currentNode);
 
-            for (auto action : SearchAction<GRAPH>::ACTIONS)
+            for (auto action : SearchActionType::ACTIONS)
             {
-                SearchAction<GRAPH> searchAction = SearchAction<GRAPH>::instanceOf(
+                SearchActionType* searchAction = SearchActionType::instanceOf(
                     action,
                     graph_,
                     currentNode);
 
-                if (searchAction.actionType != SearchAction<GRAPH>::NONE &&
-                    searchAction.getTotalCost() < SearchActionType::MAX_COST)
+                if (searchAction->actionType != SearchActionType::NONE &&
+                    searchAction->getTotalCost() < SearchActionType::MAX_COST)
                 {
                     SearchNodeType* newNode = new SearchNodeType(searchAction, currentNode);
                     pushSearchNode(newNode);

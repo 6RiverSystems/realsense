@@ -6,6 +6,10 @@
 #ifndef MAPNOTE_HPP_
 #define MAPNOTE_HPP_
 
+#include <string>
+#include <sstream>
+using namespace std;
+
 namespace srs {
 
 class MapNote
@@ -68,6 +72,15 @@ public:
     inline bool staticObstacle() const
     {
         return staticObstacle_;
+    }
+
+    friend ostream& operator<<(ostream& stream, const MapNote& mapNote)
+    {
+        return stream << "{" <<
+            (mapNote.goSlow_ ? "GS " : "   ") <<
+            (mapNote.noRotations_ ? "NR " : "   ") <<
+            (mapNote.od_ ? "OD " : "   ") <<
+            (mapNote.staticObstacle_ ? "SO" : "  ") << "}";
     }
 
 private:

@@ -62,33 +62,42 @@ public:
 
     friend ostream& operator<<(ostream& stream, const MappedPriorityQueue& queue)
     {
-        for (auto bucketIterator : queue.priorityQueue_)
+        if (queue.empty())
         {
-            for (auto item : *bucketIterator.second)
-            {
-                stream << bucketIterator.first << ": " << item << '\n';
-            }
+            stream << "(empty)";
         }
+        else
+        {
+            int counter = 0;
+            for (auto bucketIterator : queue.priorityQueue_)
+            {
+                for (auto item : *bucketIterator.second)
+                {
+                    stream << setw(4) << counter++ << ": [" <<
+                        setw(10) << bucketIterator.first << "] " << item << '\n';
+                }
+            }
 
-//        stream << "MappedPriorityQueue {" << '\n';
-//        stream << "Buckets" << endl;
-//        for (auto bucketIterator : queue.priorityQueue_)
-//        {
-//            stream << bucketIterator.first << ": {" << endl;
-//            for (auto item : *bucketIterator.second)
-//            {
-//                stream << item << '\n';
-//            }
-//            stream << "}" << '\n';
-//        }
-//
-//        stream << "Index map" << endl;
-//        for (auto item : queue.indexMap_)
-//        {
-//            stream << "(" << item.first << "  priority: " << item.second << ")\n";
-//        }
-//
-//        stream << "}";
+    //        stream << "MappedPriorityQueue {" << '\n';
+    //        stream << "Buckets" << endl;
+    //        for (auto bucketIterator : queue.priorityQueue_)
+    //        {
+    //            stream << bucketIterator.first << ": {" << endl;
+    //            for (auto item : *bucketIterator.second)
+    //            {
+    //                stream << item << '\n';
+    //            }
+    //            stream << "}" << '\n';
+    //        }
+    //
+    //        stream << "Index map" << endl;
+    //        for (auto item : queue.indexMap_)
+    //        {
+    //            stream << "(" << item.first << "  priority: " << item.second << ")\n";
+    //        }
+    //
+    //        stream << "}";
+        }
 
         return stream;
     }

@@ -99,6 +99,10 @@ set(TEST_SOURCES_GRAPH
     test/graph/Test_Grid2d_Basic.cpp
 )
 
+set(TEST_SOURCES_LOCALIZATION
+    test/localization/Test_Map_Reconstruction.cpp
+)
+
 set(TEST_SOURCES_PLANNING
     # test/planning/pathplanning/Test_Trajectory_180ShortTrajectory.cpp
     # test/planning/pathplanning/Test_Trajectory_LongStraight.cpp
@@ -113,7 +117,7 @@ set(TEST_SOURCES_ROBOTICS
 )
 
 set(TEST_SOURCES_SEARCH
-    test/search/Test_AStar_Basic.cpp
+    # test/search/Test_AStar_Basic.cpp
     test/search/Test_AStar_Map.cpp
 )
 
@@ -234,6 +238,17 @@ if (CATKIN_ENABLE_TESTING)
         ${TEST_SOURCES_GRAPH}
     )
     target_link_libraries(TestSuite_Graph
+        ${catkin_LIBRARIES}
+        ${PROJECT_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+    )
+
+    catkin_add_gtest(TestSuite_Localization
+        test/TestSuite.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_LOCALIZATION}
+    )
+    target_link_libraries(TestSuite_Localization
         ${catkin_LIBRARIES}
         ${PROJECT_LIBRARIES}
         ${srslib_test_LIBRARIES}

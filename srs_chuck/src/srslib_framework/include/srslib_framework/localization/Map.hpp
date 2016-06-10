@@ -42,7 +42,7 @@ public:
     }
 
     void getMapCoordinates(double x, double y, int& c, int& r);
-    void getCostsGrid(vector<int8_t>& costGrid);
+    void getCostsGrid(vector<int8_t>& costsGrid);
     void getNotesGrid(vector<int8_t>& notesGrid);
 
     tf::Quaternion getOrigin()
@@ -70,14 +70,17 @@ public:
         return widthM_;
     }
 
+    void print();
+
     void load(string filename);
 
-    void setGrid(const vector<int8_t>& costGrid, const vector<int8_t>& notesGrid);
+    void setGrid(const vector<int8_t>& costsGrid, const vector<int8_t>& notesGrid);
 
 private:
     const unsigned char FLAG_OD = 0x80;
     const unsigned char FLAG_GO_SLOW = 0x40;
     const unsigned char FLAG_NO_ROTATIONS = 0x20;
+    const unsigned char FLAG_STATIC_OBSTACLE = 0x01;
 
     MapNote* createNote(unsigned char flags, MapNote* note = nullptr);
 

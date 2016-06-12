@@ -25,12 +25,18 @@ public:
 
     bool empty() const
     {
-        return indexMap_.empty();
+        return indexMap_.empty() && priorityQueue_.empty();
     }
 
     void erase(TYPE item)
     {
-        PRIORITY priority = indexMap_[item];
+        auto result = indexMap_.find(item);
+        if (result == indexMap_.end())
+        {
+            return;
+        }
+
+        PRIORITY priority = result->second;
         indexMap_.erase(item);
 
         BucketType* bucket = priorityQueue_[priority];
@@ -134,7 +140,6 @@ public:
         auto bucketIterator = priorityQueue_.find(priority);
 
         BucketType* bucket;
-
         if (bucketIterator != priorityQueue_.end())
         {
             bucket = bucketIterator->second;
@@ -148,6 +153,11 @@ public:
 
         priorityQueue_[priority] = bucket;
         indexMap_[item] = priority;
+    }
+
+    size_t size()
+    {
+        return indexMap_.size();
     }
 
 private:

@@ -92,14 +92,13 @@ private:
 
     static SearchAction<GRAPH>* addBackward(GRAPH* graph, SearchNode<GRAPH>* associatedNode)
     {
-        SearchAction<GRAPH>* action = new SearchAction<GRAPH>(BACKWARD);
         int currentOrientation = associatedNode->action->position.orientation;
-
         int direction = AngleMath::normalizeAngleDeg(currentOrientation - 180);
 
         typename GRAPH::LocationType neighbor;
         if (graph->getNeighbor(associatedNode->action->position.location, direction, neighbor))
         {
+            SearchAction<GRAPH>* newAction = new SearchAction<GRAPH>(BACKWARD);
             SearchPosition<GRAPH> newPosition(neighbor, currentOrientation);
 
             const MapNote* note = reinterpret_cast<const MapNote*>(graph->getNote(neighbor));
@@ -110,11 +109,11 @@ private:
             unsigned int commandCost = getCommandCost(BACKWARD, note);
             unsigned int totalCost = BasicMath::noOverflowAdd(locationCost, commandCost);
 
-            action->position = newPosition;
-            action->g = BasicMath::noOverflowAdd(associatedNode->action->g, totalCost);
-            action->h = associatedNode->action->h;
+            newAction->position = newPosition;
+            newAction->g = BasicMath::noOverflowAdd(associatedNode->action->g, totalCost);
+            newAction->h = associatedNode->action->h;
 
-            return action;
+            return newAction;
         }
 
         return nullptr;
@@ -122,12 +121,12 @@ private:
 
     static SearchAction<GRAPH>* addForward(GRAPH* graph, SearchNode<GRAPH>* associatedNode)
     {
-        SearchAction<GRAPH>* action = new SearchAction<GRAPH>(FORWARD);
         int currentOrientation = associatedNode->action->position.orientation;
 
         typename GRAPH::LocationType neighbor;
         if (graph->getNeighbor(associatedNode->action->position.location, currentOrientation, neighbor))
         {
+            SearchAction<GRAPH>* newAction = new SearchAction<GRAPH>(FORWARD);
             SearchPosition<GRAPH> newPosition(neighbor, currentOrientation);
 
             const MapNote* note = reinterpret_cast<const MapNote*>(graph->getNote(neighbor));
@@ -138,11 +137,11 @@ private:
             unsigned int commandCost = getCommandCost(FORWARD, note);
             unsigned int totalCost = BasicMath::noOverflowAdd(locationCost, commandCost);
 
-            action->position = newPosition;
-            action->g = BasicMath::noOverflowAdd(associatedNode->action->g, totalCost);
-            action->h = associatedNode->action->h;
+            newAction->position = newPosition;
+            newAction->g = BasicMath::noOverflowAdd(associatedNode->action->g, totalCost);
+            newAction->h = associatedNode->action->h;
 
-            return action;
+            return newAction;
         }
 
         return nullptr;
@@ -151,7 +150,7 @@ private:
     static SearchAction<GRAPH>* addRotation(GRAPH* graph, SearchNode<GRAPH>* associatedNode,
         ActionEnum actionEnum, int angle)
     {
-        SearchAction<GRAPH>* action = new SearchAction<GRAPH>(actionEnum);
+        SearchAction<GRAPH>* newAction = new SearchAction<GRAPH>(actionEnum);
         int currentOrientation = associatedNode->action->position.orientation;
 
         int newOrientation = AngleMath::normalizeAngleDeg(currentOrientation + angle);
@@ -162,11 +161,11 @@ private:
 
         unsigned int commandCost = getCommandCost(actionEnum, note);
 
-        action->position = newPosition;
-        action->g = BasicMath::noOverflowAdd(associatedNode->action->g, commandCost);
-        action->h = associatedNode->action->h;
+        newAction->position = newPosition;
+        newAction->g = BasicMath::noOverflowAdd(associatedNode->action->g, commandCost);
+        newAction->h = associatedNode->action->h;
 
-        return action;
+        return newAction;
     }
 
     static unsigned int getCommandCost(ActionEnum action, const MapNote* MapNote)

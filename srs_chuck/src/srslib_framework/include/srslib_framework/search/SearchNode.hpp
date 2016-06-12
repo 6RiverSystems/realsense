@@ -23,7 +23,10 @@ struct SearchNode
 
     ~SearchNode()
     {
-        delete action;
+        if (action)
+        {
+            delete action;
+        }
     }
 
     unsigned int getTotalCost()

@@ -51,9 +51,6 @@ TEST(Test_AStar, WithMap)
 
     delete algorithm;
 
-    Solution<Grid2d> solution = algorithm->getSolution(map->getResolution());
-    cout << solution << endl;
-
     cout << "Memory usage: " << memoryWatch.getMemoryUsage() << endl;
     cout << "Memory leaks: " << !memoryWatch.isZero() << endl;
 }

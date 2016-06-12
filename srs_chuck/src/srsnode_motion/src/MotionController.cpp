@@ -215,7 +215,7 @@ void MotionController::stateFollowing()
         nextCommand = currentTrajectory_.getVelocity(projectionIndex_);
 
         // Ask the low-level controller to modulate the desired velocity
-        nextCommand = pathFollower_.step(currentRobotPose_, nextCommand);
+        nextCommand = pathFollower_.stepController(currentRobotPose_, referencePose_, nextCommand);
 
         // Recalculate the look-ahead distance based roughly on the velocity
         dynamicLookAheadDistance_ = BasicMath::saturate(
@@ -276,9 +276,6 @@ void MotionController::taskFollow()
         referenceIndex_ = currentTrajectory_.findClosestPose(currentRobotPose_);
         referencePose_ = currentTrajectory_.getPose(referenceIndex_);
 
-        // Set the reference in the low-level controller
-        pathFollower_.setReference(referencePose_);
-
         // Find the projection of the current robot pose onto the trajectory
         projectionIndex_ = currentTrajectory_.findClosestPose(currentRobotPose_,
             0, robot_.maxLookAheadDistance);
@@ -316,7 +313,6 @@ void MotionController::updateProjectionIndex()
         dynamicLookAheadDistance_);
 
     referencePose_ = currentTrajectory_.getPose(referenceIndex_);
-    pathFollower_.setReference(referencePose_);
 }
 
 } // namespace srs

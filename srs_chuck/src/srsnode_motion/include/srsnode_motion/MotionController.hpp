@@ -28,7 +28,7 @@ class MotionController
 public:
     MotionController(double dT) :
         dT_(dT),
-        pathFollower_(1, 1)
+        pathFollower_()
     {
         reset();
     }

@@ -15,9 +15,9 @@ namespace srs {
 class BaseController
 {
 public:
-    BaseController(double Kv, double Kw) :
-        Kv_(Kv),
-        Kw_(Kw),
+    BaseController() :
+        Kv_(1.0),
+        Kw_(1.0),
         maxAngular_(0.0),
         maxLinear_(0.0),
         travelAngular_(0.0),
@@ -27,7 +27,13 @@ public:
     virtual ~BaseController()
     {}
 
-    virtual Velocity<> step(Pose<> currentPose, Velocity<> command) = 0;
+    virtual Velocity<> stepController(Pose<> currentPose, Pose<> desiredPose, Velocity<> command) = 0;
+
+    void setVelocityGains(double Kv, double Kw)
+    {
+        Kv_ = Kv;
+        Kw_ = Kw;
+    }
 
     void setMaxAngularVelocity(double value)
     {
@@ -49,11 +55,6 @@ public:
         travelLinear_ = value;
     }
 
-    void setReference(Pose<> referencePose)
-    {
-        referencePose_ = referencePose;
-    }
-
 protected:
     double Kv_;
     double Kw_;
@@ -63,8 +64,6 @@ protected:
 
     double travelAngular_;
     double travelLinear_;
-
-    Pose<> referencePose_;
 };
 
 } // namespace srs

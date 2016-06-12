@@ -21,8 +21,6 @@ typedef SolutionNode<Grid2d> SolutionNodeType;
 
 TEST(Test_Trajectory, ShortTrajectory)
 {
-    Grid2d grid(10, 10);
-
     SolutionNodeType SOLUTION_00 = SolutionNodeType(SolutionNodeType::START,
         Pose<>(18, 7, AngleMath::deg2rad<double>(90)));
 

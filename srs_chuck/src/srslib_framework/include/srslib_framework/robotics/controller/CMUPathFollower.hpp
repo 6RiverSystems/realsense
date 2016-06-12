@@ -21,8 +21,8 @@ namespace srs {
 class CMUPathFollower: public BaseController
 {
 public:
-    CMUPathFollower(double Kv, double Kw) :
-        BaseController(Kv, Kw),
+    CMUPathFollower() :
+        BaseController(),
         lookAheadDistance_(0.5),
         travelRotationVelocity_(0.1)
     {}
@@ -40,14 +40,14 @@ public:
         travelRotationVelocity_ = value;
     }
 
-    Velocity<> step(Pose<> currentPose, Velocity<> command)
+    Velocity<> stepController(Pose<> currentPose, Pose<> desiredPose, Velocity<> command)
     {
         // Calculate the linear portion of the command
         double linear = Kv_ * command.linear;
         linear = BasicMath::saturate<double>(linear, maxLinear_, -maxLinear_);
 
         // Calculate the angular portion of the command
-        double slope = atan2(referencePose_.y - currentPose.y, referencePose_.x - currentPose.x);
+        double slope = atan2(desiredPose.y - currentPose.y, desiredPose.x - currentPose.x);
         double alpha = AngleMath::normalizeAngleRad(slope - currentPose.theta);
 
         double angular = Kw_ * 2 * sin(alpha) / lookAheadDistance_;

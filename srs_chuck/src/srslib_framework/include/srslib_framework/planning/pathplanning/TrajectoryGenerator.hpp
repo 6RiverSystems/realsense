@@ -34,16 +34,17 @@ public:
         robot_(robot)
     {}
 
-    void fromTravelRamp(Pose<> pose, double v0, double vf, double dT)
+    void fromRotation(Pose<> pose0, double thetaf, double dT)
     {
         trajectory_.clear();
         path_.clear();
         pathReduced_.clear();
 
-        if (BasicMath::fpEqual<double>(v0, vf))
+        if (BasicMath::fpEqual<double>(pose0.theta, thetaf))
         {
             return;
         }
+        interpolateRotation(pose0, pose0.theta, thetaf, dT);
     }
 
     void fromSolution(Solution<Grid2d>& solution, double dT)
@@ -192,6 +193,74 @@ private:
             segment++;
             fromWaypoint++;
             toWaypoint++;
+        }
+    }
+
+    void interpolateRotation(Pose<> waypoint, double theta0, double thetaf, double dT)
+    {
+        // Calculate the change in velocity that can be achieved
+        // with the specified travel acceleration and time interval
+        double deltaVelocity = robot_.travelAngularVelocity * dT;
+
+        // They keep track of the initial and final velocities
+        // for the ramp up and the ramp down in the segment
+        double coastV = robot_.travelAngularVelocity;
+
+        // Measure the distance between the two orientations
+        double d = AngleMath::normalizeAngleRad(thetaf - theta0);
+
+        // Calculate how many midpoints between the two waypoints
+        int totalMidpoints = ceil(abs(d) / deltaVelocity);
+
+        double deltaAngle = d / totalMidpoints;
+
+        // Calculate the points needed to ramp up and down the velocity
+        // using the default coasting values
+        int rampUpPoints = floor((coastV) / deltaVelocity) - 1;
+        int rampDownPoints = floor((coastV) / deltaVelocity) + 1;
+
+        // If the segment is not the last stretch, slow down earlier
+        // to maintain the curving velocity
+        int rampDownIndex = totalMidpoints - rampDownPoints;
+
+        // If it is not possible, calculate the maximum velocity achievable
+        if (rampUpPoints + rampDownPoints > totalMidpoints)
+        {
+            rampUpPoints = totalMidpoints / 2;
+            rampDownPoints = totalMidpoints - rampUpPoints;
+            rampDownIndex = rampDownPoints;
+
+            // There is not enough space to go full travel speed. The
+            // coasting velocity must be adjusted
+            coastV = rampUpPoints * deltaVelocity;
+        }
+
+        // Current velocity
+        double currentVelocity = 0.0;
+
+        // Begin from the initial waypoint
+        for (int p = 0; p < totalMidpoints; p++)
+        {
+            // Calculate the new angle
+            waypoint.theta += deltaAngle;
+
+            // Change the velocity based on where the middle point. If
+            // no change is applied, the robot is coasting
+            if (p < rampDownIndex)
+            {
+                currentVelocity += deltaVelocity;
+            }
+            else if (p >= rampDownIndex)
+            {
+                currentVelocity -= deltaVelocity;
+            }
+
+            // Saturate between the selected extremes (coast and final
+            // velocity of the stretch)
+            currentVelocity = BasicMath::saturate(currentVelocity, coastV, 0.0);
+
+            // Add the middle point and the velocity command to the trajectory
+            trajectory_.push_back(waypoint, Velocity<>(0.0, currentVelocity));
         }
     }
 

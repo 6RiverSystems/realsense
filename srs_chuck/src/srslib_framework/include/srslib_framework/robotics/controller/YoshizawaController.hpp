@@ -14,20 +14,20 @@ namespace srs {
 class YoshizawaController : public BaseController
 {
 public:
-    YoshizawaController(double Kv, double Kw) :
-        BaseController(Kv, Kw)
+    YoshizawaController() :
+        BaseController()
     {}
 
     ~YoshizawaController()
     {}
 
-    Velocity<> step(Pose<> currentPose, Velocity<> command)
+    Velocity<> stepController(Pose<> currentPose, Pose<> desiredPose, Velocity<> command)
     {
         // [ex, ey] = calculateError(o.rPose, cPose);
         double c = cos(currentPose.theta);
         double s = sin(currentPose.theta);
-        double deltaX = referencePose_.x - currentPose.x;
-        double deltaY = referencePose_.y - currentPose.y;
+        double deltaX = desiredPose.x - currentPose.x;
+        double deltaY = desiredPose.y - currentPose.y;
 
         double ex = deltaX * c + deltaY * s;
         double ey = -deltaX * s + deltaY * c;

@@ -20,8 +20,6 @@ typedef SolutionNode<Grid2d> SolutionModeType;
 
 TEST(Test_Trajectory, LongStraight)
 {
-    Grid2d grid(10, 10);
-
     SolutionModeType SOLUTION_00 = SolutionModeType(SolutionModeType::START,
         Pose<>(0, 0, AngleMath::deg2rad<double>(90)));
 

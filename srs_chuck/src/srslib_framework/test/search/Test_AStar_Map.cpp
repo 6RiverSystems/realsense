@@ -12,6 +12,8 @@ using namespace std;
 #include <srslib_framework/localization/Map.hpp>
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/localization/MapNote.hpp>
+
+#include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 
 TEST(Test_AStar, WithMap)
@@ -37,10 +39,21 @@ TEST(Test_AStar, WithMap)
     map = new Map(widthCells, heightCells, resolution);
     map->setGrid(costGrid, notesGrid);
 
-    AStar<Grid2d> algorithm(map->getGrid());
+    test::MemoryWatch memoryWatch;
 
-    algorithm.search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 0));
+    AStar<Grid2d>* algorithm = new AStar<Grid2d>(map->getGrid());
 
-    Solution<Grid2d> solution = algorithm.getSolution(map->getResolution());
+    cout << "Found: " <<
+        algorithm->search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 0)) <<
+        endl;
+
+    algorithm->clear();
+
+    delete algorithm;
+
+    Solution<Grid2d> solution = algorithm->getSolution(map->getResolution());
     cout << solution << endl;
+
+    cout << "Memory usage: " << memoryWatch.getMemoryUsage() << endl;
+    cout << "Memory leaks: " << !memoryWatch.isZero() << endl;
 }

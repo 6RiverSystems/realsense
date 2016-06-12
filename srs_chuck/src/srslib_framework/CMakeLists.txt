@@ -117,7 +117,7 @@ set(TEST_SOURCES_ROBOTICS
 )
 
 set(TEST_SOURCES_SEARCH
-    # test/search/Test_AStar_Basic.cpp
+    test/search/Test_AStar_Basic.cpp
     test/search/Test_AStar_Map.cpp
 )
 

@@ -12,6 +12,7 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/graph/grid2d/Grid2dUtils.hpp
 
     include/${PROJECT_NAME}/utils/Compare.hpp
+    include/${PROJECT_NAME}/utils/MemoryWatch.hpp
     include/${PROJECT_NAME}/utils/Print.hpp
 )
 

@@ -16,10 +16,10 @@ namespace srs {
  * Automobile Path Tracking", Robotics Institute, Carnegie Mellon
  * University, Pittsburgh, PA, USA, Tech. Report CMU-RI-TR-09-08, Feb. 2009
  */
-class CMUPathFollower: public BaseController
+class CMUPathController: public BaseController
 {
 public:
-    CMUPathFollower() :
+    CMUPathController() :
         BaseController(),
         dynamicLookAheadDistance_(0.5),
         maxLookAheadDistance_(0.5),
@@ -31,7 +31,7 @@ public:
         travelRotationVelocity_(0.1)
     {}
 
-    ~CMUPathFollower()
+    ~CMUPathController()
     {}
 
     void reset();
@@ -58,9 +58,9 @@ public:
         travelRotationVelocity_ = value;
     }
 
+private:
     void stepController(Pose<> currentPose, Odometry<> currentOdometry);
 
-private:
     void updateLookAheadDistance();
     void updateProjectionIndex(Pose<> robotPose);
 

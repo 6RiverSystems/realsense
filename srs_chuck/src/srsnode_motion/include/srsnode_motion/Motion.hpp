@@ -57,7 +57,6 @@ private:
     void evaluateTriggers();
 
     void onConfigChange(MotionConfig& config, uint32_t level);
-    void outputVelocityCommand(Velocity<> outputCommand);
 
     void publishInformation();
 
@@ -79,7 +78,6 @@ private:
 
     PositionEstimator positionEstimator_;
     ros::Time previousTime_;
-    ros::Publisher pubCmdVel_;
     ros::Publisher pubOdometry_;
 
     ros::NodeHandle rosNodeHandle_;
@@ -88,7 +86,7 @@ private:
 
     RosTapAps tapAps_;
     // RosTapGoalPlan tapPlan_;
-    RosTapJoyAdapter<> tapJoyAdapter_;
+    RosTapJoyAdapter tapJoyAdapter_;
     RosTapBrainStem tapBrainStem_;
     RosTapOdometry tapOdometry_;
     RosTapInitialPose tapInitialPose_; // TODO: This should be a command (trigger) passed down by Executive

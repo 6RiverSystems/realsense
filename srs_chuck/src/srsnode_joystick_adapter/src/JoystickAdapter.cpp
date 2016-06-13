@@ -52,28 +52,23 @@ void JoystickAdapter::run()
                 }
 
                 Velocity<> currentVelocity = tapJoy_.getVelocity();
+
                 double linear = configuration_.ratio_linear * currentVelocity.linear;
                 double angular = configuration_.ratio_angular * currentVelocity.angular;
 
-                // If the robot is moving backward and at the same time
-                // rotating, invert the direction of rotation. No transformation
-                // is performed if the robot is rotating in place (linear = 0)
-                angular *= BasicMath::sgn(linear);
-
                 geometry_msgs::Twist messageVelocity;
 
-                messageVelocity.linear.x = BasicMath::threshold(linear,
+                messageVelocity.linear.x = BasicMath::threshold<double>(linear,
                     configuration_.threshold_linear, 0.0);
                 messageVelocity.linear.y = 0.0;
                 messageVelocity.linear.z = 0.0;
 
                 messageVelocity.angular.x = 0.0;
                 messageVelocity.angular.y = 0.0;
-                messageVelocity.angular.z = BasicMath::threshold(angular,
+                messageVelocity.angular.z = BasicMath::threshold<double>(angular,
                     configuration_.threshold_angular, 0.0);
 
-                ROS_DEBUG_STREAM("l: " << linear << ", a: " << angular);
-                ROS_DEBUG_STREAM(messageVelocity);
+                ROS_DEBUG_STREAM_NAMED("JoystickAdapter", "l: " << linear << ", a: " << angular);
 
                 pubCommand_.publish(messageVelocity);
             }

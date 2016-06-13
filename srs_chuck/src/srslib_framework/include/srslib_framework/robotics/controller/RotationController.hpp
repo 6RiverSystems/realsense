@@ -35,6 +35,7 @@ public:
         Kd_ = Kd;
     }
 
+protected:
     Velocity<> stepController(Pose<> currentPose, Odometry<> currentOdometry)
     {
         double error = AngleMath::normalizeAngleRad(desiredPose.theta - currentPose.theta);

@@ -6,6 +6,8 @@
 #ifndef BASECONTROLLER_HPP_
 #define BASECONTROLLER_HPP_
 
+#include <ros/ros.h>
+
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
@@ -20,8 +22,10 @@ public:
         executingCommand_(Velocity<>()),
         goal_(Pose<>()),
         goalReached_(false),
+        goalReachedDistance_(0.1),
         Kv_(1.0),
         Kw_(1.0),
+        isRobotMoving_(false),
         maxAngular_(0.0),
         maxLinear_(0.0),
         newCommandAvailable_(false),
@@ -38,24 +42,27 @@ public:
         return executingCommand_;
     }
 
-    Pose<> getGoal()
+    Pose<> getGoal() const
     {
         return goal_;
     }
 
-    bool isGoalReached()
+    bool isGoalReached() const
     {
         return goalReached_;
     }
 
-    bool newCommandAvailable()
+    bool isRobotMoving() const
+    {
+        return isRobotMoving_;
+    }
+
+    bool newCommandAvailable() const
     {
         return newCommandAvailable_;
     }
 
     virtual void reset() = 0;
-
-    virtual void stepController(Pose<> currentPose, Odometry<> currentOdometry) = 0;
 
     void setGoal(Pose<> goal)
     {
@@ -93,6 +100,16 @@ public:
         Kw_ = Kw;
     }
 
+    void step(Pose<> currentPose, Odometry<> currentOdometry)
+    {
+        // Perform some basic operations before calling
+        // the specific controller step
+        isRobotMoving_ = !similarVelocities(currentOdometry.velocity, Velocity<>());
+
+        // Call the controller
+        stepController(currentPose, currentOdometry);
+    }
+
 protected:
     void executeCommand(Velocity<> command)
     {
@@ -108,6 +125,8 @@ protected:
         return abs(lhv.linear - rhv.linear) < 0.01 && abs(lhv.angular - rhv.angular) < 0.002;
     }
 
+    virtual void stepController(Pose<> currentPose, Odometry<> currentOdometry) = 0;
+
     Velocity<> executingCommand_;
 
     Pose<> goal_;
@@ -116,6 +135,8 @@ protected:
 
     double Kv_;
     double Kw_;
+
+    bool isRobotMoving_;
 
     double maxAngular_;
     double maxLinear_;

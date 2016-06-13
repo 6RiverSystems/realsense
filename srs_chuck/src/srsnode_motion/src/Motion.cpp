@@ -26,9 +26,9 @@ Motion::Motion(string nodeName) :
     robot_(),
     currentCommand_(),
     firstLocalization_(true),
+    rosNodeHandle_(nodeName),
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
     motionController_(1.0 / REFRESH_RATE_HZ),
-    rosNodeHandle_(nodeName),
     // tapPlan_(rosNodeHandle_),
     tapJoyAdapter_(rosNodeHandle_),
     tapBrainStem_(rosNodeHandle_),
@@ -42,7 +42,6 @@ Motion::Motion(string nodeName) :
 {
     motionController_.setRobot(robot_);
 
-    pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 100);
     pubOdometry_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("odometry", 50);
 
     positionEstimator_.addSensor(tapAps_.getSensor());
@@ -172,22 +171,7 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     tapOdometry_.getSensor()->enable(configuration_.odometry_enabled);
     ROS_INFO_STREAM("Odometry sensor enabled: " << configuration_.odometry_enabled);
 
-    //motionController_.setRobot(robot_);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::outputVelocityCommand(Velocity<> outputCommand)
-{
-    geometry_msgs::Twist messageTwist;
-
-    messageTwist.linear.x = outputCommand.linear;
-    messageTwist.linear.y = 0;
-    messageTwist.linear.z = 0;
-    messageTwist.angular.x = 0;
-    messageTwist.angular.y = 0;
-    messageTwist.angular.z = outputCommand.angular;
-
-    pubCmdVel_.publish(messageTwist);
+    motionController_.setRobot(robot_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -295,58 +279,52 @@ void Motion::reset(Pose<> pose0)
 void Motion::stepNode()
 {
     bool odometryAvailable = tapOdometry_.newDataAvailable();
-    Odometry<> odometry = tapOdometry_.getSensor()->getOdometry();
+    Odometry<> currentOdometry = tapOdometry_.getSensor()->getOdometry();
 
-    bool commandGenerated = false;
+    Velocity<> currentJoystickCommand = tapJoyAdapter_.getVelocity();
 
     // If the joystick was touched, we know that we are latched
     if (tapJoyAdapter_.newDataAvailable())
     {
-        // Stop the motion controller from whatever it was doing
-        motionController_.normalStop();
-
-        commandGenerated = true;
-        currentCommand_ = tapJoyAdapter_.getVelocity();
-    }
-    else {
-        // Run the motion controller with the current pose estimate
-        // only if the joystick is not latched
-        if (!tapJoyAdapter_.getLatchState())
+        // If the joystick was touched, we know that we are latched
+        if (tapJoyAdapter_.getLatchState())
         {
-            motionController_.run(positionEstimator_.getPose(), odometry);
-
-            if (motionController_.newCommandAvailable())
-            {
-                currentCommand_ = motionController_.getExecutingCommand();
-                commandGenerated = true;
-            }
+            // Tell the motion controller that the joystick is
+            // assuming control
+            motionController_.switchToManual();
+        }
+        else {
+            // Tell the motion controller that the joystick is
+            // assuming control
+            motionController_.switchToAutonomous();
         }
     }
 
     // Provide the command to the position estimator
     if (odometryAvailable)
     {
-        positionEstimator_.run(odometry);
+        positionEstimator_.run(&currentOdometry);
     }
+    Pose<> currentPose = positionEstimator_.getPose();
 
-    // Output the velocity command to the brainstem
-    if (commandGenerated)
+    motionController_.run(currentPose, currentOdometry, currentJoystickCommand);
+
+    if (motionController_.isMoving())
     {
-        ROS_DEBUG_STREAM_NAMED("Motion", "Sending command: " << currentCommand_);
-        outputVelocityCommand(currentCommand_);
-    }
+        currentCommand_ = motionController_.getExecutingCommand();
 
-    // If the brain stem is disconnected and the motion controller is moving, simulate odometry
-    // feeding the odometer with the commanded velocity
-    if (motionController_.isMoving() && !tapBrainStem_.isBrainStemConnected())
-    {
-        ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
-            "Brainstem disconnected. Using simulated odometry");
+        // If the brain stem is disconnected and the motion controller is moving, simulate odometry
+        // feeding the odometer with the commanded velocity
+        if (!tapBrainStem_.isBrainStemConnected())
+        {
+            ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
+                "Brainstem disconnected. Using simulated odometry");
 
-        simulatedT_ += 1.0 / REFRESH_RATE_HZ;
-        tapOdometry_.set(simulatedT_,
-            currentCommand_.linear,
-            currentCommand_.angular);
+            simulatedT_ += 1.0 / REFRESH_RATE_HZ;
+            tapOdometry_.set(simulatedT_,
+                currentCommand_.linear,
+                currentCommand_.angular);
+        }
     }
 }
 
@@ -358,21 +336,21 @@ void Motion::executePlanToGoal(Pose<> goalPose)
 
     algorithm_.setGraph(tapMap_.getMap()->getGrid());
 
-    int r1 = 0;
-    int c1 = 0;
-    tapMap_.getMap()->getMapCoordinates(robotPose.x, robotPose.y, c1, r1);
-    Grid2d::LocationType internalStart(c1, r1);
+    int fromR = 0;
+    int fromC = 0;
+    tapMap_.getMap()->getMapCoordinates(robotPose.x, robotPose.y, fromC, fromR);
+    Grid2d::LocationType internalStart(fromC, fromR);
     int startAngle = AngleMath::normalizeRad2deg90(robotPose.theta);
 
-    int r2 = 0;
-    int c2 = 0;
-    tapMap_.getMap()->getMapCoordinates(goalPose.x, goalPose.y, c2, r2);
-    Grid2d::LocationType internalGoal(c2, r2);
+    int toR = 0;
+    int toC = 0;
+    tapMap_.getMap()->getMapCoordinates(goalPose.x, goalPose.y, toC, toR);
+    Grid2d::LocationType internalGoal(toC, toR);
     int goalAngle = AngleMath::normalizeRad2deg90(goalPose.theta);
 
     ROS_DEBUG_STREAM_NAMED("Motion", "Looking for a path between " << robotPose << " (" <<
-        c1 << "," << r1 << "," << startAngle
-        << ") and " << goalPose << " (" << c2 << "," << r2 << "," << goalAngle << ")");
+        fromC << "," << fromR << "," << startAngle
+        << ") and " << goalPose << " (" << toC << "," << toR << "," << goalAngle << ")");
 
     algorithm_.search(
         SearchPosition<Grid2d>(internalStart, startAngle),
@@ -388,8 +366,8 @@ void Motion::executePlanToGoal(Pose<> goalPose)
     else
     {
         ROS_ERROR_STREAM_NAMED("Motion", "Path not found between " <<
-            robotPose << " (" << c1 << "," << r1 << "," << startAngle << ") and " <<
-            goalPose << " (" << c2 << "," << r2 << "," << goalAngle << ")");
+            robotPose << " (" << fromC << "," << fromR << "," << startAngle << ") and " <<
+            goalPose << " (" << toC << "," << toR << "," << goalAngle << ")");
     }
 }
 

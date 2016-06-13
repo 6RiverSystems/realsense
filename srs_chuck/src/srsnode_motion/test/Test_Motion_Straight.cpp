@@ -91,7 +91,7 @@ TEST(Test_Motion, Straight)
         cout << odometry << endl;
 
         // Run the step of the UKF
-        ukf.run(DT, odometry);
+        ukf.run(DT, &odometry);
 
         // ASSERT_TRUE(test::Compare::similar<>(ukf.getX(), correctStates[t], 1e-1)) <<
         //    " State vector at time-step " << t;

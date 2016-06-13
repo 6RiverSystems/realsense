@@ -1,4 +1,4 @@
-#include <srslib_framework/robotics/controller/CMUPathFollower.hpp>
+#include <srslib_framework/robotics/controller/CMUPathController.hpp>
 
 #include <ros/ros.h>
 
@@ -11,7 +11,7 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMUPathFollower::reset()
+void CMUPathController::reset()
 {
     dynamicLookAheadDistance_ = maxLookAheadDistance_;
 
@@ -26,7 +26,7 @@ void CMUPathFollower::reset()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMUPathFollower::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
+void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
 {
     currentTrajectory_ = trajectory;
     if (!currentTrajectory_.empty())
@@ -45,13 +45,16 @@ void CMUPathFollower::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMUPathFollower::stepController(Pose<> currentPose, Odometry<> currentOdometry)
+// Protected methods
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void CMUPathController::stepController(Pose<> currentPose, Odometry<> currentOdometry)
 {
     // Update the projection of the current robot pose onto the path
     updateProjectionIndex(currentPose);
 
     double distanceToGoal = PoseMath::euclidean(currentPose, goal_);
-    ROS_DEBUG_STREAM_NAMED("CMUPathFollower", "Distance to goal: " << distanceToGoal);
+    ROS_DEBUG_STREAM_NAMED("CMUPathController", "Distance to goal: " << distanceToGoal);
 
     double linear = 0.0;
     double angular = 0.0;
@@ -98,7 +101,7 @@ void CMUPathFollower::stepController(Pose<> currentPose, Odometry<> currentOdome
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMUPathFollower::updateLookAheadDistance()
+void CMUPathController::updateLookAheadDistance()
 {
     // Recalculate the look-ahead distance based roughly on the velocity
     dynamicLookAheadDistance_ = BasicMath::saturate(
@@ -107,7 +110,7 @@ void CMUPathFollower::updateLookAheadDistance()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMUPathFollower::updateProjectionIndex(Pose<> robotPose)
+void CMUPathController::updateProjectionIndex(Pose<> robotPose)
 {
     projectionIndex_ = currentTrajectory_.findClosestPose(robotPose,
         projectionIndex_, dynamicLookAheadDistance_);

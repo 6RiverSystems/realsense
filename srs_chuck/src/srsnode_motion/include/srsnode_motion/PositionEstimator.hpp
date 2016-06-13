@@ -65,12 +65,12 @@ public:
         ukf_.reset(currentState.getVectorForm(), currentCovariance);
     }
 
-    void run(Odometry<> odometry)
+    void run(Odometry<>* odometry)
     {
-        ROS_INFO_STREAM_NAMED("PositionEstimator", "Position Estimator Odometry: " << odometry);
+        ROS_DEBUG_STREAM_NAMED("PositionEstimator", "Position Estimator Odometry: " << odometry);
 
         // Calculate the elapsed time between odometry readings
-        double currentTime = odometry.velocity.arrivalTime;
+        double currentTime = odometry->velocity.arrivalTime;
         double dT = currentTime - previousReadingTime_;
         if (previousReadingTime_ < 0 || dT < 0)
         {
@@ -78,7 +78,7 @@ public:
         }
         previousReadingTime_ = currentTime;
 
-        ROS_INFO_STREAM_NAMED("PositionEstimator", "dT: " << dT);
+        ROS_DEBUG_STREAM_NAMED("PositionEstimator", "Calculated dT: " << dT);
         ukf_.run(dT, odometry);
     }
 

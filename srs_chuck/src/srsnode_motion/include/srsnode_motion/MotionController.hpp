@@ -9,6 +9,8 @@
 #include <queue>
 using namespace std;
 
+#include <ros/ros.h>
+
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
@@ -17,7 +19,8 @@ using namespace std;
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
 
-#include <srslib_framework/robotics/controller/CMUPathFollower.hpp>
+#include <srslib_framework/robotics/controller/CMUPathController.hpp>
+#include <srslib_framework/robotics/controller/ManualController.hpp>
 
 #include <srslib_framework/robotics/robot/RobotProfile.hpp>
 
@@ -26,26 +29,16 @@ namespace srs {
 class MotionController
 {
 public:
-    MotionController(double dT) :
-        dT_(dT),
-        pathFollower_(nullptr)
-    {
-        pathFollower_ = new CMUPathFollower();
-
-        reset();
-    }
+    MotionController(double dT);
 
     ~MotionController()
     {}
 
-    void emergencyStop()
-    {
-        nextTask(TaskEnum::EMERGENCY_STOP);
-    }
+    void emergencyStop();
 
     void execute(Solution<Grid2d> solution);
 
-    Velocity<> getExecutingCommand()
+    Velocity<> getExecutingCommand() const
     {
         if (activeController_)
         {
@@ -55,7 +48,7 @@ public:
         return Velocity<>();
     }
 
-    Pose<> getGoal()
+    Pose<> getGoal() const
     {
         if (activeController_)
         {
@@ -65,41 +58,30 @@ public:
         return Pose<>();
     }
 
-    bool isMoving()
+    bool isMoving() const
     {
         return currentState_ != StateEnum::STANDING;
     }
 
-    bool newCommandAvailable()
-    {
-        if (activeController_)
-        {
-            return activeController_->newCommandAvailable();
-        }
-
-        return false;
-    }
-
-    void normalStop()
-    {
-        nextTask(TaskEnum::NORMAL_STOP);
-    }
+    void normalStop();
 
     void reset();
-    void run(Pose<> currentPose, Odometry<> currentOdometry);
+    void run(Pose<> currentPose, Odometry<> currentOdometry, Velocity<> currentCommand);
 
     void setRobot(RobotProfile robot);
+    void switchToManual();
+    void switchToAutonomous();
 
 private:
-    enum TaskEnum {NIL, EMERGENCY_STOP, FOLLOW, NORMAL_STOP, ROTATE, STAND};
-    enum StateEnum {NONE, STANDING, FOLLOWING, ROTATING, STOPPING};
+    enum CommandEnum {VELOCITY, E_STOP};
+    enum StateEnum {NIL, STANDING, RUNNING, ROTATING, STOPPING};
+    enum TaskEnum {NONE, EMERGENCY_STOP, PATH_FOLLOW, MANUAL_FOLLOW, NORMAL_STOP, ROTATE, STAND};
+
+    typedef pair<int, Solution<Grid2d>*> WorkType;
 
     void checkForWork();
 
-    void nextSolution(Solution<Grid2d> nextSolution)
-    {
-        nextSolution_ = nextSolution;
-    }
+    void executeCommand(CommandEnum command, Velocity<>* velocity = nullptr);
 
     void nextState(StateEnum nextState)
     {
@@ -111,13 +93,20 @@ private:
         nextTask_ = nextTask;
     }
 
-    void stateFollowing();
+    void pushWork(TaskEnum task, Solution<Grid2d>* solution = nullptr)
+    {
+        work_.push(WorkType(task, solution));
+    }
+
+    void selectController(TaskEnum task);
+    void stateRunning();
     void stateStanding();
     void stateStopping();
 
     void taskEmergencyStop();
-    void taskFollow();
+    void taskManualFollow();
     void taskNormalStop();
+    void taskPathFollow();
     void taskRotate();
     void taskStand();
 
@@ -133,15 +122,20 @@ private:
 
     bool emergencyDeclared_;
 
-    CMUPathFollower* pathFollower_;
+    ManualController* manualController_;
+
+    ros::NodeHandle rosNodeHandle_;
 
     Solution<Grid2d> nextSolution_;
     StateEnum nextState_;
     TaskEnum nextTask_;
 
+    CMUPathController* pathController_;
+    ros::Publisher pubCmdVel_;
+
     RobotProfile robot_;
 
-    queue<pair<int, Solution<Grid2d>>> solutions_;
+    queue<WorkType> work_;
 };
 
 } // namespace srs

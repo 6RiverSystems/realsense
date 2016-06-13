@@ -34,11 +34,11 @@ public:
     virtual ~PositionUkf()
     {}
 
-    void run(double dT, Odometry<> odometry)
+    void run(double dT, Odometry<>* odometry)
     {
         // Transform a velocity point into a command
         // and advance the state of the UKF
-        CmdVelocity<> command = CmdVelocity<>(odometry.velocity);
+        CmdVelocity<> command = CmdVelocity<>(odometry->velocity);
         UkfType::run(dT, &command);
     }
 

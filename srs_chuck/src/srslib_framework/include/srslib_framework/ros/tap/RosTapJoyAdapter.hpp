@@ -18,7 +18,6 @@ using namespace std;
 
 namespace srs {
 
-template<typename TYPE = double>
 class RosTapJoyAdapter :
     public RosTap
 {
@@ -39,7 +38,7 @@ public:
         return currentLatchState_;
     }
 
-    Velocity<TYPE> getVelocity()
+    Velocity<> getVelocity()
     {
         setNewData(false);
         return currentVelocity_;
@@ -57,7 +56,7 @@ protected:
 
 private:
     bool currentLatchState_;
-    Velocity<TYPE> currentVelocity_;
+    Velocity<> currentVelocity_;
 
     ros::Subscriber subJoyVelocity_;
 
@@ -69,7 +68,7 @@ private:
 
     void onJoyVelocity(const geometry_msgs::TwistConstPtr& message)
     {
-        currentVelocity_ = Velocity<TYPE>(message->linear.x, message->angular.z);
+        currentVelocity_ = Velocity<>(message->linear.x, message->angular.z);
         setNewData(true);
     }
 };

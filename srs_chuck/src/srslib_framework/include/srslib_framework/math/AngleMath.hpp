@@ -34,7 +34,7 @@ struct AngleMath
         double lower = floor(ratio) * 90.0;
 
         angle = (upper - angle) > (angle - lower) ? lower : upper;
-        return AngleMath::normalizeAngleDeg(static_cast<int>(angle));
+        return AngleMath::normalizeAngleDeg<int>(static_cast<int>(angle));
     }
 
     /**

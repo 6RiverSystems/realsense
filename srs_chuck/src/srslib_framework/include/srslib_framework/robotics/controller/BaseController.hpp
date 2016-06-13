@@ -8,6 +8,7 @@
 
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/robotics/Odometry.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
 namespace srs {
@@ -16,10 +17,14 @@ class BaseController
 {
 public:
     BaseController() :
+        executingCommand_(Velocity<>()),
+        goal_(Pose<>()),
+        goalReached_(false),
         Kv_(1.0),
         Kw_(1.0),
         maxAngular_(0.0),
         maxLinear_(0.0),
+        newCommandAvailable_(false),
         travelAngular_(0.0),
         travelLinear_(0.0)
     {}
@@ -27,12 +32,39 @@ public:
     virtual ~BaseController()
     {}
 
-    virtual Velocity<> stepController(Pose<> currentPose, Pose<> desiredPose, Velocity<> command) = 0;
-
-    void setVelocityGains(double Kv, double Kw)
+    Velocity<> getExecutingCommand()
     {
-        Kv_ = Kv;
-        Kw_ = Kw;
+        newCommandAvailable_ = false;
+        return executingCommand_;
+    }
+
+    Pose<> getGoal()
+    {
+        return goal_;
+    }
+
+    bool isGoalReached()
+    {
+        return goalReached_;
+    }
+
+    bool newCommandAvailable()
+    {
+        return newCommandAvailable_;
+    }
+
+    virtual void reset() = 0;
+
+    virtual void stepController(Pose<> currentPose, Odometry<> currentOdometry) = 0;
+
+    void setGoal(Pose<> goal)
+    {
+        goal_ = goal;
+    }
+
+    void setGoalReachedDistance(double value)
+    {
+        goalReachedDistance_ = value;
     }
 
     void setMaxAngularVelocity(double value)
@@ -55,12 +87,40 @@ public:
         travelLinear_ = value;
     }
 
+    void setVelocityGains(double Kv, double Kw)
+    {
+        Kv_ = Kv;
+        Kw_ = Kw;
+    }
+
 protected:
+    void executeCommand(Velocity<> command)
+    {
+        newCommandAvailable_ = true;
+        executingCommand_ = command;
+    }
+
+    bool similarVelocities(const Velocity<>& lhv, const Velocity<>& rhv)
+    {
+        // The two velocities to be similar must:
+        // - difference in linear velocity must be less than 0.01 m/s
+        // - difference in angular velocity must be less than 0.1 deg/s
+        return abs(lhv.linear - rhv.linear) < 0.01 && abs(lhv.angular - rhv.angular) < 0.002;
+    }
+
+    Velocity<> executingCommand_;
+
+    Pose<> goal_;
+    bool goalReached_;
+    double goalReachedDistance_;
+
     double Kv_;
     double Kw_;
 
     double maxAngular_;
     double maxLinear_;
+
+    bool newCommandAvailable_;
 
     double travelAngular_;
     double travelLinear_;

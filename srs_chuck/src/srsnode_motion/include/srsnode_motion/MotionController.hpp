@@ -28,8 +28,10 @@ class MotionController
 public:
     MotionController(double dT) :
         dT_(dT),
-        pathFollower_()
+        pathFollower_(nullptr)
     {
+        pathFollower_ = new CMUPathFollower();
+
         reset();
     }
 
@@ -45,18 +47,22 @@ public:
 
     Velocity<> getExecutingCommand()
     {
-        newCommandAvailable_ = false;
-        return executingCommand_;
+        if (activeController_)
+        {
+            return activeController_->getExecutingCommand();
+        }
+
+        return Velocity<>();
     }
 
     Pose<> getGoal()
     {
-        return goal_;
-    }
+        if (activeController_)
+        {
+            return activeController_->getGoal();
+        }
 
-    bool isGoalReached()
-    {
-        return goalReached_;
+        return Pose<>();
     }
 
     bool isMoving()
@@ -66,7 +72,12 @@ public:
 
     bool newCommandAvailable()
     {
-        return newCommandAvailable_;
+        if (activeController_)
+        {
+            return activeController_->newCommandAvailable();
+        }
+
+        return false;
     }
 
     void normalStop()
@@ -75,7 +86,7 @@ public:
     }
 
     void reset();
-    void run(Pose<> robotPose, Odometry<> odometry);
+    void run(Pose<> currentPose, Odometry<> currentOdometry);
 
     void setRobot(RobotProfile robot);
 
@@ -84,12 +95,6 @@ private:
     enum StateEnum {NONE, STANDING, FOLLOWING, ROTATING, STOPPING};
 
     void checkForWork();
-
-    void executeCommand(Velocity<> command)
-    {
-        newCommandAvailable_ = true;
-        executingCommand_ = command;
-    }
 
     void nextSolution(Solution<Grid2d> nextSolution)
     {
@@ -106,15 +111,6 @@ private:
         nextTask_ = nextTask;
     }
 
-    // TODO: find a better place for this
-    bool similarVelocities(const Velocity<>& lhv, const Velocity<>& rhv)
-    {
-        // The two velocities to be similar must:
-        // - difference in linear velocity must be less than 0.01 m/s
-        // - difference in angular velocity must be less than 0.1 deg/s
-        return abs(lhv.linear - rhv.linear) < 0.01 && abs(lhv.angular - rhv.angular) < 0.002;
-    }
-
     void stateFollowing();
     void stateStanding();
     void stateStopping();
@@ -125,35 +121,24 @@ private:
     void taskRotate();
     void taskStand();
 
-    void updateProjectionIndex();
+    BaseController* activeController_;
 
     Odometry<> currentOdometry_;
-    Pose<> currentRobotPose_;
+    Pose<> currentPose_;
     Solution<Grid2d> currentSolution_;
     StateEnum currentState_;
     TaskEnum currentTask_;
-    Trajectory<> currentTrajectory_;
 
-    double dynamicLookAheadDistance_;
     double dT_;
 
     bool emergencyDeclared_;
-    Velocity<> executingCommand_;
 
-    Pose<> goal_;
-    bool goalReached_;
+    CMUPathFollower* pathFollower_;
 
-    CMUPathFollower pathFollower_;
-
-    bool newCommandAvailable_;
     Solution<Grid2d> nextSolution_;
     StateEnum nextState_;
     TaskEnum nextTask_;
 
-    int projectionIndex_;
-
-    Pose<> referencePose_;
-    int referenceIndex_;
     RobotProfile robot_;
 
     queue<pair<int, Solution<Grid2d>>> solutions_;

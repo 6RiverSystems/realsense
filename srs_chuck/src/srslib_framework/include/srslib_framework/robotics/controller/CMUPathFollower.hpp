@@ -6,9 +6,7 @@
 #ifndef CMUPATHFOLLOWER_HPP_
 #define CMUPATHFOLLOWER_HPP_
 
-#include <srslib_framework/math/AngleMath.hpp>
-#include <srslib_framework/math/BasicMath.hpp>
-
+#include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/controller/BaseController.hpp>
 
 namespace srs {
@@ -23,48 +21,62 @@ class CMUPathFollower: public BaseController
 public:
     CMUPathFollower() :
         BaseController(),
-        lookAheadDistance_(0.5),
+        dynamicLookAheadDistance_(0.5),
+        maxLookAheadDistance_(0.5),
+        minLookAheadDistance_(0.5),
+        projectionIndex_(-1),
+        ratioLookAheadDistance_(1.1),
+        referencePose_(Pose<>()),
+        referenceIndex_(-1),
         travelRotationVelocity_(0.1)
     {}
 
     ~CMUPathFollower()
     {}
 
-    void setLookAheadDistance(double lookAheadDistance)
+    void reset();
+
+    void setMaxLookAheadDistance(double lookAheadDistance)
     {
-        lookAheadDistance_ = lookAheadDistance;
+        maxLookAheadDistance_ = lookAheadDistance;
     }
+
+    void setMinLookAheadDistance(double lookAheadDistance)
+    {
+        minLookAheadDistance_ = lookAheadDistance;
+    }
+
+    void setRatioLookAheadDistance(double ratioLookAheadDistance)
+    {
+        ratioLookAheadDistance_ = ratioLookAheadDistance;
+    }
+
+    void setTrajectory(Trajectory<> trajectory, Pose<> robotPose);
 
     void setTravelRotationVelocity(double value)
     {
         travelRotationVelocity_ = value;
     }
 
-    Velocity<> stepController(Pose<> currentPose, Pose<> desiredPose, Velocity<> command)
-    {
-        // Calculate the linear portion of the command
-        double linear = Kv_ * command.linear;
-        linear = BasicMath::saturate<double>(linear, maxLinear_, -maxLinear_);
-
-        // Calculate the angular portion of the command
-        double slope = atan2(desiredPose.y - currentPose.y, desiredPose.x - currentPose.x);
-        double alpha = AngleMath::normalizeAngleRad(slope - currentPose.theta);
-
-        double angular = Kw_ * 2 * sin(alpha) / lookAheadDistance_;
-
-        // If the robot angle is greater than 45deg, use a different rotation velocity
-        if (abs(alpha) > M_PI / 4)
-        {
-            angular = BasicMath::sgn(angular) * travelRotationVelocity_;
-        }
-
-        angular = BasicMath::saturate<double>(angular, maxAngular_, -maxAngular_);
-
-        return Velocity<>(linear, angular);
-    }
+    void stepController(Pose<> currentPose, Odometry<> currentOdometry);
 
 private:
-    double lookAheadDistance_;
+    void updateLookAheadDistance();
+    void updateProjectionIndex(Pose<> robotPose);
+
+    Trajectory<> currentTrajectory_;
+
+    double dynamicLookAheadDistance_;
+
+    double maxLookAheadDistance_;
+    double minLookAheadDistance_;
+
+    int projectionIndex_;
+
+    double ratioLookAheadDistance_;
+    Pose<> referencePose_;
+    int referenceIndex_;
+
     double travelRotationVelocity_;
 };
 

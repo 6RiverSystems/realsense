@@ -41,32 +41,23 @@ void MotionController::execute(Solution<Grid2d> solution)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::reset()
 {
+    activeController_ = nullptr;
+
     currentOdometry_ = Odometry<>();
     currentState_ = StateEnum::NONE;
     currentTask_ = TaskEnum::STAND;
 
-    dynamicLookAheadDistance_ = robot_.maxLookAheadDistance;
-
     emergencyDeclared_ = false;
-    executingCommand_ = Velocity<>();
 
-    newCommandAvailable_ = false;
     nextState_ = StateEnum::STANDING;
     nextTask_ = TaskEnum::STAND;
 
-    projectionIndex_ = -1;
-
-    referencePose_ = Pose<>();
-    referenceIndex_ = -1;
-
-    goal_ = Pose<>();
-    goalReached_ = false;
+    pathFollower_->reset();
 
     while (!solutions_.empty())
     {
         solutions_.pop();
     }
-    currentTrajectory_.clear();
 
     normalStop();
 }
@@ -74,9 +65,9 @@ void MotionController::reset()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::run(Pose<> robotPose, Odometry<> odometry)
 {
-    currentRobotPose_ = robotPose;
+    currentPose_ = robotPose;
     currentOdometry_ = odometry;
-    ROS_DEBUG_STREAM_NAMED("MotionController", "Reported robot pose: " << currentRobotPose_);
+    ROS_DEBUG_STREAM_NAMED("MotionController", "Reported robot pose: " << currentPose_);
     ROS_DEBUG_STREAM_NAMED("MotionController", "Reported odometry: " << currentOdometry_);
 
     // Handle the current state
@@ -152,12 +143,15 @@ void MotionController::setRobot(RobotProfile robot)
 {
     robot_ = robot;
 
-    pathFollower_.setLookAheadDistance(robot_.maxLookAheadDistance);
-    pathFollower_.setMaxAngularVelocity(robot_.maxAngularVelocity);
-    pathFollower_.setMaxLinearVelocity(robot_.maxLinearVelocity);
-    pathFollower_.setTravelAngularVelocity(robot_.travelAngularVelocity);
-    pathFollower_.setTravelLinearVelocity(robot_.travelLinearVelocity);
-    pathFollower_.setTravelRotationVelocity(robot_.travelRotationVelocity);
+    pathFollower_->setGoalReachedDistance(robot_.goalReachedDistance);
+    pathFollower_->setMaxLookAheadDistance(robot_.maxLookAheadDistance);
+    pathFollower_->setMaxAngularVelocity(robot_.maxAngularVelocity);
+    pathFollower_->setMaxLinearVelocity(robot_.maxLinearVelocity);
+    pathFollower_->setMinLookAheadDistance(robot_.minLookAheadDistance);
+    pathFollower_->setRatioLookAheadDistance(robot_.ratioLookAheadDistance);
+    pathFollower_->setTravelAngularVelocity(robot_.travelAngularVelocity);
+    pathFollower_->setTravelLinearVelocity(robot_.travelLinearVelocity);
+    pathFollower_->setTravelRotationVelocity(robot_.travelRotationVelocity);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,8 +168,16 @@ void MotionController::checkForWork()
         solutions_.pop();
 
         // Schedule the next task and the solution
-        nextTask(static_cast<TaskEnum>(work.first));
+        TaskEnum task = static_cast<TaskEnum>(work.first);
+        nextTask(task);
         nextSolution(work.second);
+
+        switch (task)
+        {
+            case FOLLOW:
+                activeController_ = pathFollower_;
+                break;
+        }
     }
     else
     {
@@ -187,52 +189,13 @@ void MotionController::checkForWork()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::stateFollowing()
 {
-    updateProjectionIndex();
-
-    double distanceToGoal = PoseMath::euclidean(currentRobotPose_, goal_);
-    ROS_DEBUG_STREAM_NAMED("MotionController", "Distance to goal: " << distanceToGoal);
-
-    if (distanceToGoal < robot_.goalReachedDistance)
+    if (!activeController_ || (activeController_ && activeController_->isGoalReached()))
     {
-        goalReached_ = true;
-        ROS_DEBUG_STREAM_NAMED("MotionController", "Goal reached: " << goal_);
-
-        // Temporary fix to stop the robot when arriving to the goal
-        // It should be removed when the velocities in the trajectory
-        // are correctly calculated
-        executeCommand(Velocity<>());
-
         nextState(StateEnum::STANDING);
     }
     else
     {
-        Velocity<> nextCommand;
-
-        double distanceToReference = PoseMath::euclidean(currentRobotPose_, referencePose_);
-        ROS_DEBUG_STREAM_NAMED("MotionController", "Distance to reference: " << distanceToReference);
-
-        // Find the desired velocity command
-        nextCommand = currentTrajectory_.getVelocity(projectionIndex_);
-
-        // Ask the low-level controller to modulate the desired velocity
-        nextCommand = pathFollower_.stepController(currentRobotPose_, referencePose_, nextCommand);
-
-        // Recalculate the look-ahead distance based roughly on the velocity
-        dynamicLookAheadDistance_ = BasicMath::saturate(
-            nextCommand.linear * robot_.ratioLookAheadDistance,
-            robot_.maxLookAheadDistance, robot_.minLookAheadDistance);
-
-        ROS_DEBUG_STREAM_NAMED("MotionController", "Look-ahead distance: " <<
-            dynamicLookAheadDistance_);
-
-        pathFollower_.setLookAheadDistance(dynamicLookAheadDistance_);
-
-        // If the two velocities are similar, there is no need to send a
-        // new command (if requested).
-        if (!similarVelocities(executingCommand_, nextCommand))
-        {
-            executeCommand(nextCommand);
-        }
+        activeController_->stepController(currentPose_, currentOdometry_);
 
         nextState(StateEnum::FOLLOWING);
     }
@@ -255,7 +218,7 @@ void MotionController::taskEmergencyStop()
 {
     emergencyDeclared_ = true;
 
-    executeCommand(Velocity<>());
+    //executeCommand(Velocity<>());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,23 +226,13 @@ void MotionController::taskFollow()
 {
     currentSolution_ = nextSolution_;
 
+    Trajectory<> trajectory;
     TrajectoryGenerator converter(robot_);
+
     converter.fromSolution(currentSolution_, dT_);
-    converter.getTrajectory(currentTrajectory_);
+    converter.getTrajectory(trajectory);
 
-    if (!currentTrajectory_.empty())
-    {
-        // Find the goal of the trajectory
-        goal_ = currentTrajectory_.getGoal();
-
-        // Find the first reference point on the given trajectory
-        referenceIndex_ = currentTrajectory_.findClosestPose(currentRobotPose_);
-        referencePose_ = currentTrajectory_.getPose(referenceIndex_);
-
-        // Find the projection of the current robot pose onto the trajectory
-        projectionIndex_ = currentTrajectory_.findClosestPose(currentRobotPose_,
-            0, robot_.maxLookAheadDistance);
-    }
+    pathFollower_->setTrajectory(trajectory, currentPose_);
 
     nextState(StateEnum::FOLLOWING);
 }
@@ -287,7 +240,7 @@ void MotionController::taskFollow()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::taskNormalStop()
 {
-    executeCommand(Velocity<>());
+    //executeCommand(Velocity<>());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,20 +252,6 @@ void MotionController::taskRotate()
 void MotionController::taskStand()
 {
     // Nothing to do while standing
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void MotionController::updateProjectionIndex()
-{
-    projectionIndex_ = currentTrajectory_.findClosestPose(
-        currentRobotPose_,
-        projectionIndex_, dynamicLookAheadDistance_);
-
-    referenceIndex_ = currentTrajectory_.findWaypointAtDistance(
-        projectionIndex_,
-        dynamicLookAheadDistance_);
-
-    referencePose_ = currentTrajectory_.getPose(referenceIndex_);
 }
 
 } // namespace srs

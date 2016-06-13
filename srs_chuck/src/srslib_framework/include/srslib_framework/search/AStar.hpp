@@ -75,55 +75,101 @@ public:
 
     // TODO: Instead of passing the resolution an object with the map coordinate transformation
     // should be passed
+    // TODO: Also this conversion should be done elsewhere.
     Solution<GRAPH> getSolution(double graphResolution)
     {
         Solution<GRAPH> result;
 
-        SearchNode<GRAPH>* cursor = lastNode_;
-        while (cursor)
-        {
-            SolutionNode<GRAPH> node;
+        SolutionNode<GRAPH> solutionNode;
+        Pose<> fromPose;
+        Pose<> toPose;
 
-            switch (cursor->action->actionType)
+        double fromX = 0;
+        double fromY = 0;
+        double fromTheta = 0;
+
+        double toX = 0;
+        double toY = 0;
+        double toTheta = 0;
+
+        SearchNode<GRAPH>* toCursor = lastNode_;
+        SearchNode<GRAPH>* fromCursor = lastNode_->parent;
+
+        while (toCursor)
+        {
+            getWorldCoordinates(graphResolution,
+                toCursor->action->position.location.x, toCursor->action->position.location.y,
+                toX, toY);
+
+            toTheta = AngleMath::deg2rad<double>(toCursor->action->position.orientation);
+            toPose = Pose<>(toX, toY, toTheta);
+
+            if (fromCursor)
             {
-                case SearchAction<GRAPH>::NONE:
-                    node.actionType = SolutionNode<GRAPH>::NONE;
-                    break;
-                case SearchAction<GRAPH>::START:
-                    node.actionType = SolutionNode<GRAPH>::START;
-                    break;
-                case SearchAction<GRAPH>::GOAL:
-                    node.actionType = SolutionNode<GRAPH>::GOAL;
-                    break;
-                case SearchAction<GRAPH>::FORWARD:
-                    node.actionType = SolutionNode<GRAPH>::FORWARD;
-                    break;
-                case SearchAction<GRAPH>::BACKWARD:
-                    node.actionType = SolutionNode<GRAPH>::BACKWARD;
-                    break;
-                case SearchAction<GRAPH>::ROTATE_M90:
-                    node.actionType = SolutionNode<GRAPH>::ROTATE_M90;
-                    break;
-                case SearchAction<GRAPH>::ROTATE_P90:
-                    node.actionType = SolutionNode<GRAPH>::ROTATE_P90;
-                    break;
-                case SearchAction<GRAPH>::ROTATE_180:
-                    node.actionType = SolutionNode<GRAPH>::ROTATE_180;
-                    break;
+                getWorldCoordinates(graphResolution,
+                    fromCursor->action->position.location.x, fromCursor->action->position.location.y,
+                    fromX, fromY);
+
+                fromTheta = AngleMath::deg2rad<double>(fromCursor->action->position.orientation);
+                fromPose = Pose<>(fromX, fromY, fromTheta);
             }
 
-            double x = 0;
-            double y = 0;
-            getWorldCoordinates(graphResolution,
-                cursor->action->position.location.x, cursor->action->position.location.y,
-                x, y);
+            switch (toCursor->action->actionType)
+            {
+                case SearchAction<GRAPH>::START:
+                    solutionNode.actionType = SolutionNode<GRAPH>::START;
+                    fromPose = toPose;
+                    break;
 
-            node.pose = Pose<>(x, y,
-                AngleMath::deg2rad<double>(cursor->action->position.orientation));
-            node.cost = cursor->action->getTotalCost();
+                case SearchAction<GRAPH>::GOAL:
+                    solutionNode.actionType = SolutionNode<GRAPH>::GOAL;
+                    fromPose = toPose;
+                    break;
 
-            result.insert(result.begin(), node);
-            cursor = cursor->parent;
+                case SearchAction<GRAPH>::FORWARD:
+                    solutionNode.actionType = SolutionNode<GRAPH>::MOVE;
+                    break;
+
+                case SearchAction<GRAPH>::BACKWARD:
+                    solutionNode.actionType = SolutionNode<GRAPH>::MOVE;
+                    break;
+
+                case SearchAction<GRAPH>::ROTATE_M90:
+                    solutionNode.actionType = SolutionNode<GRAPH>::ROTATE;
+                    fromTheta = AngleMath::normalizeAngleRad<double>(
+                        toTheta + AngleMath::deg2rad<double>(90));
+                    fromPose = Pose<>(toX, toY, fromTheta);
+                    break;
+
+                case SearchAction<GRAPH>::ROTATE_P90:
+                    solutionNode.actionType = SolutionNode<GRAPH>::ROTATE;
+                    fromTheta = AngleMath::normalizeAngleRad<double>(
+                        toTheta - AngleMath::deg2rad<double>(90));
+                    fromPose = Pose<>(toX, toY, fromTheta);
+                    break;
+
+                case SearchAction<GRAPH>::ROTATE_180:
+                    solutionNode.actionType = SolutionNode<GRAPH>::ROTATE;
+                    fromTheta = AngleMath::normalizeAngleRad<double>(
+                        toTheta - AngleMath::deg2rad<double>(180));
+                    fromPose = Pose<>(toX, toY, fromTheta);
+                    break;
+
+                default:
+                    // It should never see a NONE
+                    throw;
+            }
+
+            solutionNode.fromPose = fromPose;
+            solutionNode.toPose = toPose;
+
+            result.insert(result.begin(), solutionNode);
+
+            toCursor = toCursor->parent;
+            if (fromCursor)
+            {
+                fromCursor = fromCursor->parent;
+            }
         }
 
         return result;

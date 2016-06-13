@@ -140,20 +140,17 @@ private:
     {
         path.clear();
 
-        for (auto node : solution)
+        for (auto solutionNode : solution)
         {
-            switch (node.actionType)
+            switch (solutionNode.actionType)
             {
-                case SolutionNode<Grid2d>::BACKWARD:
-                case SolutionNode<Grid2d>::FORWARD:
-                case SolutionNode<Grid2d>::ROTATE_180:
+                case SolutionNode<Grid2d>::MOVE:
                     break;
 
                 case SolutionNode<Grid2d>::START:
                 case SolutionNode<Grid2d>::GOAL:
-                case SolutionNode<Grid2d>::ROTATE_M90:
-                case SolutionNode<Grid2d>::ROTATE_P90:
-                    path.push_back(node.pose);
+                case SolutionNode<Grid2d>::ROTATE:
+                    path.push_back(solutionNode.toPose);
                     break;
             }
         }
@@ -301,7 +298,7 @@ private:
         // If the segment is not the last stretch, slow down earlier
         // to maintain the curving velocity
         int rampDownIndex = totalMidpoints - rampDownPoints;
-        if (!BasicMath::fpEqual<double>(downVf, 0.0))
+        if (!BasicMath::fpEqual<double>(downVf, 0.0) && rampDownIndex > slowZone)
         {
             rampDownIndex -= slowZone;
             rampDownIndex = BasicMath::saturate<int>(rampDownIndex, totalMidpoints, 0);

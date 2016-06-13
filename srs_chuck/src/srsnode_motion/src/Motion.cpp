@@ -386,13 +386,13 @@ void Motion::publishGoal()
 
     vector<geometry_msgs::PoseStamped> planPoses;
 
-    for (auto node : solution)
+    for (auto solutionNode : solution)
     {
         geometry_msgs::PoseStamped poseStamped;
-        tf::Quaternion quaternion = tf::createQuaternionFromYaw(node.pose.theta);
+        tf::Quaternion quaternion = tf::createQuaternionFromYaw(solutionNode.toPose.theta);
 
-        poseStamped.pose.position.x = node.pose.x;
-        poseStamped.pose.position.y = node.pose.y;
+        poseStamped.pose.position.x = solutionNode.toPose.x;
+        poseStamped.pose.position.y = solutionNode.toPose.y;
         poseStamped.pose.position.z = 0.0;
         poseStamped.pose.orientation.x = quaternion.x();
         poseStamped.pose.orientation.y = quaternion.y();

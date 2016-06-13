@@ -16,33 +16,36 @@ namespace srs {
 template<typename GRAPH>
 struct SolutionNode
 {
-    enum ActionEnum {NONE, START, GOAL, FORWARD, BACKWARD, ROTATE_M90, ROTATE_P90, ROTATE_180};
+    enum ActionEnum {NONE, START, GOAL, MOVE, ROTATE};
 
     SolutionNode() :
         actionType(NONE),
-        pose(),
+        fromPose(Pose<>()),
+        toPose(Pose<>()),
         cost(0.0)
     {}
 
-    SolutionNode(ActionEnum actionType,
-            Pose<> pose,
-            double cost = 0.0) :
+    SolutionNode(ActionEnum actionType, Pose<> fromPose, Pose<> toPose, double cost = 0.0) :
         actionType(actionType),
-        pose(pose),
+        fromPose(fromPose),
+        toPose(toPose),
         cost(cost)
     {}
 
     friend ostream& operator<<(ostream& stream, const SolutionNode& solutionNode)
     {
         return stream << " (" << ENUM_NAMES[solutionNode.actionType] <<
-            ", " << solutionNode.pose << ", " << solutionNode.cost << ")";
+            ", " << solutionNode.fromPose << " -> " <<
+                    solutionNode.toPose << ", " << solutionNode.cost << ")";
     }
 
     ActionEnum actionType;
 
     double cost;
 
-    Pose<> pose;
+    Pose<> fromPose;
+
+    Pose<> toPose;
 
 private:
     static unordered_map<int, string> ENUM_NAMES;
@@ -79,6 +82,22 @@ public:
 
         return stream << "}";
     }
+
+    void split(unsigned int position, Solution<GRAPH>& first, Solution<GRAPH>& second)
+    {
+        first.clear();
+        second.clear();
+
+        for (unsigned int i = 0; i <= position; i++)
+        {
+            first.push_back(this->at(i));
+        }
+
+        for (unsigned int i = position + 1; i < this->size(); i++)
+        {
+            second.push_back(this->at(i));
+        }
+    }
 };
 
 template<typename GRAPH>
@@ -86,11 +105,8 @@ unordered_map<int, string> SolutionNode<GRAPH>::ENUM_NAMES = {
     {SolutionNode<GRAPH>::NONE, "NONE"},
     {SolutionNode<GRAPH>::START, "START"},
     {SolutionNode<GRAPH>::GOAL, "GOAL"},
-    {SolutionNode<GRAPH>::FORWARD, "FORWARD"},
-    {SolutionNode<GRAPH>::BACKWARD, "BACKWARD"},
-    {SolutionNode<GRAPH>::ROTATE_M90, "ROTATE_M90"},
-    {SolutionNode<GRAPH>::ROTATE_P90, "ROTATE_P90"},
-    {SolutionNode<GRAPH>::ROTATE_180, "ROTATE_180"}
+    {SolutionNode<GRAPH>::MOVE, "MOVE"},
+    {SolutionNode<GRAPH>::ROTATE, "ROTATE"},
 };
 
 } // namespace srs

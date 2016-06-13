@@ -22,21 +22,19 @@ typedef SolutionNode<Grid2d> SolutionType;
 
 TEST(Test_Yoshizawa, Usage)
 {
-    Grid2d grid(10, 10);
-
-    SolutionType SOLUTION_00 = SolutionType(SolutionType::START,
-        Pose<>(0, 0, AngleMath::deg2rad<double>(90)), 0);
-
-    SolutionType SOLUTION_01 = SolutionType(SolutionType::FORWARD,
-        Pose<>(1, 0,  AngleMath::deg2rad<double>(90)), 0);
-
-    SolutionType SOLUTION_02 = SolutionType(SolutionType::GOAL,
-        Pose<>(1, 0,  AngleMath::deg2rad<double>(90)), 0);
-
-    Solution<Grid2d> solution;
-    solution.push_back(SOLUTION_00);
-    solution.push_back(SOLUTION_01);
-    solution.push_back(SOLUTION_02);
+//    SolutionType SOLUTION_00 = SolutionType(SolutionType::START,
+//        Pose<>(0, 0, AngleMath::deg2rad<double>(90)), 0);
+//
+//    SolutionType SOLUTION_01 = SolutionType(SolutionType::FORWARD,
+//        Pose<>(1, 0,  AngleMath::deg2rad<double>(90)), 0);
+//
+//    SolutionType SOLUTION_02 = SolutionType(SolutionType::GOAL,
+//        Pose<>(1, 0,  AngleMath::deg2rad<double>(90)), 0);
+//
+//    Solution<Grid2d> solution;
+//    solution.push_back(SOLUTION_00);
+//    solution.push_back(SOLUTION_01);
+//    solution.push_back(SOLUTION_02);
 
 //    // Create a sequence of commands
 //    vector<SolutionNode<Grid2d>> solution = {

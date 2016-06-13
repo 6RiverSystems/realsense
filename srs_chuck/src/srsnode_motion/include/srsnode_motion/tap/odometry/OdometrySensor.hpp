@@ -52,7 +52,7 @@ public:
     {
         if (Sensor<STATE_SIZE, TYPE>::isEnabled())
         {
-            ROS_INFO_STREAM_NAMED("OdometrySensor", "l:" << linear << ", a: " << angular);
+            ROS_DEBUG_STREAM_NAMED("OdometrySensor", "l:" << linear << ", a: " << angular);
 
             currentData_ = Odometry<BaseType>(arrivalTime, linear, angular);
             Sensor<STATE_SIZE, TYPE>::setNewData(true);

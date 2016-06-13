@@ -68,8 +68,6 @@ void JoystickAdapter::run()
                 messageVelocity.angular.z = BasicMath::threshold<double>(angular,
                     configuration_.threshold_angular, 0.0);
 
-                ROS_DEBUG_STREAM_NAMED("JoystickAdapter", "l: " << linear << ", a: " << angular);
-
                 pubCommand_.publish(messageVelocity);
             }
             else if (tapJoy_.isButtonPressed(RosTapJoy<>::BUTTON_11) && joystickLatched_)

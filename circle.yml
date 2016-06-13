@@ -13,8 +13,7 @@ dependencies:
     - rosdep update
     - echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
     - cd ~/ros/srs_chuck/src && catkin_init_workspace
-    - sudo apt-get install libsdl2-2.0
-    - sudo apt-get install libsdl2-image-2.0-0
+    - sudo apt-get install libsdl-image1.2-dev
     - sudo apt-get install socat
     - sudo apt-get install python-gevent=1.0-1ubuntu1
     - echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:${PYTHONPATH}" >> ~/.bashrc

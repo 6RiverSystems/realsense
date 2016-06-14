@@ -77,11 +77,9 @@ public:
         return open_.size();
     }
 
-    // TODO: Instead of passing the resolution an object with the map coordinate transformation
-    // should be passed
+    // TODO: Instead of passing the resolution an object with the map coordinate transformation should be passed
     // TODO: Also this conversion should be done elsewhere.
-    // TODO: Change the format of the solution to aggregate similar maneuvers:
-    // like consecutive forwards/backwards, and consecutive rotations
+    // TODO: Change the format of the solution to aggregate similar maneuvers: like consecutive forwards/backwards, and consecutive rotations
     Solution<GRAPH> getSolution(double graphResolution)
     {
         Solution<GRAPH> result;

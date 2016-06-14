@@ -44,11 +44,16 @@ public:
     }
 
 protected:
-    void stepController(Pose<> currentPose, Odometry<> currentOdometry)
+    void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
+        // The rotation controller ignores the canceled signal
+        // so that the rotation can be completed
+
+        // Calculate the difference between what has been requested and
+        // the current pose
         double error = AngleMath::normalizeAngleRad<double>(goal_.theta - currentPose.theta);
 
-        if (BasicMath::fpEqual(goal_.theta, currentPose.theta, robot_.goalReachedAngle))
+        if (AngleMath::equalRad<double>(goal_.theta, currentPose.theta, robot_.goalReachedAngle))
         {
             goalReached_ = true;
         }
@@ -64,12 +69,8 @@ protected:
         integral_ += error;
         previousError_ = error;
 
-        // Declare the command executable only if it is different from the previous one
-        Velocity<> nextCommand = Velocity<>(linear, angular);
-        if (!similarVelocities(executingCommand_, nextCommand))
-        {
-            executeCommand(nextCommand);
-        }
+        // Send the command for execution
+        executeCommand(Velocity<>(linear, angular));
     }
 
 private:

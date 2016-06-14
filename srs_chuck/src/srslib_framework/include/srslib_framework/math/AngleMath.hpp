@@ -15,6 +15,12 @@ namespace srs {
 struct AngleMath
 {
     template<typename TYPE = double>
+    inline static bool equalRad(TYPE a, TYPE b, TYPE threshold = numeric_limits<TYPE>::epsilon())
+    {
+        return abs(AngleMath::normalizeAngleRad<TYPE>(a - b)) < threshold;
+    }
+
+    template<typename TYPE = double>
     constexpr inline static TYPE deg2rad(TYPE deg)
     {
         return deg * TYPE(M_PI) / TYPE(180);

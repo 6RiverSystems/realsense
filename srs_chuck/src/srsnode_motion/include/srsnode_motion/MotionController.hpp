@@ -22,6 +22,8 @@ using namespace std;
 #include <srslib_framework/robotics/controller/CMUPathController.hpp>
 #include <srslib_framework/robotics/controller/ManualController.hpp>
 #include <srslib_framework/robotics/controller/RotationController.hpp>
+#include <srslib_framework/robotics/controller/StandController.hpp>
+#include <srslib_framework/robotics/controller/StopController.hpp>
 
 #include <srslib_framework/robotics/RobotProfile.hpp>
 
@@ -41,27 +43,12 @@ public:
 
     Velocity<> getExecutingCommand() const
     {
-        if (activeController_)
-        {
-            return activeController_->getExecutingCommand();
-        }
-
-        return Velocity<>();
+        return activeController_->getExecutingCommand();
     }
 
     Pose<> getGoal() const
     {
-        if (activeController_)
-        {
-            return activeController_->getGoal();
-        }
-
-        return Pose<>();
-    }
-
-    bool isMoving() const
-    {
-        return currentState_ != StateEnum::STANDING || currentTask_ != TaskEnum::STAND;
+        return activeController_->getGoal();
     }
 
     void normalStop();
@@ -77,24 +64,15 @@ private:
     const static Velocity<> ZERO_VELOCITY;
 
     enum CommandEnum {VELOCITY, E_STOP};
-    enum StateEnum {NIL, STANDING, RUNNING, ROTATING, STOPPING};
-    enum TaskEnum {NONE, EMERGENCY_STOP, PATH_FOLLOW, MANUAL_FOLLOW, NORMAL_STOP, ROTATE, STAND};
+    enum TaskEnum {EMERGENCY_STOP, MANUAL_FOLLOW, NONE, NORMAL_STOP, PATH_FOLLOW, ROTATE, STAND};
 
     typedef pair<int, Solution<Grid2d>*> WorkType;
 
-    void checkForWork();
+    void checkForMoreWork();
+    void checkMotionStatus();
+    void cleanWorkQueue();
 
-    void executeCommand(CommandEnum command, const Velocity<>* velocity = nullptr);
-
-    void nextState(StateEnum nextState)
-    {
-        nextState_ = nextState;
-    }
-
-    void nextTask(TaskEnum nextTask)
-    {
-        nextTask_ = nextTask;
-    }
+    void executeCommand(bool enforce, CommandEnum command, const Velocity<>* velocity = nullptr);
 
     void pushWork(TaskEnum task, Solution<Grid2d>* solution = nullptr)
     {
@@ -102,9 +80,6 @@ private:
     }
 
     void selectController(TaskEnum task);
-    void stateRunning();
-    void stateStanding();
-    void stateStopping();
 
     void taskEmergencyStop();
     void taskManualFollow();
@@ -118,8 +93,8 @@ private:
     Odometry<> currentOdometry_;
     Pose<> currentPose_;
     Solution<Grid2d> currentSolution_;
-    StateEnum currentState_;
     TaskEnum currentTask_;
+    Velocity<> currentCommand_;
 
     double dT_;
 
@@ -129,15 +104,14 @@ private:
 
     ros::NodeHandle rosNodeHandle_;
 
-    Solution<Grid2d> nextSolution_;
-    StateEnum nextState_;
-    TaskEnum nextTask_;
-
     CMUPathController* pathController_;
     ros::Publisher pubCmdVel_;
 
     RobotProfile robot_;
     RotationController* rotationController_;
+
+    StandController* standController_;
+    StopController* stopController_;
 
     queue<WorkType> work_;
 };

@@ -69,7 +69,6 @@ private:
 
     MotionConfig configuration_;
     dynamic_reconfigure::Server<MotionConfig> configServer_;
-    Velocity<> currentCommand_;
     ros::Time currentTime_;
 
     bool firstLocalization_;

@@ -40,7 +40,7 @@ public:
         path_.clear();
         pathReduced_.clear();
 
-        if (BasicMath::fpEqual<double>(pose0.theta, thetaf))
+        if (BasicMath::equal<double>(pose0.theta, thetaf))
         {
             return;
         }
@@ -295,7 +295,7 @@ private:
         // If the segment is not the first stretch, keep the curving velocity
         // for a while before ramping up
         int rampUpIndex = -1;
-        if (!BasicMath::fpEqual<double>(upV0, 0.0))
+        if (!BasicMath::equal<double>(upV0, 0.0))
         {
             rampUpIndex += slowZone;
         }
@@ -303,7 +303,7 @@ private:
         // If the segment is not the last stretch, slow down earlier
         // to maintain the curving velocity
         int rampDownIndex = totalMidpoints - rampDownPoints;
-        if (!BasicMath::fpEqual<double>(downVf, 0.0) && rampDownIndex > slowZone)
+        if (!BasicMath::equal<double>(downVf, 0.0) && rampDownIndex > slowZone)
         {
             rampDownIndex -= slowZone;
             rampDownIndex = BasicMath::saturate<int>(rampDownIndex, totalMidpoints, 0);
@@ -329,8 +329,8 @@ private:
         double directionY = calculateDirection(fromWaypoint.y, toWaypoint.y);
 
         // Check which direction is applicable
-        bool movingOnX = BasicMath::fpEqual<double>(fromWaypoint.y, toWaypoint.y, 0.002);
-        bool movingOnY = BasicMath::fpEqual<double>(fromWaypoint.x, toWaypoint.x, 0.002);
+        bool movingOnX = BasicMath::equal<double>(fromWaypoint.y, toWaypoint.y, 0.002);
+        bool movingOnY = BasicMath::equal<double>(fromWaypoint.x, toWaypoint.x, 0.002);
 
         // Begin from the initial waypoint
         Pose<> waypoint = fromWaypoint;

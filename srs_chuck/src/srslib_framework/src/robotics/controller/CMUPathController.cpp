@@ -48,7 +48,7 @@ void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
 // Protected methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMUPathController::stepController(Pose<> currentPose, Odometry<> currentOdometry)
+void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
 {
     // Update the projection of the current robot pose onto the path
     updateProjectionIndex(currentPose);
@@ -59,42 +59,37 @@ void CMUPathController::stepController(Pose<> currentPose, Odometry<> currentOdo
     double linear = 0.0;
     double angular = 0.0;
 
-    if (distanceToGoal < robot_.goalReachedDistance)
+    if (canceled_ || distanceToGoal < robot_.goalReachedDistance)
     {
         goalReached_ = true;
+        return;
     }
-    else
+
+    // Find the desired velocity command
+    Velocity<> command = currentTrajectory_.getVelocity(projectionIndex_);
+
+    // Calculate the linear portion of the command
+    linear = Kv_ * command.linear;
+    linear = BasicMath::saturate<double>(linear,
+        robot_.maxLinearVelocity, -robot_.maxLinearVelocity);
+
+    // Calculate the angular portion of the command
+    double slope = atan2(referencePose_.y - currentPose.y, referencePose_.x - currentPose.x);
+    double alpha = AngleMath::normalizeAngleRad<double>(slope - currentPose.theta);
+
+    angular = Kw_ * 2 * sin(alpha) / dynamicLookAheadDistance_;
+
+    // If the robot angle is greater than 45deg, use a different rotation velocity
+    if (abs(alpha) > M_PI / 4)
     {
-        // Find the desired velocity command
-        Velocity<> command = currentTrajectory_.getVelocity(projectionIndex_);
-
-        // Calculate the linear portion of the command
-        linear = Kv_ * command.linear;
-        linear = BasicMath::saturate<double>(linear,
-            robot_.maxLinearVelocity, -robot_.maxLinearVelocity);
-
-        // Calculate the angular portion of the command
-        double slope = atan2(referencePose_.y - currentPose.y, referencePose_.x - currentPose.x);
-        double alpha = AngleMath::normalizeAngleRad<double>(slope - currentPose.theta);
-
-        angular = Kw_ * 2 * sin(alpha) / dynamicLookAheadDistance_;
-
-        // If the robot angle is greater than 45deg, use a different rotation velocity
-        if (abs(alpha) > M_PI / 4)
-        {
-            angular = BasicMath::sgn(angular) * robot_.travelRotationVelocity;
-        }
-
-        angular = BasicMath::saturate<double>(angular,
-            robot_.maxAngularVelocity, -robot_.maxAngularVelocity);
+        angular = BasicMath::sgn(angular) * robot_.travelRotationVelocity;
     }
 
-    // Declare the command executable only if it is different from the previous one
-    Velocity<> nextCommand = Velocity<>(linear, angular);
-    if (!similarVelocities(executingCommand_, nextCommand))
-    {
-        executeCommand(nextCommand);
-    }
+    angular = BasicMath::saturate<double>(angular,
+        robot_.maxAngularVelocity, -robot_.maxAngularVelocity);
+
+    // Send the command for execution
+    executeCommand(Velocity<>(linear, angular));
 
     updateLookAheadDistance();
 }

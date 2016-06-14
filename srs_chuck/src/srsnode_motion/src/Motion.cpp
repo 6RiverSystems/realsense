@@ -24,7 +24,6 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Motion::Motion(string nodeName) :
     robot_(),
-    currentCommand_(),
     firstLocalization_(true),
     rosNodeHandle_(nodeName),
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
@@ -307,24 +306,22 @@ void Motion::stepNode()
     }
     Pose<> currentPose = positionEstimator_.getPose();
 
+    // Run the motion controller
     motionController_.run(currentPose, currentOdometry, currentJoystickCommand);
 
-    if (motionController_.isMoving())
+    // If the brain stem is disconnected and the motion controller is moving, simulate odometry
+    // feeding the odometer with the commanded velocity
+    if (!tapBrainStem_.isBrainStemConnected())
     {
-        currentCommand_ = motionController_.getExecutingCommand();
+        ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
+            "Brainstem disconnected. Using simulated odometry");
 
-        // If the brain stem is disconnected and the motion controller is moving, simulate odometry
-        // feeding the odometer with the commanded velocity
-        if (!tapBrainStem_.isBrainStemConnected())
-        {
-            ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
-                "Brainstem disconnected. Using simulated odometry");
+        Velocity<> currentCommand = motionController_.getExecutingCommand();
 
-            simulatedT_ += 1.0 / REFRESH_RATE_HZ;
-            tapOdometry_.set(simulatedT_,
-                currentCommand_.linear,
-                currentCommand_.angular);
-        }
+        simulatedT_ += 1.0 / REFRESH_RATE_HZ;
+        tapOdometry_.set(simulatedT_,
+            currentCommand.linear,
+            currentCommand.angular);
     }
 }
 

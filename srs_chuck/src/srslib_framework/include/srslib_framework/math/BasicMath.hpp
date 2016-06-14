@@ -23,7 +23,7 @@ struct BasicMath
     }
 
     template<typename TYPE = double>
-    inline static bool fpEqual(TYPE a, TYPE b, TYPE threshold = numeric_limits<TYPE>::epsilon())
+    inline static bool equal(TYPE a, TYPE b, TYPE threshold = numeric_limits<TYPE>::epsilon())
     {
         return abs(a - b) < threshold;
     }

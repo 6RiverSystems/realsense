@@ -39,8 +39,11 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/math/Ocv2Base.hpp
     include/${PROJECT_NAME}/math/PoseMath.hpp
     include/${PROJECT_NAME}/math/TimeMath.hpp
+    include/${PROJECT_NAME}/math/VelocityMath.hpp
 
     include/${PROJECT_NAME}/planning/pathplanning/Solution.hpp
+    include/${PROJECT_NAME}/planning/pathplanning/SolutionGenerator.hpp
+    include/${PROJECT_NAME}/planning/pathplanning/TrajectoryGenerator.hpp
 
     include/${PROJECT_NAME}/platform/Object.hpp
     include/${PROJECT_NAME}/platform/Thread.hpp
@@ -53,6 +56,8 @@ set(${PROJECT_NAME}_SOURCES
 
     include/${PROJECT_NAME}/robotics/controller/ManualController.hpp
     include/${PROJECT_NAME}/robotics/controller/RotationController.hpp
+    include/${PROJECT_NAME}/robotics/controller/StandController.hpp
+    include/${PROJECT_NAME}/robotics/controller/StopController.hpp
     include/${PROJECT_NAME}/robotics/controller/YoshizawaController.hpp
     src/robotics/controller/CMUPathController.cpp
 

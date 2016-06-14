@@ -104,12 +104,32 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        laser_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         left_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
         right_wheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        stargazer_camera_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        stargazer_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        stargazer_optical_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -125,6 +145,8 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        aps_anchor_98:
+          Value: true
         back_caster:
           Value: true
         base_footprint:
@@ -143,6 +165,8 @@ Visualization Manager:
           Value: true
         front_caster:
           Value: true
+        laser_frame:
+          Value: true
         left_wheel:
           Value: true
         map:
@@ -151,6 +175,12 @@ Visualization Manager:
           Value: true
         srsnode_motion/odometry:
           Value: true
+        stargazer_camera_frame:
+          Value: true
+        stargazer_link:
+          Value: true
+        stargazer_optical_frame:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
@@ -158,6 +188,8 @@ Visualization Manager:
       Show Names: true
       Tree:
         map:
+          aps_anchor_98:
+            {}
           srsnode_motion/odometry:
             base_footprint:
               base_link:
@@ -176,6 +208,12 @@ Visualization Manager:
                   {}
                 right_wheel:
                   {}
+                stargazer_link:
+                  stargazer_camera_frame:
+                    stargazer_optical_frame:
+                      {}
+              laser_frame:
+                {}
       Update Interval: 0
       Value: true
     - Alpha: 0.7
@@ -262,11 +300,11 @@ Visualization Manager:
         Value: false
       Name: Current View
       Near Clip Distance: 0.01
-      Scale: 41.9755
+      Scale: 71.1546
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
-      X: 5.54657
-      Y: 6.6714
+      X: 11.1412
+      Y: 5.33719
     Saved:
       - Class: rviz/ThirdPersonFollower
         Distance: 10
@@ -315,5 +353,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 2404
-  X: 65
-  Y: 336
+  X: 55
+  Y: 326

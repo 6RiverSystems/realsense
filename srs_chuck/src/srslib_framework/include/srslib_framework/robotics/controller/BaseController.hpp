@@ -9,6 +9,7 @@
 #include <ros/ros.h>
 
 #include <srslib_framework/math/BasicMath.hpp>
+#include <srslib_framework/math/VelocityMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
@@ -20,28 +21,37 @@ class BaseController
 {
 public:
     BaseController() :
+        canceled_(false),
         executingCommand_(Velocity<>()),
         goal_(Pose<>()),
         goalReached_(false),
         Kv_(1.0),
         Kw_(1.0),
         isRobotMoving_(false),
-        newCommandAvailable_(false),
         robot_()
     {}
 
     virtual ~BaseController()
     {}
 
+    void cancel()
+    {
+        canceled_ = true;
+    }
+
     Velocity<> getExecutingCommand()
     {
-        newCommandAvailable_ = false;
         return executingCommand_;
     }
 
     Pose<> getGoal() const
     {
         return goal_;
+    }
+
+    bool isCanceled() const
+    {
+        return canceled_;
     }
 
     bool isGoalReached() const
@@ -54,20 +64,16 @@ public:
         return isRobotMoving_;
     }
 
-    bool newCommandAvailable() const
-    {
-        return newCommandAvailable_;
-    }
-
     virtual void reset()
     {
+        canceled_ = false;
+
         goal_ = Pose<>();
         goalReached_ = false;
 
         isRobotMoving_ = false;
 
         executingCommand_ = Velocity<>();
-        newCommandAvailable_ = false;
     }
 
     void setGoal(Pose<> goal)
@@ -86,34 +92,25 @@ public:
         Kw_ = Kw;
     }
 
-    void step(Pose<> currentPose, Odometry<> currentOdometry)
+    void step(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
         // Perform some basic operations before calling
         // the specific controller step
-        isRobotMoving_ = !similarVelocities(currentOdometry.velocity, Velocity<>());
+        isRobotMoving_ = !VelocityMath::equal<double>(currentOdometry.velocity, Velocity<>());
 
         // Call the controller
-        stepController(currentPose, currentOdometry);
+        stepController(dT, currentPose, currentOdometry);
     }
 
 protected:
     void executeCommand(Velocity<> command)
     {
-        newCommandAvailable_ = true;
         executingCommand_ = command;
     }
 
-    bool similarVelocities(const Velocity<>& lhv, const Velocity<>& rhv)
-    {
-        // The two velocities to be similar must:
-        // - difference in linear velocity must be less than 0.01 m/s
-        // - difference in angular velocity must be less than 0.1 deg/s
+    virtual void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry) = 0;
 
-        // TODO: Move the constants to constexpr
-        return abs(lhv.linear - rhv.linear) < 0.01 && abs(lhv.angular - rhv.angular) < 0.002;
-    }
-
-    virtual void stepController(Pose<> currentPose, Odometry<> currentOdometry) = 0;
+    bool canceled_;
 
     Velocity<> executingCommand_;
 
@@ -124,8 +121,6 @@ protected:
     double Kw_;
 
     bool isRobotMoving_;
-
-    bool newCommandAvailable_;
 
     RobotProfile robot_;
 };

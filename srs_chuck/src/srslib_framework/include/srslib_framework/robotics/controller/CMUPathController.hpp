@@ -35,7 +35,7 @@ public:
     void setTrajectory(Trajectory<> trajectory, Pose<> robotPose);
 
 protected:
-    void stepController(Pose<> currentPose, Odometry<> currentOdometry);
+    void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry);
 
 private:
     void updateLookAheadDistance();

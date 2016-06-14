@@ -23,8 +23,8 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Motion::Motion(string nodeName) :
-    robot_(),
     firstLocalization_(true),
+    isJoystickLatched_(false),
     rosNodeHandle_(nodeName),
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
     motionController_(1.0 / REFRESH_RATE_HZ),

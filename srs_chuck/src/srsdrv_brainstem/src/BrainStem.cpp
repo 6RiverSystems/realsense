@@ -88,11 +88,11 @@ void BrainStem::OnConnectionChanged( bool bIsConnected )
 
 	m_rosOdomTime = ros::Time( );
 
-	// Get the hardware information
-	GetHardwareInformation( );
-
-	// Get the operational state
-	GetOperationalState( );
+//	// Get the hardware information
+//	GetHardwareInformation( );
+//
+//	// Get the operational state
+//	GetOperationalState( );
 }
 
 void BrainStem::OnArrived( )

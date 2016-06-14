@@ -24,7 +24,7 @@ struct VelocityMath
         // - difference in angular velocity must be less than 0.1 deg/s
 
         // TODO: Move the constants to constexpr
-        return abs(lhv.linear - rhv.linear) < 0.01 && abs(lhv.angular - rhv.angular) < 0.002;
+        return abs(lhv.linear - rhv.linear) < 0.005 && abs(lhv.angular - rhv.angular) < 0.002;
     }
 
 };

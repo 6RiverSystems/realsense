@@ -183,6 +183,7 @@ void MotionController::switchToManual()
         activeController_->cancel();
         cleanWorkQueue();
 
+        pushWork(TaskEnum::NORMAL_STOP);
         pushWork(TaskEnum::MANUAL_FOLLOW);
     }
 }
@@ -219,12 +220,25 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
                 messageTwist.angular.y = 0;
                 messageTwist.angular.z = currentCommand_.angular;
 
-                ROS_DEBUG_STREAM_NAMED("MotionController", "Sending command: " << currentCommand_);
+                ROS_INFO_STREAM_NAMED("MotionController", "Sending velocity: " << currentCommand_);
                 pubCmdVel_.publish(messageTwist);
             }
             break;
 
         case E_STOP:
+            // For now the E-STOP is implemented with a 0 velocity. However
+            // this can be changed to send a specific command to the brainstem
+            currentCommand_ = Velocity<>();
+
+            messageTwist.linear.x = currentCommand_.linear;
+            messageTwist.linear.y = 0;
+            messageTwist.linear.z = 0;
+            messageTwist.angular.x = 0;
+            messageTwist.angular.y = 0;
+            messageTwist.angular.z = currentCommand_.angular;
+
+            ROS_INFO_STREAM_NAMED("MotionController", "Sending e-stop: " << currentCommand_);
+            pubCmdVel_.publish(messageTwist);
             break;
     }
 }
@@ -367,7 +381,6 @@ void MotionController::selectController(TaskEnum task)
     switch (task)
     {
         case EMERGENCY_STOP:
-            stopController_->emergency();
             activeController_ = stopController_;
             break;
 
@@ -376,7 +389,6 @@ void MotionController::selectController(TaskEnum task)
             break;
 
         case NORMAL_STOP:
-            stopController_->normal();
             activeController_ = stopController_;
             break;
 

@@ -17,37 +17,36 @@ class StopController: public BaseController
 {
 public:
     StopController() :
-        BaseController(),
-        emergency_(false)
+        BaseController()
     {}
 
     ~StopController()
     {}
 
-    void emergency()
-    {
-        emergency_ = true;
-    }
-
-    void normal()
-    {
-        emergency_ = false;
-    }
-
-    void reset()
-    {
-        BaseController::reset();
-
-        emergency_ = false;
-    }
-
 protected:
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
-    }
+        // If the robot is not moving anymore, the goal was reached
+        if (!isRobotMoving_)
+        {
+            goalReached_ = true;
+            return;
+        }
 
-private:
-    bool emergency_;
+        double deltaVelocity = robot_.travelLinearAcceleration * dT;
+
+        double linear = currentOdometry.velocity.linear;
+        double sign = BasicMath::sgn<double>(linear);
+
+        linear =  linear - sign * deltaVelocity;
+        if ((sign > 0 && linear < 0.005) || (sign < 0 && linear > -0.005))
+        {
+            linear = 0.0;
+        }
+
+        // Send the command for execution
+        executeCommand(Velocity<>(linear, 0.0));
+    }
 };
 
 } // namespace srs

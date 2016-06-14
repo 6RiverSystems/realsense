@@ -177,7 +177,7 @@ void MotionController::setRobot(RobotProfile robot)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::switchToManual()
 {
-    if (activeController_ != manualController_)
+    if (!isManualControllerActive())
     {
         pushWork(TaskEnum::MANUAL_FOLLOW);
     }
@@ -186,7 +186,7 @@ void MotionController::switchToManual()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::switchToAutonomous()
 {
-    if (activeController_ == manualController_)
+    if (isManualControllerActive())
     {
         pushWork(TaskEnum::NONE);
     }
@@ -225,16 +225,83 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MotionController::checkForMoreWork()
+void MotionController::checkMotionStatus()
 {
-    // If the motion controller is done with whatever it was doing before
-    // and there is nothing else to do, simply stand still
-    if (work_.empty())
+    // If the stand controller is currently active and there is work in
+    // the queue, cancel work in the controller and pump work from the queue
+    if (isStandControllerActive() && isWorkPending())
     {
-        // Nothing else to do for now
-        pushWork(TaskEnum::STAND);
+        activeController_->cancel();
+
+        // If no emergency has been declared
+        if (!emergencyDeclared_)
+        {
+            pumpWorkFromQueue();
+        }
     }
 
+    // If the controller says that the goal has been reached, and
+    // the work has not been canceled for some reason
+    if (activeController_->isGoalReached() && !activeController_->isCanceled())
+    {
+        // If the active controller is the path controller, it is not
+        // guaranteed that the final angle of the robot matches the angle
+        // of the goal. In that case, a rotation is added to complete the movement
+        if (isPathControllerActive())
+        {
+            Pose<> goal = activeController_->getGoal();
+
+            // If the current angle of the robot is not what was asked
+            if (!AngleMath::equalRad<double>(goal.theta, currentPose_.theta,
+                robot_.goalReachedAngle))
+            {
+                Solution<Grid2d>* solution = SolutionGenerator<Grid2d>::fromRotation(
+                    currentPose_,
+                    currentPose_.theta, goal.theta);
+
+                pushWork(TaskEnum::ROTATE, solution);
+
+                return;
+            }
+        }
+
+        // At this point the previous task is completed
+
+        // If no emergency has been declared
+        if (!emergencyDeclared_)
+        {
+            // If there is nothing else to do, simply stand still
+            if (!isWorkPending())
+            {
+                pushWork(TaskEnum::STAND);
+            }
+
+            // Look in the queue to see if there is work to do
+            pumpWorkFromQueue();
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void MotionController::cleanWorkQueue()
+{
+    // Remove any work in the queue
+    while (isWorkPending())
+    {
+        WorkType work = work_.front();
+        work_.pop();
+
+        // Delete the solution associated with the work
+        if (work.second)
+        {
+            delete work.second;
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void MotionController::pumpWorkFromQueue()
+{
     // First, find the work to do
     WorkType work = work_.front();
     work_.pop();
@@ -296,60 +363,6 @@ void MotionController::checkForMoreWork()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MotionController::checkMotionStatus()
-{
-    // If the controller says that the goal has been reached
-    // perform something specific to the controller
-    if (activeController_->isGoalReached() && !activeController_->isCanceled())
-    {
-        // If the active controller is the path controller, it is not
-        // guaranteed that the final angle of the robot matches the angle
-        // of the goal. In that case, a rotation is added to complete the movement
-        if (activeController_ == pathController_)
-        {
-            Pose<> goal = activeController_->getGoal();
-
-            // If the current angle of the robot is not what was asked
-            if (!AngleMath::equalRad<double>(goal.theta, currentPose_.theta,
-                robot_.goalReachedAngle))
-            {
-                Solution<Grid2d>* solution = SolutionGenerator<Grid2d>::fromRotation(
-                    currentPose_,
-                    currentPose_.theta, goal.theta);
-
-                pushWork(TaskEnum::ROTATE, solution);
-
-                return;
-            }
-        }
-
-        // If no emergency and there is some work in the queue to execute
-        if (!emergencyDeclared_)
-        {
-            // Look in the queue to see if there is work to do
-            checkForMoreWork();
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void MotionController::cleanWorkQueue()
-{
-    // Remove any work in the queue
-    while (!work_.empty())
-    {
-        WorkType work = work_.front();
-        work_.pop();
-
-        // Delete the solution associated with the work
-        if (work.second)
-        {
-            delete work.second;
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::selectController(TaskEnum task)
 {
     switch (task)
@@ -361,10 +374,6 @@ void MotionController::selectController(TaskEnum task)
 
         case MANUAL_FOLLOW:
             activeController_ = manualController_;
-            break;
-
-        case NONE:
-            activeController_ = nullptr;
             break;
 
         case NORMAL_STOP:
@@ -383,6 +392,9 @@ void MotionController::selectController(TaskEnum task)
         case STAND:
             activeController_ = standController_;
             break;
+
+        default:
+            throw;
     }
 
     // Before using the new controller, make sure that

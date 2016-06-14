@@ -26,9 +26,9 @@ public:
 protected:
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
-        // The stand controller does not care about canceled signal, but
-        // only if the robot is moving or not
-        goalReached_ = !isRobotMoving_;
+        // The controller never reaches the goal. In order to exit,
+        // a cancel needs to be signaled
+        goalReached_ = false;
 
         // Send the command for execution
         executeCommand(Velocity<>());

@@ -68,11 +68,42 @@ private:
 
     typedef pair<int, Solution<Grid2d>*> WorkType;
 
-    void checkForMoreWork();
     void checkMotionStatus();
     void cleanWorkQueue();
 
     void executeCommand(bool enforce, CommandEnum command, const Velocity<>* velocity = nullptr);
+
+    bool isManualControllerActive()
+    {
+        return activeController_ == manualController_;
+    }
+
+    bool isPathControllerActive()
+    {
+        return activeController_ == pathController_;
+    }
+
+    bool isRotationControllerActive()
+    {
+        return activeController_ == rotationController_;
+    }
+
+    bool isStandControllerActive()
+    {
+        return activeController_ == standController_;
+    }
+
+    bool isStopControllerActive()
+    {
+        return activeController_ == stopController_;
+    }
+
+    bool isWorkPending()
+    {
+        return !work_.empty();
+    }
+
+    void pumpWorkFromQueue();
 
     void pushWork(TaskEnum task, Solution<Grid2d>* solution = nullptr)
     {

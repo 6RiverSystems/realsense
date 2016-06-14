@@ -16,7 +16,7 @@ namespace srs {
 template<typename GRAPH>
 struct SolutionNode
 {
-    enum ActionEnum {NONE, START, GOAL, MOVE, ROTATE};
+    enum ActionEnum {NONE, MOVE, ROTATE};
 
     SolutionNode() :
         actionType(NONE),
@@ -60,14 +60,19 @@ public:
     Solution()
     {}
 
-    NodeType afterStart()
+    Solution(NodeType firstNode)
     {
-        return *(vector<NodeType>::begin() + 1);
+        vector<NodeType>::push_back(firstNode);
     }
 
-    NodeType beforeGoal()
+    NodeType getStart()
     {
-        return *(vector<NodeType>::end() - 2);
+        return *vector<NodeType>::begin();
+    }
+
+    NodeType getGoal()
+    {
+        return *(vector<NodeType>::end() - 1);
     }
 
     friend ostream& operator<<(ostream& stream, const Solution& solution)
@@ -82,29 +87,11 @@ public:
 
         return stream << "}";
     }
-
-    void split(unsigned int position, Solution<GRAPH>& first, Solution<GRAPH>& second)
-    {
-        first.clear();
-        second.clear();
-
-        for (unsigned int i = 0; i <= position; i++)
-        {
-            first.push_back(this->at(i));
-        }
-
-        for (unsigned int i = position + 1; i < this->size(); i++)
-        {
-            second.push_back(this->at(i));
-        }
-    }
 };
 
 template<typename GRAPH>
 unordered_map<int, string> SolutionNode<GRAPH>::ENUM_NAMES = {
     {SolutionNode<GRAPH>::NONE, "NONE"},
-    {SolutionNode<GRAPH>::START, "START"},
-    {SolutionNode<GRAPH>::GOAL, "GOAL"},
     {SolutionNode<GRAPH>::MOVE, "MOVE"},
     {SolutionNode<GRAPH>::ROTATE, "ROTATE"},
 };

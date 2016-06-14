@@ -13,16 +13,15 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CMUPathController::reset()
 {
-    dynamicLookAheadDistance_ = maxLookAheadDistance_;
+    BaseController::reset();
+
+    dynamicLookAheadDistance_ = robot_.maxLookAheadDistance;
 
     currentTrajectory_.clear();
 
     projectionIndex_ = -1;
     referencePose_ = Pose<>();
     referenceIndex_ = -1;
-
-    goal_ = Pose<>();
-    goalReached_ = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +39,8 @@ void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
         referencePose_ = currentTrajectory_.getPose(referenceIndex_);
 
         // Find the projection of the current robot pose onto the trajectory
-        projectionIndex_ = currentTrajectory_.findClosestPose(robotPose, 0, maxLookAheadDistance_);
+        projectionIndex_ = currentTrajectory_.findClosestPose(robotPose, 0,
+            robot_.maxLookAheadDistance);
     }
 }
 
@@ -59,7 +59,7 @@ void CMUPathController::stepController(Pose<> currentPose, Odometry<> currentOdo
     double linear = 0.0;
     double angular = 0.0;
 
-    if (distanceToGoal < goalReachedDistance_)
+    if (distanceToGoal < robot_.goalReachedDistance)
     {
         goalReached_ = true;
     }
@@ -70,7 +70,8 @@ void CMUPathController::stepController(Pose<> currentPose, Odometry<> currentOdo
 
         // Calculate the linear portion of the command
         linear = Kv_ * command.linear;
-        linear = BasicMath::saturate<double>(linear, maxLinear_, -maxLinear_);
+        linear = BasicMath::saturate<double>(linear,
+            robot_.maxLinearVelocity, -robot_.maxLinearVelocity);
 
         // Calculate the angular portion of the command
         double slope = atan2(referencePose_.y - currentPose.y, referencePose_.x - currentPose.x);
@@ -81,10 +82,11 @@ void CMUPathController::stepController(Pose<> currentPose, Odometry<> currentOdo
         // If the robot angle is greater than 45deg, use a different rotation velocity
         if (abs(alpha) > M_PI / 4)
         {
-            angular = BasicMath::sgn(angular) * travelRotationVelocity_;
+            angular = BasicMath::sgn(angular) * robot_.travelRotationVelocity;
         }
 
-        angular = BasicMath::saturate<double>(angular, maxAngular_, -maxAngular_);
+        angular = BasicMath::saturate<double>(angular,
+            robot_.maxAngularVelocity, -robot_.maxAngularVelocity);
     }
 
     // Declare the command executable only if it is different from the previous one
@@ -105,8 +107,8 @@ void CMUPathController::updateLookAheadDistance()
 {
     // Recalculate the look-ahead distance based roughly on the velocity
     dynamicLookAheadDistance_ = BasicMath::saturate(
-        executingCommand_.linear * ratioLookAheadDistance_,
-        maxLookAheadDistance_, minLookAheadDistance_);
+        executingCommand_.linear * robot_.ratioLookAheadDistance,
+        robot_.maxLookAheadDistance, robot_.minLookAheadDistance);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

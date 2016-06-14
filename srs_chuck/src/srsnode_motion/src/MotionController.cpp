@@ -9,6 +9,8 @@
 
 namespace srs {
 
+const Velocity<> MotionController::ZERO_VELOCITY = Velocity<>(0.0, 0.0);
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
@@ -23,6 +25,7 @@ MotionController::MotionController(double dT) :
 
     manualController_ = new ManualController();
     pathController_ = new CMUPathController();
+    rotationController_ = new RotationController();
 
     reset();
 }
@@ -41,29 +44,54 @@ void MotionController::emergencyStop()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::execute(Solution<Grid2d> solution)
 {
-    // If the first action of the solution is a rotation,
-    // split the solution in two parts and give the rotation to
-    // the appropriate controller
+    // Create a copy of the specified solution
+    Solution<Grid2d>* pathSolution = new Solution<Grid2d>(solution);
 
-    Solution<Grid2d>* newSolution = new Solution<Grid2d>(solution);
-    pushWork(TaskEnum::PATH_FOLLOW, newSolution);
+    // Remove the START and GOAL nodes from the solution
+    pathSolution->erase(pathSolution->begin());
+    pathSolution->erase(pathSolution->end() - 1);
 
-//    // TODO: Make sure that it can handle multiple rotations (is there a use case like that??)
-//    SolutionNode<Grid2d> firstNode = solution.afterStart();
-//    if (firstNode.actionType == SolutionNode<Grid2d>::ROTATE_180 ||
-//        firstNode.actionType == SolutionNode<Grid2d>::ROTATE_M90 ||
-//        firstNode.actionType == SolutionNode<Grid2d>::ROTATE_P90)
-//    {
-//        Solution<Grid2d> rotation;
-//        Solution<Grid2d> path;
-//        solution.split(1, rotation, path);
-//
-//        solutions_.push(pair<int, Solution<Grid2d>>(ROTATE, rotation));
-//        solutions_.push(pair<int, Solution<Grid2d>>(FOLLOW, path));
-//    }
-//    else
-//    {
-//    }
+    // TODO: Make sure that it can handle multiple rotations.
+    // Is there a use case like that?: In theory A* can generate a solution
+    // with multiple rotations at the beginning to avoid the costly 180 rotation
+
+    Solution<Grid2d>* initialRotationSolution = nullptr;
+    Solution<Grid2d>* finalRotationSolution = nullptr;
+
+    // Check if the solution starts with a rotation. If that is the case
+    // replace it with rotation that takes in account the current pose
+    // of the robot
+    SolutionNode<Grid2d> startNode = pathSolution->getStart();
+    if (startNode.actionType == SolutionNode<Grid2d>::ROTATE)
+    {
+        startNode.fromPose = currentPose_;
+        initialRotationSolution = new Solution<Grid2d>(startNode);
+
+        // Remove the rotation from the original solution
+        pathSolution->erase(pathSolution->begin());
+    }
+
+    // Check if the solution ends with a rotation. If that is the case
+    // replace it with controlled rotation
+    SolutionNode<Grid2d> goalNode = pathSolution->getGoal();
+    if (goalNode.actionType == SolutionNode<Grid2d>::ROTATE)
+    {
+        finalRotationSolution = new Solution<Grid2d>(goalNode);
+
+        // Remove the rotation from the original solution
+        pathSolution->erase(pathSolution->end() - 1);
+    }
+
+    // Push the solutions into the work queue
+    if (initialRotationSolution)
+    {
+        pushWork(TaskEnum::ROTATE, initialRotationSolution);
+    }
+    pushWork(TaskEnum::PATH_FOLLOW, pathSolution);
+    if (finalRotationSolution)
+    {
+        pushWork(TaskEnum::ROTATE, finalRotationSolution);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +104,16 @@ void MotionController::normalStop()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::reset()
 {
+    // If the robot was moving for some reason,
+    // stop it immediately
+    executeCommand(CommandEnum::VELOCITY, &ZERO_VELOCITY);
+
+    // Reset all the controllers
+    pathController_->reset();
+    manualController_->reset();
+    rotationController_->reset();
+
+    // No controller is active
     selectController(TaskEnum::NONE);
 
     currentOdometry_ = Odometry<>();
@@ -87,15 +125,11 @@ void MotionController::reset()
     nextState_ = StateEnum::STANDING;
     nextTask_ = TaskEnum::STAND;
 
-    pathController_->reset();
-    manualController_->reset();
-
+    // Remove any work in the queue
     while (!work_.empty())
     {
         work_.pop();
     }
-
-    normalStop();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,6 +174,10 @@ void MotionController::run(Pose<> currentPose, Odometry<> currentOdometry, Veloc
         if (currentTask_ != nextTask_)
         {
             currentTask_ = nextTask_;
+
+            // Select the appropriate controller for the task
+            selectController(currentTask_);
+
             switch (currentTask_)
             {
                 case TaskEnum::EMERGENCY_STOP:
@@ -201,15 +239,9 @@ void MotionController::setRobot(RobotProfile robot)
 {
     robot_ = robot;
 
-    pathController_->setGoalReachedDistance(robot_.goalReachedDistance);
-    pathController_->setMaxLookAheadDistance(robot_.maxLookAheadDistance);
-    pathController_->setMaxAngularVelocity(robot_.maxAngularVelocity);
-    pathController_->setMaxLinearVelocity(robot_.maxLinearVelocity);
-    pathController_->setMinLookAheadDistance(robot_.minLookAheadDistance);
-    pathController_->setRatioLookAheadDistance(robot_.ratioLookAheadDistance);
-    pathController_->setTravelAngularVelocity(robot_.travelAngularVelocity);
-    pathController_->setTravelLinearVelocity(robot_.travelLinearVelocity);
-    pathController_->setTravelRotationVelocity(robot_.travelRotationVelocity);
+    pathController_->setRobotProfile(robot);
+    manualController_->setRobotProfile(robot);
+    rotationController_->setRobotProfile(robot);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +266,7 @@ void MotionController::switchToAutonomous()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MotionController::executeCommand(CommandEnum command, Velocity<>* velocity)
+void MotionController::executeCommand(CommandEnum command, const Velocity<>* velocity)
 {
     geometry_msgs::Twist messageTwist;
 
@@ -260,58 +292,86 @@ void MotionController::executeCommand(CommandEnum command, Velocity<>* velocity)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::checkForWork()
 {
-    // If there is work in the queue, change the task accordingly
-    if (!work_.empty())
+    // Grab more work only if the motion controller
+    // is not moving the robot
+    if (!isMoving())
     {
-        // First, find the work to do
-        WorkType work = work_.front();
-        work_.pop();
-
-        // Schedule the next task
-        TaskEnum task = static_cast<TaskEnum>(work.first);
-        nextTask(task);
-
-        // Specify the next solution (if any)
-        if (work.second)
+        // If there is work in the queue, change the task accordingly
+        if (!work_.empty())
         {
-            nextSolution_ = *work.second;
-            delete work.second;
+            // First, find the work to do
+            WorkType work = work_.front();
+            work_.pop();
+
+            // Schedule the next task
+            TaskEnum task = static_cast<TaskEnum>(work.first);
+            nextTask(task);
+
+            // Specify the next solution (if any)
+            if (work.second)
+            {
+                nextSolution_ = *work.second;
+                cout << "--------------------------------------" << endl;
+                cout << nextSolution_ << endl;
+                cout << "--------------------------------------" << endl;
+
+                delete work.second;
+            }
+            else
+            {
+                nextSolution_.clear();
+            }
         }
         else
         {
-            nextSolution_.clear();
+            // If the controller is not moving the robot
+            nextTask(TaskEnum::STAND);
         }
-
-        selectController(task);
-    }
-    else
-    {
-        // If the controller is not moving the robot
-        if (!isMoving())
-        {
-            // Otherwise, just keep standing
-            nextTask(STAND);
-        }
-
-        // Otherwise, let the state machine complete whatever
-        // work the controller was doing
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::selectController(TaskEnum task)
 {
-    activeController_ = nullptr;
-
     switch (task)
     {
+        case MANUAL_FOLLOW:
+            activeController_ = manualController_;
+            break;
+
+        case NORMAL_STOP:
+            // TODO: Normal stop should have its own controller. For now
+            // there is nothing else to do
+            activeController_ = nullptr;
+            break;
+
         case PATH_FOLLOW:
             activeController_ = pathController_;
             break;
 
-        case MANUAL_FOLLOW:
-            activeController_ = manualController_;
+        case ROTATE:
+            activeController_ = rotationController_;
             break;
+
+        case STAND:
+            // TODO: Stand should have its own controller in case the robot
+            // is pushed out of the way
+
+        case NONE:
+            activeController_ = nullptr;
+            break;
+
+        default:
+            // In all other cases, there might be a problem
+            // or the implementation of the case is missing
+            throw;
+    }
+
+    // Before using the new controller, make sure that
+    // it starts from a good state
+    if (activeController_)
+    {
+        activeController_->reset();
     }
 }
 
@@ -321,6 +381,7 @@ void MotionController::stateRunning()
     if (!activeController_ || (activeController_ && activeController_->isGoalReached()))
     {
         nextState(StateEnum::STANDING);
+        nextTask(TaskEnum::STAND);
     }
     else
     {
@@ -382,6 +443,15 @@ void MotionController::taskPathFollow()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::taskRotate()
 {
+    // Switch the current solution to the one that needs to be executed
+    currentSolution_ = nextSolution_;
+
+    // Pass the goal to the path controller
+    Pose<> goalPose = currentSolution_.getGoal().toPose;
+    rotationController_->setGoal(goalPose);
+
+    // Change state
+    nextState(StateEnum::RUNNING);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

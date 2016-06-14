@@ -21,7 +21,12 @@ public:
     ~ManualController()
     {}
 
-    void reset();
+    void reset()
+    {
+        BaseController::reset();
+
+        userCommand_ = Velocity<>();
+    }
 
     void setUserCommand(Velocity<> userCommand)
     {
@@ -29,7 +34,15 @@ public:
     }
 
 protected:
-    void stepController(Pose<> currentPose, Odometry<> currentOdometry);
+    void stepController(Pose<> currentPose, Odometry<> currentOdometry)
+    {
+        // If the robot is moving backward and at the same time
+        // rotating, invert the direction of rotation. No transformation
+        // is performed if the robot is rotating in place (linear = 0)
+        //angular *= BasicMath::sgn(linear);
+
+        executeCommand(userCommand_);
+    }
 
 private:
     Velocity<> userCommand_;

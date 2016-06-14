@@ -19,7 +19,7 @@ using namespace std;
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
-#include <srslib_framework/robotics/robot/RobotProfile.hpp>
+#include <srslib_framework/robotics/RobotProfile.hpp>
 using namespace srs;
 
 namespace srs {
@@ -140,6 +140,10 @@ private:
     {
         path.clear();
 
+        // Push the first node of the solution as initial waypoint
+        path.push_back(solution.getStart().fromPose);
+
+        // Ignore all but the rotations, which will be used as waypoints
         for (auto solutionNode : solution)
         {
             switch (solutionNode.actionType)
@@ -147,13 +151,14 @@ private:
                 case SolutionNode<Grid2d>::MOVE:
                     break;
 
-                case SolutionNode<Grid2d>::START:
-                case SolutionNode<Grid2d>::GOAL:
                 case SolutionNode<Grid2d>::ROTATE:
                     path.push_back(solutionNode.toPose);
                     break;
             }
         }
+
+        // Push the last node of the solution as final waypoint
+        path.push_back(solution.getGoal().toPose);
     }
 
     void interpolatePath(PathType& waypoints, double spacing, double dT)

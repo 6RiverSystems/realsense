@@ -12,6 +12,7 @@
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
+#include <srslib_framework/robotics/RobotProfile.hpp>
 
 namespace srs {
 
@@ -22,15 +23,11 @@ public:
         executingCommand_(Velocity<>()),
         goal_(Pose<>()),
         goalReached_(false),
-        goalReachedDistance_(0.1),
         Kv_(1.0),
         Kw_(1.0),
         isRobotMoving_(false),
-        maxAngular_(0.0),
-        maxLinear_(0.0),
         newCommandAvailable_(false),
-        travelAngular_(0.0),
-        travelLinear_(0.0)
+        robot_()
     {}
 
     virtual ~BaseController()
@@ -62,36 +59,25 @@ public:
         return newCommandAvailable_;
     }
 
-    virtual void reset() = 0;
+    virtual void reset()
+    {
+        goal_ = Pose<>();
+        goalReached_ = false;
+
+        isRobotMoving_ = false;
+
+        executingCommand_ = Velocity<>();
+        newCommandAvailable_ = false;
+    }
 
     void setGoal(Pose<> goal)
     {
         goal_ = goal;
     }
 
-    void setGoalReachedDistance(double value)
+    void setRobotProfile(RobotProfile robot)
     {
-        goalReachedDistance_ = value;
-    }
-
-    void setMaxAngularVelocity(double value)
-    {
-        maxAngular_ = value;
-    }
-
-    void setMaxLinearVelocity(double value)
-    {
-        maxLinear_ = value;
-    }
-
-    void setTravelAngularVelocity(double value)
-    {
-        travelAngular_ = value;
-    }
-
-    void setTravelLinearVelocity(double value)
-    {
-        travelLinear_ = value;
+        robot_ = robot;
     }
 
     void setVelocityGains(double Kv, double Kw)
@@ -122,6 +108,8 @@ protected:
         // The two velocities to be similar must:
         // - difference in linear velocity must be less than 0.01 m/s
         // - difference in angular velocity must be less than 0.1 deg/s
+
+        // TODO: Move the constants to constexpr
         return abs(lhv.linear - rhv.linear) < 0.01 && abs(lhv.angular - rhv.angular) < 0.002;
     }
 
@@ -131,20 +119,15 @@ protected:
 
     Pose<> goal_;
     bool goalReached_;
-    double goalReachedDistance_;
 
     double Kv_;
     double Kw_;
 
     bool isRobotMoving_;
 
-    double maxAngular_;
-    double maxLinear_;
-
     bool newCommandAvailable_;
 
-    double travelAngular_;
-    double travelLinear_;
+    RobotProfile robot_;
 };
 
 } // namespace srs

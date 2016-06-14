@@ -21,8 +21,9 @@ using namespace std;
 
 #include <srslib_framework/robotics/controller/CMUPathController.hpp>
 #include <srslib_framework/robotics/controller/ManualController.hpp>
+#include <srslib_framework/robotics/controller/RotationController.hpp>
 
-#include <srslib_framework/robotics/robot/RobotProfile.hpp>
+#include <srslib_framework/robotics/RobotProfile.hpp>
 
 namespace srs {
 
@@ -60,7 +61,7 @@ public:
 
     bool isMoving() const
     {
-        return currentState_ != StateEnum::STANDING;
+        return currentState_ != StateEnum::STANDING || currentTask_ != TaskEnum::STAND;
     }
 
     void normalStop();
@@ -73,6 +74,8 @@ public:
     void switchToAutonomous();
 
 private:
+    const static Velocity<> ZERO_VELOCITY;
+
     enum CommandEnum {VELOCITY, E_STOP};
     enum StateEnum {NIL, STANDING, RUNNING, ROTATING, STOPPING};
     enum TaskEnum {NONE, EMERGENCY_STOP, PATH_FOLLOW, MANUAL_FOLLOW, NORMAL_STOP, ROTATE, STAND};
@@ -81,7 +84,7 @@ private:
 
     void checkForWork();
 
-    void executeCommand(CommandEnum command, Velocity<>* velocity = nullptr);
+    void executeCommand(CommandEnum command, const Velocity<>* velocity = nullptr);
 
     void nextState(StateEnum nextState)
     {
@@ -134,6 +137,7 @@ private:
     ros::Publisher pubCmdVel_;
 
     RobotProfile robot_;
+    RotationController* rotationController_;
 
     queue<WorkType> work_;
 };

@@ -22,13 +22,9 @@ public:
     CMUPathController() :
         BaseController(),
         dynamicLookAheadDistance_(0.5),
-        maxLookAheadDistance_(0.5),
-        minLookAheadDistance_(0.5),
         projectionIndex_(-1),
-        ratioLookAheadDistance_(1.1),
         referencePose_(Pose<>()),
-        referenceIndex_(-1),
-        travelRotationVelocity_(0.1)
+        referenceIndex_(-1)
     {}
 
     ~CMUPathController()
@@ -36,31 +32,12 @@ public:
 
     void reset();
 
-    void setMaxLookAheadDistance(double lookAheadDistance)
-    {
-        maxLookAheadDistance_ = lookAheadDistance;
-    }
-
-    void setMinLookAheadDistance(double lookAheadDistance)
-    {
-        minLookAheadDistance_ = lookAheadDistance;
-    }
-
-    void setRatioLookAheadDistance(double ratioLookAheadDistance)
-    {
-        ratioLookAheadDistance_ = ratioLookAheadDistance;
-    }
-
     void setTrajectory(Trajectory<> trajectory, Pose<> robotPose);
 
-    void setTravelRotationVelocity(double value)
-    {
-        travelRotationVelocity_ = value;
-    }
-
-private:
+protected:
     void stepController(Pose<> currentPose, Odometry<> currentOdometry);
 
+private:
     void updateLookAheadDistance();
     void updateProjectionIndex(Pose<> robotPose);
 
@@ -68,16 +45,10 @@ private:
 
     double dynamicLookAheadDistance_;
 
-    double maxLookAheadDistance_;
-    double minLookAheadDistance_;
-
     int projectionIndex_;
 
-    double ratioLookAheadDistance_;
     Pose<> referencePose_;
     int referenceIndex_;
-
-    double travelRotationVelocity_;
 };
 
 } // namespace srs

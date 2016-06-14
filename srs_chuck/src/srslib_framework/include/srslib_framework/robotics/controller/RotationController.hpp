@@ -20,13 +20,21 @@ public:
         BaseController(),
         Kd_(0.0),
         Ki_(0.0),
-        Kp_(0.0),
+        Kp_(1.0),
         integral_(0.0),
         previousError_(0.0)
     {}
 
     ~RotationController()
     {}
+
+    void reset()
+    {
+        BaseController::reset();
+
+        integral_ = 0.0;
+        previousError_ = 0.0;
+    }
 
     void setPIDGains(double Kp, double Ki, double Kd)
     {
@@ -36,22 +44,32 @@ public:
     }
 
 protected:
-    Velocity<> stepController(Pose<> currentPose, Odometry<> currentOdometry)
+    void stepController(Pose<> currentPose, Odometry<> currentOdometry)
     {
-        double error = AngleMath::normalizeAngleRad(desiredPose.theta - currentPose.theta);
+        double error = AngleMath::normalizeAngleRad<double>(goal_.theta - currentPose.theta);
+
+        if (BasicMath::fpEqual(goal_.theta, currentPose.theta, robot_.goalReachedAngle))
+        {
+            goalReached_ = true;
+        }
 
         // Calculate the linear portion of the command
-        double linear = Kv_ * command.linear;
-        linear = BasicMath::saturate<double>(linear, maxLinear_, -maxLinear_);
+        double linear = 0;
 
         // Calculate the angular portion of the command
         double angular = Kw_ * (Kp_ * error + Ki_ * integral_ + Kd_ * (error - previousError_));
-        angular = BasicMath::saturate<double>(angular, maxAngular_, -maxAngular_);
+        angular = BasicMath::saturate<double>(angular,
+            robot_.travelRotationVelocity, -robot_.travelRotationVelocity);
 
         integral_ += error;
         previousError_ = error;
 
-        return Velocity<>(linear, angular);
+        // Declare the command executable only if it is different from the previous one
+        Velocity<> nextCommand = Velocity<>(linear, angular);
+        if (!similarVelocities(executingCommand_, nextCommand))
+        {
+            executeCommand(nextCommand);
+        }
     }
 
 private:

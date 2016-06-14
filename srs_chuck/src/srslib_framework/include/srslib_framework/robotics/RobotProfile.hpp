@@ -13,7 +13,9 @@ struct RobotProfile
     RobotProfile() :
         bodyWidth(0.0),
         bodyDepth(0.0),
+
         goalReachedDistance(0.0),
+        goalReachedAngle(0.0),
 
         maxAngularAcceleration(0.0),
         maxAngularVelocity(0.0),
@@ -43,6 +45,7 @@ struct RobotProfile
     double bodyDepth; // [m]
 
     double goalReachedDistance; // [m]
+    double goalReachedAngle; // [rad]
 
     double maxAngularAcceleration; // [rad/s^2]
     double maxAngularVelocity; // [rad/s]
@@ -56,7 +59,6 @@ struct RobotProfile
     double travelAngularAcceleration; // [rad/s^2]
     double travelAngularVelocity; // [rad/s]
     double travelCurveZoneRadius; // [m]
-
     double travelCurvingVelocity; // [m/s]
     double travelLinearAcceleration; // [m/s^2]
     double travelLinearVelocity; // [m/s]

@@ -47,12 +47,14 @@ set(${PROJECT_NAME}_SOURCES
 
     include/${PROJECT_NAME}/robotics/Pose.hpp
     include/${PROJECT_NAME}/robotics/Odometry.hpp
-    include/${PROJECT_NAME}/robotics/Velocity.hpp
+    include/${PROJECT_NAME}/robotics/RobotProfile.hpp
     include/${PROJECT_NAME}/robotics/Trajectory.hpp
+    include/${PROJECT_NAME}/robotics/Velocity.hpp
 
+    include/${PROJECT_NAME}/robotics/controller/ManualController.hpp
+    include/${PROJECT_NAME}/robotics/controller/RotationController.hpp
     include/${PROJECT_NAME}/robotics/controller/YoshizawaController.hpp
     src/robotics/controller/CMUPathController.cpp
-    src/robotics/controller/ManualController.cpp
 
     include/${PROJECT_NAME}/ros/RosTap.hpp
     include/${PROJECT_NAME}/ros/RosService.hpp

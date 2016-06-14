@@ -22,6 +22,10 @@ using namespace std;
 
 namespace srs {
 
+// TODO: Solve the problem of the 180 rotation: If 180rot is not allowed,
+// A* might be able to produce a sequence of 90 rotations to go around the
+// constraint. If we don't want allow that, +/-90 rot should be as expensive
+// as a 180rot.
 template<typename GRAPH>
 class AStar
 {
@@ -76,6 +80,8 @@ public:
     // TODO: Instead of passing the resolution an object with the map coordinate transformation
     // should be passed
     // TODO: Also this conversion should be done elsewhere.
+    // TODO: Change the format of the solution to aggregate similar maneuvers:
+    // like consecutive forwards/backwards, and consecutive rotations
     Solution<GRAPH> getSolution(double graphResolution)
     {
         Solution<GRAPH> result;
@@ -95,8 +101,12 @@ public:
         SearchNode<GRAPH>* toCursor = lastNode_;
         SearchNode<GRAPH>* fromCursor = lastNode_->parent;
 
+        bool insertNode;
+
         while (toCursor)
         {
+            insertNode = true;
+
             getWorldCoordinates(graphResolution,
                 toCursor->action->position.location.x, toCursor->action->position.location.y,
                 toX, toY);
@@ -117,13 +127,11 @@ public:
             switch (toCursor->action->actionType)
             {
                 case SearchAction<GRAPH>::START:
-                    solutionNode.actionType = SolutionNode<GRAPH>::START;
-                    fromPose = toPose;
+                    insertNode = false;
                     break;
 
                 case SearchAction<GRAPH>::GOAL:
-                    solutionNode.actionType = SolutionNode<GRAPH>::GOAL;
-                    fromPose = toPose;
+                    insertNode = false;
                     break;
 
                 case SearchAction<GRAPH>::FORWARD:
@@ -163,7 +171,10 @@ public:
             solutionNode.fromPose = fromPose;
             solutionNode.toPose = toPose;
 
-            result.insert(result.begin(), solutionNode);
+            if (insertNode)
+            {
+                result.insert(result.begin(), solutionNode);
+            }
 
             toCursor = toCursor->parent;
             if (fromCursor)
@@ -171,6 +182,8 @@ public:
                 fromCursor = fromCursor->parent;
             }
         }
+
+        cout << result << endl;
 
         return result;
     }

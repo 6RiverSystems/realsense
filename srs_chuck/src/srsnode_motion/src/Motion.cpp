@@ -239,6 +239,12 @@ void Motion::scanTapsForData()
         firstLocalization_ = false;
     }
 
+    // If the joystick was touched, read the state of the latch
+    if (tapJoyAdapter_.newDataAvailable())
+    {
+        isJoystickLatched_ = tapJoyAdapter_.getLatchState();
+    }
+
     // if (!motionController_.isMoving() && tapMap_.getMap() && !motionController_.isGoalReached())
     // {
     //     executePlanToGoal(tapCmdGoal_.getGoal());
@@ -248,12 +254,15 @@ void Motion::scanTapsForData()
     // If there is a new goal to reach
     if (tapCmdGoal_.newDataAvailable())
     {
-        if (!tapJoyAdapter_.getLatchState())
+        if (!isJoystickLatched_)
         {
             executePlanToGoal(tapCmdGoal_.getGoal());
             publishGoal();
         }
     }
+
+    // Check if odometry is available
+    isOdometryAvailable_ = tapOdometry_.newDataAvailable();
 
 //    // If there is a new plan to execute
 //    if (tapPlan_.newDataAvailable())
@@ -277,30 +286,22 @@ void Motion::reset(Pose<> pose0)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::stepNode()
 {
-    bool odometryAvailable = tapOdometry_.newDataAvailable();
     Odometry<> currentOdometry = tapOdometry_.getSensor()->getOdometry();
-
     Velocity<> currentJoystickCommand = tapJoyAdapter_.getVelocity();
 
-    // If the joystick was touched, we know that we are latched
-    if (tapJoyAdapter_.newDataAvailable())
+    // Depending on the state of the joystick latch, enable or disable
+    // the autonomous mode
+    if (isJoystickLatched_)
     {
-        // If the joystick was touched, we know that we are latched
-        if (tapJoyAdapter_.getLatchState())
-        {
-            // Tell the motion controller that the joystick is
-            // assuming control
-            motionController_.switchToManual();
-        }
-        else {
-            // Tell the motion controller that the joystick is
-            // assuming control
-            motionController_.switchToAutonomous();
-        }
+        motionController_.switchToManual();
+    }
+    else
+    {
+        motionController_.switchToAutonomous();
     }
 
     // Provide the command to the position estimator
-    if (odometryAvailable)
+    if (isOdometryAvailable_)
     {
         positionEstimator_.run(&currentOdometry);
     }

@@ -73,6 +73,9 @@ private:
 
     bool firstLocalization_;
 
+    bool isJoystickLatched_;
+    bool isOdometryAvailable_;
+
     MotionController motionController_;
 
     PositionEstimator positionEstimator_;

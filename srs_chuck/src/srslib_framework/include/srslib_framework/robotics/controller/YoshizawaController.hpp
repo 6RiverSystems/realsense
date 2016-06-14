@@ -39,7 +39,7 @@ public:
         // A = sign(ex) * ey / ex^2;
         // wb = 2 * A * o.Kw;
         // angular = wb;
-        double angular = 2 * Kw_ * BasicMath::sgn(ex) * ey / (ex * ex);
+        double angular = 2 * Kw_ * BasicMath::sgn<double>(ex) * ey / (ex * ex);
 
         return Velocity<>(linear, angular);
     }

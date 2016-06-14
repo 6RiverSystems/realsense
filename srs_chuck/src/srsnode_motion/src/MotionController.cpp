@@ -179,6 +179,10 @@ void MotionController::switchToManual()
 {
     if (!isManualControllerActive())
     {
+        // Cancel the current activity and clear the work queue
+        activeController_->cancel();
+        cleanWorkQueue();
+
         pushWork(TaskEnum::MANUAL_FOLLOW);
     }
 }
@@ -188,7 +192,8 @@ void MotionController::switchToAutonomous()
 {
     if (isManualControllerActive())
     {
-        pushWork(TaskEnum::NONE);
+        // Cancel the current activity
+        activeController_->cancel();
     }
 }
 
@@ -232,22 +237,16 @@ void MotionController::checkMotionStatus()
     if (isStandControllerActive() && isWorkPending())
     {
         activeController_->cancel();
-
-        // If no emergency has been declared
-        if (!emergencyDeclared_)
-        {
-            pumpWorkFromQueue();
-        }
     }
 
     // If the controller says that the goal has been reached, and
     // the work has not been canceled for some reason
-    if (activeController_->isGoalReached() && !activeController_->isCanceled())
+    if (activeController_->isGoalReached())
     {
         // If the active controller is the path controller, it is not
         // guaranteed that the final angle of the robot matches the angle
         // of the goal. In that case, a rotation is added to complete the movement
-        if (isPathControllerActive())
+        if (isPathControllerActive() && !activeController_->isCanceled())
         {
             Pose<> goal = activeController_->getGoal();
 

@@ -37,6 +37,7 @@ public:
     void cancel()
     {
         canceled_ = true;
+        goalReached_ = true;
     }
 
     Velocity<> getExecutingCommand()

@@ -166,7 +166,7 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     tapOdometry_.getSensor()->enable(configuration_.odometry_enabled);
     ROS_INFO_STREAM("Odometry sensor enabled: " << configuration_.odometry_enabled);
 
-    motionController_.setRobot(robot_);
+    //motionController_.setRobot(robot_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,7 +176,7 @@ void Motion::publishArrived()
     // has completed the request
     if (motionController_.hasArrived())
     {
-        ROS_DEBUG_NAMED("Motion", "Arrived at goal");
+        ROS_INFO_STREAM_NAMED("Motion", "Arrived at goal: " << motionController_.getGoal());
 
         std_msgs::Bool messageGoalArrived;
         messageGoalArrived.data = motionController_.hasArrived();

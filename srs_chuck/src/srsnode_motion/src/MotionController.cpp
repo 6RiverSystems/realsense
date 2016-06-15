@@ -275,6 +275,7 @@ void MotionController::checkMotionStatus()
     // the queue, cancel work in the controller and pump work from the queue
     if (isStandControllerActive() && isWorkPending())
     {
+        ROS_INFO_NAMED("MotionController", "Abandoned STAND");
         activeController_->cancel();
     }
 
@@ -282,6 +283,15 @@ void MotionController::checkMotionStatus()
     // the work has not been canceled for some reason
     if (activeController_->isGoalReached())
     {
+        if (activeController_->isCanceled())
+        {
+            ROS_INFO_NAMED("MotionController", "Controller goal canceled");
+        }
+        else
+        {
+            ROS_INFO_NAMED("MotionController", "Controller goal reached its goal");
+        }
+
         // If the active controller is the path controller, it is not
         // guaranteed that the final angle of the robot matches the angle
         // of the goal. In that case, a rotation is added to complete the movement
@@ -293,6 +303,10 @@ void MotionController::checkMotionStatus()
             if (!AngleMath::equalRad<double>(goal.theta, currentPose_.theta,
                 robot_.goalReachedAngle))
             {
+                ROS_INFO_STREAM_NAMED("MotionController", "Rotation needed from: " <<
+                    AngleMath::rad2deg<double>(currentPose_.theta) << "deg to: " <<
+                    AngleMath::rad2deg<double>(goal.theta) << "deg");
+
                 Solution<Grid2d>* solution = SolutionGenerator<Grid2d>::fromRotation(
                     currentPose_,
                     currentPose_.theta, goal.theta);
@@ -314,6 +328,7 @@ void MotionController::checkMotionStatus()
             // If there is nothing else to do, simply stand still
             if (!isWorkPending())
             {
+                ROS_INFO_NAMED("MotionController", "No work was found");
                 pushWork(TaskEnum::STAND);
             }
 
@@ -477,6 +492,9 @@ void MotionController::taskNormalStop()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::taskPathFollow()
 {
+    // Store what goal the controller is going to work on
+    currentGoal_ = currentSolution_.getGoal().toPose;
+
     // Calculate the trajectory
     Trajectory<> trajectory;
     TrajectoryGenerator converter(robot_);
@@ -491,9 +509,11 @@ void MotionController::taskPathFollow()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::taskRotate()
 {
+    // Store what goal the controller is going to work on
+    currentGoal_ = currentSolution_.getGoal().toPose;
+
     // Pass the goal to the path controller
-    Pose<> goalPose = currentSolution_.getGoal().toPose;
-    rotationController_->setGoal(goalPose);
+    rotationController_->setGoal(currentGoal_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

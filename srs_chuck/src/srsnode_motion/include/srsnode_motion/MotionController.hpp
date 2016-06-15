@@ -49,7 +49,7 @@ public:
 
     Pose<> getGoal() const
     {
-        return activeController_->getGoal();
+        return currentGoal_;
     }
 
     bool hasArrived() const
@@ -159,11 +159,12 @@ private:
 
     BaseController* activeController_;
 
+    Velocity<> currentCommand_;
+    Pose<> currentGoal_;
     Odometry<> currentOdometry_;
     Pose<> currentPose_;
     Solution<Grid2d> currentSolution_;
     TaskEnum currentTask_;
-    Velocity<> currentCommand_;
 
     double dT_;
 

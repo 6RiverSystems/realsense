@@ -47,17 +47,17 @@ void MotionController::emergencyStop()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::execute(Solution<Grid2d> solution)
 {
-//    // If the robot is already moving, cancel the previous work
-//    // and execute what has been asked
-//    if (isMoving())
-//    {
-//        // Clean the pending work
-//        cleanWorkQueue();
-//        pushWork(TaskEnum::NORMAL_STOP);
-//
-//        // Cancel the work in the controller
-//        activeController_->cancel();
-//    }
+    // If the robot is already moving, cancel the previous work, stop,
+    // and execute what has been asked
+    if (!isStandControllerActive())
+    {
+        // Clean the pending work
+        cleanWorkQueue();
+        pushWork(TaskEnum::NORMAL_STOP);
+
+        // Cancel the work in the controller
+        activeController_->cancel();
+    }
 
     // Create a copy of the specified solution
     Solution<Grid2d>* pathSolution = new Solution<Grid2d>(solution);
@@ -97,11 +97,15 @@ void MotionController::execute(Solution<Grid2d> solution)
     if (initialRotationSolution)
     {
         pushWork(TaskEnum::ROTATE, initialRotationSolution);
+        ROS_DEBUG_STREAM_NAMED("MotionController", "INITIAL");
+        ROS_DEBUG_STREAM_NAMED("MotionController", *initialRotationSolution);
     }
     pushWork(TaskEnum::PATH_FOLLOW, pathSolution);
     if (finalRotationSolution)
     {
         pushWork(TaskEnum::ROTATE, finalRotationSolution);
+        ROS_DEBUG_STREAM_NAMED("MotionController", "FINAL");
+        ROS_DEBUG_STREAM_NAMED("MotionController", *finalRotationSolution);
     }
 }
 
@@ -220,7 +224,7 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
                 messageTwist.angular.y = 0;
                 messageTwist.angular.z = currentCommand_.angular;
 
-                ROS_INFO_STREAM_NAMED("MotionController", "Sending velocity: " << currentCommand_);
+                ROS_DEBUG_STREAM_NAMED("MotionController", "Sending velocity: " << currentCommand_);
                 pubCmdVel_.publish(messageTwist);
             }
             break;
@@ -237,7 +241,7 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
             messageTwist.angular.y = 0;
             messageTwist.angular.z = currentCommand_.angular;
 
-            ROS_INFO_STREAM_NAMED("MotionController", "Sending e-stop: " << currentCommand_);
+            ROS_DEBUG_STREAM_NAMED("MotionController", "Sending e-stop: " << currentCommand_);
             pubCmdVel_.publish(messageTwist);
             break;
     }

@@ -157,20 +157,20 @@ public:
     friend ostream& operator<<(ostream& stream, const Grid2d& grid)
     {
         constexpr int WIDTH = 6;
-        stream << "Grid2d {" << '\n';
+        stream << "Grid2d {" << endl;
 
-        cout << "(" << grid.height_ << "x" << grid.width_ << ")" << endl;
+        stream << "(" << grid.height_ << "x" << grid.width_ << ")" << endl;
 
-        cout << right << setw(WIDTH) << ' ';
+        stream << right << setw(WIDTH) << ' ';
         for (int x = 0; x < grid.width_; ++x)
         {
-            cout << right << setw(WIDTH - 1) << x << ' ';
+            stream << right << setw(WIDTH - 1) << x << ' ';
         }
-        cout << endl;
+        stream << endl;
 
         for (int y = 0; y < grid.height_; ++y)
         {
-            cout << right << setw(WIDTH) << y;
+            stream << right << setw(WIDTH) << y;
             for (int x = 0; x < grid.width_; ++x)
             {
                 Grid2dLocation nodeLocation;
@@ -180,15 +180,15 @@ public:
                 if (grid.exists(nodeLocation))
                 {
                     Grid2dNode* node = grid.grid_.at(nodeLocation);
-                    cout << right << setw(WIDTH - 1) << node->cost;
-                    cout << (node->notes ? '*' : ' ');
+                    stream << right << setw(WIDTH - 1) << node->cost;
+                    stream << (node->notes ? '*' : ' ');
                 }
                 else
                 {
-                    cout << right << setw(WIDTH) << ". ";
+                    stream << right << setw(WIDTH) << ". ";
                 }
             }
-            cout << endl;
+            stream << endl;
         }
 
         stream << "}";

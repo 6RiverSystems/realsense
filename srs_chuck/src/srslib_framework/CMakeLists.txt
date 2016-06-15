@@ -67,6 +67,7 @@ set(${PROJECT_NAME}_SOURCES
     include/${PROJECT_NAME}/ros/service/RosServiceTrigger.hpp
     include/${PROJECT_NAME}/ros/service/RosTriggerShutdown.hpp
     
+    include/${PROJECT_NAME}/ros/tap/RosTapBool.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapBrainStem.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapInternal_Goal.hpp

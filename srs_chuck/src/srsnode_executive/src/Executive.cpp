@@ -132,11 +132,8 @@ void Executive::findActiveNodes(vector<string>& nodes)
 
     string nameSpace = rosNodeHandle_.getNamespace();
 
-    cout << nameSpace << endl;
-
     for (auto node : rosMasterNodes)
     {
-        cout << node << endl;
         if (node.find("srsnode") != string::npos &&
             node.find(nameSpace) == string::npos)
         {

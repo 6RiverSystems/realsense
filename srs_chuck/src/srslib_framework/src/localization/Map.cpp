@@ -168,44 +168,6 @@ void Map::load(string filename)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Map::print()
-{
-    int8_t maxValue = numeric_limits<int8_t>::max();
-
-    for (int row = grid_->getHeight() - 1; row >= 0; row--)
-    {
-        for (int col = 0; col < grid_->getWidth(); col++)
-        {
-            Grid2dLocation location = Grid2dLocation(col, row);
-
-            MapNote* note = reinterpret_cast<MapNote*>(grid_->getNote(location));
-            float floatCost = (static_cast<float>(grid_->getCost(location)) / maxValue) * 100.0;
-
-            char cost;
-
-            if (note && note->staticObstacle())
-            {
-                cost = '#';
-            }
-            else
-            {
-                if (floatCost > 0.0)
-                {
-                    cost = '+';
-                }
-                else
-                {
-                    cost = '.';
-                }
-            }
-            cout << cost;
-        }
-
-        cout << endl;
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void Map::setGrid(const vector<int8_t>& costsGrid, const vector<int8_t>& notesGrid)
 {
     if (grid_)
@@ -379,6 +341,39 @@ void Map::loadCosts()
     }
 
     SDL_FreeSurface(image);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Global operators
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+ostream& operator<<(ostream& stream, const Map& map)
+{
+    int8_t maxValue = numeric_limits<int8_t>::max();
+
+    for (int row = map.grid_->getHeight() - 1; row >= 0; row--)
+    {
+        for (int col = 0; col < map.grid_->getWidth(); col++)
+        {
+            Grid2dLocation location = Grid2dLocation(col, row);
+
+            MapNote* note = reinterpret_cast<MapNote*>(map.grid_->getNote(location));
+            float floatCost = (static_cast<float>(map.grid_->getCost(location)) / maxValue) * 100.0;
+
+            char cost = floatCost > 0.0 ? '+' : '.';
+
+            if (note && note->staticObstacle())
+            {
+                cost = '#';
+            }
+
+            stream << cost;
+        }
+
+        stream << endl;
+    }
+
+    return stream;
 }
 
 } // namespace srs

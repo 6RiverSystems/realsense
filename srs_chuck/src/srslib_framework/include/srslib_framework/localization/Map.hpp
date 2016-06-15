@@ -7,6 +7,7 @@
 #define MAP_HPP_
 
 #include <string>
+#include <sstream>
 using namespace std;
 
 #include <yaml-cpp/yaml.h>
@@ -70,9 +71,9 @@ public:
         return widthM_;
     }
 
-    void print();
-
     void load(string filename);
+
+    friend ostream& operator<<(ostream& stream, const Map& map);
 
     void setGrid(const vector<int8_t>& costsGrid, const vector<int8_t>& notesGrid);
 
@@ -105,6 +106,8 @@ private:
 
     Grid2d* grid_;
 };
+
+ostream& operator<<(ostream& stream, const Map& map);
 
 } // namespace srs
 

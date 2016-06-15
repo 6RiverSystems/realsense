@@ -181,8 +181,6 @@ public:
             }
         }
 
-        cout << result << endl;
-
         return result;
     }
 

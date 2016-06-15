@@ -21,8 +21,8 @@ class RosTapCmd_Pause :
     public RosTap
 {
 public:
-    RosTapCmd_Pause(ros::NodeHandle rosHandle) :
-        RosTap(rosHandle, "Command 'Pause' Tap"),
+    RosTapCmd_Pause() :
+        RosTap("Command 'Pause' Tap"),
         currentPause_(false)
     {}
 

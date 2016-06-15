@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPCMD_GOAL_HPP_
-#define ROSTAPCMD_GOAL_HPP_
+#ifndef ROSTAPINTERNALGOAL_HPP_
+#define ROSTAPINTERNALGOAL_HPP_
 
 #include <string>
 using namespace std;
@@ -15,15 +15,15 @@ using namespace std;
 
 namespace srs {
 
-class RosTapCmd_Goal :
+class RosTapInternal_Goal :
     public RosTapPose
 {
 public:
-    RosTapCmd_Goal() :
-        RosTapPose("/cmd/goal", "Command goal")
+    RosTapInternal_Goal() :
+        RosTapPose("/internal/goal", "Internal goal")
     {}
 };
 
 } // namespace srs
 
-#endif // ROSTAPCMD_GOAL_HPP_
+#endif // ROSTAPINTERNALGOAL_HPP_

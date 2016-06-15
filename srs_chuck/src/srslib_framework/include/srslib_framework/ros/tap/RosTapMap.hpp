@@ -9,7 +9,6 @@
 #include <string>
 using namespace std;
 
-#include <ros/ros.h>
 #include <nav_msgs/GetMap.h>
 
 #include <srslib_framework/CompleteMap.h>
@@ -24,8 +23,8 @@ class RosTapMap :
     public RosTap
 {
 public:
-    RosTapMap(ros::NodeHandle rosHandle):
-        RosTap(rosHandle, "Global Map Tap"),
+    RosTapMap():
+        RosTap("Global Map Tap"),
         map_(nullptr)
     {}
 

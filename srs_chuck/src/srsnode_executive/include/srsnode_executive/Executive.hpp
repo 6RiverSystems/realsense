@@ -45,13 +45,15 @@ private:
     void executePlanToGoal(Pose<> goal);
     void executeShutdown();
 
-    void publishInitialPose();
+    void publishInternalInitialPose(Pose<> initialPose);
+    void publishInternalGoal(Pose<> goal);
 
     void stepExecutiveFunctions();
 
     AStar<Grid2d> algorithm_;
 
     ros::Publisher pubInitialPose_;
+    ros::Publisher pubInternalGoal_;
 
     Pose<> robotCurrentPose_;
     Pose<> robotInitialPose_;

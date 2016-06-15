@@ -10,7 +10,6 @@
 #include <algorithm>
 using namespace std;
 
-#include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
 
 #include <srslib_framework/ros/RosTap.hpp>
@@ -38,8 +37,8 @@ public:
         BUTTON_11 = 10
     };
 
-    RosTapJoy(ros::NodeHandle rosHandle) :
-        RosTap(rosHandle, "Joy Tap"),
+    RosTapJoy() :
+        RosTap("Joy Tap"),
         currentVelocity_()
     {
         fill(currentButtons_, currentButtons_ + NUMBER_BUTTONS, 0);

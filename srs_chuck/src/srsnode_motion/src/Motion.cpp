@@ -29,15 +29,15 @@ Motion::Motion(string nodeName) :
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
     motionController_(1.0 / REFRESH_RATE_HZ),
     // tapPlan_(rosNodeHandle_),
-    tapJoyAdapter_(rosNodeHandle_),
-    tapBrainStem_(rosNodeHandle_),
-    tapOdometry_(rosNodeHandle_),
-    tapInitialPose_(rosNodeHandle_),
-    tapAps_(rosNodeHandle_),
+    tapJoyAdapter_(),
+    tapBrainStem_(),
+    tapOdometry_(),
+    tapInitialPose_(),
+    tapAps_(),
     triggerShutdown_(rosNodeHandle_),
     triggerStop_(rosNodeHandle_),
-    tapCmdGoal_(rosNodeHandle_),
-    tapMap_(rosNodeHandle_)
+    tapInternalGoal_(),
+    tapMap_()
 {
     motionController_.setRobot(robot_);
 
@@ -93,7 +93,7 @@ void Motion::connectAllTaps()
     triggerStop_.connectService();
     triggerShutdown_.connectService();
 
-    tapCmdGoal_.connectTap();
+    tapInternalGoal_.connectTap();
     tapMap_.connectTap();
 }
 
@@ -107,7 +107,7 @@ void Motion::disconnectAllTaps()
     tapJoyAdapter_.disconnectTap();
     tapAps_.disconnectTap();
 
-    tapCmdGoal_.disconnectTap();
+    tapInternalGoal_.disconnectTap();
     tapMap_.disconnectTap();
 }
 
@@ -252,11 +252,11 @@ void Motion::scanTapsForData()
     // }
 
     // If there is a new goal to reach
-    if (tapCmdGoal_.newDataAvailable())
+    if (tapInternalGoal_.newDataAvailable())
     {
         if (!isJoystickLatched_)
         {
-            executePlanToGoal(tapCmdGoal_.getGoal());
+            executePlanToGoal(tapInternalGoal_.getPose());
             publishGoal();
         }
     }

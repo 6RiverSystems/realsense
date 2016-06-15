@@ -19,7 +19,7 @@ namespace srs {
 JoystickAdapter::JoystickAdapter(string nodeName) :
     joystickLatched_(false),
     rosNodeHandle_(nodeName),
-    tapJoy_(rosNodeHandle_),
+    tapJoy_(),
     triggerShutdown_(rosNodeHandle_)
 {
     pubCommand_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("velocity", 50);

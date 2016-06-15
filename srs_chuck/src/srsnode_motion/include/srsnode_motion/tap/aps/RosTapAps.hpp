@@ -25,8 +25,8 @@ class RosTapAps :
 public:
     typedef typename ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>::BaseType BaseType;
 
-    RosTapAps(ros::NodeHandle rosHandle) :
-        RosTap(rosHandle, "Absolute Positioning System Tap")
+    RosTapAps() :
+        RosTap("Absolute Positioning System Tap")
     {
         sensor_ = new ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>();
     }

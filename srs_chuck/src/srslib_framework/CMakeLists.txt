@@ -69,11 +69,13 @@ set(${PROJECT_NAME}_SOURCES
     
     include/${PROJECT_NAME}/ros/tap/RosTapBrainStem.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
-    include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
-    include/${PROJECT_NAME}/ros/tap/RosTapGoalPlan.hpp
-    include/${PROJECT_NAME}/ros/tap/RosTapInitialPose.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapInternal_Goal.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapInternal_InitialPose.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapJoy.hpp
     include/${PROJECT_NAME}/ros/tap/RosTapJoyAdapter.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapMap.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapPose.hpp
+    include/${PROJECT_NAME}/ros/tap/RosTapPoseWithCovariance.hpp
 
     src/ros/tap/RosTapMap.cpp
 

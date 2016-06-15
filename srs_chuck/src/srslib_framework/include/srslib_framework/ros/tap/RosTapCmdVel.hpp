@@ -22,8 +22,8 @@ class RosTapCmdVel :
     public RosTap
 {
 public:
-    RosTapCmdVel(ros::NodeHandle rosHandle) :
-        RosTap(rosHandle, "CmdVel Tap"),
+    RosTapCmdVel() :
+        RosTap("CmdVel Tap"),
         currentCmdVel_()
     {}
 

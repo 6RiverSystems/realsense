@@ -20,8 +20,8 @@ class RosTapBrainStem :
     public RosTap
 {
 public:
-    RosTapBrainStem(ros::NodeHandle rosHandle) :
-        RosTap(rosHandle, "Brain Stem Status Tap"),
+    RosTapBrainStem() :
+        RosTap("Brain Stem Status Tap"),
         connectionStateChanged_(false),
         isBrainStemConnected_(false),
         prevBrainStemConnected_(false)

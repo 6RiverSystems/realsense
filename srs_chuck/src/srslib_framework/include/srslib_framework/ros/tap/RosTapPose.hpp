@@ -3,34 +3,33 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPINITIALPOSE_HPP_
-#define ROSTAPINITIALPOSE_HPP_
+#ifndef ROSTAPPOSE_HPP_
+#define ROSTAPPOSE_HPP_
 
 #include <string>
 using namespace std;
 
-#include <ros/ros.h>
 #include <tf/tf.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/PoseStamped.h>
 
 #include <srslib_framework/math/TimeMath.hpp>
-#include <srslib_framework/ros/RosTap.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/ros/RosTap.hpp>
 
 namespace srs {
 
-class RosTapInitialPose :
+class RosTapPose :
     public RosTap
 {
 public:
     typedef typename Pose<>::BaseType BaseType;
 
-    RosTapInitialPose(ros::NodeHandle rosHandle) :
-        RosTap(rosHandle, "Initial Pose Tap"),
-        initialPose_(Pose<>(0.0, 0.0, 0.0))
+    RosTapPose(string topic, string description = "Pose Tap") :
+        RosTap(description),
+        topic_(topic)
     {}
 
-    ~RosTapInitialPose()
+    ~RosTapPose()
     {
         disconnectTap();
     }
@@ -38,7 +37,7 @@ public:
     Pose<> getPose()
     {
         setNewData(false);
-        return initialPose_;
+        return currentPose_;
     }
 
     void reset()
@@ -48,31 +47,30 @@ public:
 
     void set(double arrivalTime, BaseType x, BaseType y, BaseType theta)
     {
-        initialPose_ = Pose<>(arrivalTime, x, y, theta);
+        currentPose_ = Pose<>(arrivalTime, x, y, theta);
         setNewData(true);
     }
 
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/srsnode_executive/initial_pose", 1,
-            &RosTapInitialPose::onInitialPose, this);
-
+        rosSubscriber_ = rosNodeHandle_.subscribe(topic_, 10, &RosTapPose::onPose, this);
         return true;
     }
 
 private:
-    void onInitialPose(geometry_msgs::PoseWithCovarianceStampedConstPtr message)
+    void onPose(const geometry_msgs::PoseStampedConstPtr message)
     {
         set(TimeMath::time2number(message->header.stamp),
-            message->pose.pose.position.x,
-            message->pose.pose.position.y,
-            tf::getYaw(message->pose.pose.orientation));
+            message->pose.position.x,
+            message->pose.position.y,
+            tf::getYaw(message->pose.orientation));
     }
 
-    Pose<> initialPose_;
+    Pose<> currentPose_;
+    string topic_;
 };
 
 } // namespace srs
 
-#endif // ROSTAPINITIALPOSE_HPP_
+#endif // ROSTAPPOSE_HPP_

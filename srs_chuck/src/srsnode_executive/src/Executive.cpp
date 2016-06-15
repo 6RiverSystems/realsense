@@ -1,6 +1,7 @@
 #include <srsnode_executive/Executive.hpp>
 
 #include <ros/ros.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <std_srvs/Empty.h>
 
 #include <srslib_framework/MapCoordinates.h>
@@ -18,16 +19,18 @@ Executive::Executive(string nodeName) :
     rosNodeHandle_(nodeName),
     robotCurrentPose_(),
     robotInitialPose_(),
-    tapCmdGoal_(rosNodeHandle_),
-    tapCmdInitialPose_(rosNodeHandle_),
-    tapCmdPause_(rosNodeHandle_),
-    tapCmdShutdown_(rosNodeHandle_),
-    tapMap_(rosNodeHandle_)
+    tapCmdGoal_(),
+    tapCmdInitialPose_(),
+    tapCmdPause_(),
+    tapCmdShutdown_(),
+    tapMap_()
 {
-    pubInitialPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseWithCovarianceStamped>(
-        "initial_pose", 1);
+    pubInitialPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>(
+        "/internal/initial_pose", 1);
+    pubInternalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>(
+        "/internal/goal", 1);
 
-    robotInitialPose_ = Pose<>(0, 3.0, 2.0, 0);
+    robotInitialPose_ = Pose<>(0, 3.0, 3.0, 0);
     robotCurrentPose_ = robotInitialPose_;
 }
 
@@ -36,7 +39,7 @@ void Executive::run()
 {
     connectAllTaps();
 
-    publishInitialPose();
+    publishInternalInitialPose(robotInitialPose_);
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
@@ -90,21 +93,6 @@ void Executive::executePause()
 void Executive::executePlanToGoal(Pose<> goal)
 {
     currentGoal_ = goal;
-
-//    algorithm_.setGraph(tapMap_.getMap()->getGrid());
-//
-//    int r = 0;
-//    int c = 0;
-//
-//    tapMap_.getMap()->getMapCoordinates(robotCurrentPose_.x, robotCurrentPose_.y, c, r);
-//    Grid2d::LocationType internalStart(c, r);
-//
-//    // tapMap_.getMap()->getMapCoordinates(goal.x, goal.y, c, r);
-//    Grid2d::LocationType internalGoal(c + 10, r);
-//
-//    algorithm_.search(
-//        SearchPosition<Grid2d>(internalStart, 0),
-//        SearchPosition<Grid2d>(internalGoal, 0));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,21 +147,39 @@ void Executive::findActiveNodes(vector<string>& nodes)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Executive::publishInitialPose()
+void Executive::publishInternalInitialPose(Pose<> initialPose)
 {
-    geometry_msgs::PoseWithCovarianceStamped message;
+    geometry_msgs::PoseStamped message;
 
-    tf::Quaternion quaternion = tf::createQuaternionFromYaw(robotInitialPose_.theta);
+    tf::Quaternion quaternion = tf::createQuaternionFromYaw(initialPose.theta);
 
     message.header.stamp = ros::Time::now();
-    message.pose.pose.position.x = robotInitialPose_.x;
-    message.pose.pose.position.y = robotInitialPose_.y;
-    message.pose.pose.orientation.x = quaternion.x();
-    message.pose.pose.orientation.y = quaternion.y();
-    message.pose.pose.orientation.z = quaternion.z();
-    message.pose.pose.orientation.w = quaternion.w();
+    message.pose.position.x = initialPose.x;
+    message.pose.position.y = initialPose.y;
+    message.pose.orientation.x = quaternion.x();
+    message.pose.orientation.y = quaternion.y();
+    message.pose.orientation.z = quaternion.z();
+    message.pose.orientation.w = quaternion.w();
 
     pubInitialPose_.publish(message);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::publishInternalGoal(Pose<> goal)
+{
+    geometry_msgs::PoseStamped message;
+
+    tf::Quaternion quaternion = tf::createQuaternionFromYaw(goal.theta);
+
+    message.header.stamp = ros::Time::now();
+    message.pose.position.x = goal.x;
+    message.pose.position.y = goal.y;
+    message.pose.orientation.x = quaternion.x();
+    message.pose.orientation.y = quaternion.y();
+    message.pose.orientation.z = quaternion.z();
+    message.pose.orientation.w = quaternion.w();
+
+    pubInternalGoal_.publish(message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -187,13 +193,14 @@ void Executive::stepExecutiveFunctions()
     // If there is a new goal to reach
     if (tapCmdGoal_.newDataAvailable())
     {
-        executePlanToGoal(tapCmdGoal_.getGoal());
+        executePlanToGoal(tapCmdGoal_.getPose());
+        publishInternalGoal(currentGoal_);
     }
 
     if (tapCmdInitialPose_.newDataAvailable())
     {
-        executeInitialPose(tapCmdInitialPose_.getRobotPose());
-        publishInitialPose();
+        executeInitialPose(tapCmdInitialPose_.getPose());
+        publishInternalInitialPose(robotInitialPose_);
     }
 
     if (tapCmdPause_.isPauseRequested())

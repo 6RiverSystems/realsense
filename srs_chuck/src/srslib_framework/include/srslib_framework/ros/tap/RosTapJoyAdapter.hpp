@@ -10,7 +10,6 @@
 #include <algorithm>
 using namespace std;
 
-#include <ros/ros.h>
 #include <std_msgs/Bool.h>
 
 #include <srslib_framework/ros/RosTap.hpp>
@@ -22,8 +21,8 @@ class RosTapJoyAdapter :
     public RosTap
 {
 public:
-    RosTapJoyAdapter(ros::NodeHandle rosHandle) :
-        RosTap(rosHandle, "Joy Adapter Tap"),
+    RosTapJoyAdapter() :
+        RosTap("Joy Adapter Tap"),
         currentLatchState_(false)
     {}
 

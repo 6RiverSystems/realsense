@@ -16,13 +16,14 @@ namespace srs {
 class RosTap
 {
 public:
-    RosTap(ros::NodeHandle rosHandle, string tapName = "") :
+    RosTap(string tapDescription = "") :
         connected_(false),
-        neverReported_(true),
+        hasNeverReported_(true),
         newData_(false),
-        rosNodeHandle_(rosHandle),
-        tapName_(tapName)
-    {}
+        tapDescription_(tapDescription)
+    {
+        rosNodeHandle_ = ros::NodeHandle();
+    }
 
     virtual ~RosTap()
     {}
@@ -39,14 +40,14 @@ public:
         return connected_;
     }
 
-    string getTapName() const
+    string getTapDescription() const
     {
-        return tapName_;
+        return tapDescription_;
     }
 
     bool hasNeverReported() const
     {
-        return neverReported_;
+        return hasNeverReported_;
     }
 
     bool isTapConnected() const
@@ -79,16 +80,17 @@ protected:
     void setNewData(bool newValue)
     {
         newData_ = newValue;
-        neverReported_ = false;
+        hasNeverReported_ = false;
     }
 
 private:
     bool connected_;
 
-    bool neverReported_;
+    bool hasNeverReported_;
+
     bool newData_;
 
-    string tapName_;
+    string tapDescription_;
 };
 
 } // namespace srs

@@ -10,66 +10,18 @@
 using namespace std;
 
 #include <ros/ros.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
 
-#include <srslib_framework/math/TimeMath.hpp>
-#include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/ros/RosTap.hpp>
-
-#include <tf/tf.h>
+#include <srslib_framework/ros/tap/RosTapPoseWithCovariance.hpp>
 
 namespace srs {
 
 class RosTapCmd_InitialPose :
-    public RosTap
+    public RosTapPoseWithCovariance
 {
 public:
-    typedef typename Pose<>::BaseType BaseType;
-
-    RosTapCmd_InitialPose(ros::NodeHandle rosHandle) :
-        RosTap(rosHandle, "Command 'Initial Pose' Tap")
+    RosTapCmd_InitialPose() :
+        RosTapPoseWithCovariance("/cmd/initial_pose", "Command 'Initial Pose' Tap")
     {}
-
-    ~RosTapCmd_InitialPose()
-    {
-        disconnectTap();
-    }
-
-    Pose<> getRobotPose()
-    {
-        setNewData(false);
-        return robotPose_;
-    }
-
-    void reset()
-    {
-        set(TimeMath::time2number(ros::Time::now()), 2.0, 2.0, 0.0);
-    }
-
-    void set(double arrivalTime, BaseType x, BaseType y, BaseType theta)
-    {
-        robotPose_ = Pose<>(arrivalTime, x, y, theta);
-        setNewData(true);
-    }
-
-protected:
-    bool connect()
-    {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/cmd/initial_pose", 10,
-            &RosTapCmd_InitialPose::onInitialPose, this);
-        return true;
-    }
-
-private:
-    void onInitialPose(geometry_msgs::PoseWithCovarianceStampedConstPtr message)
-    {
-        set(TimeMath::time2number(message->header.stamp),
-            message->pose.pose.position.x,
-            message->pose.pose.position.y,
-            tf::getYaw(message->pose.pose.orientation));
-    }
-
-    Pose<> robotPose_;
 };
 
 } // namespace srs

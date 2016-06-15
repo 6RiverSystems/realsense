@@ -21,8 +21,8 @@ class RosTapCmd_Shutdown :
     public RosTap
 {
 public:
-    RosTapCmd_Shutdown(ros::NodeHandle rosHandle) :
-        RosTap(rosHandle, "Command 'Shutdown' Tap"),
+    RosTapCmd_Shutdown() :
+        RosTap("Command 'Shutdown' Tap"),
         currentShutdown_(false)
     {}
 

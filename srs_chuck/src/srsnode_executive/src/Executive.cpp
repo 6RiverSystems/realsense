@@ -17,10 +17,13 @@ Executive::Executive(string nodeName) :
     currentGoal_(),
     rosNodeHandle_(nodeName)
 {
-    pubInitialPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>(
-        "/internal/cmd/initial_pose", 1);
+    pubInternalInitialPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>(
+        "/internal/command/initial_pose", 1);
     pubInternalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>(
-        "/internal/cmd/goal", 1);
+        "/internal/command/goal", 1);
+
+    pubExternalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
+        "/response/arrived", 1);
 
     robotInitialPose_ = Pose<>(0, 3.0, 3.0, 0);
     robotCurrentPose_ = robotInitialPose_;
@@ -54,6 +57,7 @@ void Executive::connectAllTaps()
     tapCmdInitialPose_.connectTap();
     tapCmdPause_.connectTap();
     tapCmdShutdown_.connectTap();
+    tapInternal_GoalArrived_.connectTap();
 
     tapMap_.connectTap();
 }
@@ -65,15 +69,24 @@ void Executive::disconnectAllTaps()
     tapCmdInitialPose_.disconnectTap();
     tapCmdPause_.disconnectTap();
     tapCmdShutdown_.disconnectTap();
+    tapInternal_GoalArrived_.disconnectTap();
 
     tapMap_.disconnectTap();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::executeArrived()
+{
+    std_msgs::Bool messageGoalArrived;
+    messageGoalArrived.data = true;
+
+    pubExternalArrived_.publish(messageGoalArrived);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::executeInitialPose(Pose<> initialPose)
 {
     robotInitialPose_ = initialPose;
-    //inc_ = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +163,7 @@ void Executive::publishInternalInitialPose(Pose<> initialPose)
     message.pose.orientation.z = quaternion.z();
     message.pose.orientation.w = quaternion.w();
 
-    pubInitialPose_.publish(message);
+    pubInternalInitialPose_.publish(message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,6 +208,11 @@ void Executive::stepExecutiveFunctions()
     if (tapCmdPause_.isNewValueTrue())
     {
         executePause();
+    }
+
+    if (tapInternal_GoalArrived_.isNewValueTrue())
+    {
+        executeArrived();
     }
 }
 

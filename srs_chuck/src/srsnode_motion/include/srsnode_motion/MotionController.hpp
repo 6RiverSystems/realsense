@@ -51,6 +51,11 @@ public:
         return activeController_->getGoal();
     }
 
+    bool hasArrived() const
+    {
+        return requestedGoalReached_;
+    }
+
     void normalStop();
 
     void reset();
@@ -64,7 +69,8 @@ private:
     const static Velocity<> ZERO_VELOCITY;
 
     enum CommandEnum {VELOCITY, E_STOP};
-    enum TaskEnum {EMERGENCY_STOP, MANUAL_FOLLOW, NONE, NORMAL_STOP, PATH_FOLLOW, ROTATE, STAND};
+    enum TaskEnum {EMERGENCY_STOP, MANUAL_FOLLOW,
+        NONE, NORMAL_STOP, PATH_FOLLOW, ROTATE, STAND};
 
     typedef pair<int, Solution<Grid2d>*> WorkType;
 
@@ -76,6 +82,11 @@ private:
     bool isManualControllerActive()
     {
         return activeController_ == manualController_;
+    }
+
+    bool isMovingControllerActive()
+    {
+        return isPathControllerActive() || isRotationControllerActive();
     }
 
     bool isPathControllerActive()
@@ -138,6 +149,7 @@ private:
     CMUPathController* pathController_;
     ros::Publisher pubCmdVel_;
 
+    bool requestedGoalReached_;
     RobotProfile robot_;
     RotationController* rotationController_;
 

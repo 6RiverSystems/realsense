@@ -53,10 +53,13 @@ private:
     void disconnectAllTaps();
 
     void evaluateTriggers();
+    void executePlanToGoal(Pose<> goal);
 
     void onConfigChange(MotionConfig& config, uint32_t level);
 
-    void publishInformation();
+    void publishArrived();
+    void publishGoal();
+    void publishOdometry();
 
     void reset(Pose<> pose0);
 
@@ -79,10 +82,15 @@ private:
     PositionEstimator positionEstimator_;
     ros::Time previousTime_;
     ros::Publisher pubOdometry_;
+    ros::Publisher pubStatusGoalPlan_;
+    ros::Publisher pubStatusGoalGoal_;
+    ros::Publisher pubStatusGoalArrived_;
 
     ros::NodeHandle rosNodeHandle_;
     tf::TransformBroadcaster rosTfBroadcaster_;
     Chuck robot_;
+
+    double simulatedT_;
 
     RosTapAps tapAps_;
     RosTapBrainStem tapBrainStem_;
@@ -93,15 +101,6 @@ private:
     RosTapOdometry tapOdometry_;
     RosTriggerStop triggerStop_;
     RosTriggerShutdown triggerShutdown_;
-
-    ros::Publisher pubStatusGoalPlan_;
-    ros::Publisher pubStatusGoalGoal_;
-    ros::Publisher pubStatusArrived_;
-
-    void executePlanToGoal(Pose<> goal);
-    void publishGoal();
-
-    double simulatedT_;
 };
 
 } // namespace srs

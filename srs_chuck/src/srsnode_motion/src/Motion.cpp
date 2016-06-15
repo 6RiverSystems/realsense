@@ -3,9 +3,10 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <std_msgs/Bool.h>
 #include <tf/transform_broadcaster.h>
 
 #include <srslib_framework/math/AngleMath.hpp>
@@ -37,10 +38,13 @@ Motion::Motion(string nodeName) :
 
     pubOdometry_ = rosNodeHandle_.advertise<nav_msgs::Odometry>(
         "/internal/sensors/odometry/velocity", 50);
+
     pubStatusGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>(
         "/internal/state/current_goal/plan", 1);
     pubStatusGoalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>(
         "/internal/state/current_goal/goal", 1);
+    pubStatusGoalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
+        "/internal/state/current_goal/arrived", 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +67,9 @@ void Motion::run()
         evaluateTriggers();
         scanTapsForData();
         stepNode();
-        publishInformation();
+
+        publishOdometry();
+        publishArrived();
 
         refreshRate.sleep();
     }
@@ -164,7 +170,73 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::publishInformation()
+void Motion::publishArrived()
+{
+    // Publish this only if the motion controller says that it
+    // has completed the request
+    if (motionController_.hasArrived())
+    {
+        ROS_INFO_NAMED("Motion", "Arrived");
+
+        std_msgs::Bool messageGoalArrived;
+        messageGoalArrived.data = motionController_.hasArrived();
+
+        pubStatusGoalArrived_.publish(messageGoalArrived);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::publishGoal()
+{
+    ros::Time planningTime = ros::Time::now();
+
+    Pose<> goal = motionController_.getGoal();
+
+    geometry_msgs::PoseStamped messageGoal;
+    tf::Quaternion quaternion = tf::createQuaternionFromYaw(goal.theta);
+
+    messageGoal.header.stamp = planningTime;
+    messageGoal.pose.position.x = goal.x;
+    messageGoal.pose.position.y = goal.y;
+    messageGoal.pose.position.z = 0.0;
+    messageGoal.pose.orientation.x = quaternion.x();
+    messageGoal.pose.orientation.y = quaternion.y();
+    messageGoal.pose.orientation.z = quaternion.z();
+    messageGoal.pose.orientation.w = quaternion.w();
+
+    pubStatusGoalGoal_.publish(messageGoal);
+
+    Solution<Grid2d> solution = algorithm_.getSolution(tapMap_.getMap()->getResolution());
+
+    nav_msgs::Path messageGoalPlan;
+    messageGoalPlan.header.frame_id = "map";
+    messageGoalPlan.header.stamp = planningTime;
+
+    vector<geometry_msgs::PoseStamped> planPoses;
+
+    for (auto solutionNode : solution)
+    {
+        geometry_msgs::PoseStamped poseStamped;
+        tf::Quaternion quaternion = tf::createQuaternionFromYaw(solutionNode.toPose.theta);
+
+        poseStamped.pose.position.x = solutionNode.toPose.x;
+        poseStamped.pose.position.y = solutionNode.toPose.y;
+        poseStamped.pose.position.z = 0.0;
+        poseStamped.pose.orientation.x = quaternion.x();
+        poseStamped.pose.orientation.y = quaternion.y();
+        poseStamped.pose.orientation.z = quaternion.z();
+        poseStamped.pose.orientation.w = quaternion.w();
+
+        planPoses.push_back(poseStamped);
+    }
+
+    messageGoalPlan.poses = planPoses;
+
+    pubStatusGoalPlan_.publish(messageGoalPlan);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::publishOdometry()
 {
     Pose<> currentPose = positionEstimator_.getPose();
     Velocity<> currentVelocity = positionEstimator_.getVelocity();
@@ -354,55 +426,6 @@ void Motion::executePlanToGoal(Pose<> goalPose)
             robotPose << " (" << fromC << "," << fromR << "," << startAngle << ") and " <<
             goalPose << " (" << toC << "," << toR << "," << goalAngle << ")");
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::publishGoal()
-{
-    Pose<> goal = motionController_.getGoal();
-
-    Solution<Grid2d> solution = algorithm_.getSolution(tapMap_.getMap()->getResolution());
-
-    ros::Time planningTime = ros::Time::now();
-
-    nav_msgs::Path messageGoalPlan;
-    messageGoalPlan.header.frame_id = "map";
-    messageGoalPlan.header.stamp = planningTime;
-
-    vector<geometry_msgs::PoseStamped> planPoses;
-
-    for (auto solutionNode : solution)
-    {
-        geometry_msgs::PoseStamped poseStamped;
-        tf::Quaternion quaternion = tf::createQuaternionFromYaw(solutionNode.toPose.theta);
-
-        poseStamped.pose.position.x = solutionNode.toPose.x;
-        poseStamped.pose.position.y = solutionNode.toPose.y;
-        poseStamped.pose.position.z = 0.0;
-        poseStamped.pose.orientation.x = quaternion.x();
-        poseStamped.pose.orientation.y = quaternion.y();
-        poseStamped.pose.orientation.z = quaternion.z();
-        poseStamped.pose.orientation.w = quaternion.w();
-
-        planPoses.push_back(poseStamped);
-    }
-
-    messageGoalPlan.poses = planPoses;
-
-    geometry_msgs::PoseStamped messageGoal;
-    tf::Quaternion quaternion = tf::createQuaternionFromYaw(goal.theta);
-
-    messageGoal.header.stamp = planningTime;
-    messageGoal.pose.position.x = goal.x;
-    messageGoal.pose.position.y = goal.y;
-    messageGoal.pose.position.z = 0.0;
-    messageGoal.pose.orientation.x = quaternion.x();
-    messageGoal.pose.orientation.y = quaternion.y();
-    messageGoal.pose.orientation.z = quaternion.z();
-    messageGoal.pose.orientation.w = quaternion.w();
-
-    pubStatusGoalGoal_.publish(messageGoal);
-    pubStatusGoalPlan_.publish(messageGoalPlan);
 }
 
 } // namespace srs

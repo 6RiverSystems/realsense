@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPCMD_SHUTDOWN_HPP_
-#define ROSTAPCMD_SHUTDOWN_HPP_
+#ifndef ROSTAPINTERNAL_GOALARRIVED_HPP_
+#define ROSTAPINTERNAL_GOALARRIVED_HPP_
 
 #include <string>
 using namespace std;
@@ -13,15 +13,15 @@ using namespace std;
 
 namespace srs {
 
-class RosTapCmd_Shutdown :
+class RosTapInternal_GoalArrived :
     public RosTapBool
 {
 public:
-    RosTapCmd_Shutdown() :
-        RosTapBool("/request/shutdown", "Command 'Shutdown' Tap")
+    RosTapInternal_GoalArrived() :
+        RosTapBool("/internal/state/current_goal/arrived", "ARRIVED to goal")
     {}
 };
 
 } // namespace srs
 
-#endif // ROSTAPCMD_SHUTDOWN_HPP_
+#endif // ROSTAPINTERNAL_GOALARRIVED_HPP_

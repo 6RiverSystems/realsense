@@ -19,6 +19,7 @@ const Velocity<> MotionController::ZERO_VELOCITY = Velocity<>(0.0, 0.0);
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 MotionController::MotionController(double dT) :
     dT_(dT),
+    requestedGoalReached_(false),
     rosNodeHandle_()
 {
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>(
@@ -108,6 +109,8 @@ void MotionController::execute(Solution<Grid2d> solution)
         ROS_DEBUG_STREAM_NAMED("MotionController", "FINAL");
         ROS_DEBUG_STREAM_NAMED("MotionController", *finalRotationSolution);
     }
+
+    requestedGoalReached_ = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -139,6 +142,7 @@ void MotionController::reset()
     currentOdometry_ = Odometry<>();
 
     emergencyDeclared_ = false;
+    requestedGoalReached_ = false;
 
     cleanWorkQueue();
     pushWork(TaskEnum::STAND);
@@ -251,6 +255,12 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::checkMotionStatus()
 {
+    // Consider the goal not reached yet
+    // TODO: There should be a better way to communicate to Motion that the
+    // goal has been reached only once. The next line makes sure that in the Motion cycle
+    // the test for "ARRIVED" publishes a TRUE only in the same cycle
+    requestedGoalReached_ = false;
+
     // If the stand controller is currently active and there is work in
     // the queue, cancel work in the controller and pump work from the queue
     if (isStandControllerActive() && isWorkPending())
@@ -281,6 +291,13 @@ void MotionController::checkMotionStatus()
 
                 return;
             }
+        }
+
+        // If the robot was using moving controllers, but everything has
+        // been completed, declare that the requested goal was reached
+        if (isMovingControllerActive())
+        {
+            requestedGoalReached_ = true;
         }
 
         // At this point the previous task is completed
@@ -356,11 +373,6 @@ void MotionController::pumpWorkFromQueue()
         case TaskEnum::MANUAL_FOLLOW:
             ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: MANUAL_FOLLOW");
             taskManualFollow();
-            break;
-
-        case TaskEnum::NONE:
-            ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: NONE");
-            // Nothing to do
             break;
 
         case TaskEnum::NORMAL_STOP:

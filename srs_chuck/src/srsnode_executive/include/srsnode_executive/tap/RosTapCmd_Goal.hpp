@@ -20,7 +20,7 @@ class RosTapCmd_Goal :
 {
 public:
     RosTapCmd_Goal() :
-        RosTapPose("/cmd/goal", "Command goal")
+        RosTapPose("/request/goal", "Command goal")
     {}
 };
 

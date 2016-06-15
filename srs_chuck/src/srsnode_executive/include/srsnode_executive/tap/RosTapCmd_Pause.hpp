@@ -18,7 +18,7 @@ class RosTapCmd_Pause :
 {
 public:
     RosTapCmd_Pause() :
-        RosTapBool("/cmd/pause", "Command 'Pause' Tap")
+        RosTapBool("/request/pause", "Command 'Pause' Tap")
     {}
 };
 

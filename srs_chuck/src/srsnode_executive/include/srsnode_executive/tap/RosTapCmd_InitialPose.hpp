@@ -20,7 +20,7 @@ class RosTapCmd_InitialPose :
 {
 public:
     RosTapCmd_InitialPose() :
-        RosTapPoseWithCovariance("/cmd/initial_pose", "Command 'Initial Pose' Tap")
+        RosTapPoseWithCovariance("/request/initial_pose", "Command 'Initial Pose' Tap")
     {}
 };
 

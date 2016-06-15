@@ -23,7 +23,7 @@ class RosTapCmdVel :
 {
 public:
     RosTapCmdVel() :
-        RosTap("CmdVel Tap"),
+        RosTap("/cmd_vel", "CmdVel Tap"),
         currentCmdVel_()
     {}
 
@@ -41,7 +41,7 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/cmd_vel", 1000, &RosTapCmdVel::onCmdVel, this);
+        rosSubscriber_ = rosNodeHandle_.subscribe(getTopic(), 1000, &RosTapCmdVel::onCmdVel, this);
         return true;
     }
 

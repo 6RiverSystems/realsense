@@ -38,7 +38,7 @@ public:
     };
 
     RosTapJoy() :
-        RosTap("Joy Tap"),
+        RosTap("/joy", "Joy Tap"),
         currentVelocity_()
     {
         fill(currentButtons_, currentButtons_ + NUMBER_BUTTONS, 0);
@@ -99,7 +99,7 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/joy", 10, &RosTapJoy::onJoy, this);
+        rosSubscriber_ = rosNodeHandle_.subscribe(getTopic(), 10, &RosTapJoy::onJoy, this);
         return true;
     }
 

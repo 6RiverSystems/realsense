@@ -9,64 +9,17 @@
 #include <string>
 using namespace std;
 
-#include <ros/ros.h>
-#include <std_msgs/Bool.h>
-
-#include <srslib_framework/math/TimeMath.hpp>
-#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTapBool.hpp>
 
 namespace srs {
 
 class RosTapCmd_Pause :
-    public RosTap
+    public RosTapBool
 {
 public:
     RosTapCmd_Pause() :
-        RosTap("Command 'Pause' Tap"),
-        currentPause_(false)
+        RosTapBool("/cmd/pause", "Command 'Pause' Tap")
     {}
-
-    ~RosTapCmd_Pause()
-    {
-        disconnectTap();
-    }
-
-    bool getPause()
-    {
-        setNewData(false);
-        return currentPause_;
-    }
-
-    bool isPauseRequested()
-    {
-        return newDataAvailable() && getPause();
-    }
-
-    void reset()
-    {
-        set(TimeMath::time2number(ros::Time::now()), false);
-    }
-
-    void set(double arrivalTime, bool pause)
-    {
-        currentPause_ = pause;
-        setNewData(true);
-    }
-
-protected:
-    bool connect()
-    {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/cmd/pause", 10, &RosTapCmd_Pause::onPause, this);
-        return true;
-    }
-
-private:
-    void onPause(const std_msgs::BoolConstPtr message)
-    {
-        set(TimeMath::time2number(ros::Time::now()), message->data);
-    }
-
-    bool currentPause_;
 };
 
 } // namespace srs

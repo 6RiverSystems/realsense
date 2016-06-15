@@ -24,7 +24,7 @@ class RosTapMap :
 {
 public:
     RosTapMap():
-        RosTap("Global Map Tap"),
+        RosTap("/srsnode_map_server/map_complete", "Global Map Tap"),
         map_(nullptr)
     {}
 
@@ -41,8 +41,7 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/srsnode_map_server/map_complete",
-            1, &RosTapMap::onMap, this);
+        rosSubscriber_ = rosNodeHandle_.subscribe(getTopic(), 1, &RosTapMap::onMap, this);
 
         return true;
     }

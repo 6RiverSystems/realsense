@@ -25,8 +25,7 @@ public:
     typedef typename Pose<>::BaseType BaseType;
 
     RosTapPose(string topic, string description = "Pose Tap") :
-        RosTap(description),
-        topic_(topic)
+        RosTap(topic, description)
     {}
 
     ~RosTapPose()
@@ -54,7 +53,7 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe(topic_, 10, &RosTapPose::onPose, this);
+        rosSubscriber_ = rosNodeHandle_.subscribe(getTopic(), 10, &RosTapPose::onPose, this);
         return true;
     }
 
@@ -68,7 +67,6 @@ private:
     }
 
     Pose<> currentPose_;
-    string topic_;
 };
 
 } // namespace srs

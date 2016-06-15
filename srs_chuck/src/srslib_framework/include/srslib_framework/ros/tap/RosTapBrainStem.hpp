@@ -21,7 +21,7 @@ class RosTapBrainStem :
 {
 public:
     RosTapBrainStem() :
-        RosTap("Brain Stem Status Tap"),
+        RosTap("/brain_stem/connected", "Brain Stem Status Tap"),
         connectionStateChanged_(false),
         isBrainStemConnected_(false),
         prevBrainStemConnected_(false)
@@ -45,7 +45,7 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/brain_stem/connected", 100,
+        rosSubscriber_ = rosNodeHandle_.subscribe(getTopic(), 100,
             &RosTapBrainStem::onBrainStemConnected, this);
 
         return true;

@@ -22,7 +22,7 @@ class RosTapJoyAdapter :
 {
 public:
     RosTapJoyAdapter() :
-        RosTap("Joy Adapter Tap"),
+        RosTap("", "Joy Adapter Tap"),
         currentLatchState_(false)
     {}
 

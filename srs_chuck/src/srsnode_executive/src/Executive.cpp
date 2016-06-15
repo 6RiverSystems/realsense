@@ -185,7 +185,7 @@ void Executive::publishInternalGoal(Pose<> goal)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::stepExecutiveFunctions()
 {
-    if (tapCmdShutdown_.isShutdownRequested())
+    if (tapCmdShutdown_.isNewValueTrue())
     {
         executeShutdown();
     }
@@ -203,7 +203,7 @@ void Executive::stepExecutiveFunctions()
         publishInternalInitialPose(robotInitialPose_);
     }
 
-    if (tapCmdPause_.isPauseRequested())
+    if (tapCmdPause_.isNewValueTrue())
     {
         executePause();
     }

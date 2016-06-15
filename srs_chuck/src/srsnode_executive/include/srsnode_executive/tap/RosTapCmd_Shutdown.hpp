@@ -9,64 +9,17 @@
 #include <string>
 using namespace std;
 
-#include <ros/ros.h>
-#include <std_msgs/Bool.h>
-
-#include <srslib_framework/math/TimeMath.hpp>
-#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTapBool.hpp>
 
 namespace srs {
 
 class RosTapCmd_Shutdown :
-    public RosTap
+    public RosTapBool
 {
 public:
     RosTapCmd_Shutdown() :
-        RosTap("Command 'Shutdown' Tap"),
-        currentShutdown_(false)
+        RosTapBool("/cmd/shutdown", "Command 'Shutdown' Tap")
     {}
-
-    ~RosTapCmd_Shutdown()
-    {
-        disconnectTap();
-    }
-
-    bool getShutdown()
-    {
-        setNewData(false);
-        return currentShutdown_;
-    }
-
-    bool isShutdownRequested()
-    {
-        return newDataAvailable() && getShutdown();
-    }
-
-    void reset()
-    {
-        set(TimeMath::time2number(ros::Time::now()), false);
-    }
-
-    void set(double arrivalTime, bool shutdown)
-    {
-        currentShutdown_ = pause;
-        setNewData(true);
-    }
-
-protected:
-    bool connect()
-    {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/cmd/shutdown", 10, &RosTapCmd_Shutdown::onShutdown, this);
-        return true;
-    }
-
-private:
-    void onShutdown(const std_msgs::BoolConstPtr message)
-    {
-        set(TimeMath::time2number(ros::Time::now()), message->data);
-    }
-
-    bool currentShutdown_;
 };
 
 } // namespace srs

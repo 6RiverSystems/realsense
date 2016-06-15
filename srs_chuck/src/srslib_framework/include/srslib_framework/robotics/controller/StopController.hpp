@@ -17,7 +17,7 @@ class StopController: public BaseController
 {
 public:
     StopController() :
-        BaseController()
+        BaseController("STOP CONTROLLER")
     {}
 
     ~StopController()

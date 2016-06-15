@@ -15,7 +15,7 @@ class ManualController: public BaseController
 {
 public:
     ManualController() :
-        BaseController()
+        BaseController("MANUAL CONTROLLER")
     {}
 
     ~ManualController()

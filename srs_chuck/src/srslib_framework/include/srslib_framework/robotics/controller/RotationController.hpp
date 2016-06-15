@@ -17,7 +17,7 @@ class RotationController: public BaseController
 {
 public:
     RotationController() :
-        BaseController(),
+        BaseController("ROTATION CONTROLLER"),
         Kd_(0.0),
         Ki_(0.0),
         Kp_(1.0),

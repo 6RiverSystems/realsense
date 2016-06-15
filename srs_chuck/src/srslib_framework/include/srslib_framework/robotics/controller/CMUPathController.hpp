@@ -20,7 +20,7 @@ class CMUPathController: public BaseController
 {
 public:
     CMUPathController() :
-        BaseController(),
+        BaseController("CMU PATH CONTROLLER"),
         dynamicLookAheadDistance_(0.5),
         projectionIndex_(-1),
         referencePose_(Pose<>()),

@@ -20,7 +20,7 @@ namespace srs {
 class BaseController
 {
 public:
-    BaseController() :
+    BaseController(string name) :
         canceled_(false),
         executingCommand_(Velocity<>()),
         goal_(Pose<>()),
@@ -28,6 +28,7 @@ public:
         Kv_(1.0),
         Kw_(1.0),
         isRobotMoving_(false),
+        name_(name),
         robot_()
     {}
 
@@ -48,6 +49,11 @@ public:
     Pose<> getGoal() const
     {
         return goal_;
+    }
+
+    string getName() const
+    {
+        return name_;
     }
 
     bool isCanceled() const
@@ -123,6 +129,8 @@ protected:
     double Kw_;
 
     bool isRobotMoving_;
+
+    string name_;
 
     RobotProfile robot_;
 };

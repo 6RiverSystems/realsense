@@ -15,7 +15,7 @@ class YoshizawaController : public BaseController
 {
 public:
     YoshizawaController() :
-        BaseController()
+        BaseController("YOSHIZAWA CONTROLLER")
     {}
 
     ~YoshizawaController()

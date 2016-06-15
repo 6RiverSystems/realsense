@@ -285,11 +285,13 @@ void MotionController::checkMotionStatus()
     {
         if (activeController_->isCanceled())
         {
-            ROS_INFO_NAMED("MotionController", "Controller goal canceled");
+            ROS_INFO_STREAM_NAMED("MotionController", "Controller " <<
+                activeController_->getName() << " goal canceled");
         }
         else
         {
-            ROS_INFO_NAMED("MotionController", "Controller goal reached its goal");
+            ROS_INFO_STREAM_NAMED("MotionController", "Controller " <<
+                activeController_->getName() << " reached its goal");
         }
 
         // If the active controller is the path controller, it is not
@@ -435,8 +437,6 @@ void MotionController::pumpWorkFromQueue()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::selectController(TaskEnum task)
 {
-    ROS_INFO_STREAM_NAMED("MotionController", "Switching to controller: " << TASK_NAMES[task]);
-
     switch (task)
     {
         case EMERGENCY_STOP:
@@ -466,6 +466,9 @@ void MotionController::selectController(TaskEnum task)
         default:
             throw;
     }
+
+    ROS_INFO_STREAM_NAMED("MotionController", "Switching to controller " <<
+        activeController_->getName());
 
     // Before using the new controller, make sure that
     // it starts from a good state

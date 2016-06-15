@@ -17,7 +17,7 @@ class StandController: public BaseController
 {
 public:
     StandController() :
-        BaseController()
+        BaseController("STAND CONTROLLER")
     {}
 
     ~StandController()

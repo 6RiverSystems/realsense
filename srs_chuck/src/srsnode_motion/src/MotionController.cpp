@@ -21,7 +21,8 @@ MotionController::MotionController(double dT) :
     dT_(dT),
     rosNodeHandle_()
 {
-    pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("/cmd_vel", 100);
+    pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>(
+        "/internal/drivers/brainstem/velocity", 100);
 
     manualController_ = new ManualController();
     pathController_ = new CMUPathController();

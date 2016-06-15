@@ -24,7 +24,7 @@ class RosTapMap :
 {
 public:
     RosTapMap():
-        RosTap("/srsnode_map_server/map_complete", "Global Map Tap"),
+        RosTap("/internal/state/map/complete", "Global Map Tap"),
         map_(nullptr)
     {}
 

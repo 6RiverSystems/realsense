@@ -21,7 +21,7 @@ class RosTapBrainStem :
 {
 public:
     RosTapBrainStem() :
-        RosTap("/brain_stem/connected", "Brain Stem Status Tap"),
+        RosTap("/internal/drivers/brainstem/connected", "Brain Stem Status Tap"),
         connectionStateChanged_(false),
         isBrainStemConnected_(false),
         prevBrainStemConnected_(false)

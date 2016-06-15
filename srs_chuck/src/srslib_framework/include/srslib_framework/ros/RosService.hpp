@@ -16,12 +16,14 @@ namespace srs {
 class RosService
 {
 public:
-    RosService(ros::NodeHandle rosHandle, string serviceName = "") :
+    RosService(string name, string description = "", string nameSpace = "~") :
         connected_(false),
-        newRequestPending_(false),
-        rosNodeHandle_(rosHandle),
-        serviceName_(serviceName)
-    {}
+        description_(description),
+        name_(name),
+        newRequestPending_(false)
+    {
+        rosNodeHandle_ = ros::NodeHandle(nameSpace);
+    }
 
     virtual ~RosService()
     {
@@ -34,9 +36,14 @@ public:
         return connected_;
     }
 
-    string getServiceName() const
+    string getDescription() const
     {
-        return serviceName_;
+        return description_;
+    }
+
+    string getName() const
+    {
+        return name_;
     }
 
     bool isServiceConnected() const
@@ -66,9 +73,11 @@ protected:
 private:
     bool connected_;
 
+    string description_;
+
     bool newRequestPending_;
 
-    string serviceName_;
+    string name_;
 };
 
 } // namespace srs

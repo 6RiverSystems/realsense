@@ -27,28 +27,20 @@ Motion::Motion(string nodeName) :
     isJoystickLatched_(false),
     rosNodeHandle_(nodeName),
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
-    motionController_(1.0 / REFRESH_RATE_HZ),
-    // tapPlan_(rosNodeHandle_),
-    tapJoyAdapter_(),
-    tapBrainStem_(),
-    tapOdometry_(),
-    tapInitialPose_(),
-    tapAps_(),
-    triggerShutdown_(rosNodeHandle_),
-    triggerStop_(rosNodeHandle_),
-    tapInternalGoal_(),
-    tapMap_()
+    motionController_(1.0 / REFRESH_RATE_HZ)
 {
     motionController_.setRobot(robot_);
-
-    pubOdometry_ = rosNodeHandle_.advertise<nav_msgs::Odometry>("odometry", 50);
 
     positionEstimator_.addSensor(tapAps_.getSensor());
 
     configServer_.setCallback(boost::bind(&Motion::onConfigChange, this, _1, _2));
 
-    pubGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>("current_goal/plan", 1);
-    pubGoalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>("current_goal/goal", 1);
+    pubOdometry_ = rosNodeHandle_.advertise<nav_msgs::Odometry>(
+        "/internal/sensors/odometry/velocity", 50);
+    pubStatusGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>(
+        "/internal/state/current_goal/plan", 1);
+    pubStatusGoalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>(
+        "/internal/state/current_goal/goal", 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +78,6 @@ void Motion::connectAllTaps()
     tapBrainStem_.connectTap();
     tapOdometry_.connectTap();
     tapInitialPose_.connectTap();
-    //tapPlan_.connectTap();
     tapJoyAdapter_.connectTap();
     tapAps_.connectTap();
 
@@ -103,7 +94,6 @@ void Motion::disconnectAllTaps()
     tapBrainStem_.disconnectTap();
     tapOdometry_.disconnectTap();
     tapInitialPose_.disconnectTap();
-    //tapPlan_.disconnectTap();
     tapJoyAdapter_.disconnectTap();
     tapAps_.disconnectTap();
 
@@ -263,17 +253,6 @@ void Motion::scanTapsForData()
 
     // Check if odometry is available
     isOdometryAvailable_ = tapOdometry_.newDataAvailable();
-
-//    // If there is a new plan to execute
-//    if (tapPlan_.newDataAvailable())
-//    {
-//        vector<SolutionNode<Grid2d>> solution = tapPlan_.getPlan();
-//        Trajectory::TrajectoryType currentTrajectory_;
-//
-//        trajectoryConverter_.calculateTrajectory(solution);
-//        trajectoryConverter_.getTrajectory(currentTrajectory_);
-//        motionController_.setTrajectory(currentTrajectory_);
-//    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,6 +343,8 @@ void Motion::executePlanToGoal(Pose<> goalPose)
 
     if (!solution.empty())
     {
+        ROS_INFO_STREAM_NAMED("Motion", "Found solution: " << endl << solution);
+
         motionController_.execute(solution);
         simulatedT_ = 0.0;
     }
@@ -420,8 +401,8 @@ void Motion::publishGoal()
     messageGoal.pose.orientation.z = quaternion.z();
     messageGoal.pose.orientation.w = quaternion.w();
 
-    pubGoalGoal_.publish(messageGoal);
-    pubGoalPlan_.publish(messageGoalPlan);
+    pubStatusGoalGoal_.publish(messageGoal);
+    pubStatusGoalPlan_.publish(messageGoalPlan);
 }
 
 } // namespace srs

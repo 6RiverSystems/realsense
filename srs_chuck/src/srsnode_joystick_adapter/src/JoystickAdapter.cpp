@@ -18,12 +18,12 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 JoystickAdapter::JoystickAdapter(string nodeName) :
     joystickLatched_(false),
-    rosNodeHandle_(nodeName),
-    tapJoy_(),
-    triggerShutdown_(rosNodeHandle_)
+    rosNodeHandle_(nodeName)
 {
-    pubCommand_ = rosNodeHandle_.advertise<geometry_msgs::Twist>("velocity", 50);
-    pubJoystickLatched_ = rosNodeHandle_.advertise<std_msgs::Bool>("latched", 1);
+    pubCommand_ = rosNodeHandle_.advertise<geometry_msgs::Twist>(
+        "/internal/sensors/joystick/velocity", 50);
+    pubJoystickLatched_ = rosNodeHandle_.advertise<std_msgs::Bool>(
+        "/internal/sensors/joystick/latched", 1);
 
     configServer_.setCallback(boost::bind(&JoystickAdapter::onConfigChange, this, _1, _2));
 }

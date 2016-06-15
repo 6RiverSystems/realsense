@@ -46,9 +46,9 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/srsnode_joystick_adapter/latched", 1,
+        rosSubscriber_ = rosNodeHandle_.subscribe("/internal/sensors/joystick/latched", 1,
             &RosTapJoyAdapter::onJoyLatched, this);
-        subJoyVelocity_ = rosNodeHandle_.subscribe("/srsnode_joystick_adapter/velocity", 1,
+        subJoyVelocity_ = rosNodeHandle_.subscribe("/internal/sensors/joystick/velocity", 1,
             &RosTapJoyAdapter::onJoyVelocity, this);
         return true;
     }

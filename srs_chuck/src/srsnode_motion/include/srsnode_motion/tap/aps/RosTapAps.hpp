@@ -74,7 +74,7 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/sensors/aps/raw", 100,
+        rosSubscriber_ = rosNodeHandle_.subscribe("/internal/sensors/aps/raw", 100,
             &RosTapAps::onAps, this);
 
         return true;

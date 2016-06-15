@@ -20,12 +20,11 @@ class RosServiceTrigger :
     public RosService
 {
 public:
-    RosServiceTrigger(ros::NodeHandle rosHandle, string serviceName, string triggerName) :
-        RosService(rosHandle, serviceName),
-        triggerName_("trigger/" + triggerName),
+    RosServiceTrigger(string name, string description = "") :
+        RosService(name, description),
+        triggerName_("trigger/" + name),
         triggerRequested_(false)
-    {
-    }
+    {}
 
     ~RosServiceTrigger()
     {}

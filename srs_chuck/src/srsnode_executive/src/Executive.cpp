@@ -15,20 +15,12 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Executive::Executive(string nodeName) :
     currentGoal_(),
-    //inc_(0),
-    rosNodeHandle_(nodeName),
-    robotCurrentPose_(),
-    robotInitialPose_(),
-    tapCmdGoal_(),
-    tapCmdInitialPose_(),
-    tapCmdPause_(),
-    tapCmdShutdown_(),
-    tapMap_()
+    rosNodeHandle_(nodeName)
 {
     pubInitialPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>(
-        "/internal/initial_pose", 1);
+        "/internal/cmd/initial_pose", 1);
     pubInternalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>(
-        "/internal/goal", 1);
+        "/internal/cmd/goal", 1);
 
     robotInitialPose_ = Pose<>(0, 3.0, 3.0, 0);
     robotCurrentPose_ = robotInitialPose_;

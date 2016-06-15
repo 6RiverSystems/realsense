@@ -20,7 +20,7 @@ class RosTapInternal_Goal :
 {
 public:
     RosTapInternal_Goal() :
-        RosTapPose("/internal/goal", "Internal goal")
+        RosTapPose("/internal/cmd/goal", "Internal goal")
     {}
 };
 

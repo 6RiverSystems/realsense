@@ -22,12 +22,10 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 MapServer::MapServer(string nodeName) :
     costsGrid_(),
-    rosNodeHandle_(nodeName),
-    triggerShutdown_(rosNodeHandle_)
+    rosNodeHandle_(nodeName)
 {
     string mapFilename;
     rosNodeHandle_.param("/target_map", mapFilename, string(""));
-    // mapFilename = "/home/fsantini/projects/repos/ros/srs_sites/src/srsc_6rhq/map/6rhq.yaml";
 
     ROS_INFO_STREAM("Target map: " << mapFilename);
 
@@ -38,9 +36,12 @@ MapServer::MapServer(string nodeName) :
     map_.getCostsGrid(costsGrid_);
     map_.getNotesGrid(notesGrid_);
 
-    pubMapMetadata_ = rosNodeHandle_.advertise<nav_msgs::MapMetaData>("map_metadata", 1, true);
-    pubMapOccupancyGrid_ = rosNodeHandle_.advertise<nav_msgs::OccupancyGrid>("map_grid", 1, true);
-    pubMapCompleteMap_ = rosNodeHandle_.advertise<CompleteMap>("map_complete", 1, true);
+    pubMapMetadata_ = rosNodeHandle_.advertise<nav_msgs::MapMetaData>(
+        "/internal/state/map/metadata", 1, true);
+    pubMapOccupancyGrid_ = rosNodeHandle_.advertise<nav_msgs::OccupancyGrid>(
+        "/internal/state/map/grid", 1, true);
+    pubMapCompleteMap_ = rosNodeHandle_.advertise<CompleteMap>(
+        "/internal/state/map/complete", 1, true);
 
     srvMapCoordinates_ = rosNodeHandle_.advertiseService("map_coordinates",
         &MapServer::onMapCoordinatesRequested, this);

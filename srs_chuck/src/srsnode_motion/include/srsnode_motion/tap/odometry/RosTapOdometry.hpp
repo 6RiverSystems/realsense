@@ -71,7 +71,7 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe("/sensors/odometry/raw", 100,
+        rosSubscriber_ = rosNodeHandle_.subscribe("/internal/sensors/odometry/raw", 100,
             &RosTapOdometry::onSensorsOdometryRaw, this);
 
         return true;

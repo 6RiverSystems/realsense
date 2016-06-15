@@ -10,9 +10,7 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Midbrain::Midbrain(string nodeName) :
-    rosNodeHandle_(nodeName),
-    triggerPause_(rosNodeHandle_),
-    triggerShutdown_(rosNodeHandle_)
+    rosNodeHandle_(nodeName)
 {
 }
 

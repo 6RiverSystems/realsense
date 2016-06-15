@@ -76,7 +76,35 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        camera_depth_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        camera_depth_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        camera_rgb_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        camera_rgb_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         front_caster:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        laser_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -87,6 +115,21 @@ Visualization Manager:
           Show Trail: false
           Value: true
         right_wheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        stargazer_camera_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        stargazer_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        stargazer_optical_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -102,21 +145,41 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        aps_anchor_98:
+          Value: true
         back_caster:
           Value: true
         base_footprint:
           Value: true
         base_link:
           Value: true
+        camera_depth_frame:
+          Value: true
+        camera_depth_optical_frame:
+          Value: true
+        camera_link:
+          Value: true
+        camera_rgb_frame:
+          Value: true
+        camera_rgb_optical_frame:
+          Value: true
         front_caster:
+          Value: true
+        laser_frame:
           Value: true
         left_wheel:
           Value: true
         map:
           Value: true
+        right_wheel:
+          Value: true
         srsnode_motion/odometry:
           Value: true
-        right_wheel:
+        stargazer_camera_frame:
+          Value: true
+        stargazer_link:
+          Value: true
+        stargazer_optical_frame:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -125,17 +188,32 @@ Visualization Manager:
       Show Names: true
       Tree:
         map:
+          aps_anchor_98:
+            {}
           srsnode_motion/odometry:
             base_footprint:
               base_link:
                 back_caster:
                   {}
+                camera_link:
+                  camera_depth_frame:
+                    camera_depth_optical_frame:
+                      {}
+                  camera_rgb_frame:
+                    camera_rgb_optical_frame:
+                      {}
                 front_caster:
                   {}
                 left_wheel:
                   {}
                 right_wheel:
                   {}
+                stargazer_link:
+                  stargazer_camera_frame:
+                    stargazer_optical_frame:
+                      {}
+              laser_frame:
+                {}
       Update Interval: 0
       Value: true
     - Alpha: 0.7
@@ -144,7 +222,7 @@ Visualization Manager:
       Draw Behind: false
       Enabled: true
       Name: Map
-      Topic: /srsnode_map_server/map_grid
+      Topic: /internal/state/map/grid
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -159,7 +237,7 @@ Visualization Manager:
         X: 0
         Y: 0
         Z: 0
-      Topic: /srsnode_executive/current_goal/plan
+      Topic: /internal/state/current_goal/plan
       Unreliable: false
       Value: true
     - Angle Tolerance: 0.1
@@ -170,7 +248,25 @@ Visualization Manager:
       Length: 0.2
       Name: Odometry
       Position Tolerance: 0.1
-      Topic: /srsnode_motion/odometry
+      Topic: /internal/sensors/odometry/velocity
+      Value: true
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz/Grid
+      Color: 0; 0; 0
+      Enabled: true
+      Line Style:
+        Line Width: 0.03
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 50
+      Reference Frame: <Fixed Frame>
       Value: true
   Enabled: true
   Global Options:
@@ -195,7 +291,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: 0.0049999
+      Angle: 0
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
@@ -204,11 +300,11 @@ Visualization Manager:
         Value: false
       Name: Current View
       Near Clip Distance: 0.01
-      Scale: 28.2779
+      Scale: 102.995
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
-      X: 2.55876
-      Y: 3.62355
+      X: 11.1412
+      Y: 5.33719
     Saved:
       - Class: rviz/ThirdPersonFollower
         Distance: 10
@@ -258,4 +354,4 @@ Window Geometry:
     collapsed: false
   Width: 2404
   X: 55
-  Y: 205
+  Y: 306

@@ -9,9 +9,6 @@
 #include <string>
 using namespace std;
 
-#include <ros/ros.h>
-#include <std_srvs/Empty.h>
-
 #include <srslib_framework/ros/service/RosServiceTrigger.hpp>
 
 namespace srs {
@@ -20,8 +17,8 @@ class RosTriggerShutdown :
     public RosServiceTrigger
 {
 public:
-    RosTriggerShutdown(ros::NodeHandle rosHandle) :
-        RosServiceTrigger(rosHandle, "Trigger: Shutdown", "shutdown")
+    RosTriggerShutdown() :
+        RosServiceTrigger("shutdown", "Trigger: Shutdown")
     {}
 };
 

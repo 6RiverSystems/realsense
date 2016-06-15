@@ -16,14 +16,14 @@ namespace srs {
 class RosTap
 {
 public:
-    RosTap(string topic, string description = "") :
+    RosTap(string topic, string description = "", string nameSpace = "~") :
         connected_(false),
+        description_(description),
         hasNeverReported_(true),
         newData_(false),
-        description_(description),
         topic_(topic)
     {
-        rosNodeHandle_ = ros::NodeHandle();
+        rosNodeHandle_ = ros::NodeHandle(nameSpace);
     }
 
     virtual ~RosTap()
@@ -68,7 +68,7 @@ public:
 
     virtual void reset()
     {
-    	setNewData(false);
+        setNewData(false);
     }
 
 protected:

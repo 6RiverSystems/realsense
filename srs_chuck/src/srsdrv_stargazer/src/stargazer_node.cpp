@@ -9,7 +9,7 @@
 
 const std::string g_SerialPort( "/dev/ftdi" );
 
-const std::string g_strApsTopic( "/sensors/aps/raw" );
+const std::string g_strApsTopic( "/internal/sensors/aps/raw" );
 
 int main( int argc, char** argv )
 {

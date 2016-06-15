@@ -222,7 +222,7 @@ Visualization Manager:
       Draw Behind: false
       Enabled: true
       Name: Map
-      Topic: /srsnode_map_server/map_grid
+      Topic: /internal/state/map/grid
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -237,7 +237,7 @@ Visualization Manager:
         X: 0
         Y: 0
         Z: 0
-      Topic: /srsnode_motion/current_goal/plan
+      Topic: /internal/state/current_goal/plan
       Unreliable: false
       Value: true
     - Angle Tolerance: 0.1
@@ -248,7 +248,7 @@ Visualization Manager:
       Length: 0.2
       Name: Odometry
       Position Tolerance: 0.1
-      Topic: /srsnode_motion/odometry
+      Topic: /internal/sensors/odometry/velocity
       Value: true
     - Alpha: 0.5
       Cell Size: 1
@@ -300,7 +300,7 @@ Visualization Manager:
         Value: false
       Name: Current View
       Near Clip Distance: 0.01
-      Scale: 71.1546
+      Scale: 102.995
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
       X: 11.1412
@@ -354,4 +354,4 @@ Window Geometry:
     collapsed: false
   Width: 2404
   X: 55
-  Y: 326
+  Y: 306

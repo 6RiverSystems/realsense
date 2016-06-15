@@ -20,7 +20,7 @@ class RosTapInternal_InitialPose :
 {
 public:
     RosTapInternal_InitialPose() :
-        RosTapPose("/internal/initial_pose", "Internal initial pose")
+        RosTapPose("/internal/cmd/initial_pose", "Internal initial pose")
     {}
 };
 

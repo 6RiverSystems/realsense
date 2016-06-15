@@ -63,7 +63,7 @@ private:
     void scanTapsForData();
     void stepNode();
 
-    AStar<Grid2d> algorithm_; // TODO: Remove
+    AStar<Grid2d> algorithm_;
 
     MotionConfig configuration_;
     dynamic_reconfigure::Server<MotionConfig> configServer_;
@@ -85,19 +85,18 @@ private:
     Chuck robot_;
 
     RosTapAps tapAps_;
-    // RosTapGoalPlan tapPlan_;
-    RosTapJoyAdapter tapJoyAdapter_;
     RosTapBrainStem tapBrainStem_;
+    RosTapInternal_InitialPose tapInitialPose_;
+    RosTapInternal_Goal tapInternalGoal_;
+    RosTapJoyAdapter tapJoyAdapter_;
+    RosTapMap tapMap_;
     RosTapOdometry tapOdometry_;
-    RosTapInternal_InitialPose tapInitialPose_; // TODO: This should be a command (trigger) passed down by Executive
     RosTriggerStop triggerStop_;
     RosTriggerShutdown triggerShutdown_;
 
-    // TODO: remove this tap from Motion. It should be in Executive
-    RosTapInternal_Goal tapInternalGoal_;
-    RosTapMap tapMap_;
-    ros::Publisher pubGoalPlan_;
-    ros::Publisher pubGoalGoal_;
+    ros::Publisher pubStatusGoalPlan_;
+    ros::Publisher pubStatusGoalGoal_;
+    ros::Publisher pubStatusArrived_;
 
     void executePlanToGoal(Pose<> goal);
     void publishGoal();

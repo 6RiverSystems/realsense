@@ -39,7 +39,7 @@ protected:
 
 private:
     void updateLookAheadDistance();
-    void updateProjectionIndex(Pose<> robotPose);
+    void updateProjectionIndex(Pose<> currentPose);
 
     Trajectory<> currentTrajectory_;
 

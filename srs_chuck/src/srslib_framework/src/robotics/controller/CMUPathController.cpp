@@ -73,6 +73,15 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     linear = BasicMath::saturate<double>(linear,
         robot_.maxLinearVelocity, -robot_.maxLinearVelocity);
 
+    // If, for some reason, the linear velocity is 0
+    // but we are still far from the goal, bottom the linear velocity
+    // to a nominal minimum value
+    if (BasicMath::equal<double>(linear, 0.0, 0.001))
+    {
+        // TODO: Add in the configuration the minimum travel velocity
+        linear = 0.05 * robot_.travelLinearVelocity;
+    }
+
     // Calculate the angular portion of the command
     double slope = atan2(referencePose_.y - currentPose.y, referencePose_.x - currentPose.x);
     double alpha = AngleMath::normalizeAngleRad<double>(slope - currentPose.theta);
@@ -107,15 +116,18 @@ void CMUPathController::updateLookAheadDistance()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMUPathController::updateProjectionIndex(Pose<> robotPose)
+void CMUPathController::updateProjectionIndex(Pose<> currentPose)
 {
-    projectionIndex_ = currentTrajectory_.findClosestPose(robotPose,
+    projectionIndex_ = currentTrajectory_.findClosestPose(currentPose,
         projectionIndex_, dynamicLookAheadDistance_);
 
     referenceIndex_ = currentTrajectory_.findWaypointAtDistance(projectionIndex_,
         dynamicLookAheadDistance_);
 
     referencePose_ = currentTrajectory_.getPose(referenceIndex_);
+
+    double distanceToReference = PoseMath::euclidean(currentPose, referencePose_);
+    ROS_DEBUG_STREAM_NAMED("CMUPathController", "Distance to reference: " << distanceToReference);
 }
 
 } // namespace srs

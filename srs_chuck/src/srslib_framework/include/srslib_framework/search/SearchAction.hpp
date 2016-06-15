@@ -28,7 +28,14 @@ struct SearchAction
 {
     constexpr static unsigned int MAX_COST = numeric_limits<unsigned int>::max();
 
-    enum ActionEnum {NONE, START, GOAL, FORWARD, BACKWARD, ROTATE_M90, ROTATE_P90, ROTATE_180};
+    enum ActionEnum {
+        BACKWARD,
+        FORWARD,
+        GOAL,
+        NONE,
+        ROTATE_M90, ROTATE_P90, ROTATE_180,
+        START
+    };
 
     static array<ActionEnum, 5> ACTIONS;
 
@@ -220,14 +227,14 @@ array<typename SearchAction<GRAPH>::ActionEnum, 5> SearchAction<GRAPH>::ACTIONS 
 
 template<typename GRAPH>
 unordered_map<int, string> SearchAction<GRAPH>::ENUM_NAMES = {
-    {SearchAction<GRAPH>::NONE, "NONE"},
-    {SearchAction<GRAPH>::START, "START"},
-    {SearchAction<GRAPH>::GOAL, "GOAL"},
-    {SearchAction<GRAPH>::FORWARD, "FORWARD"},
     {SearchAction<GRAPH>::BACKWARD, "BACKWARD"},
+    {SearchAction<GRAPH>::FORWARD, "FORWARD"},
+    {SearchAction<GRAPH>::GOAL, "GOAL"},
+    {SearchAction<GRAPH>::NONE, "NONE"},
     {SearchAction<GRAPH>::ROTATE_M90, "ROTATE_M90"},
     {SearchAction<GRAPH>::ROTATE_P90, "ROTATE_P90"},
-    {SearchAction<GRAPH>::ROTATE_180, "ROTATE_180"}
+    {SearchAction<GRAPH>::ROTATE_180, "ROTATE_180"},
+    {SearchAction<GRAPH>::START, "START"}
 };
 
 } // namespace srs

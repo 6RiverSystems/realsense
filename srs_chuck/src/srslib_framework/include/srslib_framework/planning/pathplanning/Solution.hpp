@@ -16,7 +16,10 @@ namespace srs {
 template<typename GRAPH>
 struct SolutionNode
 {
-    enum ActionEnum {NONE, MOVE, ROTATE};
+    enum ActionEnum {
+        MOVE,
+        NONE,
+        ROTATE};
 
     SolutionNode() :
         actionType(NONE),
@@ -91,8 +94,8 @@ public:
 
 template<typename GRAPH>
 unordered_map<int, string> SolutionNode<GRAPH>::ENUM_NAMES = {
-    {SolutionNode<GRAPH>::NONE, "NONE"},
     {SolutionNode<GRAPH>::MOVE, "MOVE"},
+    {SolutionNode<GRAPH>::NONE, "NONE"},
     {SolutionNode<GRAPH>::ROTATE, "ROTATE"},
 };
 

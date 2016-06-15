@@ -176,7 +176,7 @@ void Motion::publishArrived()
     // has completed the request
     if (motionController_.hasArrived())
     {
-        ROS_INFO_NAMED("Motion", "Arrived");
+        ROS_DEBUG_NAMED("Motion", "Arrived at goal");
 
         std_msgs::Bool messageGoalArrived;
         messageGoalArrived.data = motionController_.hasArrived();

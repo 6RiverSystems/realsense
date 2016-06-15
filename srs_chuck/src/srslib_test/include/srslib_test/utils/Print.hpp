@@ -58,7 +58,6 @@ struct Print
 
         return output.str();
     }
-
 };
 
 } // namespace test

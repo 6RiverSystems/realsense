@@ -1,6 +1,5 @@
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 
-#include <srsnode_motion/StatePe.hpp>
 #include <srsnode_motion/CmdVelocity.hpp>
 
 namespace srs {
@@ -29,32 +28,39 @@ cv::Mat Robot<TYPE>::FB(
     Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>* const command,
     BaseType dT)
 {
-    StatePe<TYPE> state(stateVector);
+    StatePe<TYPE> oldState(stateVector);
+    oldState.velocity = reinterpret_cast<CmdVelocity<>*>(command)->velocity;
 
-    state.velocity = reinterpret_cast<CmdVelocity<>*>(command)->velocity;
+    StatePe<TYPE> newState;
+    Robot<TYPE>::kinematics(oldState, dT, newState);
 
-    double v = state.velocity.linear;
-    double w = state.velocity.angular;
+    return newState.getVectorForm();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+template<int TYPE>
+void Robot<TYPE>::kinematics(StatePe<TYPE> sT0, BaseType dT, StatePe<TYPE>& sT1)
+{
+    double v = sT0.velocity.linear;
+    double w = sT0.velocity.angular;
 
     // Check for the special case in which omega is 0 (the robot is moving straight)
     if (abs(w) > ANGULAR_VELOCITY_EPSILON)
     {
         double r = v / w;
 
-        state.pose = Pose<>(
-            state.pose.x + r * sin(state.pose.theta + w * dT) - r * sin(state.pose.theta),
-            state.pose.y + r * cos(state.pose.theta) - r * cos(state.pose.theta + w * dT),
-            state.pose.theta + w * dT);
+        sT1.pose = Pose<>(
+            sT0.pose.x + r * sin(sT0.pose.theta + w * dT) - r * sin(sT0.pose.theta),
+            sT0.pose.y + r * cos(sT0.pose.theta) - r * cos(sT0.pose.theta + w * dT),
+            sT0.pose.theta + w * dT);
     }
     else
     {
-        state.pose = Pose<>(
-            state.pose.x + v * dT * cos(state.pose.theta),
-            state.pose.y + v * dT * sin(state.pose.theta),
-            state.pose.theta);
+        sT1.pose = Pose<>(
+            sT0.pose.x + v * dT * cos(sT0.pose.theta),
+            sT0.pose.y + v * dT * sin(sT0.pose.theta),
+            sT0.pose.theta);
     }
-
-    return state.getVectorForm();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

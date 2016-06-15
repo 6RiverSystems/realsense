@@ -13,6 +13,7 @@
 #include <srslib_framework/math/AngleMath.hpp>
 
 #include <srsnode_motion/Configuration.hpp>
+#include <srsnode_motion/StatePe.hpp>
 
 namespace srs {
 
@@ -41,6 +42,8 @@ public:
         const cv::Mat stateVector,
         Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>* const command,
         BaseType dT);
+
+    void kinematics(StatePe<TYPE> sT0, BaseType dT, StatePe<TYPE>& sT1);
 
 private:
     const static cv::Mat Q;

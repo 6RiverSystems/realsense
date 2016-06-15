@@ -84,6 +84,14 @@ public:
     {
         Solution<GRAPH> result;
 
+        // If no path was found in the previous search,
+        // exit immediately and return an empty solution
+        if (!lastNode_)
+        {
+            return result;
+
+        }
+
         SolutionNode<GRAPH> solutionNode;
         Pose<> fromPose;
         Pose<> toPose;

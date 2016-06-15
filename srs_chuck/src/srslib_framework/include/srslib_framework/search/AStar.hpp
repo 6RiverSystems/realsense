@@ -270,8 +270,8 @@ private:
     // TODO: This should be in the map
     void getWorldCoordinates(double resolution, int c, int r, double& x, double& y)
     {
-        x = static_cast<double>(c + 1) * resolution;
-        y = static_cast<double>(r + 1) * resolution;
+        x = static_cast<double>(c) * resolution;
+        y = static_cast<double>(r) * resolution;
 
         // The precision is down to 1mm
         x = round(x * 1000) / 1000;

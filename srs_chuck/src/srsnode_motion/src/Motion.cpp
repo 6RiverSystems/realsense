@@ -327,26 +327,32 @@ void Motion::stepNode()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// TODO: This should be in Executive
+// TODO: should this be in Executive
 void Motion::executePlanToGoal(Pose<> goalPose)
 {
     Pose<> robotPose = positionEstimator_.getPose();
 
     algorithm_.setGraph(tapMap_.getMap()->getGrid());
 
+    // Prepare the start position for the search
     int fromR = 0;
     int fromC = 0;
     tapMap_.getMap()->getMapCoordinates(robotPose.x, robotPose.y, fromC, fromR);
     Grid2d::LocationType internalStart(fromC, fromR);
     int startAngle = AngleMath::normalizeRad2deg90(robotPose.theta);
 
+    // Keep the goal in line with current robot pose
+    double goalX = (abs(goalPose.x - robotPose.x) < 0.2) ? robotPose.x : goalPose.x;
+    double goalY = (abs(goalPose.y - robotPose.y) < 0.2) ? robotPose.y : goalPose.y;
+
+    // Prepare the goal position for the search
     int toR = 0;
     int toC = 0;
-    tapMap_.getMap()->getMapCoordinates(goalPose.x, goalPose.y, toC, toR);
+    tapMap_.getMap()->getMapCoordinates(goalX, goalY, toC, toR);
     Grid2d::LocationType internalGoal(toC, toR);
     int goalAngle = AngleMath::normalizeRad2deg90(goalPose.theta);
 
-    ROS_DEBUG_STREAM_NAMED("Motion", "Looking for a path between " << robotPose << " (" <<
+    ROS_INFO_STREAM_NAMED("Motion", "Looking for a path between " << robotPose << " (" <<
         fromC << "," << fromR << "," << startAngle
         << ") and " << goalPose << " (" << toC << "," << toR << "," << goalAngle << ")");
 

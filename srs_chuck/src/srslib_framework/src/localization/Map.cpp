@@ -72,8 +72,8 @@ Map::~Map()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Map::getMapCoordinates(double x, double y, int& c, int& r)
 {
-    c = static_cast<int>(floor(x / resolution_));
-    r = static_cast<int>(floor(y / resolution_));
+    c = static_cast<int>(round(x / resolution_));
+    r = static_cast<int>(round(y / resolution_));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -186,9 +186,8 @@ void SerialIO::Write( const std::vector<char>& buffer )
 void SerialIO::WriteInSerialThread( std::vector<char> writeBuffer )
 {
 	assert( m_serialThreadId == std::this_thread::get_id( ) );
-//
-//	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write Complete: " <<
-//		std::string( writeBuffer.begin( ), writeBuffer.end( ) ) );
+
+	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Serial IO Write: " << ToHex( writeBuffer ) );
 
 	// Add leading character
 	if( m_bHasLeading )
@@ -272,9 +271,9 @@ void SerialIO::StartAsyncRead( )
 void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::size_t size )
 {
 	assert( m_serialThreadId == std::this_thread::get_id( ) );
-//
-//	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write Complete: " <<
-//		std::string( m_writeBuffer.begin( ), m_writeBuffer.begin( ) + size ) );
+
+	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write Complete (" << size << "):" <<
+		ToHex( std::vector<char>( m_writeBuffer.begin( ), m_writeBuffer.begin( ) + size ) ) );
 
 	std::vector<char>( m_writeBuffer.begin( ) + size, m_writeBuffer.end( ) ).swap( m_writeBuffer );
 
@@ -416,8 +415,8 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				{
 					if( messageData[0] == '<' )
 					{
-//						ROS_ERROR_STREAM_NAMED( "SerialIO", "ReadData: " <<
-//							std::string( messageData.begin( ), messageData.end( ) ) );
+						ROS_ERROR_STREAM_NAMED( "SerialIO", "ReadData: " <<
+							std::string( messageData.begin( ), messageData.end( ) ) );
 
 						m_cCRC = 0;
 					}

@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include "StarGazerFilter.h"
 
-
-
 namespace srs {
 	float generateRandomFloat(float min, float max) {
 		float random = ((float)rand()) / (float)RAND_MAX;

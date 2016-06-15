@@ -8,84 +8,14 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srslib_framework)
 
 set(${PROJECT_NAME}_SOURCES
+	src/io/SerialIO.cpp
 
-    include/${PROJECT_NAME}/datastructure/ThreadSafeQueue.hpp
-    include/${PROJECT_NAME}/datastructure/MappedPriorityQueue.hpp
-
-    include/${PROJECT_NAME}/filter/BaseKalmanFilter.hpp
-    include/${PROJECT_NAME}/filter/Command.hpp
-    include/${PROJECT_NAME}/filter/FilterState.hpp
-    include/${PROJECT_NAME}/filter/Measurement.hpp
-    include/${PROJECT_NAME}/filter/Process.hpp
-    include/${PROJECT_NAME}/filter/Sensor.hpp
-
-    include/${PROJECT_NAME}/filter/ukf/UnscentedKalmanFilter.hpp
-
-    include/${PROJECT_NAME}/graph/grid2d/Grid2dLocation.hpp
-    include/${PROJECT_NAME}/graph/grid2d/Grid2dNode.hpp
-    include/${PROJECT_NAME}/graph/grid2d/Grid2d.hpp
-
-    include/${PROJECT_NAME}/io/SerialIO.hpp
-    src/io/SerialIO.cpp
-
-    include/${PROJECT_NAME}/localization/Anchor.hpp
     src/localization/Map.cpp
     src/localization/MapNote.cpp
-    
-    include/${PROJECT_NAME}/math/AngleMath.hpp
-    include/${PROJECT_NAME}/math/BasicMath.hpp
-    include/${PROJECT_NAME}/math/MatrixMath.hpp
-    include/${PROJECT_NAME}/math/MeasurementMath.hpp
-    include/${PROJECT_NAME}/math/Ocv2Base.hpp
-    include/${PROJECT_NAME}/math/PoseMath.hpp
-    include/${PROJECT_NAME}/math/TimeMath.hpp
-    include/${PROJECT_NAME}/math/VelocityMath.hpp
 
-    include/${PROJECT_NAME}/planning/pathplanning/Solution.hpp
-    include/${PROJECT_NAME}/planning/pathplanning/SolutionGenerator.hpp
-    include/${PROJECT_NAME}/planning/pathplanning/TrajectoryGenerator.hpp
-
-    include/${PROJECT_NAME}/platform/Object.hpp
-    include/${PROJECT_NAME}/platform/Thread.hpp
-
-    include/${PROJECT_NAME}/robotics/Pose.hpp
-    include/${PROJECT_NAME}/robotics/Odometry.hpp
-    include/${PROJECT_NAME}/robotics/RobotProfile.hpp
-    include/${PROJECT_NAME}/robotics/Trajectory.hpp
-    include/${PROJECT_NAME}/robotics/Velocity.hpp
-
-    include/${PROJECT_NAME}/robotics/controller/ManualController.hpp
-    include/${PROJECT_NAME}/robotics/controller/RotationController.hpp
-    include/${PROJECT_NAME}/robotics/controller/StandController.hpp
-    include/${PROJECT_NAME}/robotics/controller/StopController.hpp
-    include/${PROJECT_NAME}/robotics/controller/YoshizawaController.hpp
     src/robotics/controller/CMUPathController.cpp
 
-    include/${PROJECT_NAME}/ros/RosTap.hpp
-    include/${PROJECT_NAME}/ros/RosService.hpp
-    
-    include/${PROJECT_NAME}/ros/service/RosServiceTrigger.hpp
-    include/${PROJECT_NAME}/ros/service/RosTriggerShutdown.hpp
-    
-    include/${PROJECT_NAME}/ros/tap/RosTapBool.hpp
-    include/${PROJECT_NAME}/ros/tap/RosTapBrainStem.hpp
-    include/${PROJECT_NAME}/ros/tap/RosTapCmdVel.hpp
-    include/${PROJECT_NAME}/ros/tap/RosTapInternal_Goal.hpp
-    include/${PROJECT_NAME}/ros/tap/RosTapInternal_InitialPose.hpp
-    include/${PROJECT_NAME}/ros/tap/RosTapJoy.hpp
-    include/${PROJECT_NAME}/ros/tap/RosTapJoyAdapter.hpp
-    include/${PROJECT_NAME}/ros/tap/RosTapMap.hpp
-    include/${PROJECT_NAME}/ros/tap/RosTapPose.hpp
-    include/${PROJECT_NAME}/ros/tap/RosTapPoseWithCovariance.hpp
-
     src/ros/tap/RosTapMap.cpp
-
-    include/${PROJECT_NAME}/search/SearchAction.hpp
-    include/${PROJECT_NAME}/search/SearchPosition.hpp
-    include/${PROJECT_NAME}/search/SearchNode.hpp
-    include/${PROJECT_NAME}/search/AStar.hpp
-
-    include/${PROJECT_NAME}/utils/Filesystem.hpp
 )
 
 set(${PROJECT_NAME}_MSGS

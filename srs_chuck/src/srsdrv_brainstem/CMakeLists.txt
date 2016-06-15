@@ -64,14 +64,14 @@ target_link_libraries(${PROJECT_NODE}
 ####################################################################################################
 # Tests
 
-#if (CATKIN_ENABLE_TESTING)
-#    catkin_add_gtest(serial-io-test
-#        ${${PROJECT_NAME}_SOURCES}
-#        ${${PROJECT_NAME}_TEST_SOURCES}
-#    )
-#    target_link_libraries(serial-io-test
-#        ${catkin_LIBRARIES}
-#        ${boost_LIBRARIES}
-#        ${srslib_framework_LIBRARIES}
-#    )
-#endif()
+if (CATKIN_ENABLE_TESTING)
+    catkin_add_gtest(TestSuite_Brainstem
+        ${${PROJECT_NAME}_SOURCES}
+    )
+
+    target_link_libraries(TestSuite_Brainstem
+        ${catkin_LIBRARIES}
+        ${PROJECT_LIBRARIES}
+        ${srslib_test_LIBRARIES}
+    )
+endif()

@@ -110,7 +110,7 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 			}
 			else
 			{
-				ROS_ERROR_STREAM_NAMED( "Brainstem", "Unknown button pressed: " << (int)eButtonId );
+				ROS_ERROR_STREAM( "Unknown button pressed: " << (int)eButtonId );
 			}
 		}
 		break;
@@ -123,7 +123,7 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 
 			std::string strSafetyProcessorVersion( pHardwareInfo->pszBrainstemVersion + strBrainstemVersion.size( ) + 1 );
 
-			ROS_INFO_STREAM_NAMED( "Brainstem", "Hardware Info => id:" << pHardwareInfo->uniqueId << ", bodyType: " << pHardwareInfo->bodyType <<
+			ROS_INFO_STREAM( "Hardware Info => id:" << pHardwareInfo->uniqueId << ", bodyType: " << pHardwareInfo->bodyType <<
 				", configuration:" << pHardwareInfo->configuration << ", lifetimeHours:" << pHardwareInfo->lifetimeHours << ", lifetimeMeters:" << pHardwareInfo->lifetimeMeters <<
 				", batteryHours:" << pHardwareInfo->batteryHours << ", wheelMeters:" << pHardwareInfo->wheelMeters << ", Brainstem Version:" << strBrainstemVersion <<
 				", Safety Processor Version:" << strSafetyProcessorVersion );
@@ -134,7 +134,7 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 		{
 			OPERATIONAL_STATE_DATA* pOperationalState = reinterpret_cast<OPERATIONAL_STATE_DATA*>( buffer.data( ) );
 
-			ROS_INFO_STREAM_NAMED( "Brainstem", "Hardware Info => id:" << pOperationalState->upTime <<
+			ROS_INFO_STREAM( "Hardware Info => id:" << pOperationalState->upTime <<
 				", frontEStop: " << pOperationalState->motionStatus.frontEStop << ", backEStop: " << pOperationalState->motionStatus.backEStop <<
 				", wirelessEStop: " << pOperationalState->motionStatus.wirelessEStop << ", bumpSensor: " << pOperationalState->motionStatus.bumpSensor <<
 				", pause: " << pOperationalState->motionStatus.pause << ", hardStop: " << pOperationalState->motionStatus.hardStop <<
@@ -148,7 +148,7 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 		{
 			VOLTAGE_DATA* pVoltage = reinterpret_cast<VOLTAGE_DATA*>( buffer.data( ) );
 
-			ROS_INFO_STREAM_NAMED( "Brainstem", "Voltage => " << pVoltage->voltage);
+			ROS_INFO_STREAM( "Voltage => " << pVoltage->voltage);
 		}
 		break;
 
@@ -163,7 +163,7 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 		case BRAIN_STEM_MSG::UNKNOWN:
 		default:
 		{
-			ROS_ERROR_STREAM_NAMED( "Brainstem", "Unknown message from brainstem: " << (int)eCommand << ", data: " << ToHex( buffer ) );
+			ROS_ERROR_STREAM( "Unknown message from brainstem: " << (int)eCommand << ", data: " << ToHex( buffer ) );
 		}
 		break;
 	}
@@ -199,7 +199,7 @@ void BrainStemMessageProcessor::SetVelocity( double dfLinear, double dfAngular )
 	if( dfLinear != s_dfLinear ||
 		dfAngular != s_dfAngular )
 	{
-		ROS_DEBUG_NAMED( "Brainstem", "Velocity: %f, %f", dfLinear, dfAngular );
+		ROS_DEBUG( "Velocity: %f, %f", dfLinear, dfAngular );
 
 		s_dfLinear = dfLinear;
 		s_dfAngular = dfAngular;
@@ -215,7 +215,7 @@ void BrainStemMessageProcessor::SetVelocity( double dfLinear, double dfAngular )
 
 void BrainStemMessageProcessor::ProcessRosMessage( const std::string& strMessage )
 {
-	ROS_DEBUG_NAMED( "Brainstem", "Received command: %s", strMessage.c_str( ) );
+	ROS_DEBUG( "Received command: %s", strMessage.c_str( ) );
 
 	std::vector<std::string> vecParsed;
 	boost::tokenizer<> tok( strMessage );
@@ -238,7 +238,7 @@ void BrainStemMessageProcessor::ProcessRosMessage( const std::string& strMessage
 			}
 			else
 			{
-				ROS_ERROR_NAMED( "Brainstem", "Bridge has invalid number of arguments: %s", strMessage.c_str( ) );
+				ROS_ERROR( "Bridge has invalid number of arguments: %s", strMessage.c_str( ) );
 			}
 		}
 	}

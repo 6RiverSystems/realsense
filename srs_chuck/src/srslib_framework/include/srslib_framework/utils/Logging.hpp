@@ -7,18 +7,31 @@
 #define LOGGING_HPP_
 
 #include <boost/algorithm/hex.hpp>
+#include <cstdio>
 
-namespace srs {
+namespace srs
+{
 
-	inline std::string ToHex( const std::vector<char>& data )
+inline std::string ToHex( const std::vector<char>& data )
+{
+	std::string strDebug;
+
+	for( char c : data )
 	{
-	   std::ostringstream result;
-	   result << std::setw(2) << std::setfill('0') << std::hex << std::showbase << std::uppercase;
-
-	   std::copy( data.begin( ), data.end( ), std::ostream_iterator<unsigned int>(result, " "));
-
-	   return result.str( );
+		if( std::isprint( c ) )
+		{
+			strDebug += c;
+		}
+		else
+		{
+			char pszFormat[64] = { '\0' };
+		    snprintf( pszFormat, 64, " 0x%.2x", c );
+		    strDebug += pszFormat;
+		}
 	}
+
+	return strDebug;
+}
 
 } // namespace srs
 

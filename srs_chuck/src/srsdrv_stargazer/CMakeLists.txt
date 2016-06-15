@@ -9,6 +9,7 @@ set(PROJECT_NAME srsdrv_stargazer)
 
 set(${PROJECT_NAME}_SOURCES
 	src/StarGazerMessageProcessor.cpp
+	src/StarGazerPointTransformer.cpp
     src/StarGazerFilter.cpp
     src/StarGazer.cpp
 )
@@ -73,5 +74,16 @@ target_link_libraries(${PROJECT_NODE}
 # Tests
 
 if (CATKIN_ENABLE_TESTING)
+    catkin_add_gtest(TestSuite_Stargazer
+    	test/Test_Stargazer.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        "${CMAKE_CURRENT_LIST_DIR}/data/anchor-test-data.yaml"
+    )
 
+    target_link_libraries(TestSuite_Stargazer
+        ${catkin_LIBRARIES}
+        ${boost_LIBRARIES}
+        ${srslib_framework_LIBRARIES}
+        yaml-cpp
+    )
 endif()

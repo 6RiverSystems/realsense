@@ -1,0 +1,8 @@
+anchors: 
+    id: 98,
+    location: { x: 6.79518, y: 5.58061, z: 6.2217396, orientation: 1.5721926 }
+    map_points:
+        id: 25,
+        location: { x: 15.71100, y: 5.33400 }
+        measurements:
+          raw: { x: -0.184886, y: 0.773486, z: 5.110509, orientation: -0.470000 }

@@ -90,7 +90,7 @@ void BrainStem::OnConnectionChanged( bool bIsConnected )
 	m_ConnectedPublisher.publish( msg );
 
 	m_rosOdomTime = ros::Time( );
-
+//
 //	// Get the hardware information
 //	GetHardwareInformation( );
 //
@@ -103,7 +103,7 @@ void BrainStem::OnArrived( )
 	std_msgs::String msg;
 	msg.data = "ARRIVED";
 
-	ROS_DEBUG_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
+	ROS_DEBUG( "%s", msg.data.c_str( ) );
 
 	m_llEventPublisher.publish( msg );
 }
@@ -120,13 +120,13 @@ void BrainStem::OnButtonEvent( LED_ENTITIES eButtonId )
 		ss << "UI " << strEntity;
 		msg.data = ss.str();
 
-		ROS_DEBUG_NAMED( "Brainstem", "%s", msg.data.c_str( ) );
+		ROS_DEBUG( "%s", msg.data.c_str( ) );
 
 		m_llEventPublisher.publish( msg );
 	}
 	else
 	{
-		ROS_ERROR_NAMED( "Brainstem", "Unknown button entity %d", eButtonId );
+		ROS_ERROR( "Unknown button entity %d", eButtonId );
 	}
 }
 
@@ -141,7 +141,7 @@ void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, 
 	if( !m_rosOdomTime.isZero( ) &&
 		bInvalidTime )
 	{
-		ROS_ERROR_NAMED( "Brainstem", "Timestamp out of range and resynced (possible communication problem) (diff: %f): odom: %f, ros: %f",
+		ROS_ERROR( "Timestamp out of range and resynced (possible communication problem) (diff: %f): odom: %f, ros: %f",
 			currentTime.toSec( ) - m_rosOdomTime.toSec( ), m_rosOdomTime.toSec( ), currentTime.toSec( ) );
 	}
 
@@ -156,7 +156,7 @@ void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, 
 	{
 		double dfOdomTimeDelta = (double)(dwTimeStamp - m_dwLastOdomTime) / 1000.0f;
 
-		ROS_DEBUG_NAMED( "Brainstem", "Odometry (%f): %f, %f",
+		ROS_DEBUG( "Odometry (%f): %f, %f",
 			dfOdomTimeDelta, fLinearVelocity, fAngularVelocity );
 
 		// Base our time on the realtime clock (brain_stem) since our clock does not match odom info
@@ -175,7 +175,7 @@ void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, 
 
 	if( dfClockDiff > 0.05 )
 	{
-		ROS_ERROR_NAMED( "Brainstem", "Odometry clock drift: %f", dfClockDiff );
+		ROS_ERROR( "Odometry clock drift: %f", dfClockDiff );
 	}
 
 	m_dwLastOdomTime = dwTimeStamp;

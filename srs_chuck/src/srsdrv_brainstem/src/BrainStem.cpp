@@ -22,7 +22,7 @@ namespace srs
 BrainStem::BrainStem( const std::string& strSerialPort ) :
 	m_rosNodeHandle( ),
     m_VelocitySubscriber( m_rosNodeHandle.subscribe<geometry_msgs::Twist>(
-        "/internal/drivers/brainstem/velocity", 100,
+        "/internal/drivers/brainstem/cmd_velocity", 100,
         std::bind( &BrainStem::OnChangeVelocity, this, std::placeholders::_1 ) ) ),
     m_OdometryRawPublisher( m_rosNodeHandle.advertise<geometry_msgs::TwistStamped>(
         "/internal/sensors/odometry/raw", 1000 ) ),

@@ -1,5 +1,9 @@
 #include <srsnode_motion/MotionController.hpp>
 
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 
@@ -13,6 +17,16 @@ namespace srs {
 
 const Velocity<> MotionController::ZERO_VELOCITY = Velocity<>(0.0, 0.0);
 
+unordered_map<int, string> MotionController::TASK_NAMES = {
+    {TaskEnum::EMERGENCY_STOP, "EMERGENCY_STOP"},
+    {TaskEnum::MANUAL_FOLLOW, "MANUAL_FOLLOW"},
+    {TaskEnum::NONE, "NONE"},
+    {TaskEnum::NORMAL_STOP, "NORMAL_STOP"},
+    {TaskEnum::PATH_FOLLOW, "PATH_FOLLOW"},
+    {TaskEnum::ROTATE, "ROTATE"},
+    {TaskEnum::STAND, "STAND"}
+};
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
@@ -23,7 +37,7 @@ MotionController::MotionController(double dT) :
     rosNodeHandle_()
 {
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>(
-        "/internal/drivers/brainstem/velocity", 100);
+        "/internal/drivers/brainstem/cmd_velocity", 100);
 
     manualController_ = new ManualController();
     pathController_ = new CMUPathController();
@@ -99,15 +113,11 @@ void MotionController::execute(Solution<Grid2d> solution)
     if (initialRotationSolution)
     {
         pushWork(TaskEnum::ROTATE, initialRotationSolution);
-        ROS_DEBUG_STREAM_NAMED("MotionController", "INITIAL");
-        ROS_DEBUG_STREAM_NAMED("MotionController", *initialRotationSolution);
     }
     pushWork(TaskEnum::PATH_FOLLOW, pathSolution);
     if (finalRotationSolution)
     {
         pushWork(TaskEnum::ROTATE, finalRotationSolution);
-        ROS_DEBUG_STREAM_NAMED("MotionController", "FINAL");
-        ROS_DEBUG_STREAM_NAMED("MotionController", *finalRotationSolution);
     }
 
     requestedGoalReached_ = false;
@@ -246,7 +256,7 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
             messageTwist.angular.y = 0;
             messageTwist.angular.z = currentCommand_.angular;
 
-            ROS_DEBUG_STREAM_NAMED("MotionController", "Sending e-stop: " << currentCommand_);
+            ROS_DEBUG_STREAM_NAMED("MotionController", "Sending e-stop");
             pubCmdVel_.publish(messageTwist);
             break;
     }
@@ -288,19 +298,15 @@ void MotionController::checkMotionStatus()
                     currentPose_.theta, goal.theta);
 
                 pushWork(TaskEnum::ROTATE, solution);
-
-                return;
             }
         }
 
         // If the robot was using moving controllers, but everything has
         // been completed, declare that the requested goal was reached
-        if (isMovingControllerActive())
+        if (isMovingControllerActive() && !isWorkPending())
         {
             requestedGoalReached_ = true;
         }
-
-        // At this point the previous task is completed
 
         // If no emergency has been declared
         if (!emergencyDeclared_)
@@ -324,7 +330,7 @@ void MotionController::cleanWorkQueue()
     while (isWorkPending())
     {
         WorkType work = work_.front();
-        work_.pop();
+        work_.pop_front();
 
         // Delete the solution associated with the work
         if (work.second)
@@ -335,11 +341,34 @@ void MotionController::cleanWorkQueue()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+string MotionController::printWorkToString()
+{
+    ostringstream output;
+
+    output << "WORK QUEUE" << endl;
+    int counter = 0;
+    for (auto workTask : work_)
+    {
+        output << setw(3) << counter++ << ": " << TASK_NAMES[workTask.first]<< endl;
+        if (workTask.second)
+        {
+            output << *workTask.second << endl;
+        }
+        else
+        {
+            output << "null" << endl;
+        }
+    }
+
+    return output.str();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::pumpWorkFromQueue()
 {
     // First, find the work to do
     WorkType work = work_.front();
-    work_.pop();
+    work_.pop_front();
 
     // Schedule the next task
     currentTask_ = static_cast<TaskEnum>(work.first);
@@ -360,33 +389,29 @@ void MotionController::pumpWorkFromQueue()
 
     switch (currentTask_)
     {
+        ROS_INFO_STREAM_NAMED("MotionController", "Requested task: " << TASK_NAMES[currentTask_]);
+
         case TaskEnum::EMERGENCY_STOP:
-            ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: EMERGENCY_STOP");
             taskEmergencyStop();
             break;
 
         case TaskEnum::PATH_FOLLOW:
-            ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: PATH_FOLLOW");
             taskPathFollow();
             break;
 
         case TaskEnum::MANUAL_FOLLOW:
-            ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: MANUAL_FOLLOW");
             taskManualFollow();
             break;
 
         case TaskEnum::NORMAL_STOP:
-            ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: NORMAL_STOP");
             taskNormalStop();
             break;
 
         case TaskEnum::ROTATE:
-            ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: ROTATE");
             taskRotate();
             break;
 
         case TaskEnum::STAND:
-            ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: STAND");
             taskStand();
             break;
     }
@@ -395,6 +420,8 @@ void MotionController::pumpWorkFromQueue()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::selectController(TaskEnum task)
 {
+    ROS_INFO_STREAM_NAMED("MotionController", "Switching to controller: " << TASK_NAMES[task]);
+
     switch (task)
     {
         case EMERGENCY_STOP:

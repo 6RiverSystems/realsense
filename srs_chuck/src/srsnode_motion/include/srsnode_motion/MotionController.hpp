@@ -6,7 +6,8 @@
 #ifndef MOTIONCONTROLLER_HPP_
 #define MOTIONCONTROLLER_HPP_
 
-#include <queue>
+#include <deque>
+#include <string>
 using namespace std;
 
 #include <ros/ros.h>
@@ -68,9 +69,21 @@ public:
 private:
     const static Velocity<> ZERO_VELOCITY;
 
-    enum CommandEnum {VELOCITY, E_STOP};
-    enum TaskEnum {EMERGENCY_STOP, MANUAL_FOLLOW,
-        NONE, NORMAL_STOP, PATH_FOLLOW, ROTATE, STAND};
+    enum CommandEnum {
+        E_STOP,
+        VELOCITY
+    };
+
+    enum TaskEnum {
+        EMERGENCY_STOP,
+        MANUAL_FOLLOW,
+        NONE, NORMAL_STOP,
+        PATH_FOLLOW,
+        ROTATE,
+        STAND
+    };
+
+    static unordered_map<int, string> TASK_NAMES;
 
     typedef pair<int, Solution<Grid2d>*> WorkType;
 
@@ -114,11 +127,25 @@ private:
         return !work_.empty();
     }
 
+    string printWorkToString();
+
     void pumpWorkFromQueue();
 
     void pushWork(TaskEnum task, Solution<Grid2d>* solution = nullptr)
     {
-        work_.push(WorkType(task, solution));
+        ROS_INFO_STREAM_NAMED("MotionController", printWorkToString());
+
+        ROS_INFO_STREAM_NAMED("MotionController", "Pushing task: " << TASK_NAMES[task]);
+        if (solution)
+        {
+            ROS_INFO_STREAM_NAMED("MotionController", "Pushing solution: " << *solution);
+        }
+        else
+        {
+            ROS_INFO_STREAM_NAMED("MotionController", "Pushing solution: (null)");
+        }
+
+        work_.push_back(WorkType(task, solution));
     }
 
     void selectController(TaskEnum task);
@@ -156,7 +183,7 @@ private:
     StandController* standController_;
     StopController* stopController_;
 
-    queue<WorkType> work_;
+    deque<WorkType> work_;
 };
 
 } // namespace srs

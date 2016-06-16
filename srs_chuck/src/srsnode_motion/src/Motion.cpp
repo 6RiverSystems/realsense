@@ -167,7 +167,7 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     tapOdometry_.getSensor()->enable(configuration_.odometry_enabled);
     ROS_INFO_STREAM("Odometry sensor enabled: " << configuration_.odometry_enabled);
 
-    //motionController_.setRobot(robot_);
+    motionController_.setRobot(robot_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

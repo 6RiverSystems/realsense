@@ -54,7 +54,7 @@ MotionController::MotionController(double dT) :
 void MotionController::emergencyStop()
 {
     // Issue a zero velocity command immediately
-    executeCommand(true, CommandEnum::E_STOP);
+    executeCommand(true, CommandEnum::BRAKE);
 
     // Cancel the current activity and clear the work queue
     activeController_->cancel();
@@ -284,13 +284,13 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
                 messageTwist.angular.y = 0;
                 messageTwist.angular.z = currentCommand_.angular;
 
-                ROS_INFO_STREAM_NAMED("MotionController", "Sending velocity: " << currentCommand_);
+                ROS_DEBUG_STREAM_NAMED("MotionController", "Sending VELOCITY: " << currentCommand_);
                 pubCmdVel_.publish(messageTwist);
             }
             break;
 
-        case E_STOP:
-            // For now the E-STOP is implemented with a 0 velocity. However
+        case BRAKE:
+            // For now the BRAKE is implemented with a 0 velocity. However
             // this can be changed to send a specific command to the brainstem
             currentCommand_ = Velocity<>();
 
@@ -301,7 +301,7 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
             messageTwist.angular.y = 0;
             messageTwist.angular.z = currentCommand_.angular;
 
-            ROS_INFO_STREAM_NAMED("MotionController", "Sending e-stop");
+            ROS_DEBUG_STREAM_NAMED("MotionController", "Sending BRAKE");
             pubCmdVel_.publish(messageTwist);
             break;
     }

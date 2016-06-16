@@ -86,7 +86,7 @@ private:
     const static Velocity<> ZERO_VELOCITY;
 
     enum CommandEnum {
-        E_STOP,
+        BRAKE,
         VELOCITY
     };
 

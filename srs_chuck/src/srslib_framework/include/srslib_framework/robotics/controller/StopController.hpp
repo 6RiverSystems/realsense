@@ -36,13 +36,8 @@ protected:
         double deltaVelocity = robot_.travelLinearAcceleration * dT;
 
         double linear = currentOdometry.velocity.linear;
-        double sign = BasicMath::sgn<double>(linear);
-
-        linear =  linear - sign * deltaVelocity;
-        if ((sign > 0 && linear < 0.005) || (sign < 0 && linear > -0.005))
-        {
-            linear = 0.0;
-        }
+        linear -=  BasicMath::sgn<double>(linear) * deltaVelocity;
+        linear = BasicMath::threshold<double>(linear, robot_.minLinearVelocity, 0.0);
 
         // Send the command for execution
         executeCommand(Velocity<>(linear, 0.0));

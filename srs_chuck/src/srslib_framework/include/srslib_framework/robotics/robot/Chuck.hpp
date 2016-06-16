@@ -28,6 +28,7 @@ struct Chuck : RobotProfile
         maxLinearVelocity = 2.600; // [m/s]
         maxLookAheadDistance = 1.500; // [m]
         minLookAheadDistance = 0.500; // [m]
+        minLinearVelocity = 0.005; // [m/s]
 
         ratioLookAheadDistance = 1.1; // []
 

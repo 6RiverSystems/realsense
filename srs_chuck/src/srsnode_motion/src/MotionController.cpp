@@ -45,6 +45,7 @@ MotionController::MotionController(double dT) :
     rotationController_ = new RotationController();
     stopController_ = new StopController();
     standController_ = new StandController();
+    emergencyController_ = new EmergencyController();
 
     reset();
 }
@@ -60,11 +61,21 @@ void MotionController::emergencyStop()
     cleanWorkQueue();
 
     pushWork(TaskEnum::EMERGENCY_STOP);
+
+    // Pump work from queue immediately, do not wait for the next cycle
+    pumpWorkFromQueue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::execute(Solution<Grid2d> solution)
 {
+    if (isEmergencyDeclared())
+    {
+        // Do not add anything to the work queue if
+        // an emergency is in progress
+        return;
+    }
+
     // If the robot is already moving, cancel the previous work, stop,
     // and execute what has been asked
     if (!isStandControllerActive())
@@ -132,6 +143,13 @@ void MotionController::execute(Solution<Grid2d> solution)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::normalStop()
 {
+    // Ignore the normal stop request if an
+    // emergency has been declared
+    if (isEmergencyDeclared())
+    {
+        return;
+    }
+
     // Cancel the current activity and clear the work queue
     activeController_->cancel();
     cleanWorkQueue();
@@ -153,6 +171,7 @@ void MotionController::reset()
     rotationController_->reset();
     stopController_->reset();
     standController_->reset();
+    emergencyController_->reset();
 
     // No controller is active
     currentTask_ = TaskEnum::NONE;
@@ -160,7 +179,6 @@ void MotionController::reset()
 
     currentOdometry_ = Odometry<>();
 
-    emergencyDeclared_ = false;
     hasArrived_ = false;
     hasArrivedChanged_ = false;
 
@@ -183,6 +201,7 @@ void MotionController::run(Pose<> currentPose, Odometry<> currentOdometry, Veloc
 
     // Make sure that the manual controller has the user command
     manualController_->setUserCommand(currentCommand);
+    emergencyController_->setUserCommand(currentCommand);
 
     // Run the active controller and send the command
     // if something is available
@@ -203,18 +222,25 @@ void MotionController::setRobot(RobotProfile robot)
     rotationController_->setRobotProfile(robot);
     standController_->setRobotProfile(robot);
     stopController_->setRobotProfile(robot);
+    emergencyController_->setRobotProfile(robot);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::switchToManual()
 {
+    // Ignore the request request if an
+    // emergency has been declared
+    if (isEmergencyDeclared())
+    {
+        return;
+    }
+
     if (!isManualControllerActive())
     {
         // Cancel the current activity and clear the work queue
         activeController_->cancel();
         cleanWorkQueue();
 
-        pushWork(TaskEnum::NORMAL_STOP);
         pushWork(TaskEnum::MANUAL_FOLLOW);
     }
 }
@@ -222,6 +248,13 @@ void MotionController::switchToManual()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::switchToAutonomous()
 {
+    // Ignore the request request if an
+    // emergency has been declared
+    if (isEmergencyDeclared())
+    {
+        return;
+    }
+
     if (isManualControllerActive())
     {
         // Cancel the current activity
@@ -330,8 +363,8 @@ void MotionController::checkMotionStatus()
             setHasArrived(true);
         }
 
-        // If no emergency has been declared
-        if (!emergencyDeclared_)
+        // If no emergency has been declared, consider more work
+        if (!isEmergencyDeclared())
         {
             // If there is nothing else to do, simply stand still
             if (!isWorkPending())
@@ -446,7 +479,7 @@ void MotionController::selectController(TaskEnum task)
     switch (task)
     {
         case EMERGENCY_STOP:
-            activeController_ = stopController_;
+            activeController_ = emergencyController_;
             break;
 
         case MANUAL_FOLLOW:
@@ -484,7 +517,7 @@ void MotionController::selectController(TaskEnum task)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::taskEmergencyStop()
 {
-    emergencyDeclared_ = true;
+    // Nothing to do but follow the manual commands
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

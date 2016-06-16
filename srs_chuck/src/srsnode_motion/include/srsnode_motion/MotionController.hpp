@@ -21,6 +21,7 @@ using namespace std;
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
 
 #include <srslib_framework/robotics/controller/CMUPathController.hpp>
+#include <srslib_framework/robotics/controller/EmergencyController.hpp>
 #include <srslib_framework/robotics/controller/ManualController.hpp>
 #include <srslib_framework/robotics/controller/RotationController.hpp>
 #include <srslib_framework/robotics/controller/StandController.hpp>
@@ -67,6 +68,11 @@ public:
         return hasArrivedChanged_;
     }
 
+    bool isEmergencyDeclared()
+    {
+        return isEmergencyControllerActive();
+    }
+
     void normalStop();
 
     void reset();
@@ -101,6 +107,11 @@ private:
     void cleanWorkQueue();
 
     void executeCommand(bool enforce, CommandEnum command, const Velocity<>* velocity = nullptr);
+
+    bool isEmergencyControllerActive()
+    {
+        return activeController_ == emergencyController_;
+    }
 
     bool isManualControllerActive()
     {
@@ -185,7 +196,7 @@ private:
 
     double dT_;
 
-    bool emergencyDeclared_;
+    EmergencyController* emergencyController_;
 
     bool hasArrived_;
     bool hasArrivedChanged_;

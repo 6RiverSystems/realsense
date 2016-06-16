@@ -26,8 +26,8 @@ public:
 protected:
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
-        // The controller never reaches the goal. In order to exit,
-        // a cancel needs to be signaled
+        // The controller never completes its goal. In order to complete its
+        // goal, it must be canceled
         goalReached_ = false;
 
         // Send the command for execution

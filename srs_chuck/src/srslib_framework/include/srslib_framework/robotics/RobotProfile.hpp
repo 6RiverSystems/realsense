@@ -25,7 +25,9 @@ struct RobotProfile
         minLookAheadDistance(0.0),
         minLinearVelocity(0.0),
 
+        ratioEmergency(0.0),
         ratioLookAheadDistance(0.0),
+        ratioManual(0.0),
 
         travelAngularAcceleration(0.0),
         travelAngularVelocity(0.0),
@@ -56,7 +58,9 @@ struct RobotProfile
     double minLookAheadDistance; // [m]
     double minLinearVelocity; // [m/s]
 
+    double ratioEmergency; // []
     double ratioLookAheadDistance; // []
+    double ratioManual; // []
 
     double travelAngularAcceleration; // [rad/s^2]
     double travelAngularVelocity; // [rad/s]

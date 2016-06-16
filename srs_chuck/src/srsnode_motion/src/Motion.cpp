@@ -315,6 +315,14 @@ void Motion::scanTapsForData()
     // If the joystick was touched, read the state of the latch
     if (tapJoyAdapter_.newDataAvailable())
     {
+        // If the controller emergency button has been pressed, tell
+        // the motion controller immediately
+        if (tapJoyAdapter_.getEmergencyState())
+        {
+            motionController_.emergencyStop();
+        }
+
+        // Store the latch state for later use
         isJoystickLatched_ = tapJoyAdapter_.getLatchState();
     }
 
@@ -351,15 +359,28 @@ void Motion::stepNode()
     Odometry<> currentOdometry = tapOdometry_.getSensor()->getOdometry();
     Velocity<> currentJoystickCommand = tapJoyAdapter_.getVelocity();
 
-    // Depending on the state of the joystick latch, enable or disable
-    // the autonomous mode
-    if (isJoystickLatched_)
+    if (motionController_.isEmergencyDeclared())
     {
-        motionController_.switchToManual();
+        // If an emergency has been declared, reset the motion controller
+        // only once the joystick has been unlatched
+        if (!isJoystickLatched_)
+        {
+            motionController_.reset();
+            motionController_.switchToAutonomous();
+        }
     }
     else
     {
-        motionController_.switchToAutonomous();
+        // Depending on the state of the joystick latch, enable or disable
+        // the autonomous mode
+        if (isJoystickLatched_)
+        {
+            motionController_.switchToManual();
+        }
+        else
+        {
+            motionController_.switchToAutonomous();
+        }
     }
 
     // Provide the command to the position estimator

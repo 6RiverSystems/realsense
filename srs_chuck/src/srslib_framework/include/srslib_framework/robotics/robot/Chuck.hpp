@@ -30,9 +30,9 @@ struct Chuck : RobotProfile
         minLookAheadDistance = 0.500; // [m]
         minLinearVelocity = 0.005; // [m/s]
 
-        ratioEmergency = 0.1; // []
+        ratioEmergency = 0.05; // []
         ratioLookAheadDistance = 1.1; // []
-        ratioManual = 0.6; // []
+        ratioManual = 0.5; // []
 
         travelAngularAcceleration = AngleMath::deg2rad<double>(28.0); // 0.489 [rad/s^2]
         travelAngularVelocity = AngleMath::deg2rad<double>(115); // 2.007 [rad/s]

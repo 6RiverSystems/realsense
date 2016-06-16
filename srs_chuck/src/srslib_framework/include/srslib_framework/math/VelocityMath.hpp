@@ -10,6 +10,8 @@
 #include <limits>
 using namespace std;
 
+#include <srslib_framework/math/AngleMath.hpp>
+#include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
 namespace srs {
@@ -20,11 +22,12 @@ struct VelocityMath
     inline static bool equal(const Velocity<TYPE>& lhv, const Velocity<TYPE>& rhv)
     {
         // The two velocities to be similar must:
-        // - difference in linear velocity must be less than 0.01 m/s
-        // - difference in angular velocity must be less than 0.1 deg/s
-
-        // TODO: Move the constants to constexpr
-        return abs(lhv.linear - rhv.linear) < 0.005 && abs(lhv.angular - rhv.angular) < 0.002;
+        //
+        // - difference in linear velocity must be less than 0.001 m/s
+        // - difference in angular velocity must be less than 0.05 deg/s
+        //
+        return BasicMath::equal(lhv.linear, rhv.linear, 0.001) &&
+            AngleMath::equalRad(lhv.angular, rhv.angular, 0.001);
     }
 
 };

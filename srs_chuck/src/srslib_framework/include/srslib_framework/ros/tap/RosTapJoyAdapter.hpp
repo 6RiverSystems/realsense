@@ -23,12 +23,19 @@ class RosTapJoyAdapter :
 public:
     RosTapJoyAdapter() :
         RosTap("", "Joy Adapter Tap"),
-        currentLatchState_(false)
+        currentLatchState_(false),
+        currentEmergencyState_(false)
     {}
 
     ~RosTapJoyAdapter()
     {
         disconnectTap();
+    }
+
+    bool getEmergencyState()
+    {
+        setNewData(false);
+        return currentEmergencyState_;
     }
 
     bool getLatchState()
@@ -50,14 +57,18 @@ protected:
             &RosTapJoyAdapter::onJoyLatched, this);
         subJoyVelocity_ = rosNodeHandle_.subscribe("/internal/sensors/joystick/velocity", 1,
             &RosTapJoyAdapter::onJoyVelocity, this);
+        subJoyEmergency_ = rosNodeHandle_.subscribe("/internal/sensors/joystick/emergency", 1,
+            &RosTapJoyAdapter::onJoyEmergency, this);
+
         return true;
     }
 
 private:
-    bool currentLatchState_;
-    Velocity<> currentVelocity_;
-
-    ros::Subscriber subJoyVelocity_;
+    void onJoyEmergency(const std_msgs::BoolConstPtr& message)
+    {
+        currentEmergencyState_ = message->data;
+        setNewData(true);
+    }
 
     void onJoyLatched(const std_msgs::BoolConstPtr& message)
     {
@@ -70,6 +81,13 @@ private:
         currentVelocity_ = Velocity<>(message->linear.x, message->angular.z);
         setNewData(true);
     }
+
+    bool currentEmergencyState_;
+    bool currentLatchState_;
+    Velocity<> currentVelocity_;
+
+    ros::Subscriber subJoyEmergency_;
+    ros::Subscriber subJoyVelocity_;
 };
 
 } // namespace srs

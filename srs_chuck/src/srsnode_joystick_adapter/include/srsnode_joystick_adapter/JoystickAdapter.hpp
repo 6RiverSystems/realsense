@@ -38,6 +38,10 @@ private:
 
     void onConfigChange(JoystickConfig& config, uint32_t level);
 
+    void publishEmergency(bool state);
+    void publishLatched(bool state);
+    void publishVelocity(Velocity<> velocity);
+
     JoystickConfig configuration_;
     dynamic_reconfigure::Server<JoystickConfig> configServer_;
 
@@ -45,6 +49,7 @@ private:
 
     ros::Publisher pubCommand_;
     ros::Publisher pubJoystickLatched_;
+    ros::Publisher pubJoystickEmergency_;
 
     ros::NodeHandle rosNodeHandle_;
 

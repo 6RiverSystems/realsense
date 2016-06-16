@@ -22,27 +22,28 @@ class RosTapJoy :
     public RosTap
 {
 public:
-    // TODO Rename the buttons with PS3 names
     enum ButtonEnum {
-        BUTTON_FIRE = 0,
-        BUTTON_2 = 1,
-        BUTTON_3 = 2,
-        BUTTON_4 = 3,
-        BUTTON_5 = 4,
-        BUTTON_6 = 5,
-        BUTTON_7 = 6,
-        BUTTON_8 = 7,
-        BUTTON_9 = 8,
-        BUTTON_10 = 9,
-        BUTTON_11 = 10
+        BUTTON_A = 0,
+        BUTTON_B = 1,
+        BUTTON_2 = 2, // Not present in the PS2 joypad
+        BUTTON_X = 3,
+        BUTTON_Y = 4,
+        BUTTON_5 = 5, // Not present int the PS2 joypad
+        BUTTON_LEFT_TOP = 6,
+        BUTTON_RIGHT_TOP = 7,
+        BUTTON_LEFT_BOTTOM = 8,
+        BUTTON_RIGHT_BOTTOM = 9,
+        BUTTON_SELECT = 10,
+        BUTTON_START = 11,
+        BUTTON_MODE = 12
     };
 
     RosTapJoy() :
         RosTap("/joy", "Joy Tap"),
         currentVelocity_()
     {
-        fill(currentButtons_, currentButtons_ + NUMBER_BUTTONS, 0);
-        fill(previousButtons_, previousButtons_ + NUMBER_BUTTONS, 0);
+        fill(currentButtons_, currentButtons_ + MAX_NUMBER_BUTTONS, 0);
+        fill(previousButtons_, previousButtons_ + MAX_NUMBER_BUTTONS, 0);
     }
 
     ~RosTapJoy()
@@ -52,7 +53,7 @@ public:
 
     bool anyButtonPressed()
     {
-        for (unsigned int b = 0; b < NUMBER_BUTTONS; b++)
+        for (unsigned int b = 0; b < MAX_NUMBER_BUTTONS; b++)
         {
             if (isButtonPressed(static_cast<ButtonEnum>(b)))
             {
@@ -65,7 +66,7 @@ public:
 
     bool anyButtonReleased()
     {
-        for (unsigned int b = 0; b < NUMBER_BUTTONS; b++)
+        for (unsigned int b = 0; b < MAX_NUMBER_BUTTONS; b++)
         {
             if (isButtonReleased(static_cast<ButtonEnum>(b)))
             {
@@ -82,17 +83,22 @@ public:
         return currentVelocity_;
     }
 
+    bool isButtonChanged(ButtonEnum button)
+    {
+        return isButtonPressed(button) || isButtonReleased(button);
+    }
+
     bool isButtonPressed(ButtonEnum button)
     {
         setNewData(false);
-        return (button >= 0 && button < NUMBER_BUTTONS) ?
+        return (button >= 0 && button < MAX_NUMBER_BUTTONS) ?
             currentButtons_[button] && !previousButtons_[button] : false;
     }
 
     bool isButtonReleased(ButtonEnum button)
     {
         setNewData(false);
-        return (button >= 0 && button < NUMBER_BUTTONS) ?
+        return (button >= 0 && button < MAX_NUMBER_BUTTONS) ?
             !currentButtons_[button] && previousButtons_[button] : false;
     }
 
@@ -104,19 +110,23 @@ protected:
     }
 
 private:
-    constexpr static unsigned int NUMBER_BUTTONS = 11;
+    constexpr static unsigned int MAX_NUMBER_BUTTONS = 20;
 
-    bool currentButtons_[NUMBER_BUTTONS];
+    bool currentButtons_[MAX_NUMBER_BUTTONS];
     Velocity<TYPE> currentVelocity_;
 
-    bool previousButtons_[NUMBER_BUTTONS];
+    bool previousButtons_[MAX_NUMBER_BUTTONS];
 
     void onJoy(const sensor_msgs::Joy::ConstPtr& message)
     {
+        // Extract the current velocity from the axis
         currentVelocity_ = Velocity<TYPE>(message->axes[1], message->axes[0]);
 
-        copy(currentButtons_, currentButtons_ + NUMBER_BUTTONS, previousButtons_);
-        for (unsigned int b = 0; b < NUMBER_BUTTONS; b++)
+        // Copy the previous state of the buttons
+        copy(currentButtons_, currentButtons_ + MAX_NUMBER_BUTTONS, previousButtons_);
+
+        // Update the current state of the buttons
+        for (unsigned int b = 0; b < message->buttons.size(); b++)
         {
             currentButtons_[b] = message->buttons[b] > 0;
         }

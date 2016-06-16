@@ -261,7 +261,7 @@ TEST_F( StargazerTest, TestTransforms )
 	ROS_DEBUG_NAMED( "StarGazerPointTransformer", "partial footprint (%2.5f): %2.5f, %2.5f, %2.5f\n",
 		tf::getYaw( rotation ), footprintOffset.getX( ), footprintOffset.getY( ), footprintOffset.getZ( ) );
 
-	tf::Vector3 totalFootprintOffset = footprintOffset + cameraOffset + stargazerOffset;
+	tf::Vector3 totalFootprintOffset = totalCameraOffset + footprintOffset;
 
 	ROS_DEBUG_NAMED( "StarGazerPointTransformer", "total footprint (%2.5f): %2.5f, %2.5f, %2.5f\n",
 		tf::getYaw( rotation ), totalFootprintOffset.getX( ), totalFootprintOffset.getY( ), totalFootprintOffset.getZ( ) );

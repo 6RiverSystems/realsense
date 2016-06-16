@@ -63,15 +63,15 @@ target_link_libraries(${PROJECT_NODE}
 
 ####################################################################################################
 # Tests
-
-if (CATKIN_ENABLE_TESTING)
-    catkin_add_gtest(TestSuite_Brainstem
-        ${${PROJECT_NAME}_SOURCES}
-    )
-
-    target_link_libraries(TestSuite_Brainstem
-        ${catkin_LIBRARIES}
-        ${PROJECT_LIBRARIES}
-        ${srslib_test_LIBRARIES}
-    )
-endif()
+#
+#if (CATKIN_ENABLE_TESTING)
+#    catkin_add_gtest(TestSuite_Brainstem
+#        ${${PROJECT_NAME}_SOURCES}
+#    )
+#
+#    target_link_libraries(TestSuite_Brainstem
+#        ${catkin_LIBRARIES}
+#        ${PROJECT_LIBRARIES}
+#        ${srslib_test_LIBRARIES}
+#    )
+#endif()

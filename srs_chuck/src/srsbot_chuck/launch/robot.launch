@@ -46,5 +46,5 @@
     <include file="$(find srsnode_executive)/launch/node.launch" />
 
     <!-- Launch the ros-bridge -->
-    <!-- <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" /> -->
+	<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
 </launch>

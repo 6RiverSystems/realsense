@@ -156,19 +156,19 @@ tf::Pose StarGazerPointTransformer::TransformPoint( int nTagId, double fX, doubl
 
 			tf::Vector3 totalFootprintOffset = totalCameraOffset + footprintOffset;
 
-			std::ostringstream stream;
-
-			stream << "Stargazer Data: " << std::fixed <<  endl <<
-				tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
-				stargazerOffset.getX( ) << ", " << stargazerOffset.getY( ) << ", " << stargazerOffset.getZ( ) << ", " <<
-				totalCameraOffset.getX( ) << ", " << totalCameraOffset.getY( ) << ", " << totalCameraOffset.getZ( ) << ", " <<
-				totalFootprintOffset.getX( ) << ", " << totalFootprintOffset.getY( ) << ", " << totalFootprintOffset.getZ( ) << ", " <<
-				chuckOrigin.getX( ) << ", " << chuckOrigin.getY( ) << ", " << chuckOrigin.getZ( ) << ", " <<
-				tf::getYaw( chuckOrientation ) * 180.0f / M_PI << ", " << std::endl;
-
-			std::string strData =  stream.str( );
-
-			ROS_DEBUG_NAMED( "StarGazerPointTransformer", "%s", strData.c_str( ) );
+//			std::ostringstream stream;
+//
+//			stream << "Stargazer Data: " << std::fixed <<  endl <<
+//				tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
+//				stargazerOffset.getX( ) << ", " << stargazerOffset.getY( ) << ", " << stargazerOffset.getZ( ) << ", " <<
+//				totalCameraOffset.getX( ) << ", " << totalCameraOffset.getY( ) << ", " << totalCameraOffset.getZ( ) << ", " <<
+//				totalFootprintOffset.getX( ) << ", " << totalFootprintOffset.getY( ) << ", " << totalFootprintOffset.getZ( ) << ", " <<
+//				chuckOrigin.getX( ) << ", " << chuckOrigin.getY( ) << ", " << chuckOrigin.getZ( ) << ", " <<
+//				tf::getYaw( chuckOrientation ) * 180.0f / M_PI << ", " << std::endl;
+//
+//			std::string strData =  stream.str( );
+//
+//			ROS_DEBUG_NAMED( "StarGazerPointTransformer", "%s", strData.c_str( ) );
 
 			static double_acc accLocalX;
 			static double_acc accLocalY;

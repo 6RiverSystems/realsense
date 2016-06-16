@@ -75,11 +75,11 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
 
     // If, for some reason, the linear velocity is 0
     // but we are still far from the goal, bottom the linear velocity
-    // to a nominal minimum value
+    // to a nominal minimum value (10 times the minimum linear velocity
+    // specific to the robot)
     if (BasicMath::equal<double>(linear, 0.0, 0.001))
     {
-        // TODO: Add in the configuration the minimum travel velocity
-        linear = 0.05 * robot_.travelLinearVelocity;
+        linear = 10.0 * robot_.minLinearVelocity;
     }
 
     // Calculate the angular portion of the command

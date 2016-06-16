@@ -25,6 +25,8 @@ const cv::Mat ApsSensor<STATE_SIZE, TYPE>::R = (
 template<unsigned int STATE_SIZE, int TYPE>
 cv::Mat ApsSensor<STATE_SIZE, TYPE>::getCurrentData()
 {
+    Sensor<STATE_SIZE, TYPE>::setNewData(false);
+
     // Transfer the value that the odometer care about to the new state
     StatePe<TYPE> state = StatePe<TYPE>();
     state.pose = currentData_;

@@ -33,7 +33,8 @@ unordered_map<int, string> MotionController::TASK_NAMES = {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 MotionController::MotionController(double dT) :
     dT_(dT),
-    requestedGoalReached_(false),
+    hasArrived_(false),
+    hasArrivedChanged_(false),
     rosNodeHandle_()
 {
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>(
@@ -114,13 +115,17 @@ void MotionController::execute(Solution<Grid2d> solution)
     {
         pushWork(TaskEnum::ROTATE, initialRotationSolution);
     }
+
     pushWork(TaskEnum::PATH_FOLLOW, pathSolution);
+    currentFinalGoal_ = pathSolution->getGoal().toPose;
+
     if (finalRotationSolution)
     {
         pushWork(TaskEnum::ROTATE, finalRotationSolution);
+        currentFinalGoal_ = finalRotationSolution->getGoal().toPose;
     }
 
-    requestedGoalReached_ = false;
+    setHasArrived(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,7 +157,8 @@ void MotionController::reset()
     currentOdometry_ = Odometry<>();
 
     emergencyDeclared_ = false;
-    requestedGoalReached_ = false;
+    hasArrived_ = false;
+    hasArrivedChanged_ = false;
 
     cleanWorkQueue();
     pushWork(TaskEnum::STAND);
@@ -161,6 +167,8 @@ void MotionController::reset()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::run(Pose<> currentPose, Odometry<> currentOdometry, Velocity<> currentCommand)
 {
+    hasArrivedChanged_ = false;
+
     currentPose_ = currentPose;
     ROS_DEBUG_STREAM_NAMED("MotionController", "Reported robot pose: " << currentPose_);
 
@@ -265,12 +273,6 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::checkMotionStatus()
 {
-    // Consider the goal not reached yet
-    // TODO: There should be a better way to communicate to Motion that the
-    // goal has been reached only once. The next line makes sure that in the Motion cycle
-    // the test for "ARRIVED" publishes a TRUE only in the same cycle
-    requestedGoalReached_ = false;
-
     // If the stand controller is currently active and there is work in
     // the queue, cancel work in the controller and pump work from the queue
     if (isStandControllerActive() && isWorkPending())
@@ -321,7 +323,7 @@ void MotionController::checkMotionStatus()
         // been completed, declare that the requested goal was reached
         if (isMovingControllerActive() && !isWorkPending())
         {
-            requestedGoalReached_ = true;
+            setHasArrived(true);
         }
 
         // If no emergency has been declared
@@ -496,7 +498,7 @@ void MotionController::taskNormalStop()
 void MotionController::taskPathFollow()
 {
     // Store what goal the controller is going to work on
-    currentGoal_ = currentSolution_.getGoal().toPose;
+    currentShortTermGoal_ = currentSolution_.getGoal().toPose;
 
     // Calculate the trajectory
     Trajectory<> trajectory;
@@ -513,10 +515,10 @@ void MotionController::taskPathFollow()
 void MotionController::taskRotate()
 {
     // Store what goal the controller is going to work on
-    currentGoal_ = currentSolution_.getGoal().toPose;
+    currentShortTermGoal_ = currentSolution_.getGoal().toPose;
 
     // Pass the goal to the path controller
-    rotationController_->setGoal(currentGoal_);
+    rotationController_->setGoal(currentShortTermGoal_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

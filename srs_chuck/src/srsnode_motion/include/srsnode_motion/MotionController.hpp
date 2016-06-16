@@ -47,14 +47,24 @@ public:
         return activeController_->getExecutingCommand();
     }
 
-    Pose<> getGoal() const
+    Pose<> getFinalGoal() const
     {
-        return currentGoal_;
+        return currentFinalGoal_;
+    }
+
+    Pose<> getShortTermGoal() const
+    {
+        return currentShortTermGoal_;
     }
 
     bool hasArrived() const
     {
-        return requestedGoalReached_;
+        return hasArrived_;
+    }
+
+    bool hasArrivedChanged() const
+    {
+        return hasArrivedChanged_;
     }
 
     void normalStop();
@@ -150,6 +160,12 @@ private:
 
     void selectController(TaskEnum task);
 
+    void setHasArrived(bool newValue)
+    {
+        hasArrived_ = newValue;
+        hasArrivedChanged_ = true;
+    }
+
     void taskEmergencyStop();
     void taskManualFollow();
     void taskNormalStop();
@@ -160,9 +176,10 @@ private:
     BaseController* activeController_;
 
     Velocity<> currentCommand_;
-    Pose<> currentGoal_;
+    Pose<> currentFinalGoal_;
     Odometry<> currentOdometry_;
     Pose<> currentPose_;
+    Pose<> currentShortTermGoal_;
     Solution<Grid2d> currentSolution_;
     TaskEnum currentTask_;
 
@@ -170,15 +187,16 @@ private:
 
     bool emergencyDeclared_;
 
-    ManualController* manualController_;
+    bool hasArrived_;
+    bool hasArrivedChanged_;
 
-    ros::NodeHandle rosNodeHandle_;
+    ManualController* manualController_;
 
     CMUPathController* pathController_;
     ros::Publisher pubCmdVel_;
 
-    bool requestedGoalReached_;
     RobotProfile robot_;
+    ros::NodeHandle rosNodeHandle_;
     RotationController* rotationController_;
 
     StandController* standController_;

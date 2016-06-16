@@ -66,10 +66,11 @@ void Motion::run()
 
         evaluateTriggers();
         scanTapsForData();
+        publishArrived();
+
         stepNode();
 
         publishOdometry();
-        publishArrived();
 
         refreshRate.sleep();
     }
@@ -172,14 +173,24 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishArrived()
 {
-    // Publish this only if the motion controller says that it
-    // has completed the request
-    if (motionController_.hasArrived())
+    // Publish this only if the motion controller says that
+    // something has changed
+    if (motionController_.hasArrivedChanged())
     {
-        ROS_INFO_STREAM_NAMED("Motion", "Arrived at goal: " << motionController_.getGoal());
-
         std_msgs::Bool messageGoalArrived;
-        messageGoalArrived.data = motionController_.hasArrived();
+
+        if (motionController_.hasArrived())
+        {
+            messageGoalArrived.data = true;
+            ROS_INFO_STREAM_NAMED("Motion", "Arrived at goal: " <<
+                motionController_.getFinalGoal());
+        }
+        else
+        {
+            messageGoalArrived.data = false;
+            ROS_INFO_STREAM_NAMED("Motion", "Departed for goal: " <<
+                motionController_.getFinalGoal());
+        }
 
         pubStatusGoalArrived_.publish(messageGoalArrived);
     }
@@ -190,7 +201,7 @@ void Motion::publishGoal()
 {
     ros::Time planningTime = ros::Time::now();
 
-    Pose<> goal = motionController_.getGoal();
+    Pose<> goal = motionController_.getFinalGoal();
 
     geometry_msgs::PoseStamped messageGoal;
     tf::Quaternion quaternion = tf::createQuaternionFromYaw(goal.theta);

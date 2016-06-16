@@ -78,7 +78,7 @@ void Executive::disconnectAllTaps()
 void Executive::executeArrived()
 {
     std_msgs::Bool messageGoalArrived;
-    messageGoalArrived.data = true;
+    messageGoalArrived.data = tapInternal_GoalArrived_.getBool();
 
     pubExternalArrived_.publish(messageGoalArrived);
 }
@@ -210,7 +210,7 @@ void Executive::stepExecutiveFunctions()
         executePause();
     }
 
-    if (tapInternal_GoalArrived_.isNewValueTrue())
+    if (tapInternal_GoalArrived_.newDataAvailable())
     {
         executeArrived();
     }

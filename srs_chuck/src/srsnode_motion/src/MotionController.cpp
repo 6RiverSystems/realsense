@@ -52,12 +52,13 @@ MotionController::MotionController(double dT) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::emergencyStop()
 {
-    switchToManual();
-
     // Issue a zero velocity command immediately
     executeCommand(true, CommandEnum::E_STOP);
 
+    // Cancel the current activity and clear the work queue
+    activeController_->cancel();
     cleanWorkQueue();
+
     pushWork(TaskEnum::EMERGENCY_STOP);
 }
 
@@ -131,8 +132,11 @@ void MotionController::execute(Solution<Grid2d> solution)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::normalStop()
 {
+    // Cancel the current activity and clear the work queue
+    activeController_->cancel();
+    cleanWorkQueue();
+
     pushWork(TaskEnum::NORMAL_STOP);
-    switchToManual();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -247,7 +251,7 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
                 messageTwist.angular.y = 0;
                 messageTwist.angular.z = currentCommand_.angular;
 
-                ROS_DEBUG_STREAM_NAMED("MotionController", "Sending velocity: " << currentCommand_);
+                ROS_INFO_STREAM_NAMED("MotionController", "Sending velocity: " << currentCommand_);
                 pubCmdVel_.publish(messageTwist);
             }
             break;
@@ -264,7 +268,7 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
             messageTwist.angular.y = 0;
             messageTwist.angular.z = currentCommand_.angular;
 
-            ROS_DEBUG_STREAM_NAMED("MotionController", "Sending e-stop");
+            ROS_INFO_STREAM_NAMED("MotionController", "Sending e-stop");
             pubCmdVel_.publish(messageTwist);
             break;
     }
@@ -492,6 +496,7 @@ void MotionController::taskManualFollow()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::taskNormalStop()
 {
+    // Nothing to do while stopping
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -17,8 +17,6 @@ using namespace std;
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
 
-#include <srsnode_motion/tap/odometry/OdometrySensor.hpp>
-
 #include <srsnode_motion/PositionUkf.hpp>
 #include <srsnode_motion/Robot.hpp>
 #include <srsnode_motion/StatePe.hpp>

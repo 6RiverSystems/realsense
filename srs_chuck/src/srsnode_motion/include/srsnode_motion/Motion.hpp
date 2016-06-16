@@ -22,6 +22,7 @@ using namespace srsnode_motion;
 #include <srslib_framework/ros/tap/RosTapInternal_InitialPose.hpp>
 #include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
 #include <srslib_framework/ros/tap/RosTapMap.hpp>
+#include <srslib_framework/ros/tap/RosTapOdometry.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
 #include <srslib_framework/ros/service/RosTriggerStop.hpp>
 #include <srslib_framework/search/AStar.hpp>
@@ -29,7 +30,6 @@ using namespace srsnode_motion;
 #include <srsnode_motion/PositionEstimator.hpp>
 #include <srsnode_motion/MotionController.hpp>
 #include <srsnode_motion/tap/aps/RosTapAps.hpp>
-#include <srsnode_motion/tap/odometry/RosTapOdometry.hpp>
 
 namespace srs {
 

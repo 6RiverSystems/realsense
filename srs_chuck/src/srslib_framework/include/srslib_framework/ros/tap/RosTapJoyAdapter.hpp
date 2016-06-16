@@ -50,6 +50,15 @@ public:
         return currentVelocity_;
     }
 
+    void reset()
+    {
+        RosTap::reset();
+
+        currentLatchState_ = false;
+        currentEmergencyState_ = false;
+        currentVelocity_ = Velocity<>();
+    }
+
 protected:
     bool connect()
     {

@@ -102,6 +102,15 @@ public:
             !currentButtons_[button] && previousButtons_[button] : false;
     }
 
+    void reset()
+    {
+        RosTap::reset();
+
+        currentVelocity_ = Velocity<>();
+        fill(currentButtons_, currentButtons_ + MAX_NUMBER_BUTTONS, 0);
+        fill(previousButtons_, previousButtons_ + MAX_NUMBER_BUTTONS, 0);
+    }
+
 protected:
     bool connect()
     {
@@ -111,11 +120,6 @@ protected:
 
 private:
     constexpr static unsigned int MAX_NUMBER_BUTTONS = 20;
-
-    bool currentButtons_[MAX_NUMBER_BUTTONS];
-    Velocity<TYPE> currentVelocity_;
-
-    bool previousButtons_[MAX_NUMBER_BUTTONS];
 
     void onJoy(const sensor_msgs::Joy::ConstPtr& message)
     {
@@ -133,6 +137,11 @@ private:
 
         setNewData(true);
     }
+
+    bool currentButtons_[MAX_NUMBER_BUTTONS];
+    Velocity<TYPE> currentVelocity_;
+
+    bool previousButtons_[MAX_NUMBER_BUTTONS];
 };
 
 } // namespace srs

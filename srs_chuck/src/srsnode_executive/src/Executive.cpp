@@ -34,8 +34,6 @@ void Executive::run()
 {
     connectAllTaps();
 
-    publishInternalInitialPose(robotInitialPose_);
-
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
     {

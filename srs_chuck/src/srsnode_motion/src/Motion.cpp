@@ -28,7 +28,8 @@ Motion::Motion(string nodeName) :
     isJoystickLatched_(false),
     rosNodeHandle_(nodeName),
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
-    motionController_(1.0 / REFRESH_RATE_HZ)
+    motionController_(1.0 / REFRESH_RATE_HZ),
+    simulatedT_(0.0)
 {
     motionController_.setRobot(robot_);
 
@@ -52,8 +53,11 @@ void Motion::run()
 {
     connectAllTaps();
 
-    // Establish an "acceptable" initial position
-    tapInitialPose_.set(0, 3.0, 3.0, 0);
+    currentTime_ = ros::Time::now();
+
+    // Establish an "acceptable" initial position, at least until the
+    // Position Estimator can get its bearings
+    tapInitialPose_.set(TimeMath::time2number(currentTime_), 3.0, 3.0, 0);
     reset(tapInitialPose_.getPose());
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
@@ -87,12 +91,11 @@ void Motion::connectAllTaps()
     tapInitialPose_.connectTap();
     tapJoyAdapter_.connectTap();
     tapAps_.connectTap();
+    tapInternalGoal_.connectTap();
+    tapMap_.connectTap();
 
     triggerStop_.connectService();
     triggerShutdown_.connectService();
-
-    tapInternalGoal_.connectTap();
-    tapMap_.connectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +106,6 @@ void Motion::disconnectAllTaps()
     tapInitialPose_.disconnectTap();
     tapJoyAdapter_.disconnectTap();
     tapAps_.disconnectTap();
-
     tapInternalGoal_.disconnectTap();
     tapMap_.disconnectTap();
 }
@@ -163,9 +165,6 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 
     robot_.travelRotationVelocity = configuration_.travel_rotation_velocity;
     ROS_INFO_STREAM("Travel rotation velocity [rad/s]: " << configuration_.travel_rotation_velocity);
-
-    tapOdometry_.getSensor()->enable(configuration_.odometry_enabled);
-    ROS_INFO_STREAM("Odometry sensor enabled: " << configuration_.odometry_enabled);
 
     motionController_.setRobot(robot_);
 }
@@ -351,12 +350,13 @@ void Motion::reset(Pose<> pose0)
 {
     positionEstimator_.reset(pose0);
     motionController_.reset();
+    simulatedT_ = 0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::stepNode()
 {
-    Odometry<> currentOdometry = tapOdometry_.getSensor()->getOdometry();
+    Odometry<> currentOdometry = tapOdometry_.getOdometry();
     Velocity<> currentJoystickCommand = tapJoyAdapter_.getVelocity();
 
     if (motionController_.isEmergencyDeclared())

@@ -12,6 +12,7 @@ using namespace std;
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 
+#include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/ros/RosTap.hpp>
 
 namespace srs {
@@ -42,6 +43,31 @@ public:
         return connectionStateChanged_;
     }
 
+    void reset()
+    {
+        RosTap::reset();
+
+        prevBrainStemConnected_ = false;
+        set(TimeMath::time2number(ros::Time::now()), false);
+    }
+
+    void set(double arrivalTime, bool value)
+    {
+        isBrainStemConnected_ = value;
+
+        connectionStateChanged_ = prevBrainStemConnected_ != isBrainStemConnected_;
+
+        if (connectionStateChanged_)
+        {
+            ROS_INFO_STREAM("Brain stem changed the connection state from " <<
+                prevBrainStemConnected_ << " to " << isBrainStemConnected_);
+        }
+
+        prevBrainStemConnected_ = isBrainStemConnected_;
+
+        setNewData(true);
+    }
+
 protected:
     bool connect()
     {
@@ -52,24 +78,16 @@ protected:
     }
 
 private:
-    bool connectionStateChanged_;
-    bool isBrainStemConnected_;
-    bool prevBrainStemConnected_;
-
     void onBrainStemConnected(std_msgs::BoolConstPtr message)
     {
-        isBrainStemConnected_ = message->data;
-        connectionStateChanged_ = prevBrainStemConnected_ != isBrainStemConnected_;
-
-        if (connectionStateChanged_)
-        {
-            ROS_INFO_STREAM("Brain stem changed the connection state from " <<
-                prevBrainStemConnected_ << " to " << isBrainStemConnected_);
-        }
-
-        prevBrainStemConnected_ = isBrainStemConnected_;
-        setNewData(true);
+        set(TimeMath::time2number(ros::Time::now()), message->data);
     }
+
+    bool connectionStateChanged_;
+
+    bool isBrainStemConnected_;
+
+    bool prevBrainStemConnected_;
 };
 
 } // namespace srs

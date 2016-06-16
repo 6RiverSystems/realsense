@@ -17,8 +17,6 @@ using namespace std;
 #include <srslib_framework/robotics/Odometry.hpp>
 #include <srslib_framework/robotics/RobotProfile.hpp>
 
-#include <srsnode_motion/tap/odometry/OdometrySensor.hpp>
-
 #include <srsnode_motion/PositionUkf.hpp>
 #include <srsnode_motion/Robot.hpp>
 #include <srsnode_motion/StatePe.hpp>
@@ -37,10 +35,8 @@ TEST(Test_Motion, Diagonal)
 {
     // Create standard robot process model
     Robot<> robot;
-    OdometrySensor<UKF_STATE_SIZE, CV_64F> odometer;
 
     PositionUkf ukf(robot);
-    ukf.addSensor(&odometer);
 
     // Create a sequence of commands
     vector<const CmdVelocity<>*> commands = {
@@ -107,7 +103,6 @@ TEST(Test_Motion, Diagonal)
     {
         // Push the simulated measurement
         auto odometry = *measurements.at(t);
-        odometer.set(t * DT, odometry.velocity.linear, odometry.velocity.angular);
 
         // Run the step of the UKF
         // TODO: ukf.run(t * DT, const_cast<CmdVelocity<>*>(commands.at(t)));

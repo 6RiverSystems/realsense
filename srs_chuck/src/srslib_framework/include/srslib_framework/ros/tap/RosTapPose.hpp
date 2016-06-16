@@ -41,6 +41,7 @@ public:
 
     void reset()
     {
+        RosTap::reset();
         set(TimeMath::time2number(ros::Time::now()), 0.0, 0.0, 0.0);
     }
 

@@ -40,20 +40,21 @@ protected:
         // goal, it must be canceled
         goalReached_ = false;
 
-        double linear = BasicMath::saturate<double>(robot_.ratioManual * userCommand_.linear,
+        double linear = BasicMath::saturate<double>(
+            robot_.ratioManual * userCommand_.linear * robot_.travelLinearVelocity,
             robot_.maxLinearVelocity, -robot_.maxLinearVelocity);
+
+        double angular = BasicMath::saturate<double>(
+            robot_.ratioManual * userCommand_.angular * robot_.travelAngularVelocity,
+            robot_.maxAngularVelocity, -robot_.maxAngularVelocity);
 
         // If the robot is moving backward and at the same time
         // rotating, invert the direction of rotation. No transformation
         // is performed if the robot is rotating in place (linear = 0)
-        double angular = userCommand_.angular;
         if (!BasicMath::equal(userCommand_.linear, 0.0, 0.001))
         {
             angular *= BasicMath::sgn<double>(userCommand_.linear);
         }
-
-        angular = BasicMath::saturate<double>(robot_.ratioManual * angular,
-            robot_.maxAngularVelocity, -robot_.maxAngularVelocity);
 
         // Send the command for execution
         executeCommand(Velocity<>(linear, angular));

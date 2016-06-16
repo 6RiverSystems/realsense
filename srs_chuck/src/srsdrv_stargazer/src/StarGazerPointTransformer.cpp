@@ -121,9 +121,9 @@ tf::Vector3 StarGazerPointTransformer::GetFootprintOffset( const tf::Quaternion&
 	return footprintPose.getOrigin( );
 }
 
-tf::Pose StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY, double fZ, double fAngleInDegrees )
+bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY, double fZ, double fAngleInDegrees, tf::Pose& pose )
 {
-	tf::Pose pose( tf::Quaternion::getIdentity( ) );
+	bool bSuccess = false;
 
 	auto iter = m_mapTransforms.find( nTagId );
 
@@ -151,6 +151,8 @@ tf::Pose StarGazerPointTransformer::TransformPoint( int nTagId, double fX, doubl
 			tf::Quaternion chuckOrientation = anchorGlobal * anchorRotation;
 
 			pose = tf::Pose( chuckOrientation, chuckOrigin);
+
+			bSuccess = true;
 
 			tf::Vector3 totalCameraOffset = cameraOffset + stargazerOffset;
 
@@ -258,7 +260,7 @@ tf::Pose StarGazerPointTransformer::TransformPoint( int nTagId, double fX, doubl
 			nTagId, fX, fY, fZ, fAngleInDegrees );
 	}
 
-	return pose;
+	return bSuccess;
 }
 
 std::string StarGazerPointTransformer::GetTargetFrame( ) const

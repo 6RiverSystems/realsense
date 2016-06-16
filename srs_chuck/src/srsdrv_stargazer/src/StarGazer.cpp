@@ -163,15 +163,18 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
 {
 	ros::Time now( ros::Time::now( ) );
 
-	tf::Pose pose = m_pointTransformer.TransformPoint( nTagId, fX, fY, fZ, fAngle );
+	tf::Pose pose( tf::Quaternion::getIdentity( ) );
 
-	tf::Stamped<tf::Pose> stampedPose( pose, now, m_pointTransformer.GetAnchorFrame( nTagId ) );
+	if( m_pointTransformer.TransformPoint( nTagId, fX, fY, fZ, fAngle, pose ) )
+	{
+		tf::Stamped<tf::Pose> stampedPose( pose, now, m_pointTransformer.GetAnchorFrame( nTagId ) );
 
-	// The data from the anchor frame reference
-	geometry_msgs::PoseStamped msg;
-	poseStampedTFToMsg( stampedPose, msg );
+		// The data from the anchor frame reference
+		geometry_msgs::PoseStamped msg;
+		poseStampedTFToMsg( stampedPose, msg );
 
-	m_rosApsPublisher.publish( msg );
+		m_rosApsPublisher.publish( msg );
+	}
 }
 
 void StarGazer::LoadTransforms( )

@@ -35,7 +35,7 @@ public:
 
 	tf::Vector3 GetFootprintOffset( const tf::Quaternion& angle ) const;
 
-	tf::Pose TransformPoint( int tagID, double fX, double fY, double fZ, double fAngle );
+	bool TransformPoint( int tagID, double fX, double fY, double fZ, double fAngle, tf::Pose& pose );
 
 	std::string GetTargetFrame( ) const;
 

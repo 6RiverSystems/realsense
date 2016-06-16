@@ -271,14 +271,17 @@ TEST_F( StargazerTest, TestMapTransform )
 {
 	double dfAngleLeftDegrees = GetLeftHandAngle( -0.47000 );
 
-	tf::Pose mapPose = m_pointTransformer.TransformPoint( 98, -18.489, 77.349, 511.051, dfAngleLeftDegrees );
+	tf::Pose pose( tf::Quaternion::getIdentity( ) );
 
-	tf::Vector3 mapOffset = mapPose.getOrigin( );
+	if( m_pointTransformer.TransformPoint( 98, -18.489, 77.349, 511.051, dfAngleLeftDegrees, pose ) )
+	{
+		tf::Vector3 mapOffset = pose.getOrigin( );
 
-	tf:: Quaternion mapRotation = mapPose.getRotation( );
+		tf:: Quaternion mapRotation = pose.getRotation( );
 
-	ROS_DEBUG_NAMED( "StarGazerPointTransformer", "map (%2.5f): %2.5f, %2.5f, %2.5f\n",
-		tf::getYaw( mapRotation ), mapOffset.getX( ), mapOffset.getY( ), mapOffset.getZ( ) );
+		ROS_DEBUG_NAMED( "StarGazerPointTransformer", "map (%2.5f): %2.5f, %2.5f, %2.5f\n",
+			tf::getYaw( mapRotation ), mapOffset.getX( ), mapOffset.getY( ), mapOffset.getZ( ) );
+	}
 }
 
 }  // namespace

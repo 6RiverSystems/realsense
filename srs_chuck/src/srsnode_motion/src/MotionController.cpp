@@ -631,6 +631,8 @@ void MotionController::taskPathFollow()
     converter.fromSolution(currentSolution_, dT_);
     converter.getTrajectory(trajectory);
 
+    ROS_DEBUG_STREAM_NAMED("MotionController", "Trajectory: " << trajectory);
+
     // Pass the trajectory to the path controller
     pathController_->setTrajectory(trajectory, currentPose_);
 }

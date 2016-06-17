@@ -170,7 +170,7 @@ private:
         auto fromWaypoint = waypoints.begin();
         auto toWaypoint = fromWaypoint + 1;
 
-        double v0 = robot_.minLinearVelocity;
+        double v0 = robot_.minInitialLinearVelocity;
         double vf = 0.0;
         while (toWaypoint != waypoints.end())
         {
@@ -298,8 +298,11 @@ private:
             }
 
             // Saturate between the selected extremes (coast and final
-            // velocity of the stretch)
-            currentVelocity = BasicMath::saturate(currentVelocity, coastV, downVf);
+            // velocity of the stretch), and set it to 0.0
+            // if it is below the minimum physical linear velocity
+            currentVelocity = BasicMath::saturate<double>(currentVelocity, coastV, downVf);
+            currentVelocity = BasicMath::threshold<double>(currentVelocity,
+                robot_.minLinearVelocity, 0.0);
 
             // Add the middle point and the velocity command to the trajectory
             trajectory_.push_back(waypoint, Velocity<>(currentVelocity, 0.0));

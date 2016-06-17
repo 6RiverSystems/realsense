@@ -89,7 +89,7 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     angular = Kw_ * 2 * sin(alpha) / dynamicLookAheadDistance_;
 
     // If the robot angle is greater than 45deg, use a different rotation velocity
-    if (abs(alpha) > M_PI / 4)
+    if (abs(alpha) > M_PI_4)
     {
         angular = BasicMath::sgn<double>(angular) * robot_.travelRotationVelocity;
     }

@@ -236,7 +236,7 @@ void MotionController::switchToManual()
     }
 
     // If manual follow was not scheduled
-    if (!isScheduled(TaskEnum::MANUAL_FOLLOW))
+    if (!isScheduled(TaskEnum::MANUAL_FOLLOW) && !isManualControllerActive())
     {
         // Cancel the current activity and clear the work queue
         activeController_->cancel();

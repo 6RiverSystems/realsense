@@ -235,12 +235,15 @@ void MotionController::switchToManual()
         return;
     }
 
-    if (!isManualControllerActive())
+    // If manual follow was not scheduled
+    if (!isScheduled(TaskEnum::MANUAL_FOLLOW))
     {
         // Cancel the current activity and clear the work queue
         activeController_->cancel();
         cleanWorkQueue();
 
+        // Schedule a normal stop followed by a manual follow
+        pushWorkItem(TaskEnum::NORMAL_STOP);
         pushWorkItem(TaskEnum::MANUAL_FOLLOW);
     }
 }
@@ -257,7 +260,7 @@ void MotionController::switchToAutonomous()
 
     if (isManualControllerActive())
     {
-        // Cancel the current activity
+        // Cancel the current manual controller activity
         activeController_->cancel();
     }
 }

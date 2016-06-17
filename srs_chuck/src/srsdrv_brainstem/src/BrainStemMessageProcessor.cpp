@@ -134,7 +134,7 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 		{
 			OPERATIONAL_STATE_DATA* pOperationalState = reinterpret_cast<OPERATIONAL_STATE_DATA*>( buffer.data( ) );
 
-			ROS_INFO_STREAM( "Hardware Info => id:" << pOperationalState->upTime <<
+			ROS_INFO_STREAM( "Operational State => id:" << pOperationalState->upTime <<
 				", frontEStop: " << pOperationalState->motionStatus.frontEStop << ", backEStop: " << pOperationalState->motionStatus.backEStop <<
 				", wirelessEStop: " << pOperationalState->motionStatus.wirelessEStop << ", bumpSensor: " << pOperationalState->motionStatus.bumpSensor <<
 				", pause: " << pOperationalState->motionStatus.pause << ", hardStop: " << pOperationalState->motionStatus.hardStop <<
@@ -304,17 +304,18 @@ void BrainStemMessageProcessor::SetMotionStatus( MOTION_STATUS eMotionStatus, bo
 
 	SET_OPERATIONAL_STATE_DATA msg = { static_cast<uint8_t>( command ), statusData };
 
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+	ROS_DEBUG( "SetMotionStatus: %d => %d", eMotionStatus, command );
+
+	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof(msg) );
 }
 
 void BrainStemMessageProcessor::OnHardStop( )
 {
+	ROS_DEBUG( "OnHardStop" );
+
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::HARD_STOP );
 
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
-
-	// TODO: This is temporary until we send motion status up the bridge and UI
-	Pause( true );
 }
 
 void BrainStemMessageProcessor::OnPing( )
@@ -379,11 +380,11 @@ void BrainStemMessageProcessor::OnUpdateLights( std::vector<std::string> vecPara
 		ROS_ERROR( "Invalid button entity name: %s", strEntity.c_str( ) );
 	}
 
-	ROS_ERROR( "OnUpdateLights: %d=>%d", msg.entitiy, msg.mode );
-
 	if( static_cast<LED_ENTITIES>( msg.entitiy ) != LED_ENTITIES::UNKNOWN &&
 		static_cast<LED_MODE>( msg.mode ) != LED_MODE::UNKNOWN )
 	{
+		ROS_ERROR( "OnUpdateLights (0x%x): %d=>%d", msg.cmd, msg.entitiy, msg.mode );
+
 		WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 	}
 }

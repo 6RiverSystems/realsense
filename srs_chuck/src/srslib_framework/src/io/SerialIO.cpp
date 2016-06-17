@@ -37,6 +37,7 @@ SerialIO::SerialIO( ) :
 	m_bHasEscape( false ),
 	m_cEscape( 0 ),
 	m_firstByteDelay( ),
+	m_byteDelay( ),
 	m_interByteDelay( )
 #if defined( ENABLE_TEST_FIXTURE )
 	,
@@ -171,6 +172,8 @@ std::chrono::microseconds SerialIO::GetByteDelay( )
 
 void SerialIO::Write( const std::vector<char>& buffer )
 {
+//	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write: " << ToHex( buffer ) );
+
 	if( IsOpen( ) )
 	{
 		// Do all data operations in serial processing thread
@@ -185,9 +188,9 @@ void SerialIO::Write( const std::vector<char>& buffer )
 
 void SerialIO::WriteInSerialThread( std::vector<char> writeBuffer )
 {
-	assert( m_serialThreadId == std::this_thread::get_id( ) );
+//	ROS_DEBUG_STREAM_NAMED( "SerialIO", "WriteInSerialThread: " << ToHex( m_writeBuffer ) );
 
-	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Serial IO Write: " << ToHex( writeBuffer ) );
+	assert( m_serialThreadId == std::this_thread::get_id( ) );
 
 	// Add leading character
 	if( m_bHasLeading )
@@ -243,7 +246,7 @@ void SerialIO::WriteInSerialThread( std::vector<char> writeBuffer )
 		// If we have a first byte delay only write one byte
 		size_t writeSize = m_interByteDelay.count( ) ?  1 : m_writeBuffer.size( );
 
-//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write Bytes: " << writeSize );
+//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Serial IO Write: " << ToHex( m_writeBuffer ) );
 
 		m_SerialPort.async_write_some( boost::asio::buffer( m_writeBuffer.data( ), writeSize ),
 			std::bind( &SerialIO::OnWriteComplete, this, std::placeholders::_1, std::placeholders::_2 ) );
@@ -415,7 +418,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				{
 					if( messageData[0] == '<' )
 					{
-						ROS_ERROR_STREAM_NAMED( "SerialIO", "ReadData: " <<
+						ROS_DEBUG_STREAM_NAMED( "SerialIO", "ReadData: " <<
 							std::string( messageData.begin( ), messageData.end( ) ) );
 
 						m_cCRC = 0;
@@ -438,7 +441,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					{
 						if( m_readCallback )
 						{
-//							ROS_ERROR_STREAM_NAMED( "SerialIO", "ReadData: " <<
+//							ROS_DEBUG_STREAM_NAMED( "SerialIO", "ReadData: " <<
 //								std::string( messageData.begin( ), messageData.end( ) ) );
 
 							m_readCallback( messageData );

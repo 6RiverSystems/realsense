@@ -1,5 +1,7 @@
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 
+#include <srslib_framework/math/PoseMath.hpp>
+
 #include <srsnode_motion/CmdVelocity.hpp>
 
 namespace srs {

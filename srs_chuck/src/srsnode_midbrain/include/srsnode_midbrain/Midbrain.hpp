@@ -24,7 +24,7 @@ public:
     void run();
 
 private:
-    constexpr static unsigned int REFRESH_RATE_HZ = 200;
+    constexpr static double REFRESH_RATE_HZ = 200;
 
     void evaluateTriggers();
 

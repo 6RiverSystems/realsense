@@ -206,11 +206,11 @@ void MotionController::run(Pose<> currentPose, Odometry<> currentOdometry, Veloc
     hasArrivedChanged_ = false;
 
     currentPose_ = currentPose;
-    ROS_DEBUG_STREAM_THROTTLE_NAMED(0.5, "MotionController",
+    ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "MotionController",
         "Reported robot pose: " << currentPose_);
 
     currentOdometry_ = currentOdometry;
-    ROS_DEBUG_STREAM_THROTTLE_NAMED(0.5, "MotionController",
+    ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "MotionController",
         "Reported odometry: " << currentOdometry_);
 
     checkMotionStatus();

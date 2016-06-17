@@ -32,7 +32,7 @@ public:
     void run();
 
 private:
-    constexpr static unsigned int REFRESH_RATE_HZ = 5;
+    constexpr static double REFRESH_RATE_HZ = 5;
     constexpr static int GRID_SIZE = 60;
 
     void connectAllTaps();

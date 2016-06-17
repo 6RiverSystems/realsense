@@ -14,12 +14,17 @@ namespace srs
 {
 
 Reflexes::Reflexes(ros::NodeHandle nodeHandle) :
+	m_chuckWidth_( 0.619125 ),
+	m_chuckHalfWidth( m_chuckWidth_ / 2.0f ),
+	m_yPaddedOffset( m_chuckHalfWidth * 1.2 ),
+	m_safeDistance( 0.5f ),
 	m_laserScanSubscriber( nodeHandle.subscribe<sensor_msgs::LaserScan>(
 		"/camera/scan", 10, std::bind( &Reflexes::OnLaserScan, this, std::placeholders::_1 ) ) ),
 	m_commandPublisher( nodeHandle.advertise<std_msgs::String>(
 		"/cmd_ll", 1, true) )
 {
-
+	ROS_INFO( "Reflex: half width: %f, yOffset: %f, safeDistance: %f",
+		m_chuckHalfWidth, m_yPaddedOffset, m_safeDistance );
 }
 
 Reflexes::~Reflexes( )
@@ -29,43 +34,51 @@ Reflexes::~Reflexes( )
 
 void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 {
-	for( int x = scan->range_min; x < scan->range_max; x++ )
+	uint32_t numberOfObstacles = 0;
+
+	uint32_t numberOfScans = scan->ranges.size( );
+
+	for( int x = 0; x < numberOfScans; x++ )
 	{
-		double angle = (double)x * scan->angle_increment;
+		double angle = ((double)x * scan->angle_increment) + scan->angle_min;
 
 		double scanDistance = scan->ranges[x];
 
-		// TODO: Parse from URDF or pass through from the executive
-		double chuckWidth = 0.619125;
-		double chuckHalfWidth = chuckWidth / 2.0f;
-
-		double yOffsetWithBuffer = chuckHalfWidth * 1.2f;
-		double safeDistanceFromBot = 0.5f;
-
-		//            y Offset
-		//             ------
-		//             \    |
-		//              \   |
-		// scan distance \  | Distance from bot
-		//                \0|
-		//                 \|
-
-		double yOffset = scanDistance * tan( angle );
-		double distanceFromBot = distanceFromBot / sin( angle );
-
-		ROS_DEBUG( "Reflex: yOffset: %f, distance: %f", yOffset, distanceFromBot);
-
-		if( yOffset <= yOffsetWithBuffer &&
-			distanceFromBot < safeDistanceFromBot)
+		if( !std::isinf( scanDistance ) )
 		{
-			ROS_DEBUG( "Reflex detected obstacle" );
+			//            y Offset
+			//             ------
+			//             \    |
+			//              \   |
+			// scan distance \  | Distance from bot
+			//                \0|
+			//                 \|
 
-			// Send the hard stop to the brainstem
-			std_msgs::String msg;
-			msg.data = "STOP";
+			double yOffset = scanDistance * tan( angle );
+			double distanceFromBot = yOffset / sin( angle );
 
-			m_commandPublisher.publish( msg );
+//			ROS_DEBUG( "angle: %f, scanDistance: %f, distance: %f, yOffset: %f",
+//				angle, scanDistance, distanceFromBot, yOffset);
+
+			if( distanceFromBot < m_chuckHalfWidth )
+			{
+				if( yOffset < m_yPaddedOffset )
+				{
+					numberOfObstacles++;
+				}
+			}
 		}
+	}
+
+	if( numberOfObstacles )
+	{
+		ROS_DEBUG_THROTTLE( 1, "Obstacles detected: %d", numberOfObstacles);
+
+		// Send the hard stop to the brainstem
+		std_msgs::String msg;
+		msg.data = "STOP";
+
+		m_commandPublisher.publish( msg );
 	}
 }
 

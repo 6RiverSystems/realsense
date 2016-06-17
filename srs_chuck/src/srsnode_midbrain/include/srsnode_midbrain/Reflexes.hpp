@@ -23,10 +23,17 @@ public:
 
 private:
 
+	double			m_chuckWidth_;
+
+	double 			m_chuckHalfWidth;
+
+	double 			m_yPaddedOffset;
+
+	double 			m_safeDistance;
+
 	ros::Subscriber	m_laserScanSubscriber;
 
 	ros::Publisher	m_commandPublisher;
-
 
 };
 

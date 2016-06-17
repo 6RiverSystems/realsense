@@ -44,7 +44,7 @@ namespace srs
 
 StarGazerPointTransformer::StarGazerPointTransformer( ) :
 	m_filter( 2.6, 5.0, 70 ),
-	m_strAnchorFrame( "/map" ),
+	m_strAnchorFrame( "/internal/state/map/grid" ),
 	m_strTargetFrame(),
 	m_mapTransforms( ),
 	m_stargazerTransform( ),

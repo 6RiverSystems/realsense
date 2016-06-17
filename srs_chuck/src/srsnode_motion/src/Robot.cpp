@@ -60,10 +60,7 @@ void Robot<TYPE>::kinematics(StatePe<TYPE> sT0, BaseType dT, StatePe<TYPE>& sT1)
     }
     else
     {
-        sT1.pose = Pose<>(
-            sT0.pose.x + v * dT * cos(sT0.pose.theta),
-            sT0.pose.y + v * dT * sin(sT0.pose.theta),
-            sT0.pose.theta);
+        sT1.pose = PoseMath::transform<double>(sT0.pose, v * dT);
     }
 }
 

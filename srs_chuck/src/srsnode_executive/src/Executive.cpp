@@ -7,6 +7,9 @@
 #include <srslib_framework/MapCoordinates.h>
 using namespace srslib_framework;
 
+#include <srslib_framework/math/PoseMath.hpp>
+#include <srslib_framework/robotics/robot/Chuck.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,7 +98,11 @@ void Executive::executePause()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::executePlanToGoal(Pose<> goal)
 {
-    currentGoal_ = goal;
+    Chuck chuck;
+
+    // The requested goal is transformed so that it coincides with
+    // where the robot screen will be
+    currentGoal_ = PoseMath::transform<double>(goal, chuck.bodyDepth / 2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

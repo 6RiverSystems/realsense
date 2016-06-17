@@ -18,6 +18,14 @@ namespace srs {
 
 struct PoseMath
 {
+    template<typename TYPE = double>
+    inline static TYPE euclidean(Pose<TYPE> p1, Pose<TYPE> p2)
+    {
+        TYPE deltaX = p1.x - p2.x;
+        TYPE deltaY = p1.y - p2.y;
+        return sqrt(deltaX * deltaX + deltaY * deltaY);
+    }
+
     // TODO: Better implement this function. The type of R should not be fixed but
     // depending on TYPE (ocv2base in reverse)
     template<typename TYPE = double>
@@ -32,11 +40,12 @@ struct PoseMath
     }
 
     template<typename TYPE = double>
-    inline static TYPE euclidean(Pose<TYPE> p1, Pose<TYPE> p2)
+    inline static Pose<TYPE> transform(Pose<TYPE> p, TYPE distance)
     {
-        TYPE deltaX = p1.x - p2.x;
-        TYPE deltaY = p1.y - p2.y;
-        return sqrt(deltaX * deltaX + deltaY * deltaY);
+        return Pose<TYPE>(p.arrivalTime,
+            p.x + distance * cos(p.theta),
+            p.y + distance * sin(p.theta),
+            p.theta);
     }
 };
 

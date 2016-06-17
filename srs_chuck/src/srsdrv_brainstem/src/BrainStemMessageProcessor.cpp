@@ -374,6 +374,8 @@ void BrainStemMessageProcessor::OnUpdateLights( std::vector<std::string> vecPara
 		ROS_ERROR( "Invalid button entity name: %s", strEntity.c_str( ) );
 	}
 
+	ROS_ERROR( "OnUpdateLights: %d=>%d", msg.entitiy, msg.mode );
+
 	if( static_cast<LED_ENTITIES>( msg.entitiy ) != LED_ENTITIES::UNKNOWN &&
 		static_cast<LED_MODE>( msg.mode ) != LED_MODE::UNKNOWN )
 	{

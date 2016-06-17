@@ -125,46 +125,46 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     configuration_ = config;
 
     tapAps_.getSensor()->enable(configuration_.aps_enabled);
-    ROS_INFO_STREAM("APS sensor enabled: " << configuration_.aps_enabled);
+    ROS_INFO_STREAM_NAMED("Motion", "APS sensor enabled: " << configuration_.aps_enabled);
 
     robot_.goalReachedDistance = configuration_.goal_reached_distance;
-    ROS_INFO_STREAM("Goal reached distance [m]: " << configuration_.goal_reached_distance);
+    ROS_INFO_STREAM_NAMED("Motion", "Goal reached distance [m]: " << configuration_.goal_reached_distance);
 
     robot_.maxAngularAcceleration = configuration_.max_angular_acceleration;
-    ROS_INFO_STREAM("Max angular acceleration [m/s^2]: " << configuration_.max_angular_acceleration);
+    ROS_INFO_STREAM_NAMED("Motion", "Max angular acceleration [m/s^2]: " << configuration_.max_angular_acceleration);
 
     robot_. maxAngularVelocity = configuration_.max_angular_velocity;
-    ROS_INFO_STREAM("Max angular velocity [m/s]: " << configuration_.max_angular_velocity);
+    ROS_INFO_STREAM_NAMED("Motion", "Max angular velocity [m/s]: " << configuration_.max_angular_velocity);
 
     robot_.maxLinearAcceleration = configuration_.max_linear_acceleration;
-    ROS_INFO_STREAM("Max linear acceleration [m/s^2]: " << configuration_.max_linear_acceleration);
+    ROS_INFO_STREAM_NAMED("Motion", "Max linear acceleration [m/s^2]: " << configuration_.max_linear_acceleration);
 
     robot_.maxLinearVelocity = configuration_.max_linear_velocity;
-    ROS_INFO_STREAM("Max linear velocity [m/s]: " << configuration_.max_linear_velocity);
+    ROS_INFO_STREAM_NAMED("Motion", "Max linear velocity [m/s]: " << configuration_.max_linear_velocity);
 
     robot_.maxLookAheadDistance = configuration_.max_look_ahead_distance;
-    ROS_INFO_STREAM("Max look-ahead distance [m]: " << configuration_.max_look_ahead_distance);
+    ROS_INFO_STREAM_NAMED("Motion", "Max look-ahead distance [m]: " << configuration_.max_look_ahead_distance);
 
     robot_.minLookAheadDistance = configuration_.min_look_ahead_distance;
-    ROS_INFO_STREAM("Min look-ahead distance [m]: " << configuration_.min_look_ahead_distance);
+    ROS_INFO_STREAM_NAMED("Motion", "Min look-ahead distance [m]: " << configuration_.min_look_ahead_distance);
 
     robot_.ratioLookAheadDistance = configuration_.ratio_look_ahead_distance;
-    ROS_INFO_STREAM("Ratio look-ahead distance []: " << configuration_.ratio_look_ahead_distance);
+    ROS_INFO_STREAM_NAMED("Motion", "Ratio look-ahead distance []: " << configuration_.ratio_look_ahead_distance);
 
     robot_.travelAngularAcceleration = configuration_.travel_angular_acceleration;
-    ROS_INFO_STREAM("Travel angular acceleration [rad/s^2]: " << configuration_.travel_angular_acceleration);
+    ROS_INFO_STREAM_NAMED("Motion", "Travel angular acceleration [rad/s^2]: " << configuration_.travel_angular_acceleration);
 
     robot_.travelAngularVelocity = configuration_.travel_angular_velocity;
-    ROS_INFO_STREAM("Travel angular velocity [rad/s]: " << configuration_.travel_angular_velocity);
+    ROS_INFO_STREAM_NAMED("Motion", "Travel angular velocity [rad/s]: " << configuration_.travel_angular_velocity);
 
     robot_.travelLinearAcceleration = configuration_.travel_linear_acceleration;
-    ROS_INFO_STREAM("Travel linear acceleration [m/s^2]: " << configuration_.travel_linear_acceleration);
+    ROS_INFO_STREAM_NAMED("Motion", "Travel linear acceleration [m/s^2]: " << configuration_.travel_linear_acceleration);
 
     robot_.travelLinearVelocity = configuration_.travel_linear_velocity;
-    ROS_INFO_STREAM("Travel linear velocity [m/s]: " << configuration_.travel_linear_velocity);
+    ROS_INFO_STREAM_NAMED("Motion", "Travel linear velocity [m/s]: " << configuration_.travel_linear_velocity);
 
     robot_.travelRotationVelocity = configuration_.travel_rotation_velocity;
-    ROS_INFO_STREAM("Travel rotation velocity [rad/s]: " << configuration_.travel_rotation_velocity);
+    ROS_INFO_STREAM_NAMED("Motion", "Travel rotation velocity [rad/s]: " << configuration_.travel_rotation_velocity);
 
     motionController_.setRobot(robot_);
 }
@@ -181,13 +181,13 @@ void Motion::publishArrived()
         if (motionController_.hasArrived())
         {
             messageGoalArrived.data = true;
-            ROS_INFO_STREAM_NAMED("Motion", "Arrived at goal: " <<
+            ROS_DEBUG_STREAM_NAMED("Motion", "Arrived at goal: " <<
                 motionController_.getFinalGoal());
         }
         else
         {
             messageGoalArrived.data = false;
-            ROS_INFO_STREAM_NAMED("Motion", "Departed for goal: " <<
+            ROS_DEBUG_STREAM_NAMED("Motion", "Departed for goal: " <<
                 motionController_.getFinalGoal());
         }
 
@@ -297,7 +297,7 @@ void Motion::scanTapsForData()
     // gets it, make sure that the Position Estimator knows of it.
     if (!tapAps_.hasNeverReported() && firstLocalization_)
     {
-        ROS_INFO_STREAM("Reporting its first position: " << tapAps_.getPose());
+        ROS_DEBUG_STREAM("Reporting its first position: " << tapAps_.getPose());
 
         reset(tapAps_.getPose());
         firstLocalization_ = false;
@@ -305,7 +305,7 @@ void Motion::scanTapsForData()
 
     if (tapInitialPose_.newDataAvailable())
     {
-        ROS_INFO_STREAM("Received initial pose: " << tapInitialPose_.getPose());
+        ROS_DEBUG_STREAM("Received initial pose: " << tapInitialPose_.getPose());
 
         reset(tapInitialPose_.getPose());
         firstLocalization_ = false;
@@ -445,7 +445,7 @@ void Motion::executePlanToGoal(Pose<> goalPose)
 
     if (!solution.empty())
     {
-        ROS_INFO_STREAM_NAMED("Motion", "Found solution: " << endl << solution);
+        ROS_DEBUG_STREAM_NAMED("Motion", "Found solution: " << endl << solution);
 
         motionController_.execute(solution);
         simulatedT_ = 0.0;

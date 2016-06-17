@@ -112,7 +112,8 @@ public:
 protected:
     void executeCommand(Velocity<> command)
     {
-        ROS_DEBUG_STREAM_NAMED("BaseController", "Executing command: " << command);
+        ROS_DEBUG_STREAM_THROTTLE_NAMED(2.0, "BaseController",
+            "Executing command: " << command);
         executingCommand_ = command;
     }
 

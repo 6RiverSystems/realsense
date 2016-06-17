@@ -94,7 +94,7 @@ struct COMMAND_DATA
 struct LIGHT_UPDATE_DATA
 {
 	uint8_t 	cmd;
-	uint32_t 	entitiy; 				// Light identifier - see LED_ENTITIES
+	uint8_t 	entitiy; 				// Light identifier - see LED_ENTITIES
 	uint8_t 	mode;   				// Light mode - see LED_MODE
 };
 

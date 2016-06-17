@@ -19,7 +19,7 @@ Reflexes::Reflexes(ros::NodeHandle nodeHandle) :
 	m_yPaddedOffset( m_chuckHalfWidth * 1.2 ),
 	m_safeDistance( 0.5f ),
 	m_laserScanSubscriber( nodeHandle.subscribe<sensor_msgs::LaserScan>(
-		"/camera/scan", 10, std::bind( &Reflexes::OnLaserScan, this, std::placeholders::_1 ) ) ),
+		"/camera/depth/scan", 10, std::bind( &Reflexes::OnLaserScan, this, std::placeholders::_1 ) ) ),
 	m_commandPublisher( nodeHandle.advertise<std_msgs::String>(
 		"/cmd_ll", 1, true) )
 {
@@ -57,12 +57,9 @@ void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 			double yOffset = scanDistance * tan( angle );
 			double distanceFromBot = yOffset / sin( angle );
 
-//			ROS_DEBUG( "angle: %f, scanDistance: %f, distance: %f, yOffset: %f",
-//				angle, scanDistance, distanceFromBot, yOffset);
-
-			if( distanceFromBot < m_chuckHalfWidth )
+			if( abs( distanceFromBot ) < m_safeDistance )
 			{
-				if( yOffset < m_yPaddedOffset )
+				if( abs( yOffset )  < m_yPaddedOffset )
 				{
 					numberOfObstacles++;
 				}
@@ -70,9 +67,9 @@ void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 		}
 	}
 
-	if( numberOfObstacles )
+	if( numberOfObstacles > 10 )
 	{
-		ROS_DEBUG_THROTTLE( 1, "Obstacles detected: %d", numberOfObstacles);
+		ROS_DEBUG_THROTTLE( 0.3, "Obstacles detected: %d", numberOfObstacles);
 
 		// Send the hard stop to the brainstem
 		std_msgs::String msg;

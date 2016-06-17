@@ -166,7 +166,7 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     robot_.travelRotationVelocity = configuration_.travel_rotation_velocity;
     ROS_INFO_STREAM_NAMED("Motion", "Travel rotation velocity [rad/s]: " << configuration_.travel_rotation_velocity);
 
-    motionController_.setRobot(robot_);
+    //motionController_.setRobot(robot_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

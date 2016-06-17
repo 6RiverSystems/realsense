@@ -101,7 +101,8 @@ private:
 
     static unordered_map<int, string> TASK_NAMES;
 
-    typedef pair<int, Solution<Grid2d>*> WorkType;
+    typedef Solution<Grid2d> SolutionType;
+    typedef pair<int, SolutionType*> WorkType;
 
     void checkMotionStatus();
     void cleanWorkQueue();
@@ -148,26 +149,32 @@ private:
         return !work_.empty();
     }
 
-    string printWorkToString();
-
-    void pumpWorkFromQueue();
-
-    void pushWork(TaskEnum task, Solution<Grid2d>* solution = nullptr)
+    bool isScheduledNext(TaskEnum task)
     {
-        ROS_INFO_STREAM_NAMED("MotionController", printWorkToString());
-
-        ROS_INFO_STREAM_NAMED("MotionController", "Pushing task: " << TASK_NAMES[task]);
-        if (solution)
-        {
-            ROS_INFO_STREAM_NAMED("MotionController", "Pushing solution: " << *solution);
-        }
-        else
-        {
-            ROS_INFO_STREAM_NAMED("MotionController", "Pushing solution: (null)");
-        }
-
-        work_.push_back(WorkType(task, solution));
+        WorkType nextTask = work_.front();
+        return nextTask.first == task;
     }
+
+    bool isScheduled(TaskEnum task)
+    {
+        for (auto workItem : work_)
+        {
+            if (workItem.first == task)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void optimizeRotations();
+
+    string printWorkToString();
+    void popWorkItem(TaskEnum& task, SolutionType& solution);
+    void prependWorkItem(TaskEnum task, SolutionType* solution = nullptr);
+    void pumpWorkFromQueue();
+    void pushWorkItem(TaskEnum task, SolutionType* solution = nullptr);
 
     void selectController(TaskEnum task);
 
@@ -191,7 +198,7 @@ private:
     Odometry<> currentOdometry_;
     Pose<> currentPose_;
     Pose<> currentShortTermGoal_;
-    Solution<Grid2d> currentSolution_;
+    SolutionType currentSolution_;
     TaskEnum currentTask_;
 
     double dT_;

@@ -188,7 +188,7 @@ public:
 		std::string strCalibrationFile( g_strDataFile );
 		strCalibrationFile += "/robot-config.yaml";
 
-		m_pointTransformer.Load( "/map", m_footprintTransform, strAnchors, strCalibrationFile );
+		m_pointTransformer.Load( "/internal/state/map/grid", m_footprintTransform, strAnchors, strCalibrationFile );
 	}
 
 	void TearDown( )

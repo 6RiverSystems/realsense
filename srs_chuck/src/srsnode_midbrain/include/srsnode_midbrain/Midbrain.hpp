@@ -10,6 +10,7 @@
 
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
 #include <srslib_framework/ros/service/RosTriggerPause.hpp>
+#include <srsnode_midbrain/Reflexes.hpp>
 
 namespace srs {
 
@@ -32,6 +33,7 @@ private:
 
     RosTriggerShutdown triggerShutdown_;
     RosTriggerPause triggerPause_;
+//    Reflexes reflexes_;
 };
 
 } // namespace srs

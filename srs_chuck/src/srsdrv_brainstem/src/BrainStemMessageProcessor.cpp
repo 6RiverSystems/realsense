@@ -134,7 +134,7 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 		{
 			OPERATIONAL_STATE_DATA* pOperationalState = reinterpret_cast<OPERATIONAL_STATE_DATA*>( buffer.data( ) );
 
-			ROS_INFO_STREAM( "Hardware Info => id:" << pOperationalState->upTime <<
+			ROS_INFO_STREAM( "Operational State => id:" << pOperationalState->upTime <<
 				", frontEStop: " << pOperationalState->motionStatus.frontEStop << ", backEStop: " << pOperationalState->motionStatus.backEStop <<
 				", wirelessEStop: " << pOperationalState->motionStatus.wirelessEStop << ", bumpSensor: " << pOperationalState->motionStatus.bumpSensor <<
 				", pause: " << pOperationalState->motionStatus.pause << ", hardStop: " << pOperationalState->motionStatus.hardStop <<
@@ -215,30 +215,42 @@ void BrainStemMessageProcessor::SetVelocity( double dfLinear, double dfAngular )
 
 void BrainStemMessageProcessor::ProcessRosMessage( const std::string& strMessage )
 {
-	ROS_DEBUG( "Received command: %s", strMessage.c_str( ) );
+	boost::char_separator<char> separator(";");
 
-	std::vector<std::string> vecParsed;
-	boost::tokenizer<> tok( strMessage );
+	boost::tokenizer<boost::char_separator<char>> messageListTokenizer( strMessage, separator );
 
-	for( auto && strValue : tok ) { vecParsed.push_back( strValue ); }
-
-	if( vecParsed.size( ) )
+	// Parse the list of semicolon delimited commands
+	for( auto && strCommand : messageListTokenizer )
 	{
-		const std::string& strCommand = vecParsed[0];
+		ROS_DEBUG( "Parse command: %s", strCommand.c_str( ) );
 
-		std::vector<std::string> vecParams = { vecParsed.begin( ) + 1, vecParsed.end( ) };
+		// Parse the command by whitespace
+		std::vector<std::string> vecParsed;
+		boost::tokenizer<> tok( strCommand );
 
-		auto iter = m_vecBridgeCallbacks.find( strCommand );
-
-		if( iter != m_vecBridgeCallbacks.end( ) )
+		for( auto && strValue : tok )
 		{
-			if( vecParams.size( ) == iter->second.dwNumParams )
+			vecParsed.push_back( strValue );
+		}
+
+		if( vecParsed.size( ) )
+		{
+			const std::string& strCommand = vecParsed[0];
+
+			std::vector<std::string> vecParams = { vecParsed.begin( ) + 1, vecParsed.end( ) };
+
+			auto iter = m_vecBridgeCallbacks.find( strCommand );
+
+			if( iter != m_vecBridgeCallbacks.end( ) )
 			{
-				iter->second.callback( vecParams );
-			}
-			else
-			{
-				ROS_ERROR( "Bridge has invalid number of arguments: %s", strMessage.c_str( ) );
+				if( vecParams.size( ) == iter->second.dwNumParams )
+				{
+					iter->second.callback( vecParams );
+				}
+				else
+				{
+					ROS_ERROR( "Bridge has invalid number of arguments: %s", strMessage.c_str( ) );
+				}
 			}
 		}
 	}
@@ -278,7 +290,7 @@ std::string BrainStemMessageProcessor::GetButtonName( LED_ENTITIES eButtonId ) c
 // Bridge Callbacks
 //////////////////////////////////////////////////////////////////////////
 
-void BrainStemMessageProcessor::OnClearMotionStatus( MOTION_STATUS eMotionStatus )
+void BrainStemMessageProcessor::SetMotionStatus( MOTION_STATUS eMotionStatus, bool bSetBit )
 {
 	MOTION_STATUS_DATA statusData = { false };
 	statusData.frontEStop = (eMotionStatus == MOTION_STATUS::FRONT_E_STOP);
@@ -288,13 +300,19 @@ void BrainStemMessageProcessor::OnClearMotionStatus( MOTION_STATUS eMotionStatus
 	statusData.pause = (eMotionStatus == MOTION_STATUS::PAUSE);
 	statusData.hardStop = (eMotionStatus == MOTION_STATUS::HARD_STOP);
 
-	SET_OPERATIONAL_STATE_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SET_MOTION_STATUS ), statusData };
+	BRAIN_STEM_CMD command = bSetBit ? BRAIN_STEM_CMD::SET_MOTION_STATUS : BRAIN_STEM_CMD::CLEAR_MOTION_STATUS;
 
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+	SET_OPERATIONAL_STATE_DATA msg = { static_cast<uint8_t>( command ), statusData };
+
+	ROS_DEBUG( "SetMotionStatus: %d => %d", eMotionStatus, command );
+
+	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof(msg) );
 }
 
 void BrainStemMessageProcessor::OnHardStop( )
 {
+	ROS_DEBUG( "OnHardStop" );
+
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::HARD_STOP );
 
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
@@ -365,6 +383,8 @@ void BrainStemMessageProcessor::OnUpdateLights( std::vector<std::string> vecPara
 	if( static_cast<LED_ENTITIES>( msg.entitiy ) != LED_ENTITIES::UNKNOWN &&
 		static_cast<LED_MODE>( msg.mode ) != LED_MODE::UNKNOWN )
 	{
+		ROS_ERROR( "OnUpdateLights (0x%x): %d=>%d", msg.cmd, msg.entitiy, msg.mode );
+
 		WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 	}
 }
@@ -380,10 +400,7 @@ void BrainStemMessageProcessor::OnPause( std::vector<std::string> vecParams )
 {
 	std::string& strPaused = vecParams[0];
 
-	SUSPEND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SET_SUSPEND_STATE ),
-		strPaused == "OFF" ? false : true };
-
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+	Pause( strPaused == "ON" );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -400,6 +417,21 @@ void BrainStemMessageProcessor::WriteToSerialPort( char* pszData, std::size_t dw
 	{
 		ROS_ERROR_THROTTLE_NAMED( 60, "BrainStem", "Attempt to write to the brain stem, but the serial port is not open!" );
 	}
+}
+
+void BrainStemMessageProcessor::Pause( bool bPaused )
+{
+	SUSPEND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SET_SUSPEND_STATE ),
+		bPaused };
+
+	// TODO: Change this behavior from the bridge
+	if( !bPaused)
+	{
+		// Clear the motion status fault
+		SetMotionStatus( MOTION_STATUS::HARD_STOP, false );
+	}
+
+	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 
 } /* namespace srs */

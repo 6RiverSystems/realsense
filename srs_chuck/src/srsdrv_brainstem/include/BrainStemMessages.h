@@ -94,7 +94,7 @@ struct COMMAND_DATA
 struct LIGHT_UPDATE_DATA
 {
 	uint8_t 	cmd;
-	uint32_t 	entitiy; 				// Light identifier - see LED_ENTITIES
+	uint8_t 	entitiy; 				// Light identifier - see LED_ENTITIES
 	uint8_t 	mode;   				// Light mode - see LED_MODE
 };
 
@@ -114,13 +114,13 @@ struct HARDWARE_INFORMATION_DATA
 
 struct MOTION_STATUS_DATA
 {
-	bool		frontEStop:1; 				// front eStop state
-	bool		backEStop:1; 				// back eStop state
-	bool		wirelessEStop:1; 			// wireless eStop state
-	bool		bumpSensor:1; 				// bump sensor state
-	bool		pause:1; 					// paused state
-	bool		hardStop:1; 				// hard stop state
-	bool		reservedMotion:2; 			// reserved
+	uint8_t		frontEStop:1; 				// front eStop state
+	uint8_t		backEStop:1; 				// back eStop state
+	uint8_t		wirelessEStop:1; 			// wireless eStop state
+	uint8_t		bumpSensor:1; 				// bump sensor state
+	uint8_t		pause:1; 					// paused state
+	uint8_t		hardStop:1; 				// hard stop state
+	uint8_t		reservedMotion:2; 			// reserved
 };
 
 struct FAILURE_STATUS_DATA

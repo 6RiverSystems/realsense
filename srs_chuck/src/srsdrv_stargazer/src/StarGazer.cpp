@@ -190,7 +190,7 @@ void StarGazer::LoadTransforms( )
 
 	if( !strTargetFrame.length( ) )
 	{
-		strTargetFrame = "/map";
+		strTargetFrame = "/internal/state/map/grid";
 	}
 
 	ROS_INFO_STREAM( "Stargazer pose target frame: " << strTargetFrame );

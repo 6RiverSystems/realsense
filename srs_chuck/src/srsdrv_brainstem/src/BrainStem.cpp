@@ -93,9 +93,9 @@ void BrainStem::OnConnectionChanged( bool bIsConnected )
 //
 //	// Get the hardware information
 //	GetHardwareInformation( );
-//
-//	// Get the operational state
-//	GetOperationalState( );
+
+	// Get the operational state
+	GetOperationalState( );
 }
 
 void BrainStem::OnArrived( )

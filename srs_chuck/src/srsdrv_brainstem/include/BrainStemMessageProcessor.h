@@ -96,7 +96,7 @@ private:
 
 // Bridge Callbacks
 
-	void OnClearMotionStatus( MOTION_STATUS eMotionStatus );
+	void SetMotionStatus( MOTION_STATUS eMotionStatus, bool bSetBit );
 
 	void OnHardStop( );
 
@@ -117,6 +117,10 @@ private:
 // Helper Methods
 
 	void WriteToSerialPort( char* pszData, std::size_t dwSize );
+
+private:
+
+	void Pause( bool bPause );
 
 };
 

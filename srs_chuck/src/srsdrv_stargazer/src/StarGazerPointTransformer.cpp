@@ -44,7 +44,7 @@ namespace srs
 
 StarGazerPointTransformer::StarGazerPointTransformer( ) :
 	m_filter( 2.6, 5.0, 70 ),
-	m_strAnchorFrame( "/map" ),
+	m_strAnchorFrame( "/internal/state/map/grid" ),
 	m_strTargetFrame(),
 	m_mapTransforms( ),
 	m_stargazerTransform( ),
@@ -223,7 +223,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 				std::string strData =  stream.str( );
 
-				ROS_ERROR_NAMED( "StarGazerPointTransformer", "%s", strData.c_str( ) );
+				ROS_INFO_NAMED( "StarGazerPointTransformer", "%s", strData.c_str( ) );
 
 				// reset accumulators
 				accLocalX = double_acc( );

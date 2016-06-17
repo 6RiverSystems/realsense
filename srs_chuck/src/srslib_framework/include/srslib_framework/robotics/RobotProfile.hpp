@@ -22,6 +22,7 @@ struct RobotProfile
         maxLinearAcceleration(0.0),
         maxLinearVelocity(0.0),
         maxLookAheadDistance(0.0),
+        minInitialLinearVelocity(0.0),
         minLookAheadDistance(0.0),
         minLinearVelocity(0.0),
 
@@ -55,6 +56,7 @@ struct RobotProfile
     double maxLinearAcceleration; // [m/s^2]
     double maxLinearVelocity; // [m/s]
     double maxLookAheadDistance; // [m]
+    double minInitialLinearVelocity; // [m/s]
     double minLookAheadDistance; // [m]
     double minLinearVelocity; // [m/s]
 

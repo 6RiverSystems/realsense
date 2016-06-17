@@ -16,30 +16,44 @@ using namespace std;
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 using namespace srs;
 
+// TODO: Move this definition inside Solution<GRAPH>
 typedef SolutionNode<Grid2d> SolutionNodeType;
 
 TEST(Test_Trajectory, 180ShortTrajectory)
 {
-    SolutionNodeType SOLUTION_00 = SolutionNodeType(SolutionNodeType::START,
-        Pose<>(18, 7, AngleMath::deg2rad<double>(90)));
+    constexpr double DEG0 = 0.0;
+    constexpr double DEG90 = AngleMath::deg2rad<double>(-90);
+    constexpr double DEG180 = AngleMath::deg2rad<double>(180);
 
-    SolutionNodeType SOLUTION_01 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(18, 7.1, AngleMath::deg2rad<double>(90)));
+    SolutionNodeType SOLUTION_00 = SolutionNodeType(SolutionNodeType::ROTATE,
+        Pose<>(18, 7, DEG180), Pose<>(18, 7, DEG0));
 
-    SolutionNodeType SOLUTION_02 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(18, 7.2, AngleMath::deg2rad<double>(90)));
+    SolutionNodeType SOLUTION_01 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(18, 7, DEG0), Pose<>(19, 7, DEG0));
 
-    SolutionNodeType SOLUTION_03 = SolutionNodeType(SolutionNodeType::ROTATE_P90,
-        Pose<>(18, 7.2, AngleMath::deg2rad<double>(180)));
+    SolutionNodeType SOLUTION_02 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(19, 7, DEG0), Pose<>(20, 7, DEG0));
 
-    SolutionNodeType SOLUTION_04 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(17.9, 7.2, AngleMath::deg2rad<double>(180)));
+    SolutionNodeType SOLUTION_03 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(20, 7, DEG0), Pose<>(21, 7, DEG0));
 
-    SolutionNodeType SOLUTION_05 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(17.8, 7.2, AngleMath::deg2rad<double>(180)));
+    SolutionNodeType SOLUTION_04 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(21, 7, DEG0), Pose<>(22, 7, DEG0));
 
-    SolutionNodeType SOLUTION_06 = SolutionNodeType(SolutionNodeType::GOAL,
-        Pose<>(17.8, 7.2, AngleMath::deg2rad<double>(180)));
+    SolutionNodeType SOLUTION_05 = SolutionNodeType(SolutionNodeType::ROTATE,
+        Pose<>(22, 7, DEG0), Pose<>(22, 7, DEG90));
+
+    SolutionNodeType SOLUTION_06 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(22, 7, DEG90), Pose<>(23, 7, DEG90));
+
+    SolutionNodeType SOLUTION_07 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(23, 7, DEG90), Pose<>(24, 7, DEG90));
+
+    SolutionNodeType SOLUTION_08 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(24, 7, DEG90), Pose<>(25, 7, DEG90));
+
+    SolutionNodeType SOLUTION_09 = SolutionNodeType(SolutionNodeType::ROTATE,
+        Pose<>(25, 7, DEG90), Pose<>(26, 7, DEG0));
 
     Solution<Grid2d> solution;
     solution.push_back(SOLUTION_00);
@@ -49,6 +63,9 @@ TEST(Test_Trajectory, 180ShortTrajectory)
     solution.push_back(SOLUTION_04);
     solution.push_back(SOLUTION_05);
     solution.push_back(SOLUTION_06);
+    solution.push_back(SOLUTION_07);
+    solution.push_back(SOLUTION_08);
+    solution.push_back(SOLUTION_09);
 
     Chuck chuck;
     Trajectory<> trajectory;

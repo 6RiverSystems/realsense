@@ -34,19 +34,6 @@ public:
         robot_(robot)
     {}
 
-    void fromRotation(Pose<> pose0, double thetaf, double dT)
-    {
-        trajectory_.clear();
-        path_.clear();
-        pathReduced_.clear();
-
-        if (BasicMath::equal<double>(pose0.theta, thetaf))
-        {
-            return;
-        }
-        interpolateRotation(pose0, pose0.theta, thetaf, dT);
-    }
-
     void fromSolution(Solution<Grid2d>& solution, double dT)
     {
         trajectory_.clear();
@@ -141,7 +128,11 @@ private:
         path.clear();
 
         // Push the first node of the solution as initial waypoint
-        path.push_back(solution.getStart().fromPose);
+        // only if it not a rotate
+        if (solution.getStart().actionType != SolutionNode<Grid2d>::ROTATE)
+        {
+            path.push_back(solution.getStart().fromPose);
+        }
 
         // Ignore all but the rotations, which will be used as waypoints
         for (auto solutionNode : solution)
@@ -158,7 +149,11 @@ private:
         }
 
         // Push the last node of the solution as final waypoint
-        path.push_back(solution.getGoal().toPose);
+        // only if it is not a rotate
+        if (solution.getGoal().actionType != SolutionNode<Grid2d>::ROTATE)
+        {
+            path.push_back(solution.getGoal().toPose);
+        }
     }
 
     void interpolatePath(PathType& waypoints, double spacing, double dT)
@@ -175,7 +170,7 @@ private:
         auto fromWaypoint = waypoints.begin();
         auto toWaypoint = fromWaypoint + 1;
 
-        double v0 = 0.0;
+        double v0 = robot_.minLinearVelocity;
         double vf = 0.0;
         while (toWaypoint != waypoints.end())
         {
@@ -186,7 +181,10 @@ private:
             vf = lastStretch ? 0.0 : robot_.travelCurvingVelocity;
 
             // Interpolate the trajectory between the two waypoints
-            interpolateWaypoints(*fromWaypoint, *toWaypoint, v0, vf, spacing, dT);
+            interpolateWaypoints(*fromWaypoint, *toWaypoint,
+                v0, vf,
+                toWaypoint->theta,
+                spacing, dT);
 
             // The next initial velocity is equal to the final velocity of this segment
             v0 = vf;
@@ -198,76 +196,10 @@ private:
         }
     }
 
-    void interpolateRotation(Pose<> waypoint, double theta0, double thetaf, double dT)
-    {
-        // Calculate the change in velocity that can be achieved
-        // with the specified travel acceleration and time interval
-        double deltaVelocity = robot_.travelAngularVelocity * dT;
-
-        // They keep track of the initial and final velocities
-        // for the ramp up and the ramp down in the segment
-        double coastV = robot_.travelAngularVelocity;
-
-        // Measure the distance between the two orientations
-        double d = AngleMath::normalizeAngleRad(thetaf - theta0);
-
-        // Calculate how many midpoints between the two waypoints
-        int totalMidpoints = ceil(abs(d) / deltaVelocity);
-
-        double deltaAngle = d / totalMidpoints;
-
-        // Calculate the points needed to ramp up and down the velocity
-        // using the default coasting values
-        int rampUpPoints = floor((coastV) / deltaVelocity) - 1;
-        int rampDownPoints = floor((coastV) / deltaVelocity) + 1;
-
-        // If the segment is not the last stretch, slow down earlier
-        // to maintain the curving velocity
-        int rampDownIndex = totalMidpoints - rampDownPoints;
-
-        // If it is not possible, calculate the maximum velocity achievable
-        if (rampUpPoints + rampDownPoints > totalMidpoints)
-        {
-            rampUpPoints = totalMidpoints / 2;
-            rampDownPoints = totalMidpoints - rampUpPoints;
-            rampDownIndex = rampDownPoints;
-
-            // There is not enough space to go full travel speed. The
-            // coasting velocity must be adjusted
-            coastV = rampUpPoints * deltaVelocity;
-        }
-
-        // Current velocity
-        double currentVelocity = 0.0;
-
-        // Begin from the initial waypoint
-        for (int p = 0; p < totalMidpoints; p++)
-        {
-            // Calculate the new angle
-            waypoint.theta += deltaAngle;
-
-            // Change the velocity based on where the middle point. If
-            // no change is applied, the robot is coasting
-            if (p < rampDownIndex)
-            {
-                currentVelocity += deltaVelocity;
-            }
-            else if (p >= rampDownIndex)
-            {
-                currentVelocity -= deltaVelocity;
-            }
-
-            // Saturate between the selected extremes (coast and final
-            // velocity of the stretch)
-            currentVelocity = BasicMath::saturate(currentVelocity, coastV, 0.0);
-
-            // Add the middle point and the velocity command to the trajectory
-            trajectory_.push_back(waypoint, Velocity<>(0.0, currentVelocity));
-        }
-    }
-
     void interpolateWaypoints(WaypointType fromWaypoint, WaypointType toWaypoint,
-        double upV0, double downVf, double spacing, double dT)
+        double upV0, double downVf,
+        double orientation,
+        double spacing, double dT)
     {
         // Calculate the change in velocity that can be achieved
         // with the specified travel acceleration and time interval
@@ -334,6 +266,7 @@ private:
 
         // Begin from the initial waypoint
         Pose<> waypoint = fromWaypoint;
+        //waypoint.theta = orientation;
         for (int p = 0; p < totalMidpoints; p++)
         {
             // If the trajectory between the two waypoints moves along the x

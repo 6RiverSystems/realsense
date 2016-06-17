@@ -41,6 +41,8 @@ void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
         // Find the projection of the current robot pose onto the trajectory
         projectionIndex_ = currentTrajectory_.findClosestPose(robotPose, 0,
             robot_.maxLookAheadDistance);
+
+        dynamicLookAheadDistance_ = robot_.maxLookAheadDistance;
     }
 }
 
@@ -103,7 +105,7 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     // Send the command for execution
     executeCommand(Velocity<>(linear, angular));
 
-    updateLookAheadDistance();
+    // updateLookAheadDistance();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

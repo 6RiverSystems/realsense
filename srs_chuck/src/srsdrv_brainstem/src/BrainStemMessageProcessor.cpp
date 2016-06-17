@@ -100,6 +100,21 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 
 	switch( eCommand )
 	{
+		case BRAIN_STEM_MSG::MESSAGE:
+		{
+			std::string strMessage( buffer.begin( ), buffer.end( ) );
+
+			if( strMessage.find( "<MSG Error" ) != -1 )
+			{
+				ROS_ERROR_NAMED( "Brainstem", "Fatal Error: %s", strMessage.c_str( ) );
+			}
+			else
+			{
+				ROS_DEBUG_STREAM_THROTTLE_NAMED(1, "Brainstem", "Message: <" << strMessage << ">");
+			}
+		}
+		break;
+
 		case BRAIN_STEM_MSG::BUTTON_PRESSED:
 		{
 			LED_ENTITIES eButtonId = static_cast<LED_ENTITIES>( buffer[1] );
@@ -383,7 +398,7 @@ void BrainStemMessageProcessor::OnUpdateLights( std::vector<std::string> vecPara
 	if( static_cast<LED_ENTITIES>( msg.entitiy ) != LED_ENTITIES::UNKNOWN &&
 		static_cast<LED_MODE>( msg.mode ) != LED_MODE::UNKNOWN )
 	{
-		ROS_ERROR( "OnUpdateLights (0x%x): %d=>%d", msg.cmd, msg.entitiy, msg.mode );
+		ROS_DEBUG( "OnUpdateLights (0x%x): %d=>%d", msg.cmd, msg.entitiy, msg.mode );
 
 		WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 	}

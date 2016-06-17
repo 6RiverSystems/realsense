@@ -14,6 +14,7 @@ namespace srs {
 
 enum class BRAIN_STEM_MSG
 {
+	MESSAGE				= 0x3C, // '<'
 	BUTTON_PRESSED			= 0x42, // 'B',
 	HARDWARE_INFO			= 0x59, // 'Y',
 	ODOMETRY_VELOCITY		= 0x4f, // 'O',

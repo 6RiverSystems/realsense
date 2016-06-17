@@ -337,7 +337,7 @@ void StarGazerPointTransformer::LoadCalibrationTransform( const std::string& str
 			m_stargazerTransform.setRotation( tf::Quaternion::getIdentity( ) );
 			m_stargazerTransform.setOrigin( translation );
 
-			ROS_INFO_STREAM( "Stargazer calibration: x=" << translation.getX( ) << ", y=" << translation.getY( ) );
+			ROS_INFO_STREAM( "Stargazer calibration (" << strConfigurationFile << "): x=" << translation.getX( ) << ", y=" << translation.getY( ) );
 		}
 		else
 		{

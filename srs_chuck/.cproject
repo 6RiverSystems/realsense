@@ -18,7 +18,7 @@
 					<folderInfo id="0.1815177988." name="/" resourcePath="">
 						<toolChain id="org.eclipse.cdt.build.core.prefbase.toolchain.233572554" name="No ToolChain" resourceTypeBasedDiscovery="false" superClass="org.eclipse.cdt.build.core.prefbase.toolchain">
 							<targetPlatform id="org.eclipse.cdt.build.core.prefbase.toolchain.233572554.543861905" name=""/>
-							<builder arguments="-DCMAKE_BUILD_TYPE=Debug" autoBuildTarget="" buildPath="${workspace_loc:/srs_chuck}/" command="catkin_make" enableAutoBuild="false" id="org.eclipse.cdt.build.core.settings.default.builder.1154078335" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
+							<builder arguments="-DCMAKE_BUILD_TYPE=Debug" autoBuildTarget="" buildPath="${workspace_loc:/srs_chuck}/" command="catkin_make" enableAutoBuild="false" id="org.eclipse.cdt.build.core.settings.default.builder.1154078335" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.libs.1332102349" name="holder for library settings" superClass="org.eclipse.cdt.build.core.settings.holder.libs"/>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.446761718" name="CUDA C" superClass="org.eclipse.cdt.build.core.settings.holder">
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.170586716" languageId="com.nvidia.cuda.ide.editor.cudac" languageName="CUDA C" sourceContentType="com.nvidia.cuda.ide.cudac" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
@@ -79,4 +79,5 @@
 			</target>
 		</buildTargets>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>

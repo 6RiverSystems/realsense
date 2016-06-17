@@ -290,7 +290,7 @@ std::string BrainStemMessageProcessor::GetButtonName( LED_ENTITIES eButtonId ) c
 // Bridge Callbacks
 //////////////////////////////////////////////////////////////////////////
 
-void BrainStemMessageProcessor::OnClearMotionStatus( MOTION_STATUS eMotionStatus )
+void BrainStemMessageProcessor::SetMotionStatus( MOTION_STATUS eMotionStatus, bool bSetBit )
 {
 	MOTION_STATUS_DATA statusData = { false };
 	statusData.frontEStop = (eMotionStatus == MOTION_STATUS::FRONT_E_STOP);
@@ -300,7 +300,9 @@ void BrainStemMessageProcessor::OnClearMotionStatus( MOTION_STATUS eMotionStatus
 	statusData.pause = (eMotionStatus == MOTION_STATUS::PAUSE);
 	statusData.hardStop = (eMotionStatus == MOTION_STATUS::HARD_STOP);
 
-	SET_OPERATIONAL_STATE_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SET_MOTION_STATUS ), statusData };
+	BRAIN_STEM_CMD command = bSetBit ? BRAIN_STEM_CMD::SET_MOTION_STATUS : BRAIN_STEM_CMD::CLEAR_MOTION_STATUS;
+
+	SET_OPERATIONAL_STATE_DATA msg = { static_cast<uint8_t>( command ), statusData };
 
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
@@ -310,6 +312,9 @@ void BrainStemMessageProcessor::OnHardStop( )
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::HARD_STOP );
 
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
+
+	// TODO: This is temporary until we send motion status up the bridge and UI
+	Pause( true );
 }
 
 void BrainStemMessageProcessor::OnPing( )
@@ -394,10 +399,7 @@ void BrainStemMessageProcessor::OnPause( std::vector<std::string> vecParams )
 {
 	std::string& strPaused = vecParams[0];
 
-	SUSPEND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SET_SUSPEND_STATE ),
-		strPaused == "OFF" ? false : true };
-
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+	Pause( strPaused == "ON" );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -414,6 +416,21 @@ void BrainStemMessageProcessor::WriteToSerialPort( char* pszData, std::size_t dw
 	{
 		ROS_ERROR_THROTTLE_NAMED( 60, "BrainStem", "Attempt to write to the brain stem, but the serial port is not open!" );
 	}
+}
+
+void BrainStemMessageProcessor::Pause( bool bPaused )
+{
+	SUSPEND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SET_SUSPEND_STATE ),
+		bPaused };
+
+	// TODO: Change this behavior from the bridge
+	if( !bPaused)
+	{
+		// Clear the motion status fault
+		SetMotionStatus( MOTION_STATUS::HARD_STOP, false );
+	}
+
+	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 
 } /* namespace srs */

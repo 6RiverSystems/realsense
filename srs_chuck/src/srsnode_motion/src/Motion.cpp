@@ -356,7 +356,6 @@ void Motion::reset(Pose<> pose0)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::stepNode()
 {
-    Odometry<> currentOdometry = tapOdometry_.getOdometry();
     Velocity<> currentJoystickCommand = tapJoyAdapter_.getVelocity();
 
     if (motionController_.isEmergencyDeclared())
@@ -383,11 +382,10 @@ void Motion::stepNode()
         }
     }
 
-    // Provide the command to the position estimator
-    if (isOdometryAvailable_)
-    {
-        positionEstimator_.run(&currentOdometry);
-    }
+    Odometry<> currentOdometry = tapOdometry_.getOdometry();
+
+    // Provide the command to the position estimator if available
+    positionEstimator_.run(isOdometryAvailable_ ? &currentOdometry : nullptr);
     Pose<> currentPose = positionEstimator_.getPose();
 
     // Run the motion controller

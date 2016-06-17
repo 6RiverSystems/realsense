@@ -29,7 +29,11 @@ cv::Mat Robot<TYPE>::FB(
     BaseType dT)
 {
     StatePe<TYPE> oldState(stateVector);
-    oldState.velocity = reinterpret_cast<CmdVelocity<>*>(command)->velocity;
+
+    if (command)
+    {
+        oldState.velocity = reinterpret_cast<CmdVelocity<>*>(command)->velocity;
+    }
 
     StatePe<TYPE> newState;
     Robot<TYPE>::kinematics(oldState, dT, newState);

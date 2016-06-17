@@ -36,10 +36,17 @@ public:
 
     void run(double dT, Odometry<>* odometry)
     {
-        // Transform a velocity point into a command
-        // and advance the state of the UKF
-        CmdVelocity<> command = CmdVelocity<>(odometry->velocity);
-        UkfType::run(dT, &command);
+        if (odometry)
+        {
+            // Transform a velocity point into a command
+            // and advance the state of the UKF
+            CmdVelocity<> command = CmdVelocity<>(odometry->velocity);
+            UkfType::run(dT, &command);
+        }
+        else
+        {
+            UkfType::run(dT, nullptr);
+        }
     }
 
 protected:

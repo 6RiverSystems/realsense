@@ -63,18 +63,23 @@ public:
 
     void run(Odometry<>* odometry)
     {
-        ROS_DEBUG_STREAM_NAMED("PositionEstimator", "Position Estimator Odometry: " << odometry);
-
-        // Calculate the elapsed time between odometry readings
-        double currentTime = odometry->velocity.arrivalTime;
-        double dT = currentTime - previousReadingTime_;
-        if (previousReadingTime_ < 0 || dT < 0)
+        double dT = dT_;
+        if (odometry)
         {
-            dT = dT_;
-        }
-        previousReadingTime_ = currentTime;
+            ROS_DEBUG_STREAM_NAMED("PositionEstimator", "Position Estimator Odometry: " << odometry);
 
-        ROS_DEBUG_STREAM_NAMED("PositionEstimator", "Calculated dT: " << dT);
+            // Calculate the elapsed time between odometry readings
+            double currentTime = odometry->velocity.arrivalTime;
+            dT = currentTime - previousReadingTime_;
+            if (previousReadingTime_ < 0 || dT < 0)
+            {
+                dT = dT_;
+            }
+            previousReadingTime_ = currentTime;
+
+            ROS_DEBUG_STREAM_NAMED("PositionEstimator", "Calculated dT: " << dT);
+        }
+
         ukf_.run(dT, odometry);
     }
 

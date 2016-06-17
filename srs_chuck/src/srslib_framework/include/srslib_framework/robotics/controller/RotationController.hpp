@@ -63,8 +63,12 @@ protected:
 
         // Calculate the angular portion of the command
         double angular = Kw_ * (Kp_ * error + Ki_ * integral_ + Kd_ * (error - previousError_));
+
         angular = BasicMath::saturate<double>(angular,
             robot_.travelRotationVelocity, -robot_.travelRotationVelocity);
+
+        angular = BasicMath::threshold<double>(angular,
+            robot_.minAngularVelocity, 0.0);
 
         integral_ += error;
         previousError_ = error;

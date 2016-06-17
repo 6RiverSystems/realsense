@@ -21,13 +21,14 @@ struct Chuck : RobotProfile
         bodyDepth = MeasurementMath::inch2m<double>(38.474); // 0.977 [m]
 
         goalReachedDistance = 0.100; // [m]
-        goalReachedAngle = AngleMath::deg2rad<double>(1.0); // 0.009 [rad]
+        goalReachedAngle = AngleMath::deg2rad<double>(1.0); // 0.0175 [rad]
         maxAngularAcceleration = AngleMath::deg2rad<double>(150.0); // 2.618 [rad/s^2]
         maxAngularVelocity = AngleMath::deg2rad<double>(555.0); // 9.687 [rad/s]
         maxLinearAcceleration = 0.700; // [m/s^2]
         maxLinearVelocity = 2.600; // [m/s]
         minInitialLinearVelocity = 0.3; // [m/s]
         maxLookAheadDistance = 1.500; // [m]
+        minAngularVelocity = AngleMath::deg2rad(0.05); // 0.0008 [rad/s]
         minLookAheadDistance = 0.500; // [m]
         minLinearVelocity = 0.005; // [m/s]
 

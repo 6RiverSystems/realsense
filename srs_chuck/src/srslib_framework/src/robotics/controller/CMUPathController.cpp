@@ -97,6 +97,9 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     angular = BasicMath::saturate<double>(angular,
         robot_.maxAngularVelocity, -robot_.maxAngularVelocity);
 
+    angular = BasicMath::threshold<double>(angular,
+        robot_.minAngularVelocity, 0.0);
+
     // Send the command for execution
     executeCommand(Velocity<>(linear, angular));
 

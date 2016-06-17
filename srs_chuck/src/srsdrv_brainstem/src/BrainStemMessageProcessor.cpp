@@ -215,30 +215,44 @@ void BrainStemMessageProcessor::SetVelocity( double dfLinear, double dfAngular )
 
 void BrainStemMessageProcessor::ProcessRosMessage( const std::string& strMessage )
 {
-	ROS_DEBUG( "Received command: %s", strMessage.c_str( ) );
+	ROS_DEBUG( "Received commands: %s", strMessage.c_str( ) );
 
-	std::vector<std::string> vecParsed;
-	boost::tokenizer<> tok( strMessage );
+	boost::char_separator<char> separator(";");
 
-	for( auto && strValue : tok ) { vecParsed.push_back( strValue ); }
+	boost::tokenizer<boost::char_separator<char>> messageListTokenizer( strMessage );
 
-	if( vecParsed.size( ) )
+	// Parse the list of semicolon delimited commands
+	for( auto && strCommand : messageListTokenizer )
 	{
-		const std::string& strCommand = vecParsed[0];
+		ROS_DEBUG( "Parse command: %s", strCommand.c_str( ) );
 
-		std::vector<std::string> vecParams = { vecParsed.begin( ) + 1, vecParsed.end( ) };
+		// Parse the command by whitespace
+		std::vector<std::string> vecParsed;
+		boost::tokenizer<> tok( strCommand );
 
-		auto iter = m_vecBridgeCallbacks.find( strCommand );
-
-		if( iter != m_vecBridgeCallbacks.end( ) )
+		for( auto && strValue : tok )
 		{
-			if( vecParams.size( ) == iter->second.dwNumParams )
+			vecParsed.push_back( strValue );
+		}
+
+		if( vecParsed.size( ) )
+		{
+			const std::string& strCommand = vecParsed[0];
+
+			std::vector<std::string> vecParams = { vecParsed.begin( ) + 1, vecParsed.end( ) };
+
+			auto iter = m_vecBridgeCallbacks.find( strCommand );
+
+			if( iter != m_vecBridgeCallbacks.end( ) )
 			{
-				iter->second.callback( vecParams );
-			}
-			else
-			{
-				ROS_ERROR( "Bridge has invalid number of arguments: %s", strMessage.c_str( ) );
+				if( vecParams.size( ) == iter->second.dwNumParams )
+				{
+					iter->second.callback( vecParams );
+				}
+				else
+				{
+					ROS_ERROR( "Bridge has invalid number of arguments: %s", strMessage.c_str( ) );
+				}
 			}
 		}
 	}

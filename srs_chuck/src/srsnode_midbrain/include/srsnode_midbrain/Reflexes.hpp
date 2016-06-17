@@ -25,6 +25,9 @@ private:
 
 	ros::Subscriber	m_laserScanSubscriber;
 
+	ros::Publisher	m_commandPublisher;
+
+
 };
 
 } /* namespace srs */

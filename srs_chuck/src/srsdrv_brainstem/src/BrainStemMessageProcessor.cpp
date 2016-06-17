@@ -215,11 +215,9 @@ void BrainStemMessageProcessor::SetVelocity( double dfLinear, double dfAngular )
 
 void BrainStemMessageProcessor::ProcessRosMessage( const std::string& strMessage )
 {
-	ROS_DEBUG( "Received commands: %s", strMessage.c_str( ) );
-
 	boost::char_separator<char> separator(";");
 
-	boost::tokenizer<boost::char_separator<char>> messageListTokenizer( strMessage );
+	boost::tokenizer<boost::char_separator<char>> messageListTokenizer( strMessage, separator );
 
 	// Parse the list of semicolon delimited commands
 	for( auto && strCommand : messageListTokenizer )

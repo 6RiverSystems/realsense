@@ -101,8 +101,8 @@ void MotionController::execute(SolutionType solution)
     // Check if the solution starts with a rotation. If that is the case
     // replace it with rotation that takes in account the current pose
     // of the robot
-    SolutionNode<Grid2d> startNode = pathSolution->getStart();
-    if (startNode.actionType == SolutionNode<Grid2d>::ROTATE)
+    SolutionNodeType startNode = pathSolution->getStart();
+    if (startNode.actionType == SolutionNodeType::ROTATE)
     {
         startNode.fromPose = currentPose_;
         initialRotationSolution = new SolutionType(startNode);
@@ -113,23 +113,37 @@ void MotionController::execute(SolutionType solution)
 
     // Check if the solution ends with a rotation. If that is the case
     // replace it with controlled rotation
-    SolutionNode<Grid2d> goalNode = pathSolution->getGoal();
-    if (goalNode.actionType == SolutionNode<Grid2d>::ROTATE)
+    if (!pathSolution->empty())
     {
-        finalRotationSolution = new SolutionType(goalNode);
+        SolutionNodeType goalNode = pathSolution->getGoal();
+        if (goalNode.actionType == SolutionNodeType::ROTATE)
+        {
+            finalRotationSolution = new SolutionType(goalNode);
 
-        // Remove the rotation from the original solution
-        pathSolution->erase(pathSolution->end() - 1);
+            // Remove the rotation from the original solution
+            pathSolution->erase(pathSolution->end() - 1);
+        }
     }
 
     // Push the solutions into the work queue
     if (initialRotationSolution)
     {
         pushWorkItem(TaskEnum::ROTATE, initialRotationSolution);
+        currentFinalGoal_ = initialRotationSolution->getGoal().toPose;
     }
 
-    pushWorkItem(TaskEnum::PATH_FOLLOW, pathSolution);
-    currentFinalGoal_ = pathSolution->getGoal().toPose;
+    // If the path solution is not empty, push it into
+    // the work queue
+    if (!pathSolution->empty())
+    {
+        pushWorkItem(TaskEnum::PATH_FOLLOW, pathSolution);
+        currentFinalGoal_ = pathSolution->getGoal().toPose;
+    }
+    else
+    {
+        // Otherwise get rid of it
+        delete pathSolution;
+    }
 
     if (finalRotationSolution)
     {

@@ -102,6 +102,7 @@ private:
     static unordered_map<int, string> TASK_NAMES;
 
     typedef Solution<Grid2d> SolutionType;
+    typedef SolutionNode<Grid2d> SolutionNodeType;
     typedef pair<int, SolutionType*> WorkType;
 
     void checkMotionStatus();

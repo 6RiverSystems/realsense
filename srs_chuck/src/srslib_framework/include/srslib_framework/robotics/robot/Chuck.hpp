@@ -32,7 +32,7 @@ struct Chuck : RobotProfile
 
         ratioEmergency = 0.05; // []
         ratioLookAheadDistance = 1.1; // []
-        ratioManual = 0.5; // []
+        ratioManual = 0.4; // []
 
         travelAngularAcceleration = AngleMath::deg2rad<double>(28.0); // 0.489 [rad/s^2]
         travelAngularVelocity = AngleMath::deg2rad<double>(115); // 2.007 [rad/s]

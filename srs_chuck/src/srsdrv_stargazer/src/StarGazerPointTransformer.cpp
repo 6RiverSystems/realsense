@@ -129,7 +129,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 	if( iter != m_mapTransforms.end( ) )
 	{
-		if( true )//m_filter.unfilterStargazerData( nTagId, fX, fY, fZ ) )
+		if( m_filter.unfilterStargazerData( nTagId, fX, fY, fZ ) )
 		{
 			// The anchor transform from the origin of the map to the anchor point
 			const tf::Transform& anchorGlobal = iter->second;
@@ -223,7 +223,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 				std::string strData =  stream.str( );
 
-				ROS_ERROR_NAMED( "StarGazerPointTransformer", "%s", strData.c_str( ) );
+				ROS_INFO_NAMED( "StarGazerPointTransformer", "%s", strData.c_str( ) );
 
 				// reset accumulators
 				accLocalX = double_acc( );

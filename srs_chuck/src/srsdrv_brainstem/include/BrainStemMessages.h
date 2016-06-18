@@ -110,7 +110,6 @@ struct HARDWARE_INFORMATION_DATA
 	uint32_t	batteryHours;				// battery hours
 	uint32_t	wheelMeters; 				// wheel meters
 	char*		pszBrainstemVersion;		// brainstem version
-	//char*		pszSafetyProcessorVersion;	// Safety processor version
 };
 
 struct MOTION_STATUS_DATA
@@ -126,12 +125,12 @@ struct MOTION_STATUS_DATA
 
 struct FAILURE_STATUS_DATA
 {
-	bool		safetyProcessorFailure:1; 	// safety processor failure
-	bool		brainstemFailure:1; 		// brainstem failure
-	bool		brainTimeoutFailure:1; 		// brainstem timeout failure
-	bool		rightMotorFailure:1; 		// right motor failure
-	bool		leftMotorFailure:1; 		// left motor failure
-	bool		reservedFailure:3; 			// reserved
+	uint8_t		safetyProcessorFailure:1; 	// safety processor failure
+	uint8_t		brainstemFailure:1; 		// brainstem failure
+	uint8_t		brainTimeoutFailure:1; 		// brainstem timeout failure
+	uint8_t		rightMotorFailure:1; 		// right motor failure
+	uint8_t		leftMotorFailure:1; 		// left motor failure
+	uint8_t		reservedFailure:3; 			// reserved
 };
 
 struct OPERATIONAL_STATE_DATA

@@ -20,12 +20,21 @@ typedef SolutionNode<Grid2d> SolutionNodeType;
 
 TEST(Test_Trajectory, SingleRotation)
 {
+    constexpr double DEG90 = AngleMath::deg2rad<double>(90);
+    constexpr double DEG180 = AngleMath::deg2rad<double>(180);
+
+    SolutionNodeType SOLUTION_00 = SolutionNodeType(SolutionNodeType::ROTATE,
+        Pose<>(18, 9, DEG90), Pose<>(18, 9, DEG180));
+
+    Solution<Grid2d> solution;
+    solution.push_back(SOLUTION_00);
+    cout << solution << endl;
+
     Chuck chuck;
     Trajectory<> trajectory;
 
     TrajectoryGenerator solutionConverter(chuck);
-    solutionConverter.fromRotation(Pose<>(1, 1, AngleMath::deg2rad<double>(0)),
-        AngleMath::deg2rad<double>(180), 0.1);
+    solutionConverter.fromSolution(solution);
     solutionConverter.getTrajectory(trajectory);
 
     cout << trajectory << endl;

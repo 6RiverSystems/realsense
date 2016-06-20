@@ -21,27 +21,20 @@ typedef SolutionNode<Grid2d> SolutionNodeType;
 
 TEST(Test_Trajectory, ShortStraight)
 {
-    SolutionNodeType SOLUTION_00 = SolutionNodeType(SolutionNodeType::START,
-        Pose<>(3, 3, 0), Pose<>(3, 3, 0));
-
-    SolutionNodeType SOLUTION_01 = SolutionNodeType(SolutionNodeType::MOVE,
+    SolutionNodeType SOLUTION_00 = SolutionNodeType(SolutionNodeType::MOVE,
         Pose<>(3, 3, 0), Pose<>(3, 4, 0));
-
-    SolutionNodeType SOLUTION_02 = SolutionNodeType(SolutionNodeType::GOAL,
-        Pose<>(3, 4, 0), Pose<>(3, 4, 0));
 
     Solution<Grid2d> solution;
     solution.push_back(SOLUTION_00);
-    solution.push_back(SOLUTION_01);
-    solution.push_back(SOLUTION_02);
+
+    cout << solution << endl;
 
     Chuck chuck;
     Trajectory<> trajectory;
 
     TrajectoryGenerator solutionConverter(chuck);
-    solutionConverter.fromSolution(solution, 0.1);
+    solutionConverter.fromSolution(solution);
     solutionConverter.getTrajectory(trajectory);
 
-    cout << solution << endl;
     cout << trajectory << endl;
 }

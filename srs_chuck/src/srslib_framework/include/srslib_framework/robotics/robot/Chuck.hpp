@@ -49,7 +49,7 @@ struct Chuck : RobotProfile
         wheelDiameter = MeasurementMath::inch2m<double>(8.000); // 0.203 [m]
         wheelDistance = MeasurementMath::inch2m<double>(20.915); // 0.531 [m]
 
-        zeroLookAheadDistance = 1.100; // [m]
+        zeroLookAheadDistance = 0.8; // [m]
     }
 
     virtual ~Chuck()

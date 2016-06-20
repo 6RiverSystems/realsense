@@ -174,6 +174,7 @@ private:
     string printWorkToString();
     void popWorkItem(TaskEnum& task, SolutionType& solution);
     void prependWorkItem(TaskEnum task, SolutionType* solution = nullptr);
+    void publishLookAheadDistance();
     void pumpWorkFromQueue();
     void pushWorkItem(TaskEnum task, SolutionType* solution = nullptr);
 
@@ -213,6 +214,7 @@ private:
 
     CMUPathController* pathController_;
     ros::Publisher pubCmdVel_;
+    ros::Publisher pubLookAheadDistance_;
 
     RobotProfile robot_;
     ros::NodeHandle rosNodeHandle_;

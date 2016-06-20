@@ -124,12 +124,13 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 {
     configuration_ = config;
 
-    tapAps_.getSensor()->enable(configuration_.aps_enabled);
-    ROS_INFO_STREAM_NAMED("Motion", "APS sensor enabled: " << configuration_.aps_enabled);
-
     robot_.adaptiveLookAhead = configuration_.adaptive_lookahead_enabled;
-    ROS_INFO_STREAM_NAMED("Motion", "Goal reached distance [m]: " <<
+    ROS_INFO_STREAM_NAMED("Motion", "Adaptive look-ahead enabled [t/f]: " <<
         configuration_.adaptive_lookahead_enabled);
+
+    tapAps_.getSensor()->enable(configuration_.aps_enabled);
+    ROS_INFO_STREAM_NAMED("Motion", "APS sensor enabled: " <<
+        configuration_.aps_enabled);
 
     robot_.goalReachedDistance = configuration_.goal_reached_distance;
     ROS_INFO_STREAM_NAMED("Motion", "Goal reached distance [m]: " <<

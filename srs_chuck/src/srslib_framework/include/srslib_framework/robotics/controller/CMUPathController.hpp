@@ -30,6 +30,11 @@ public:
     ~CMUPathController()
     {}
 
+    double getLookAheadDistance() const
+    {
+        return lookAheadDistance_;
+    }
+
     void reset();
 
     void setTrajectory(Trajectory<> trajectory, Pose<> robotPose);

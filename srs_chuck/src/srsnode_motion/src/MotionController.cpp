@@ -6,6 +6,7 @@ using namespace std;
 
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
+#include <std_msgs/Float64.h>
 
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
@@ -39,6 +40,9 @@ MotionController::MotionController(double dT) :
 {
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>(
         "/internal/drivers/brainstem/cmd_velocity", 100);
+
+    pubLookAheadDistance_ = rosNodeHandle_.advertise<std_msgs::Float64>(
+        "/internal/motion/look_ahead_distance", 1);
 
     manualController_ = new ManualController();
     pathController_ = new CMUPathController();
@@ -226,6 +230,8 @@ void MotionController::run(Pose<> currentPose, Odometry<> currentOdometry, Veloc
     // Send the command for execution. Similar commands will not be sent
     Velocity<> command = activeController_->getExecutingCommand();
     executeCommand(false, CommandEnum::VELOCITY, &command);
+
+    publishLookAheadDistance();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -503,6 +509,15 @@ void MotionController::prependWorkItem(TaskEnum task, SolutionType* solution)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void MotionController::publishLookAheadDistance()
+{
+    std_msgs::Float64 messageLookAhead;
+    messageLookAhead.data = pathController_->getLookAheadDistance();
+
+    pubLookAheadDistance_.publish(messageLookAhead);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::pumpWorkFromQueue()
 {
     // Pop a work item from the queue
@@ -628,7 +643,7 @@ void MotionController::taskPathFollow()
     Trajectory<> trajectory;
     TrajectoryGenerator converter(robot_);
 
-    converter.fromSolution(currentSolution_, dT_);
+    converter.fromSolution(currentSolution_);
     converter.getTrajectory(trajectory);
 
     ROS_DEBUG_STREAM_NAMED("MotionController", "Trajectory: " << trajectory);

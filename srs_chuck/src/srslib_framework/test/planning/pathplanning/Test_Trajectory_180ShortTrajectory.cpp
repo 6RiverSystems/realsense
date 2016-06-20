@@ -16,8 +16,7 @@ using namespace std;
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 using namespace srs;
 
-// TODO: Move this definition inside Solution<GRAPH>
-typedef SolutionNode<Grid2d> SolutionNodeType;
+typedef Solution<Grid2d>::NodeType SolutionNodeType;
 
 TEST(Test_Trajectory, 180ShortTrajectory)
 {
@@ -67,13 +66,14 @@ TEST(Test_Trajectory, 180ShortTrajectory)
     solution.push_back(SOLUTION_08);
     solution.push_back(SOLUTION_09);
 
+    cout << solution << endl;
+
     Chuck chuck;
     Trajectory<> trajectory;
 
     TrajectoryGenerator solutionConverter(chuck);
-    solutionConverter.fromSolution(solution, 0.1);
+    solutionConverter.fromSolution(solution);
     solutionConverter.getTrajectory(trajectory);
 
-    cout << solution << endl;
     cout << trajectory << endl;
 }

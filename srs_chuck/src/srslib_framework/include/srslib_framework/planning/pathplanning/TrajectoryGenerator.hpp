@@ -170,7 +170,7 @@ private:
         auto fromWaypoint = waypoints.begin();
         auto toWaypoint = fromWaypoint + 1;
 
-        double v0 = robot_.minInitialLinearVelocity;
+        double v0 = robot_.minLinearVelocity;
         double vf = 0.0;
         while (toWaypoint != waypoints.end())
         {

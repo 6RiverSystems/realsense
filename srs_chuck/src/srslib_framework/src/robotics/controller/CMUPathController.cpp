@@ -15,7 +15,7 @@ void CMUPathController::reset()
 {
     BaseController::reset();
 
-    dynamicLookAheadDistance_ = robot_.maxLookAheadDistance;
+    lookAheadDistance_ = robot_.zeroLookAheadDistance;
 
     currentTrajectory_.clear();
 
@@ -27,6 +27,8 @@ void CMUPathController::reset()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
 {
+    reset();
+
     currentTrajectory_ = trajectory;
     if (!currentTrajectory_.empty())
     {
@@ -41,8 +43,6 @@ void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
         // Find the projection of the current robot pose onto the trajectory
         projectionIndex_ = currentTrajectory_.findClosestPose(robotPose, 0,
             robot_.maxLookAheadDistance);
-
-        dynamicLookAheadDistance_ = robot_.maxLookAheadDistance;
     }
 }
 
@@ -52,8 +52,9 @@ void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
 {
-    // Update the projection of the current robot pose onto the path
-    updateProjectionIndex(currentPose);
+    // Update the projection of the current robot pose onto the path and the
+    // look-ahead distance
+    updateParameters(currentPose);
 
     double distanceToGoal = PoseMath::euclidean(currentPose, goal_);
     ROS_DEBUG_STREAM_NAMED("CMUPathController", "Distance to goal: " << distanceToGoal);
@@ -81,14 +82,14 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     // specific to the robot)
     if (BasicMath::equal<double>(linear, 0.0, 0.001))
     {
-        linear = 10.0 * robot_.minLinearVelocity;
+        linear = robot_.minLinearVelocity;
     }
 
     // Calculate the angular portion of the command
     double slope = atan2(referencePose_.y - currentPose.y, referencePose_.x - currentPose.x);
     double alpha = AngleMath::normalizeAngleRad<double>(slope - currentPose.theta);
 
-    angular = Kw_ * 2 * sin(alpha) / dynamicLookAheadDistance_;
+    angular = Kw_ * 2 * sin(alpha) / lookAheadDistance_;
 
     // If the robot angle is greater than 45deg, use a different rotation velocity
     if (abs(alpha) > M_PI_4)
@@ -100,39 +101,42 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
         robot_.maxAngularVelocity, -robot_.maxAngularVelocity);
 
     angular = BasicMath::threshold<double>(angular,
-        robot_.minAngularVelocity, 0.0);
+        robot_.minPhysicalAngularVelocity, 0.0);
 
     // Send the command for execution
     executeCommand(Velocity<>(linear, angular));
-
-    // updateLookAheadDistance();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMUPathController::updateLookAheadDistance()
-{
-    // Recalculate the look-ahead distance based roughly on the velocity
-    dynamicLookAheadDistance_ = BasicMath::saturate(
-        executingCommand_.linear * robot_.ratioLookAheadDistance,
-        robot_.maxLookAheadDistance, robot_.minLookAheadDistance);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMUPathController::updateProjectionIndex(Pose<> currentPose)
+void CMUPathController::updateParameters(Pose<> currentPose)
 {
     projectionIndex_ = currentTrajectory_.findClosestPose(currentPose,
-        projectionIndex_, dynamicLookAheadDistance_);
+        projectionIndex_, lookAheadDistance_);
 
     referenceIndex_ = currentTrajectory_.findWaypointAtDistance(projectionIndex_,
-        dynamicLookAheadDistance_);
+        lookAheadDistance_);
 
     referencePose_ = currentTrajectory_.getPose(referenceIndex_);
 
     double distanceToReference = PoseMath::euclidean(currentPose, referencePose_);
     ROS_DEBUG_STREAM_NAMED("CMUPathController", "Distance to reference: " << distanceToReference);
+
+    // Recalculate the look-ahead distance
+    if (robot_.adaptiveLookAhead)
+    {
+        Pose<> projectionPose = currentTrajectory_.getPose(projectionIndex_);
+
+        lookAheadDistance_ = robot_.zeroLookAheadDistance +
+            PoseMath::euclidean(currentPose, projectionPose);
+
+        lookAheadDistance_ = BasicMath::saturate(lookAheadDistance_,
+            robot_.maxLookAheadDistance, robot_.minLookAheadDistance);
+
+        ROS_DEBUG_STREAM_NAMED("CMUPathController", "Look-ahead distance: " << lookAheadDistance_);
+    }
 }
 
 } // namespace srs

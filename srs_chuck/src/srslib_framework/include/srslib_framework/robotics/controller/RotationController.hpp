@@ -68,7 +68,7 @@ protected:
             robot_.travelRotationVelocity, -robot_.travelRotationVelocity);
 
         angular = BasicMath::threshold<double>(angular,
-            robot_.minAngularVelocity, 0.0);
+            robot_.minPhysicalAngularVelocity, 0.0);
 
         integral_ += error;
         previousError_ = error;

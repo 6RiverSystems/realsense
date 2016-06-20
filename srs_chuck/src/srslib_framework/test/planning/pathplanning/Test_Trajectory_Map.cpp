@@ -12,7 +12,7 @@ using namespace std;
 #include <srslib_framework/localization/Map.hpp>
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/planning/pathplanning/TrajectoryGenerator.hpp>
-#include <srslib_framework/robotics/Robot/Chuck.hpp>
+#include <srslib_framework/robotics/robot/Chuck.hpp>
 
 using namespace srs;
 

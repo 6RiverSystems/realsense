@@ -1,7 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 #include "StarGazerFilter.h"
-
+#include <ros/ros.h>
 
 namespace srs {
 
@@ -99,11 +99,13 @@ namespace srs {
 				if ((absVel < m_velocityLimitCMpS) && (absAcc < m_accelerationLimitCMpS2) && (absJerk < m_jerkLimitCMpS3))
 				{
 					returnValue = true;
-//					printf("vel: %7.4f (%1.0f) acc: %6.2f (%1.0f) jerk: %7.1f (%1.0f)\n", absVel, m_velocityLimitCMpS, absAcc, m_accelerationLimitCMpS2, absJerk, m_jerkLimitCMpS3);
+
+					ROS_DEBUG_NAMED( "filter", "vel: %7.4f (%1.0f) acc: %6.2f (%1.0f) jerk: %7.1f (%1.0f)", absVel, m_velocityLimitCMpS, absAcc, m_accelerationLimitCMpS2, absJerk, m_jerkLimitCMpS3);
 				}
 				else 
 				{
-//					printf("vel: %7.4f (%1.0f) acc: %6.2f (%1.0f) jerk: %7.1f (%1.0f) <", absVel, m_velocityLimitCMpS, absAcc, m_accelerationLimitCMpS2, absJerk, m_jerkLimitCMpS3);
+					ROS_DEBUG_NAMED( "filter", "vel: %7.4f (%1.0f) acc: %6.2f (%1.0f) jerk: %7.1f (%1.0f) <", absVel, m_velocityLimitCMpS, absAcc, m_accelerationLimitCMpS2, absJerk, m_jerkLimitCMpS3);
+
 					int vm = absVel / m_velocityLimitCMpS;
 					int am = absAcc / m_accelerationLimitCMpS2;
 					int jm = absJerk / m_jerkLimitCMpS3;
@@ -113,8 +115,6 @@ namespace srs {
 //						printf("-");
 //					}
 //					printf("\n");
-					
-					
 				}
 			}
 

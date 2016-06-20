@@ -26,7 +26,7 @@ namespace srs
 StarGazer::StarGazer( const std::string& strNodeName, const std::string& strSerialPort, const std::string& strApsTopic ) :
 	m_rosNodeHandle( strNodeName ),
 	m_rosApsPublisher( m_rosNodeHandle.advertise < geometry_msgs::PoseStamped > (strApsTopic, 1000) ),
-	m_pSerialIO( new SerialIO( ) ),
+	m_pSerialIO( new SerialIO( "stargazer" ) ),
 	m_messageProcessor( m_pSerialIO ),
 	m_sleeper( REFRESH_RATE_HZ / 1000.0 ),
 	m_mapTransformSenders( ),
@@ -85,7 +85,7 @@ void StarGazer::Run( )
 
 void StarGazer::OnConnectionChanged( bool bIsConnected )
 {
-	ROS_DEBUG_STREAM_NAMED( "StarGazer", "Connected" );
+	ROS_DEBUG_STREAM( "Connected" );
 
 	if( bIsConnected )
 	{
@@ -156,7 +156,7 @@ void StarGazer::PumpMessageProcessor( )
 
 void StarGazer::ReadCallback( std::string strType, std::string strValue )
 {
-	ROS_DEBUG_STREAM_NAMED( "StarGazer", strType << " = " << strValue );
+	ROS_DEBUG_STREAM( strType << " = " << strValue );
 }
 
 void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, float fAngle )

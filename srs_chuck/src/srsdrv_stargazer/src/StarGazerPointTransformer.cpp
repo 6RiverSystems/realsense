@@ -10,11 +10,12 @@
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/median.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
 #include <yaml-cpp/yaml.h>
 
 using namespace boost::accumulators;
 
-typedef accumulator_set<double, stats<tag::median> > double_acc;
+typedef accumulator_set<double, stats<tag::median, tag::lazy_variance> > double_acc;
 
 namespace YAML
 {
@@ -158,19 +159,19 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 			tf::Vector3 totalFootprintOffset = totalCameraOffset + footprintOffset;
 
-//			std::ostringstream stream;
-//
-//			stream << "Stargazer Data: " << std::fixed <<  endl <<
-//				tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
-//				stargazerOffset.getX( ) << ", " << stargazerOffset.getY( ) << ", " << stargazerOffset.getZ( ) << ", " <<
-//				totalCameraOffset.getX( ) << ", " << totalCameraOffset.getY( ) << ", " << totalCameraOffset.getZ( ) << ", " <<
-//				totalFootprintOffset.getX( ) << ", " << totalFootprintOffset.getY( ) << ", " << totalFootprintOffset.getZ( ) << ", " <<
-//				chuckOrigin.getX( ) << ", " << chuckOrigin.getY( ) << ", " << chuckOrigin.getZ( ) << ", " <<
-//				tf::getYaw( chuckOrientation ) * 180.0f / M_PI << ", " << std::endl;
-//
-//			std::string strData =  stream.str( );
-//
-//			ROS_DEBUG_NAMED( "StarGazerPointTransformer", "%s", strData.c_str( ) );
+			std::ostringstream stream;
+
+			stream << "Stargazer Data: " << std::fixed <<  endl <<
+				tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
+				stargazerOffset.getX( ) << ", " << stargazerOffset.getY( ) << ", " << stargazerOffset.getZ( ) << ", " <<
+				totalCameraOffset.getX( ) << ", " << totalCameraOffset.getY( ) << ", " << totalCameraOffset.getZ( ) << ", " <<
+				totalFootprintOffset.getX( ) << ", " << totalFootprintOffset.getY( ) << ", " << totalFootprintOffset.getZ( ) << ", " <<
+				chuckOrigin.getX( ) << ", " << chuckOrigin.getY( ) << ", " << chuckOrigin.getZ( ) << ", " <<
+				tf::getYaw( chuckOrientation ) * 180.0f / M_PI << ", " << std::endl;
+
+			std::string strData =  stream.str( );
+
+			ROS_DEBUG_NAMED( "transform", "%s", strData.c_str( ) );
 
 			static double_acc accLocalX;
 			static double_acc accLocalY;
@@ -219,11 +220,14 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 					median( accCameraX ) << ", " << median( accCameraY ) << ", " << median( accCameraZ ) << ", " <<
 					median( accFootprintX ) << ", " << median( accFootprintY ) << ", " << median( accFootprintZ ) << ", " <<
 					median( accChuckX ) << ", " << median( accChuckY ) << ", " << median( accChuckZ ) << ", " <<
-					median( accChuckRotation ) << endl;
+					median( accChuckRotation ) << ", " <<
+					lazy_variance( accChuckX ) << ", " << lazy_variance( accChuckY ) << ", " << lazy_variance( accChuckZ ) << ", " <<
+					lazy_variance( accChuckRotation ) <<
+					std::endl;
 
 				std::string strData =  stream.str( );
 
-				ROS_INFO_NAMED( "StarGazerPointTransformer", "%s", strData.c_str( ) );
+				ROS_INFO_NAMED( "transform", "%s", strData.c_str( ) );
 
 				// reset accumulators
 				accLocalX = double_acc( );
@@ -248,7 +252,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 		}
 		else
 		{
-			ROS_DEBUG_NAMED( "StarGazerPointTransformer", "Rejected anchor position: %04i (%2.2f, %2.2f, %2.2f) %2.2f degrees\n",
+			ROS_DEBUG_NAMED( "transform", "Rejected anchor position: %04i (%2.2f, %2.2f, %2.2f) %2.2f degrees\n",
 				nTagId, fX, fY, fZ, fAngleInDegrees );
 		}
 	}
@@ -256,7 +260,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 	{
 		m_filter.reportDeadZone( );
 
-		ROS_DEBUG_NAMED( "StarGazerPointTransformer", "Invalid or Unknown Tag: %04i (%2.2f, %2.2f, %2.2f) %2.2f degrees\n",
+		ROS_DEBUG_NAMED( "transform", "Invalid or Unknown Tag: %04i (%2.2f, %2.2f, %2.2f) %2.2f degrees\n",
 			nTagId, fX, fY, fZ, fAngleInDegrees );
 	}
 

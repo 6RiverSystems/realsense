@@ -139,7 +139,9 @@ public:
 	std::vector<CONFIG>				m_testConfigs;
 
 public:
-	SerialIOTest( )
+	SerialIOTest( ) :
+		m_serial1( "test1" ),
+		m_serial2( "test2" )
 	{
 		m_testConfigs.push_back( CONFIG::BRAIN_STEM );
 		m_testConfigs.push_back( CONFIG::STAR_GAZER );

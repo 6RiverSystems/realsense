@@ -218,6 +218,13 @@ void BrainStemMessageProcessor::GetHardwareInformation( )
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 
+void BrainStemMessageProcessor::SendPing( )
+{
+	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::PING );
+
+	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
+}
+
 void BrainStemMessageProcessor::SetVelocity( double dfLinear, double dfAngular )
 {
 	VELOCITY_DATA msg = {
@@ -347,13 +354,6 @@ void BrainStemMessageProcessor::OnHardStop( )
 	ROS_DEBUG( "OnHardStop" );
 
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::HARD_STOP );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
-}
-
-void BrainStemMessageProcessor::OnPing( )
-{
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::PING );
 
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
 }

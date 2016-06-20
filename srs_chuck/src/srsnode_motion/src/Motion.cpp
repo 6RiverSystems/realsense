@@ -46,6 +46,8 @@ Motion::Motion(string nodeName) :
         "/internal/state/current_goal/goal", 1);
     pubStatusGoalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
         "/internal/state/current_goal/arrived", 1);
+    pubPing_ = rosNodeHandle_.advertise<std_msgs::Bool>(
+        "/internal/state/ping", 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,6 +77,8 @@ void Motion::run()
         stepNode();
 
         publishOdometry();
+
+        publishPing();
 
         refreshRate.sleep();
     }
@@ -342,6 +346,15 @@ void Motion::publishOdometry()
 
     // Publish the Odometry
     pubOdometry_.publish(messageOdometry);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::publishPing()
+{
+    std_msgs::Bool messagePing;
+    messagePing.data = true;
+
+    pubPing_.publish(messagePing);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

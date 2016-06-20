@@ -9,6 +9,7 @@
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
 #include <srslib_framework/io/IO.hpp>
 #include <BrainStemMessageProcessor.h>
@@ -54,6 +55,8 @@ private:
 
 	void GetOperationalState( );
 
+	void OnPing( );
+
 	void OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity );
 
 	void OnRosCallback( const std_msgs::String::ConstPtr& msg );
@@ -64,7 +67,9 @@ private:
 
 	ros::Subscriber				m_llcmdSubscriber;
 
-	ros::Subscriber				m_VelocitySubscriber;
+	ros::Subscriber				m_pingSubscriber;
+
+	ros::Subscriber				m_velocitySubscriber;
 
 	ros::Publisher				m_llEventPublisher;
 

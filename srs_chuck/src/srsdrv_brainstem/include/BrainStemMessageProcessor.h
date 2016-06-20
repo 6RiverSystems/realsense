@@ -97,6 +97,8 @@ public:
 
 	void GetHardwareInformation( );
 
+	void SendPing( );
+
 	void SetVelocity( double dfLinear, double dfAngular );
 
 	void SetConnected( bool bIsConnected );
@@ -114,8 +116,6 @@ private:
 	void SetMotionStatus( MOTION_STATUS eMotionStatus, bool bSetBit );
 
 	void OnHardStop( );
-
-	void OnPing( );
 
 	void OnResetBatteryHours( );
 

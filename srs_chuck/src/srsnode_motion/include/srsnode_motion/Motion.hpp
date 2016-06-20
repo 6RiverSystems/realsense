@@ -60,6 +60,7 @@ private:
     void publishArrived();
     void publishGoal();
     void publishOdometry();
+    void publishPing();
 
     void reset(Pose<> pose0);
 
@@ -85,6 +86,7 @@ private:
     ros::Publisher pubStatusGoalPlan_;
     ros::Publisher pubStatusGoalGoal_;
     ros::Publisher pubStatusGoalArrived_;
+    ros::Publisher pubPing_;
 
     ros::NodeHandle rosNodeHandle_;
     tf::TransformBroadcaster rosTfBroadcaster_;

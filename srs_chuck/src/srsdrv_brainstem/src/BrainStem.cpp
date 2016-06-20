@@ -23,6 +23,8 @@ constexpr auto REFRESH_RATE_HZ = 100;
 
 constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
 
+constexpr auto PING_TOPIC = "/internal/state/ping";
+
 constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
 constexpr auto CONNECTED_TOPIC = "/internal/drivers/brainstem/connected";
 
@@ -32,7 +34,8 @@ constexpr auto EVENT_TOPIC = "/cmd_ll";
 
 BrainStem::BrainStem( const std::string& strSerialPort ) :
 	m_rosNodeHandle( ),
-    m_VelocitySubscriber( ),
+	m_pingSubscriber( ),
+    m_velocitySubscriber( ),
     m_OdometryRawPublisher( ),
     m_ConnectedPublisher( ),
 	m_llcmdSubscriber( ),
@@ -196,7 +199,10 @@ void BrainStem::OnVoltageChanged( float fVoltage )
 
 void BrainStem::CreateSubscribers( )
 {
-	m_VelocitySubscriber = m_rosNodeHandle.subscribe<geometry_msgs::Twist>( VELOCITY_TOPIC, 10,
+	m_pingSubscriber = m_rosNodeHandle.subscribe<std_msgs::Bool>( PING_TOPIC, 10,
+	    std::bind( &BrainStem::OnPing, this ) );
+
+	m_velocitySubscriber = m_rosNodeHandle.subscribe<geometry_msgs::Twist>( VELOCITY_TOPIC, 10,
 	    std::bind( &BrainStem::OnChangeVelocity, this, std::placeholders::_1 ) );
 
 	m_llcmdSubscriber = m_rosNodeHandle.subscribe<std_msgs::String>( COMMAND_TOPIC, 100,
@@ -237,6 +243,11 @@ void BrainStem::GetOperationalState( )
 void BrainStem::GetHardwareInformation( )
 {
 	m_messageProcessor.GetHardwareInformation( );
+}
+
+void BrainStem::OnPing( )
+{
+	m_messageProcessor.SendPing( );
 }
 
 void BrainStem::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity )

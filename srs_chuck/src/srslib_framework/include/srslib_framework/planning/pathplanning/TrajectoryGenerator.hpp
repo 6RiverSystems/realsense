@@ -11,6 +11,7 @@ using namespace std;
 
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
+#include <srslib_framework/math/VelocityMath.hpp>
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 
@@ -34,7 +35,7 @@ public:
         robot_(robot)
     {}
 
-    void fromSolution(Solution<Grid2d>& solution, double dT)
+    void fromSolution(Solution<Grid2d>& solution)
     {
         trajectory_.clear();
         path_.clear();
@@ -47,7 +48,7 @@ public:
 
         findPath(solution, path_);
         double delta = calculateDelta();
-        interpolatePath(pathReduced_, delta, dT);
+        interpolatePath(pathReduced_, delta);
     }
 
     void getTrajectory(Trajectory<>& trajectory)
@@ -154,9 +155,15 @@ private:
         {
             path.push_back(solution.getGoal().toPose);
         }
+
+        cout << "Path: " << endl;
+        for (auto milestone : path)
+        {
+            cout << milestone << endl;
+        }
     }
 
-    void interpolatePath(PathType& waypoints, double spacing, double dT)
+    void interpolatePath(PathType& waypoints, double spacing)
     {
         if (waypoints.size() < 2)
         {
@@ -170,10 +177,11 @@ private:
         auto fromWaypoint = waypoints.begin();
         auto toWaypoint = fromWaypoint + 1;
 
-        double v0 = robot_.minInitialLinearVelocity;
+        double v0 = robot_.minLinearVelocity;
         double vf = 0.0;
         while (toWaypoint != waypoints.end())
         {
+            bool firstStretch = segment == 1;
             bool lastStretch = segment == totalSegments;
 
             // If the segment is the last stretch the final velocity will be 0
@@ -184,7 +192,8 @@ private:
             interpolateWaypoints(*fromWaypoint, *toWaypoint,
                 v0, vf,
                 toWaypoint->theta,
-                spacing, dT);
+                spacing,
+                firstStretch, lastStretch);
 
             // The next initial velocity is equal to the final velocity of this segment
             v0 = vf;
@@ -199,11 +208,12 @@ private:
     void interpolateWaypoints(WaypointType fromWaypoint, WaypointType toWaypoint,
         double upV0, double downVf,
         double orientation,
-        double spacing, double dT)
+        double spacing,
+        bool firstStretch, bool lastStretch)
     {
         // Calculate the change in velocity that can be achieved
-        // with the specified travel acceleration and time interval
-        double deltaVelocity = robot_.travelLinearAcceleration * dT;
+        // with the specified travel acceleration and the specified spacing
+        double deltaVelocity = sqrt(2 * robot_.travelLinearAcceleration * spacing);
 
         // They keep track of the initial and final velocities
         // for the ramp up and the ramp down in the segment
@@ -227,7 +237,7 @@ private:
         // If the segment is not the first stretch, keep the curving velocity
         // for a while before ramping up
         int rampUpIndex = -1;
-        if (!BasicMath::equal<double>(upV0, 0.0))
+        if (!firstStretch)
         {
             rampUpIndex += slowZone;
         }
@@ -235,7 +245,7 @@ private:
         // If the segment is not the last stretch, slow down earlier
         // to maintain the curving velocity
         int rampDownIndex = totalMidpoints - rampDownPoints;
-        if (!BasicMath::equal<double>(downVf, 0.0) && rampDownIndex > slowZone)
+        if (!lastStretch && rampDownIndex > slowZone)
         {
             rampDownIndex -= slowZone;
             rampDownIndex = BasicMath::saturate<int>(rampDownIndex, totalMidpoints, 0);
@@ -266,7 +276,6 @@ private:
 
         // Begin from the initial waypoint
         Pose<> waypoint = fromWaypoint;
-        //waypoint.theta = orientation;
         for (int p = 0; p < totalMidpoints; p++)
         {
             // If the trajectory between the two waypoints moves along the x
@@ -286,26 +295,43 @@ private:
                 throw;
             }
 
+            // Add the middle point and the velocity command to the trajectory
+            trajectory_.push_back(waypoint, Velocity<>(currentVelocity, 0.0));
+
+            cout << waypoint << " " << currentVelocity << endl;
+
             // Change the velocity based on where the middle point. If
             // no change is applied, the robot is coasting
             if (p > rampUpIndex && p < rampDownIndex)
             {
                 currentVelocity += deltaVelocity;
+
+                // Saturate between the selected extremes (coast and initial
+                // velocity of the stretch)
+                currentVelocity = BasicMath::saturate<double>(currentVelocity, coastV, upV0);
             }
             else if (p >= rampDownIndex)
             {
                 currentVelocity -= deltaVelocity;
+
+                // Saturate between the selected extremes (coast and final
+                // velocity of the stretch), and set it to 0.0
+                // if it is below the minimum physical linear velocity
+                currentVelocity = BasicMath::saturate<double>(currentVelocity, coastV, downVf);
+                currentVelocity = BasicMath::threshold<double>(currentVelocity,
+                    robot_.minLinearVelocity, 0.0);
             }
+        }
 
-            // Saturate between the selected extremes (coast and final
-            // velocity of the stretch), and set it to 0.0
-            // if it is below the minimum physical linear velocity
-            currentVelocity = BasicMath::saturate<double>(currentVelocity, coastV, downVf);
-            currentVelocity = BasicMath::threshold<double>(currentVelocity,
-                robot_.minLinearVelocity, 0.0);
-
-            // Add the middle point and the velocity command to the trajectory
-            trajectory_.push_back(waypoint, Velocity<>(currentVelocity, 0.0));
+        // Make sure that the down final velocity is included in the
+        // last stretch of the trajectory
+        if (lastStretch)
+        {
+            Trajectory<>::NodeType lastNode = trajectory_.back();
+            if (!VelocityMath::equal(lastNode.second, Velocity<>(downVf, 0.0)))
+            {
+                trajectory_.push_back(waypoint, Velocity<>(downVf, 0.0));
+            }
         }
     }
 

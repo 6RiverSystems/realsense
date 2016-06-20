@@ -21,7 +21,7 @@
     <!-- Joint and robot state publishers -->
     <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /srsnode_motion/odometry 100" />
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
     <!-- Launch all the robot drivers -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />

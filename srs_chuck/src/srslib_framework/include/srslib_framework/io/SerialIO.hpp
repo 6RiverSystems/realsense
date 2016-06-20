@@ -34,7 +34,7 @@ class SerialIO :
 
 public:
 
-	SerialIO( );
+	SerialIO( const char* pszName );
 
 	virtual ~SerialIO( );
 
@@ -95,6 +95,10 @@ private:
 		boost::system::error_code( ) );
 
 private:
+
+	std::string								m_strName;
+
+	std::string								m_strDebug;
 
     std::shared_ptr<std::thread>			m_Thread;
 

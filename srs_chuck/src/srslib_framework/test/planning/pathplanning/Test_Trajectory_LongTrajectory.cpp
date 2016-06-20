@@ -14,63 +14,62 @@ using namespace std;
 #include <srslib_framework/planning/pathplanning/TrajectoryGenerator.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
-#include <srslib_framework/search/SearchPosition.hpp>
 using namespace srs;
 
 typedef SolutionNode<Grid2d> SolutionNodeType;
 
 TEST(Test_Trajectory, LongTrajectory)
 {
-    SolutionNodeType SOLUTION_00 = SolutionNodeType(SolutionNodeType::START,
-        Pose<>(0, 0, 0));
+    constexpr double DEG0 = 0.0;
+    constexpr double DEG90 = AngleMath::deg2rad<double>(90);
 
-    SolutionNodeType SOLUTION_01 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(1, 0, 0));
+    SolutionNodeType SOLUTION_00 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(0, 0, DEG0), Pose<>(1, 0, DEG0));
 
-    SolutionNodeType SOLUTION_02 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(2, 0, 0));
+    SolutionNodeType SOLUTION_01 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(1, 0, DEG0), Pose<>(2, 0, DEG0));
 
-    SolutionNodeType SOLUTION_03 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(3, 0, 0));
+    SolutionNodeType SOLUTION_02 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(2, 0, DEG0), Pose<>(3, 0, DEG0));
 
-    SolutionNodeType SOLUTION_04 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(4, 0, 0));
+    SolutionNodeType SOLUTION_03 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(3, 0, DEG0), Pose<>(4, 0, DEG0));
 
-    SolutionNodeType SOLUTION_05 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(5, 0, 0));
+    SolutionNodeType SOLUTION_04 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(4, 0, DEG0), Pose<>(5, 0, DEG0));
 
-    SolutionNodeType SOLUTION_06 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(6, 0, 0));
+    SolutionNodeType SOLUTION_05 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(5, 0, DEG0), Pose<>(6, 0, DEG0));
 
-    SolutionNodeType SOLUTION_07 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(7, 0, 0));
+    SolutionNodeType SOLUTION_06 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(6, 0, DEG0), Pose<>(7, 0, DEG0));
 
-    SolutionNodeType SOLUTION_08 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 0, 0));
+    SolutionNodeType SOLUTION_07 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(7, 0, DEG0), Pose<>(8, 0, DEG0));
 
-    SolutionNodeType SOLUTION_09 = SolutionNodeType(SolutionNodeType::ROTATE_P90,
-        Pose<>(8, 0, AngleMath::deg2rad<double>(90)));
+    SolutionNodeType SOLUTION_08 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(8, 0, DEG0), Pose<>(9, 0, DEG0));
 
-    SolutionNodeType SOLUTION_10 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 1, AngleMath::deg2rad<double>(90)));
+    SolutionNodeType SOLUTION_09 = SolutionNodeType(SolutionNodeType::ROTATE,
+        Pose<>(9, 0, DEG0), Pose<>(9, 0, DEG90));
 
-    SolutionNodeType SOLUTION_11 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 2, AngleMath::deg2rad<double>(90)));
+    SolutionNodeType SOLUTION_10 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(9, 0, DEG90), Pose<>(9, 1, DEG90));
 
-    SolutionNodeType SOLUTION_12 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 3, AngleMath::deg2rad<double>(90)));
+    SolutionNodeType SOLUTION_11 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(9, 1, DEG90), Pose<>(9, 2, DEG90));
 
-    SolutionNodeType SOLUTION_13 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 4, AngleMath::deg2rad<double>(90)));
+    SolutionNodeType SOLUTION_12 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(9, 2, DEG90), Pose<>(9, 3, DEG90));
 
-    SolutionNodeType SOLUTION_14 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 5, AngleMath::deg2rad<double>(90)));
+    SolutionNodeType SOLUTION_13 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(9, 3, DEG90), Pose<>(9, 4, DEG90));
 
-    SolutionNodeType SOLUTION_15 = SolutionNodeType(SolutionNodeType::FORWARD,
-        Pose<>(8, 6, AngleMath::deg2rad<double>(90)));
+    SolutionNodeType SOLUTION_14 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(9, 4, DEG90), Pose<>(9, 5, DEG90));
 
-    SolutionNodeType SOLUTION_16 = SolutionNodeType(SolutionNodeType::GOAL,
-        Pose<>(8, 7, AngleMath::deg2rad<double>(90)));
+    SolutionNodeType SOLUTION_15 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(9, 5, DEG90), Pose<>(9, 6, DEG90));
 
     Solution<Grid2d> solution;
     solution.push_back(SOLUTION_00);
@@ -89,15 +88,15 @@ TEST(Test_Trajectory, LongTrajectory)
     solution.push_back(SOLUTION_13);
     solution.push_back(SOLUTION_14);
     solution.push_back(SOLUTION_15);
-    solution.push_back(SOLUTION_16);
+
+    cout << solution << endl;
 
     Chuck chuck;
     Trajectory<> trajectory;
 
     TrajectoryGenerator solutionConverter(chuck);
-    solutionConverter.fromSolution(solution, 0.1);
+    solutionConverter.fromSolution(solution);
     solutionConverter.getTrajectory(trajectory);
 
-    cout << solution << endl;
     cout << trajectory << endl;
 }

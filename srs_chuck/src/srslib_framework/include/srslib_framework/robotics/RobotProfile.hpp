@@ -11,6 +11,7 @@ namespace srs {
 struct RobotProfile
 {
     RobotProfile() :
+        adaptiveLookAhead(true),
         bodyWidth(0.0),
         bodyDepth(0.0),
 
@@ -23,12 +24,12 @@ struct RobotProfile
         maxLinearVelocity(0.0),
         maxLookAheadDistance(0.0),
         minAngularVelocity(0.0),
-        minInitialLinearVelocity(0.0),
-        minLookAheadDistance(0.0),
         minLinearVelocity(0.0),
+        minLookAheadDistance(0.0),
+        minPhysicalAngularVelocity(0.0),
+        minPhysicalLinearVelocity(0.0),
 
-        ratioEmergency(0.0),
-        ratioLookAheadDistance(0.0),
+        ratioCrawl(0.0),
         ratioManual(0.0),
 
         travelAngularAcceleration(0.0),
@@ -40,11 +41,15 @@ struct RobotProfile
         travelRotationVelocity(0.0),
 
         wheelDiameter(0.0),
-        wheelDistance(0.0)
+        wheelDistance(0.0),
+
+        zeroLookAheadDistance(0.0)
     {}
 
     virtual ~RobotProfile()
     {}
+
+    bool adaptiveLookAhead;
 
     double bodyWidth; // [m]
     double bodyDepth; // [m]
@@ -58,12 +63,12 @@ struct RobotProfile
     double maxLinearVelocity; // [m/s]
     double maxLookAheadDistance; // [m]
     double minAngularVelocity; // [rad/s]
-    double minInitialLinearVelocity; // [m/s]
-    double minLookAheadDistance; // [m]
     double minLinearVelocity; // [m/s]
+    double minLookAheadDistance; // [m]
+    double minPhysicalAngularVelocity; // [rad/s]
+    double minPhysicalLinearVelocity; // [m/s]
 
-    double ratioEmergency; // []
-    double ratioLookAheadDistance; // []
+    double ratioCrawl; // []
     double ratioManual; // []
 
     double travelAngularAcceleration; // [rad/s^2]
@@ -76,6 +81,8 @@ struct RobotProfile
 
     double wheelDiameter; // [m]
     double wheelDistance; // [m]
+
+    double zeroLookAheadDistance; // [m]
 };
 
 } // namespace srs

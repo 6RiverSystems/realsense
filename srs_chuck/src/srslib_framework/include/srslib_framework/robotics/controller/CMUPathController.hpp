@@ -21,7 +21,7 @@ class CMUPathController: public BaseController
 public:
     CMUPathController() :
         BaseController("CMU PATH CONTROLLER"),
-        dynamicLookAheadDistance_(0.5),
+        lookAheadDistance_(1.0),
         projectionIndex_(-1),
         referencePose_(Pose<>()),
         referenceIndex_(-1)
@@ -29,6 +29,11 @@ public:
 
     ~CMUPathController()
     {}
+
+    double getLookAheadDistance() const
+    {
+        return lookAheadDistance_;
+    }
 
     void reset();
 
@@ -38,12 +43,11 @@ protected:
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry);
 
 private:
-    void updateLookAheadDistance();
-    void updateProjectionIndex(Pose<> currentPose);
+    void updateParameters(Pose<> currentPose);
 
     Trajectory<> currentTrajectory_;
 
-    double dynamicLookAheadDistance_;
+    double lookAheadDistance_;
 
     int projectionIndex_;
 

@@ -45,12 +45,13 @@ set(TEST_SOURCES_LOCALIZATION
 )
 
 set(TEST_SOURCES_PLANNING
+    test/planning/pathplanning/Test_Trajectory_Map.cpp
     test/planning/pathplanning/Test_Trajectory_180ShortTrajectory.cpp
-#    test/planning/pathplanning/Test_Trajectory_LongStraight.cpp
-#    test/planning/pathplanning/Test_Trajectory_LongTrajectory.cpp
-#    test/planning/pathplanning/Test_Trajectory_ShortStraight.cpp
-#    test/planning/pathplanning/Test_Trajectory_ShortTrajectory.cpp
-#    test/planning/pathplanning/Test_Trajectory_SingleRotation.cpp
+    test/planning/pathplanning/Test_Trajectory_LongStraight.cpp
+    test/planning/pathplanning/Test_Trajectory_LongTrajectory.cpp
+    test/planning/pathplanning/Test_Trajectory_ShortStraight.cpp
+    test/planning/pathplanning/Test_Trajectory_ShortTrajectory.cpp
+    test/planning/pathplanning/Test_Trajectory_SingleRotation.cpp
 )
 
 set(TEST_SOURCES_ROBOTICS
@@ -61,6 +62,7 @@ set(TEST_SOURCES_ROBOTICS
 set(TEST_SOURCES_SEARCH
     test/search/Test_AStar_Basic.cpp
     test/search/Test_AStar_Map.cpp
+    test/search/Test_AStar_SamePlaceOnMap.cpp
 )
 
 set(TEST_SOURCES_IO

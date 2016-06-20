@@ -17,6 +17,8 @@ struct Chuck : RobotProfile
     Chuck() :
         RobotProfile()
     {
+        adaptiveLookAhead = true;
+
         bodyWidth = MeasurementMath::inch2m<double>(24.375); // 0.619 [m]
         bodyDepth = MeasurementMath::inch2m<double>(38.474); // 0.977 [m]
 
@@ -26,15 +28,15 @@ struct Chuck : RobotProfile
         maxAngularVelocity = AngleMath::deg2rad<double>(555.0); // 9.687 [rad/s]
         maxLinearAcceleration = 0.700; // [m/s^2]
         maxLinearVelocity = 2.600; // [m/s]
-        minInitialLinearVelocity = 0.2; // [m/s]
-        maxLookAheadDistance = 1.100; // [m]
-        minAngularVelocity = AngleMath::deg2rad(0.05); // 0.0008 [rad/s]
-        minLookAheadDistance = 0.500; // [m]
-        minLinearVelocity = 0.005; // [m/s]
+        maxLookAheadDistance = 1.500; // [m]
+        minAngularVelocity = AngleMath::deg2rad(0.1); // 0.0017 [rad/s]
+        minLinearVelocity = 0.1; // [m/s]
+        minLookAheadDistance = 0.800; // [m]
+        minPhysicalAngularVelocity = AngleMath::deg2rad(0.05); // 0.0008 [rad/s]
+        minPhysicalLinearVelocity = 0.005; // [m/s]
 
-        ratioEmergency = 0.05; // []
-        ratioLookAheadDistance = 1.3; // []
-        ratioManual = 0.4; // []
+        ratioCrawl = 0.08; // []
+        ratioManual = 0.40; // []
 
         travelAngularAcceleration = AngleMath::deg2rad<double>(28.0); // 0.489 [rad/s^2]
         travelAngularVelocity = AngleMath::deg2rad<double>(115); // 2.007 [rad/s]
@@ -46,6 +48,8 @@ struct Chuck : RobotProfile
 
         wheelDiameter = MeasurementMath::inch2m<double>(8.000); // 0.203 [m]
         wheelDistance = MeasurementMath::inch2m<double>(20.915); // 0.531 [m]
+
+        zeroLookAheadDistance = 0.8; // [m]
     }
 
     virtual ~Chuck()

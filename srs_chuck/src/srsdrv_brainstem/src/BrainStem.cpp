@@ -37,7 +37,7 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
     m_ConnectedPublisher( ),
 	m_llcmdSubscriber( ),
 	m_llEventPublisher( ),
-	m_pSerialIO( new SerialIO( ) ),
+	m_pSerialIO( new SerialIO( "brainstem" ) ),
 	m_messageProcessor( m_pSerialIO ),
 	m_dwLastOdomTime( 0 ),
 	m_rosOdomTime( )

@@ -124,49 +124,103 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 {
     configuration_ = config;
 
+    robot_.adaptiveLookAhead = configuration_.adaptive_lookahead_enabled;
+    ROS_INFO_STREAM_NAMED("Motion", "Adaptive look-ahead enabled [t/f]: " <<
+        configuration_.adaptive_lookahead_enabled);
+
     tapAps_.getSensor()->enable(configuration_.aps_enabled);
-    ROS_INFO_STREAM_NAMED("Motion", "APS sensor enabled: " << configuration_.aps_enabled);
+    ROS_INFO_STREAM_NAMED("Motion", "APS sensor enabled: " <<
+        configuration_.aps_enabled);
 
     robot_.goalReachedDistance = configuration_.goal_reached_distance;
-    ROS_INFO_STREAM_NAMED("Motion", "Goal reached distance [m]: " << configuration_.goal_reached_distance);
+    ROS_INFO_STREAM_NAMED("Motion", "Goal reached distance [m]: " <<
+        configuration_.goal_reached_distance);
+
+    robot_.goalReachedAngle = configuration_.goal_reached_angle;
+    ROS_INFO_STREAM_NAMED("Motion", "Goal reached angle [rad]: " <<
+        configuration_.goal_reached_angle);
 
     robot_.maxAngularAcceleration = configuration_.max_angular_acceleration;
-    ROS_INFO_STREAM_NAMED("Motion", "Max angular acceleration [m/s^2]: " << configuration_.max_angular_acceleration);
+    ROS_INFO_STREAM_NAMED("Motion", "Max angular acceleration [m/s^2]: " <<
+        configuration_.max_angular_acceleration);
 
-    robot_. maxAngularVelocity = configuration_.max_angular_velocity;
-    ROS_INFO_STREAM_NAMED("Motion", "Max angular velocity [m/s]: " << configuration_.max_angular_velocity);
+    robot_.maxAngularVelocity = configuration_.max_angular_velocity;
+    ROS_INFO_STREAM_NAMED("Motion", "Max angular velocity [m/s]: " <<
+        configuration_.max_angular_velocity);
 
     robot_.maxLinearAcceleration = configuration_.max_linear_acceleration;
-    ROS_INFO_STREAM_NAMED("Motion", "Max linear acceleration [m/s^2]: " << configuration_.max_linear_acceleration);
+    ROS_INFO_STREAM_NAMED("Motion", "Max linear acceleration [m/s^2]: " <<
+        configuration_.max_linear_acceleration);
 
     robot_.maxLinearVelocity = configuration_.max_linear_velocity;
-    ROS_INFO_STREAM_NAMED("Motion", "Max linear velocity [m/s]: " << configuration_.max_linear_velocity);
+    ROS_INFO_STREAM_NAMED("Motion", "Max linear velocity [m/s]: " <<
+        configuration_.max_linear_velocity);
 
     robot_.maxLookAheadDistance = configuration_.max_look_ahead_distance;
-    ROS_INFO_STREAM_NAMED("Motion", "Max look-ahead distance [m]: " << configuration_.max_look_ahead_distance);
+    ROS_INFO_STREAM_NAMED("Motion", "Max look-ahead distance [m]: " <<
+        configuration_.max_look_ahead_distance);
+
+    robot_.minAngularVelocity = configuration_.min_angular_velocity;
+    ROS_INFO_STREAM_NAMED("Motion", "Minimum angular velocity during motion [rad/s]: " <<
+        configuration_.min_angular_velocity);
+
+    robot_.minLinearVelocity = configuration_.min_linear_velocity;
+    ROS_INFO_STREAM_NAMED("Motion", "Minimum linear velocity during motion [m/s]: " <<
+        configuration_.min_linear_velocity);
 
     robot_.minLookAheadDistance = configuration_.min_look_ahead_distance;
-    ROS_INFO_STREAM_NAMED("Motion", "Min look-ahead distance [m]: " << configuration_.min_look_ahead_distance);
+    ROS_INFO_STREAM_NAMED("Motion", "Min look-ahead distance [m]: " <<
+        configuration_.min_look_ahead_distance);
 
-    robot_.ratioLookAheadDistance = configuration_.ratio_look_ahead_distance;
-    ROS_INFO_STREAM_NAMED("Motion", "Ratio look-ahead distance []: " << configuration_.ratio_look_ahead_distance);
+    robot_.minPhysicalAngularVelocity = configuration_.min_physical_angular_velocity;
+    ROS_INFO_STREAM_NAMED("Motion", "Minimum physical angular velocity [rad/s]: " <<
+        configuration_.min_physical_angular_velocity);
+
+    robot_.minPhysicalLinearVelocity = configuration_.min_physical_linear_velocity;
+    ROS_INFO_STREAM_NAMED("Motion", "Minimum physical linear velocity [m/s]: " <<
+        configuration_.min_physical_linear_velocity);
+
+    robot_.ratioCrawl = configuration_.ratio_crawl;
+    ROS_INFO_STREAM_NAMED("Motion", "Ratio of the dynamic motion controller in crawl mode []: " <<
+        configuration_.ratio_crawl);
+
+    robot_.ratioManual = configuration_.ratio_manual;
+    ROS_INFO_STREAM_NAMED("Motion", "Ratio of the dynamic motion controller in manual mode []: " <<
+        configuration_.ratio_manual);
 
     robot_.travelAngularAcceleration = configuration_.travel_angular_acceleration;
-    ROS_INFO_STREAM_NAMED("Motion", "Travel angular acceleration [rad/s^2]: " << configuration_.travel_angular_acceleration);
+    ROS_INFO_STREAM_NAMED("Motion", "Travel angular acceleration [rad/s^2]: " <<
+        configuration_.travel_angular_acceleration);
 
     robot_.travelAngularVelocity = configuration_.travel_angular_velocity;
-    ROS_INFO_STREAM_NAMED("Motion", "Travel angular velocity [rad/s]: " << configuration_.travel_angular_velocity);
+    ROS_INFO_STREAM_NAMED("Motion", "Travel angular velocity [rad/s]: " <<
+        configuration_.travel_angular_velocity);
+
+    robot_.travelCurveZoneRadius = configuration_.travel_curve_zone_radius;
+    ROS_INFO_STREAM_NAMED("Motion", "Travel reduced velocity radius during curves [m]: " <<
+        configuration_.travel_curve_zone_radius);
+
+    robot_.travelCurvingVelocity = configuration_.travel_curving_linear_velocity;
+    ROS_INFO_STREAM_NAMED("Motion", "Travel linear velocity during curves [m/s]: " <<
+        configuration_.travel_curving_linear_velocity);
 
     robot_.travelLinearAcceleration = configuration_.travel_linear_acceleration;
-    ROS_INFO_STREAM_NAMED("Motion", "Travel linear acceleration [m/s^2]: " << configuration_.travel_linear_acceleration);
+    ROS_INFO_STREAM_NAMED("Motion", "Travel linear acceleration [m/s^2]: " <<
+        configuration_.travel_linear_acceleration);
 
     robot_.travelLinearVelocity = configuration_.travel_linear_velocity;
-    ROS_INFO_STREAM_NAMED("Motion", "Travel linear velocity [m/s]: " << configuration_.travel_linear_velocity);
+    ROS_INFO_STREAM_NAMED("Motion", "Travel linear velocity [m/s]: " <<
+        configuration_.travel_linear_velocity);
 
     robot_.travelRotationVelocity = configuration_.travel_rotation_velocity;
-    ROS_INFO_STREAM_NAMED("Motion", "Travel rotation velocity [rad/s]: " << configuration_.travel_rotation_velocity);
+    ROS_INFO_STREAM_NAMED("Motion", "Travel rotation velocity [rad/s]: " <<
+        configuration_.travel_rotation_velocity);
 
-    //motionController_.setRobot(robot_);
+    robot_.zeroLookAheadDistance = configuration_.zero_look_ahead_distance;
+    ROS_INFO_STREAM_NAMED("Motion", "Zero-point motion controller look-ahead distance [m]: " <<
+        configuration_.zero_look_ahead_distance);
+
+    motionController_.setRobot(robot_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

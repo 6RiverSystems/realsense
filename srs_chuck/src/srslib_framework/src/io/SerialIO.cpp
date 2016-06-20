@@ -14,7 +14,9 @@
 namespace srs
 {
 
-SerialIO::SerialIO( ) :
+SerialIO::SerialIO( const char* pszName ) :
+	m_strName( pszName ),
+	m_strDebug( "serial-io." + m_strName ),
 	m_Thread( ),
 	m_serialThreadId( ),
 	m_oWork( m_IOService ),
@@ -98,7 +100,8 @@ void SerialIO::Open( const char* pszName, ConnectionCallbackFn connectionCallbac
 	}
 	else
 	{
-		ROS_ERROR_STREAM_NAMED( "SerialIO", "Attempt to open serial port but it is already open." );
+		ROS_ERROR_NAMED( m_strDebug, "%s: Attempt to open serial port but it is already open.",
+			m_strName.c_str( ) );
 	}
 }
 
@@ -172,7 +175,7 @@ std::chrono::microseconds SerialIO::GetByteDelay( )
 
 void SerialIO::Write( const std::vector<char>& buffer )
 {
-//	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write: " << ToHex( buffer ) );
+//	ROS_DEBUG_STREAM_NAMED( m_strDebug, "%s: Write: " << m_strName.c_str( ), ToHex( buffer ) );
 
 	if( IsOpen( ) )
 	{
@@ -188,7 +191,8 @@ void SerialIO::Write( const std::vector<char>& buffer )
 
 void SerialIO::WriteInSerialThread( std::vector<char> writeBuffer )
 {
-//	ROS_DEBUG_STREAM_NAMED( "SerialIO", "WriteInSerialThread: " << ToHex( m_writeBuffer ) );
+//	ROS_DEBUG_STREAM_NAMED( m_strDebug, m_strName << ": WriteInSerialThread: " <<
+//		ToHex( writeBuffer ) );
 
 	assert( m_serialThreadId == std::this_thread::get_id( ) );
 
@@ -246,7 +250,8 @@ void SerialIO::WriteInSerialThread( std::vector<char> writeBuffer )
 		// If we have a first byte delay only write one byte
 		size_t writeSize = m_interByteDelay.count( ) ?  1 : m_writeBuffer.size( );
 
-//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Serial IO Write: " << ToHex( m_writeBuffer ) );
+		ROS_DEBUG_NAMED( m_strDebug, "%s: Serial Write: %s", m_strName.c_str( ),
+			ToHex( m_writeBuffer ).c_str( ) );
 
 		m_SerialPort.async_write_some( boost::asio::buffer( m_writeBuffer.data( ), writeSize ),
 			std::bind( &SerialIO::OnWriteComplete, this, std::placeholders::_1, std::placeholders::_2 ) );
@@ -275,14 +280,17 @@ void SerialIO::OnWriteComplete( const boost::system::error_code& error, std::siz
 {
 	assert( m_serialThreadId == std::this_thread::get_id( ) );
 
-	ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write Complete (" << size << "):" <<
-		ToHex( std::vector<char>( m_writeBuffer.begin( ), m_writeBuffer.begin( ) + size ) ) );
+//	ROS_DEBUG_STREAM_NAMED( m_strDebug, m_strName << ": Write Complete (" << size << ", " << m_writeBuffer.size( ) << "):" <<
+//		ToHex( std::vector<char>( m_writeBuffer.begin( ), m_writeBuffer.begin( ) + size ) ) );
 
 	std::vector<char>( m_writeBuffer.begin( ) + size, m_writeBuffer.end( ) ).swap( m_writeBuffer );
 
+//	ROS_DEBUG_STREAM_NAMED( m_strDebug, m_strName << ": Write Complete remaining (" << m_writeBuffer.size( ) << "):" <<
+//		ToHex( m_writeBuffer ) );
+
 	if( m_writeBuffer.begin( ) != m_writeBuffer.end( ) )
 	{
-//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Write Bytes: sleep for " << m_interByteDelay.count( ) );
+//		ROS_DEBUG_STREAM_NAMED( m_strDebug, "Write Bytes: sleep for " << m_interByteDelay.count( ) );
 
 		std::this_thread::sleep_for( m_interByteDelay );
 
@@ -333,7 +341,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 		// Start with the partially parsed message
 		std::vector<char> messageData( m_readPartialData.begin( ), m_readPartialData.end( ) );
 
-//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Left over read data: " << ToHex( messageData ) );
+//		ROS_DEBUG_STREAM_NAMED( m_strDebug, "Left over read data: " << ToHex( messageData ) );
 
 		auto changeState =
 			[&]( const READ_STATE& eNewState )
@@ -342,7 +350,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					if( m_readState == READ_STATE::DEFAULT &&
 						eNewState == READ_STATE::IN_MESSAGE )
 					{
-//						ROS_DEBUG_NAMED( "SerialIO", "Time reset" );
+//						ROS_DEBUG_NAMED( m_strDebug, "Time reset" );
 
 						m_lastTime = now;
 					}
@@ -364,7 +372,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 		{
 			#if defined( ENABLE_TEST_FIXTURE )
 
-//				ROS_DEBUG_NAMED( "SerialIO", "Time between reads %d: %d ", messageData.size( ), std::chrono::duration_cast<std::chrono::microseconds>(now - m_lastTime).count( ) );
+//				ROS_DEBUG_NAMED( m_strDebug, "Time between reads %d: %d ", messageData.size( ), std::chrono::duration_cast<std::chrono::microseconds>(now - m_lastTime).count( ) );
 
 				m_messageTiming.push_back( std::chrono::duration_cast<std::chrono::microseconds>(now - m_lastTime) );
 
@@ -378,7 +386,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				changeState( READ_STATE::IN_MESSAGE );
 			}
 
-//			ROS_ERROR_NAMED( "SerialIO", "Char: %.2x", *iter );
+//			ROS_ERROR_NAMED( m_strDebug, "Char: %.2x", *iter );
 
 			if( m_bHasEscape &&
 				*iter == m_cEscape )
@@ -418,7 +426,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				{
 					if( messageData[0] == '<' )
 					{
-						ROS_DEBUG_STREAM_NAMED( "SerialIO", "ReadData: " <<
+						ROS_DEBUG_STREAM_NAMED( m_strDebug, "ReadData: " <<
 							std::string( messageData.begin( ), messageData.end( ) ) );
 
 						m_cCRC = 0;
@@ -441,25 +449,25 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					{
 						if( m_readCallback )
 						{
-//							ROS_DEBUG_STREAM_NAMED( "SerialIO", "ReadData: " <<
+//							ROS_DEBUG_STREAM_NAMED( m_strDebug, "ReadData: " <<
 //								std::string( messageData.begin( ), messageData.end( ) ) );
 
 							m_readCallback( messageData );
 						}
 						else
 						{
-							ROS_ERROR_NAMED( "SerialIO", "Serial port data read but no callback specified!\n" );
+							ROS_ERROR_NAMED( m_strDebug, "Serial port data read but no callback specified!\n" );
 						}
 					}
 					else
 					{
-						ROS_ERROR_STREAM_NAMED( "SerialIO", "Invalid CRC: " << ToHex( messageData ) <<
+						ROS_ERROR_STREAM_NAMED( m_strDebug, "Invalid CRC: " << ToHex( messageData ) <<
 							"(CRC: " << ToHex( std::vector<char>( { (char)m_cCRC } ) ) << ")" );
 					}
 				}
 				else
 				{
-					ROS_ERROR_STREAM_NAMED( "SerialIO", "Empty Message" );
+					ROS_ERROR_STREAM_NAMED( m_strDebug, "Empty Message" );
 				}
 
 				messageData.clear( );
@@ -478,7 +486,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 			}
 		}
 
-//		ROS_DEBUG_STREAM_NAMED( "SerialIO", "Left over read data: " << ToHex( m_readPartialData ) );
+//		ROS_DEBUG_STREAM_NAMED( m_strDebug, "Left over read data: " << ToHex( m_readPartialData ) );
 
 		// Left over partial message
 		m_readPartialData = messageData;
@@ -487,7 +495,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 	{
 		if( IsOpen( ) )
 		{
-			ROS_ERROR_NAMED( "SerialIO", "Read Error: %s", error.message( ).c_str( ) );
+			ROS_ERROR_NAMED( m_strDebug, "Read Error: %s", error.message( ).c_str( ) );
 
 			if( error == boost::asio::error::eof )
 			{
@@ -554,8 +562,8 @@ bool SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error
 
 		if( !m_bIsSerialOpen && bInitialCheck )
 		{
-			ROS_DEBUG_NAMED( "SerialIO", "Error connecting to serial port (%s): %s (Will retry every %.2f seconds)", m_strSerialPort.c_str( ),
-				strError.c_str( ), m_fRetryTimeout );
+			ROS_DEBUG_NAMED( m_strDebug, "%s: Error connecting to serial port (%s): %s (Will retry every %.2f seconds)",
+				m_strName.c_str( ), m_strSerialPort.c_str( ), strError.c_str( ), m_fRetryTimeout );
 		}
 	}
 
@@ -563,12 +571,13 @@ bool SerialIO::OnCheckSerialPort( bool bInitialCheck, const boost::system::error
 	{
 		if( m_bIsSerialOpen == true )
 		{
-			ROS_INFO_NAMED( "SerialIO", "Connected to serial port: %s", m_strSerialPort.c_str( ) );
+			ROS_INFO_NAMED( m_strDebug, "%s: Connected to serial port: %s",
+				m_strName.c_str( ), m_strSerialPort.c_str( ) );
 		}
 		else
 		{
-			ROS_ERROR_NAMED( "SerialIO", "Disconnected from serial port (%s): %s (Will retry every %.2f seconds)", m_strSerialPort.c_str( ),
-				strError.c_str( ), m_fRetryTimeout );
+			ROS_ERROR_NAMED( m_strDebug, "%s: Disconnected from serial port (%s): %s (Will retry every %.2f seconds)",
+				m_strName.c_str( ), m_strSerialPort.c_str( ), strError.c_str( ), m_fRetryTimeout );
 		}
 
 		if( m_connectionCallback )

@@ -31,7 +31,7 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
 	m_llcmdSubscriber( m_rosNodeHandle.subscribe<std_msgs::String>( "/cmd_ll", 1000,
 		std::bind( &BrainStem::OnRosCallback, this, std::placeholders::_1 ) ) ),
 	m_llEventPublisher( m_rosNodeHandle.advertise<std_msgs::String>( "/ll_event", 50 ) ),
-	m_pSerialIO( new SerialIO( ) ),
+	m_pSerialIO( new SerialIO( "brainstem" ) ),
 	m_messageProcessor( m_pSerialIO ),
 	m_dwLastOdomTime( 0 ),
 	m_rosOdomTime( )
@@ -93,9 +93,9 @@ void BrainStem::OnConnectionChanged( bool bIsConnected )
 //
 //	// Get the hardware information
 //	GetHardwareInformation( );
-
-	// Get the operational state
-	GetOperationalState( );
+//
+//	// Get the operational state
+//	GetOperationalState( );
 }
 
 void BrainStem::OnArrived( )

@@ -18,7 +18,7 @@ inline std::string ToHex( const std::vector<char>& data )
 
 	for( char c : data )
 	{
-		if( std::isprint( c ) )
+		if( false )//std::isprint( c ) )
 		{
 			strDebug += c;
 		}

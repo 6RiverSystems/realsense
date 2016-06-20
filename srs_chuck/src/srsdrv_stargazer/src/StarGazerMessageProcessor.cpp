@@ -93,7 +93,7 @@ void StarGazerMessageProcessor::SendRawCommand( QueuedMessage msg )
 {
 	if( m_mapPendingResponses.find( msg.command ) == m_mapPendingResponses.end( ) )
 	{
-		ROS_DEBUG_STREAM_NAMED( "StarGazer", "Rawsend: " << msg.command <<
+		ROS_DEBUG_STREAM( "Rawsend: " << msg.command <<
 			", Timeout: " << msg.timeout.count( ) );
 
 		m_mapPendingResponses[msg.expectedAck1] = { m_highrezclk.now( ), msg };
@@ -108,8 +108,7 @@ void StarGazerMessageProcessor::SendRawCommand( QueuedMessage msg )
 		}
 		else
 		{
-			ROS_ERROR_THROTTLE_NAMED( 60, "StarGazer",
-				"Attempt to write to the serial port, but the serial port is not open!" );
+			ROS_ERROR_THROTTLE( 60, "Attempt to write to the serial port, but the serial port is not open!" );
 		}
 	}
 }
@@ -284,7 +283,7 @@ void StarGazerMessageProcessor::PumpMessageProcessor( )
 		}
 		else
 		{
-			ROS_DEBUG_STREAM_NAMED("StarGazerMessageProcessor", "ACK timeout - retransmitting " << expiredMsg.second.msg.command );
+			ROS_DEBUG_STREAM( "ACK timeout - retransmitting " << expiredMsg.second.msg.command );
 
 			SendRawCommand( expiredMsg.second.msg );
 		}
@@ -319,7 +318,7 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 				{
 					if( regexMatch.size( ) != 6 )
 					{
-						ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry with only " <<
+						ROS_DEBUG_STREAM( "Odometry with only " <<
 							regexMatch.size( ) << " fields: " << std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
 					}
 					else if( m_odometryCallback )
@@ -340,35 +339,33 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 						}
 						catch( const std::invalid_argument& )
 						{
-							ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry has invalid parameter" );
+							ROS_ERROR_STREAM( "Odometry has invalid parameter" );
 						}
 						catch( const std::out_of_range& )
 						{
-							ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry has parameter out of range" );
+							ROS_ERROR_STREAM( "Odometry has parameter out of range" );
 						}
 					}
 					else
 					{
-						ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor",
-							"Serial port data read but no callback specified!" );
+						ROS_ERROR_STREAM( "Serial port data read but no callback specified!" );
 					}
 				}
 				else
 				{
-					ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Odometry with bad format: " <<
-						std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
+					ROS_DEBUG_STREAM( "Odometry with bad format: " << std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
 				}
 			}
 			else
 			{
-				ROS_DEBUG_STREAM_THROTTLE_NAMED( 0.5, "StarGazerMessageProcessor", "Odometry info recieved before start, ignoring." );
+				ROS_DEBUG_STREAM_THROTTLE( 0.5, "Odometry info recieved before start, ignoring." );
 			}
 		}
 		break;
 
 		case STAR_GAZER_MESSAGE_TYPES::MESSAGE:
 		{
-			ROS_DEBUG_STREAM_NAMED( "StarGazer write duplicate messageMessageProcessor", typeStr );
+			ROS_ERROR_STREAM( "Got ack for unknown command: " << typeStr );
 		}
 		break;
 
@@ -380,13 +377,13 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 			{
 				auto pendingMessage = iter->second;
 
-				ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Got ack for: " << typeStr );
+				ROS_DEBUG_STREAM( "Got ack for: " << typeStr );
 
 				// If we are expecting an additional ack then add it to the pending message list
 				if( pendingMessage.msg.expectedAck2.size( ) &&
 					pendingMessage.msg.expectedAck1 == typeStr )
 				{
-					ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Adding additional expected ack: " << pendingMessage.msg.expectedAck2 );
+					ROS_DEBUG_STREAM( "Adding additional expected ack: " << pendingMessage.msg.expectedAck2 );
 
 					m_mapPendingResponses[pendingMessage.msg.expectedAck2] = pendingMessage;
 
@@ -412,7 +409,7 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 			}
 			else
 			{
-				ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Got ack for unknown command: " << typeStr );
+				ROS_ERROR_STREAM( "Got ack for unknown command: " << typeStr );
 			}
 		}
 		break;
@@ -425,21 +422,20 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 			{
 				m_mapPendingResponses.erase( iter );
 
-				ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Got return value for: " << typeStr );
+				ROS_DEBUG_STREAM( "Got return value for: " << typeStr );
 
 				SendNextMessage( );
 			}
 			else
 			{
-				ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Got ack for unknown command: " << typeStr );
+				ROS_ERROR_STREAM( "Got ack for unknown command: " << typeStr );
 			}
 
 			if( boost::regex_match( regexString, regexMatch, m_messageRegex ) )
 			{
 				if( regexMatch.size( ) != 3 )
 				{
-					ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Return value with only "
-						<< regexMatch.size( ) << " fields: " <<
+					ROS_DEBUG_STREAM( "Return value with only " << regexMatch.size( ) << " fields: " <<
 						std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
 				}
 				else if( m_readCallback )
@@ -449,15 +445,13 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 				}
 				else
 				{
-					ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor",
-						"Serial port data read but no callback specified!\n" );
+					ROS_ERROR_STREAM( "Serial port data read but no callback specified!\n" );
 					printMessage = true;
 				}
 			}
 			else
 			{
-				ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Return value with bad format: " <<
-					std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
+				ROS_DEBUG_STREAM( "Return value with bad format: " << std::string( msgBuffer.begin( ), msgBuffer.end( ) ) );
 				printMessage = true;
 
 			}
@@ -466,7 +460,7 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 
 		default:
 		{
-			ROS_ERROR_STREAM_NAMED( "StarGazerMessageProcessor", "Unknown command type " << (char)command );
+			ROS_ERROR_STREAM( "Unknown command type " << (char)command );
 
 			printMessage = true;
 		}
@@ -475,7 +469,7 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 
 	if( printMessage )
 	{
-		ROS_DEBUG_STREAM_NAMED( "StarGazerMessageProcessor", "Raw Message: \"" << std::string( msgBuffer.begin( ), msgBuffer.end( ) ) << "\"" );
+		ROS_DEBUG_STREAM( "Raw Message: \"" << std::string( msgBuffer.begin( ), msgBuffer.end( ) ) << "\"" );
 	}
 }
 
@@ -492,8 +486,7 @@ void StarGazerMessageProcessor::WriteToSerialPort( char* pszData, std::size_t dw
 	}
 	else
 	{
-		ROS_ERROR_THROTTLE_NAMED( 60, "StarGazer",
-			"Attempt to write to the serial port, but the serial port is not open!" );
+		ROS_ERROR_THROTTLE( 60, "Attempt to write to the serial port, but the serial port is not open!" );
 	}
 }
 

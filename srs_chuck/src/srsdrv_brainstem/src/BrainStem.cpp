@@ -26,7 +26,7 @@ static constexpr auto REFRESH_RATE_HZ = 100;
 
 static constexpr auto HARDWARE_INFO_TOPIC = "/info/hardware";
 
-static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/state";
+static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/operational_state";
 
 static constexpr auto VOLTAGE_TOPIC = "/info/voltage";
 
@@ -198,15 +198,17 @@ void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t bodyType, uint32_t
 	uint32_t wheelMeters, const std::string& strBrainstemVersion )
 {
 	char pszGuid[255] = { '\0' };
-
 	sprintf( pszGuid, "%08X-%08X-%08X-%08X", uniqueId[0], uniqueId[1], uniqueId[2], uniqueId[3] );
 
-	ROS_INFO_STREAM( "Hardware Info => id: " << pszGuid << ", bodyType: " << bodyType <<
-		", configuration:" << configuration << ", lifetimeHours:" << lifetimeHours <<
-		", lifetimeMeters:" << lifetimeMeters << ", batteryHours:" << batteryHours <<
-		", wheelMeters:" << wheelMeters << ", Brainstem Version:" << strBrainstemVersion );
+	std::string strName( getenv( "ROBOT_NAME" ) );
 
-	srslib_framework::HardwareInfo msg;
+	ROS_INFO_STREAM( "Hardware Info => name: " << strName << ", id: " << pszGuid << ", bodyType: " << bodyType <<
+		", configuration: " << configuration << ", lifetimeHours: " << lifetimeHours <<
+		", lifetimeMeters:"  << lifetimeMeters << ", batteryHours: " << batteryHours <<
+		", wheelMeters: " << wheelMeters << ", Brainstem Version: " << strBrainstemVersion );
+
+	srslib_framework::HardwareInfo msg;;
+	msg.name = strName;
 	msg.uniqueId = pszGuid;
 	msg.bodyType = bodyType;
 	msg.configuration = configuration;

@@ -1,3 +1,4 @@
+string name
 string uniqueId
 uint8 bodyType
 uint32 configuration

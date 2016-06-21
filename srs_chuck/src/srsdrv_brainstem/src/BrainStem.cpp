@@ -167,8 +167,7 @@ void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, 
 	{
 		double dfOdomTimeDelta = (double)(dwTimeStamp - m_dwLastOdomTime) / 1000.0f;
 
-		ROS_DEBUG( "Odometry (%f): %f, %f",
-			dfOdomTimeDelta, fLinearVelocity, fAngularVelocity );
+		ROS_DEBUG_NAMED( "odometry", "Odometry (%f): %f, %f", dfOdomTimeDelta, fLinearVelocity, fAngularVelocity );
 
 		// Base our time on the realtime clock (brain_stem) since our clock does not match odom info
 		// and our loop is not realtime

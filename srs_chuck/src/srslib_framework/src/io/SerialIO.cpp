@@ -250,7 +250,7 @@ void SerialIO::WriteInSerialThread( std::vector<char> writeBuffer )
 		// If we have a first byte delay only write one byte
 		size_t writeSize = m_interByteDelay.count( ) ?  1 : m_writeBuffer.size( );
 
-		ROS_DEBUG_NAMED( m_strDebug, "%s: Serial Write: %s", m_strName.c_str( ),
+		ROS_ERROR_NAMED( m_strDebug, "%s: Serial Write: %s", m_strName.c_str( ),
 			ToHex( m_writeBuffer ).c_str( ) );
 
 		m_SerialPort.async_write_some( boost::asio::buffer( m_writeBuffer.data( ), writeSize ),
@@ -386,7 +386,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				changeState( READ_STATE::IN_MESSAGE );
 			}
 
-//			ROS_ERROR_NAMED( m_strDebug, "Char: %.2x", *iter );
+//			ROS_ERROR_NAMED( m_strDebug, "Char: %02x", (unsigned char)*iter );
 
 			if( m_bHasEscape &&
 				*iter == m_cEscape )
@@ -426,8 +426,8 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				{
 					if( messageData[0] == '<' )
 					{
-						ROS_DEBUG_STREAM_NAMED( m_strDebug, "ReadData: " <<
-							std::string( messageData.begin( ), messageData.end( ) ) );
+//						ROS_DEBUG_STREAM_NAMED( m_strDebug, "ReadData: " <<
+//							ToHex( std::vector<char>( messageData.begin( ), messageData.end( ) ) ) );
 
 						m_cCRC = 0;
 					}
@@ -449,8 +449,8 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					{
 						if( m_readCallback )
 						{
-//							ROS_DEBUG_STREAM_NAMED( m_strDebug, "ReadData: " <<
-//								std::string( messageData.begin( ), messageData.end( ) ) );
+							ROS_ERROR_STREAM_NAMED( m_strDebug, "ReadData (" << messageData.size( ) << "): " <<
+								ToHex( std::vector<char>( messageData.begin( ), messageData.end( ) ) ) );
 
 							m_readCallback( messageData );
 						}
@@ -461,7 +461,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					}
 					else
 					{
-						ROS_ERROR_STREAM_NAMED( m_strDebug, "Invalid CRC: " << ToHex( messageData ) <<
+						ROS_ERROR_STREAM_NAMED( m_strDebug, "Invalid CRC (" << messageData.size( ) << "): " << ToHex( messageData ) <<
 							"(CRC: " << ToHex( std::vector<char>( { (char)m_cCRC } ) ) << ")" );
 					}
 				}

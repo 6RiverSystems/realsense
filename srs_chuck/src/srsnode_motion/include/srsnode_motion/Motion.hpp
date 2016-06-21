@@ -47,6 +47,7 @@ public:
 
 private:
     constexpr static double REFRESH_RATE_HZ = 100;
+    constexpr static double PING_HZ = 10;
 
     void connectAllTaps();
 
@@ -87,6 +88,8 @@ private:
     ros::Publisher pubStatusGoalGoal_;
     ros::Publisher pubStatusGoalArrived_;
     ros::Publisher pubPing_;
+
+    uint32_t pingDecimator_;
 
     ros::NodeHandle rosNodeHandle_;
     tf::TransformBroadcaster rosTfBroadcaster_;

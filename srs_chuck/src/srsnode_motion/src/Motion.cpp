@@ -29,6 +29,7 @@ Motion::Motion(string nodeName) :
     rosNodeHandle_(nodeName),
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
     motionController_(1.0 / REFRESH_RATE_HZ),
+    pingDecimator_(0),
     simulatedT_(0.0)
 {
     motionController_.setRobot(robot_);
@@ -351,10 +352,17 @@ void Motion::publishOdometry()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishPing()
 {
-    std_msgs::Bool messagePing;
-    messagePing.data = true;
+	constexpr uint32_t frequencyDivisor = uint32_t(REFRESH_RATE_HZ / PING_HZ);
 
-    pubPing_.publish(messagePing);
+	if ((pingDecimator_ % frequencyDivisor) == 0)
+	{
+		std_msgs::Bool messagePing;
+		messagePing.data = true;
+
+		pubPing_.publish(messagePing);
+	}
+
+    pingDecimator_++;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

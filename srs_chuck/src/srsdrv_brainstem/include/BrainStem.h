@@ -34,9 +34,9 @@ public:
 
 	void OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, float fAngularVelocity );
 
-	void OnHardwareInfo( uint16_t uniqueId, uint8_t bodyType, uint32_t configuration,
+	void OnHardwareInfo( uint32_t uniqueId[4], uint8_t bodyType, uint32_t configuration,
 		uint32_t lifetimeHours, uint32_t lifetimeMeters, uint32_t batteryHours,
-		uint32_t wheelMeters, const std::string& strBrainstemVersion );
+		uint32_t wheelMeters, std::string strBrainstemVersion );
 
 	void OnOperationalStateChanged( uint32_t upTime, MOTION_STATUS_DATA motionStatus,
 		FAILURE_STATUS_DATA failureStatus, uint8_t suspendState );

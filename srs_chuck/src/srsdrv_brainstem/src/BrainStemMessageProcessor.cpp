@@ -144,31 +144,20 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 		{
 			HARDWARE_INFORMATION_DATA* pHardwareInfo = reinterpret_cast<HARDWARE_INFORMATION_DATA*>( buffer.data( ) );
 
-			std::string strBrainstemVersion( pHardwareInfo->pszBrainstemVersion );
+			char* pszBrainStemVersion = (char*)buffer.data( ) + sizeof(HARDWARE_INFORMATION_DATA);
 
-			ROS_INFO_STREAM( "Hardware Info => id:" << pHardwareInfo->uniqueId << ", bodyType: " << pHardwareInfo->bodyType <<
-				", configuration:" << pHardwareInfo->configuration << ", lifetimeHours:" << pHardwareInfo->lifetimeHours <<
-				", lifetimeMeters:" << pHardwareInfo->lifetimeMeters << ", batteryHours:" << pHardwareInfo->batteryHours <<
-				", wheelMeters:" << pHardwareInfo->wheelMeters << ", Brainstem Version:" << strBrainstemVersion );
+			std::string strBrainStemVersion( pszBrainStemVersion );
 
 			m_hardwareInfoCallback( pHardwareInfo->uniqueId, pHardwareInfo->bodyType,
 				pHardwareInfo->configuration, pHardwareInfo->lifetimeHours,
 				pHardwareInfo->lifetimeMeters, pHardwareInfo->batteryHours,
-				pHardwareInfo->wheelMeters, strBrainstemVersion );
+				pHardwareInfo->wheelMeters, strBrainStemVersion );
 		}
 		break;
 
 		case BRAIN_STEM_MSG::OPERATIONAL_STATE:
 		{
 			OPERATIONAL_STATE_DATA* pOperationalState = reinterpret_cast<OPERATIONAL_STATE_DATA*>( buffer.data( ) );
-
-			ROS_INFO_STREAM( "Operational State => id:" << pOperationalState->upTime <<
-				", frontEStop: " << pOperationalState->motionStatus.frontEStop << ", backEStop: " << pOperationalState->motionStatus.backEStop <<
-				", wirelessEStop: " << pOperationalState->motionStatus.wirelessEStop << ", bumpSensor: " << pOperationalState->motionStatus.bumpSensor <<
-				", pause: " << pOperationalState->motionStatus.pause << ", hardStop: " << pOperationalState->motionStatus.hardStop <<
-				", safetyProcessorFailure: " << pOperationalState->failureStatus.safetyProcessorFailure << ", brainstemFailure: " << pOperationalState->failureStatus.brainstemFailure <<
-				", brainTimeoutFailure: " << pOperationalState->failureStatus.brainTimeoutFailure << ", rightMotorFailure: " << pOperationalState->failureStatus.rightMotorFailure <<
-				", leftMotorFailure: " << pOperationalState->failureStatus.leftMotorFailure << ", suspendState: " << pOperationalState->suspendState );
 
 			m_operationalStateCallback( pOperationalState->upTime, pOperationalState->motionStatus,
 				pOperationalState->failureStatus, pOperationalState->suspendState );
@@ -178,8 +167,6 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 		case BRAIN_STEM_MSG::SYSTEM_VOLTAGE:
 		{
 			VOLTAGE_DATA* pVoltage = reinterpret_cast<VOLTAGE_DATA*>( buffer.data( ) );
-
-			ROS_INFO_STREAM( "Voltage => " << pVoltage->voltage);
 
 			m_voltageCallback( pVoltage->voltage );
 		}
@@ -204,6 +191,8 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 
 void BrainStemMessageProcessor::GetOperationalState( )
 {
+	ROS_INFO( "GetOperationalState" );
+
 	COMMAND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_OPERATIONAL_STATE) };
 
 	// Get the operational state
@@ -212,6 +201,8 @@ void BrainStemMessageProcessor::GetOperationalState( )
 
 void BrainStemMessageProcessor::GetHardwareInformation( )
 {
+	ROS_INFO( "GetHardwareInformation" );
+
 	COMMAND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_HARDWARE_INFO ) };
 
 	// Get the hardware information (version, configuration, etc.)

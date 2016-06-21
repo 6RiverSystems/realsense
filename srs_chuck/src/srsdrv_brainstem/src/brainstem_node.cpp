@@ -7,7 +7,7 @@
 #include <ros/ros.h>
 #include <BrainStem.h>
 
-const std::string g_SerialPort( "/dev/malg" );
+const std::string g_SerialPort( "/dev/ftdi" );
 
 int main( int argc, char** argv )
 {

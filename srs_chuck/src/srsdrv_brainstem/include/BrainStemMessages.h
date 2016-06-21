@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 #include <limits>
+#include <uuid/uuid.h>
 
 #ifndef _MESSAGES_H_
 #define _MESSAGES_H_
@@ -102,14 +103,15 @@ struct LIGHT_UPDATE_DATA
 struct HARDWARE_INFORMATION_DATA
 {
 	uint8_t 	cmd;
-	uint16_t	uniqueId;					// Hardware unique identifier (unique across all robots)
-	uint8_t		bodyType; 					// Body type
-	uint32_t	configuration; 				// configuration layout
-	uint32_t	lifetimeHours; 				// lifetime hours
-	uint32_t	lifetimeMeters; 			// lifetime meters
-	uint32_t	batteryHours;				// battery hours
-	uint32_t	wheelMeters; 				// wheel meters
-	char*		pszBrainstemVersion;		// brainstem version
+	uint32_t	uniqueId[4];			// Hardware unique identifier (unique across all robots)
+	uint8_t		bodyType; 				// Body type
+	int32_t	configuration; 				// configuration layout
+	int32_t	lifetimeHours; 				// lifetime hours
+	int32_t	lifetimeMeters; 			// lifetime meters
+	int32_t	batteryHours;				// battery hours
+	int32_t	wheelMeters; 				// wheel meters
+	//char*	    pszBrainstemVersion;	// brainstem version
+	//char*	    pszSafetyVersion;		// safety processor version
 };
 
 struct MOTION_STATUS_DATA

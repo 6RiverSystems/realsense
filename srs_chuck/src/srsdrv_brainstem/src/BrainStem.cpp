@@ -19,18 +19,18 @@ bool approximatively_equal(double x, double y, int ulp)
 namespace srs
 {
 
-constexpr auto REFRESH_RATE_HZ = 100;
+static constexpr auto REFRESH_RATE_HZ = 100;
 
-constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
+static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
 
-constexpr auto PING_TOPIC = "/internal/state/ping";
+static constexpr auto PING_TOPIC = "/internal/state/ping";
 
-constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
-constexpr auto CONNECTED_TOPIC = "/internal/drivers/brainstem/connected";
+static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
+static constexpr auto CONNECTED_TOPIC = "/internal/drivers/brainstem/connected";
 
 // TODO: Remove/Replace with proper messages
-constexpr auto COMMAND_TOPIC = "/cmd_ll";
-constexpr auto EVENT_TOPIC = "/cmd_ll";
+static constexpr auto COMMAND_TOPIC = "/cmd_ll";
+static constexpr auto EVENT_TOPIC = "/cmd_ll";
 
 BrainStem::BrainStem( const std::string& strSerialPort ) :
 	m_rosNodeHandle( ),
@@ -179,22 +179,35 @@ void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, 
 	sLastTime = currentTime;
 }
 
-void BrainStem::OnHardwareInfo( uint16_t uniqueId, uint8_t bodyType, uint32_t configuration,
+void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t bodyType, uint32_t configuration,
 	uint32_t lifetimeHours, uint32_t lifetimeMeters, uint32_t batteryHours,
-	uint32_t wheelMeters, const std::string& strBrainstemVersion )
+	uint32_t wheelMeters, std::string strBrainstemVersion )
 {
+	char pszGuid[255] = { '\0' };
 
+	sprintf( pszGuid, "%08X-%08X-%08X-%08X", uniqueId[0], uniqueId[1], uniqueId[2], uniqueId[3] );
+
+	ROS_INFO_STREAM( "Hardware Info => id: " << pszGuid << ", bodyType: " << bodyType <<
+		", configuration:" << configuration << ", lifetimeHours:" << lifetimeHours <<
+		", lifetimeMeters:" << lifetimeMeters << ", batteryHours:" << batteryHours <<
+		", wheelMeters:" << wheelMeters << ", Brainstem Version:" << strBrainstemVersion );
 }
 
 void BrainStem::OnOperationalStateChanged( uint32_t upTime, MOTION_STATUS_DATA motionStatus,
 	FAILURE_STATUS_DATA failureStatus, uint8_t suspendState )
 {
-
+	ROS_INFO_STREAM( "Operational State => id:" << upTime <<
+		", frontEStop: " << motionStatus.frontEStop << ", backEStop: " << motionStatus.backEStop <<
+		", wirelessEStop: " << motionStatus.wirelessEStop << ", bumpSensor: " << motionStatus.bumpSensor <<
+		", pause: " << motionStatus.pause << ", hardStop: " << motionStatus.hardStop <<
+		", safetyProcessorFailure: " << failureStatus.safetyProcessorFailure << ", brainstemFailure: " << failureStatus.brainstemFailure <<
+		", brainTimeoutFailure: " << failureStatus.brainTimeoutFailure << ", rightMotorFailure: " << failureStatus.rightMotorFailure <<
+		", leftMotorFailure: " << failureStatus.leftMotorFailure << ", suspendState: " << suspendState );
 }
 
 void BrainStem::OnVoltageChanged( float fVoltage )
 {
-
+	ROS_INFO_STREAM( "Voltage => " << fVoltage );
 }
 
 void BrainStem::CreateSubscribers( )
@@ -227,6 +240,10 @@ void BrainStem::SetupCallbacks( )
 
 	m_messageProcessor.SetOdometryCallback( std::bind( &BrainStem::OnOdometryChanged, this,
 		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
+
+	m_messageProcessor.SetHardwareInfoCallback( std::bind( &BrainStem::OnHardwareInfo, this,
+		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+		std::placeholders::_5, std::placeholders::_6, std::placeholders::_7, std::placeholders::_8 ) );
 
 	m_messageProcessor.SetOperationalStateCallback( std::bind( &BrainStem::OnOperationalStateChanged, this,
 		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );

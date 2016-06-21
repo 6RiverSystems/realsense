@@ -34,9 +34,9 @@ class BrainStemMessageProcessor {
 
 	typedef std::function<void(uint32_t, float, float)> OdometryCallbackFn;
 
-	typedef std::function<void(uint16_t, uint8_t,
+	typedef std::function<void(uint32_t[4], uint8_t,
 		uint32_t, uint32_t, uint32_t, uint32_t,
-		uint32_t, const std::string&)> HardwareInfoCallbackFn;
+		uint32_t, std::string)> HardwareInfoCallbackFn;
 
 	typedef std::function<void(uint32_t, MOTION_STATUS_DATA,
 		FAILURE_STATUS_DATA, uint8_t)> OperationalStateCallbackFn;

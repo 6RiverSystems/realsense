@@ -81,7 +81,7 @@ enum class MOTION_STATUS
 	BACK_E_STOP 		= 0b00000010,
 	WIRELESS_E_STOP 	= 0b00000100,
 	BUMP_SENSOR			= 0b00001000,
-	PAUSE 			= 0b00010000,
+	PAUSE 				= 0b00010000,
 	HARD_STOP 			= 0b00100000
 };
 
@@ -152,7 +152,7 @@ struct SET_OPERATIONAL_STATE_DATA
 
 struct VOLTAGE_DATA
 {
-	uint32_t	cmd;
+	uint8_t		cmd;
 	float		voltage;					// Voltage from 0V => 24V
 };
 

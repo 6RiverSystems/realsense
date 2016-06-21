@@ -30,11 +30,18 @@ class BrainStemMessageProcessor {
 
 	typedef std::function<void(bool)> ConnectionChangedFn;
 
-	typedef std::function<void()> ArrivedCallbackFn;
-
 	typedef std::function<void(LED_ENTITIES)> ButtonCallbackFn;
 
 	typedef std::function<void(uint32_t, float, float)> OdometryCallbackFn;
+
+	typedef std::function<void(uint32_t[4], uint8_t,
+		uint32_t, uint32_t, uint32_t, uint32_t,
+		uint32_t, std::string)> HardwareInfoCallbackFn;
+
+	typedef std::function<void(uint32_t, MOTION_STATUS_DATA,
+		FAILURE_STATUS_DATA, uint8_t)> OperationalStateCallbackFn;
+
+	typedef std::function<void(float)> VoltageCallbackFn;
 
 private:
 
@@ -50,11 +57,15 @@ private:
 
 	ConnectionChangedFn				m_connectionChangedCallback;
 
-	ArrivedCallbackFn				m_arrivedCallback;
-
 	ButtonCallbackFn				m_buttonCallback;
 
 	OdometryCallbackFn				m_odometryCallback;
+
+	HardwareInfoCallbackFn			m_hardwareInfoCallback;
+
+	OperationalStateCallbackFn		m_operationalStateCallback;
+
+	VoltageCallbackFn				m_voltageCallback;
 
 public:
 
@@ -66,11 +77,15 @@ public:
 
 	void SetConnectionChangedCallback( ConnectionChangedFn connectionChangedCallback );
 
-	void SetArrivedCallback( ArrivedCallbackFn arrivedCallback );
-
 	void SetButtonCallback( ButtonCallbackFn buttonCallback );
 
 	void SetOdometryCallback( OdometryCallbackFn odometryCallback );
+
+	void SetHardwareInfoCallback( HardwareInfoCallbackFn hardwareInfoCallback );
+
+	void SetOperationalStateCallback( OperationalStateCallbackFn operationalStateCallback );
+
+	void SetVoltageCallback( VoltageCallbackFn voltageCallback );
 
 // Message Processing
 
@@ -81,6 +96,8 @@ public:
 	void GetOperationalState( );
 
 	void GetHardwareInformation( );
+
+	void SendPing( );
 
 	void SetVelocity( double dfLinear, double dfAngular );
 
@@ -99,8 +116,6 @@ private:
 	void SetMotionStatus( MOTION_STATUS eMotionStatus, bool bSetBit );
 
 	void OnHardStop( );
-
-	void OnPing( );
 
 	void OnResetBatteryHours( );
 

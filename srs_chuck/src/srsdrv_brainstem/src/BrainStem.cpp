@@ -19,31 +19,37 @@ bool approximatively_equal(double x, double y, int ulp)
 namespace srs
 {
 
+static constexpr auto REFRESH_RATE_HZ = 100;
+
+static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
+
+static constexpr auto PING_TOPIC = "/internal/state/ping";
+
+static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
+static constexpr auto CONNECTED_TOPIC = "/internal/drivers/brainstem/connected";
+
+// TODO: Remove/Replace with proper messages
+static constexpr auto COMMAND_TOPIC = "/cmd_ll";
+static constexpr auto EVENT_TOPIC = "/cmd_ll";
+
 BrainStem::BrainStem( const std::string& strSerialPort ) :
 	m_rosNodeHandle( ),
-    m_VelocitySubscriber( m_rosNodeHandle.subscribe<geometry_msgs::Twist>(
-        "/internal/drivers/brainstem/cmd_velocity", 100,
-        std::bind( &BrainStem::OnChangeVelocity, this, std::placeholders::_1 ) ) ),
-    m_OdometryRawPublisher( m_rosNodeHandle.advertise<geometry_msgs::TwistStamped>(
-        "/internal/sensors/odometry/raw", 1000 ) ),
-    m_ConnectedPublisher( m_rosNodeHandle.advertise<std_msgs::Bool>(
-        "/internal/drivers/brainstem/connected", 1, true) ),
-	m_llcmdSubscriber( m_rosNodeHandle.subscribe<std_msgs::String>( "/cmd_ll", 1000,
-		std::bind( &BrainStem::OnRosCallback, this, std::placeholders::_1 ) ) ),
-	m_llEventPublisher( m_rosNodeHandle.advertise<std_msgs::String>( "/ll_event", 50 ) ),
+	m_pingSubscriber( ),
+    m_velocitySubscriber( ),
+    m_OdometryRawPublisher( ),
+    m_ConnectedPublisher( ),
+	m_llcmdSubscriber( ),
+	m_llEventPublisher( ),
 	m_pSerialIO( new SerialIO( "brainstem" ) ),
 	m_messageProcessor( m_pSerialIO ),
 	m_dwLastOdomTime( 0 ),
 	m_rosOdomTime( )
 {
-	m_messageProcessor.SetConnectionChangedCallback( std::bind( &BrainStem::OnConnectionChanged, this, std::placeholders::_1 ) );
+	CreateSubscribers( );
 
-	m_messageProcessor.SetArrivedCallback( std::bind( &BrainStem::OnArrived, this ) );
+	CreatePublishers( );
 
-	m_messageProcessor.SetButtonCallback( std::bind( &BrainStem::OnButtonEvent, this, std::placeholders::_1 ) );
-
-	m_messageProcessor.SetOdometryCallback(
-		std::bind( &BrainStem::OnOdometryChanged, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
+	SetupCallbacks( );
 
 	std::shared_ptr<SerialIO> pSerialIO = std::dynamic_pointer_cast<SerialIO>( m_pSerialIO );
 
@@ -90,22 +96,12 @@ void BrainStem::OnConnectionChanged( bool bIsConnected )
 	m_ConnectedPublisher.publish( msg );
 
 	m_rosOdomTime = ros::Time( );
-//
-//	// Get the hardware information
-//	GetHardwareInformation( );
-//
-//	// Get the operational state
-//	GetOperationalState( );
-}
 
-void BrainStem::OnArrived( )
-{
-	std_msgs::String msg;
-	msg.data = "ARRIVED";
+	// Get the hardware information
+	GetHardwareInformation( );
 
-	ROS_DEBUG( "%s", msg.data.c_str( ) );
-
-	m_llEventPublisher.publish( msg );
+	// Get the operational state
+	GetOperationalState( );
 }
 
 void BrainStem::OnButtonEvent( LED_ENTITIES eButtonId )
@@ -183,6 +179,92 @@ void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, 
 	sLastTime = currentTime;
 }
 
+void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t bodyType, uint32_t configuration,
+	uint32_t lifetimeHours, uint32_t lifetimeMeters, uint32_t batteryHours,
+	uint32_t wheelMeters, std::string strBrainstemVersion )
+{
+	char pszGuid[255] = { '\0' };
+
+	sprintf( pszGuid, "%08X-%08X-%08X-%08X", uniqueId[0], uniqueId[1], uniqueId[2], uniqueId[3] );
+
+	ROS_INFO_STREAM( "Hardware Info => id: " << pszGuid << ", bodyType: " << bodyType <<
+		", configuration:" << configuration << ", lifetimeHours:" << lifetimeHours <<
+		", lifetimeMeters:" << lifetimeMeters << ", batteryHours:" << batteryHours <<
+		", wheelMeters:" << wheelMeters << ", Brainstem Version:" << strBrainstemVersion );
+}
+
+void BrainStem::OnOperationalStateChanged( uint32_t upTime, MOTION_STATUS_DATA motionStatus,
+	FAILURE_STATUS_DATA failureStatus, uint8_t suspendState )
+{
+	std::ostringstream stream;
+
+	stream << "Operational State => uptime:" << upTime <<
+		", frontEStop: " << (bool)(motionStatus.frontEStop == 1) <<
+		", backEStop: " << (bool)(motionStatus.backEStop == 1) <<
+		", wirelessEStop: " << (bool)(motionStatus.wirelessEStop == 1) <<
+		", bumpSensor: " << (bool)(motionStatus.bumpSensor == 1) <<
+		", pause: " << (bool)(motionStatus.pause == 1) <<
+		", hardStop: " << (bool)(motionStatus.hardStop == 1) <<
+		", safetyProcessorFailure: " << (bool)(failureStatus.safetyProcessorFailure == 1) <<
+		", brainstemFailure: " << (bool)(failureStatus.brainstemFailure == 1) <<
+		", brainTimeoutFailure: " << (bool)(failureStatus.brainTimeoutFailure == 1) <<
+		", rightMotorFailure: " << (bool)(failureStatus.rightMotorFailure == 1) <<
+		", leftMotorFailure: " << (bool)(failureStatus.leftMotorFailure == 1) <<
+		", suspendState: " << suspendState <<
+		std::endl;
+
+	std::string strData =  stream.str( );
+
+	ROS_INFO_STREAM( strData );
+}
+
+void BrainStem::OnVoltageChanged( float fVoltage )
+{
+	ROS_INFO_STREAM( "Voltage => " << fVoltage );
+}
+
+void BrainStem::CreateSubscribers( )
+{
+	m_pingSubscriber = m_rosNodeHandle.subscribe<std_msgs::Bool>( PING_TOPIC, 10,
+	    std::bind( &BrainStem::OnPing, this ) );
+
+	m_velocitySubscriber = m_rosNodeHandle.subscribe<geometry_msgs::Twist>( VELOCITY_TOPIC, 10,
+	    std::bind( &BrainStem::OnChangeVelocity, this, std::placeholders::_1 ) );
+
+	m_llcmdSubscriber = m_rosNodeHandle.subscribe<std_msgs::String>( COMMAND_TOPIC, 100,
+	    std::bind( &BrainStem::OnRosCallback, this, std::placeholders::_1 ) );
+}
+
+void BrainStem::CreatePublishers( )
+{
+	m_OdometryRawPublisher = m_rosNodeHandle.advertise<geometry_msgs::TwistStamped>( ODOMETRY_TOPIC, 100 );
+
+	m_ConnectedPublisher = m_rosNodeHandle.advertise<std_msgs::Bool>( CONNECTED_TOPIC, 1, true );
+
+	m_llEventPublisher = m_rosNodeHandle.advertise<std_msgs::String>( EVENT_TOPIC, 100 );
+}
+
+void BrainStem::SetupCallbacks( )
+{
+	m_messageProcessor.SetConnectionChangedCallback( std::bind( &BrainStem::OnConnectionChanged,
+		this, std::placeholders::_1 ) );
+
+	m_messageProcessor.SetButtonCallback( std::bind( &BrainStem::OnButtonEvent, this, std::placeholders::_1 ) );
+
+	m_messageProcessor.SetOdometryCallback( std::bind( &BrainStem::OnOdometryChanged, this,
+		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
+
+	m_messageProcessor.SetHardwareInfoCallback( std::bind( &BrainStem::OnHardwareInfo, this,
+		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+		std::placeholders::_5, std::placeholders::_6, std::placeholders::_7, std::placeholders::_8 ) );
+
+	m_messageProcessor.SetOperationalStateCallback( std::bind( &BrainStem::OnOperationalStateChanged, this,
+		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
+
+	m_messageProcessor.SetVoltageCallback( std::bind( &BrainStem::OnVoltageChanged, this,
+		std::placeholders::_1 ) );
+}
+
 void BrainStem::GetOperationalState( )
 {
 	m_messageProcessor.GetOperationalState( );
@@ -191,6 +273,11 @@ void BrainStem::GetOperationalState( )
 void BrainStem::GetHardwareInformation( )
 {
 	m_messageProcessor.GetHardwareInformation( );
+}
+
+void BrainStem::OnPing( )
+{
+	m_messageProcessor.SendPing( );
 }
 
 void BrainStem::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity )

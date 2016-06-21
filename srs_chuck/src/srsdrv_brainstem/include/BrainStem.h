@@ -9,6 +9,7 @@
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
 #include <srslib_framework/io/IO.hpp>
 #include <BrainStemMessageProcessor.h>
@@ -29,17 +30,32 @@ public:
 
 	void OnConnectionChanged( bool bIsConnected );
 
-	void OnArrived( );
-
 	void OnButtonEvent( LED_ENTITIES eButtonId );
 
 	void OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, float fAngularVelocity );
 
+	void OnHardwareInfo( uint32_t uniqueId[4], uint8_t bodyType, uint32_t configuration,
+		uint32_t lifetimeHours, uint32_t lifetimeMeters, uint32_t batteryHours,
+		uint32_t wheelMeters, std::string strBrainstemVersion );
+
+	void OnOperationalStateChanged( uint32_t upTime, MOTION_STATUS_DATA motionStatus,
+		FAILURE_STATUS_DATA failureStatus, uint8_t suspendState );
+
+	void OnVoltageChanged( float fVoltage );
+
 private:
+
+	void CreateSubscribers( );
+
+	void CreatePublishers( );
+
+	void SetupCallbacks( );
 
 	void GetHardwareInformation( );
 
 	void GetOperationalState( );
+
+	void OnPing( );
 
 	void OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity );
 
@@ -47,13 +63,13 @@ private:
 
 private:
 
-	constexpr static unsigned int REFRESH_RATE_HZ = 100;
-
 	ros::NodeHandle 			m_rosNodeHandle;
 
 	ros::Subscriber				m_llcmdSubscriber;
 
-	ros::Subscriber				m_VelocitySubscriber;
+	ros::Subscriber				m_pingSubscriber;
+
+	ros::Subscriber				m_velocitySubscriber;
 
 	ros::Publisher				m_llEventPublisher;
 

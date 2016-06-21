@@ -29,6 +29,7 @@ Motion::Motion(string nodeName) :
     rosNodeHandle_(nodeName),
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
     motionController_(1.0 / REFRESH_RATE_HZ),
+    pingDecimator_(0),
     simulatedT_(0.0)
 {
     motionController_.setRobot(robot_);
@@ -46,6 +47,8 @@ Motion::Motion(string nodeName) :
         "/internal/state/current_goal/goal", 1);
     pubStatusGoalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
         "/internal/state/current_goal/arrived", 1);
+    pubPing_ = rosNodeHandle_.advertise<std_msgs::Bool>(
+        "/internal/state/ping", 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,6 +78,8 @@ void Motion::run()
         stepNode();
 
         publishOdometry();
+
+        publishPing();
 
         refreshRate.sleep();
     }
@@ -342,6 +347,22 @@ void Motion::publishOdometry()
 
     // Publish the Odometry
     pubOdometry_.publish(messageOdometry);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::publishPing()
+{
+	constexpr uint32_t frequencyDivisor = uint32_t(REFRESH_RATE_HZ / PING_HZ);
+
+	if ((pingDecimator_ % frequencyDivisor) == 0)
+	{
+		std_msgs::Bool messagePing;
+		messagePing.data = true;
+
+		pubPing_.publish(messagePing);
+	}
+
+    pingDecimator_++;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

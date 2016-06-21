@@ -18,16 +18,9 @@ inline std::string ToHex( const std::vector<char>& data )
 
 	for( char c : data )
 	{
-		if( false )//std::isprint( c ) )
-		{
-			strDebug += c;
-		}
-		else
-		{
-			char pszFormat[64] = { '\0' };
-		    snprintf( pszFormat, 64, " 0x%.2x", c );
-		    strDebug += pszFormat;
-		}
+		char pszFormat[64] = { '\0' };
+		snprintf( pszFormat, 64, " 0x%.2x", (unsigned char)c );
+		strDebug += pszFormat;
 	}
 
 	return strDebug;

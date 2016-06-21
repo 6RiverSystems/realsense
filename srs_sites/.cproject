@@ -23,7 +23,7 @@
 					<folderInfo id="com.nvidia.cuda.ide.toolchain.base.120884994.1091032756" name="/" resourcePath="">
 						<toolChain id="com.nvidia.cuda.ide.toolchain.base.329441100" name="com.nvidia.cuda.ide.toolchain.base">
 							<targetPlatform archList="all" binaryParser="com.nvidia.cuda.ide.elf;com.nvidia.cuda.ide.macho;com.nvidia.cuda.ide.cubin" id="com.nvidia.cuda.ide.targetPlatform.496524505" isAbstract="false" name="Debug Platform" osList="linux,macosx"/>
-							<builder enableCleanBuild="false" enabledIncrementalBuild="false" id="com.nvidia.cuda.ide.builder.10238417" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="CUDA Toolkit 7.0 Builder.Default"/>
+							<builder command="" enableCleanBuild="false" enabledIncrementalBuild="false" id="com.nvidia.cuda.ide.builder.10238417" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="CUDA Toolkit 7.0 Builder.Default"/>
 						</toolChain>
 					</folderInfo>
 				</configuration>
@@ -62,4 +62,8 @@
 			<resource resourceType="PROJECT" workspacePath="/srs_sites"/>
 		</configuration>
 	</storageModule>
+<<<<<<< HEAD
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+=======
+>>>>>>> develop
 </cproject>

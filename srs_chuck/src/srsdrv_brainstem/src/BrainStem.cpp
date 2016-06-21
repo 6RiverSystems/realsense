@@ -196,13 +196,26 @@ void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t bodyType, uint32_t
 void BrainStem::OnOperationalStateChanged( uint32_t upTime, MOTION_STATUS_DATA motionStatus,
 	FAILURE_STATUS_DATA failureStatus, uint8_t suspendState )
 {
-	ROS_INFO_STREAM( "Operational State => id:" << upTime <<
-		", frontEStop: " << motionStatus.frontEStop << ", backEStop: " << motionStatus.backEStop <<
-		", wirelessEStop: " << motionStatus.wirelessEStop << ", bumpSensor: " << motionStatus.bumpSensor <<
-		", pause: " << motionStatus.pause << ", hardStop: " << motionStatus.hardStop <<
-		", safetyProcessorFailure: " << failureStatus.safetyProcessorFailure << ", brainstemFailure: " << failureStatus.brainstemFailure <<
-		", brainTimeoutFailure: " << failureStatus.brainTimeoutFailure << ", rightMotorFailure: " << failureStatus.rightMotorFailure <<
-		", leftMotorFailure: " << failureStatus.leftMotorFailure << ", suspendState: " << suspendState );
+	std::ostringstream stream;
+
+	stream << "Operational State => uptime:" << upTime <<
+		", frontEStop: " << (bool)(motionStatus.frontEStop == 1) <<
+		", backEStop: " << (bool)(motionStatus.backEStop == 1) <<
+		", wirelessEStop: " << (bool)(motionStatus.wirelessEStop == 1) <<
+		", bumpSensor: " << (bool)(motionStatus.bumpSensor == 1) <<
+		", pause: " << (bool)(motionStatus.pause == 1) <<
+		", hardStop: " << (bool)(motionStatus.hardStop == 1) <<
+		", safetyProcessorFailure: " << (bool)(failureStatus.safetyProcessorFailure == 1) <<
+		", brainstemFailure: " << (bool)(failureStatus.brainstemFailure == 1) <<
+		", brainTimeoutFailure: " << (bool)(failureStatus.brainTimeoutFailure == 1) <<
+		", rightMotorFailure: " << (bool)(failureStatus.rightMotorFailure == 1) <<
+		", leftMotorFailure: " << (bool)(failureStatus.leftMotorFailure == 1) <<
+		", suspendState: " << suspendState <<
+		std::endl;
+
+	std::string strData =  stream.str( );
+
+	ROS_INFO_STREAM( strData );
 }
 
 void BrainStem::OnVoltageChanged( float fVoltage )

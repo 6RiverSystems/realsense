@@ -250,7 +250,7 @@ void SerialIO::WriteInSerialThread( std::vector<char> writeBuffer )
 		// If we have a first byte delay only write one byte
 		size_t writeSize = m_interByteDelay.count( ) ?  1 : m_writeBuffer.size( );
 
-		ROS_ERROR_NAMED( m_strDebug, "%s: Serial Write: %s", m_strName.c_str( ),
+		ROS_DEBUG_NAMED( m_strDebug, "%s: Serial Write: %s", m_strName.c_str( ),
 			ToHex( m_writeBuffer ).c_str( ) );
 
 		m_SerialPort.async_write_some( boost::asio::buffer( m_writeBuffer.data( ), writeSize ),
@@ -449,7 +449,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					{
 						if( m_readCallback )
 						{
-							ROS_ERROR_STREAM_NAMED( m_strDebug, "ReadData (" << messageData.size( ) << "): " <<
+							ROS_DEBUG_STREAM_NAMED( m_strDebug, "ReadData (" << messageData.size( ) << "): " <<
 								ToHex( std::vector<char>( messageData.begin( ), messageData.end( ) ) ) );
 
 							m_readCallback( messageData );

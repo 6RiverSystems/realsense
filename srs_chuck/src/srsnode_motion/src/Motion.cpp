@@ -145,6 +145,14 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     ROS_INFO_STREAM_NAMED("Motion", "Goal reached angle [rad]: " <<
         configuration_.goal_reached_angle);
 
+    robot_.manualRatioAngular = configuration_.manual_controller_ratio_angular;
+    ROS_INFO_STREAM_NAMED("Motion", "Manual Controller: ratio of the angular velocity in manual mode []: " <<
+        configuration_.manual_controller_ratio_angular);
+
+    robot_.manualRatioLinear = configuration_.manual_controller_ratio_linear;
+    ROS_INFO_STREAM_NAMED("Motion", "Manual Controller: ratio of the linear velocity in manual mode []: " <<
+        configuration_.manual_controller_ratio_linear);
+
     robot_.maxAngularAcceleration = configuration_.max_angular_acceleration;
     ROS_INFO_STREAM_NAMED("Motion", "Max angular acceleration [m/s^2]: " <<
         configuration_.max_angular_acceleration);
@@ -189,13 +197,17 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     ROS_INFO_STREAM_NAMED("Motion", "Ratio of the dynamic motion controller in crawl mode []: " <<
         configuration_.ratio_crawl);
 
-    robot_.ratioManualAngular = configuration_.ratio_manual_angular;
-    ROS_INFO_STREAM_NAMED("Motion", "Ratio of the angular velocity in manual mode []: " <<
-        configuration_.ratio_manual_angular);
+    robot_.rotationKd = configuration_.rotation_controller_kd;
+    ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: derivative constant []: " <<
+        configuration_.rotation_controller_kd);
 
-    robot_.ratioManualLinear = configuration_.ratio_manual_linear;
-    ROS_INFO_STREAM_NAMED("Motion", "Ratio of the linear velocity in manual mode []: " <<
-        configuration_.ratio_manual_linear);
+    robot_.rotationKi = configuration_.rotation_controller_ki;
+    ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: integral constant []: " <<
+        configuration_.rotation_controller_ki);
+
+    robot_.rotationKp= configuration_.rotation_controller_kp;
+    ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: proportional constant []: " <<
+        configuration_.rotation_controller_kp);
 
     robot_.travelAngularAcceleration = configuration_.travel_angular_acceleration;
     ROS_INFO_STREAM_NAMED("Motion", "Travel angular acceleration [rad/s^2]: " <<

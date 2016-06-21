@@ -24,6 +24,9 @@ struct Chuck : RobotProfile
 
         goalReachedDistance = 0.100; // [m]
         goalReachedAngle = AngleMath::deg2rad<double>(1.0); // 0.0175 [rad]
+
+        manualRatioAngular = 0.20; // []
+        manualRatioLinear = 0.40; // []
         maxAngularAcceleration = AngleMath::deg2rad<double>(150.0); // 2.618 [rad/s^2]
         maxAngularVelocity = AngleMath::deg2rad<double>(555.0); // 9.687 [rad/s]
         maxLinearAcceleration = 0.700; // [m/s^2]
@@ -36,8 +39,9 @@ struct Chuck : RobotProfile
         minPhysicalLinearVelocity = 0.005; // [m/s]
 
         ratioCrawl = 0.08; // []
-        ratioManualAngular = 0.20; // []
-        ratioManualLinear = 0.40; // []
+        rotationKd = 0.0; // []
+        rotationKi = 0.0; // []
+        rotationKp = 1.0; // []
 
         travelAngularAcceleration = AngleMath::deg2rad<double>(28.0); // 0.489 [rad/s^2]
         travelAngularVelocity = AngleMath::deg2rad<double>(115); // 2.007 [rad/s]

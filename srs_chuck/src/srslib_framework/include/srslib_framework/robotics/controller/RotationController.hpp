@@ -18,9 +18,6 @@ class RotationController: public BaseController
 public:
     RotationController() :
         BaseController("ROTATION CONTROLLER"),
-        Kd_(0.0),
-        Ki_(0.0),
-        Kp_(1.0),
         integral_(0.0),
         previousError_(0.0)
     {}
@@ -34,13 +31,6 @@ public:
 
         integral_ = 0.0;
         previousError_ = 0.0;
-    }
-
-    void setPIDGains(double Kp, double Ki, double Kd)
-    {
-        Kp_ = Kp;
-        Ki_ = Ki;
-        Kd_ = Kd;
     }
 
 protected:
@@ -62,7 +52,10 @@ protected:
         double linear = 0;
 
         // Calculate the angular portion of the command
-        double angular = Kw_ * (Kp_ * error + Ki_ * integral_ + Kd_ * (error - previousError_));
+        double angular = Kw_ * (
+            robot_.rotationKp * error +
+            robot_.rotationKi * integral_ +
+            robot_.rotationKd * (error - previousError_));
 
         angular = BasicMath::saturate<double>(angular,
             robot_.travelRotationVelocity, -robot_.travelRotationVelocity);
@@ -78,10 +71,6 @@ protected:
     }
 
 private:
-    double Kd_;
-    double Ki_;
-    double Kp_;
-
     double integral_;
     double previousError_;
 };

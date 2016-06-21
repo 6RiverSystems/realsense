@@ -18,6 +18,8 @@ struct RobotProfile
         goalReachedDistance(0.0),
         goalReachedAngle(0.0),
 
+        manualRatioAngular(0.0),
+        manualRatioLinear(0.0),
         maxAngularAcceleration(0.0),
         maxAngularVelocity(0.0),
         maxLinearAcceleration(0.0),
@@ -30,8 +32,9 @@ struct RobotProfile
         minPhysicalLinearVelocity(0.0),
 
         ratioCrawl(0.0),
-        ratioManualAngular(0.0),
-        ratioManualLinear(0.0),
+        rotationKd(0.0),
+        rotationKi(0.0),
+        rotationKp(1.0),
 
         travelAngularAcceleration(0.0),
         travelAngularVelocity(0.0),
@@ -58,6 +61,8 @@ struct RobotProfile
     double goalReachedDistance; // [m]
     double goalReachedAngle; // [rad]
 
+    double manualRatioAngular; // []
+    double manualRatioLinear; // []
     double maxAngularAcceleration; // [rad/s^2]
     double maxAngularVelocity; // [rad/s]
     double maxLinearAcceleration; // [m/s^2]
@@ -70,8 +75,9 @@ struct RobotProfile
     double minPhysicalLinearVelocity; // [m/s]
 
     double ratioCrawl; // []
-    double ratioManualAngular; // []
-    double ratioManualLinear; // []
+    double rotationKd; // []
+    double rotationKi; // []
+    double rotationKp; // []
 
     double travelAngularAcceleration; // [rad/s^2]
     double travelAngularVelocity; // [rad/s]

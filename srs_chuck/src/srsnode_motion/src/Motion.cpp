@@ -528,17 +528,19 @@ void Motion::executePlanToGoal(Pose<> goalPose)
         fromC << "," << fromR << "," << startAngle
         << ") and " << goalPose << " (" << toC << "," << toR << "," << goalAngle << ")");
 
-    algorithm_.search(
+    bool foundSolution = algorithm_.search(
         SearchPosition<Grid2d>(internalStart, startAngle),
         SearchPosition<Grid2d>(internalGoal, goalAngle));
 
     Solution<Grid2d> solution = algorithm_.getSolution(tapMap_.getMap()->getResolution());
 
-    if (!solution.empty())
+    if (foundSolution)
     {
         ROS_DEBUG_STREAM_NAMED("Motion", "Found solution: " << endl << solution);
-
-        motionController_.execute(solution);
+        if (!solution.empty())
+        {
+            motionController_.execute(solution);
+        }
         simulatedT_ = 0.0;
     }
     else

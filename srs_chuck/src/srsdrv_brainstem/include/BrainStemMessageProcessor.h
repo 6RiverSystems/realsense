@@ -10,6 +10,7 @@
 #include <memory>
 #include <BrainStemMessages.h>
 #include <srslib_framework/io/IO.hpp>
+#include <bitset>
 
 #ifndef BRAINSTEM_MESSAGEPROCESSOR_H_
 #define BRAINSTEM_MESSAGEPROCESSOR_H_
@@ -38,8 +39,8 @@ class BrainStemMessageProcessor {
 		uint32_t, uint32_t, uint32_t, uint32_t,
 		uint32_t, const std::string&)> HardwareInfoCallbackFn;
 
-	typedef std::function<void(uint32_t, MOTION_STATUS_DATA,
-		FAILURE_STATUS_DATA, uint8_t)> OperationalStateCallbackFn;
+	typedef std::function<void(uint32_t, const MOTION_STATUS_DATA&,
+		const FAILURE_STATUS_DATA&, bool)> OperationalStateCallbackFn;
 
 	typedef std::function<void(float)> VoltageCallbackFn;
 
@@ -113,7 +114,7 @@ private:
 
 // Bridge Callbacks
 
-	void SetMotionStatus( MOTION_STATUS eMotionStatus, bool bSetBit );
+	void SetMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues );
 
 	void OnHardStop( );
 

@@ -75,15 +75,25 @@ enum class LED_MODE
 };
 
 
-enum class MOTION_STATUS
+enum MOTION_STATUS
 {
-	FRONT_E_STOP 		= 0b00000001,
-	BACK_E_STOP 		= 0b00000010,
-	WIRELESS_E_STOP 	= 0b00000100,
-	BUMP_SENSOR			= 0b00001000,
-	PAUSE 				= 0b00010000,
-	HARD_STOP 			= 0b00100000
+	FRONT_E_STOP 		= 0,
+	BACK_E_STOP 		= 1,
+	WIRELESS_E_STOP 	= 2,
+	BUMP_SENSOR			= 3,
+	PAUSE 				= 4,
+	HARD_STOP 			= 5
 };
+
+enum FAILURE_STATUS
+{
+	SAFETY_PROCESSOR	= 0,
+	BRAINSTEM			= 1,
+	BRAINSTEM_TIMEOUT	= 2,
+	RIGHT_MOTOR			= 3,
+	LEFT_MOTOR			= 4
+};
+
 
 // We need to make sure that these are byte packed
 #pragma pack(push, 1)
@@ -116,50 +126,49 @@ struct HARDWARE_INFORMATION_DATA
 
 struct MOTION_STATUS_DATA
 {
-	uint8_t		frontEStop:1; 				// front eStop state
-	uint8_t		backEStop:1; 				// back eStop state
-	uint8_t		wirelessEStop:1; 			// wireless eStop state
-	uint8_t		bumpSensor:1; 				// bump sensor state
-	uint8_t		pause:1; 					// paused state
-	uint8_t		hardStop:1; 				// hard stop state
-	uint8_t		reservedMotion:2; 			// reserved
+	bool		frontEStop; 			// front eStop state
+	bool		backEStop; 				// back eStop state
+	bool		wirelessEStop; 			// wireless eStop state
+	bool		bumpSensor; 			// bump sensor state
+	bool		pause; 					// paused state
+	bool		hardStop; 				// hard stop state
 };
 
 struct FAILURE_STATUS_DATA
 {
-	uint8_t		safetyProcessorFailure:1; 	// safety processor failure
-	uint8_t		brainstemFailure:1; 		// brainstem failure
-	uint8_t		brainTimeoutFailure:1; 		// brainstem timeout failure
-	uint8_t		rightMotorFailure:1; 		// right motor failure
-	uint8_t		leftMotorFailure:1; 		// left motor failure
-	uint8_t		reservedFailure:3; 			// reserved
+	bool		safetyProcessorFailure; // safety processor failure
+	bool		brainstemFailure; 		// brainstem failure
+	bool		brainTimeoutFailure; 	// brainstem timeout failure
+	bool		rightMotorFailure; 		// right motor failure
+	bool		leftMotorFailure; 		// left motor failure
 };
+
 
 struct OPERATIONAL_STATE_DATA
 {
-	uint8_t 			cmd;
-	uint32_t			upTime;				// Hardware up time in seconds
-	MOTION_STATUS_DATA	motionStatus;		// Motion status
-	FAILURE_STATUS_DATA failureStatus;		// Failure status
-	uint8_t				suspendState; 		// 0 = unsuspended, suspended otherwise
+	uint8_t 	cmd;
+	uint32_t	upTime;					// Hardware up time in seconds
+	uint8_t		motionStatus;			// Motion status
+	uint8_t 	failureStatus;			// Failure status
+	uint8_t		suspendState; 			// 0 = unsuspended, suspended otherwise
 };
 
 struct SET_OPERATIONAL_STATE_DATA
 {
-	uint8_t 			cmd;
-	MOTION_STATUS_DATA	motionStatus;		// Motion status
+	uint8_t 	cmd;
+	uint8_t		motionStatus;			// Motion status
 };
 
 struct VOLTAGE_DATA
 {
 	uint8_t		cmd;
-	float		voltage;					// Voltage from 0V => 24V
+	float		voltage;				// Voltage from 0V => 24V
 };
 
 struct SUSPEND_DATA
 {
-	uint8_t cmd;
-	uint8_t isSuspended;				// 0 or '0' = unsuspended, suspended otherwise
+	uint8_t 	cmd;
+	uint8_t 	isSuspended;			// 0 or '0' = unsuspended, suspended otherwise
 };
 
 struct VELOCITY_DATA

@@ -159,8 +159,26 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 		{
 			OPERATIONAL_STATE_DATA* pOperationalState = reinterpret_cast<OPERATIONAL_STATE_DATA*>( buffer.data( ) );
 
-			m_operationalStateCallback( pOperationalState->upTime, pOperationalState->motionStatus,
-				pOperationalState->failureStatus, pOperationalState->suspendState );
+			std::bitset<8> motionStatusSet( pOperationalState->motionStatus );
+			std::bitset<8> failureStatusSet( pOperationalState->failureStatus );
+
+			MOTION_STATUS_DATA motionStatusData;
+			motionStatusData.frontEStop = motionStatusSet.test( MOTION_STATUS::FRONT_E_STOP );
+			motionStatusData.backEStop = motionStatusSet.test( MOTION_STATUS::BACK_E_STOP );
+			motionStatusData.wirelessEStop = motionStatusSet.test( MOTION_STATUS::WIRELESS_E_STOP );
+			motionStatusData.bumpSensor = motionStatusSet.test( MOTION_STATUS::BUMP_SENSOR);
+			motionStatusData.pause = motionStatusSet.test( MOTION_STATUS::PAUSE );
+			motionStatusData.hardStop = motionStatusSet.test( MOTION_STATUS::HARD_STOP );
+
+			FAILURE_STATUS_DATA failureStatusData;
+			failureStatusData.safetyProcessorFailure = failureStatusSet.test( FAILURE_STATUS::SAFETY_PROCESSOR );
+			failureStatusData.brainstemFailure = failureStatusSet.test( FAILURE_STATUS::BRAINSTEM );
+			failureStatusData.brainTimeoutFailure = failureStatusSet.test( FAILURE_STATUS::BRAINSTEM_TIMEOUT );
+			failureStatusData.rightMotorFailure = failureStatusSet.test( FAILURE_STATUS::RIGHT_MOTOR );
+			failureStatusData.leftMotorFailure = failureStatusSet.test( FAILURE_STATUS::LEFT_MOTOR );
+
+			m_operationalStateCallback( pOperationalState->upTime, motionStatusData,
+				failureStatusData, pOperationalState->suspendState );
 		}
 		break;
 
@@ -322,21 +340,21 @@ std::string BrainStemMessageProcessor::GetButtonName( LED_ENTITIES eButtonId ) c
 // Bridge Callbacks
 //////////////////////////////////////////////////////////////////////////
 
-void BrainStemMessageProcessor::SetMotionStatus( MOTION_STATUS eMotionStatus, bool bSetBit )
+void BrainStemMessageProcessor::SetMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues )
 {
-	MOTION_STATUS_DATA statusData = { false };
-	statusData.frontEStop = (eMotionStatus == MOTION_STATUS::FRONT_E_STOP);
-	statusData.backEStop = (eMotionStatus == MOTION_STATUS::BACK_E_STOP);
-	statusData.wirelessEStop = (eMotionStatus == MOTION_STATUS::WIRELESS_E_STOP);
-	statusData.bumpSensor = (eMotionStatus == MOTION_STATUS::BUMP_SENSOR);
-	statusData.pause = (eMotionStatus == MOTION_STATUS::PAUSE);
-	statusData.hardStop = (eMotionStatus == MOTION_STATUS::HARD_STOP);
+	std::string strMotionStatus;
+	strMotionStatus += motionStatusSet.test( MOTION_STATUS::FRONT_E_STOP ) ? "frontEStop, " : "";
+	strMotionStatus += motionStatusSet.test( MOTION_STATUS::BACK_E_STOP ) ? "backEStop, " : "";
+	strMotionStatus += motionStatusSet.test( MOTION_STATUS::WIRELESS_E_STOP ) ? "wirelessEStop, " : "";
+	strMotionStatus += motionStatusSet.test( MOTION_STATUS::BUMP_SENSOR ) ? "bumpSensor, " : "";
+	strMotionStatus += motionStatusSet.test( MOTION_STATUS::PAUSE ) ? "pause, " : "";
+	strMotionStatus += motionStatusSet.test( MOTION_STATUS::HARD_STOP ) ? "hardStop, " : "";
 
-	BRAIN_STEM_CMD command = bSetBit ? BRAIN_STEM_CMD::SET_MOTION_STATUS : BRAIN_STEM_CMD::CLEAR_MOTION_STATUS;
+	BRAIN_STEM_CMD command = bSetValues ? BRAIN_STEM_CMD::SET_MOTION_STATUS : BRAIN_STEM_CMD::CLEAR_MOTION_STATUS;
 
-	SET_OPERATIONAL_STATE_DATA msg = { static_cast<uint8_t>( command ), statusData };
+	SET_OPERATIONAL_STATE_DATA msg = { static_cast<uint8_t>( command ), static_cast<uint8_t>( motionStatusSet.to_ulong( ) ) };
 
-	ROS_DEBUG( "SetMotionStatus: %d => %d", eMotionStatus, command );
+	ROS_DEBUG( "%s motion status for %s", command == BRAIN_STEM_CMD::SET_MOTION_STATUS ? "Setting" : "Clearing", strMotionStatus.c_str( ) );
 
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof(msg) );
 }
@@ -452,8 +470,11 @@ void BrainStemMessageProcessor::Pause( bool bPaused )
 	// TODO: Change this behavior from the bridge
 	if( !bPaused )
 	{
+		std::bitset<8> motionStatusSet;
+		motionStatusSet.set( MOTION_STATUS::HARD_STOP, true );
+
 		// Clear the motion status fault
-		SetMotionStatus( MOTION_STATUS::HARD_STOP, false );
+		SetMotionStatus( motionStatusSet, false );
 	}
 
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );

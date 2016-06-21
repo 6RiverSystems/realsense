@@ -12,8 +12,11 @@ struct RobotProfile
 {
     RobotProfile() :
         adaptiveLookAhead(true),
+
         bodyWidth(0.0),
         bodyDepth(0.0),
+
+        emergencyRatioCrawl(0.0),
 
         goalReachedDistance(0.0),
         goalReachedAngle(0.0),
@@ -31,7 +34,6 @@ struct RobotProfile
         minPhysicalAngularVelocity(0.0),
         minPhysicalLinearVelocity(0.0),
 
-        ratioCrawl(0.0),
         rotationKd(0.0),
         rotationKi(0.0),
         rotationKp(1.0),
@@ -58,6 +60,8 @@ struct RobotProfile
     double bodyWidth; // [m]
     double bodyDepth; // [m]
 
+    double emergencyRatioCrawl; // []
+
     double goalReachedDistance; // [m]
     double goalReachedAngle; // [rad]
 
@@ -74,7 +78,6 @@ struct RobotProfile
     double minPhysicalAngularVelocity; // [rad/s]
     double minPhysicalLinearVelocity; // [m/s]
 
-    double ratioCrawl; // []
     double rotationKd; // []
     double rotationKi; // []
     double rotationKp; // []

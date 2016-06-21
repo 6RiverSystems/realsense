@@ -41,11 +41,11 @@ protected:
         goalReached_ = false;
 
         double linear = BasicMath::saturate<double>(
-            robot_.ratioCrawl * userCommand_.linear * robot_.travelLinearVelocity,
+            robot_.emergencyRatioCrawl * userCommand_.linear * robot_.travelLinearVelocity,
             robot_.maxLinearVelocity, -robot_.maxLinearVelocity);
 
         double angular = BasicMath::saturate<double>(
-            robot_.ratioCrawl * userCommand_.angular * robot_.travelAngularVelocity,
+            robot_.emergencyRatioCrawl * userCommand_.angular * robot_.travelAngularVelocity,
             robot_.maxAngularVelocity, -robot_.maxAngularVelocity);
 
         // If the robot is moving backward and at the same time

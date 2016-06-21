@@ -22,6 +22,8 @@ struct Chuck : RobotProfile
         bodyWidth = MeasurementMath::inch2m<double>(24.375); // 0.619 [m]
         bodyDepth = MeasurementMath::inch2m<double>(38.474); // 0.977 [m]
 
+        emergencyRatioCrawl = 0.08; // []
+
         goalReachedDistance = 0.100; // [m]
         goalReachedAngle = AngleMath::deg2rad<double>(1.0); // 0.0175 [rad]
 
@@ -38,7 +40,6 @@ struct Chuck : RobotProfile
         minPhysicalAngularVelocity = AngleMath::deg2rad(0.05); // 0.0008 [rad/s]
         minPhysicalLinearVelocity = 0.005; // [m/s]
 
-        ratioCrawl = 0.08; // []
         rotationKd = 0.0; // []
         rotationKi = 0.0; // []
         rotationKp = 1.0; // []

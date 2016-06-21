@@ -137,6 +137,10 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     ROS_INFO_STREAM_NAMED("Motion", "APS sensor enabled: " <<
         configuration_.aps_enabled);
 
+    robot_.emergencyRatioCrawl = configuration_.emergency_controller_ratio_crawl;
+    ROS_INFO_STREAM_NAMED("Motion", "Emergency Controller: Ratio of the motion in crawl mode []: " <<
+        configuration_.emergency_controller_ratio_crawl);
+
     robot_.goalReachedDistance = configuration_.goal_reached_distance;
     ROS_INFO_STREAM_NAMED("Motion", "Goal reached distance [m]: " <<
         configuration_.goal_reached_distance);
@@ -192,10 +196,6 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     robot_.minPhysicalLinearVelocity = configuration_.min_physical_linear_velocity;
     ROS_INFO_STREAM_NAMED("Motion", "Minimum physical linear velocity [m/s]: " <<
         configuration_.min_physical_linear_velocity);
-
-    robot_.ratioCrawl = configuration_.ratio_crawl;
-    ROS_INFO_STREAM_NAMED("Motion", "Ratio of the dynamic motion controller in crawl mode []: " <<
-        configuration_.ratio_crawl);
 
     robot_.rotationKd = configuration_.rotation_controller_kd;
     ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: derivative constant []: " <<

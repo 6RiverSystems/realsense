@@ -92,67 +92,75 @@ void MotionController::execute(SolutionType solution)
         activeController_->cancel();
     }
 
-    // Create a copy of the specified solution
-    SolutionType* pathSolution = new SolutionType(solution);
-
-    // TODO: Make sure that it can handle multiple rotations.
-    // Is there a use case like that?: In theory A* can generate a solution
-    // with multiple rotations at the beginning to avoid the costly 180 rotation
-
-    SolutionType* initialRotationSolution = nullptr;
-    SolutionType* finalRotationSolution = nullptr;
-
-    // Check if the solution starts with a rotation. If that is the case
-    // replace it with rotation that takes in account the current pose
-    // of the robot
-    SolutionNodeType startNode = pathSolution->getStart();
-    if (startNode.actionType == SolutionNodeType::ROTATE)
+    if (!solution.empty())
     {
-        startNode.fromPose = currentPose_;
-        initialRotationSolution = new SolutionType(startNode);
+        // Create a copy of the specified solution
+        SolutionType* pathSolution = new SolutionType(solution);
 
-        // Remove the rotation from the original solution
-        pathSolution->erase(pathSolution->begin());
-    }
+        // TODO: Make sure that it can handle multiple rotations.
+        // Is there a use case like that?: In theory A* can generate a solution
+        // with multiple rotations at the beginning to avoid the costly 180 rotation
 
-    // Check if the solution ends with a rotation. If that is the case
-    // replace it with controlled rotation
-    if (!pathSolution->empty())
-    {
-        SolutionNodeType goalNode = pathSolution->getGoal();
-        if (goalNode.actionType == SolutionNodeType::ROTATE)
+        SolutionType* initialRotationSolution = nullptr;
+        SolutionType* finalRotationSolution = nullptr;
+
+        // Check if the solution starts with a rotation. If that is the case
+        // replace it with rotation that takes in account the current pose
+        // of the robot
+        SolutionNodeType startNode = pathSolution->getStart();
+        if (startNode.actionType == SolutionNodeType::ROTATE)
         {
-            finalRotationSolution = new SolutionType(goalNode);
+            startNode.fromPose = currentPose_;
+            initialRotationSolution = new SolutionType(startNode);
 
             // Remove the rotation from the original solution
-            pathSolution->erase(pathSolution->end() - 1);
+            pathSolution->erase(pathSolution->begin());
         }
-    }
 
-    // Push the solutions into the work queue
-    if (initialRotationSolution)
-    {
-        pushWorkItem(TaskEnum::ROTATE, initialRotationSolution);
-        currentFinalGoal_ = initialRotationSolution->getGoal().toPose;
-    }
+        // Check if the solution ends with a rotation. If that is the case
+        // replace it with controlled rotation
+        if (!pathSolution->empty())
+        {
+            SolutionNodeType goalNode = pathSolution->getGoal();
+            if (goalNode.actionType == SolutionNodeType::ROTATE)
+            {
+                finalRotationSolution = new SolutionType(goalNode);
 
-    // If the path solution is not empty, push it into
-    // the work queue
-    if (!pathSolution->empty())
-    {
-        pushWorkItem(TaskEnum::PATH_FOLLOW, pathSolution);
-        currentFinalGoal_ = pathSolution->getGoal().toPose;
+                // Remove the rotation from the original solution
+                pathSolution->erase(pathSolution->end() - 1);
+            }
+        }
+
+        // Push the solutions into the work queue
+        if (initialRotationSolution)
+        {
+            pushWorkItem(TaskEnum::ROTATE, initialRotationSolution);
+            currentFinalGoal_ = initialRotationSolution->getGoal().toPose;
+        }
+
+        // If the path solution is not empty, push it into
+        // the work queue
+        if (!pathSolution->empty())
+        {
+            pushWorkItem(TaskEnum::PATH_FOLLOW, pathSolution);
+            currentFinalGoal_ = pathSolution->getGoal().toPose;
+        }
+        else
+        {
+            // Otherwise get rid of it
+            delete pathSolution;
+        }
+
+        if (finalRotationSolution)
+        {
+            pushWorkItem(TaskEnum::ROTATE, finalRotationSolution);
+            currentFinalGoal_ = finalRotationSolution->getGoal().toPose;
+        }
     }
     else
     {
-        // Otherwise get rid of it
-        delete pathSolution;
-    }
-
-    if (finalRotationSolution)
-    {
-        pushWorkItem(TaskEnum::ROTATE, finalRotationSolution);
-        currentFinalGoal_ = finalRotationSolution->getGoal().toPose;
+        pushWorkItem(TaskEnum::PATH_FOLLOW, nullptr);
+        currentFinalGoal_ = currentPose_;
     }
 
     setHasArrived(false);
@@ -636,20 +644,29 @@ void MotionController::taskNormalStop()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::taskPathFollow()
 {
-    // Store what goal the controller is going to work on
-    currentShortTermGoal_ = currentSolution_.getGoal().toPose;
+    if (!currentSolution_.empty())
+    {
+        // Store what goal the controller is going to work on
+        currentShortTermGoal_ = currentSolution_.getGoal().toPose;
 
-    // Calculate the trajectory
-    Trajectory<> trajectory;
-    TrajectoryGenerator converter(robot_);
+        // Calculate the trajectory
+        Trajectory<> trajectory;
+        TrajectoryGenerator converter(robot_);
 
-    converter.fromSolution(currentSolution_, dT_);
-    converter.getTrajectory(trajectory);
+        converter.fromSolution(currentSolution_, dT_);
+        converter.getTrajectory(trajectory);
 
-    ROS_DEBUG_STREAM_NAMED("MotionController", "Trajectory: " << trajectory);
+        ROS_DEBUG_STREAM_NAMED("MotionController", "Trajectory: " << trajectory);
 
-    // Pass the trajectory to the path controller
-    pathController_->setTrajectory(trajectory, currentPose_);
+        // Pass the trajectory to the path controller
+        pathController_->setTrajectory(trajectory, currentPose_);
+    }
+    else
+    {
+        // If an empty solution was passed to the Path Controller
+        // cancel the movement right away. The next cycle will set the flag ARRIVED
+        pathController_->cancel();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

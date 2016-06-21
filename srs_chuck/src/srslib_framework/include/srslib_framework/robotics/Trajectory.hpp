@@ -34,11 +34,7 @@ public:
         int toIndex = this->size() - 1;
         if (searchDistance > -1)
         {
-            toIndex = fromIndex + 2 * round(searchDistance / calculateTrajectoryStep());
-            if (toIndex > this->size())
-            {
-                toIndex = this->size() - 1;
-            }
+            toIndex = calculateIndexFromDistance(fromIndex, searchDistance);
         }
 
         BaseType minimum = numeric_limits<double>::max();
@@ -47,7 +43,7 @@ public:
         for (int i = fromIndex; i < toIndex; i++)
         {
             Pose<BaseType> current = this->at(i).first;
-            BaseType distance = PoseMath::euclidean(current, toPose);
+            BaseType distance = PoseMath::euclidean2(current, toPose);
             if (distance < minimum)
             {
                 minimum = distance;
@@ -60,14 +56,7 @@ public:
 
     int findWaypointAtDistance(int fromIndex, double distance)
     {
-        int deltaTo = round(distance / calculateTrajectoryStep());
-        int toIndex = fromIndex + deltaTo;
-        if (toIndex >= this->size())
-        {
-            toIndex = this->size() - 1;
-        }
-
-        return toIndex;
+        return calculateIndexFromDistance(fromIndex, distance);
     }
 
     Pose<BaseType> getGoal()
@@ -137,10 +126,23 @@ public:
     }
 
 private:
-
-    double calculateTrajectoryStep()
+    int calculateIndexFromDistance(int fromIndex, double distance)
     {
-        return PoseMath::euclidean(this->at(0).first, this->at(1).first);
+        double distance2 = distance * distance;
+
+        Pose<BaseType> fromPose = this->at(fromIndex).first;
+        int toIndex = fromIndex;
+
+        BaseType distanceToPose;
+        do {
+            Pose<> toPose = this->at(toIndex).first;
+            distanceToPose = PoseMath::euclidean2(fromPose, toPose);
+
+            toIndex++;
+
+        } while (toIndex < this->size() && distanceToPose < distance2);
+
+        return toIndex - 1;
     }
 };
 

@@ -30,7 +30,8 @@ struct RobotProfile
         minPhysicalLinearVelocity(0.0),
 
         ratioCrawl(0.0),
-        ratioManual(0.0),
+        ratioManualAngular(0.0),
+        ratioManualLinear(0.0),
 
         travelAngularAcceleration(0.0),
         travelAngularVelocity(0.0),
@@ -69,7 +70,8 @@ struct RobotProfile
     double minPhysicalLinearVelocity; // [m/s]
 
     double ratioCrawl; // []
-    double ratioManual; // []
+    double ratioManualAngular; // []
+    double ratioManualLinear; // []
 
     double travelAngularAcceleration; // [rad/s^2]
     double travelAngularVelocity; // [rad/s]

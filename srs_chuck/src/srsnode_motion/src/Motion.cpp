@@ -189,9 +189,13 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     ROS_INFO_STREAM_NAMED("Motion", "Ratio of the dynamic motion controller in crawl mode []: " <<
         configuration_.ratio_crawl);
 
-    robot_.ratioManual = configuration_.ratio_manual;
-    ROS_INFO_STREAM_NAMED("Motion", "Ratio of the dynamic motion controller in manual mode []: " <<
-        configuration_.ratio_manual);
+    robot_.ratioManualAngular = configuration_.ratio_manual_angular;
+    ROS_INFO_STREAM_NAMED("Motion", "Ratio of the angular velocity in manual mode []: " <<
+        configuration_.ratio_manual_angular);
+
+    robot_.ratioManualLinear = configuration_.ratio_manual_linear;
+    ROS_INFO_STREAM_NAMED("Motion", "Ratio of the linear velocity in manual mode []: " <<
+        configuration_.ratio_manual_linear);
 
     robot_.travelAngularAcceleration = configuration_.travel_angular_acceleration;
     ROS_INFO_STREAM_NAMED("Motion", "Travel angular acceleration [rad/s^2]: " <<

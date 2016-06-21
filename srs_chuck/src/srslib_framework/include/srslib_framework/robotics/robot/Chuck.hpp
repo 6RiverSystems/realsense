@@ -36,7 +36,8 @@ struct Chuck : RobotProfile
         minPhysicalLinearVelocity = 0.005; // [m/s]
 
         ratioCrawl = 0.08; // []
-        ratioManual = 0.40; // []
+        ratioManualAngular = 0.20; // []
+        ratioManualLinear = 0.40; // []
 
         travelAngularAcceleration = AngleMath::deg2rad<double>(28.0); // 0.489 [rad/s^2]
         travelAngularVelocity = AngleMath::deg2rad<double>(115); // 2.007 [rad/s]
@@ -49,7 +50,7 @@ struct Chuck : RobotProfile
         wheelDiameter = MeasurementMath::inch2m<double>(8.000); // 0.203 [m]
         wheelDistance = MeasurementMath::inch2m<double>(20.915); // 0.531 [m]
 
-        zeroLookAheadDistance = 0.8; // [m]
+        zeroLookAheadDistance = 0.5; // [m]
     }
 
     virtual ~Chuck()

@@ -26,6 +26,14 @@ struct PoseMath
         return sqrt(deltaX * deltaX + deltaY * deltaY);
     }
 
+    template<typename TYPE = double>
+    inline static TYPE euclidean2(Pose<TYPE> p1, Pose<TYPE> p2)
+    {
+        TYPE deltaX = p1.x - p2.x;
+        TYPE deltaY = p1.y - p2.y;
+        return deltaX * deltaX + deltaY * deltaY;
+    }
+
     // TODO: Better implement this function. The type of R should not be fixed but
     // depending on TYPE (ocv2base in reverse)
     template<typename TYPE = double>

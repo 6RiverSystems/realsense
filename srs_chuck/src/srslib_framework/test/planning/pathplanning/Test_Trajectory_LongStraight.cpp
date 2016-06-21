@@ -26,28 +26,28 @@ TEST(Test_Trajectory, LongStraight)
         Pose<>(0, 0, DEG90), Pose<>(0, 1, DEG90));
 
     SolutionNodeType SOLUTION_01 = SolutionNodeType(SolutionNodeType::MOVE,
-        Pose<>(0, 0, DEG90), Pose<>(0, 1, DEG90));
-
-    SolutionNodeType SOLUTION_02 = SolutionNodeType(SolutionNodeType::MOVE,
         Pose<>(0, 1, DEG90), Pose<>(0, 2, DEG90));
 
-    SolutionNodeType SOLUTION_03 = SolutionNodeType(SolutionNodeType::MOVE,
+    SolutionNodeType SOLUTION_02 = SolutionNodeType(SolutionNodeType::MOVE,
         Pose<>(0, 2, DEG90), Pose<>(0, 3, DEG90));
 
-    SolutionNodeType SOLUTION_04 = SolutionNodeType(SolutionNodeType::MOVE,
+    SolutionNodeType SOLUTION_03 = SolutionNodeType(SolutionNodeType::MOVE,
         Pose<>(0, 3, DEG90), Pose<>(0, 4, DEG90));
 
-    SolutionNodeType SOLUTION_05 = SolutionNodeType(SolutionNodeType::MOVE,
+    SolutionNodeType SOLUTION_04 = SolutionNodeType(SolutionNodeType::MOVE,
         Pose<>(0, 4, DEG90), Pose<>(0, 5, DEG90));
 
-    SolutionNodeType SOLUTION_06 = SolutionNodeType(SolutionNodeType::MOVE,
+    SolutionNodeType SOLUTION_05 = SolutionNodeType(SolutionNodeType::MOVE,
         Pose<>(0, 5, DEG90), Pose<>(0, 6, DEG90));
 
-    SolutionNodeType SOLUTION_07 = SolutionNodeType(SolutionNodeType::MOVE,
+    SolutionNodeType SOLUTION_06 = SolutionNodeType(SolutionNodeType::MOVE,
         Pose<>(0, 6, DEG90), Pose<>(0, 7, DEG90));
 
-    SolutionNodeType SOLUTION_08 = SolutionNodeType(SolutionNodeType::MOVE,
+    SolutionNodeType SOLUTION_07 = SolutionNodeType(SolutionNodeType::MOVE,
         Pose<>(0, 7, DEG90), Pose<>(0, 8, DEG90));
+
+    SolutionNodeType SOLUTION_08 = SolutionNodeType(SolutionNodeType::MOVE,
+        Pose<>(0, 8, DEG90), Pose<>(0, 9, DEG90));
 
     Solution<Grid2d> solution;
     solution.push_back(SOLUTION_00);
@@ -66,7 +66,7 @@ TEST(Test_Trajectory, LongStraight)
     Trajectory<> trajectory;
 
     TrajectoryGenerator solutionConverter(chuck);
-    solutionConverter.fromSolution(solution);
+    solutionConverter.fromSolution(solution, 1.0 / 100.0);
     solutionConverter.getTrajectory(trajectory);
 
     cout << trajectory << endl;

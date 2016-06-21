@@ -36,7 +36,7 @@ TEST(Test_Trajectory, Map)
     Trajectory<> trajectory;
     TrajectoryGenerator converter(chuck);
 
-    converter.fromSolution(solution);
+    converter.fromSolution(solution, 1.0 / 100.0);
     converter.getTrajectory(trajectory);
 
     cout << trajectory << endl;

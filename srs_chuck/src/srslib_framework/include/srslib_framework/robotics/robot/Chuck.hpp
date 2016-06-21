@@ -42,7 +42,7 @@ struct Chuck : RobotProfile
         travelAngularVelocity = AngleMath::deg2rad<double>(115); // 2.007 [rad/s]
         travelCurveZoneRadius = 0.500; // [m]
         travelCurvingVelocity = 0.300; // [m/s]
-        travelLinearAcceleration =  0.750; // [m/s^2]
+        travelLinearAcceleration =  0.650; // [m/s^2]
         travelLinearVelocity = 1.000; // [m/s]
         travelRotationVelocity = AngleMath::deg2rad(30.0); // 0.524 [rad/s]
 

@@ -34,7 +34,7 @@ TEST(Test_Trajectory, SingleRotation)
     Trajectory<> trajectory;
 
     TrajectoryGenerator solutionConverter(chuck);
-    solutionConverter.fromSolution(solution);
+    solutionConverter.fromSolution(solution, 1.0 / 100.0);
     solutionConverter.getTrajectory(trajectory);
 
     cout << trajectory << endl;

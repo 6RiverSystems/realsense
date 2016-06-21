@@ -643,7 +643,7 @@ void MotionController::taskPathFollow()
     Trajectory<> trajectory;
     TrajectoryGenerator converter(robot_);
 
-    converter.fromSolution(currentSolution_);
+    converter.fromSolution(currentSolution_, dT_);
     converter.getTrajectory(trajectory);
 
     ROS_DEBUG_STREAM_NAMED("MotionController", "Trajectory: " << trajectory);

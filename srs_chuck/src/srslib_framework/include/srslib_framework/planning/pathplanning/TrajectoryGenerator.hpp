@@ -35,11 +35,10 @@ public:
         robot_(robot)
     {}
 
-    void fromSolution(Solution<Grid2d>& solution)
+    void fromSolution(Solution<Grid2d>& solution, double dT)
     {
         trajectory_.clear();
         path_.clear();
-        pathReduced_.clear();
 
         if (solution.empty())
         {
@@ -47,8 +46,7 @@ public:
         }
 
         findPath(solution, path_);
-        double delta = calculateDelta();
-        interpolatePath(pathReduced_, delta);
+        interpolatePath(path_, dT);
     }
 
     void getTrajectory(Trajectory<>& trajectory)
@@ -57,71 +55,9 @@ public:
     }
 
 private:
-    double calculateDelta()
-    {
-        double minDistance;
-        double maxDistance;
-        double meanDistance;
-
-        calculateMinMaxMean(path_, minDistance, maxDistance, meanDistance);
-
-        double minimumDelta = 0.0001 * meanDistance;
-        double maximumDelta = 0.005 * meanDistance;
-
-        filterPath(path_, minimumDelta, pathReduced_);
-
-        calculateMinMaxMean(pathReduced_, minDistance, maxDistance, meanDistance);
-
-        maximumDelta = min(maximumDelta, minDistance);
-        return max(minimumDelta, maximumDelta);
-    }
-
     double calculateDirection(double from, double to)
     {
         return BasicMath::sgn<double>(to - from);
-    }
-
-    void calculateMinMaxMean(PathType& path, double& minD, double& maxD, double& meanD)
-    {
-        minD = numeric_limits<double>::max();
-        maxD = numeric_limits<double>::min();
-        meanD = 0;
-        int meanCount = 0;
-
-        Pose<> previousWaypoint = path_.front();
-        for (auto waypoint : path_)
-        {
-            double d = PoseMath::euclidean(previousWaypoint, waypoint);
-            if (d > 0)
-            {
-                minD = min(minD, d);
-                maxD = max(maxD, d);
-
-                meanD += d;
-                meanCount++;
-            }
-
-            previousWaypoint = waypoint;
-        }
-
-        meanD /= meanCount;
-    }
-
-    void filterPath(PathType& path, double minDistance, PathType& reducedPath)
-    {
-        Pose<> previousWaypoint = path.front();
-        reducedPath.push_back(previousWaypoint);
-
-        for (auto waypoint : path)
-        {
-            double d = PoseMath::euclidean(previousWaypoint, waypoint);
-            if (d > minDistance)
-            {
-                reducedPath.push_back(waypoint);
-            }
-
-            previousWaypoint = waypoint;
-        }
     }
 
     void findPath(Solution<Grid2d>& solution, PathType& path)
@@ -161,9 +97,10 @@ private:
         {
             cout << milestone << endl;
         }
+        cout << endl;
     }
 
-    void interpolatePath(PathType& waypoints, double spacing)
+    void interpolatePath(PathType& waypoints, double dT)
     {
         if (waypoints.size() < 2)
         {
@@ -177,23 +114,21 @@ private:
         auto fromWaypoint = waypoints.begin();
         auto toWaypoint = fromWaypoint + 1;
 
-        double v0 = robot_.minLinearVelocity;
+        double v0 = 0.0; //robot_.minLinearVelocity;
         double vf = 0.0;
         while (toWaypoint != waypoints.end())
         {
-            bool firstStretch = segment == 1;
-            bool lastStretch = segment == totalSegments;
+            bool isFirstStretch = segment == 1;
+            bool isLastStretch = segment == totalSegments;
 
             // If the segment is the last stretch the final velocity will be 0
             // otherwise it will be the default velocity for curves
-            vf = lastStretch ? 0.0 : robot_.travelCurvingVelocity;
+            vf = isLastStretch ? 0.0 : robot_.travelCurvingVelocity;
 
             // Interpolate the trajectory between the two waypoints
             interpolateWaypoints(*fromWaypoint, *toWaypoint,
-                v0, vf,
-                toWaypoint->theta,
-                spacing,
-                firstStretch, lastStretch);
+                v0, vf, dT,
+                isFirstStretch, isLastStretch);
 
             // The next initial velocity is equal to the final velocity of this segment
             v0 = vf;
@@ -206,65 +141,16 @@ private:
     }
 
     void interpolateWaypoints(WaypointType fromWaypoint, WaypointType toWaypoint,
-        double upV0, double downVf,
-        double orientation,
-        double spacing,
-        bool firstStretch, bool lastStretch)
+        double upV0, double downVf, double dT,
+        bool isFirstStretch, bool isLastStretch)
     {
         // Calculate the change in velocity that can be achieved
         // with the specified travel acceleration and the specified spacing
-        double deltaVelocity = sqrt(2 * robot_.travelLinearAcceleration * spacing);
+        double deltaVelocity = robot_.travelLinearAcceleration * dT;
 
         // They keep track of the initial and final velocities
         // for the ramp up and the ramp down in the segment
         double coastV = robot_.travelLinearVelocity;
-
-        // Measure the distance between the two waypoints
-        double d = PoseMath::euclidean(fromWaypoint, toWaypoint);
-
-        // Calculate how many midpoints between the two waypoints
-        int totalMidpoints = ceil(d / spacing);
-
-        double deltaSpace = d / totalMidpoints;
-
-        // Calculate the points needed to ramp up and down the velocity
-        // using the default coasting values
-        int rampUpPoints = floor((coastV - upV0) / deltaVelocity) - 1;
-        int rampDownPoints = floor((coastV - downVf) / deltaVelocity) + 1;
-
-        int slowZone = ceil(robot_.travelCurveZoneRadius / spacing) - 1;
-
-        // If the segment is not the first stretch, keep the curving velocity
-        // for a while before ramping up
-        int rampUpIndex = -1;
-        if (!firstStretch)
-        {
-            rampUpIndex += slowZone;
-        }
-
-        // If the segment is not the last stretch, slow down earlier
-        // to maintain the curving velocity
-        int rampDownIndex = totalMidpoints - rampDownPoints;
-        if (!lastStretch && rampDownIndex > slowZone)
-        {
-            rampDownIndex -= slowZone;
-            rampDownIndex = BasicMath::saturate<int>(rampDownIndex, totalMidpoints, 0);
-        }
-
-        // If it is not possible, calculate the maximum velocity achievable
-        if (rampUpPoints + rampDownPoints > totalMidpoints)
-        {
-            rampUpPoints = totalMidpoints / 2;
-            rampDownPoints = totalMidpoints - rampUpPoints;
-            rampDownIndex = rampDownPoints;
-
-            // There is not enough space to go full travel speed. The
-            // coasting velocity must be adjusted
-            coastV = rampUpPoints * deltaVelocity;
-        }
-
-        // Current velocity
-        double currentVelocity = upV0;
 
         // Calculate the direction of the motion
         double directionX = calculateDirection(fromWaypoint.x, toWaypoint.x);
@@ -274,10 +160,59 @@ private:
         bool movingOnX = BasicMath::equal<double>(fromWaypoint.y, toWaypoint.y, 0.002);
         bool movingOnY = BasicMath::equal<double>(fromWaypoint.x, toWaypoint.x, 0.002);
 
+        // Measure the distance from the starting waypoint
+        double distanceFromStart = 0.0;
+
+        // Measure the distance to the ending waypoint
+        double distanceToEnd = PoseMath::euclidean(fromWaypoint, toWaypoint);
+
+        // Calculate the distance trod during ramp up and down
+        double timeRampUp = (coastV - upV0) / robot_.travelLinearAcceleration;
+        double rampUpDistance = 0.5 * (coastV + upV0) * timeRampUp;
+
+        double timeRampDown = (coastV - downVf) / robot_.travelLinearAcceleration;
+        double rampDownDistance = 0.5 * (coastV + downVf) * timeRampDown;
+
+        if (distanceToEnd < rampUpDistance + rampDownDistance)
+        {
+            rampUpDistance = distanceToEnd / 2;
+            rampDownDistance = rampUpDistance;
+        }
+
+        double initiateRampUp = 0;
+        double initiateRampDown = distanceToEnd - rampDownDistance;
+
+        // If the total distance is bigger than twice the
+        // curve radius, then the reduced velocity on curves can be applied
+        if (distanceToEnd > 2 * robot_.travelCurveZoneRadius)
+        {
+            if (!isFirstStretch)
+            {
+                initiateRampUp += robot_.travelCurveZoneRadius;
+            }
+            if (!isLastStretch)
+            {
+                initiateRampDown -= robot_.travelCurveZoneRadius;
+            }
+        }
+
+        // Current velocity and delta space
+        double updatedUpV0 = BasicMath::threshold<double>(upV0,
+            robot_.minLinearVelocity, robot_.minLinearVelocity);
+        double currentVelocity = updatedUpV0;
+
         // Begin from the initial waypoint
         Pose<> waypoint = fromWaypoint;
-        for (int p = 0; p < totalMidpoints; p++)
+        while (distanceToEnd > 0)
         {
+            trajectory_.push_back(waypoint, Velocity<>(currentVelocity, 0.0));
+
+            cout << setw(6) << currentVelocity << "  " << waypoint << endl;
+
+            // Calculate how much space the robot will advance in the time step
+            double deltaSpace = currentVelocity * dT +
+                0.5 * (robot_.travelLinearAcceleration * dT * dT);
+
             // If the trajectory between the two waypoints moves along the x
             // axis, the two Y coordinates should be roughly the same (2mm difference)
             if (movingOnX)
@@ -295,22 +230,17 @@ private:
                 throw;
             }
 
-            // Add the middle point and the velocity command to the trajectory
-            trajectory_.push_back(waypoint, Velocity<>(currentVelocity, 0.0));
-
-            cout << waypoint << " " << currentVelocity << endl;
-
             // Change the velocity based on where the middle point. If
             // no change is applied, the robot is coasting
-            if (p > rampUpIndex && p < rampDownIndex)
+            if (distanceFromStart >= initiateRampUp && distanceFromStart < initiateRampDown)
             {
                 currentVelocity += deltaVelocity;
 
                 // Saturate between the selected extremes (coast and initial
                 // velocity of the stretch)
-                currentVelocity = BasicMath::saturate<double>(currentVelocity, coastV, upV0);
+                currentVelocity = BasicMath::saturate<double>(currentVelocity, coastV, updatedUpV0);
             }
-            else if (p >= rampDownIndex)
+            else if (distanceFromStart >= initiateRampDown)
             {
                 currentVelocity -= deltaVelocity;
 
@@ -321,22 +251,25 @@ private:
                 currentVelocity = BasicMath::threshold<double>(currentVelocity,
                     robot_.minLinearVelocity, 0.0);
             }
+
+            distanceToEnd -= deltaSpace;
+            distanceFromStart += deltaSpace;
         }
 
         // Make sure that the down final velocity is included in the
         // last stretch of the trajectory
-        if (lastStretch)
+        if (isLastStretch)
         {
             Trajectory<>::NodeType lastNode = trajectory_.back();
             if (!VelocityMath::equal(lastNode.second, Velocity<>(downVf, 0.0)))
             {
                 trajectory_.push_back(waypoint, Velocity<>(downVf, 0.0));
+                cout << setw(6) << downVf << "  " << waypoint << endl;
             }
         }
     }
 
     PathType path_;
-    PathType pathReduced_;
 
     RobotProfile& robot_;
 

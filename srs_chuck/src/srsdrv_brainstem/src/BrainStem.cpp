@@ -269,7 +269,7 @@ void BrainStem::OnVoltageChanged( float fVoltage )
 	std_msgs::Float32 msg;
 	msg.data = fVoltage;
 
-	m_operationalStatePublisher.publish( msg );
+	m_voltagePublisher.publish( msg );
 }
 
 void BrainStem::CreateSubscribers( )

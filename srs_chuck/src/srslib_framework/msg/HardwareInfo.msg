@@ -1,0 +1,8 @@
+string uniqueId
+uint8 bodyType
+uint32 configuration
+uint32 lifetimeHours
+uint32 lifetimeMeters
+uint32 batteryHours
+uint32 wheelMeters
+string brainstemVersion

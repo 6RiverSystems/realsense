@@ -21,6 +21,8 @@ set(${PROJECT_NAME}_SOURCES
 set(${PROJECT_NAME}_MSGS
     Aps.msg
     CompleteMap.msg
+    HardwareInfo.msg
+    OperationalState.msg
 )
 
 set(${PROJECT_NAME}_SRVS

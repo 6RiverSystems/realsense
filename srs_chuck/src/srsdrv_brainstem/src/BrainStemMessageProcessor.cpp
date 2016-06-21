@@ -280,7 +280,8 @@ void BrainStemMessageProcessor::ProcessRosMessage( const std::string& strMessage
 				}
 				else
 				{
-					ROS_ERROR( "Bridge has invalid number of arguments: %s", strMessage.c_str( ) );
+					ROS_ERROR( "Bridge has invalid number of arguments for command %s: %s",
+						strCommand.c_str( ), strMessage.c_str( ) );
 				}
 			}
 		}

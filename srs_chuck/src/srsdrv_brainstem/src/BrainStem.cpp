@@ -7,6 +7,9 @@
 #include <BrainStem.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Float32.h>
+#include <srslib_framework/HardwareInfo.h>
+#include <srslib_framework/OperationalState.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <srslib_framework/io/SerialIO.hpp>
 #include <srslib_framework/platform/Thread.hpp>
@@ -21,25 +24,36 @@ namespace srs
 
 static constexpr auto REFRESH_RATE_HZ = 100;
 
+static constexpr auto HARDWARE_INFO_TOPIC = "/info/hardware";
+
+static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/state";
+
+static constexpr auto VOLTAGE_TOPIC = "/info/voltage";
+
+static constexpr auto CONNECTED_TOPIC = "/internal/drivers/brainstem/connected";
+
+static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
+
 static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
 
 static constexpr auto PING_TOPIC = "/internal/state/ping";
 
-static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
-static constexpr auto CONNECTED_TOPIC = "/internal/drivers/brainstem/connected";
-
 // TODO: Remove/Replace with proper messages
 static constexpr auto COMMAND_TOPIC = "/cmd_ll";
-static constexpr auto EVENT_TOPIC = "/cmd_ll";
+
+static constexpr auto EVENT_TOPIC = "/ll_event";
 
 BrainStem::BrainStem( const std::string& strSerialPort ) :
 	m_rosNodeHandle( ),
 	m_pingSubscriber( ),
     m_velocitySubscriber( ),
-    m_OdometryRawPublisher( ),
-    m_ConnectedPublisher( ),
+    m_odometryRawPublisher( ),
+    m_connectedPublisher( ),
 	m_llcmdSubscriber( ),
 	m_llEventPublisher( ),
+	m_hardwareInfoPublisher( ),
+	m_operationalStatePublisher( ),
+	m_voltagePublisher( ),
 	m_pSerialIO( new SerialIO( "brainstem" ) ),
 	m_messageProcessor( m_pSerialIO ),
 	m_dwLastOdomTime( 0 ),
@@ -93,7 +107,7 @@ void BrainStem::OnConnectionChanged( bool bIsConnected )
 	std_msgs::Bool msg;
 	msg.data = bIsConnected;
 
-	m_ConnectedPublisher.publish( msg );
+	m_connectedPublisher.publish( msg );
 
 	m_rosOdomTime = ros::Time( );
 
@@ -114,7 +128,7 @@ void BrainStem::OnButtonEvent( LED_ENTITIES eButtonId )
 
 		std::stringstream ss;
 		ss << "UI " << strEntity;
-		msg.data = ss.str();
+		msg.data = ss.str( );
 
 		ROS_DEBUG( "%s", msg.data.c_str( ) );
 
@@ -165,7 +179,7 @@ void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, 
 	odometry.twist.linear.x = fLinearVelocity;
 	odometry.twist.angular.z = fAngularVelocity;
 
-	m_OdometryRawPublisher.publish( odometry );
+	m_odometryRawPublisher.publish( odometry );
 
 	double dfClockDiff = currentTime.toSec( ) - m_rosOdomTime.toSec( );
 
@@ -181,7 +195,7 @@ void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, 
 
 void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t bodyType, uint32_t configuration,
 	uint32_t lifetimeHours, uint32_t lifetimeMeters, uint32_t batteryHours,
-	uint32_t wheelMeters, std::string strBrainstemVersion )
+	uint32_t wheelMeters, const std::string& strBrainstemVersion )
 {
 	char pszGuid[255] = { '\0' };
 
@@ -191,6 +205,18 @@ void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t bodyType, uint32_t
 		", configuration:" << configuration << ", lifetimeHours:" << lifetimeHours <<
 		", lifetimeMeters:" << lifetimeMeters << ", batteryHours:" << batteryHours <<
 		", wheelMeters:" << wheelMeters << ", Brainstem Version:" << strBrainstemVersion );
+
+	srslib_framework::HardwareInfo msg;
+	msg.uniqueId = pszGuid;
+	msg.bodyType = bodyType;
+	msg.configuration = configuration;
+	msg.lifetimeHours = lifetimeHours;
+	msg.lifetimeMeters = lifetimeMeters;
+	msg.batteryHours = batteryHours;
+	msg.wheelMeters = wheelMeters;
+	msg.brainstemVersion = strBrainstemVersion;
+
+	m_hardwareInfoPublisher.publish( msg );
 }
 
 void BrainStem::OnOperationalStateChanged( uint32_t upTime, MOTION_STATUS_DATA motionStatus,
@@ -210,17 +236,38 @@ void BrainStem::OnOperationalStateChanged( uint32_t upTime, MOTION_STATUS_DATA m
 		", brainTimeoutFailure: " << (bool)(failureStatus.brainTimeoutFailure == 1) <<
 		", rightMotorFailure: " << (bool)(failureStatus.rightMotorFailure == 1) <<
 		", leftMotorFailure: " << (bool)(failureStatus.leftMotorFailure == 1) <<
-		", suspendState: " << suspendState <<
+		", suspendState: " << (bool)(suspendState == 1) <<
 		std::endl;
 
 	std::string strData =  stream.str( );
 
 	ROS_INFO_STREAM( strData );
+
+	srslib_framework::OperationalState msg;
+	msg.frontEStop = (bool)(motionStatus.frontEStop == 1);
+	msg.backEStop = (bool)(motionStatus.backEStop == 1);
+	msg.wirelessEStop = (bool)(motionStatus.wirelessEStop == 1);
+	msg.bumpSensor = (bool)(motionStatus.bumpSensor == 1);
+	msg.pause = (bool)(motionStatus.pause == 1);
+	msg.hardStop = (bool)(motionStatus.hardStop == 1);
+	msg.safetyProcessorFailure = (bool)(failureStatus.safetyProcessorFailure == 1);
+	msg.brainstemFailure = (bool)(failureStatus.brainstemFailure == 1);
+	msg.brainTimeoutFailure = (bool)(failureStatus.brainTimeoutFailure == 1);
+	msg.rightMotorFailure = (bool)(failureStatus.rightMotorFailure == 1);
+	msg.leftMotorFailure = (bool)(failureStatus.leftMotorFailure == 1);
+	msg.suspendState = (suspendState == 1);
+
+	m_operationalStatePublisher.publish( msg );
 }
 
 void BrainStem::OnVoltageChanged( float fVoltage )
 {
 	ROS_INFO_STREAM( "Voltage => " << fVoltage );
+
+	std_msgs::Float32 msg;
+	msg.data = fVoltage;
+
+	m_operationalStatePublisher.publish( msg );
 }
 
 void BrainStem::CreateSubscribers( )
@@ -237,9 +284,15 @@ void BrainStem::CreateSubscribers( )
 
 void BrainStem::CreatePublishers( )
 {
-	m_OdometryRawPublisher = m_rosNodeHandle.advertise<geometry_msgs::TwistStamped>( ODOMETRY_TOPIC, 100 );
+	m_connectedPublisher = m_rosNodeHandle.advertise<std_msgs::Bool>( CONNECTED_TOPIC, 1, true );
 
-	m_ConnectedPublisher = m_rosNodeHandle.advertise<std_msgs::Bool>( CONNECTED_TOPIC, 1, true );
+	m_hardwareInfoPublisher = m_rosNodeHandle.advertise<srslib_framework::HardwareInfo>( HARDWARE_INFO_TOPIC, 1, true );
+
+	m_operationalStatePublisher = m_rosNodeHandle.advertise<srslib_framework::OperationalState>( OPERATIONAL_STATE_TOPIC, 1, true );
+
+	m_voltagePublisher = m_rosNodeHandle.advertise<std_msgs::Float32>( VOLTAGE_TOPIC, 1, true );
+
+	m_odometryRawPublisher = m_rosNodeHandle.advertise<geometry_msgs::TwistStamped>( ODOMETRY_TOPIC, 100 );
 
 	m_llEventPublisher = m_rosNodeHandle.advertise<std_msgs::String>( EVENT_TOPIC, 100 );
 }

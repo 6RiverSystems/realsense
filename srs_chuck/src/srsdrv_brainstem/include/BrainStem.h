@@ -36,7 +36,7 @@ public:
 
 	void OnHardwareInfo( uint32_t uniqueId[4], uint8_t bodyType, uint32_t configuration,
 		uint32_t lifetimeHours, uint32_t lifetimeMeters, uint32_t batteryHours,
-		uint32_t wheelMeters, std::string strBrainstemVersion );
+		uint32_t wheelMeters, const std::string& strBrainstemVersion );
 
 	void OnOperationalStateChanged( uint32_t upTime, MOTION_STATUS_DATA motionStatus,
 		FAILURE_STATUS_DATA failureStatus, uint8_t suspendState );
@@ -73,9 +73,15 @@ private:
 
 	ros::Publisher				m_llEventPublisher;
 
-	ros::Publisher				m_OdometryRawPublisher;
+	ros::Publisher				m_hardwareInfoPublisher;
 
-	ros::Publisher				m_ConnectedPublisher;
+	ros::Publisher				m_operationalStatePublisher;
+
+	ros::Publisher				m_voltagePublisher;
+
+	ros::Publisher				m_connectedPublisher;
+
+	ros::Publisher				m_odometryRawPublisher;
 
 	std::shared_ptr<IO>			m_pSerialIO;
 

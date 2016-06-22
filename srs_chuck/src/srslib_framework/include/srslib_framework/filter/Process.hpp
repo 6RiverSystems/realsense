@@ -20,7 +20,7 @@ class Process : public Model<STATE_SIZE, TYPE>
 public:
     typedef typename Ocv2Base<TYPE>::BaseType BaseType;
 
-    Process(BaseType noiseValue = BaseType()) :
+    Process(BaseType noiseValue = BaseType(1)) :
             Model<STATE_SIZE, TYPE>(noiseValue)
     {}
 
@@ -31,15 +31,20 @@ public:
     virtual ~Process()
     {}
 
-    cv::Mat getQ()
-    {
-        return Model<STATE_SIZE, TYPE>::noiseMatrix_;
-    }
-
     virtual cv::Mat FB(
         const cv::Mat stateVector,
         Command<COMMAND_SIZE, TYPE>* const command,
         BaseType dT) = 0;
+
+    cv::Mat getQ() const
+    {
+        return Model<STATE_SIZE, TYPE>::getNoiseMatrix();
+    }
+
+    void setQ(cv::Mat Q)
+    {
+        Model<STATE_SIZE, TYPE>::setNoiseMatrix(Q);
+    }
 };
 
 } // namespace srs

@@ -43,7 +43,8 @@ protected:
         // the current pose
         double error = AngleMath::normalizeAngleRad<double>(goal_.theta - currentPose.theta);
 
-        if (AngleMath::equalRad<double>(goal_.theta, currentPose.theta, robot_.goalReachedAngle))
+        if (!isRobotMoving_ &&
+            AngleMath::equalRad<double>(goal_.theta, currentPose.theta, robot_.goalReachedAngle))
         {
             goalReached_ = true;
         }

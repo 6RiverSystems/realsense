@@ -10,9 +10,6 @@
 #include <std_srvs/Empty.h>
 #include <tf/transform_broadcaster.h>
 
-#include <srsnode_motion/MotionConfig.h>
-using namespace srsnode_motion;
-
 #include <dynamic_reconfigure/server.h>
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
@@ -62,6 +59,7 @@ private:
     void publishGoal();
     void publishOdometry();
     void publishPing();
+    void publishPose();
 
     void reset(Pose<> pose0);
 
@@ -70,7 +68,6 @@ private:
 
     AStar<Grid2d> algorithm_;
 
-    MotionConfig configuration_;
     dynamic_reconfigure::Server<MotionConfig> configServer_;
     ros::Time currentTime_;
 
@@ -84,10 +81,13 @@ private:
     PositionEstimator positionEstimator_;
     ros::Time previousTime_;
     ros::Publisher pubOdometry_;
+    ros::Publisher pubPing_;
+    ros::Publisher pubRobotTheta_;
+    ros::Publisher pubRobotX_;
+    ros::Publisher pubRobotY_;
     ros::Publisher pubStatusGoalPlan_;
     ros::Publisher pubStatusGoalGoal_;
     ros::Publisher pubStatusGoalArrived_;
-    ros::Publisher pubPing_;
 
     uint32_t pingDecimator_;
 

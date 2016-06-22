@@ -14,6 +14,8 @@ using namespace std;
 #include <srslib_framework/planning/pathplanning/TrajectoryGenerator.hpp>
 #include <srslib_framework/planning/pathplanning/SolutionGenerator.hpp>
 
+#include <srsnode_motion/FactoryRobotProfile.hpp>
+
 namespace srs {
 
 const Velocity<> MotionController::ZERO_VELOCITY = Velocity<>(0.0, 0.0);
@@ -243,8 +245,10 @@ void MotionController::run(Pose<> currentPose, Odometry<> currentOdometry, Veloc
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MotionController::setRobot(RobotProfile robot)
+void MotionController::setConfiguration(MotionConfig& configuration)
 {
+    RobotProfile robot = FactoryRobotProfile::fromConfiguration(configuration);
+
     robot_ = robot;
 
     pathController_->setRobotProfile(robot);

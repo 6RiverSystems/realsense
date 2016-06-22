@@ -7,7 +7,11 @@
 #include <nav_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Float64.h>
 #include <tf/transform_broadcaster.h>
+
+#include <srsnode_motion/MotionConfig.h>
+using namespace srsnode_motion;
 
 #include <srslib_framework/math/AngleMath.hpp>
 
@@ -16,6 +20,8 @@
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
+
+#include <srsnode_motion/tap/aps/FactoryApsNoise.hpp>
 
 namespace srs {
 
@@ -32,8 +38,6 @@ Motion::Motion(string nodeName) :
     pingDecimator_(0),
     simulatedT_(0.0)
 {
-    motionController_.setRobot(robot_);
-
     positionEstimator_.addSensor(tapAps_.getSensor());
 
     configServer_.setCallback(boost::bind(&Motion::onConfigChange, this, _1, _2));
@@ -49,6 +53,13 @@ Motion::Motion(string nodeName) :
         "/internal/state/current_goal/arrived", 1);
     pubPing_ = rosNodeHandle_.advertise<std_msgs::Bool>(
         "/internal/state/ping", 1);
+
+    pubRobotTheta_ = rosNodeHandle_.advertise<std_msgs::Float64>(
+        "/internal/state/pose/theta", 100);
+    pubRobotX_ = rosNodeHandle_.advertise<std_msgs::Float64>(
+        "/internal/state/pose/x", 100);
+    pubRobotY_ = rosNodeHandle_.advertise<std_msgs::Float64>(
+        "/internal/state/pose/y", 100);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,8 +89,8 @@ void Motion::run()
         stepNode();
 
         publishOdometry();
-
         publishPing();
+        publishPose();
 
         refreshRate.sleep();
     }
@@ -127,121 +138,90 @@ void Motion::evaluateTriggers()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 {
-    configuration_ = config;
+    positionEstimator_.setConfiguration(config);
+    motionController_.setConfiguration(config);
 
-    robot_.adaptiveLookAhead = configuration_.adaptive_lookahead_enabled;
+    cv::Mat R = FactoryApsNoise::fromConfiguration(config);
+    tapAps_.getSensor()->setR(R);
+    tapAps_.getSensor()->enable(config.aps_enabled);
+
     ROS_INFO_STREAM_NAMED("Motion", "Adaptive look-ahead enabled [t/f]: " <<
-        configuration_.adaptive_lookahead_enabled);
+        config.adaptive_lookahead_enabled);
 
-    tapAps_.getSensor()->enable(configuration_.aps_enabled);
     ROS_INFO_STREAM_NAMED("Motion", "APS sensor enabled: " <<
-        configuration_.aps_enabled);
+        config.aps_enabled);
 
-    robot_.emergencyRatioCrawl = configuration_.emergency_controller_ratio_crawl;
     ROS_INFO_STREAM_NAMED("Motion", "Emergency Controller: Ratio of the motion in crawl mode []: " <<
-        configuration_.emergency_controller_ratio_crawl);
+        config.emergency_controller_ratio_crawl);
 
-    robot_.goalReachedDistance = configuration_.goal_reached_distance;
     ROS_INFO_STREAM_NAMED("Motion", "Goal reached distance [m]: " <<
-        configuration_.goal_reached_distance);
-
-    robot_.goalReachedAngle = configuration_.goal_reached_angle;
+        config.goal_reached_distance);
     ROS_INFO_STREAM_NAMED("Motion", "Goal reached angle [rad]: " <<
-        configuration_.goal_reached_angle);
+        config.goal_reached_angle);
 
-    robot_.manualRatioAngular = configuration_.manual_controller_ratio_angular;
     ROS_INFO_STREAM_NAMED("Motion", "Manual Controller: ratio of the angular velocity in manual mode []: " <<
-        configuration_.manual_controller_ratio_angular);
-
-    robot_.manualRatioLinear = configuration_.manual_controller_ratio_linear;
+        config.manual_controller_ratio_angular);
     ROS_INFO_STREAM_NAMED("Motion", "Manual Controller: ratio of the linear velocity in manual mode []: " <<
-        configuration_.manual_controller_ratio_linear);
-
-    robot_.maxAngularAcceleration = configuration_.max_angular_acceleration;
+        config.manual_controller_ratio_linear);
     ROS_INFO_STREAM_NAMED("Motion", "Max angular acceleration [m/s^2]: " <<
-        configuration_.max_angular_acceleration);
-
-    robot_.maxAngularVelocity = configuration_.max_angular_velocity;
+        config.max_angular_acceleration);
     ROS_INFO_STREAM_NAMED("Motion", "Max angular velocity [m/s]: " <<
-        configuration_.max_angular_velocity);
-
-    robot_.maxLinearAcceleration = configuration_.max_linear_acceleration;
+        config.max_angular_velocity);
     ROS_INFO_STREAM_NAMED("Motion", "Max linear acceleration [m/s^2]: " <<
-        configuration_.max_linear_acceleration);
-
-    robot_.maxLinearVelocity = configuration_.max_linear_velocity;
+        config.max_linear_acceleration);
     ROS_INFO_STREAM_NAMED("Motion", "Max linear velocity [m/s]: " <<
-        configuration_.max_linear_velocity);
-
-    robot_.maxLookAheadDistance = configuration_.max_look_ahead_distance;
+        config.max_linear_velocity);
     ROS_INFO_STREAM_NAMED("Motion", "Max look-ahead distance [m]: " <<
-        configuration_.max_look_ahead_distance);
-
-    robot_.minAngularVelocity = configuration_.min_angular_velocity;
+        config.max_look_ahead_distance);
     ROS_INFO_STREAM_NAMED("Motion", "Minimum angular velocity during motion [rad/s]: " <<
-        configuration_.min_angular_velocity);
-
-    robot_.minLinearVelocity = configuration_.min_linear_velocity;
+        config.min_angular_velocity);
     ROS_INFO_STREAM_NAMED("Motion", "Minimum linear velocity during motion [m/s]: " <<
-        configuration_.min_linear_velocity);
-
-    robot_.minLookAheadDistance = configuration_.min_look_ahead_distance;
+        config.min_linear_velocity);
     ROS_INFO_STREAM_NAMED("Motion", "Min look-ahead distance [m]: " <<
-        configuration_.min_look_ahead_distance);
-
-    robot_.minPhysicalAngularVelocity = configuration_.min_physical_angular_velocity;
+        config.min_look_ahead_distance);
     ROS_INFO_STREAM_NAMED("Motion", "Minimum physical angular velocity [rad/s]: " <<
-        configuration_.min_physical_angular_velocity);
-
-    robot_.minPhysicalLinearVelocity = configuration_.min_physical_linear_velocity;
+        config.min_physical_angular_velocity);
     ROS_INFO_STREAM_NAMED("Motion", "Minimum physical linear velocity [m/s]: " <<
-        configuration_.min_physical_linear_velocity);
+        config.min_physical_linear_velocity);
 
-    robot_.rotationKd = configuration_.rotation_controller_kd;
     ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: derivative constant []: " <<
-        configuration_.rotation_controller_kd);
-
-    robot_.rotationKi = configuration_.rotation_controller_ki;
+        config.rotation_controller_kd);
     ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: integral constant []: " <<
-        configuration_.rotation_controller_ki);
-
-    robot_.rotationKp= configuration_.rotation_controller_kp;
+        config.rotation_controller_ki);
     ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: proportional constant []: " <<
-        configuration_.rotation_controller_kp);
+        config.rotation_controller_kp);
 
-    robot_.travelAngularAcceleration = configuration_.travel_angular_acceleration;
     ROS_INFO_STREAM_NAMED("Motion", "Travel angular acceleration [rad/s^2]: " <<
-        configuration_.travel_angular_acceleration);
-
-    robot_.travelAngularVelocity = configuration_.travel_angular_velocity;
+        config.travel_angular_acceleration);
     ROS_INFO_STREAM_NAMED("Motion", "Travel angular velocity [rad/s]: " <<
-        configuration_.travel_angular_velocity);
-
-    robot_.travelTurningZoneRadius = configuration_.travel_turning_zone_radius;
+        config.travel_angular_velocity);
     ROS_INFO_STREAM_NAMED("Motion", "Travel reduced velocity radius during curves [m]: " <<
-        configuration_.travel_turning_zone_radius);
-
-    robot_.travelTurningVelocity = configuration_.travel_turning_linear_velocity;
+        config.travel_turning_zone_radius);
     ROS_INFO_STREAM_NAMED("Motion", "Travel linear velocity during curves [m/s]: " <<
-        configuration_.travel_turning_linear_velocity);
-
-    robot_.travelLinearAcceleration = configuration_.travel_linear_acceleration;
+        config.travel_turning_linear_velocity);
     ROS_INFO_STREAM_NAMED("Motion", "Travel linear acceleration [m/s^2]: " <<
-        configuration_.travel_linear_acceleration);
-
-    robot_.travelLinearVelocity = configuration_.travel_linear_velocity;
+        config.travel_linear_acceleration);
     ROS_INFO_STREAM_NAMED("Motion", "Travel linear velocity [m/s]: " <<
-        configuration_.travel_linear_velocity);
-
-    robot_.travelRotationVelocity = configuration_.travel_rotation_velocity;
+        config.travel_linear_velocity);
     ROS_INFO_STREAM_NAMED("Motion", "Travel rotation velocity [rad/s]: " <<
-        configuration_.travel_rotation_velocity);
+        config.travel_rotation_velocity);
 
-    robot_.zeroLookAheadDistance = configuration_.zero_look_ahead_distance;
+    ROS_INFO_STREAM_NAMED("Motion", "Heading component of the APS noise [rad]: " <<
+        config.ukf_aps_error_heading);
+    ROS_INFO_STREAM_NAMED("Motion", "Location (X and Y) component of the APS noise [m]: " <<
+        config.ukf_aps_error_location);
+
+    ROS_INFO_STREAM_NAMED("Motion", "Heading component of the robot noise [rad]: " <<
+        config.ukf_robot_error_heading);
+    ROS_INFO_STREAM_NAMED("Motion", "Location (X and Y) component of the robot noise [m]: " <<
+        config.ukf_robot_error_location);
+    ROS_INFO_STREAM_NAMED("Motion", "Angular velocity component of the robot noise [rad/s]: " <<
+        config.ukf_robot_error_velocity_angular);
+    ROS_INFO_STREAM_NAMED("Motion", "Linear velocity component of the robot noise [m/s]: " <<
+        config.ukf_robot_error_velocity_linear);
+
     ROS_INFO_STREAM_NAMED("Motion", "Zero-point motion controller look-ahead distance [m]: " <<
-        configuration_.zero_look_ahead_distance);
-
-    motionController_.setRobot(robot_);
+        config.zero_look_ahead_distance);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -379,6 +359,22 @@ void Motion::publishPing()
     }
 
     pingDecimator_++;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::publishPose()
+{
+    Pose<> currentPose = positionEstimator_.getPose();
+    std_msgs::Float64 message;
+
+    message.data = currentPose.x;
+    pubRobotX_.publish(message);
+
+    message.data = currentPose.y;
+    pubRobotY_.publish(message);
+
+    message.data = AngleMath::rad2deg<double>(currentPose.theta);
+    pubRobotTheta_.publish(message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -28,16 +28,15 @@ TEST(Test_Trajectory, Map)
     algorithm->search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 0));
 
     Solution<Grid2d> solution = algorithm->getSolution(map->getResolution());
+
     cout << solution << endl;
 
     Chuck chuck;
-
-    // Calculate the trajectory
     Trajectory<> trajectory;
-    TrajectoryGenerator converter(chuck);
 
-    converter.fromSolution(solution, 1.0 / 100.0);
-    converter.getTrajectory(trajectory);
+    TrajectoryGenerator solutionConverter(chuck);
+    solutionConverter.fromSolution(solution);
+    solutionConverter.getTrajectory(trajectory);
 
     cout << trajectory << endl;
 }

@@ -19,12 +19,29 @@ using namespace srs;
 
 namespace srs {
 
+struct TrajectoryAnnotation
+{
+    double maxVelocity;
+
+    TrajectoryAnnotation() :
+        maxVelocity(0.0)
+    {}
+
+    friend ostream& operator<<(ostream& stream, const TrajectoryAnnotation& annotation)
+    {
+        stream << "Annotation {" <<
+            "maxVelocity: " << annotation.maxVelocity;
+
+        return stream << "}";
+    }
+};
+
 template<typename TYPE = double>
-class Trajectory : public vector<pair<Pose<TYPE>, Velocity<TYPE>>>
+class Trajectory : public vector<pair<Pose<TYPE>, TrajectoryAnnotation>>
 {
 public:
     typedef TYPE BaseType;
-    typedef pair<Pose<BaseType>, Velocity<BaseType>> NodeType;
+    typedef pair<Pose<BaseType>, TrajectoryAnnotation> NodeType;
 
     Trajectory()
     {}
@@ -81,7 +98,7 @@ public:
         return Pose<BaseType>();
     }
 
-    Velocity<BaseType> getVelocity(int position)
+    TrajectoryAnnotation getAnnotation(int position)
     {
         if (position >= 0 && position < this->size())
         {
@@ -90,16 +107,16 @@ public:
         }
 
         // TODO: An exception should thrown
-        return Velocity<BaseType>();
+        return TrajectoryAnnotation();
     }
 
-    void getWaypoint(int position, Pose<BaseType>& pose, Velocity<BaseType>& velocity)
+    void getWaypoint(int position, Pose<BaseType>& pose, TrajectoryAnnotation& annotation)
     {
         if (position >= 0 && position < this->size())
         {
             NodeType node = this[position];
             pose = node.first;
-            velocity = node.second;
+            annotation = node.second;
 
             return;
         }
@@ -114,15 +131,16 @@ public:
         stream << "Trajectory {" << endl;
         for (auto waypoint : trajectory)
         {
-            stream << setw(4) << counter++ << ": " << waypoint.first << ", " << waypoint.second << endl;
+            stream << setw(4) << counter++ << ": " <<
+                waypoint.first << ", " << waypoint.second << endl;
         }
 
         return stream << "}";
     }
 
-    void push_back(Pose<BaseType> pose, Velocity<BaseType> velocity)
+    void push_back(Pose<BaseType> pose, TrajectoryAnnotation annotation)
     {
-        this->vector<NodeType>::push_back(NodeType(pose, velocity));
+        this->vector<NodeType>::push_back(NodeType(pose, annotation));
     }
 
 private:

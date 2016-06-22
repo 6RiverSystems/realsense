@@ -537,10 +537,8 @@ void Motion::executePlanToGoal(Pose<> goalPose)
     if (foundSolution)
     {
         ROS_DEBUG_STREAM_NAMED("Motion", "Found solution: " << endl << solution);
-        if (!solution.empty())
-        {
-            motionController_.execute(solution);
-        }
+        motionController_.execute(solution);
+
         simulatedT_ = 0.0;
     }
     else

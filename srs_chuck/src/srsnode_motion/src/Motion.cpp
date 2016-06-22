@@ -7,6 +7,7 @@
 #include <nav_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Float64.h>
 #include <tf/transform_broadcaster.h>
 
 #include <srslib_framework/math/AngleMath.hpp>
@@ -86,7 +87,7 @@ void Motion::run()
 
         publishOdometry();
         publishPing();
-        publishedPose();
+        publishPose();
 
         refreshRate.sleep();
     }

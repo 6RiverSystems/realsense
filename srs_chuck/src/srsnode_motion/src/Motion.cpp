@@ -49,6 +49,13 @@ Motion::Motion(string nodeName) :
         "/internal/state/current_goal/arrived", 1);
     pubPing_ = rosNodeHandle_.advertise<std_msgs::Bool>(
         "/internal/state/ping", 1);
+
+    pubRobotTheta_ = rosNodeHandle_.advertise<std_msgs::Float64>(
+        "/internal/state/pose/theta", 100);
+    pubRobotX_ = rosNodeHandle_.advertise<std_msgs::Float64>(
+        "/internal/state/pose/x", 100);
+    pubRobotY_ = rosNodeHandle_.advertise<std_msgs::Float64>(
+        "/internal/state/pose/y", 100);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,8 +85,8 @@ void Motion::run()
         stepNode();
 
         publishOdometry();
-
         publishPing();
+        publishedPose();
 
         refreshRate.sleep();
     }
@@ -379,6 +386,22 @@ void Motion::publishPing()
     }
 
     pingDecimator_++;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::publishPose()
+{
+    Pose<> currentPose = positionEstimator_.getPose();
+    std_msgs::Float64 message;
+
+    message.data = currentPose.x;
+    pubRobotX_.publish(message);
+
+    message.data = currentPose.y;
+    pubRobotY_.publish(message);
+
+    message.data = AngleMath::rad2deg<double>(currentPose.theta);
+    pubRobotTheta_.publish(message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -62,6 +62,7 @@ private:
     void publishGoal();
     void publishOdometry();
     void publishPing();
+    void publishPose();
 
     void reset(Pose<> pose0);
 
@@ -84,10 +85,13 @@ private:
     PositionEstimator positionEstimator_;
     ros::Time previousTime_;
     ros::Publisher pubOdometry_;
+    ros::Publisher pubPing_;
+    ros::Publisher pubRobotTheta_;
+    ros::Publisher pubRobotX_;
+    ros::Publisher pubRobotY_;
     ros::Publisher pubStatusGoalPlan_;
     ros::Publisher pubStatusGoalGoal_;
     ros::Publisher pubStatusGoalArrived_;
-    ros::Publisher pubPing_;
 
     uint32_t pingDecimator_;
 

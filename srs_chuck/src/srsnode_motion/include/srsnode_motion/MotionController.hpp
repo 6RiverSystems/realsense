@@ -73,6 +73,11 @@ public:
         return isEmergencyControllerActive();
     }
 
+    bool isMoving()
+    {
+        return isMovingControllerActive();
+    }
+
     void normalStop();
 
     void reset();

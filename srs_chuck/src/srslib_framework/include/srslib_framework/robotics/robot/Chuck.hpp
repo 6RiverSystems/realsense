@@ -24,7 +24,7 @@ struct Chuck : RobotProfile
 
         emergencyRatioCrawl = 0.08; // []
 
-        goalReachedDistance = 0.100; // [m]
+        goalReachedDistance = 0.050; // [m]
         goalReachedAngle = AngleMath::deg2rad<double>(1.0); // 0.0175 [rad]
 
         manualRatioAngular = 0.20; // []
@@ -33,9 +33,9 @@ struct Chuck : RobotProfile
         maxAngularVelocity = AngleMath::deg2rad<double>(555.0); // 9.687 [rad/s]
         maxLinearAcceleration = 0.700; // [m/s^2]
         maxLinearVelocity = 2.600; // [m/s]
-        maxLookAheadDistance = 1.200; // [m]
+        maxLookAheadDistance = 1.100; // [m]
         minAngularVelocity = AngleMath::deg2rad(0.1); // 0.0017 [rad/s]
-        minLinearVelocity = 0.05; // [m/s]
+        minLinearVelocity = 0.1; // [m/s]
         minLookAheadDistance = 0.800; // [m]
         minPhysicalAngularVelocity = AngleMath::deg2rad(0.05); // 0.0008 [rad/s]
         minPhysicalLinearVelocity = 0.005; // [m/s]
@@ -46,8 +46,8 @@ struct Chuck : RobotProfile
 
         travelAngularAcceleration = AngleMath::deg2rad<double>(28.0); // 0.489 [rad/s^2]
         travelAngularVelocity = AngleMath::deg2rad<double>(115); // 2.007 [rad/s]
-        travelCurveZoneRadius = 0.500; // [m]
-        travelCurvingVelocity = 0.300; // [m/s]
+        travelTurningZoneRadius = 0.500; // [m]
+        travelTurningVelocity = 0.300; // [m/s]
         travelLinearAcceleration =  0.650; // [m/s^2]
         travelLinearVelocity = 1.000; // [m/s]
         travelRotationVelocity = AngleMath::deg2rad(30.0); // 0.524 [rad/s]

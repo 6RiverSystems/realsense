@@ -217,13 +217,13 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     ROS_INFO_STREAM_NAMED("Motion", "Travel angular velocity [rad/s]: " <<
         configuration_.travel_angular_velocity);
 
-    robot_.travelCurveZoneRadius = configuration_.travel_curve_zone_radius;
+    robot_.travelTurningZoneRadius = configuration_.travel_turning_zone_radius;
     ROS_INFO_STREAM_NAMED("Motion", "Travel reduced velocity radius during curves [m]: " <<
-        configuration_.travel_curve_zone_radius);
+        configuration_.travel_turning_zone_radius);
 
-    robot_.travelCurvingVelocity = configuration_.travel_curving_linear_velocity;
+    robot_.travelTurningVelocity = configuration_.travel_turning_linear_velocity;
     ROS_INFO_STREAM_NAMED("Motion", "Travel linear velocity during curves [m/s]: " <<
-        configuration_.travel_curving_linear_velocity);
+        configuration_.travel_turning_linear_velocity);
 
     robot_.travelLinearAcceleration = configuration_.travel_linear_acceleration;
     ROS_INFO_STREAM_NAMED("Motion", "Travel linear acceleration [m/s^2]: " <<
@@ -368,15 +368,15 @@ void Motion::publishOdometry()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishPing()
 {
-	constexpr uint32_t frequencyDivisor = uint32_t(REFRESH_RATE_HZ / PING_HZ);
+    constexpr uint32_t frequencyDivisor = uint32_t(REFRESH_RATE_HZ / PING_HZ);
 
-	if ((pingDecimator_ % frequencyDivisor) == 0)
-	{
-		std_msgs::Bool messagePing;
-		messagePing.data = true;
+    if ((pingDecimator_ % frequencyDivisor) == 0)
+    {
+        std_msgs::Bool messagePing;
+        messagePing.data = true;
 
-		pubPing_.publish(messagePing);
-	}
+        pubPing_.publish(messagePing);
+    }
 
     pingDecimator_++;
 }
@@ -416,10 +416,10 @@ void Motion::scanTapsForData()
         isJoystickLatched_ = tapJoyAdapter_.getLatchState();
     }
 
-    // if (!motionController_.isMoving() && tapMap_.getMap() && !motionController_.isGoalReached())
+    // if (tapMap_.getMap() && !motionController_.isMoving() && !motionController_.hasArrived())
     // {
-    //     executePlanToGoal(tapCmdGoal_.getGoal());
-    //     publishGoal();
+    //      executePlanToGoal(tapInternalGoal_.getPose());
+    //      publishGoal();
     // }
 
     // If there is a new goal to reach

@@ -33,7 +33,7 @@ TEST(Test_Trajectory, ShortStraight)
     Trajectory<> trajectory;
 
     TrajectoryGenerator solutionConverter(chuck);
-    solutionConverter.fromSolution(solution, 1.0 / 100.0);
+    solutionConverter.fromSolution(solution);
     solutionConverter.getTrajectory(trajectory);
 
     cout << trajectory << endl;

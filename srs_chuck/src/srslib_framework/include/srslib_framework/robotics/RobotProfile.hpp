@@ -40,8 +40,8 @@ struct RobotProfile
 
         travelAngularAcceleration(0.0),
         travelAngularVelocity(0.0),
-        travelCurveZoneRadius(0.0),
-        travelCurvingVelocity(0.0),
+        travelTurningZoneRadius(0.0),
+        travelTurningVelocity(0.0),
         travelLinearAcceleration(0.0),
         travelLinearVelocity(0.0),
         travelRotationVelocity(0.0),
@@ -84,8 +84,8 @@ struct RobotProfile
 
     double travelAngularAcceleration; // [rad/s^2]
     double travelAngularVelocity; // [rad/s]
-    double travelCurveZoneRadius; // [m]
-    double travelCurvingVelocity; // [m/s]
+    double travelTurningZoneRadius; // [m]
+    double travelTurningVelocity; // [m/s]
     double travelLinearAcceleration; // [m/s^2]
     double travelLinearVelocity; // [m/s]
     double travelRotationVelocity; // [rad/s]

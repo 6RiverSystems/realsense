@@ -19,14 +19,10 @@ class ApsSensor :
     public Sensor<STATE_SIZE, TYPE>
 {
 public:
-    // Standard deviation values for the APS sensor process
-    constexpr static double ERROR_LOCATION = 0.001; // [m]
-    constexpr static double ERROR_HEADING = AngleMath::deg2rad<double>(0.1); // [rad]
-
     typedef typename Sensor<STATE_SIZE, TYPE>::BaseType BaseType;
 
     ApsSensor() :
-        Sensor<STATE_SIZE, TYPE>(cv::Mat::diag(R)),
+        Sensor<STATE_SIZE, TYPE>(),
         currentData_(Pose<BaseType>(0.0, 0.0, 0.0))
     {
         reset();
@@ -50,14 +46,16 @@ public:
 
     void set(double arrivalTime, BaseType x, BaseType y, BaseType theta)
     {
-        currentData_ = Pose<BaseType>(arrivalTime, x, y, theta);
-        Sensor<STATE_SIZE, TYPE>::setNewData(true);
+        if (Sensor<STATE_SIZE, TYPE>::isEnabled())
+        {
+            currentData_ = Pose<BaseType>(arrivalTime, x, y, theta);
+            Sensor<STATE_SIZE, TYPE>::setNewData(true);
+        }
     }
 
     virtual cv::Mat H(const cv::Mat stateVector);
 
 private:
-    const static cv::Mat R;
     Pose<BaseType> currentData_;
 };
 

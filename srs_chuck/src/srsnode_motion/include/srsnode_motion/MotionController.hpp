@@ -12,6 +12,9 @@ using namespace std;
 
 #include <ros/ros.h>
 
+#include <srsnode_motion/MotionConfig.h>
+using namespace srsnode_motion;
+
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
@@ -83,7 +86,7 @@ public:
     void reset();
     void run(Pose<> currentPose, Odometry<> currentOdometry, Velocity<> currentCommand);
 
-    void setRobot(RobotProfile robot);
+    void setConfiguration(MotionConfig& configuration);
     void switchToManual();
     void switchToAutonomous();
 

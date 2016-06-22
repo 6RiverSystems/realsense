@@ -19,21 +19,33 @@ class Model : public Object
 public:
     typedef typename Ocv2Base<TYPE>::BaseType BaseType;
 
-    Model(BaseType noiseValue = BaseType()) :
+    Model(BaseType noiseValue = BaseType(1)) :
             Object()
     {
-        noiseMatrix_ = cv::Mat::eye(STATE_SIZE, STATE_SIZE, TYPE) * noiseValue;
+        setNoiseMatrix(cv::Mat::eye(STATE_SIZE, STATE_SIZE, TYPE) * noiseValue);
     }
 
     Model(cv::Mat noiseMatrix) :
-            Object(),
-            noiseMatrix_(noiseMatrix)
-    {}
+            Object()
+    {
+        setNoiseMatrix(noiseMatrix);
+    }
 
     virtual ~Model()
     {}
 
 protected:
+    cv::Mat getNoiseMatrix() const
+    {
+        return noiseMatrix_;
+    }
+
+    void setNoiseMatrix(cv::Mat noiseMatrix)
+    {
+        noiseMatrix.copyTo(noiseMatrix_);
+    }
+
+private:
     cv::Mat noiseMatrix_;
 };
 

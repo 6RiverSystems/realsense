@@ -10,11 +10,15 @@
 #include <vector>
 using namespace std;
 
+#include <srsnode_motion/MotionConfig.h>
+using namespace srsnode_motion;
+
 #include <srslib_framework/filter/Sensor.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
 #include <srsnode_motion/Configuration.hpp>
+#include <srsnode_motion/FactoryRobotNoise.hpp>
 #include <srsnode_motion/Robot.hpp>
 #include <srsnode_motion/StatePe.hpp>
 
@@ -83,6 +87,12 @@ public:
         }
 
         ukf_.run(dT, odometry);
+    }
+
+    void setConfiguration(MotionConfig& configuration)
+    {
+        cv::Mat newQ = FactoryRobotNoise::fromConfiguration(configuration);
+        robot_.setQ(newQ);
     }
 
 private:

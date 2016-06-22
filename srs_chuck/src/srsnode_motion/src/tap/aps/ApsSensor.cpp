@@ -5,20 +5,6 @@
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Constant initialization
-
-// Covariance vector of the robot process
-template<unsigned int STATE_SIZE, int TYPE>
-const cv::Mat ApsSensor<STATE_SIZE, TYPE>::R = (
-    cv::Mat_<ApsSensor<STATE_SIZE, TYPE>::BaseType>(1, STATE_SIZE) <<
-        ApsSensor<STATE_SIZE, TYPE>::ERROR_LOCATION * ApsSensor<STATE_SIZE, TYPE>::ERROR_LOCATION, // [m^2]
-        ApsSensor<STATE_SIZE, TYPE>::ERROR_LOCATION * ApsSensor<STATE_SIZE, TYPE>::ERROR_LOCATION, // [m^2]
-        ApsSensor<STATE_SIZE, TYPE>::ERROR_HEADING * ApsSensor<STATE_SIZE, TYPE>::ERROR_HEADING, // [rad^2]
-        0.0,
-        0.0
-);
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

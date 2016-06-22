@@ -10,9 +10,6 @@
 #include <std_srvs/Empty.h>
 #include <tf/transform_broadcaster.h>
 
-#include <srsnode_motion/MotionConfig.h>
-using namespace srsnode_motion;
-
 #include <dynamic_reconfigure/server.h>
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
@@ -71,7 +68,6 @@ private:
 
     AStar<Grid2d> algorithm_;
 
-    MotionConfig configuration_;
     dynamic_reconfigure::Server<MotionConfig> configServer_;
     ros::Time currentTime_;
 

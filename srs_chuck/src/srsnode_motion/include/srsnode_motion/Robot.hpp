@@ -15,6 +15,9 @@
 #include <srsnode_motion/Configuration.hpp>
 #include <srsnode_motion/StatePe.hpp>
 
+#include <srsnode_motion/MotionConfig.h>
+using namespace srsnode_motion;
+
 namespace srs {
 
 template<int TYPE = CV_64F>
@@ -23,16 +26,10 @@ class Robot : public Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VE
 public:
     typedef typename Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>::BaseType BaseType;
 
-    // Standard deviation values for the robot process
-    constexpr static double ERROR_LOCATION = 0.001; // [m]
-    constexpr static double ERROR_HEADING = AngleMath::deg2rad<double>(0.1); // [rad]
-    constexpr static double ERROR_LINEAR_VELOCITY = 0.002; // [m/s]
-    constexpr static double ERROR_ANGULAR_VELOCITY = 0.002; // [m/s]
-
     constexpr static double ANGULAR_VELOCITY_EPSILON = 0.001; // [rad/s] (0.0573 [deg/s])
 
     Robot() :
-        Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>(cv::Mat::diag(Q))
+        Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>()
     {}
 
     virtual ~Robot()
@@ -44,9 +41,6 @@ public:
         BaseType dT);
 
     void kinematics(StatePe<TYPE> sT0, BaseType dT, StatePe<TYPE>& sT1);
-
-private:
-    const static cv::Mat Q;
 };
 
 } // namespace srs

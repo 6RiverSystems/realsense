@@ -13,6 +13,7 @@ set(${PROJECT_NAME}_SOURCES
     src/localization/Map.cpp
     src/localization/MapNote.cpp
 
+    src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp
 
     src/ros/tap/RosTapMap.cpp

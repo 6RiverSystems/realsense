@@ -23,6 +23,11 @@ public:
     ~StandController()
     {}
 
+    void setRobotProfile(RobotProfile robot)
+    {
+        BaseController::setRobotProfile(robot, 1.0, 1.0);
+    }
+
 protected:
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
@@ -31,7 +36,7 @@ protected:
         goalReached_ = false;
 
         // Send the command for execution
-        executeCommand(Velocity<>());
+        executeCommand(ZERO_VELOCITY);
     }
 
 private:

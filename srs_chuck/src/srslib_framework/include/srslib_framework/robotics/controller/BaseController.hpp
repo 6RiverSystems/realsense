@@ -20,10 +20,13 @@ namespace srs {
 class BaseController
 {
 public:
+    static const Velocity<> ZERO_VELOCITY;
+    static const Pose<> ZERO_POSE;
+
     BaseController(string name) :
         canceled_(false),
-        executingCommand_(Velocity<>()),
-        goal_(Pose<>()),
+        executingCommand_(ZERO_VELOCITY),
+        goal_(ZERO_POSE),
         goalReached_(false),
         Kv_(1.0),
         Kw_(1.0),
@@ -71,52 +74,29 @@ public:
         return isRobotMoving_;
     }
 
-    virtual void reset()
-    {
-        canceled_ = false;
-
-        goal_ = Pose<>();
-        goalReached_ = false;
-
-        isRobotMoving_ = false;
-
-        executingCommand_ = Velocity<>();
-    }
+    virtual void reset();
 
     void setGoal(Pose<> goal)
     {
         goal_ = goal;
     }
 
-    void setRobotProfile(RobotProfile robot)
-    {
-        robot_ = robot;
-    }
-
-    void setVelocityGains(double Kv, double Kw)
-    {
-        Kv_ = Kv;
-        Kw_ = Kw;
-    }
-
-    void step(double dT, Pose<> currentPose, Odometry<> currentOdometry)
-    {
-        // Perform some basic operations before calling
-        // the specific controller step
-        isRobotMoving_ = !VelocityMath::equal<double>(currentOdometry.velocity, Velocity<>());
-
-        // Call the controller
-        stepController(dT, currentPose, currentOdometry);
-    }
+    void step(double dT, Pose<> currentPose, Odometry<> currentOdometry);
+    virtual void setRobotProfile(RobotProfile robot) = 0;
 
 protected:
-    void executeCommand(Velocity<> command)
-    {
-        ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "BaseController", "Executing command: " << command);
-        executingCommand_ = command;
-    }
+    void executeCommand(Velocity<> command);
+    void executeCommand(double linear, double angular);
 
     virtual void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry) = 0;
+
+    void setRobotProfile(RobotProfile robot, double Kv, double Kw)
+    {
+        robot_ = robot;
+
+        Kv_ = 1.0;
+        Kw_ = 1.0;
+    }
 
     bool canceled_;
 
@@ -125,10 +105,10 @@ protected:
     Pose<> goal_;
     bool goalReached_;
 
+    bool isRobotMoving_;
+
     double Kv_;
     double Kw_;
-
-    bool isRobotMoving_;
 
     string name_;
 

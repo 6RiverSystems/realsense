@@ -26,9 +26,9 @@ public:
         currentVelocity_(0.0),
         lookAheadDistance_(1.0),
         projectionIndex_(-1),
-        referencePose_(Pose<>()),
+        referencePose_(ZERO_POSE),
         velocityChange_(0.0),
-        velocityChangePose_(Pose<>()),
+        velocityChangePose_(ZERO_POSE),
         velocityCurrentMax_(0.0)
     {}
 
@@ -41,6 +41,11 @@ public:
     }
 
     void reset();
+
+    void setRobotProfile(RobotProfile robot)
+    {
+        BaseController::setRobotProfile(robot, robot.pathFollowKv, robot.pathFollowKw);
+    }
 
     void setTrajectory(Trajectory<> trajectory, Pose<> robotPose);
 

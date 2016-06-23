@@ -25,7 +25,12 @@ public:
     {
         BaseController::reset();
 
-        userCommand_ = Velocity<>();
+        userCommand_ = ZERO_VELOCITY;
+    }
+
+    void setRobotProfile(RobotProfile robot)
+    {
+        BaseController::setRobotProfile(robot, robot.emergencyKv, robot.emergencyKw);
     }
 
     void setUserCommand(Velocity<> userCommand)
@@ -40,13 +45,11 @@ protected:
         // goal, it must be canceled
         goalReached_ = false;
 
-        double linear = BasicMath::saturate<double>(
-            robot_.emergencyRatioCrawl * userCommand_.linear * robot_.travelLinearVelocity,
-            robot_.maxLinearVelocity, -robot_.maxLinearVelocity);
+        double linear = robot_.emergencyRatioCrawl *
+            userCommand_.linear * robot_.travelLinearVelocity;
 
-        double angular = BasicMath::saturate<double>(
-            robot_.emergencyRatioCrawl * userCommand_.angular * robot_.travelAngularVelocity,
-            robot_.maxAngularVelocity, -robot_.maxAngularVelocity);
+        double angular = robot_.emergencyRatioCrawl *
+            userCommand_.angular * robot_.travelAngularVelocity;
 
         // If the robot is moving backward and at the same time
         // rotating, invert the direction of rotation. No transformation
@@ -57,7 +60,7 @@ protected:
         }
 
         // Send the command for execution
-        executeCommand(Velocity<>(linear, angular));
+        executeCommand(linear, angular);
     }
 
 private:

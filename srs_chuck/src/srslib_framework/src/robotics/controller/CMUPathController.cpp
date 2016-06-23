@@ -19,12 +19,12 @@ void CMUPathController::reset()
 
     currentVelocity_ = 0.0;
     velocityChange_ = 0.0;
-    velocityChangePose_ = Pose<>();
+    velocityChangePose_ = ZERO_POSE;
     velocityCurrentMax_ = 0.0;
     currentTrajectory_.clear();
 
     projectionIndex_ = -1;
-    referencePose_ = Pose<>();
+    referencePose_ = ZERO_POSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,13 +80,13 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     if (canceled_ || distanceToGoal < robot_.goalReachedDistance)
     {
         goalReached_ = true;
-        executeCommand(Velocity<>(0.0, 0.0));
+        executeCommand(ZERO_VELOCITY);
 
         return;
     }
 
     // Calculate what would be the velocity change based on the set acceleration
-    double deltaVelocity = Kv_ * robot_.travelLinearAcceleration * dT;
+    double deltaVelocity = robot_.travelLinearAcceleration * dT;
 
     // Calculate the velocity after the acceleration has taken place
     double projectedVelocity = currentVelocity_ + deltaVelocity;
@@ -134,16 +134,10 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     double slope = atan2(referencePose_.y - currentPose.y, referencePose_.x - currentPose.x);
     double alpha = AngleMath::normalizeAngleRad<double>(slope - currentPose.theta);
 
-    double angular = Kw_ * 2 * sin(alpha) / lookAheadDistance_;
-
-    angular = BasicMath::saturate<double>(angular,
-        robot_.maxAngularVelocity, -robot_.maxAngularVelocity);
-
-    angular = BasicMath::threshold<double>(angular,
-        robot_.minPhysicalAngularVelocity, 0.0);
+    double angular = 2 * sin(alpha) / lookAheadDistance_;
 
     // Send the command for execution
-    executeCommand(Velocity<>(currentVelocity_, angular));
+    executeCommand(currentVelocity_, angular);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

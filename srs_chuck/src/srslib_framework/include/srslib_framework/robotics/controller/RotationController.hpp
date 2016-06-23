@@ -33,6 +33,11 @@ public:
         previousError_ = 0.0;
     }
 
+    void setRobotProfile(RobotProfile robot)
+    {
+        BaseController::setRobotProfile(robot, robot.rotationKv, robot.rotationKw);
+    }
+
 protected:
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
@@ -58,17 +63,11 @@ protected:
             robot_.rotationKi * integral_ +
             robot_.rotationKd * (error - previousError_));
 
-        angular = BasicMath::saturate<double>(angular,
-            robot_.travelRotationVelocity, -robot_.travelRotationVelocity);
-
-        angular = BasicMath::threshold<double>(angular,
-            robot_.minPhysicalAngularVelocity, 0.0);
-
         integral_ += error;
         previousError_ = error;
 
         // Send the command for execution
-        executeCommand(Velocity<>(linear, angular));
+        executeCommand(linear, angular);
     }
 
 private:

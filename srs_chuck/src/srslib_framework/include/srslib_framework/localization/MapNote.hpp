@@ -15,11 +15,11 @@ namespace srs {
 class MapNote
 {
 public:
-    const static MapNote DISABLE_OD;
-    const static MapNote ENABLE_OD;
-    const static MapNote GO_SLOW;
-    const static MapNote NO_ROTATIONS;
-    const static MapNote STATIC_OBSTACLE;
+    static const MapNote DISABLE_OD;
+    static const MapNote ENABLE_OD;
+    static const MapNote GO_SLOW;
+    static const MapNote NO_ROTATIONS;
+    static const MapNote STATIC_OBSTACLE;
 
     MapNote() :
         od_(false),

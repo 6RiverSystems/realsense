@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv)
 {
-    const static string NODE_NAME = "srsnode_joystick_adapter";
+    static const string NODE_NAME = "srsnode_joystick_adapter";
 
     // Initialize ROS
     ros::init(argc, argv, NODE_NAME);

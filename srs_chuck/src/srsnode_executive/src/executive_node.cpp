@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv)
 {
-    const static string NODE_NAME = "srsnode_executive";
+    static const string NODE_NAME = "srsnode_executive";
 
     // Initialize ROS
     ros::init(argc, argv, NODE_NAME);

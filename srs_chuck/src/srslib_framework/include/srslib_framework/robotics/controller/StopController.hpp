@@ -23,6 +23,11 @@ public:
     ~StopController()
     {}
 
+    void setRobotProfile(RobotProfile robot)
+    {
+        BaseController::setRobotProfile(robot, 1.0, 1.0);
+    }
+
 protected:
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
@@ -40,7 +45,7 @@ protected:
         linear = BasicMath::threshold<double>(linear, robot_.minLinearVelocity, 0.0);
 
         // Send the command for execution
-        executeCommand(Velocity<>(linear, 0.0));
+        executeCommand(linear, 0.0);
     }
 };
 

@@ -40,6 +40,10 @@ struct convert<srs::Anchor>
 namespace srs
 {
 
+// From calibrated Natasha
+auto constexpr DEFAULT_OFFSET_X = 0.0371973746;
+auto constexpr DEFAULT_OFFSET_Y = -0.0697303969746;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
@@ -48,7 +52,7 @@ StarGazerPointTransformer::StarGazerPointTransformer( ) :
 	m_strAnchorFrame( "/internal/state/map/grid" ),
 	m_strTargetFrame(),
 	m_mapTransforms( ),
-	m_stargazerTransform( ),
+	m_stargazerTransform( tf::Quaternion::getIdentity( ), tf::Vector3( DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y, 0.0f ) ),
 	m_footprintTransform( ),
 	m_rotationTransform( tf::createQuaternionFromRPY( M_PI, 0.0f, 0.0 ) )
 {

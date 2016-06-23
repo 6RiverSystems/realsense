@@ -116,11 +116,11 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 
 			if( strMessage.find( "<MSG Error" ) != -1 )
 			{
-				ROS_ERROR_NAMED( "Brainstem", "Fatal Error: %s", strMessage.c_str( ) );
+				ROS_ERROR_NAMED( "firmware", "Fatal Error: %s", strMessage.c_str( ) );
 			}
 			else
 			{
-				ROS_DEBUG_STREAM_NAMED( "Brainstem", "Message: <" << strMessage << ">" );
+				ROS_DEBUG_STREAM_NAMED( "firmware", "Message: <" << strMessage << ">" );
 			}
 		}
 		break;

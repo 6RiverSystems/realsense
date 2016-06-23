@@ -94,8 +94,8 @@ protected:
     {
         robot_ = robot;
 
-        Kv_ = 1.0;
-        Kw_ = 1.0;
+        Kv_ = Kv;
+        Kw_ = Kw;
     }
 
     bool canceled_;

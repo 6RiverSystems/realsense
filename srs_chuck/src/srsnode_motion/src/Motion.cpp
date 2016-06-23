@@ -31,6 +31,7 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Motion::Motion(string nodeName) :
     firstLocalization_(true),
+    isCustomActionEnabled_(false),
     isJoystickLatched_(false),
     rosNodeHandle_(nodeName),
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
@@ -60,6 +61,13 @@ Motion::Motion(string nodeName) :
         "/internal/state/pose/x", 100);
     pubRobotY_ = rosNodeHandle_.advertise<std_msgs::Float64>(
         "/internal/state/pose/y", 100);
+
+    pubAccOdometryTheta_ = rosNodeHandle_.advertise<std_msgs::Float64>(
+        "/internal/state/acc_odometry/theta", 100);
+    pubAccOdometryX_ = rosNodeHandle_.advertise<std_msgs::Float64>(
+        "/internal/state/acc_odometry/x", 100);
+    pubAccOdometryY_ = rosNodeHandle_.advertise<std_msgs::Float64>(
+        "/internal/state/acc_odometry/y", 100);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,6 +99,7 @@ void Motion::run()
         publishOdometry();
         publishPing();
         publishPose();
+        publishAccumulatedOdometry();
 
         refreshRate.sleep();
     }
@@ -145,11 +154,16 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     tapAps_.getSensor()->setR(R);
     tapAps_.getSensor()->enable(config.aps_enabled);
 
+    isCustomActionEnabled_ = config.custom_action_enabled;
+
     ROS_INFO_STREAM_NAMED("Motion", "Adaptive look-ahead enabled [t/f]: " <<
         config.adaptive_lookahead_enabled);
 
     ROS_INFO_STREAM_NAMED("Motion", "APS sensor enabled: " <<
         config.aps_enabled);
+
+    ROS_INFO_STREAM_NAMED("Motion", "Custom action enabled [t/f]: " <<
+        config.custom_action_enabled);
 
     ROS_INFO_STREAM_NAMED("Motion", "Emergency Controller: Ratio of the motion in crawl mode []: " <<
         config.emergency_controller_ratio_crawl);
@@ -177,7 +191,7 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
         config.min_angular_velocity);
     ROS_INFO_STREAM_NAMED("Motion", "Minimum linear velocity during motion [m/s]: " <<
         config.min_linear_velocity);
-    ROS_INFO_STREAM_NAMED("Motion", "Min look-ahead distance [m]: " <<
+    ROS_INFO_STREAM_NAMED("Motion", "Minimum look-ahead distance [m]: " <<
         config.min_look_ahead_distance);
     ROS_INFO_STREAM_NAMED("Motion", "Minimum physical angular velocity [rad/s]: " <<
         config.min_physical_angular_velocity);
@@ -225,6 +239,34 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 
     ROS_INFO_STREAM_NAMED("Motion", "Zero-point motion controller look-ahead distance [m]: " <<
         config.zero_look_ahead_distance);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::performCustomAction()
+{
+    if (isCustomActionEnabled_)
+    {
+        Pose<> currentPose = positionEstimator_.getPose();
+        Pose<> goalPose = PoseMath::add<double>(currentPose, Pose<>(12.286, 0, 0));
+
+        executePlanToGoal(goalPose);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::publishAccumulatedOdometry()
+{
+    Pose<> accOdometry = positionEstimator_.getAccumulatedOdometry();
+    std_msgs::Float64 message;
+
+    message.data = accOdometry.x;
+    pubAccOdometryX_.publish(message);
+
+    message.data = accOdometry.y;
+    pubAccOdometryY_.publish(message);
+
+    message.data = AngleMath::rad2deg<double>(accOdometry.theta);
+    pubAccOdometryTheta_.publish(message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -411,6 +453,11 @@ void Motion::scanTapsForData()
             motionController_.emergencyStop();
         }
 
+        if (tapJoyAdapter_.getCustomActionState())
+        {
+            performCustomAction();
+        }
+
         // Store the latch state for later use
         isJoystickLatched_ = tapJoyAdapter_.getLatchState();
     }
@@ -536,7 +583,9 @@ void Motion::executePlanToGoal(Pose<> goalPose)
     if (foundSolution)
     {
         ROS_DEBUG_STREAM_NAMED("Motion", "Found solution: " << endl << solution);
+
         motionController_.execute(solution);
+        positionEstimator_.resetAccumulatedOdometry();
 
         simulatedT_ = 0.0;
     }

@@ -23,13 +23,20 @@ class RosTapJoyAdapter :
 public:
     RosTapJoyAdapter() :
         RosTap("", "Joy Adapter Tap"),
-        currentLatchState_(false),
-        currentEmergencyState_(false)
+        currentCustomActionState_(false),
+        currentEmergencyState_(false),
+        currentLatchState_(false)
     {}
 
     ~RosTapJoyAdapter()
     {
         disconnectTap();
+    }
+
+    bool getCustomActionState()
+    {
+        setNewData(false);
+        return currentCustomActionState_;
     }
 
     bool getEmergencyState()
@@ -56,6 +63,7 @@ public:
 
         currentLatchState_ = false;
         currentEmergencyState_ = false;
+        currentCustomActionState_ = false;
         currentVelocity_ = Velocity<>();
     }
 
@@ -68,11 +76,19 @@ protected:
             &RosTapJoyAdapter::onJoyVelocity, this);
         subJoyEmergency_ = rosNodeHandle_.subscribe("/internal/sensors/joystick/emergency", 1,
             &RosTapJoyAdapter::onJoyEmergency, this);
+        subJoyCustomAction_ = rosNodeHandle_.subscribe("/internal/sensors/joystick/custom_action", 1,
+            &RosTapJoyAdapter::onJoyCustomAction, this);
 
         return true;
     }
 
 private:
+    void onJoyCustomAction(const std_msgs::BoolConstPtr& message)
+    {
+        currentCustomActionState_ = message->data;
+        setNewData(true);
+    }
+
     void onJoyEmergency(const std_msgs::BoolConstPtr& message)
     {
         currentEmergencyState_ = message->data;
@@ -91,10 +107,12 @@ private:
         setNewData(true);
     }
 
+    bool currentCustomActionState_;
     bool currentEmergencyState_;
     bool currentLatchState_;
     Velocity<> currentVelocity_;
 
+    ros::Subscriber subJoyCustomAction_;
     ros::Subscriber subJoyEmergency_;
     ros::Subscriber subJoyVelocity_;
 };

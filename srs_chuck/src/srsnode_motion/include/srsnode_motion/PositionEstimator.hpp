@@ -45,6 +45,11 @@ public:
         ukf_.addSensor(sensor);
     }
 
+    Pose<> getAccumulatedOdometry()
+    {
+        return accumulatedOdometry_;
+    }
+
     Pose<> getPose()
     {
         StatePe<> currentState = StatePe<>(ukf_.getX());
@@ -65,29 +70,12 @@ public:
         ukf_.reset(currentState.getVectorForm(), currentCovariance);
     }
 
-    void run(Odometry<>* odometry)
+    void resetAccumulatedOdometry()
     {
-        double dT = dT_;
-        if (odometry)
-        {
-            ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "PositionEstimator",
-                "Position Estimator Odometry: " << *odometry);
-
-            // Calculate the elapsed time between odometry readings
-            double currentTime = odometry->velocity.arrivalTime;
-            dT = currentTime - previousReadingTime_;
-            if (previousReadingTime_ < 0 || dT < 0)
-            {
-                dT = dT_;
-            }
-            previousReadingTime_ = currentTime;
-
-            ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0,
-                "PositionEstimator", "Calculated dT: " << dT);
-        }
-
-        ukf_.run(dT, odometry);
+        accumulatedOdometry_ = Pose<>();
     }
+
+    void run(Odometry<>* odometry);
 
     void setConfiguration(MotionConfig& configuration)
     {
@@ -96,6 +84,10 @@ public:
     }
 
 private:
+    void updateAccumulatedOdometry(double dT, Odometry<> odometry);
+
+    Pose<> accumulatedOdometry_;
+
     double dT_;
 
     double previousReadingTime_;

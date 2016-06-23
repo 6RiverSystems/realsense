@@ -19,6 +19,15 @@ namespace srs {
 struct PoseMath
 {
     template<typename TYPE = double>
+    inline static Pose<TYPE> add(Pose<TYPE> p1, Pose<TYPE> p2)
+    {
+        return Pose<TYPE>(
+            p1.x + p2.x,
+            p1.y + p2.y,
+            AngleMath::normalizeAngleRad(p1.theta + p2.theta));
+    }
+
+    template<typename TYPE = double>
     inline static TYPE euclidean(Pose<TYPE> p1, Pose<TYPE> p2)
     {
         TYPE deltaX = p1.x - p2.x;
@@ -50,7 +59,7 @@ struct PoseMath
     template<typename TYPE = double>
     inline static Pose<TYPE> transform(Pose<TYPE> p, TYPE distance)
     {
-        return Pose<TYPE>(p.arrivalTime,
+        return Pose<TYPE>(
             p.x + distance * cos(p.theta),
             p.y + distance * sin(p.theta),
             p.theta);

@@ -206,7 +206,9 @@ private:
         double directionX = calculateDirection(fromWaypoint.x, toWaypoint.x);
         double directionY = calculateDirection(fromWaypoint.y, toWaypoint.y);
 
-        // Check which direction is applicable
+        // Check which direction is applicable. If the trajectory between the two waypoints
+        // moves along the x axis, the two Y coordinates should be roughly the same
+        // (2mm difference)
         bool movingOnX = BasicMath::equal<double>(fromWaypoint.y, toWaypoint.y, 0.002);
         bool movingOnY = BasicMath::equal<double>(fromWaypoint.x, toWaypoint.x, 0.002);
 
@@ -240,24 +242,16 @@ private:
 
         pushWaypoint(waypoint, currentMaxVelocity);
 
+        // Calculate the change in pose that depend on the
+        // direction of motion and the specified spacing
+        Pose<> deltaPose = Pose<>(
+            movingOnX ? directionX * spacing : 0.0,
+            movingOnY ? directionY * spacing : 0.0,
+            0.0);
+
         while (distanceToEnd > robot_.goalReachedDistance)
         {
-            // If the trajectory between the two waypoints moves along the x
-            // axis, the two Y coordinates should be roughly the same (2mm difference)
-            if (movingOnX)
-            {
-                // Advance in the direction of motion
-                waypoint.x += directionX * spacing;
-            }
-            else if (movingOnY)
-            {
-                // Advance in the direction of motion
-                waypoint.y += directionY * spacing;
-            }
-            else {
-                // TODO: Handle situations where the robot moves in both directions?
-                throw;
-            }
+            waypoint = PoseMath::add<double>(waypoint, deltaPose);
 
             if (distanceFromStart < robot_.travelTurningZoneRadius)
             {

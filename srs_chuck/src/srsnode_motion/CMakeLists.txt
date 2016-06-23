@@ -14,12 +14,12 @@ set(${PROJECT_NAME}_SOURCES
 
     include/${PROJECT_NAME}/CmdVelocity.hpp
     include/${PROJECT_NAME}/Configuration.hpp
-    include/${PROJECT_NAME}/PositionEstimator.hpp
     include/${PROJECT_NAME}/Robot.hpp
     include/${PROJECT_NAME}/StatePe.hpp
 
     src/Motion.cpp
     src/MotionController.cpp
+    src/PositionEstimator.cpp
     src/PositionUkf.cpp
 )
 

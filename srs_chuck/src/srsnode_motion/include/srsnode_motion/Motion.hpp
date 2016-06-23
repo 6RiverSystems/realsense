@@ -55,6 +55,8 @@ private:
 
     void onConfigChange(MotionConfig& config, uint32_t level);
 
+    void performCustomAction();
+    void publishAccumulatedOdometry();
     void publishArrived();
     void publishGoal();
     void publishOdometry();
@@ -75,11 +77,15 @@ private:
 
     bool isJoystickLatched_;
     bool isOdometryAvailable_;
+    bool isCustomActionEnabled_;
 
     MotionController motionController_;
 
     PositionEstimator positionEstimator_;
     ros::Time previousTime_;
+    ros::Publisher pubAccOdometryX_;
+    ros::Publisher pubAccOdometryY_;
+    ros::Publisher pubAccOdometryTheta_;
     ros::Publisher pubOdometry_;
     ros::Publisher pubPing_;
     ros::Publisher pubRobotTheta_;

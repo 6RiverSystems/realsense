@@ -38,6 +38,7 @@ private:
 
     void onConfigChange(JoystickConfig& config, uint32_t level);
 
+    void publishCustomAction(bool state);
     void publishEmergency(bool state);
     void publishLatched(bool state);
     void publishVelocity(Velocity<> velocity);
@@ -50,6 +51,7 @@ private:
     ros::Publisher pubCommand_;
     ros::Publisher pubJoystickLatched_;
     ros::Publisher pubJoystickEmergency_;
+    ros::Publisher pubJoystickCustomAction_;
 
     ros::NodeHandle rosNodeHandle_;
 

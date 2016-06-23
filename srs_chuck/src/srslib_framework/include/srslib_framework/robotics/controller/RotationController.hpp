@@ -52,19 +52,25 @@ protected:
             AngleMath::equalRad<double>(goal_.theta, currentPose.theta, robot_.goalReachedAngle))
         {
             goalReached_ = true;
+            executeCommand(ZERO_VELOCITY);
+
+            return;
         }
 
         // Calculate the linear portion of the command
         double linear = 0;
 
         // Calculate the angular portion of the command
-        double angular = Kw_ * (
-            robot_.rotationKp * error +
-            robot_.rotationKi * integral_ +
-            robot_.rotationKd * (error - previousError_));
+        double angular = robot_.rotationKp * error + robot_.rotationKi * integral_ +
+            robot_.rotationKd * (error - previousError_);
 
         integral_ += error;
         previousError_ = error;
+
+        // Make sure that the calculated angular velocity is not bigger
+        // than the specified travel angular velocity
+        angular = BasicMath::saturate<double>(angular,
+            robot_.travelAngularVelocity, -robot_.travelAngularVelocity);
 
         // Send the command for execution
         executeCommand(linear, angular);

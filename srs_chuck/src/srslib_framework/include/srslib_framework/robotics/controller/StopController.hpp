@@ -35,6 +35,8 @@ protected:
         if (!isRobotMoving_)
         {
             goalReached_ = true;
+            executeCommand(ZERO_VELOCITY);
+
             return;
         }
 

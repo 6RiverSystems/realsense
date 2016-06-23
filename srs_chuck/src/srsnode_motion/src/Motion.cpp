@@ -247,8 +247,9 @@ void Motion::performCustomAction()
     if (isCustomActionEnabled_)
     {
         Pose<> currentPose = positionEstimator_.getPose();
-        Pose<> goalPose = PoseMath::add<double>(currentPose, Pose<>(12.286, 0, 0));
 
+        double delta = currentPose.x < 10.0 ? 12.286 : -12.286;
+        Pose<> goalPose = PoseMath::add<double>(currentPose, Pose<>(delta, 0, 0));
         executePlanToGoal(goalPose);
     }
 }

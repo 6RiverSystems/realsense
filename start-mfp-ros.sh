@@ -1,4 +1,5 @@
 #!/bin/bash
-source /home/rivs/.bashrc
+source ~/.bashrc
+source ~/.bashrc_ros
 
-roslaunch srsc_6rhq_norviz map.launch
+runChuck

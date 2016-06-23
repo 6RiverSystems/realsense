@@ -10,6 +10,14 @@ function getChuckDirectory() {
   echo "*************************************************"
 }
 
+function updateChuck() {
+  getChuckDirectory &&
+
+  pushd "$baseDirectory" &&
+  git pull --rebase &&
+  popd
+}
+
 function buildChuck() {
   getChuckDirectory &&
 
@@ -50,6 +58,7 @@ logChuck() {
 }
 
 alias chucklog=logChuck
+alias chuckupdate=updateChuck
 alias chuckclean=cleanChuck
 alias chuckbuild=buildChuck
 alias chuckrun=runChuck

@@ -44,6 +44,8 @@ struct Chuck : RobotProfile
         rotationKi = 0.0; // []
         rotationKp = 2.25; // []
 
+        smallStraightDistance = 3.0; // [m]
+
         travelAngularAcceleration = AngleMath::deg2rad<double>(28.0); // 0.489 [rad/s^2]
         travelAngularVelocity = AngleMath::deg2rad<double>(115); // 2.007 [rad/s]
         travelTurningZoneRadius = 0.500; // [m]

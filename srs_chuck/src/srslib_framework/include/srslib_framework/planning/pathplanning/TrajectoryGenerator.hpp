@@ -210,11 +210,29 @@ private:
         bool movingOnX = BasicMath::equal<double>(fromWaypoint.y, toWaypoint.y, 0.002);
         bool movingOnY = BasicMath::equal<double>(fromWaypoint.x, toWaypoint.x, 0.002);
 
-        double v0Max = isFirstStretch ? robot_.travelLinearVelocity : robot_.travelTurningVelocity;
-        double vfMax = isLastStretch ? robot_.travelLinearVelocity : robot_.travelTurningVelocity;
-
         double distanceFromStart = 0.0;
         double distanceToEnd = PoseMath::euclidean(fromWaypoint, toWaypoint);
+
+        double vCoasting = robot_.travelLinearVelocity;
+        if  (distanceToEnd < robot_.smallStraightDistance)
+        {
+            vCoasting = robot_.travelTurningVelocity;
+        }
+
+        // Make sure that if the total distance between the two waypoints
+        // is smaller than the specified value, the maximum velocity is forced
+        // to be the turning velocity
+        double v0Max = robot_.travelLinearVelocity;
+        if (!isFirstStretch || distanceToEnd < robot_.smallStraightDistance)
+        {
+            v0Max = robot_.travelTurningVelocity;
+        }
+
+        double vfMax = robot_.travelLinearVelocity;
+        if (!isLastStretch || distanceToEnd < robot_.smallStraightDistance)
+        {
+            vfMax = robot_.travelTurningVelocity;
+        }
 
         // Begin from the initial waypoint
         Pose<> waypoint = fromWaypoint;
@@ -241,25 +259,21 @@ private:
                 throw;
             }
 
-            if (!isFirstStretch && distanceFromStart < robot_.travelTurningZoneRadius)
+            if (distanceFromStart < robot_.travelTurningZoneRadius)
             {
                 // If this segment is not the first stretch and
                 currentMaxVelocity = v0Max;
             }
-            else if (!isLastStretch && distanceToEnd < robot_.travelTurningZoneRadius)
+            else if (distanceToEnd < robot_.travelTurningZoneRadius)
             {
                 currentMaxVelocity = vfMax;
             }
             else
             {
-                currentMaxVelocity = robot_.travelLinearVelocity;
+                currentMaxVelocity = vCoasting;
             }
 
             pushWaypoint(waypoint, currentMaxVelocity);
-
-            //trajectory_.push_back(waypoint, currentAnnotation);
-
-            cout << waypoint << " " << currentMaxVelocity << endl;
 
             distanceFromStart = PoseMath::euclidean(waypoint, fromWaypoint);
             distanceToEnd = PoseMath::euclidean(waypoint, toWaypoint);

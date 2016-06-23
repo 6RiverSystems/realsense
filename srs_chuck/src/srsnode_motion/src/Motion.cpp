@@ -191,6 +191,9 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: proportional constant []: " <<
         config.rotation_controller_kp);
 
+    ROS_INFO_STREAM_NAMED("Motion", "Straight distance that is considered small [m]: " <<
+        config.small_straight_distance);
+
     ROS_INFO_STREAM_NAMED("Motion", "Travel angular acceleration [rad/s^2]: " <<
         config.travel_angular_acceleration);
     ROS_INFO_STREAM_NAMED("Motion", "Travel angular velocity [rad/s]: " <<

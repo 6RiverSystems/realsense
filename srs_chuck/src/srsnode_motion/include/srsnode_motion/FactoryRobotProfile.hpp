@@ -43,6 +43,8 @@ struct FactoryRobotProfile
         robot.rotationKi = configuration.rotation_controller_ki;
         robot.rotationKp= configuration.rotation_controller_kp;
 
+        robot.smallStraightDistance = configuration.small_straight_distance;
+
         robot.travelAngularAcceleration = configuration.travel_angular_acceleration;
         robot.travelAngularVelocity = configuration.travel_angular_velocity;
         robot.travelTurningZoneRadius = configuration.travel_turning_zone_radius;

@@ -38,6 +38,8 @@ struct RobotProfile
         rotationKi(0.0),
         rotationKp(1.0),
 
+        smallStraightDistance(0.0),
+
         travelAngularAcceleration(0.0),
         travelAngularVelocity(0.0),
         travelTurningZoneRadius(0.0),
@@ -81,6 +83,8 @@ struct RobotProfile
     double rotationKd; // []
     double rotationKi; // []
     double rotationKp; // []
+
+    double smallStraightDistance; // [m]
 
     double travelAngularAcceleration; // [rad/s^2]
     double travelAngularVelocity; // [rad/s]

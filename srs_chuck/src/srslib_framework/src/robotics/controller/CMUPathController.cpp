@@ -89,12 +89,12 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     double deltaVelocity = robot_.travelLinearAcceleration * dT;
 
     // Calculate the velocity after the acceleration has taken place
-    double projectedVelocity = currentVelocity_ + deltaVelocity;
+    double linear = currentVelocity_ + deltaVelocity;
 
     // Calculate the stopping distance based on the projected velocity
     // and the velocity requested at the velocity change point
-    double changingTime = (velocityChange_ - projectedVelocity) / robot_.travelLinearAcceleration;
-    double changingDistance = 0.5 * (velocityChange_ + projectedVelocity) * abs(changingTime);
+    double changingTime = (velocityChange_ - linear) / robot_.travelLinearAcceleration;
+    double changingDistance = 0.5 * (velocityChange_ + linear) * abs(changingTime);
 
     ROS_DEBUG_STREAM_NAMED("CMUPathController", "Current max velocity: " << velocityCurrentMax_);
     ROS_DEBUG_STREAM_NAMED("CMUPathController", "Next velocity change: " << velocityChange_);
@@ -105,28 +105,34 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     // the velocity can be increased. Otherwise, the deceleration must commence
     if (distanceToChange > changingDistance)
     {
-        projectedVelocity = BasicMath::saturate<double>(projectedVelocity, velocityCurrentMax_, 0.0);
-        currentVelocity_ = projectedVelocity;
+        // Enforce the current maximum velocity
+        linear = BasicMath::saturate<double>(linear, velocityCurrentMax_, 0.0);
+        currentVelocity_ = linear;
 
         ROS_DEBUG_STREAM_NAMED("CMUPathController",
-            "Free increase velocity to: " << projectedVelocity);
+            "Free increase velocity to: " << linear);
     }
     else
     {
         if (currentVelocity_ > velocityChange_)
         {
+            // Reduce the moving velocity, if the new requested
+            // velocity is less than the current one
             currentVelocity_ = BasicMath::threshold<double>(currentVelocity_ - deltaVelocity,
                 robot_.minLinearVelocity, 0.0);
+
             ROS_DEBUG_STREAM_NAMED("CMUPathController",
                 "Decreasing velocity: " << currentVelocity_);
         }
         else
         {
-            projectedVelocity = BasicMath::saturate<double>(projectedVelocity, velocityCurrentMax_, 0.0);
-            currentVelocity_ = projectedVelocity;
+            // Increase the velocity to match if the new requested
+            // velocity is greater than the current one
+            linear = BasicMath::saturate<double>(linear, velocityCurrentMax_, 0.0);
+            currentVelocity_ = linear;
 
             ROS_DEBUG_STREAM_NAMED("CMUPathController",
-                "Increasing velocity: " << projectedVelocity);
+                "Increasing velocity: " << linear);
         }
     }
 
@@ -135,6 +141,11 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     double alpha = AngleMath::normalizeAngleRad<double>(slope - currentPose.theta);
 
     double angular = 2 * sin(alpha) / lookAheadDistance_;
+
+    // Make sure that the calculated angular velocity is not bigger
+    // than the specified travel angular velocity
+    angular = BasicMath::saturate<double>(angular,
+        robot_.travelAngularVelocity, -robot_.travelAngularVelocity);
 
     // Send the command for execution
     executeCommand(currentVelocity_, angular);

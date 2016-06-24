@@ -1,13 +1,22 @@
 #!/bin/bash
 function getChuckDirectory() {
+  BLUE='\033[0;34m'
+  YELLOW='\033[0;33m'
+  NC='\033[0m' # No Color
+
   baseDirectory=~/ros
   if [ "$ENV" != "ros" ]; then
     baseDirectory="/home/rivs/projects/$ENV/ros"
   fi
 
-  echo "*************************************************"
-  echo "*** Building ros in directory: $baseDirectory ***"
-  echo "*************************************************"
+  logDirectory="$baseDirectory/log/mfp-ros.log"
+
+  echo -e "${BLUE}*************************************************************"
+  echo -e "${BLUE}*** ${YELLOW}ENV: $ENV"
+  echo -e "${BLUE}*** ${YELLOW}ROS directory: $baseDirectory"
+  echo -e "${BLUE}*** ${YELLOW}Log file: $logDirectory"
+  echo -e "${BLUE}*************************************************************"
+  echo -e "${NC}"
 }
 
 function updateChuck() {
@@ -38,7 +47,7 @@ function runChuck() {
   source devel/setup.bash &&
   popd
 
-  roslaunch srsc_6rhq_norviz map.launch
+  launch srsc_6rhq_norviz map.launch 2>&1 | tee "$baseDirectory/log/mfp-ros.log"
 }
 
 function cleanChuck() {
@@ -54,7 +63,7 @@ function cleanChuck() {
 }
 
 logChuck() {
-  tail -f /var/opt/mfp/logs/ros.log -f /var/opt/mfp/logs/bridge.log
+  tail -f /var/log/mfp-ros.log -f /var/log/mfp-bridge.log
 }
 
 alias chucklog=logChuck

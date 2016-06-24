@@ -14,6 +14,7 @@
 
 #include <srsnode_executive/tap/RosTapCmd_Goal.hpp>
 #include <srsnode_executive/tap/RosTapCmd_InitialPose.hpp>
+#include <srsnode_executive/tap/RosTapCmd_Move.hpp>
 #include <srsnode_executive/tap/RosTapCmd_Pause.hpp>
 #include <srsnode_executive/tap/RosTapCmd_Shutdown.hpp>
 
@@ -45,6 +46,7 @@ private:
     void executeInitialPose(Pose<> initialPose);
     void executePause();
     void executePlanToGoal(Pose<> goal);
+    void executePlanToMove(Pose<> goal);
     void executeShutdown();
 
     void publishInternalInitialPose(Pose<> initialPose);
@@ -66,6 +68,7 @@ private:
 
     RosTapCmd_Goal tapCmdGoal_;
     RosTapCmd_InitialPose tapCmdInitialPose_;
+    RosTapCmd_Move tapCmdMove_;
     RosTapCmd_Pause tapCmdPause_;
     RosTapCmd_Shutdown tapCmdShutdown_;
     RosTapInternal_GoalArrived tapInternal_GoalArrived_;

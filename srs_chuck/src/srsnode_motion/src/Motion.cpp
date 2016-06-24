@@ -10,6 +10,9 @@
 #include <std_msgs/Float64.h>
 #include <tf/transform_broadcaster.h>
 
+#include <srslib_framework/MsgPose.h>
+using namespace srslib_framework;
+
 #include <srsnode_motion/MotionConfig.h>
 using namespace srsnode_motion;
 
@@ -50,26 +53,18 @@ Motion::Motion(string nodeName) :
 
     pubStatusGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>(
         "/internal/state/current_goal/plan", 1);
-    pubStatusGoalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>(
+    pubStatusGoalGoal_ = rosNodeHandle_.advertise<MsgPose>(
         "/internal/state/current_goal/goal", 1);
     pubStatusGoalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
         "/internal/state/current_goal/arrived", 1);
     pubPing_ = rosNodeHandle_.advertise<std_msgs::Bool>(
         "/internal/state/ping", 1);
 
-    pubRobotTheta_ = rosNodeHandle_.advertise<std_msgs::Float64>(
-        "/internal/state/pose/theta", 100);
-    pubRobotX_ = rosNodeHandle_.advertise<std_msgs::Float64>(
-        "/internal/state/pose/x", 100);
-    pubRobotY_ = rosNodeHandle_.advertise<std_msgs::Float64>(
-        "/internal/state/pose/y", 100);
+    pubRobotPose_ = rosNodeHandle_.advertise<MsgPose>(
+        "/internal/state/robot_pose", 100);
 
-    pubAccOdometryTheta_ = rosNodeHandle_.advertise<std_msgs::Float64>(
-        "/internal/state/acc_odometry/theta", 100);
-    pubAccOdometryX_ = rosNodeHandle_.advertise<std_msgs::Float64>(
-        "/internal/state/acc_odometry/x", 100);
-    pubAccOdometryY_ = rosNodeHandle_.advertise<std_msgs::Float64>(
-        "/internal/state/acc_odometry/y", 100);
+    pubAccOdometry_ = rosNodeHandle_.advertise<MsgPose>(
+        "/internal/state/acc_odometry", 100);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,16 +258,13 @@ void Motion::performCustomAction()
 void Motion::publishAccumulatedOdometry()
 {
     Pose<> accOdometry = positionEstimator_.getAccumulatedOdometry();
-    std_msgs::Float64 message;
+    MsgPose message;
 
-    message.data = accOdometry.x;
-    pubAccOdometryX_.publish(message);
-
-    message.data = accOdometry.y;
-    pubAccOdometryY_.publish(message);
-
-    message.data = AngleMath::rad2deg<double>(accOdometry.theta);
-    pubAccOdometryTheta_.publish(message);
+    message.header.stamp = ros::Time::now();
+    message.x = accOdometry.x;
+    message.y = accOdometry.y;
+    message.theta = AngleMath::rad2deg<double>(accOdometry.theta);
+    pubAccOdometry_.publish(message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -308,17 +300,23 @@ void Motion::publishGoal()
 
     Pose<> goal = motionController_.getFinalGoal();
 
-    geometry_msgs::PoseStamped messageGoal;
-    tf::Quaternion quaternion = tf::createQuaternionFromYaw(goal.theta);
+//    geometry_msgs::PoseStamped messageGoal;
+//    tf::Quaternion quaternion = tf::createQuaternionFromYaw(goal.theta);
+//
+//    messageGoal.header.stamp = planningTime;
+//    messageGoal.pose.position.x = goal.x;
+//    messageGoal.pose.position.y = goal.y;
+//    messageGoal.pose.position.z = 0.0;
+//    messageGoal.pose.orientation.x = quaternion.x();
+//    messageGoal.pose.orientation.y = quaternion.y();
+//    messageGoal.pose.orientation.z = quaternion.z();
+//    messageGoal.pose.orientation.w = quaternion.w();
 
+    MsgPose messageGoal;
     messageGoal.header.stamp = planningTime;
-    messageGoal.pose.position.x = goal.x;
-    messageGoal.pose.position.y = goal.y;
-    messageGoal.pose.position.z = 0.0;
-    messageGoal.pose.orientation.x = quaternion.x();
-    messageGoal.pose.orientation.y = quaternion.y();
-    messageGoal.pose.orientation.z = quaternion.z();
-    messageGoal.pose.orientation.w = quaternion.w();
+    messageGoal.x = goal.x;
+    messageGoal.y = goal.y;
+    messageGoal.theta = goal.theta;
 
     pubStatusGoalGoal_.publish(messageGoal);
 
@@ -403,10 +401,10 @@ void Motion::publishPing()
 
     if ((pingDecimator_ % frequencyDivisor) == 0)
     {
-        std_msgs::Bool messagePing;
-        messagePing.data = true;
+        std_msgs::Bool message;
+        message.data = true;
 
-        pubPing_.publish(messagePing);
+        pubPing_.publish(message);
     }
 
     pingDecimator_++;
@@ -416,16 +414,13 @@ void Motion::publishPing()
 void Motion::publishPose()
 {
     Pose<> currentPose = positionEstimator_.getPose();
-    std_msgs::Float64 message;
+    MsgPose message;
 
-    message.data = currentPose.x;
-    pubRobotX_.publish(message);
-
-    message.data = currentPose.y;
-    pubRobotY_.publish(message);
-
-    message.data = AngleMath::rad2deg<double>(currentPose.theta);
-    pubRobotTheta_.publish(message);
+    message.header.stamp = ros::Time::now();
+    message.x = currentPose.x;
+    message.y = currentPose.y;
+    message.theta = AngleMath::rad2deg<double>(currentPose.theta);
+    pubRobotPose_.publish(message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -570,10 +565,6 @@ void Motion::executePlanToGoal(Pose<> goalPose)
     tapMap_.getMap()->getMapCoordinates(robotPose.x, robotPose.y, fromC, fromR);
     Grid2d::LocationType internalStart(fromC, fromR);
     int startAngle = AngleMath::normalizeRad2deg90(robotPose.theta);
-
-    // Keep the goal in line with current robot pose
-    goalPose.x = (abs(goalPose.x - robotPose.x) < 0.4) ? robotPose.x : goalPose.x;
-    goalPose.y = (abs(goalPose.y - robotPose.y) < 0.4) ? robotPose.y : goalPose.y;
 
     // Prepare the goal position for the search
     int toR = 0;

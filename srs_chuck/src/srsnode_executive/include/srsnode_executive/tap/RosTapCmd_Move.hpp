@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPCMD_GOAL_HPP_
-#define ROSTAPCMD_GOAL_HPP_
+#ifndef ROSTAPCMD_MOVE_HPP_
+#define ROSTAPCMD_MOVE_HPP_
 
 #include <string>
 using namespace std;
@@ -15,15 +15,15 @@ using namespace std;
 
 namespace srs {
 
-class RosTapCmd_Goal :
+class RosTapCmd_Move :
     public RosTapPoseStamped
 {
 public:
-    RosTapCmd_Goal() :
-        RosTapPoseStamped("/request/goal", "Command move")
+    RosTapCmd_Move() :
+        RosTapPoseStamped("/request/move", "Command move")
     {}
 };
 
 } // namespace srs
 
-#endif // ROSTAPCMD_GOAL_HPP_
+#endif // ROSTAPCMD_MOVE_HPP_

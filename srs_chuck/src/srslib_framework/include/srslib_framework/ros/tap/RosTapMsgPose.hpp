@@ -3,32 +3,32 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPPOSE_HPP_
-#define ROSTAPPOSE_HPP_
+#ifndef ROSTAPMSGPOSE_HPP_
+#define ROSTAPMSGPOSE_HPP_
 
 #include <string>
 using namespace std;
-
-#include <tf/tf.h>
-#include <geometry_msgs/PoseStamped.h>
 
 #include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/RosTap.hpp>
 
+#include <srslib_framework/MsgPose.h>
+using namespace srslib_framework;
+
 namespace srs {
 
-class RosTapPose :
+class RosTapMsgPose :
     public RosTap
 {
 public:
     typedef typename Pose<>::BaseType BaseType;
 
-    RosTapPose(string topic, string description = "Pose Tap") :
+    RosTapMsgPose(string topic, string description = "Pose Tap") :
         RosTap(topic, description)
     {}
 
-    ~RosTapPose()
+    ~RosTapMsgPose()
     {
         disconnectTap();
     }
@@ -54,17 +54,17 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe(getTopic(), 10, &RosTapPose::onPose, this);
+        rosSubscriber_ = rosNodeHandle_.subscribe(getTopic(), 10, &RosTapMsgPose::onPose, this);
         return true;
     }
 
 private:
-    void onPose(const geometry_msgs::PoseStampedConstPtr message)
+    void onPose(const MsgPoseConstPtr message)
     {
         set(TimeMath::time2number(message->header.stamp),
-            message->pose.position.x,
-            message->pose.position.y,
-            tf::getYaw(message->pose.orientation));
+            message->x,
+            message->y,
+            AngleMath::deg2rad<double>(message->theta));
     }
 
     Pose<> currentPose_;
@@ -72,4 +72,4 @@ private:
 
 } // namespace srs
 
-#endif // ROSTAPPOSE_HPP_
+#endif // ROSTAPMSGPOSE_HPP_

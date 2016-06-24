@@ -84,14 +84,10 @@ private:
 
     PositionEstimator positionEstimator_;
     ros::Time previousTime_;
-    ros::Publisher pubAccOdometryX_;
-    ros::Publisher pubAccOdometryY_;
-    ros::Publisher pubAccOdometryTheta_;
+    ros::Publisher pubAccOdometry_;
     ros::Publisher pubOdometry_;
     ros::Publisher pubPing_;
-    ros::Publisher pubRobotTheta_;
-    ros::Publisher pubRobotX_;
-    ros::Publisher pubRobotY_;
+    ros::Publisher pubRobotPose_;
     ros::Publisher pubStatusGoalPlan_;
     ros::Publisher pubStatusGoalGoal_;
     ros::Publisher pubStatusGoalArrived_;

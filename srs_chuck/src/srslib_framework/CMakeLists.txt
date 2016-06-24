@@ -23,6 +23,7 @@ set(${PROJECT_NAME}_MSGS
     Aps.msg
     CompleteMap.msg
     HardwareInfo.msg
+    MsgPose.msg
     OperationalState.msg
 )
 

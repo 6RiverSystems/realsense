@@ -1,10 +1,10 @@
 #include <srsnode_executive/Executive.hpp>
 
 #include <ros/ros.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <std_srvs/Empty.h>
 
 #include <srslib_framework/MapCoordinates.h>
+#include <srslib_framework/MsgPose.h>
 using namespace srslib_framework;
 
 #include <srslib_framework/math/PoseMath.hpp>
@@ -20,13 +20,10 @@ Executive::Executive(string nodeName) :
     currentGoal_(),
     rosNodeHandle_(nodeName)
 {
-    pubInternalInitialPose_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>(
-        "/internal/command/initial_pose", 1);
-    pubInternalGoal_ = rosNodeHandle_.advertise<geometry_msgs::PoseStamped>(
-        "/internal/command/goal", 1);
+    pubInternalInitialPose_ = rosNodeHandle_.advertise<MsgPose>("/internal/command/initial_pose", 1);
+    pubInternalGoal_ = rosNodeHandle_.advertise<MsgPose>("/internal/command/goal", 1);
 
-    pubExternalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
-        "/response/arrived", 1);
+    pubExternalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>("/response/arrived", 1);
 
     robotInitialPose_ = Pose<>(0, 3.0, 3.0, 0);
     robotCurrentPose_ = robotInitialPose_;
@@ -56,6 +53,7 @@ void Executive::connectAllTaps()
 {
     tapCmdGoal_.connectTap();
     tapCmdInitialPose_.connectTap();
+    tapCmdMove_.connectTap();
     tapCmdPause_.connectTap();
     tapCmdShutdown_.connectTap();
     tapInternal_GoalArrived_.connectTap();
@@ -68,6 +66,7 @@ void Executive::disconnectAllTaps()
 {
     tapCmdGoal_.disconnectTap();
     tapCmdInitialPose_.disconnectTap();
+    tapCmdMove_.disconnectTap();
     tapCmdPause_.disconnectTap();
     tapCmdShutdown_.disconnectTap();
     tapInternal_GoalArrived_.disconnectTap();
@@ -103,6 +102,20 @@ void Executive::executePlanToGoal(Pose<> goal)
     // The requested goal is transformed so that it coincides with
     // where the robot screen will be
     currentGoal_ = PoseMath::transform<double>(goal, chuck.bodyDepth / 2);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::executePlanToMove(Pose<> goal)
+{
+//    Chuck chuck;
+//    double angle = PoseMath::measureAngle(goal, robotCurrentPose_);
+//
+//    // Keep the goal in line with current robot pose
+//    goalPose.x = (abs(goalPose.x - robotPose.x) < chuck.bodyWidth / 2) ? robotPose.x : goalPose.x;
+//    goalPose.y = (abs(goalPose.y - robotPose.y) < chuck.bodyDepth / 2) ? robotPose.y : goalPose.y;
+//
+//
+    currentGoal_ = goal;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -156,17 +169,12 @@ void Executive::findActiveNodes(vector<string>& nodes)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::publishInternalInitialPose(Pose<> initialPose)
 {
-    geometry_msgs::PoseStamped message;
-
-    tf::Quaternion quaternion = tf::createQuaternionFromYaw(initialPose.theta);
+    MsgPose message;
 
     message.header.stamp = ros::Time::now();
-    message.pose.position.x = initialPose.x;
-    message.pose.position.y = initialPose.y;
-    message.pose.orientation.x = quaternion.x();
-    message.pose.orientation.y = quaternion.y();
-    message.pose.orientation.z = quaternion.z();
-    message.pose.orientation.w = quaternion.w();
+    message.x = initialPose.x;
+    message.y = initialPose.y;
+    message.theta = AngleMath::rad2deg<double>(initialPose.theta);
 
     pubInternalInitialPose_.publish(message);
 }
@@ -174,17 +182,12 @@ void Executive::publishInternalInitialPose(Pose<> initialPose)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::publishInternalGoal(Pose<> goal)
 {
-    geometry_msgs::PoseStamped message;
-
-    tf::Quaternion quaternion = tf::createQuaternionFromYaw(goal.theta);
+    MsgPose message;
 
     message.header.stamp = ros::Time::now();
-    message.pose.position.x = goal.x;
-    message.pose.position.y = goal.y;
-    message.pose.orientation.x = quaternion.x();
-    message.pose.orientation.y = quaternion.y();
-    message.pose.orientation.z = quaternion.z();
-    message.pose.orientation.w = quaternion.w();
+    message.x = goal.x;
+    message.y = goal.y;
+    message.theta = AngleMath::rad2deg<double>(goal.theta);
 
     pubInternalGoal_.publish(message);
 }
@@ -195,6 +198,13 @@ void Executive::stepExecutiveFunctions()
     if (tapCmdShutdown_.isNewValueTrue())
     {
         executeShutdown();
+    }
+
+    // If there is a new goal to reach
+    if (tapCmdMove_.newDataAvailable())
+    {
+        executePlanToMove(tapCmdMove_.getPose());
+        publishInternalGoal(currentGoal_);
     }
 
     // If there is a new goal to reach

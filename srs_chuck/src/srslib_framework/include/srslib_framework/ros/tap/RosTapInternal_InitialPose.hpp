@@ -11,16 +11,16 @@ using namespace std;
 
 #include <ros/ros.h>
 
-#include <srslib_framework/ros/tap/RosTapPose.hpp>
+#include <srslib_framework/ros/tap/RosTapMsgPose.hpp>
 
 namespace srs {
 
 class RosTapInternal_InitialPose :
-    public RosTapPose
+    public RosTapMsgPose
 {
 public:
     RosTapInternal_InitialPose() :
-        RosTapPose("/internal/command/initial_pose", "Internal initial pose")
+        RosTapMsgPose("/internal/command/initial_pose", "Internal initial pose")
     {}
 };
 

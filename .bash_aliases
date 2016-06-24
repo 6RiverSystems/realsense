@@ -9,7 +9,7 @@ function getChuckDirectory() {
     baseDirectory="/home/rivs/projects/$ENV/ros"
   fi
 
-  logDirectory="$baseDirectory/log/mfp-ros.log"
+  logDirectory="$baseDirectory/log/ros.log"
 
   echo -e "${BLUE}*************************************************************"
   echo -e "${BLUE}*** ${YELLOW}ENV: $ENV"
@@ -47,7 +47,7 @@ function runChuck() {
   source devel/setup.bash &&
   popd
 
-  roslaunch srsc_6rhq_norviz map.launch 2>&1 | tee "$baseDirectory/log/mfp-ros.log"
+  roslaunch srsc_6rhq_norviz map.launch 2>&1 | tee "$baseDirectory/log/ros.log"
 }
 
 function cleanChuck() {
@@ -63,7 +63,7 @@ function cleanChuck() {
 }
 
 logChuck() {
-  tail -f "$baseDirectory/log/mfp-ros.log" ~/mfp_bridge/log/bridge.log
+  tail -f "$baseDirectory/log/ros.log" ~/mfp_bridge/log/bridge.log
 }
 
 alias chucklog=logChuck

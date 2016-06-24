@@ -15,7 +15,8 @@ using namespace std;
 #include <srslib_framework/ros/RosTap.hpp>
 #include <srsnode_motion/tap/aps/ApsSensor.hpp>
 
-#include <geometry_msgs/PoseStamped.h>
+#include <srslib_framework/MsgPose.h>
+using namespace srslib_framework;
 
 namespace srs {
 
@@ -58,9 +59,9 @@ public:
         RosTap::reset();
     }
 
-    void set(double arrivalTime, BaseType x, BaseType y, BaseType yaw)
+    void set(double arrivalTime, BaseType x, BaseType y, BaseType theta)
     {
-        sensor_->set(arrivalTime, x, y, yaw);
+        sensor_->set(arrivalTime, x, y, theta);
 
         if (!sensor_->isEnabled())
         {
@@ -80,12 +81,12 @@ protected:
     }
 
 private:
-    void onAps(const geometry_msgs::PoseStampedPtr& message)
+    void onAps(const MsgPoseConstPtr& message)
     {
         set(TimeMath::time2number(message->header.stamp),
-            static_cast<double>(message->pose.position.x),
-            static_cast<double>(message->pose.position.y),
-            static_cast<double>(tf::getYaw(message->pose.orientation)));
+            static_cast<double>(message->x),
+            static_cast<double>(message->y),
+            static_cast<double>(AngleMath::deg2rad(message->theta)));
     }
 
     ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensor_;

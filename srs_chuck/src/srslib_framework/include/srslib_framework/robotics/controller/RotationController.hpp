@@ -70,7 +70,7 @@ protected:
         // Make sure that the calculated angular velocity is not bigger
         // than the specified travel angular velocity
         angular = BasicMath::saturate<double>(angular,
-            robot_.travelAngularVelocity, -robot_.travelAngularVelocity);
+            robot_.travelRotationVelocity, -robot_.travelRotationVelocity);
 
         // Send the command for execution
         executeCommand(linear, angular);

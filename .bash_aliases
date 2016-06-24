@@ -47,7 +47,7 @@ function runChuck() {
   source devel/setup.bash &&
   popd
 
-  launch srsc_6rhq_norviz map.launch 2>&1 | tee "$baseDirectory/log/mfp-ros.log"
+  roslaunch srsc_6rhq_norviz map.launch 2>&1 | tee "$baseDirectory/log/mfp-ros.log"
 }
 
 function cleanChuck() {
@@ -63,7 +63,7 @@ function cleanChuck() {
 }
 
 logChuck() {
-  tail -f /var/log/mfp-ros.log -f /var/log/mfp-bridge.log
+  tail -f "$baseDirectory/log/mfp-ros.log" ~/mfp_bridge/log/bridge.log
 }
 
 alias chucklog=logChuck

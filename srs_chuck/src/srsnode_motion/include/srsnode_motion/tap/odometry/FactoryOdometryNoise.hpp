@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef FACTORYROBOTNOISE_HPP_
-#define FACTORYROBOTNOISE_HPP_
+#ifndef FACTORYODOMETRYNOISE_HPP_
+#define FACTORYODOMETRYNOISE_HPP_
 
 #include <cmath>
 
@@ -15,24 +15,21 @@
 #include <srsnode_motion/MotionConfig.h>
 using namespace srsnode_motion;
 
-// TODO: At the moment the odometry noise is included in the robot model
-// because odometry is treated like a command. Moving odometry to be a sensor
-// requires those values to be 0
-struct FactoryRobotNoise
+struct FactoryOdometryNoise
 {
     static cv::Mat fromConfiguration(MotionConfig& configuration)
     {
         // TODO Fix this so that double comes from a template
-        cv::Mat Q = (cv::Mat_<double>(1, STATIC_UKF_STATE_VECTOR_SIZE) <<
-            pow(configuration.ukf_robot_error_location, 2.0), // [m^2]
-            pow(configuration.ukf_robot_error_location, 2.0), // [m^2]
-            pow(configuration.ukf_robot_error_heading, 2.0), // [rad^2]
+        cv::Mat R = (cv::Mat_<double>(1, STATIC_UKF_STATE_VECTOR_SIZE) <<
+            0.0, // [m^2]
+            0.0, // [m^2]
+            0.0, // [rad^2]
             pow(configuration.ukf_odometry_error_linear, 2.0), // [m^2/s^2]
             pow(configuration.ukf_odometry_error_angular, 2.0) // [m^2/s^2]
         );
 
-        return cv::Mat::diag(Q);
+        return cv::Mat::diag(R);
     }
 };
 
-#endif // FACTORYROBOTNOISE_HPP_
+#endif // FACTORYODOMETRYNOISE_HPP_

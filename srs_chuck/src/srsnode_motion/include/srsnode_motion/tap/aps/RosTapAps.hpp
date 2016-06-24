@@ -55,7 +55,6 @@ public:
     void reset()
     {
         sensor_->reset();
-
         RosTap::reset();
     }
 
@@ -65,10 +64,10 @@ public:
 
         if (!sensor_->isEnabled())
         {
-            ROS_DEBUG_STREAM("APS sensor disabled. Ignoring readings.");
+            ROS_DEBUG_STREAM_NAMED("RosTapAps", "APS disabled. Ignoring readings.");
         }
 
-        setNewData(true);
+        setNewData(sensor_->newDataAvailable());
     }
 
 protected:

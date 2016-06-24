@@ -22,6 +22,7 @@ using namespace srsnode_motion;
 #include <srslib_framework/robotics/Odometry.hpp>
 
 #include <srsnode_motion/tap/aps/FactoryApsNoise.hpp>
+#include <srsnode_motion/tap/odometry/FactoryOdometryNoise.hpp>
 
 namespace srs {
 
@@ -31,6 +32,7 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Motion::Motion(string nodeName) :
     firstLocalization_(true),
+    isApsAvailable_(false),
     isCustomActionEnabled_(false),
     isJoystickLatched_(false),
     rosNodeHandle_(nodeName),
@@ -152,15 +154,16 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 
     cv::Mat R = FactoryApsNoise::fromConfiguration(config);
     tapAps_.getSensor()->setR(R);
-    tapAps_.getSensor()->enable(config.aps_enabled);
+    tapAps_.getSensor()->enable(config.sensor_aps_enabled);
+
+    R = FactoryOdometryNoise::fromConfiguration(config);
+    tapOdometry_.getSensor()->setR(R);
+    tapOdometry_.getSensor()->enable(config.sensor_odometry_enabled);
 
     isCustomActionEnabled_ = config.custom_action_enabled;
 
     ROS_INFO_STREAM_NAMED("Motion", "Adaptive look-ahead enabled [t/f]: " <<
         config.adaptive_lookahead_enabled);
-
-    ROS_INFO_STREAM_NAMED("Motion", "APS sensor enabled: " <<
-        config.aps_enabled);
 
     ROS_INFO_STREAM_NAMED("Motion", "Custom action enabled [t/f]: " <<
         config.custom_action_enabled);
@@ -205,6 +208,10 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: proportional constant []: " <<
         config.rotation_controller_kp);
 
+    ROS_INFO_STREAM_NAMED("Motion", "APS enabled: " <<
+        config.sensor_aps_enabled);
+    ROS_INFO_STREAM_NAMED("Motion", "ODOMETRY enabled: " <<
+        config.sensor_odometry_enabled);
     ROS_INFO_STREAM_NAMED("Motion", "Straight distance that is considered small [m]: " <<
         config.small_straight_distance);
 
@@ -227,15 +234,14 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
         config.ukf_aps_error_heading);
     ROS_INFO_STREAM_NAMED("Motion", "Location (X and Y) component of the APS noise [m]: " <<
         config.ukf_aps_error_location);
-
+    ROS_INFO_STREAM_NAMED("Motion", "Angular velocity component of the odometry noise [rad/s]: " <<
+        config.ukf_odometry_error_angular);
+    ROS_INFO_STREAM_NAMED("Motion", "Linear velocity component of the odometry noise [m/s]: " <<
+        config.ukf_odometry_error_linear);
     ROS_INFO_STREAM_NAMED("Motion", "Heading component of the robot noise [rad]: " <<
         config.ukf_robot_error_heading);
     ROS_INFO_STREAM_NAMED("Motion", "Location (X and Y) component of the robot noise [m]: " <<
         config.ukf_robot_error_location);
-    ROS_INFO_STREAM_NAMED("Motion", "Angular velocity component of the robot noise [rad/s]: " <<
-        config.ukf_robot_error_velocity_angular);
-    ROS_INFO_STREAM_NAMED("Motion", "Linear velocity component of the robot noise [m/s]: " <<
-        config.ukf_robot_error_velocity_linear);
 
     ROS_INFO_STREAM_NAMED("Motion", "Zero-point motion controller look-ahead distance [m]: " <<
         config.zero_look_ahead_distance);
@@ -478,8 +484,9 @@ void Motion::scanTapsForData()
         }
     }
 
-    // Check if odometry is available
+    // Check if odometry or APS data is available
     isOdometryAvailable_ = tapOdometry_.newDataAvailable();
+    isApsAvailable_ = tapAps_.newDataAvailable();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -519,10 +526,15 @@ void Motion::stepNode()
         }
     }
 
+    // TODO: Move the odometry to be a sensor of the UKF and not a command
     Odometry<> currentOdometry = tapOdometry_.getOdometry();
 
     // Provide the command to the position estimator if available
-    positionEstimator_.run(isOdometryAvailable_ ? &currentOdometry : nullptr);
+    if (isOdometryAvailable_ || isApsAvailable_)
+    {
+        positionEstimator_.run(isOdometryAvailable_ ? &currentOdometry : nullptr);
+    }
+
     Pose<> currentPose = positionEstimator_.getPose();
 
     // Run the motion controller

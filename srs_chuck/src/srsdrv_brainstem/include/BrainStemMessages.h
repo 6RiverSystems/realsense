@@ -65,7 +65,7 @@ enum class LED_MODE
 {
 	OFF 		= 0,
 	ON 			= 1,
-	BLINK 		= 2,
+	ESTOP 		= 2,
 	GRAB 		= 10,
 	PUT 		= 11,
 	BRAKE 		= 100,

@@ -35,6 +35,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 
 	m_mapLedMode["OFF"] 					= LED_MODE::OFF;
 	m_mapLedMode["ON"] 						= LED_MODE::ON;
+	m_mapLedMode["ESTOP"] 					= LED_MODE::ESTOP;
 	m_mapLedMode["GRAB"] 					= LED_MODE::GRAB;
 	m_mapLedMode["PUT"] 					= LED_MODE::PUT;
 	m_mapLedMode["BRAKE"] 					= LED_MODE::BRAKE;

@@ -14,6 +14,9 @@
 #include <tf2_sensor_msgs/tf2_sensor_msgs.h>
 #include <geometry_msgs/PoseStamped.h>
 
+#include <srslib_framework/MsgPose.h>
+using namespace srslib_framework;
+
 namespace srs
 {
 
@@ -25,7 +28,7 @@ namespace srs
 
 StarGazer::StarGazer( const std::string& strNodeName, const std::string& strSerialPort, const std::string& strApsTopic ) :
 	m_rosNodeHandle( strNodeName ),
-	m_rosApsPublisher( m_rosNodeHandle.advertise < geometry_msgs::PoseStamped > (strApsTopic, 1000) ),
+    m_rosApsPublisher(m_rosNodeHandle.advertise<MsgPose>(strApsTopic, 1000)),
 	m_pSerialIO( new SerialIO( "stargazer" ) ),
 	m_messageProcessor( m_pSerialIO ),
 	m_sleeper( REFRESH_RATE_HZ / 1000.0 ),
@@ -161,20 +164,27 @@ void StarGazer::ReadCallback( std::string strType, std::string strValue )
 
 void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, float fAngle )
 {
-	ros::Time now( ros::Time::now( ) );
+    tf::Pose pose(tf::Quaternion::getIdentity());
 
-	tf::Pose pose( tf::Quaternion::getIdentity( ) );
+    if (m_pointTransformer.TransformPoint(nTagId, fX, fY, fZ, fAngle, pose))
+    {
+        tf::Stamped<tf::Pose> stampedPose(pose, ros::Time::now(),
+            m_pointTransformer.GetAnchorFrame(nTagId));
 
-	if( m_pointTransformer.TransformPoint( nTagId, fX, fY, fZ, fAngle, pose ) )
-	{
-		tf::Stamped<tf::Pose> stampedPose( pose, now, m_pointTransformer.GetAnchorFrame( nTagId ) );
+        // The data from the anchor frame reference
+        geometry_msgs::PoseStamped msg;
+        poseStampedTFToMsg(stampedPose, msg);
 
-		// The data from the anchor frame reference
-		geometry_msgs::PoseStamped msg;
-		poseStampedTFToMsg( stampedPose, msg );
+        // Create our internal message
+        MsgPose message;
 
-		m_rosApsPublisher.publish( msg );
-	}
+        message.header = msg.header;
+        message.x = msg.pose.position.x;
+        message.y = msg.pose.position.y;
+        message.theta = AngleMath::rad2deg<double>(tf::getYaw(msg.pose.orientation));
+
+        m_rosApsPublisher.publish(message);
+    }
 }
 
 void StarGazer::LoadTransforms( )

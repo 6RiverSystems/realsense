@@ -112,15 +112,10 @@ struct LIGHT_UPDATE_DATA
 struct HARDWARE_INFORMATION_DATA
 {
 	uint8_t 	cmd;
-	uint32_t	uniqueId[4];			// Hardware unique identifier (unique across all robots)
-	uint8_t		bodyType; 				// Body type
-	int32_t		configuration; 			// configuration layout
-	int32_t		lifetimeHours; 			// lifetime hours
-	int32_t		lifetimeMeters; 		// lifetime meters
-	int32_t		batteryHours;			// battery hours
-	int32_t		wheelMeters; 			// wheel meters
-	//char*	    pszBrainstemVersion;	// brainstem version
-	//char*	    pszSafetyVersion;		// safety processor version
+	uint32_t	uniqueId[4];			// hardware unique identifier (unique across all robots)
+	uint8_t		chassisGeneration; 		// chassis generation
+	uint8_t		brainstemHwVersion; 	// brainstem hardware version
+	//char*	    brainstemSwVersion;		// brainstem software version
 };
 
 struct MOTION_STATUS_DATA

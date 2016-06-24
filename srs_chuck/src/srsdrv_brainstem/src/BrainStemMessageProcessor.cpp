@@ -18,7 +18,8 @@ namespace srs {
 using namespace ros;
 
 BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) :
-	m_pIO( pIO )
+	m_pIO( pIO ),
+	m_mapMotionStatus( )
 {
 	m_mapEntityButton[LED_ENTITIES::TOTE0]		= "TOTE0";
 	m_mapEntityButton[LED_ENTITIES::TOTE1]		= "TOTE1";
@@ -42,6 +43,11 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_mapLedMode["TURN"] 					= LED_MODE::TURN;
 	m_mapLedMode["SELECT"] 					= LED_MODE::SELECT;
 
+	m_mapMotionStatus["WIRELESS_E_STOP"]	= MOTION_STATUS::WIRELESS_E_STOP;
+	m_mapMotionStatus["BUMP_SENSOR"]		= MOTION_STATUS::BUMP_SENSOR;
+	m_mapMotionStatus["PAUSE"]				= MOTION_STATUS::PAUSE;
+	m_mapMotionStatus["HARD_STOP"]			= MOTION_STATUS::HARD_STOP;
+
 	for( auto& kv : m_mapEntityButton )
 	{
 		m_mapButtonEntity[kv.second] = kv.first;
@@ -51,6 +57,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_vecBridgeCallbacks["STOP"] = { std::bind( &BrainStemMessageProcessor::OnHardStop, this ), 0 };
 	m_vecBridgeCallbacks["STARTUP"] = { std::bind( &BrainStemMessageProcessor::OnStartup, this, std::placeholders::_1 ), 0 };
 	m_vecBridgeCallbacks["PAUSE"] = { std::bind( &BrainStemMessageProcessor::OnPause, this, std::placeholders::_1 ), 1 };
+	m_vecBridgeCallbacks["CLEAR_MOTION_STATUS"] = { std::bind( &BrainStemMessageProcessor::ClearMotionStatus, this ), 1 };
 }
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor( )
@@ -149,10 +156,8 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 
 			std::string strBrainStemVersion( pszBrainStemVersion );
 
-			m_hardwareInfoCallback( pHardwareInfo->uniqueId, pHardwareInfo->bodyType,
-				pHardwareInfo->configuration, pHardwareInfo->lifetimeHours,
-				pHardwareInfo->lifetimeMeters, pHardwareInfo->batteryHours,
-				pHardwareInfo->wheelMeters, strBrainStemVersion );
+			m_hardwareInfoCallback( pHardwareInfo->uniqueId, pHardwareInfo->chassisGeneration,
+				pHardwareInfo->brainstemHwVersion, strBrainStemVersion );
 		}
 		break;
 
@@ -447,6 +452,16 @@ void BrainStemMessageProcessor::OnPause( std::vector<std::string> vecParams )
 	Pause( strPaused == "ON" );
 }
 
+void BrainStemMessageProcessor::ClearMotionStatus( )
+{
+	std::bitset<8> clearSet;
+	clearSet.set( MOTION_STATUS::WIRELESS_E_STOP, true );
+	clearSet.set( MOTION_STATUS::BUMP_SENSOR, true );
+	clearSet.set( MOTION_STATUS::HARD_STOP, true );
+
+	SetMotionStatus( clearSet, false );
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Helper Methods
 //////////////////////////////////////////////////////////////////////////
@@ -469,16 +484,6 @@ void BrainStemMessageProcessor::Pause( bool bPaused )
 	pauseSet.set( MOTION_STATUS::PAUSE, true );
 
 	SetMotionStatus( pauseSet, bPaused );
-
-	// TODO: Change this behavior from the bridge
-	if( !bPaused )
-	{
-		std::bitset<8> motionStatusSet;
-		motionStatusSet.set( MOTION_STATUS::HARD_STOP, true );
-
-		// Clear the motion status fault
-		SetMotionStatus( motionStatusSet, false );
-	}
 }
 
 } /* namespace srs */

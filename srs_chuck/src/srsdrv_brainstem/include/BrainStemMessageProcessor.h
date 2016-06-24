@@ -36,8 +36,7 @@ class BrainStemMessageProcessor {
 	typedef std::function<void(uint32_t, float, float)> OdometryCallbackFn;
 
 	typedef std::function<void(uint32_t[4], uint8_t,
-		uint32_t, uint32_t, uint32_t, uint32_t,
-		uint32_t, const std::string&)> HardwareInfoCallbackFn;
+		uint8_t, const std::string&)> HardwareInfoCallbackFn;
 
 	typedef std::function<void(uint32_t, const MOTION_STATUS_DATA&,
 		const FAILURE_STATUS_DATA&)> OperationalStateCallbackFn;
@@ -46,27 +45,29 @@ class BrainStemMessageProcessor {
 
 private:
 
-	std::shared_ptr<IO>				m_pIO;
+	std::shared_ptr<IO>						m_pIO;
 
-	std::map<LED_ENTITIES, std::string>	m_mapEntityButton;
+	std::map<LED_ENTITIES, std::string>		m_mapEntityButton;
 
-	std::map<std::string, LED_ENTITIES>	m_mapButtonEntity;
+	std::map<std::string, LED_ENTITIES>		m_mapButtonEntity;
 
-	std::map<std::string, LED_MODE>	m_mapLedMode;
+	std::map<std::string, LED_MODE>			m_mapLedMode;
 
-	std::map<std::string, Handler>	m_vecBridgeCallbacks;
+	std::map<std::string, MOTION_STATUS>	m_mapMotionStatus;
 
-	ConnectionChangedFn				m_connectionChangedCallback;
+	std::map<std::string, Handler>			m_vecBridgeCallbacks;
 
-	ButtonCallbackFn				m_buttonCallback;
+	ConnectionChangedFn						m_connectionChangedCallback;
 
-	OdometryCallbackFn				m_odometryCallback;
+	ButtonCallbackFn						m_buttonCallback;
 
-	HardwareInfoCallbackFn			m_hardwareInfoCallback;
+	OdometryCallbackFn						m_odometryCallback;
 
-	OperationalStateCallbackFn		m_operationalStateCallback;
+	HardwareInfoCallbackFn					m_hardwareInfoCallback;
 
-	VoltageCallbackFn				m_voltageCallback;
+	OperationalStateCallbackFn				m_operationalStateCallback;
+
+	VoltageCallbackFn						m_voltageCallback;
 
 public:
 
@@ -127,6 +128,8 @@ private:
 	void OnUpdateLights( std::vector<std::string> vecParams );
 
 	void OnPause( std::vector<std::string> vecParams );
+
+	void ClearMotionStatus( );
 
 	void OnStartup( std::vector<std::string> vecParams );
 

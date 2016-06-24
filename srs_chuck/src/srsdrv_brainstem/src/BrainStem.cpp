@@ -193,30 +193,24 @@ void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, 
 	sLastTime = currentTime;
 }
 
-void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t bodyType, uint32_t configuration,
-	uint32_t lifetimeHours, uint32_t lifetimeMeters, uint32_t batteryHours,
-	uint32_t wheelMeters, const std::string& strBrainstemVersion )
+void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t chassisGeneration, uint8_t brainstemHwVersion,
+	const std::string& strBrainstemSwVersion )
 {
-	char pszGuid[255] = { '\0' };
-	sprintf( pszGuid, "%08X-%08X-%08X-%08X", uniqueId[0], uniqueId[1], uniqueId[2], uniqueId[3] );
+	char pszUid[255] = { '\0' };
+	sprintf( pszUid, "%08X-%08X-%08X-%08X", uniqueId[0], uniqueId[1], uniqueId[2], uniqueId[3] );
 
 	std::string strName( getenv( "ROBOT_NAME" ) );
 
-	ROS_INFO_STREAM( "Hardware Info => name: " << strName << ", id: " << pszGuid << ", bodyType: " << bodyType <<
-		", configuration: " << configuration << ", lifetimeHours: " << lifetimeHours <<
-		", lifetimeMeters:"  << lifetimeMeters << ", batteryHours: " << batteryHours <<
-		", wheelMeters: " << wheelMeters << ", Brainstem Version: " << strBrainstemVersion );
+	ROS_INFO_STREAM( "Hardware Info => name: " << strName << ", id: " << pszUid <<
+		", chassisGeneration: " << chassisGeneration << ", brainstemHwVersion: " << brainstemHwVersion <<
+		", brainstemSwVersion: " << strBrainstemSwVersion );
 
 	srslib_framework::HardwareInfo msg;;
 	msg.name = strName;
-	msg.uniqueId = pszGuid;
-	msg.bodyType = bodyType;
-	msg.configuration = configuration;
-	msg.lifetimeHours = lifetimeHours;
-	msg.lifetimeMeters = lifetimeMeters;
-	msg.batteryHours = batteryHours;
-	msg.wheelMeters = wheelMeters;
-	msg.brainstemVersion = strBrainstemVersion;
+	msg.uid = pszUid;
+	msg.chassisGeneration = chassisGeneration;
+	msg.brainstemHwVersion = brainstemHwVersion;
+	msg.brainstemSwVersion = strBrainstemSwVersion;
 
 	m_hardwareInfoPublisher.publish( msg );
 }
@@ -308,8 +302,7 @@ void BrainStem::SetupCallbacks( )
 		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
 
 	m_messageProcessor.SetHardwareInfoCallback( std::bind( &BrainStem::OnHardwareInfo, this,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
-		std::placeholders::_5, std::placeholders::_6, std::placeholders::_7, std::placeholders::_8 ) );
+		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
 
 	m_messageProcessor.SetOperationalStateCallback( std::bind( &BrainStem::OnOperationalStateChanged, this,
 		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );

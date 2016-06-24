@@ -222,7 +222,7 @@ void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t bodyType, uint32_t
 }
 
 void BrainStem::OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_DATA& motionStatus,
-	const FAILURE_STATUS_DATA& failureStatus, bool suspendState )
+	const FAILURE_STATUS_DATA& failureStatus )
 {
 	std::ostringstream stream;
 
@@ -238,7 +238,6 @@ void BrainStem::OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_
 		", brainTimeoutFailure: " << failureStatus.brainTimeoutFailure <<
 		", rightMotorFailure: " << failureStatus.rightMotorFailure <<
 		", leftMotorFailure: " << failureStatus.leftMotorFailure <<
-		", suspendState: " << suspendState <<
 		std::endl;
 
 	std::string strData =  stream.str( );
@@ -257,7 +256,6 @@ void BrainStem::OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_
 	msg.brainTimeoutFailure = failureStatus.brainTimeoutFailure;
 	msg.rightMotorFailure = failureStatus.rightMotorFailure;
 	msg.leftMotorFailure = failureStatus.leftMotorFailure;
-	msg.suspendState = suspendState;
 
 	m_operationalStatePublisher.publish( msg );
 }
@@ -314,7 +312,7 @@ void BrainStem::SetupCallbacks( )
 		std::placeholders::_5, std::placeholders::_6, std::placeholders::_7, std::placeholders::_8 ) );
 
 	m_messageProcessor.SetOperationalStateCallback( std::bind( &BrainStem::OnOperationalStateChanged, this,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
+		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
 
 	m_messageProcessor.SetVoltageCallback( std::bind( &BrainStem::OnVoltageChanged, this,
 		std::placeholders::_1 ) );

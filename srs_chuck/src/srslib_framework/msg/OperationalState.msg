@@ -10,4 +10,3 @@ bool brainstemFailure
 bool brainTimeoutFailure
 bool rightMotorFailure
 bool leftMotorFailure
-bool suspendState

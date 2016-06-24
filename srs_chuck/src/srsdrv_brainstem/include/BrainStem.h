@@ -39,7 +39,7 @@ public:
 		uint32_t wheelMeters, const std::string& strBrainstemVersion );
 
 	void OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_DATA& motionStatus,
-		const FAILURE_STATUS_DATA& failureStatus, bool suspendState );
+		const FAILURE_STATUS_DATA& failureStatus );
 
 	void OnVoltageChanged( float fVoltage );
 

@@ -179,7 +179,7 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 			failureStatusData.leftMotorFailure = failureStatusSet.test( FAILURE_STATUS::LEFT_MOTOR );
 
 			m_operationalStateCallback( pOperationalState->upTime, motionStatusData,
-				failureStatusData, pOperationalState->suspendState );
+				failureStatusData );
 		}
 		break;
 
@@ -465,8 +465,10 @@ void BrainStemMessageProcessor::WriteToSerialPort( char* pszData, std::size_t dw
 
 void BrainStemMessageProcessor::Pause( bool bPaused )
 {
-	SUSPEND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::SET_SUSPEND_STATE ),
-		bPaused };
+	std::bitset<8> pauseSet;
+	pauseSet.set( MOTION_STATUS::PAUSE, true );
+
+	SetMotionStatus( pauseSet, bPaused );
 
 	// TODO: Change this behavior from the bridge
 	if( !bPaused )
@@ -477,8 +479,6 @@ void BrainStemMessageProcessor::Pause( bool bPaused )
 		// Clear the motion status fault
 		SetMotionStatus( motionStatusSet, false );
 	}
-
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 
 } /* namespace srs */

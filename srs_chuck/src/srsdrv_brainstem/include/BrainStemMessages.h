@@ -36,7 +36,6 @@ enum class BRAIN_STEM_CMD
 	UPDATE_LIGHT			= 0x37, // '7'
 	SET_CONFIGURATION		= 0x66, // 'f'
 	SET_MOTION_STATUS		= 0x32, // '2'
-	SET_SUSPEND_STATE		= 0x34, // '4'
 	SET_TOTE_LIGHTS			= 0x39, // '9'
 	SET_VELOCITY			= 0x76, // 'v'
 	STARTUP					= 0x38, // '8'

@@ -40,7 +40,7 @@ class BrainStemMessageProcessor {
 		uint32_t, const std::string&)> HardwareInfoCallbackFn;
 
 	typedef std::function<void(uint32_t, const MOTION_STATUS_DATA&,
-		const FAILURE_STATUS_DATA&, bool)> OperationalStateCallbackFn;
+		const FAILURE_STATUS_DATA&)> OperationalStateCallbackFn;
 
 	typedef std::function<void(float)> VoltageCallbackFn;
 

@@ -63,6 +63,8 @@ function cleanChuck() {
 }
 
 logChuck() {
+  getChuckDirectory &&
+
   tail -f "$baseDirectory/log/ros.log" ~/mfp_bridge/log/bridge.log
 }
 

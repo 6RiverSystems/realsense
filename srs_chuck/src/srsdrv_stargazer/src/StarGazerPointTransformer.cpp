@@ -73,7 +73,7 @@ double StarGazerPointTransformer::ConvertToRightHandRule( double fLeftHandAngleI
 	return tf::getYaw( leftHandOrientation );
 }
 
-void StarGazerPointTransformer::Load( const std::string& strTargetFrame,
+bool StarGazerPointTransformer::Load( const std::string& strTargetFrame,
 	const tf::Transform& footprintTransform, const std::string& strAnchorsFile,
 	const std::string& strCalibrationFile )
 {
@@ -86,9 +86,8 @@ void StarGazerPointTransformer::Load( const std::string& strTargetFrame,
 	ROS_INFO_STREAM( "Stargazer footprint transform: x=" << origin.getX( ) << ", y=" << origin.getY( ) <<
 		", z=" << origin.getZ( )  << ", orientation=" << tf::getYaw( m_footprintTransform.getRotation( ) ) );
 
-	LoadAnchors( strAnchorsFile );
-
-	LoadCalibrationTransform( strCalibrationFile );
+	return LoadAnchors( strAnchorsFile ) &&
+		LoadCalibrationTransform( strCalibrationFile );
 }
 
 tf::Quaternion StarGazerPointTransformer::ConvertAngle( double fLeftHandAngleInDegrees ) const
@@ -126,7 +125,8 @@ tf::Vector3 StarGazerPointTransformer::GetFootprintOffset( const tf::Quaternion&
 	return footprintPose.getOrigin( );
 }
 
-bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY, double fZ, double fAngleInDegrees, tf::Pose& pose )
+bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY, double fZ,
+	double fAngleInDegrees, tf::Pose& pose, bool bFilter )
 {
 	bool bSuccess = false;
 
@@ -134,7 +134,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 	if( iter != m_mapTransforms.end( ) )
 	{
-		if( m_filter.unfilterStargazerData( nTagId, fX, fY, fZ ) )
+		if( !bFilter || m_filter.unfilterStargazerData( nTagId, fX, fY, fZ ) )
 		{
 			// The anchor transform from the origin of the map to the anchor point
 			const tf::Transform& anchorGlobal = iter->second;
@@ -153,8 +153,10 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 			tf::Vector3 chuckOrigin = anchorGlobal * stargazerTranslation;
 
-			tf::Quaternion chuckOrientation = anchorGlobal.getRotation() + anchorRotation;
+			double dfAnchorGlobal = tf::getYaw(anchorGlobal.getRotation( ) );
+			double dfAnchroRotation = tf::getYaw( anchorRotation );
 
+			tf::Quaternion chuckOrientation( tf::createQuaternionFromYaw( dfAnchorGlobal + dfAnchroRotation) );
 			pose = tf::Pose( chuckOrientation, chuckOrigin);
 
 			bSuccess = true;
@@ -285,8 +287,10 @@ std::string StarGazerPointTransformer::GetAnchorFrame( int tagID ) const
 	return std::move( stringStream.str( ) );
 }
 
-void StarGazerPointTransformer::LoadAnchors( const std::string& strAnchorsFile )
+bool StarGazerPointTransformer::LoadAnchors( const std::string& strAnchorsFile )
 {
+	bool bSuccess = true;
+
 	try
 	{
 		YAML::Node document = YAML::LoadFile( strAnchorsFile );
@@ -314,22 +318,32 @@ void StarGazerPointTransformer::LoadAnchors( const std::string& strAnchorsFile )
 				catch( const boost::bad_lexical_cast& e )
 				{
 					ROS_ERROR_STREAM( "Could not convert anchor id to int: " << anchor.id << " " << e.what( ) );
+
+					bSuccess = false;
 				}
 			}
 		}
 		else
 		{
 			ROS_ERROR_STREAM( "Configuration file not found: " << strAnchorsFile );
+
+			bSuccess = false;
 		}
 	}
 	catch( const std::runtime_error& e )
 	{
 		ROS_ERROR_STREAM( "Could not parse yaml file for anchors: " << strAnchorsFile << " " << e.what( ) );
+
+		bSuccess = false;
 	}
+
+	return bSuccess;
 }
 
-void StarGazerPointTransformer::LoadCalibrationTransform( const std::string& strConfigurationFile )
+bool StarGazerPointTransformer::LoadCalibrationTransform( const std::string& strConfigurationFile )
 {
+	bool bSuccess = true;
+
 	try
 	{
 		YAML::Node document = YAML::LoadFile( strConfigurationFile );
@@ -350,12 +364,19 @@ void StarGazerPointTransformer::LoadCalibrationTransform( const std::string& str
 		else
 		{
 			ROS_ERROR_STREAM( "Stargazer calibration file not found: " << strConfigurationFile );
+
+			bSuccess = false;
 		}
 	}
 	catch( const std::runtime_error& e )
 	{
-		ROS_ERROR_STREAM( "Could not parse yaml file for Stargazer calibration: " << strConfigurationFile << " " << e.what( ) );
+		ROS_ERROR_STREAM( "Could not parse yaml file for Stargazer calibration: " <<
+			strConfigurationFile << " " << e.what( ) );
+
+		bSuccess = false;
 	}
+
+	return bSuccess;
 }
 
 }

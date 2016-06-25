@@ -10,157 +10,21 @@
 #include <tf/tf.h>
 #include <yaml-cpp/yaml.h>
 
-struct Pose
-{
-	Pose() :
-		x(0),
-		y(0),
-		z(0),
-		orientation()
-	{}
-
-	Pose(unsigned int x, unsigned int y, unsigned int z, double orientation) :
-		x(0),
-		y(0),
-		z(0),
-		orientation()
-	{}
-
-	bool decode( const YAML::Node& node )
-	{
-		x = node["x"].as<double>( );
-		y = node["y"].as<double>( );
-		z = node["z"].as<double>( );
-		orientation = node["orientation"].as<double>( );
-
-		return true;
-	}
-
-    double x;
-    double y;
-    double z;
-
-    double orientation;
-};
-
-struct StargazerMeasurement
-{
-	StargazerMeasurement() :
-		rawPose(),
-		cameraPose(),
-		footprintPose(),
-		mapPose()
-	{}
-
-	StargazerMeasurement(Pose rawPose, Pose cameraPose, Pose footprintPose, Pose mapPose) :
-		rawPose(),
-		cameraPose(),
-		footprintPose(),
-		mapPose()
-	{}
-
-	bool decode( const YAML::Node& node )
-	{
-		rawPose.decode( node );
-
-		return true;
-	}
-
-	Pose rawPose;
-
-	Pose cameraPose;
-
-	Pose footprintPose;
-
-	Pose mapPose;
-};
-
-struct StargazerMapPoint
-{
-	StargazerMapPoint() :
-		id(""),
-		pose(),
-		measurements()
-	{}
-
-	StargazerMapPoint(Pose pose) :
-		id(id),
-		pose(pose),
-		measurements()
-	{}
-
-	bool decode( const YAML::Node& node )
-	{
-		id = node["id"].as<std::string>( );
-		pose.decode( node["location"] );
-		measurements = node["measurements"].as<std::vector<StargazerMeasurement>>( );
-
-		return true;
-	}
-
-	std::string id;
-
-	Pose pose;
-
-	std::vector<StargazerMeasurement> measurements;
-};
-
-struct StargazerAnchor
-{
-	StargazerAnchor() :
-        id(""),
-        pose()
-    {}
-
-	StargazerAnchor(std::string id, Pose pose) :
-        id(id),
-        pose(pose),
-        vecMapPoints()
-    {}
-
-	bool decode( const YAML::Node& node )
-	{
-		id = node["id"].as<std::string>( );
-		pose.decode( node["location"] );
-		pose.y = node["location"][1].as<double>( );
-		pose.z = node["location"][2].as<double>( );
-		pose.orientation = node["orientation"].as<double>( );
-
-		return true;
-	}
-
-    std::string id;
-
-    Pose pose;
-
-    std::vector<StargazerMapPoint> vecMapPoints;
-};
-
-
-namespace YAML
-{
-template<>
-struct convert<StargazerAnchor>
-{
-	static bool decode( const Node& node, StargazerAnchor& anchor )
-	{
-		return anchor.decode( node );
-	}
-};
-
-template<>
-struct convert<StargazerMeasurement>
-{
-	static bool decode( const Node& node, StargazerMeasurement& measurement )
-	{
-		return measurement.decode( node );
-	}
-};
-}
-
 namespace srs {
 
 std::string g_strDataFile;
+
+const auto g_footprintOffsetX = 7.0f;
+const auto g_footprintOffsetY = 13.0f;
+
+struct Point
+{
+	uint32_t anchorId;
+	double x; // In meters
+	double y; // In meters
+	double z; // In meters
+	double angle; // In degrees
+};
 
 class StargazerTest : public ::testing::Test
 {
@@ -168,27 +32,26 @@ public:
 
 	StarGazerPointTransformer  		m_pointTransformer;
 
-	std::vector<StargazerAnchor>	m_vecAnchors;
-
 	tf::Transform					m_footprintTransform;
+
+	std::vector<Point>				m_vecTestPoints;
 
 public:
 
 	StargazerTest( ) :
-		m_footprintTransform( tf::Quaternion::getIdentity( ), tf::Vector3( 0.39f, 0.064f, 0.0 ) )
+		m_footprintTransform( tf::Quaternion::getIdentity( ),
+			tf::Vector3( g_footprintOffsetX, g_footprintOffsetY, 0.0 ) )
 	{
+		m_vecTestPoints.push_back( { 1, 300.0f, 700.0f, 300.0f, 0.0f } );
+		m_vecTestPoints.push_back( { 1, 300.0f, 700.0f, 300.0f, 90.0f } );
+		m_vecTestPoints.push_back( { 1, 300.0f, 700.0f, 300.0f, 180.0f } );
+		m_vecTestPoints.push_back( { 1, 300.0f, 700.0f, 300.0f, -90.0f } );
 
 	}
 
 	void SetUp( )
 	{
-		std::string strAnchors( g_strDataFile );
-		strAnchors += "/anchors.yaml";
 
-		std::string strCalibrationFile( g_strDataFile );
-		strCalibrationFile += "/robot-config.yaml";
-
-		m_pointTransformer.Load( "/internal/state/map/grid", m_footprintTransform, strAnchors, strCalibrationFile );
 	}
 
 	void TearDown( )
@@ -201,25 +64,22 @@ public:
 
 	}
 
-	void LoadTestData( )
+	bool LoadTestData( const std::string& strConfigTest )
 	{
-		try
-		{
-			YAML::Node document = YAML::LoadFile( g_strDataFile );
+		std::string strAnchors( g_strDataFile );
+		strAnchors += "/anchors.yaml";
 
-			if( !document.IsNull( ) )
-			{
-				m_vecAnchors = document["anchors"].as<std::vector<StargazerAnchor>>( );
-			}
-			else
-			{
-				ROS_ERROR_STREAM( "Test data file not found: " << g_strDataFile );
-			}
-		}
-		catch( const std::runtime_error& e )
-		{
-			ROS_ERROR_STREAM( "Could not parse yaml file for test data: " << g_strDataFile << " " << e.what( ) );
-		}
+		std::string strCalibrationFile( g_strDataFile );
+		strCalibrationFile += "/";
+		strCalibrationFile += strConfigTest;
+
+		return m_pointTransformer.Load( "/internal/state/map/grid", m_footprintTransform,
+			strAnchors, strCalibrationFile );
+	}
+
+	void GetCalculatedData( )
+	{
+
 	}
 
 	double GetLeftHandAngle( double dfRightHandDegrees )
@@ -233,54 +93,73 @@ public:
 
 TEST_F( StargazerTest, TestTransforms )
 {
-	double dfAngleLeftDegrees = GetLeftHandAngle( -0.47000 );
+	uint32_t testIndex = 0;
 
-	tf::Quaternion rotation = m_pointTransformer.ConvertAngle( dfAngleLeftDegrees );
+	char pszConfigTest[255] = { '\0' };
 
-	double dfAngleRightRadians = tf::getYaw( rotation );
-
-	double dfAngleRightDegrees = dfAngleRightRadians * 180.0f / M_PI;
-
-	tf::Vector3 cameraOffset = m_pointTransformer.GetCameraOffset( rotation );
-
-	tf::Vector3 footprintOffset = m_pointTransformer.GetFootprintOffset( rotation );
-
-	tf::Vector3 stargazerOffset = m_pointTransformer.GetStargazerOffset( -18.489, 77.349, 511.051 );
-
-	tf::Vector3 totalCameraOffset = cameraOffset + stargazerOffset;
-
-	ROS_DEBUG_NAMED( "StarGazerPointTransformer", "stargazer (%2.5f): %2.5f, %2.5f, %2.5f\n",
-		tf::getYaw( rotation ), stargazerOffset.getX( ), stargazerOffset.getY( ), stargazerOffset.getZ( ) );
-
-	ROS_DEBUG_NAMED( "StarGazerPointTransformer", "partial camera (%2.5f): %2.5f, %2.5f, %2.5f\n",
-		tf::getYaw( rotation ), cameraOffset.getX( ), cameraOffset.getY( ), cameraOffset.getZ( ) );
-
-	ROS_DEBUG_NAMED( "StarGazerPointTransformer", "total camera (%2.5f): %2.5f, %2.5f, %2.5f\n",
-		tf::getYaw( rotation ), totalCameraOffset.getX( ), totalCameraOffset.getY( ), totalCameraOffset.getZ( ) );
-
-	ROS_DEBUG_NAMED( "StarGazerPointTransformer", "partial footprint (%2.5f): %2.5f, %2.5f, %2.5f\n",
-		tf::getYaw( rotation ), footprintOffset.getX( ), footprintOffset.getY( ), footprintOffset.getZ( ) );
-
-	tf::Vector3 totalFootprintOffset = totalCameraOffset + footprintOffset;
-
-	ROS_DEBUG_NAMED( "StarGazerPointTransformer", "total footprint (%2.5f): %2.5f, %2.5f, %2.5f\n",
-		tf::getYaw( rotation ), totalFootprintOffset.getX( ), totalFootprintOffset.getY( ), totalFootprintOffset.getZ( ) );
-}
-
-TEST_F( StargazerTest, TestMapTransform )
-{
-	double dfAngleLeftDegrees = GetLeftHandAngle( -0.47000 );
-
-	tf::Pose pose( tf::Quaternion::getIdentity( ) );
-
-	if( m_pointTransformer.TransformPoint( 98, -18.489, 77.349, 511.051, dfAngleLeftDegrees, pose ) )
+	while( true )
 	{
-		tf::Vector3 mapOffset = pose.getOrigin( );
+		sprintf( pszConfigTest, "robot-config-%d.yaml", ++testIndex );
 
-		tf:: Quaternion mapRotation = pose.getRotation( );
+		if( LoadTestData( pszConfigTest ) )
+		{
+			std::map<int, tf::Transform> mapAnchorTransforms = m_pointTransformer.GetAnchorTransforms( );
 
-		ROS_DEBUG_NAMED( "StarGazerPointTransformer", "map (%2.5f): %2.5f, %2.5f, %2.5f\n",
-			tf::getYaw( mapRotation ), mapOffset.getX( ), mapOffset.getY( ), mapOffset.getZ( ) );
+			for( auto testPoint : m_vecTestPoints )
+			{
+				ROS_DEBUG_NAMED( "transform", "Testing config: %s, id: %d, x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
+					pszConfigTest, testPoint.anchorId, testPoint.x, testPoint.y, testPoint.z, testPoint.angle );
+
+				// Convert to left hand degrees from right hand degrees
+				double dfAngleLeftDegrees = GetLeftHandAngle( testPoint.angle );
+
+				tf::Quaternion rotation = m_pointTransformer.ConvertAngle( dfAngleLeftDegrees );
+
+				tf::Transform anchorTransform = mapAnchorTransforms[testPoint.anchorId];
+
+				double dfAngleRightRadians = tf::getYaw( rotation );
+
+				double dfAngleRightDegrees = dfAngleRightRadians * 180.0f / M_PI;
+
+				tf::Vector3 cameraOffset = m_pointTransformer.GetCameraOffset( rotation );
+
+				tf::Vector3 footprintOffset = m_pointTransformer.GetFootprintOffset( rotation );
+
+				tf::Vector3 stargazerOffset = m_pointTransformer.GetStargazerOffset( testPoint.x*100.0f, testPoint.y*100.0f, testPoint.z*100.0f );
+
+				tf::Vector3 totalCameraOffset = cameraOffset + stargazerOffset;
+
+				tf::Vector3 totalFootprintOffset = totalCameraOffset + footprintOffset;
+
+				ROS_DEBUG_NAMED( "StarGazerPointTransformer", "stargazer (%2.5f): %2.5f, %2.5f, %2.5f",
+					tf::getYaw( rotation ), stargazerOffset.getX( ), stargazerOffset.getY( ), stargazerOffset.getZ( ) );
+
+				ROS_DEBUG_NAMED( "StarGazerPointTransformer", "camera (%2.5f): %2.5f, %2.5f, %2.5f",
+					tf::getYaw( rotation ), totalCameraOffset.getX( ), totalCameraOffset.getY( ), totalCameraOffset.getZ( ) );
+
+				ROS_DEBUG_NAMED( "StarGazerPointTransformer", "footprint (%2.5f): %2.5f, %2.5f, %2.5f",
+					tf::getYaw( rotation ), totalFootprintOffset.getX( ), totalFootprintOffset.getY( ), totalFootprintOffset.getZ( ) );
+
+				tf::Pose pose( tf::createIdentityQuaternion( ) );
+
+				// Convert to cm
+				testPoint.x *= 100.0f;
+				testPoint.y *= 100.0f;
+				testPoint.z *= 100.0f;
+
+				if( m_pointTransformer.TransformPoint( testPoint.anchorId, testPoint.x, testPoint.y,
+					testPoint.z, dfAngleLeftDegrees, pose, false ) )
+				{
+					// TODO: Calculate the expected results and test each case
+					// For now bugs are fixed and eyeballed so it is working
+					// EXPECT_EQ( pose, poseCalculated );
+				}
+			}
+		}
+		else
+		{
+			break;
+		}
 	}
 }
 

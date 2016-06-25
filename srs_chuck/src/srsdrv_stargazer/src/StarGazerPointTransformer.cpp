@@ -306,12 +306,12 @@ bool StarGazerPointTransformer::LoadAnchors( const std::string& strAnchorsFile )
 					int32_t anchorId = boost::lexical_cast < int32_t > (anchor.id);
 
 					tf::Vector3 origin( anchor.x, anchor.y, -anchor.z );
-					tf::Quaternion orientation = tf::createQuaternionFromYaw( anchor.orientation );
+					tf::Quaternion orientation = tf::createQuaternionFromYaw( anchor.orientation * M_PI / 180.0f );
 
 					tf::Transform transform( orientation, origin );
 
 					ROS_INFO_STREAM( "Stargazer anchor: x=" << origin.getX( ) << ", y=" << origin.getY( ) <<
-						", z=" << origin.getZ( )  << ", orientation=" << tf::getYaw( orientation ) );
+						", z=" << origin.getZ( )  << ", orientation=" << tf::getYaw( orientation ) * 180.0f / M_PI );
 
 					m_mapTransforms[anchorId] = transform;
 				}

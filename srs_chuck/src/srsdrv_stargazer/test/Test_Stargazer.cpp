@@ -19,7 +19,6 @@ const auto g_footprintOffsetY = 13.0f;
 
 struct Point
 {
-	uint32_t anchorId;
 	double x; // In meters
 	double y; // In meters
 	double z; // In meters
@@ -34,6 +33,8 @@ public:
 
 	tf::Transform					m_footprintTransform;
 
+	std::vector<uint32_t>			m_vecAnchors;
+
 	std::vector<Point>				m_vecTestPoints;
 
 public:
@@ -42,11 +43,16 @@ public:
 		m_footprintTransform( tf::Quaternion::getIdentity( ),
 			tf::Vector3( g_footprintOffsetX, g_footprintOffsetY, 0.0 ) )
 	{
-		m_vecTestPoints.push_back( { 1, 300.0f, 700.0f, 300.0f, 0.0f } );
-		m_vecTestPoints.push_back( { 1, 300.0f, 700.0f, 300.0f, 90.0f } );
-		m_vecTestPoints.push_back( { 1, 300.0f, 700.0f, 300.0f, 180.0f } );
-		m_vecTestPoints.push_back( { 1, 300.0f, 700.0f, 300.0f, -90.0f } );
+		// TODO: Load from anchor file
+		m_vecAnchors.push_back( 1 );
+		m_vecAnchors.push_back( 2 );
+		m_vecAnchors.push_back( 3 );
+		m_vecAnchors.push_back( 4 );
 
+		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, 0.0f } );
+		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, 90.0f } );
+		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, 180.0f } );
+		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, -90.0f } );
 	}
 
 	void SetUp( )
@@ -105,54 +111,65 @@ TEST_F( StargazerTest, TestTransforms )
 		{
 			std::map<int, tf::Transform> mapAnchorTransforms = m_pointTransformer.GetAnchorTransforms( );
 
-			for( auto testPoint : m_vecTestPoints )
+			for( auto point : m_vecTestPoints )
 			{
-				ROS_DEBUG_NAMED( "transform", "Testing config: %s, id: %d, x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
-					pszConfigTest, testPoint.anchorId, testPoint.x, testPoint.y, testPoint.z, testPoint.angle );
-
-				// Convert to left hand degrees from right hand degrees
-				double dfAngleLeftDegrees = GetLeftHandAngle( testPoint.angle );
-
-				tf::Quaternion rotation = m_pointTransformer.ConvertAngle( dfAngleLeftDegrees );
-
-				tf::Transform anchorTransform = mapAnchorTransforms[testPoint.anchorId];
-
-				double dfAngleRightRadians = tf::getYaw( rotation );
-
-				double dfAngleRightDegrees = dfAngleRightRadians * 180.0f / M_PI;
-
-				tf::Vector3 cameraOffset = m_pointTransformer.GetCameraOffset( rotation );
-
-				tf::Vector3 footprintOffset = m_pointTransformer.GetFootprintOffset( rotation );
-
-				tf::Vector3 stargazerOffset = m_pointTransformer.GetStargazerOffset( testPoint.x*100.0f, testPoint.y*100.0f, testPoint.z*100.0f );
-
-				tf::Vector3 totalCameraOffset = cameraOffset + stargazerOffset;
-
-				tf::Vector3 totalFootprintOffset = totalCameraOffset + footprintOffset;
-
-				ROS_DEBUG_NAMED( "StarGazerPointTransformer", "stargazer (%2.5f): %2.5f, %2.5f, %2.5f",
-					tf::getYaw( rotation ), stargazerOffset.getX( ), stargazerOffset.getY( ), stargazerOffset.getZ( ) );
-
-				ROS_DEBUG_NAMED( "StarGazerPointTransformer", "camera (%2.5f): %2.5f, %2.5f, %2.5f",
-					tf::getYaw( rotation ), totalCameraOffset.getX( ), totalCameraOffset.getY( ), totalCameraOffset.getZ( ) );
-
-				ROS_DEBUG_NAMED( "StarGazerPointTransformer", "footprint (%2.5f): %2.5f, %2.5f, %2.5f",
-					tf::getYaw( rotation ), totalFootprintOffset.getX( ), totalFootprintOffset.getY( ), totalFootprintOffset.getZ( ) );
-
-				tf::Pose pose( tf::createIdentityQuaternion( ) );
-
-				// Convert to cm
-				testPoint.x *= 100.0f;
-				testPoint.y *= 100.0f;
-				testPoint.z *= 100.0f;
-
-				if( m_pointTransformer.TransformPoint( testPoint.anchorId, testPoint.x, testPoint.y,
-					testPoint.z, dfAngleLeftDegrees, pose, false ) )
+				for( auto anchorId : m_vecAnchors )
 				{
-					// TODO: Calculate the expected results and test each case
-					// For now bugs are fixed and eyeballed so it is working
-					// EXPECT_EQ( pose, poseCalculated );
+					auto testPoint = point;
+
+					tf::Transform anchorTransform = mapAnchorTransforms[anchorId];
+					tf::Vector3 origin = anchorTransform.getOrigin( );
+					double dfAngle = tf::getYaw( anchorTransform.getRotation( ) ) * 180.0 / M_PI;
+
+					ROS_DEBUG_NAMED( "transform", "Testing config: %s", pszConfigTest );
+					ROS_DEBUG_NAMED( "transform", "Testing anchor: id: %d, x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
+						anchorId, origin.getX( ), origin.getY( ), origin.getZ( ), dfAngle );
+					ROS_DEBUG_NAMED( "transform", "Testing point: x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
+						testPoint.x, testPoint.y, testPoint.z, testPoint.angle );
+
+					// Convert to left hand degrees from right hand degrees
+					double dfAngleLeftDegrees = GetLeftHandAngle( testPoint.angle );
+
+					tf::Quaternion rotation = m_pointTransformer.ConvertAngle( dfAngleLeftDegrees );
+
+
+					double dfAngleRightRadians = tf::getYaw( rotation );
+
+					double dfAngleRightDegrees = dfAngleRightRadians * 180.0f / M_PI;
+
+					tf::Vector3 cameraOffset = m_pointTransformer.GetCameraOffset( rotation );
+
+					tf::Vector3 footprintOffset = m_pointTransformer.GetFootprintOffset( rotation );
+
+					tf::Vector3 stargazerOffset = m_pointTransformer.GetStargazerOffset( testPoint.x*100.0f, testPoint.y*100.0f, testPoint.z*100.0f );
+
+					tf::Vector3 totalCameraOffset = cameraOffset + stargazerOffset;
+
+					tf::Vector3 totalFootprintOffset = totalCameraOffset + footprintOffset;
+
+					ROS_DEBUG_NAMED( "StarGazerPointTransformer", "stargazer (%2.5f): %2.5f, %2.5f, %2.5f",
+						tf::getYaw( rotation ), stargazerOffset.getX( ), stargazerOffset.getY( ), stargazerOffset.getZ( ) );
+
+					ROS_DEBUG_NAMED( "StarGazerPointTransformer", "camera (%2.5f): %2.5f, %2.5f, %2.5f",
+						tf::getYaw( rotation ), totalCameraOffset.getX( ), totalCameraOffset.getY( ), totalCameraOffset.getZ( ) );
+
+					ROS_DEBUG_NAMED( "StarGazerPointTransformer", "footprint (%2.5f): %2.5f, %2.5f, %2.5f",
+						tf::getYaw( rotation ), totalFootprintOffset.getX( ), totalFootprintOffset.getY( ), totalFootprintOffset.getZ( ) );
+
+					tf::Pose pose( tf::createIdentityQuaternion( ) );
+
+					// Convert to cm
+					testPoint.x *= 100.0f;
+					testPoint.y *= 100.0f;
+					testPoint.z *= 100.0f;
+
+					if( m_pointTransformer.TransformPoint( anchorId, testPoint.x, testPoint.y,
+						testPoint.z, dfAngleLeftDegrees, pose, false ) )
+					{
+						// TODO: Calculate the expected results and test each case
+						// For now bugs are fixed and eyeballed so it is working
+						// EXPECT_EQ( pose, poseCalculated );
+					}
 				}
 			}
 		}

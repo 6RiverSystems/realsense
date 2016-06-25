@@ -202,7 +202,7 @@ void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t chassisGeneration,
 	std::string strName( getenv( "ROBOT_NAME" ) );
 
 	ROS_INFO_STREAM( "Hardware Info => name: " << strName << ", id: " << pszUid <<
-		", chassisGeneration: " << chassisGeneration << ", brainstemHwVersion: " << brainstemHwVersion <<
+		", chassisGeneration: " << unsigned( chassisGeneration ) << ", brainstemHwVersion: " << unsigned( brainstemHwVersion ) <<
 		", brainstemSwVersion: " << strBrainstemSwVersion );
 
 	srslib_framework::HardwareInfo msg;;

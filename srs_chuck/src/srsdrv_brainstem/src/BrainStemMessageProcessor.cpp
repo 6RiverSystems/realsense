@@ -57,7 +57,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_vecBridgeCallbacks["STOP"] = { std::bind( &BrainStemMessageProcessor::OnHardStop, this ), 0 };
 	m_vecBridgeCallbacks["STARTUP"] = { std::bind( &BrainStemMessageProcessor::OnStartup, this, std::placeholders::_1 ), 0 };
 	m_vecBridgeCallbacks["PAUSE"] = { std::bind( &BrainStemMessageProcessor::OnPause, this, std::placeholders::_1 ), 1 };
-	m_vecBridgeCallbacks["CLEAR_MOTION_STATUS"] = { std::bind( &BrainStemMessageProcessor::ClearMotionStatus, this ), 1 };
+	m_vecBridgeCallbacks["CLEAR_MOTION_STATUS"] = { std::bind( &BrainStemMessageProcessor::ClearMotionStatus, this ), 0 };
 }
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor( )
@@ -281,9 +281,12 @@ void BrainStemMessageProcessor::ProcessRosMessage( const std::string& strMessage
 
 		// Parse the command by whitespace
 		std::vector<std::string> vecParsed;
-		boost::tokenizer<> tok( strCommand );
 
-		for( auto && strValue : tok )
+		boost::char_separator<char> spaceSeparator(" ");
+
+		boost::tokenizer<boost::char_separator<char>> commandListTokenizer( strCommand, spaceSeparator );
+
+		for( auto && strValue : commandListTokenizer )
 		{
 			vecParsed.push_back( strValue );
 		}
@@ -307,6 +310,11 @@ void BrainStemMessageProcessor::ProcessRosMessage( const std::string& strMessage
 					ROS_ERROR( "Bridge has invalid number of arguments for command %s: %s",
 						strCommand.c_str( ), strMessage.c_str( ) );
 				}
+			}
+			else
+			{
+				ROS_ERROR( "Invalid command %s", strCommand.c_str( ) );
+
 			}
 		}
 	}
@@ -454,6 +462,8 @@ void BrainStemMessageProcessor::OnPause( std::vector<std::string> vecParams )
 
 void BrainStemMessageProcessor::ClearMotionStatus( )
 {
+	ROS_INFO( "Clearing motion status." );
+
 	std::bitset<8> clearSet;
 	clearSet.set( MOTION_STATUS::WIRELESS_E_STOP, true );
 	clearSet.set( MOTION_STATUS::BUMP_SENSOR, true );

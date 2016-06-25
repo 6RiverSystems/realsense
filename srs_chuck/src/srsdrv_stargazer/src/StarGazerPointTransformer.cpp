@@ -153,7 +153,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 			tf::Vector3 chuckOrigin = anchorGlobal * stargazerTranslation;
 
-			tf::Quaternion chuckOrientation = anchorGlobal * anchorRotation;
+			tf::Quaternion chuckOrientation = anchorGlobal.getRotation() + anchorRotation;
 
 			pose = tf::Pose( chuckOrientation, chuckOrigin);
 

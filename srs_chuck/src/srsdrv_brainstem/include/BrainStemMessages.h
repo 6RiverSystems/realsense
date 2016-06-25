@@ -115,7 +115,7 @@ struct HARDWARE_INFORMATION_DATA
 	uint32_t	uniqueId[4];			// hardware unique identifier (unique across all robots)
 	uint8_t		chassisGeneration; 		// chassis generation
 	uint8_t		brainstemHwVersion; 	// brainstem hardware version
-	//char*	    brainstemSwVersion;		// brainstem software version
+//	char*	    brainstemSwVersion;		// brainstem software version
 };
 
 struct MOTION_STATUS_DATA

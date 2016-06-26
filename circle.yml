@@ -19,7 +19,8 @@ dependencies:
     - sudo apt-get install ccache
     - sudo apt-get install python-gevent=1.0-1ubuntu1
     - echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:${PYTHONPATH}" >> ~/.bashrc
+    - export PATH="/usr/lib/ccache:$PATH"
 
 test:
   override:
-    - cd ~/ros/srs_chuck && catkin_make run_tests_srsdrv_stargazer 
+    - cd ~/ros/srs_chuck && catkin_make run_tests_srsdrv_stargazer

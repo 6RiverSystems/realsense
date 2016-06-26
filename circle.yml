@@ -1,7 +1,7 @@
 dependencies:
   cache_directories:
     - "~/.apt-cache"
-    - "~/.ccache"
+    - "$HOME/.ccache"
   pre:
     - sudo rm -rf /var/cache/apt/archives && sudo ln -s ~/.apt-cache /var/cache/apt/archives && mkdir -p ~/.apt-cache/partial
     - gpg --keyserver pgp.mit.edu --recv-keys 749D6EEC0353B12C
@@ -23,4 +23,4 @@ dependencies:
 test:
   override:
     - export CIRCLE_TEST_REPORTS=~/ros/srs_chuck/build/test_results
-    - cd ~/ros/srs_chuck && catkin_make run_tests
+    - cd ~/ros/srs_chuck && catkin_make run_tests_srsdrv_stargazer 

@@ -4,6 +4,7 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
+#include <ros/ros.h>
 
 #include <vector>
 #include <unordered_map>
@@ -50,22 +51,22 @@ TEST(Test_MappedPriorityQueue, UserDefinedKey)
     queue.push(200, Node<int>{2, 20});
     queue.push(200, Node<int>{2, 21});
 
-    cout << queue << endl;
+	ROS_DEBUG_STREAM(queue);
 
     Node<int> item;
 
-    queue.pop(item);
-    cout << item << endl;
+	queue.pop(item);
+	ROS_DEBUG_STREAM(item);
 
-    cout << queue.exists(Node<int>{1, 11}) << endl;
-    cout << queue.exists(Node<int>{5, 50}) << endl;
+	ROS_DEBUG_STREAM(queue.exists(Node<int>{1, 11}));
+	ROS_DEBUG_STREAM(queue.exists(Node<int>{5, 50}));
 
-    queue.pop(item);
-    cout << item << endl;
+	queue.pop(item);
+	ROS_DEBUG_STREAM(item);
 
-    queue.pop(item);
-    cout << item << endl;
+	queue.pop(item);
+	ROS_DEBUG_STREAM(item);
 
-    queue.pop(item);
-    cout << item << endl;
+	queue.pop(item);
+	ROS_DEBUG_STREAM(item);
 }

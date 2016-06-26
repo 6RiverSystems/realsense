@@ -4,6 +4,7 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
+#include <ros/ros.h>
 
 #include <vector>
 using namespace std;
@@ -22,7 +23,7 @@ TEST(Test_AStar, WithMap)
     Grid2d::LocationType goal(87, 48);
 
     Map* map = new Map();
-    map->load("/home/fsantini/projects/repos/ros/srs_sites/src/srsc_6rhq/map/6rhq.yaml");
+    map->load("6rhq.yaml");
 
     vector<int8_t> costGrid;
     vector<int8_t> notesGrid;
@@ -43,14 +44,13 @@ TEST(Test_AStar, WithMap)
 
     AStar<Grid2d>* algorithm = new AStar<Grid2d>(map->getGrid());
 
-    cout << "Found: " <<
-        algorithm->search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 0)) <<
-        endl;
+    ROS_DEBUG_STREAM("Found: " <<
+        algorithm->search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 0)));
 
     algorithm->clear();
 
     delete algorithm;
 
-    cout << "Memory usage: " << memoryWatch.getMemoryUsage() << endl;
-    cout << "Memory leaks: " << !memoryWatch.isZero() << endl;
+    ROS_DEBUG_STREAM("Memory usage: " << memoryWatch.getMemoryUsage());
+    ROS_DEBUG_STREAM("Memory leaks: " << !memoryWatch.isZero());
 }

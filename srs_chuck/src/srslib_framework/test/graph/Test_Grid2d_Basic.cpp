@@ -4,6 +4,7 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
+#include <ros/ros.h>
 
 #include <vector>
 using namespace std;
@@ -22,12 +23,12 @@ TEST(Test_Graph, Grid2dCreation)
     test::Grid2dUtils::addRectangleCost(grid, 4, 1, 4, 1, 900);
     test::Grid2dUtils::addRectangleCost(grid, 3, 4, 3, 7, 900);
 
-    cout << grid << endl;
-    cout << grid.getCost(Grid2d::LocationType(1, 1)) << endl;
+    ROS_DEBUG_STREAM(grid);
+    ROS_DEBUG_STREAM(grid.getCost(Grid2d::LocationType(1, 1)));
 
     grid.clear();
 
-    cout << grid << endl;
-    cout << grid.getCost(Grid2d::LocationType(1, 1)) << endl;
+    ROS_DEBUG_STREAM(grid);
+    ROS_DEBUG_STREAM(grid.getCost(Grid2d::LocationType(1, 1)));
 
 }

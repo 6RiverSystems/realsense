@@ -4,8 +4,9 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
-
 #include <vector>
+#include <ros/ros.h>
+
 using namespace std;
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
@@ -66,7 +67,7 @@ TEST(Test_Trajectory, 180ShortTrajectory)
     solution.push_back(SOLUTION_08);
     solution.push_back(SOLUTION_09);
 
-    cout << solution << endl;
+    ROS_DEBUG_STREAM(solution);
 
     Chuck chuck;
     Trajectory<> trajectory;
@@ -75,5 +76,5 @@ TEST(Test_Trajectory, 180ShortTrajectory)
     solutionConverter.fromSolution(solution);
     solutionConverter.getTrajectory(trajectory);
 
-    cout << trajectory << endl;
+    ROS_DEBUG_STREAM(trajectory);
 }

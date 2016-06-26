@@ -4,6 +4,7 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
+#include <ros/ros.h>
 
 #include <vector>
 using namespace std;
@@ -13,6 +14,8 @@ using namespace std;
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/planning/pathplanning/TrajectoryGenerator.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
+#include <boost/filesystem.hpp>
+#include <ros/ros.h>
 
 using namespace srs;
 
@@ -21,15 +24,17 @@ TEST(Test_Trajectory, Map)
     Grid2d::LocationType start(60, 54);
     Grid2d::LocationType goal(95, 54);
 
+	boost::filesystem::path filePath( boost::filesystem::current_path( ) );
+
     Map* map = new Map();
-    map->load("/home/fsantini/projects/repos/ros/srs_sites/src/srsc_6rhq/map/6rhq.yaml");
+    map->load("6rhq.yaml");
 
     AStar<Grid2d>* algorithm = new AStar<Grid2d>(map->getGrid());
     algorithm->search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 0));
 
     Solution<Grid2d> solution = algorithm->getSolution(map->getResolution());
 
-    cout << solution << endl;
+    ROS_DEBUG_STREAM(solution);
 
     Chuck chuck;
     Trajectory<> trajectory;
@@ -38,5 +43,5 @@ TEST(Test_Trajectory, Map)
     solutionConverter.fromSolution(solution);
     solutionConverter.getTrajectory(trajectory);
 
-    cout << trajectory << endl;
+    ROS_DEBUG_STREAM(trajectory);
 }

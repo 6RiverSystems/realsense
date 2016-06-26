@@ -54,7 +54,7 @@ public:
 		m_strAnchorFile = currentPath.c_str( );
 		m_strAnchorFile += "/anchors.yaml";
 
-		ROS_INFO_NAMED( "transform", "Anchor file: %s", m_strAnchorFile.c_str( ) );
+		ROS_DEBUG_NAMED( "transform", "Anchor file: %s", m_strAnchorFile.c_str( ) );
 
 		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, 0.0f } );
 		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, 90.0f } );
@@ -157,14 +157,14 @@ TEST_F( StargazerTest, TestTransforms )
 
 			tf::Vector3 origin = anchorTransform.getOrigin( );
 
-			ROS_INFO_NAMED( "transform", "Testing anchor: id: %d, x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
+			ROS_DEBUG_NAMED( "transform", "Testing anchor: id: %d, x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
 				anchorId, origin.getX( ), origin.getY( ), origin.getZ( ), dfAngle );
 
 			for( auto point : m_vecTestPoints )
 			{
 				auto testPoint = point;
 
-				ROS_INFO_NAMED( "transform", "\tTesting point: x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
+				ROS_DEBUG_NAMED( "transform", "\tTesting point: x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
 					testPoint.x, testPoint.y, testPoint.z, testPoint.angle );
 
 				// Convert to left hand degrees from right hand degrees
@@ -186,13 +186,13 @@ TEST_F( StargazerTest, TestTransforms )
 
 				tf::Vector3 totalFootprintOffset = totalCameraOffset + footprintOffset;
 
-				ROS_INFO_NAMED( "transform", "\t\tstargazer (%2.5f): %2.5f, %2.5f, %2.5f",
+				ROS_DEBUG_NAMED( "transform", "\t\tstargazer (%2.5f): %2.5f, %2.5f, %2.5f",
 					tf::getYaw( rotation ) * 180.0f / M_PI, stargazerOffset.getX( ), stargazerOffset.getY( ), stargazerOffset.getZ( ) );
 
-				ROS_INFO_NAMED( "transform", "\t\tcamera (%2.5f): %2.5f, %2.5f, %2.5f",
+				ROS_DEBUG_NAMED( "transform", "\t\tcamera (%2.5f): %2.5f, %2.5f, %2.5f",
 					tf::getYaw( rotation ) * 180.0f / M_PI, totalCameraOffset.getX( ), totalCameraOffset.getY( ), totalCameraOffset.getZ( ) );
 
-				ROS_INFO_NAMED( "transform", "\t\tfootprint (%2.5f): %2.5f, %2.5f, %2.5f",
+				ROS_DEBUG_NAMED( "transform", "\t\tfootprint (%2.5f): %2.5f, %2.5f, %2.5f",
 					tf::getYaw( rotation ) * 180.0f / M_PI, totalFootprintOffset.getX( ), totalFootprintOffset.getY( ), totalFootprintOffset.getZ( ) );
 
 				tf::Pose pose( tf::createIdentityQuaternion( ) );
@@ -210,14 +210,14 @@ TEST_F( StargazerTest, TestTransforms )
 					tf::Vector3 origin = pose.getOrigin( );
 					tf::Quaternion rotation = pose.getRotation( );
 
-					ROS_INFO_NAMED( "transform", "\t\tmap (%2.5f): %2.5f, %2.5f, %2.5f",
+					ROS_DEBUG_NAMED( "transform", "\t\tmap (%2.5f): %2.5f, %2.5f, %2.5f",
 						tf::getYaw( rotation ) * 180.0f / M_PI, origin.getX( ), origin.getY( ), origin.getZ( ) );
 
 					tf::Vector3 calculatedOrigin = calculatedPose.getOrigin( );
 					tf::Quaternion calculatedRotation = calculatedPose.getRotation( );
 
 
-					ROS_INFO_NAMED( "transform", "\t\tmap (correct) (%2.5f): %2.5f, %2.5f, %2.5f",
+					ROS_DEBUG_NAMED( "transform", "\t\tmap (correct) (%2.5f): %2.5f, %2.5f, %2.5f",
 						tf::getYaw( calculatedRotation ) * 180.0f / M_PI, calculatedOrigin.getX( ),
 						calculatedOrigin.getY( ), calculatedOrigin.getZ( ) );
 

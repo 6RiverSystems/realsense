@@ -85,7 +85,7 @@ bool StarGazerPointTransformer::Load( const std::string& strTargetFrame,
 
 	tf::Vector3 origin = m_footprintTransform.getOrigin( );
 
-	ROS_INFO_STREAM( "Stargazer footprint transform: x=" << origin.getX( ) << ", y=" << origin.getY( ) <<
+	ROS_DEBUG_STREAM( "Stargazer footprint transform: x=" << origin.getX( ) << ", y=" << origin.getY( ) <<
 		", z=" << origin.getZ( )  << ", orientation=" << tf::getYaw( m_footprintTransform.getRotation( ) ) );
 
 	return LoadAnchors( strAnchorsFile );

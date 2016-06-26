@@ -4,6 +4,7 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
+#include <ros/ros.h>
 
 #include <vector>
 using namespace std;
@@ -60,7 +61,7 @@ TEST(Test_Trajectory, LongStraight)
     solution.push_back(SOLUTION_07);
     solution.push_back(SOLUTION_08);
 
-    cout << solution << endl;
+    ROS_DEBUG_STREAM(solution);
 
     Chuck chuck;
     Trajectory<> trajectory;
@@ -69,5 +70,5 @@ TEST(Test_Trajectory, LongStraight)
     solutionConverter.fromSolution(solution);
     solutionConverter.getTrajectory(trajectory);
 
-    cout << trajectory << endl;
+    ROS_DEBUG_STREAM(trajectory);
 }

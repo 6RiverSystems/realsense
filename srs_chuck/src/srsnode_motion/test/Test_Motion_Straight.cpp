@@ -86,7 +86,7 @@ TEST(Test_Motion, Straight)
         // Push the simulated measurement
         auto odometry = *measurements.at(t);
 
-        cout << odometry << endl;
+        ROS_DEBUG_STREAM(odometry);
 
         // Run the step of the UKF
         ukf.run(DT, &odometry);

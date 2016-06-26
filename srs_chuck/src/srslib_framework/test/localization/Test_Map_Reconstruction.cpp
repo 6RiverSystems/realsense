@@ -4,6 +4,7 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
+#include <ros/ros.h>
 
 #include <vector>
 using namespace std;
@@ -19,12 +20,12 @@ TEST(Test_Map, Reconstruction)
     test::MemoryWatch memoryWatch;
 
     Map* map = new Map();
-    map->load("/home/fsantini/projects/repos/ros/srs_sites/src/srsc_empty/map/empty.yaml");
+    map->load("empty.yaml");
 
-    cout << *map << endl;
+    ROS_DEBUG_STREAM(*map);
 
-    cout << map->getGrid()->getCost(Grid2dLocation(1, 0)) << endl;
-    cout << *(reinterpret_cast<MapNote*>(map->getGrid()->getNote(Grid2dLocation(1, 0)))) << endl;
+    ROS_DEBUG_STREAM(map->getGrid()->getCost(Grid2dLocation(1, 0)));
+    ROS_DEBUG_STREAM(*(reinterpret_cast<MapNote*>(map->getGrid()->getNote(Grid2dLocation(1, 0)))));
 
     vector<int8_t> costGrid;
     vector<int8_t> notesGrid;
@@ -36,18 +37,18 @@ TEST(Test_Map, Reconstruction)
     double heightCells = map->getHeightCells();
     double resolution = map->getResolution();
 
-    cout << "Memory usage: " << memoryWatch.getMemoryUsage() << endl;
+    ROS_DEBUG_STREAM("Memory usage: " << memoryWatch.getMemoryUsage());
     delete map;
 
     map = new Map(widthCells, heightCells, resolution);
     map->setGrid(costGrid, notesGrid);
 
-    cout << *map << endl;
+    ROS_DEBUG_STREAM(*map);
 
-    cout << map->getGrid()->getCost(Grid2dLocation(1, 0)) << endl;
-    cout << *(reinterpret_cast<MapNote*>(map->getGrid()->getNote(Grid2dLocation(1, 0)))) << endl;
+    ROS_DEBUG_STREAM(map->getGrid()->getCost(Grid2dLocation(1, 0)));
+    ROS_DEBUG_STREAM(*(reinterpret_cast<MapNote*>(map->getGrid()->getNote(Grid2dLocation(1, 0)))));
 
     // TODO: Reaserch the memory leaks in the YAML library
-    cout << "End memory usage: " << memoryWatch.getMemoryUsage() << endl;
-    cout << "Zero marker: " << memoryWatch.isZero() << endl;
+    ROS_DEBUG_STREAM("End memory usage: " << memoryWatch.getMemoryUsage());
+    ROS_DEBUG_STREAM("Zero marker: " << memoryWatch.isZero());
 }

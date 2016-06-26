@@ -4,6 +4,7 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
+#include <ros/ros.h>
 
 #include <vector>
 using namespace std;
@@ -19,7 +20,7 @@ TEST(Test_MappedPriorityQueue, MappedPriorityQueueCreation)
     MappedPriorityQueue<int>* queue = new MappedPriorityQueue<int>();
     int item;
 
-    cout << "Memory usage: " << memoryWatch.getMemoryUsage() << endl;
+    ROS_DEBUG_STREAM("Memory usage: " << memoryWatch.getMemoryUsage());
 
     queue->push(500, 50);
     queue->push(100, 0);
@@ -34,54 +35,54 @@ TEST(Test_MappedPriorityQueue, MappedPriorityQueueCreation)
     queue->push(500, 51);
     queue->push(500, 52);
 
-    cout << "POP ---------------------" << endl;
-    cout << *queue << endl;
+    ROS_DEBUG_STREAM("POP ---------------------");
+    ROS_DEBUG_STREAM(*queue);
 
     queue->pop(item);
-    cout << item << endl;
+    ROS_DEBUG_STREAM(item);
 
     queue->pop(item);
-    cout << item << endl;
+    ROS_DEBUG_STREAM(item);
 
     queue->pop(item);
-    cout << item << endl;
+    ROS_DEBUG_STREAM(item);
 
     queue->pop(item);
-    cout << item << endl;
+    ROS_DEBUG_STREAM(item);
 
     queue->pop(item);
-    cout << item << endl;
+    ROS_DEBUG_STREAM(item);
 
-    cout << "PUSH ---------------------" << endl;
+    ROS_DEBUG_STREAM("PUSH ---------------------");
     queue->push(500, 53);
 
-    cout << *queue << endl;
+    ROS_DEBUG_STREAM(*queue);
 
-    cout << "POP ---------------------" << endl;
+    ROS_DEBUG_STREAM("POP ---------------------");
     queue->pop(item);
-    cout << item << endl;
+    ROS_DEBUG_STREAM(item);
 
-    cout << "EXIST -------------------" << endl;
-    cout << *queue << endl;
+    ROS_DEBUG_STREAM("EXIST -------------------");
+    ROS_DEBUG_STREAM(*queue);
 
-    cout << queue->exists(50) << endl;
-    cout << queue->exists(53) << endl;
+    ROS_DEBUG_STREAM(queue->exists(50));
+    ROS_DEBUG_STREAM(queue->exists(53));
 
-    cout << "ERASE -------------------" << endl;
+    ROS_DEBUG_STREAM("ERASE -------------------");
     queue->erase(0);
 
-    cout << "CLEAR------------------" << endl;
-    cout << *queue << endl;
+    ROS_DEBUG_STREAM("CLEAR------------------");
+    ROS_DEBUG_STREAM(*queue);
 
     while (!queue->empty())
     {
         queue->pop(item);
     }
 
-    cout << *queue << endl;
+    ROS_DEBUG_STREAM(*queue);
 
     delete queue;
 
-    cout << "Memory usage: " << memoryWatch.getMemoryUsage() << endl;
-    cout << "Memory leaks: " << !memoryWatch.isZero() << endl;
+    ROS_DEBUG_STREAM("Memory usage: " << memoryWatch.getMemoryUsage());
+    ROS_DEBUG_STREAM("Memory leaks: " << !memoryWatch.isZero());
 }

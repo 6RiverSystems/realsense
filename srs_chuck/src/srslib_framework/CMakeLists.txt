@@ -142,6 +142,7 @@ add_library(${PROJECT_LIBRARY}
 )
 
 add_dependencies(${PROJECT_LIBRARY}
+    ${srslib_framework_EXPORTED_TARGETS}
     ${catkin_EXPORTED_TARGETS}
 )
 
@@ -149,24 +150,26 @@ target_link_libraries(${PROJECT_LIBRARY}
     ${PROJECT_LIBRARIES}
 )
 
-set_target_properties(${PROJECT_LIBRARY} 
-    PROPERTIES LINKER_LANGUAGE CXX
-)
-
 ####################################################################################################
 # Tests
 
 if (CATKIN_ENABLE_TESTING)
 
+    file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
+
+    # Add test libraries to all tests
+    add_dependencies(${PROJECT_LIBRARY}
+        ${srslib_test_LIBRARIES}
+    )
+
     catkin_add_gtest(TestSuite_Datastructure
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_DATASTRUCTURE}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Datastructure
-        ${catkin_LIBRARIES}
-        ${PROJECT_LIBRARIES}
-        ${srslib_test_LIBRARIES}
+        ${PROJECT_LIBRARY}
     )
 
     catkin_add_gtest(TestSuite_Filter
@@ -175,79 +178,67 @@ if (CATKIN_ENABLE_TESTING)
         ${TEST_SOURCES_FILTER}
     )
     target_link_libraries(TestSuite_Filter
-        ${catkin_LIBRARIES}
-        ${PROJECT_LIBRARIES}
-        ${srslib_test_LIBRARIES}
+        ${PROJECT_LIBRARY}
     )
 
     catkin_add_gtest(TestSuite_Graph
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_GRAPH}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Graph
-        ${catkin_LIBRARIES}
-        ${PROJECT_LIBRARIES}
-        ${srslib_test_LIBRARIES}
+        ${PROJECT_LIBRARY}
     )
 
     catkin_add_gtest(TestSuite_Localization
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_LOCALIZATION}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Localization
-        ${catkin_LIBRARIES}
-        ${PROJECT_LIBRARIES}
-        ${srslib_test_LIBRARIES}
+        ${PROJECT_LIBRARY}
     )
 
     catkin_add_gtest(TestSuite_Planning
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_PLANNING}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Planning
-        ${catkin_LIBRARIES}
-        ${PROJECT_LIBRARIES}
-        ${srslib_test_LIBRARIES}
+        ${PROJECT_LIBRARY}
     )
 
     catkin_add_gtest(TestSuite_Robotics
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_ROBOTICS}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Robotics
-        ${catkin_LIBRARIES}
-        ${PROJECT_LIBRARIES}
-        ${srslib_test_LIBRARIES}
+        ${PROJECT_LIBRARY}
     )
 
     catkin_add_gtest(TestSuite_Search
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_SEARCH}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Search
-        ${catkin_LIBRARIES}
-        ${PROJECT_LIBRARIES}
-        ${srslib_test_LIBRARIES}
+        ${PROJECT_LIBRARY}
     )
 
     catkin_add_gtest(TestSuite_Io
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_IO}
     )
-    
     target_compile_definitions(TestSuite_Io 
         PRIVATE ENABLE_TEST_FIXTURE
     )
-
     target_link_libraries(TestSuite_Io
-        ${catkin_LIBRARIES}
-        ${srslib_test_LIBRARIES}
-        ${PROJECT_LIBRARIES}
-        ${Boost_LIBRARIES}
+        ${PROJECT_LIBRARY}
     )
 endif()

@@ -59,14 +59,15 @@
 			<resource resourceType="PROJECT" workspacePath="/srs_chuck"/>
 		</configuration>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets>
 			<target name="run_tests" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
-				<buildArguments>-DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildArguments>-DCMAKE_BUILD_TYPE=Debug -j8</buildArguments>
 				<buildTarget>run_tests</buildTarget>
 				<stopOnError>true</stopOnError>
-				<useDefaultCommand>true</useDefaultCommand>
+				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 			<target name="run_tests_srsdrv_stargazer" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
@@ -77,7 +78,30 @@
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
+			<target name="clean" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>clean</buildArguments>
+				<buildTarget>clean</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="run_tests_srslib_framework" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>run_tests_srslib_framework -DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildTarget>run_tests_srslib_framework</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="run_tests_srsdrv_brainstem" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>run_tests_srsdrv_brainstem -DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildTarget>run_tests_srsdrv_brainstem</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
 		</buildTargets>
 	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>

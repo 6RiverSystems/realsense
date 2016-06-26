@@ -4,6 +4,7 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
+#include <ros/ros.h>
 
 #include <vector>
 using namespace std;
@@ -23,7 +24,7 @@ TEST(Test_AStar, SamePlaceOnMap)
     Pose<> goalPose = Pose<>(18.1335, 5.24097, 0);
 
     Map* map = new Map();
-    map->load("/home/fsantini/projects/repos/ros/srs_sites/src/srsc_6rhq/map/6rhq.yaml");
+    map->load("6rhq.yaml");
 
     // Prepare the start position for the search
     int fromR = 0;
@@ -40,11 +41,10 @@ TEST(Test_AStar, SamePlaceOnMap)
     int goalAngle = AngleMath::normalizeRad2deg90(goalPose.theta);
 
     AStar<Grid2d>* algorithm = new AStar<Grid2d>(map->getGrid());
-    cout << "Found: " <<
+    ROS_DEBUG_STREAM("Found: " <<
         algorithm->search(SearchPosition<Grid2d>(internalStart, startAngle),
-            SearchPosition<Grid2d>(internalGoal, goalAngle)) <<
-        endl;
+            SearchPosition<Grid2d>(internalGoal, goalAngle)));
 
     Solution<Grid2d> solution = algorithm->getSolution(map->getResolution());
-    cout << solution << endl;
+    ROS_DEBUG_STREAM(solution);
 }

@@ -53,7 +53,7 @@ TEST(Test_Yoshizawa, Usage)
 //
 //    for (auto milestone : trajectory)
 //    {
-//        cout << milestone.first << milestone.second << endl;
+//        ROS_DEBUG_STREAM(milestone.first << milestone.second);
 //    }
 //
 //    YoshizawaController controller(0.1, 0.9);
@@ -65,5 +65,5 @@ TEST(Test_Yoshizawa, Usage)
 //    Velocity<> velocity;
 
 //    Velocity<> command = controller.step(pose);
-//    cout << command << endl;
+//    ROS_DEBUG_STREAM(command);
 }

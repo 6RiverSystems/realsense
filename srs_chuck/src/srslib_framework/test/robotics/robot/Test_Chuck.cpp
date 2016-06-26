@@ -4,6 +4,7 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
+#include <ros/ros.h>
 
 #include <vector>
 using namespace std;
@@ -15,5 +16,5 @@ TEST(Test_Chuck, Usage)
 {
     Chuck robotProfile;
 
-    cout << robotProfile.bodyWidth << endl;
+    ROS_DEBUG_STREAM(robotProfile.bodyWidth);
 }

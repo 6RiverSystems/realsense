@@ -4,6 +4,7 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
+#include <ros/ros.h>
 
 #include <vector>
 using namespace std;
@@ -38,5 +39,5 @@ TEST(Test_AStar, SearchCreation)
     algorithm.search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 0));
     Solution<Grid2d> solution = algorithm.getSolution(1.0);
 
-    cout << solution << endl;
+    ROS_DEBUG_STREAM(solution);
 }

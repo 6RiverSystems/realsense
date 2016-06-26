@@ -74,7 +74,10 @@ add_dependencies(${PROJECT_NODE}
     ${PROJECT_NAME}_gencfg
 )
 
-#add_dependencies(${PROJECT_LIBRARY} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NODE}
+    ${catkin_EXPORTED_TARGETS}
+    ${srsnode_motion_EXPORTED_TARGETS}
+)
 
 target_link_libraries(${PROJECT_NODE}
     ${catkin_LIBRARIES}
@@ -86,16 +89,20 @@ target_link_libraries(${PROJECT_NODE}
 # Tests
 
 if (CATKIN_ENABLE_TESTING)
+    file(COPY test/data DESTINATION ${CMAKE_BINARY_DIR})
+
     catkin_add_gtest(TestSuite_Motion
         test/TestSuite_Motion.cpp
         ${${PROJECT_NAME}_TEST_SOURCES}
         ${${PROJECT_NAME}_SOURCES}
     )
+    add_dependencies(${TestSuite_Motion}
+        ${catkin_EXPORTED_TARGETS}
+        ${srsnode_motion_EXPORTED_TARGETS}
+    )
     target_link_libraries(TestSuite_Motion
         ${catkin_LIBRARIES}
-        ${boost_LIBRARIES}
         ${OpenCV_LIBRARIES}
-        ${srslib_test_LIBRARIES}
         ${srslib_framework_LIBRARIES}
     )
 endif()

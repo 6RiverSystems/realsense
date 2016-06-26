@@ -96,8 +96,8 @@ TEST(Test_CMUPathFollower, Usage)
     solutionConverter.fromSolution(solution, 0.1);
     solutionConverter.getTrajectory(trajectory);
 
-    cout << solution << endl;
-    cout << trajectory << endl;
+    ROS_DEBUG_STREAM(solution);
+    ROS_DEBUG_STREAM(trajectory);
 
 //    CMUPathFollower controller(1.0, 1.0);
 
@@ -109,5 +109,5 @@ TEST(Test_CMUPathFollower, Usage)
 //    Velocity<> velocity;
 
 //    Velocity<> command = controller.step(pose);
-//    cout << command << endl;
+//    ROS_DEBUG_STREAM(command);
 }

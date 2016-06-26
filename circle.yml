@@ -22,5 +22,4 @@ dependencies:
 
 test:
   override:
-    - export CIRCLE_TEST_REPORTS=~/ros/srs_chuck/build/test_results
     - cd ~/ros/srs_chuck && catkin_make run_tests_srsdrv_stargazer 

@@ -13,6 +13,7 @@
 
 #include <tf2_sensor_msgs/tf2_sensor_msgs.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <yaml-cpp/yaml.h>
 
 #include <srslib_framework/MsgPose.h>
 using namespace srslib_framework;
@@ -230,8 +231,56 @@ void StarGazer::LoadTransforms( )
 		ROS_ERROR( "%s", ex.what( ) );
 	}
 
-	m_pointTransformer.Load( strTargetFrame, footprintTransform, strAnchorsFile, strConfigurationFile );
+	tf::Transform stargazerTransform( tf::Quaternion::getIdentity( ) );
+
+	if( LoadCalibrationTransform( strConfigurationFile, stargazerTransform ) )
+	{
+		m_pointTransformer.Load( strTargetFrame, stargazerTransform,
+			footprintTransform, strAnchorsFile );
+	}
 }
+
+
+bool StarGazer::LoadCalibrationTransform( const std::string& strConfigurationFile,
+	tf::Transform& stargazer )
+{
+	bool bSuccess = true;
+
+	try
+	{
+		YAML::Node document = YAML::LoadFile( strConfigurationFile );
+
+		if( !document.IsNull( ) )
+		{
+			tf::Vector3 translation(
+				document["stargazer_offset"]["x"].as<double>( ),
+				document["stargazer_offset"]["y"].as<double>( ),
+				0.0f
+			);
+
+			stargazer.setRotation( tf::Quaternion::getIdentity( ) );
+			stargazer.setOrigin( translation );
+
+			ROS_INFO_STREAM( "Stargazer calibration (" << strConfigurationFile << "): x=" << translation.getX( ) << ", y=" << translation.getY( ) );
+		}
+		else
+		{
+			ROS_ERROR_STREAM( "Stargazer calibration file not found: " << strConfigurationFile );
+
+			bSuccess = false;
+		}
+	}
+	catch( const std::runtime_error& e )
+	{
+		ROS_ERROR_STREAM( "Could not parse yaml file for Stargazer calibration: " <<
+			strConfigurationFile << " " << e.what( ) );
+
+		bSuccess = false;
+	}
+
+	return bSuccess;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods

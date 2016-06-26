@@ -74,20 +74,21 @@ double StarGazerPointTransformer::ConvertToRightHandRule( double fLeftHandAngleI
 }
 
 bool StarGazerPointTransformer::Load( const std::string& strTargetFrame,
-	const tf::Transform& footprintTransform, const std::string& strAnchorsFile,
-	const std::string& strCalibrationFile )
+	const tf::Transform& stargazerTransform, const tf::Transform& footprintTransform,
+	const std::string& strAnchorsFile )
 {
 	m_strTargetFrame = strTargetFrame;
 
 	m_footprintTransform = footprintTransform;
+
+	m_stargazerTransform = stargazerTransform;
 
 	tf::Vector3 origin = m_footprintTransform.getOrigin( );
 
 	ROS_INFO_STREAM( "Stargazer footprint transform: x=" << origin.getX( ) << ", y=" << origin.getY( ) <<
 		", z=" << origin.getZ( )  << ", orientation=" << tf::getYaw( m_footprintTransform.getRotation( ) ) );
 
-	return LoadAnchors( strAnchorsFile ) &&
-		LoadCalibrationTransform( strCalibrationFile );
+	return LoadAnchors( strAnchorsFile );
 }
 
 tf::Quaternion StarGazerPointTransformer::ConvertAngle( double fLeftHandAngleInDegrees ) const
@@ -333,45 +334,6 @@ bool StarGazerPointTransformer::LoadAnchors( const std::string& strAnchorsFile )
 	catch( const std::runtime_error& e )
 	{
 		ROS_ERROR_STREAM( "Could not parse yaml file for anchors: " << strAnchorsFile << " " << e.what( ) );
-
-		bSuccess = false;
-	}
-
-	return bSuccess;
-}
-
-bool StarGazerPointTransformer::LoadCalibrationTransform( const std::string& strConfigurationFile )
-{
-	bool bSuccess = true;
-
-	try
-	{
-		YAML::Node document = YAML::LoadFile( strConfigurationFile );
-
-		if( !document.IsNull( ) )
-		{
-			tf::Vector3 translation(
-				document["stargazer_offset"]["x"].as<double>( ),
-				document["stargazer_offset"]["y"].as<double>( ),
-				0.0f
-			);
-
-			m_stargazerTransform.setRotation( tf::Quaternion::getIdentity( ) );
-			m_stargazerTransform.setOrigin( translation );
-
-			ROS_INFO_STREAM( "Stargazer calibration (" << strConfigurationFile << "): x=" << translation.getX( ) << ", y=" << translation.getY( ) );
-		}
-		else
-		{
-			ROS_ERROR_STREAM( "Stargazer calibration file not found: " << strConfigurationFile );
-
-			bSuccess = false;
-		}
-	}
-	catch( const std::runtime_error& e )
-	{
-		ROS_ERROR_STREAM( "Could not parse yaml file for Stargazer calibration: " <<
-			strConfigurationFile << " " << e.what( ) );
 
 		bSuccess = false;
 	}

@@ -66,6 +66,9 @@ private:
 
 private:
 
+	bool LoadCalibrationTransform( const std::string& strCalibrationFile,
+		tf::Transform& stargazer );
+
 	constexpr static unsigned int 			REFRESH_RATE_HZ = 20;
 
 	ros::NodeHandle							m_rosNodeHandle;

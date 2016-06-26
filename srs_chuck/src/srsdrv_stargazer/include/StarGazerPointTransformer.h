@@ -23,7 +23,7 @@ public:
 	virtual ~StarGazerPointTransformer( );
 
 	bool Load( const std::string& strTargetFrame, const tf::Transform& footprintTransform,
-		const std::string& strAnchorsFile, const std::string& strCalibrationFile );
+		const tf::Transform& stargazerTransform, const std::string& strAnchorsFile );
 
 	double ConvertToRightHandRule( double fLeftHandAngleInDegrees ) const;
 
@@ -35,7 +35,8 @@ public:
 
 	tf::Vector3 GetFootprintOffset( const tf::Quaternion& angle ) const;
 
-	bool TransformPoint( int tagID, double fX, double fY, double fZ, double fAngle, tf::Pose& pose, bool bFilter = true );
+	bool TransformPoint( int tagID, double fX, double fY, double fZ, double fAngle,
+		tf::Pose& pose, bool bFilter = true );
 
 	std::string GetTargetFrame( ) const;
 
@@ -46,8 +47,6 @@ public:
 private:
 
 	bool LoadAnchors( const std::string& strAnchorsFile );
-
-	bool LoadCalibrationTransform( const std::string& strCalibrationFile );
 
 private:
 

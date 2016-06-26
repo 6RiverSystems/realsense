@@ -23,11 +23,11 @@ dependencies:
     - cd ~/ros/srs_chuck/src && catkin_init_workspace
 
   override:
-    - cd ~/ros/srs_chuck && catkin_make run_tests_srsdrv_stargazer
+    - cd ~/ros/srs_chuck && catkin_make run_tests
 
 test:
   override:
-    - cd ~/ros/srs_chuck && catkin_make run_tests_srsdrv_stargazer
+    - cd ~/ros/srs_chuck && catkin_make run_tests
     - catkin_test_results ~/ros/srs_chuck/build/test_results
 
 test:

@@ -77,7 +77,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(TestSuite_Stargazer
     	test/Test_Stargazer.cpp
         ${${PROJECT_NAME}_SOURCES}
-        "${CMAKE_CURRENT_LIST_DIR}/data/anchor-test-data.yaml"
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/data
     )
 
     target_link_libraries(TestSuite_Stargazer

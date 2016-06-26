@@ -11,6 +11,7 @@
 #include <yaml-cpp/yaml.h>
 #include <sys/stat.h>
 #include <math.h>
+#include <boost/filesystem.hpp>
 
 namespace srs {
 
@@ -48,6 +49,13 @@ public:
 		m_footprintTransform( tf::Quaternion::getIdentity( ),
 			tf::Vector3( FOOTPRINT_OFFSET_X, FOOTPRINT_OFFSET_Y, 0.0 ) )
 	{
+		boost::filesystem::path currentPath( boost::filesystem::current_path( ) );
+
+		m_strAnchorFile = currentPath.c_str( );
+		m_strAnchorFile += "/anchors.yaml";
+
+		ROS_INFO_NAMED( "transform", "Anchor file: %s", m_strAnchorFile.c_str( ) );
+
 		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, 0.0f } );
 		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, 90.0f } );
 		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, 180.0f } );
@@ -129,8 +137,6 @@ TEST_F( StargazerTest, TestTransforms )
 {
 	uint32_t testIndex = 0;
 
-	char pszConfigTest[255] = { '\0' };
-
 	for( auto stargazerOffset : m_vecStargazerOffsets )
 	{
 		tf::Transform stargazerTransform( tf::Quaternion::getIdentity( ), tf::Vector3( stargazerOffset.x,
@@ -140,25 +146,25 @@ TEST_F( StargazerTest, TestTransforms )
 			m_footprintTransform, m_strAnchorFile );
 
 		std::map<int, tf::Transform> mapAnchorTransforms = m_pointTransformer.GetAnchorTransforms( );
-
-		for( auto point : m_vecTestPoints )
+		for( auto anchorPair : mapAnchorTransforms )
 		{
-			for( auto anchorPair : mapAnchorTransforms )
-			{
-				uint32_t anchorId = anchorPair.first;
 
+			uint32_t anchorId = anchorPair.first;
+
+			tf::Transform anchorTransform = mapAnchorTransforms[anchorId];
+
+			double dfAngle = tf::getYaw( anchorTransform.getRotation( ) ) * 180.0 / M_PI;
+
+			tf::Vector3 origin = anchorTransform.getOrigin( );
+
+			ROS_INFO_NAMED( "transform", "Testing anchor: id: %d, x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
+				anchorId, origin.getX( ), origin.getY( ), origin.getZ( ), dfAngle );
+
+			for( auto point : m_vecTestPoints )
+			{
 				auto testPoint = point;
 
-				tf::Transform anchorTransform = mapAnchorTransforms[anchorId];
-
-				tf::Vector3 origin = anchorTransform.getOrigin( );
-
-				double dfAngle = tf::getYaw( anchorTransform.getRotation( ) ) * 180.0 / M_PI;
-
-				ROS_INFO_NAMED( "transform", "Testing config: %s", pszConfigTest );
-				ROS_INFO_NAMED( "transform", "Testing anchor: id: %d, x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
-					anchorId, origin.getX( ), origin.getY( ), origin.getZ( ), dfAngle );
-				ROS_INFO_NAMED( "transform", "Testing point: x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
+				ROS_INFO_NAMED( "transform", "\tTesting point: x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
 					testPoint.x, testPoint.y, testPoint.z, testPoint.angle );
 
 				// Convert to left hand degrees from right hand degrees
@@ -180,13 +186,13 @@ TEST_F( StargazerTest, TestTransforms )
 
 				tf::Vector3 totalFootprintOffset = totalCameraOffset + footprintOffset;
 
-				ROS_INFO_NAMED( "StarGazerPointTransformer", "stargazer (%2.5f): %2.5f, %2.5f, %2.5f",
+				ROS_INFO_NAMED( "transform", "\t\tstargazer (%2.5f): %2.5f, %2.5f, %2.5f",
 					tf::getYaw( rotation ) * 180.0f / M_PI, stargazerOffset.getX( ), stargazerOffset.getY( ), stargazerOffset.getZ( ) );
 
-				ROS_INFO_NAMED( "StarGazerPointTransformer", "camera (%2.5f): %2.5f, %2.5f, %2.5f",
+				ROS_INFO_NAMED( "transform", "\t\tcamera (%2.5f): %2.5f, %2.5f, %2.5f",
 					tf::getYaw( rotation ) * 180.0f / M_PI, totalCameraOffset.getX( ), totalCameraOffset.getY( ), totalCameraOffset.getZ( ) );
 
-				ROS_INFO_NAMED( "StarGazerPointTransformer", "footprint (%2.5f): %2.5f, %2.5f, %2.5f",
+				ROS_INFO_NAMED( "transform", "\t\tfootprint (%2.5f): %2.5f, %2.5f, %2.5f",
 					tf::getYaw( rotation ) * 180.0f / M_PI, totalFootprintOffset.getX( ), totalFootprintOffset.getY( ), totalFootprintOffset.getZ( ) );
 
 				tf::Pose pose( tf::createIdentityQuaternion( ) );
@@ -204,14 +210,14 @@ TEST_F( StargazerTest, TestTransforms )
 					tf::Vector3 origin = pose.getOrigin( );
 					tf::Quaternion rotation = pose.getRotation( );
 
-					ROS_INFO_NAMED( "StarGazerPointTransformer", "map (%2.5f): %2.5f, %2.5f, %2.5f",
+					ROS_INFO_NAMED( "transform", "\t\tmap (%2.5f): %2.5f, %2.5f, %2.5f",
 						tf::getYaw( rotation ) * 180.0f / M_PI, origin.getX( ), origin.getY( ), origin.getZ( ) );
 
 					tf::Vector3 calculatedOrigin = calculatedPose.getOrigin( );
 					tf::Quaternion calculatedRotation = calculatedPose.getRotation( );
 
 
-					ROS_INFO_NAMED( "StarGazerPointTransformer", "map (correct) (%2.5f): %2.5f, %2.5f, %2.5f",
+					ROS_INFO_NAMED( "transform", "\t\tmap (correct) (%2.5f): %2.5f, %2.5f, %2.5f",
 						tf::getYaw( calculatedRotation ) * 180.0f / M_PI, calculatedOrigin.getX( ),
 						calculatedOrigin.getY( ), calculatedOrigin.getZ( ) );
 
@@ -230,10 +236,6 @@ TEST_F( StargazerTest, TestTransforms )
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest( &argc, argv );
-
-	srs::g_strDataFile = "/home/dan/ros/srs_chuck/src/srsdrv_stargazer/data";
-
-	printf("Test File: %s", srs::g_strDataFile.c_str( ) );
 
 	return RUN_ALL_TESTS( );
 }

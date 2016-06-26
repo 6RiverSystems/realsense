@@ -1,6 +1,7 @@
 dependencies:
   cache_directories:
     - "~/.apt-cache"
+    - "~/.ccache"
   pre:
     - sudo rm -rf /var/cache/apt/archives && sudo ln -s ~/.apt-cache /var/cache/apt/archives && mkdir -p ~/.apt-cache/partial
     - gpg --keyserver pgp.mit.edu --recv-keys 749D6EEC0353B12C
@@ -15,9 +16,11 @@ dependencies:
     - cd ~/ros/srs_chuck/src && catkin_init_workspace
     - sudo apt-get install libsdl-image1.2-dev
     - sudo apt-get install socat
+    - sudo apt-get install ccache
     - sudo apt-get install python-gevent=1.0-1ubuntu1
     - echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:${PYTHONPATH}" >> ~/.bashrc
 
 test:
   override:
+    - export CIRCLE_TEST_REPORTS=~/ros/srs_chuck/build/test_results
     - cd ~/ros/srs_chuck && catkin_make run_tests

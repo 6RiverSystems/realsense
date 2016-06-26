@@ -19,7 +19,7 @@ dependencies:
     - sudo apt-get install ccache
     - sudo apt-get install python-gevent=1.0-1ubuntu1
     - echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:${PYTHONPATH}" >> ~/.bashrc
-    - echo "export PATH="/usr/lib/ccache:$PATH" >> ~/.bashrc
+    - echo "export PATH=/usr/lib/ccache:$PATH" >> ~/.bashrc
     - echo "export ROS_PARALLEL_JOBS=-j8" >> ~/.bashrc
 
 test:

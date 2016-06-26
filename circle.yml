@@ -20,4 +20,4 @@ dependencies:
 
 test:
   override:
-    - cd ~/ros/srs_chuck && catkin_make && catkin_make run_tests
+    - cd ~/ros/srs_chuck && catkin_make run_tests

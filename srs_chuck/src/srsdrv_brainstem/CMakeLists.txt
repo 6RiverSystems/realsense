@@ -69,7 +69,6 @@ if (CATKIN_ENABLE_TESTING)
     	test/Test_MessageProcessor.cpp
         ${${PROJECT_NAME}_SOURCES}
     )
-
     target_link_libraries(TestSuite_Brainstem
         ${catkin_LIBRARIES}
         ${boost_LIBRARIES}

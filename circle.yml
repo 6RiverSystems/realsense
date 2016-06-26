@@ -28,3 +28,4 @@ dependencies:
 test:
   override:
     - cd ~/ros/srs_chuck && catkin_make run_tests_srsdrv_stargazer
+    - catkin_test_results build/test_results

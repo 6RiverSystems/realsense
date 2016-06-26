@@ -28,4 +28,10 @@ dependencies:
 test:
   override:
     - cd ~/ros/srs_chuck && catkin_make run_tests_srsdrv_stargazer
-    - catkin_test_results build/test_results
+    - catkin_test_results ~/ros/srs_chuck/build/test_results
+
+test:
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find ~/ros/srs_chuck/build/test_results/ -type f -regex "*.xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+

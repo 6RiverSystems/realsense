@@ -1,7 +1,7 @@
 dependencies:
   cache_directories:
     - "~/.apt-cache"
-    - "$HOME/.ccache"
+    - "~/.ccache"
   pre:
     - sudo rm -rf /var/cache/apt/archives && sudo ln -s ~/.apt-cache /var/cache/apt/archives && mkdir -p ~/.apt-cache/partial
     - gpg --keyserver pgp.mit.edu --recv-keys 749D6EEC0353B12C
@@ -33,5 +33,4 @@ test:
 test:
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
-    - find ~/ros/srs_chuck/build/test_results/ -type f -regex "*.xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
-
+    - find ~/ros/srs_chuck/build/test_results -type f -name '*.xml' -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;

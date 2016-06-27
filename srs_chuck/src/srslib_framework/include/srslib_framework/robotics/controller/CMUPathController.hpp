@@ -50,12 +50,14 @@ public:
     void setTrajectory(Trajectory<> trajectory, Pose<> robotPose);
 
 protected:
+    void calculateLanding(Pose<> goal);
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry);
 
 private:
     int findVelocityChange(double fromVelocity, int fromIndex);
 
     double getMaxVelocity(int position);
+    bool goalReached(Pose<> currentPose);
 
     void updateParameters(Pose<> currentPose);
 

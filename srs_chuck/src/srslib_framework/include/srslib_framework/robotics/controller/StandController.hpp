@@ -33,7 +33,7 @@ protected:
     {
         // The controller never completes its goal. In order to complete its
         // goal, it must be canceled
-        goalReached_ = false;
+        setGoalReached(false);
 
         // Send the command for execution
         executeCommand(ZERO_VELOCITY);

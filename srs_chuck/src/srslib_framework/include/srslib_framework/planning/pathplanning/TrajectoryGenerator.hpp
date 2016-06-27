@@ -215,25 +215,25 @@ private:
         double distanceFromStart = 0.0;
         double distanceToEnd = PoseMath::euclidean(fromWaypoint, toWaypoint);
 
-        double vCoasting = robot_.travelLinearVelocity;
-        if  (distanceToEnd < robot_.smallStraightDistance)
+        double vCoasting = robot_.pathFollowMaxLinearVelocity;
+        if  (distanceToEnd < robot_.pathFollowSmallStraightDistance)
         {
-            vCoasting = robot_.travelTurningVelocity;
+            vCoasting = robot_.pathFollowTurningVelocity;
         }
 
         // Make sure that if the total distance between the two waypoints
         // is smaller than the specified value, the maximum velocity is forced
         // to be the turning velocity
-        double v0Max = robot_.travelLinearVelocity;
-        if (!isFirstStretch || distanceToEnd < robot_.smallStraightDistance)
+        double v0Max = robot_.pathFollowMaxLinearVelocity;
+        if (!isFirstStretch || distanceToEnd < robot_.pathFollowSmallStraightDistance)
         {
-            v0Max = robot_.travelTurningVelocity;
+            v0Max = robot_.pathFollowTurningVelocity;
         }
 
-        double vfMax = robot_.travelLinearVelocity;
-        if (!isLastStretch || distanceToEnd < robot_.smallStraightDistance)
+        double vfMax = robot_.pathFollowMaxLinearVelocity;
+        if (!isLastStretch || distanceToEnd < robot_.pathFollowSmallStraightDistance)
         {
-            vfMax = robot_.travelTurningVelocity;
+            vfMax = robot_.pathFollowTurningVelocity;
         }
 
         // Begin from the initial waypoint
@@ -249,16 +249,16 @@ private:
             movingOnY ? directionY * spacing : 0.0,
             0.0);
 
-        while (distanceToEnd > robot_.goalReachedDistance)
+        while (distanceToEnd > robot_.pathFollowGoalReachedDistance)
         {
             waypoint = PoseMath::add<double>(waypoint, deltaPose);
 
-            if (distanceFromStart < robot_.travelTurningZoneRadius)
+            if (distanceFromStart < robot_.pathFollowTurningZoneRadius)
             {
                 // If this segment is not the first stretch and
                 currentMaxVelocity = v0Max;
             }
-            else if (distanceToEnd < robot_.travelTurningZoneRadius)
+            else if (distanceToEnd < robot_.pathFollowTurningZoneRadius)
             {
                 currentMaxVelocity = vfMax;
             }

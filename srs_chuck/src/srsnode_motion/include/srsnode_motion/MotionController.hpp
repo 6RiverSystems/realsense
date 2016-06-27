@@ -56,6 +56,11 @@ public:
         return currentFinalGoal_;
     }
 
+    void getLanding(vector<Pose<>>& landingArea) const
+    {
+        activeController_->getLanding(landingArea);
+    }
+
     Pose<> getShortTermGoal() const
     {
         return currentShortTermGoal_;

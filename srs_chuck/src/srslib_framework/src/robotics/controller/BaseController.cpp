@@ -1,5 +1,7 @@
 #include <srslib_framework/robotics/controller/BaseController.hpp>
 
+#include <srslib_framework/math/PoseMath.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,6 +40,18 @@ void BaseController::step(double dT, Pose<> currentPose, Odometry<> currentOdome
 // Protected methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+bool BaseController::checkGoalReached(Pose<> currentPose)
+{
+    double distanceToGoal = PoseMath::euclidean(currentPose, getGoal());
+    ROS_DEBUG_STREAM_NAMED("CMUPathController", "Distance to goal line: " << distanceToGoal);
+
+    bool isIntersecting = PoseMath::intersection(goalLanding_, currentPose);
+    ROS_DEBUG_STREAM_NAMED("CMUPathController", "Inside landing zone: " << isIntersecting);
+
+    return isIntersecting;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void BaseController::executeCommand(Velocity<> command)
 {
     executeCommand(command.linear, command.angular);
@@ -47,16 +61,16 @@ void BaseController::executeCommand(Velocity<> command)
 void BaseController::executeCommand(double linear, double angular)
 {
     double finalLinear = BasicMath::saturate<double>(Kv_ * linear,
-        robot_.maxLinearVelocity, -robot_.maxLinearVelocity);
+        robot_.physicalMaxLinearVelocity, -robot_.physicalMaxLinearVelocity);
 
     double finalAngular = BasicMath::saturate<double>(Kw_ * angular,
-        robot_.maxAngularVelocity, -robot_.maxAngularVelocity);
+        robot_.physicalMaxAngularVelocity, -robot_.physicalMaxAngularVelocity);
 
     finalLinear = BasicMath::threshold<double>(finalLinear,
-        robot_.minPhysicalLinearVelocity, 0.0);
+        robot_.physicalMinLinearVelocity, 0.0);
 
     finalAngular = BasicMath::threshold<double>(finalAngular,
-        robot_.minPhysicalAngularVelocity, 0.0);
+        robot_.physicalMinAngularVelocity, 0.0);
 
     executingCommand_ = Velocity<>(finalLinear, finalAngular);
 

@@ -54,7 +54,7 @@ function runChuck() {
   echo -e "${BLUE}*************************************************************"
   echo -e "${NC}"
 
-  roslaunch srsc_6rhq_norviz map.launch 2>&1 | tee "$baseDirectory/log/ros.log"
+  roslaunch srsc_6rhq map.launch 2>&1 | tee "$baseDirectory/log/ros.log"
 }
 
 function cleanChuck() {

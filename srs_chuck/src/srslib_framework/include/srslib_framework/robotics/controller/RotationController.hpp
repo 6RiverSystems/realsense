@@ -46,12 +46,13 @@ protected:
 
         // Calculate the difference between what has been requested and
         // the current pose
-        double error = AngleMath::normalizeAngleRad<double>(goal_.theta - currentPose.theta);
+        double error = AngleMath::normalizeAngleRad<double>(getGoal().theta - currentPose.theta);
 
-        if (!isRobotMoving_ &&
-            AngleMath::equalRad<double>(goal_.theta, currentPose.theta, robot_.goalReachedAngle))
+        if (!isRobotMoving() &&
+            AngleMath::equalRad<double>(getGoal().theta, currentPose.theta,
+                robot_.rotationGoalReachedAngle))
         {
-            goalReached_ = true;
+            setGoalReached(true);
             executeCommand(ZERO_VELOCITY);
 
             return;
@@ -70,7 +71,7 @@ protected:
         // Make sure that the calculated angular velocity is not bigger
         // than the specified travel angular velocity
         angular = BasicMath::saturate<double>(angular,
-            robot_.travelRotationVelocity, -robot_.travelRotationVelocity);
+            robot_.rotationRotationVelocity, -robot_.rotationRotationVelocity);
 
         // Send the command for execution
         executeCommand(linear, angular);

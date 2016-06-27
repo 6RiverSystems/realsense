@@ -58,7 +58,8 @@ private:
     void performCustomAction();
     void publishAccumulatedOdometry();
     void publishArrived();
-    void publishGoal();
+    void publishGoalInformation();
+    void publishGoalLanding();
     void publishOdometry();
     void publishPing();
     void publishPose();
@@ -88,9 +89,10 @@ private:
     ros::Publisher pubOdometry_;
     ros::Publisher pubPing_;
     ros::Publisher pubRobotPose_;
-    ros::Publisher pubStatusGoalPlan_;
-    ros::Publisher pubStatusGoalGoal_;
     ros::Publisher pubStatusGoalArrived_;
+    ros::Publisher pubStatusGoalGoal_;
+    ros::Publisher pubStatusGoalLanding_;
+    ros::Publisher pubStatusGoalPlan_;
 
     uint32_t pingDecimator_;
 

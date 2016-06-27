@@ -4,6 +4,7 @@
 
 #include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/math/BasicMath.hpp>
+#include <srslib_framework/math/PoseMath.hpp>
 
 namespace srs {
 
@@ -15,7 +16,7 @@ void CMUPathController::reset()
 {
     BaseController::reset();
 
-    lookAheadDistance_ = robot_.zeroLookAheadDistance;
+    lookAheadDistance_ = robot_.pathFollowZeroLookAheadDistance;
 
     currentVelocity_ = 0.0;
     velocityChange_ = 0.0;
@@ -36,8 +37,10 @@ void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
     if (!currentTrajectory_.empty())
     {
         // Find the goal of the trajectory
-        goal_ = currentTrajectory_.getGoal();
-        goalReached_ = false;
+        setGoal(currentTrajectory_.getGoal());
+
+        // Calculate the landing zone for the goal
+        calculateLanding(getGoal());
 
         // Find the first reference point on the given trajectory
         int referenceIndex = currentTrajectory_.findClosestPose(robotPose);
@@ -45,7 +48,7 @@ void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
 
         // Find the projection of the current robot pose onto the trajectory
         projectionIndex_ = currentTrajectory_.findClosestPose(robotPose, 0,
-            robot_.maxLookAheadDistance);
+            robot_.pathFollowMaxLookAheadDistance);
 
         // Find the first maximum velocity change
         velocityChange_ = getMaxVelocity(projectionIndex_);
@@ -59,14 +62,34 @@ void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
 // Protected methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void CMUPathController::calculateLanding(Pose<> goal)
+{
+    goalLanding_.clear();
+
+    Pose<> reflection = PoseMath::rotate(goal, M_PI);
+    Pose<> p = PoseMath::transform(reflection, robot_.pathFollowGoalReachedDistance);
+
+    reflection = PoseMath::rotate(p, M_PI_2);
+    goalLanding_.push_back(PoseMath::transform(reflection, robot_.pathFollowLandingWidth / 2));
+
+    reflection = PoseMath::rotate(p, -M_PI_2);
+    goalLanding_.push_back(PoseMath::transform(reflection, robot_.pathFollowLandingWidth / 2));
+
+    reflection = goalLanding_[1];
+    reflection.theta = goal.theta;
+    goalLanding_.push_back(PoseMath::transform(reflection, robot_.pathFollowLandingDepth));
+
+    reflection = goalLanding_[0];
+    reflection.theta = goal.theta;
+    goalLanding_.push_back(PoseMath::transform(reflection, robot_.pathFollowLandingDepth));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
 {
     // Update the projection of the current robot pose onto the path and the
     // look-ahead distance
     updateParameters(currentPose);
-
-    double distanceToGoal = PoseMath::euclidean(currentPose, goal_);
-    ROS_DEBUG_STREAM_NAMED("CMUPathController", "Distance to goal: " << distanceToGoal);
 
     double distanceToReference = PoseMath::euclidean(currentPose, referencePose_);
     ROS_DEBUG_STREAM_NAMED("CMUPathController", "Distance to reference: " << distanceToReference);
@@ -77,23 +100,23 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     // If the controller has received a cancel signal or
     // the distance to the goal is smaller than the threshold
     // declare that the goal was reached
-    if (canceled_ || distanceToGoal < robot_.goalReachedDistance)
+    if (isCanceled() || checkGoalReached(currentPose))
     {
-        goalReached_ = true;
+        setGoalReached(true);
         executeCommand(ZERO_VELOCITY);
 
         return;
     }
 
     // Calculate what would be the velocity change based on the set acceleration
-    double deltaVelocity = robot_.travelLinearAcceleration * dT;
+    double deltaVelocity = robot_.pathFollowLinearAcceleration * dT;
 
     // Calculate the velocity after the acceleration has taken place
     double linear = currentVelocity_ + deltaVelocity;
 
     // Calculate the stopping distance based on the projected velocity
     // and the velocity requested at the velocity change point
-    double changingTime = (velocityChange_ - linear) / robot_.travelLinearAcceleration;
+    double changingTime = (velocityChange_ - linear) / robot_.pathFollowLinearAcceleration;
     double changingDistance = 0.5 * (velocityChange_ + linear) * abs(changingTime);
 
     ROS_DEBUG_STREAM_NAMED("CMUPathController", "Current max velocity: " << velocityCurrentMax_);
@@ -119,7 +142,7 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
             // Reduce the moving velocity, if the new requested
             // velocity is less than the current one
             currentVelocity_ = BasicMath::threshold<double>(currentVelocity_ - deltaVelocity,
-                robot_.minLinearVelocity, 0.0);
+                robot_.pathFollowMinLinearVelocity, 0.0);
 
             ROS_DEBUG_STREAM_NAMED("CMUPathController",
                 "Decreasing velocity: " << currentVelocity_);
@@ -145,7 +168,7 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     // Make sure that the calculated angular velocity is not bigger
     // than the specified travel angular velocity
     angular = BasicMath::saturate<double>(angular,
-        robot_.travelAngularVelocity, -robot_.travelAngularVelocity);
+        robot_.pathFollowMaxAngularVelocity, -robot_.pathFollowMaxAngularVelocity);
 
     // Send the command for execution
     executeCommand(currentVelocity_, angular);
@@ -165,7 +188,7 @@ int CMUPathController::findVelocityChange(double fromVelocity, int fromIndex)
     for (int i = fromIndex; i < currentTrajectory_.size(); i++)
     {
         double velocity = getMaxVelocity(i);
-        if (!BasicMath::equal(fromVelocity, velocity, robot_.minPhysicalLinearVelocity))
+        if (!BasicMath::equal(fromVelocity, velocity, robot_.physicalMinLinearVelocity))
         {
             return i;
         }
@@ -208,11 +231,11 @@ void CMUPathController::updateParameters(Pose<> currentPose)
     {
         Pose<> projectionPose = currentTrajectory_.getPose(projectionIndex_);
 
-        lookAheadDistance_ = robot_.zeroLookAheadDistance +
+        lookAheadDistance_ = robot_.pathFollowZeroLookAheadDistance +
             PoseMath::euclidean(currentPose, projectionPose);
 
         lookAheadDistance_ = BasicMath::saturate(lookAheadDistance_,
-            robot_.maxLookAheadDistance, robot_.minLookAheadDistance);
+            robot_.pathFollowMaxLookAheadDistance, robot_.pathFollowMinLookAheadDistance);
 
         ROS_DEBUG_STREAM_NAMED("CMUPathController", "Look-ahead distance: " << lookAheadDistance_);
     }

@@ -6,6 +6,9 @@
 #ifndef BASECONTROLLER_HPP_
 #define BASECONTROLLER_HPP_
 
+#include <vector>
+using namespace std;
+
 #include <ros/ros.h>
 
 #include <srslib_framework/math/BasicMath.hpp>
@@ -44,7 +47,7 @@ public:
         goalReached_ = true;
     }
 
-    Velocity<> getExecutingCommand()
+    Velocity<> getExecutingCommand() const
     {
         return executingCommand_;
     }
@@ -52,6 +55,11 @@ public:
     Pose<> getGoal() const
     {
         return goal_;
+    }
+
+    void getLanding(vector<Pose<>>& landingArea) const
+    {
+        landingArea = goalLanding_;
     }
 
     string getName() const
@@ -79,12 +87,23 @@ public:
     void setGoal(Pose<> goal)
     {
         goal_ = goal;
+        calculateLanding(goal);
+    }
+
+    void setGoalReached(const bool newValue)
+    {
+        goalReached_ = newValue;
     }
 
     void step(double dT, Pose<> currentPose, Odometry<> currentOdometry);
     virtual void setRobotProfile(RobotProfile robot) = 0;
 
 protected:
+    virtual void calculateLanding(Pose<> goal)
+    {}
+
+    bool checkGoalReached(Pose<> currentPose);
+
     void executeCommand(Velocity<> command);
     void executeCommand(double linear, double angular);
 
@@ -98,6 +117,10 @@ protected:
         Kw_ = Kw;
     }
 
+    RobotProfile robot_;
+    vector<Pose<>> goalLanding_;
+
+private:
     bool canceled_;
 
     Velocity<> executingCommand_;
@@ -111,8 +134,6 @@ protected:
     double Kw_;
 
     string name_;
-
-    RobotProfile robot_;
 };
 
 } // namespace srs

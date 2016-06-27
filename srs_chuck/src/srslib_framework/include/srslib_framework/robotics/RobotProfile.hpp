@@ -16,51 +16,53 @@ struct RobotProfile
         bodyWidth(0.0),
         bodyDepth(0.0),
 
-        emergencyRatioCrawl(0.0),
         emergencyKv(1.0),
         emergencyKw(1.0),
+        emergencyMaxAngularVelocity(0.0),
+        emergencyMaxLinearVelocity(0.0),
 
-        goalReachedDistance(0.0),
-        goalReachedAngle(0.0),
-
-        manualRatioAngular(0.0),
-        manualRatioLinear(0.0),
         manualKv(1.0),
         manualKw(1.0),
-        maxAngularAcceleration(0.0),
-        maxAngularVelocity(0.0),
-        maxLinearAcceleration(0.0),
-        maxLinearVelocity(0.0),
-        maxLookAheadDistance(0.0),
-        minAngularVelocity(0.0),
-        minLinearVelocity(0.0),
-        minLookAheadDistance(0.0),
-        minPhysicalAngularVelocity(0.0),
-        minPhysicalLinearVelocity(0.0),
+        manualMaxAngularVelocity(0.0),
+        manualMaxLinearVelocity(0.0),
 
+        physicalMaxAngularAcceleration(0.0),
+        physicalMaxAngularVelocity(0.0),
+        physicalMaxLinearAcceleration(0.0),
+        physicalMaxLinearVelocity(0.0),
+        physicalMinAngularVelocity(0.0),
+        physicalMinLinearVelocity(0.0),
+
+        pathFollowGoalReachedDistance(0.0),
         pathFollowKv(1.0),
         pathFollowKw(1.0),
+        pathFollowLandingDepth(0.0),
+        pathFollowLandingWidth(0.0),
+        pathFollowLinearAcceleration(0.0),
+        pathFollowMaxAngularVelocity(0.0),
+        pathFollowMaxLinearVelocity(0.0),
+        pathFollowMaxLookAheadDistance(0.0),
+        pathFollowMinLinearVelocity(0.0),
+        pathFollowMinLookAheadDistance(0.0),
+        pathFollowSmallStraightDistance(0.0),
+        pathFollowTurningVelocity(0.0),
+        pathFollowTurningZoneRadius(0.0),
+        pathFollowZeroLookAheadDistance(0.0),
 
+        rotationGoalReachedAngle(0.0),
         rotationKd(0.0),
         rotationKi(0.0),
         rotationKp(1.0),
         rotationKv(1.0),
         rotationKw(1.0),
+        rotationMinAngularVelocity(0.0),
+        rotationRotationVelocity(0.0),
 
-        smallStraightDistance(0.0),
-
-        travelAngularAcceleration(0.0),
-        travelAngularVelocity(0.0),
-        travelTurningZoneRadius(0.0),
-        travelTurningVelocity(0.0),
-        travelLinearAcceleration(0.0),
-        travelLinearVelocity(0.0),
-        travelRotationVelocity(0.0),
+        stopMinLinearVelocity(0.0),
+        stopNormalDeceleration(0.0),
 
         wheelDiameter(0.0),
-        wheelDistance(0.0),
-
-        zeroLookAheadDistance(0.0)
+        wheelDistance(0.0)
     {}
 
     virtual ~RobotProfile()
@@ -71,51 +73,53 @@ struct RobotProfile
     double bodyWidth; // [m]
     double bodyDepth; // [m]
 
-    double emergencyRatioCrawl; // []
     double emergencyKv; // []
     double emergencyKw; // []
-
-    double goalReachedDistance; // [m]
-    double goalReachedAngle; // [rad]
+    double emergencyMaxAngularVelocity; // [rad/s]
+    double emergencyMaxLinearVelocity; // [m/s]
 
     double manualKv; // []
     double manualKw; // []
-    double manualRatioAngular; // []
-    double manualRatioLinear; // []
-    double maxAngularAcceleration; // [rad/s^2]
-    double maxAngularVelocity; // [rad/s]
-    double maxLinearAcceleration; // [m/s^2]
-    double maxLinearVelocity; // [m/s]
-    double maxLookAheadDistance; // [m]
-    double minAngularVelocity; // [rad/s]
-    double minLinearVelocity; // [m/s]
-    double minLookAheadDistance; // [m]
-    double minPhysicalAngularVelocity; // [rad/s]
-    double minPhysicalLinearVelocity; // [m/s]
+    double manualMaxAngularVelocity; // [rad/s]
+    double manualMaxLinearVelocity; // [m/s]
 
+    double physicalMaxAngularAcceleration; // [rad/s^2]
+    double physicalMaxAngularVelocity; // [rad/s]
+    double physicalMaxLinearAcceleration; // [m/s^2]
+    double physicalMaxLinearVelocity; // [m/s]
+    double physicalMinAngularVelocity; // [rad/s]
+    double physicalMinLinearVelocity; // [m/s]
+
+    double pathFollowGoalReachedDistance; // [m]
     double pathFollowKv; // []
     double pathFollowKw; // []
+    double pathFollowLandingDepth; // [m]
+    double pathFollowLandingWidth; // [m]
+    double pathFollowLinearAcceleration; // [m/s^2]
+    double pathFollowMaxAngularVelocity; // [rad/s]
+    double pathFollowMaxLinearVelocity; // [m/s]
+    double pathFollowMaxLookAheadDistance; // [m]
+    double pathFollowMinLinearVelocity; // [m/s]
+    double pathFollowMinLookAheadDistance; // [m]
+    double pathFollowSmallStraightDistance; // [m]
+    double pathFollowTurningVelocity; // [m/s]
+    double pathFollowTurningZoneRadius; // [m]
+    double pathFollowZeroLookAheadDistance; // [m]
 
+    double rotationGoalReachedAngle; // [rad]
     double rotationKd; // []
     double rotationKi; // []
     double rotationKp; // []
     double rotationKv; // []
     double rotationKw; // []
+    double rotationMinAngularVelocity; // [rad/s]
+    double rotationRotationVelocity; // [rad/s]
 
-    double smallStraightDistance; // [m]
-
-    double travelAngularAcceleration; // [rad/s^2]
-    double travelAngularVelocity; // [rad/s]
-    double travelTurningZoneRadius; // [m]
-    double travelTurningVelocity; // [m/s]
-    double travelLinearAcceleration; // [m/s^2]
-    double travelLinearVelocity; // [m/s]
-    double travelRotationVelocity; // [rad/s]
+    double stopMinLinearVelocity; // [m/s]
+    double stopNormalDeceleration; // [m/s^2]
 
     double wheelDiameter; // [m]
     double wheelDistance; // [m]
-
-    double zeroLookAheadDistance; // [m]
 };
 
 } // namespace srs

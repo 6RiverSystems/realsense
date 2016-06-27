@@ -41,15 +41,12 @@ public:
 protected:
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
-        // The controller never completes its goal. In order to complete its
-        // goal, it must be canceled
-        goalReached_ = false;
+        // The controller never completes its goal. In order to do that,
+        // it must be canceled
+        setGoalReached(false);
 
-        double linear = robot_.manualRatioLinear *
-            userCommand_.linear * robot_.travelLinearVelocity;
-
-        double angular = robot_.manualRatioAngular *
-            userCommand_.angular * robot_.travelAngularVelocity;
+        double linear = userCommand_.linear * robot_.manualMaxLinearVelocity;
+        double angular = userCommand_.angular * robot_.manualMaxAngularVelocity;
 
         // If the robot is moving backward and at the same time
         // rotating, invert the direction of rotation. No transformation

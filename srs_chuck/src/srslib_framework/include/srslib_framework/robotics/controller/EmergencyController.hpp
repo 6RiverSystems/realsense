@@ -43,13 +43,10 @@ protected:
     {
         // The controller never completes its goal. In order to complete its
         // goal, it must be canceled
-        goalReached_ = false;
+        setGoalReached(false);
 
-        double linear = robot_.emergencyRatioCrawl *
-            userCommand_.linear * robot_.travelLinearVelocity;
-
-        double angular = robot_.emergencyRatioCrawl *
-            userCommand_.angular * robot_.travelAngularVelocity;
+        double linear = userCommand_.linear * robot_.emergencyMaxLinearVelocity;
+        double angular = userCommand_.angular * robot_.emergencyMaxAngularVelocity;
 
         // If the robot is moving backward and at the same time
         // rotating, invert the direction of rotation. No transformation

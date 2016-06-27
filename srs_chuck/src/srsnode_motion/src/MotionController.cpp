@@ -443,7 +443,7 @@ void MotionController::optimizeRotations()
 
     // If the current angle of the robot is not what was asked
     if (!AngleMath::equalRad<double>(finalTheta, currentPose_.theta,
-        robot_.goalReachedAngle))
+        robot_.rotationGoalReachedAngle))
     {
         ROS_DEBUG_STREAM_NAMED("MotionController", "Rotation needed from: " <<
             AngleMath::rad2deg<double>(currentPose_.theta) << "deg to: " <<

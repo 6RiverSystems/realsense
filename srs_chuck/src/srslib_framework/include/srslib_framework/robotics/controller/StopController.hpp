@@ -32,19 +32,19 @@ protected:
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
         // If the robot is not moving anymore, the goal was reached
-        if (!isRobotMoving_)
+        if (!isRobotMoving())
         {
-            goalReached_ = true;
+            setGoalReached(true);
             executeCommand(ZERO_VELOCITY);
 
             return;
         }
 
-        double deltaVelocity = robot_.travelLinearAcceleration * dT;
+        double deltaVelocity = robot_.stopNormalDeceleration * dT;
 
         double linear = currentOdometry.velocity.linear;
         linear -=  BasicMath::sgn<double>(linear) * deltaVelocity;
-        linear = BasicMath::threshold<double>(linear, robot_.minLinearVelocity, 0.0);
+        linear = BasicMath::threshold<double>(linear, robot_.stopMinLinearVelocity, 0.0);
 
         // Send the command for execution
         executeCommand(linear, 0.0);

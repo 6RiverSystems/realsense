@@ -45,7 +45,7 @@ struct Chuck : RobotProfile
         pathFollowLandingDepth = 1.0; // [m]
         pathFollowLandingWidth = 1.0; // [m]
         pathFollowLinearAcceleration =  0.250; // [m/s^2]
-        pathFollowMaxAngularVelocity = AngleMath::deg2rad<double>(115); // 2.007 [rad/s]
+        pathFollowMaxAngularVelocity = AngleMath::deg2rad<double>(57); // 1.000 [rad/s]
         pathFollowMaxLinearVelocity = 1.000; // [m]
         pathFollowMaxLookAheadDistance = 1.100; // [m]
         pathFollowMinLinearVelocity = 0.010; // [m/s]

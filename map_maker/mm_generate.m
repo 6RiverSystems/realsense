@@ -50,6 +50,8 @@ function map = mm_generate(map)
             map.image(r, c, 3) = pixel(RGB_BLUE);
         end
     end
+    
+    imshow(map.image);
 end
 
 function flag = checkFlag(data, field)

@@ -2,4 +2,4 @@
 wheel_diameter: {left: 0, y: 0}
 
 # Stargazer calibration
-stargazer_offset: {x: 0.0371973746, y: -0.0697303969}
+stargazer_offset: {x: 0.0699635705, y: -0.0858598095}

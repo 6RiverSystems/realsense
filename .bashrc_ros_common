@@ -2,6 +2,6 @@ export ROS_HOSTNAME=$ROBOT_NAME
 export ROSCONSOLE_CONFIG_FILE=~/.rosconsole.config
 export ROS_PACKAGE_PATH=
 export ROSLISP_PACKAGE_DIRECTORIES=
-export ENV=dan
+export ENV=ros
 source ~/ros/.bash_aliases
 source /opt/ros/indigo/setup.bash

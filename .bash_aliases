@@ -47,12 +47,20 @@ function runChuck() {
   source devel/setup.bash &&
   popd
 
+  echo -e "${BLUE}*************************************************************"
+  echo -e "${BLUE}*** Running roslaunch from `pwd`"
+  echo -e "${BLUE}*** ${YELLOW}ROS_PACKAGE_PATH: $ROS_PACKAGE_PATH"
+  echo -e "${BLUE}*** ${YELLOW}ROSCONSOLE_CONFIG_FILE: $ROSCONSOLE_CONFIG_FILE"
+  echo -e "${BLUE}*************************************************************"
+  echo -e "${NC}"
+
   roslaunch srsc_6rhq_norviz map.launch 2>&1 | tee "$baseDirectory/log/ros.log"
 }
 
 function cleanChuck() {
   getChuckDirectory &&
 
+  source /opt/ros/indigo/setup.bash
   pushd "$baseDirectory/srs_chuck" &&
   rm -rf build/ devel/ install &&
   popd &&
@@ -65,7 +73,7 @@ function cleanChuck() {
 logChuck() {
   getChuckDirectory &&
 
-  tail -f "$baseDirectory/log/ros.log" ~/mfp_bridge/log/bridge.log
+  tail -n 1000 -f "$baseDirectory/log/ros.log" -f ~/mfp_bridge/log/bridge.log
 }
 
 alias chucklog=logChuck

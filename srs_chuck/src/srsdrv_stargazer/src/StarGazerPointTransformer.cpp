@@ -242,7 +242,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 				std::string strData =  stream.str( );
 
-				ROS_ERROR_NAMED( "calibrate", "%s", strData.c_str( ) );
+				ROS_INFO_NAMED( "calibrate", "%s", strData.c_str( ) );
 
 				// reset accumulators
 				accLocalX = double_acc( );

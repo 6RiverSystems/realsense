@@ -155,9 +155,10 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 			tf::Vector3 chuckOrigin = anchorGlobal * stargazerTranslation;
 
 			double dfAnchorGlobal = tf::getYaw(anchorGlobal.getRotation( ) );
-			double dfAnchroRotation = tf::getYaw( anchorRotation );
+			double dfAnchorRotation = tf::getYaw( anchorRotation );
+			double dfMapRotation = dfAnchorGlobal + dfAnchorRotation;
 
-			tf::Quaternion chuckOrientation( tf::createQuaternionFromYaw( dfAnchorGlobal + dfAnchroRotation) );
+			tf::Quaternion chuckOrientation( tf::createQuaternionFromYaw( dfMapRotation ) );
 			pose = tf::Pose( chuckOrientation, chuckOrigin);
 
 			bSuccess = true;
@@ -168,13 +169,20 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 			std::ostringstream stream;
 
+			double dfMapRotationDegrees = dfMapRotation * 180.0f / M_PI;
+
+			if( dfMapRotationDegrees < 0 )
+			{
+				dfMapRotationDegrees += 360.0f;
+			}
+
 			stream << "Stargazer Data: " << std::fixed <<  endl <<
 				tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
 				stargazerOffset.getX( ) << ", " << stargazerOffset.getY( ) << ", " << stargazerOffset.getZ( ) << ", " <<
 				totalCameraOffset.getX( ) << ", " << totalCameraOffset.getY( ) << ", " << totalCameraOffset.getZ( ) << ", " <<
 				totalFootprintOffset.getX( ) << ", " << totalFootprintOffset.getY( ) << ", " << totalFootprintOffset.getZ( ) << ", " <<
 				chuckOrigin.getX( ) << ", " << chuckOrigin.getY( ) << ", " << chuckOrigin.getZ( ) << ", " <<
-				tf::getYaw( chuckOrientation ) * 180.0f / M_PI << ", " << std::endl;
+				dfMapRotationDegrees << ", " << std::endl;
 
 			std::string strData =  stream.str( );
 
@@ -214,7 +222,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 			accChuckX( chuckOrigin.getX( ) );
 			accChuckY( chuckOrigin.getY( ) );
 			accChuckZ( chuckOrigin.getZ( ) );
-			accChuckRotation( tf::getYaw( chuckOrientation ) * 180.0f / M_PI );
+			accChuckRotation( dfMapRotationDegrees );
 
 			static int sCount = 0;
 			if( sCount++ == 50 )
@@ -234,7 +242,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 				std::string strData =  stream.str( );
 
-				ROS_DEBUG_NAMED( "calibrate", "%s", strData.c_str( ) );
+				ROS_ERROR_NAMED( "calibrate", "%s", strData.c_str( ) );
 
 				// reset accumulators
 				accLocalX = double_acc( );

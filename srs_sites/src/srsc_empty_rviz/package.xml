@@ -8,11 +8,11 @@
   *
 -->
 <package>
-    <name>srsc_6rhq</name>
+    <name>srsc_empty_rviz</name>
     <version>1.0.0</version>
-    <description>Customer package: 6RS headquarters</description>
+    <description>Customer package: empty map</description>
 
-    <author email="dan@6river.com">Dan Winkler</author>
+    <author email="dan@6river.com">Dan Winkler</author> -->
     <maintainer email="dan@6river.com">Dan Winkler</maintainer>
 
     <license>TODO</license>

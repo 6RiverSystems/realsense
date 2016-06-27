@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-
 <!-- 
   *
   * (c) Copyright 2015-2016 River Systems, all rights reserved.
@@ -8,12 +7,12 @@
   *
 -->
 <package>
-    <name>srsc_6rhq</name>
+    <name>srsc_barrett</name>
     <version>1.0.0</version>
-    <description>Customer package: 6RS headquarters</description>
+    <description>Customer package: Barrett Warehouse</description>
 
-    <author email="dan@6river.com">Dan Winkler</author>
-    <maintainer email="dan@6river.com">Dan Winkler</maintainer>
+    <author email="fsantini@6river.com">Fabrizio Santini</author>
+    <maintainer email="fsantini@6river.com">Fabrizio Santini</maintainer>
 
     <license>TODO</license>
 

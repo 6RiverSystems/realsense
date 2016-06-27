@@ -6,8 +6,8 @@
   *
 -->
 <launch>
-    <arg name="customer_map" value="6rhq.yaml" />
-    <arg name="customer_anchors" value="6rhq-anchors.yaml" />
+    <arg name="customer_map" value="barrett.yaml" />
+    <arg name="customer_anchors" value="barrett-anchors.yaml" />
     <arg name="robot_configuration" value="$(optenv ROBOT_NAME development).yaml" />
 
     <arg name="paused" default="false" />
@@ -18,8 +18,8 @@
 
     <!-- Launch the robot with the specified cost parameters -->
     <include file="$(find srsbot_chuck)/launch/robot.launch">
-        <arg name="target_map" value="$(find srsc_6rhq)/map/$(arg customer_map)" />
-        <arg name="target_anchors" value="$(find srsc_6rhq)/map/$(arg customer_anchors)" />
-        <arg name="robot_configuration" value="$(find srsc_6rhq)/robots/$(arg robot_configuration)" />
+        <arg name="target_map" value="$(find srsc_barrett)/map/$(arg customer_map)" />
+        <arg name="target_anchors" value="$(find srsc_barrett)/map/$(arg customer_anchors)" />
+        <arg name="robot_configuration" value="$(find srsc_barrett)/robots/$(arg robot_configuration)" />
     </include>
 </launch>

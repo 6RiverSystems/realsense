@@ -1,6 +1,0 @@
-# Robot calibration parameters
-wheel_diameter: {left: 0, y: 0}
-
-# Stargazer calibration
-
-stargazer_offset: {x: -0.1968848584, y: 0.0803437199}

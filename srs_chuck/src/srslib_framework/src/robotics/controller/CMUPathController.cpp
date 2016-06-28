@@ -39,9 +39,6 @@ void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
         // Find the goal of the trajectory
         setGoal(currentTrajectory_.getGoal());
 
-        // Calculate the landing zone for the goal
-        calculateLanding(getGoal());
-
         // Find the first reference point on the given trajectory
         int referenceIndex = currentTrajectory_.findClosestPose(robotPose);
         referencePose_ = currentTrajectory_.getPose(referenceIndex);
@@ -64,29 +61,44 @@ void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CMUPathController::calculateLanding(Pose<> goal)
 {
-    goalLanding_.clear();
-
     Pose<> reflection = PoseMath::rotate(goal, M_PI);
     Pose<> p = PoseMath::transform(reflection, robot_.pathFollowGoalReachedDistance);
 
     reflection = PoseMath::rotate(p, M_PI_2);
-    goalLanding_.push_back(PoseMath::transform(reflection, robot_.pathFollowLandingWidth / 2));
+    Pose<> p0 = PoseMath::transform(reflection, robot_.pathFollowLandingWidth / 2);
 
     reflection = PoseMath::rotate(p, -M_PI_2);
-    goalLanding_.push_back(PoseMath::transform(reflection, robot_.pathFollowLandingWidth / 2));
+    Pose<> p1 = PoseMath::transform(reflection, robot_.pathFollowLandingWidth / 2);
 
-    reflection = goalLanding_[1];
+    reflection = p1;
     reflection.theta = goal.theta;
-    goalLanding_.push_back(PoseMath::transform(reflection, robot_.pathFollowLandingDepth));
+    Pose<> p2 = PoseMath::transform(reflection, robot_.pathFollowLandingDepth);
 
-    reflection = goalLanding_[0];
+    reflection = p0;
     reflection.theta = goal.theta;
-    goalLanding_.push_back(PoseMath::transform(reflection, robot_.pathFollowLandingDepth));
+    Pose<> p3 = PoseMath::transform(reflection, robot_.pathFollowLandingDepth);
+
+    goalLanding_.clear();
+    goalLanding_.push_back(p0);
+    goalLanding_.push_back(p1);
+    goalLanding_.push_back(p2);
+    goalLanding_.push_back(p3);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
 {
+    // If the controller has no work to do, or it has received a cancel signal or
+    // the distance to the goal is smaller than the threshold
+    // declare that the goal was reached
+    if (currentTrajectory_.empty() || isCanceled() || checkGoalReached(currentPose))
+    {
+        setGoalReached(true);
+        executeCommand(ZERO_VELOCITY);
+
+        return;
+    }
+
     // Update the projection of the current robot pose onto the path and the
     // look-ahead distance
     updateParameters(currentPose);
@@ -96,17 +108,6 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
 
     double distanceToChange = PoseMath::euclidean(currentPose, velocityChangePose_);
     ROS_DEBUG_STREAM_NAMED("CMUPathController", "Distance to change: " << distanceToChange);
-
-    // If the controller has received a cancel signal or
-    // the distance to the goal is smaller than the threshold
-    // declare that the goal was reached
-    if (isCanceled() || checkGoalReached(currentPose))
-    {
-        setGoalReached(true);
-        executeCommand(ZERO_VELOCITY);
-
-        return;
-    }
 
     // Calculate what would be the velocity change based on the set acceleration
     double deltaVelocity = robot_.pathFollowLinearAcceleration * dT;

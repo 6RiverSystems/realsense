@@ -65,7 +65,7 @@ struct Chuck : RobotProfile
         rotationRotationVelocity = AngleMath::deg2rad(40.0); // 0.7 [rad/s]
 
         stopMinLinearVelocity = 0.010; // [m/s]
-        stopNormalDeceleration = 0.700; // [m/s^2]
+        stopNormalDeceleration = 0.650; // [m/s^2]
 
         wheelDiameter = MeasurementMath::inch2m<double>(8.000); // 0.203 [m]
         wheelDistance = MeasurementMath::inch2m<double>(20.915); // 0.531 [m]

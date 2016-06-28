@@ -228,7 +228,7 @@ void CMUPathController::updateParameters(Pose<> currentPose)
     velocityChangePose_ = currentTrajectory_.getPose(velocityChangeIndex);
 
     // Recalculate the look-ahead distance
-    if (robot_.adaptiveLookAhead)
+    if (robot_.pathFollowAdaptiveLookAhead)
     {
         Pose<> projectionPose = currentTrajectory_.getPose(projectionIndex_);
 

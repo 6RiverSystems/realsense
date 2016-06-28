@@ -162,9 +162,6 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 
     isCustomActionEnabled_ = config.custom_action_enabled;
 
-    ROS_INFO_STREAM_NAMED("Motion", "Adaptive look-ahead enabled [t/f]: " <<
-        config.adaptive_lookahead_enabled);
-
     ROS_INFO_STREAM_NAMED("Motion", "Custom action enabled [t/f]: " <<
         config.custom_action_enabled);
 
@@ -199,13 +196,14 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     ROS_INFO_STREAM_NAMED("Motion", "Minimum physical linear velocity [m/s]: " <<
         config.physical_min_linear_velocity);
 
+    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: adaptive look-ahead enabled [t/f]: " <<
+        config.pathfollow_controller_adaptive_lookahead_enabled);
     ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: distance used to check if the goal was reached [m]: " <<
         config.pathfollow_controller_goal_reached_distance);
     ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: linear velocity gain []: " <<
         config.pathfollow_controller_kv);
     ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: angular velocity gain []: " <<
         config.pathfollow_controller_kw);
-
     ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: depth of the landing zone [m]: " <<
         config.pathfollow_controller_landing_depth);
     ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: width of the landing zone [m]: " <<

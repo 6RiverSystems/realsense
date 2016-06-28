@@ -11,8 +11,6 @@ namespace srs {
 struct RobotProfile
 {
     RobotProfile() :
-        adaptiveLookAhead(true),
-
         bodyWidth(0.0),
         bodyDepth(0.0),
 
@@ -33,6 +31,7 @@ struct RobotProfile
         physicalMinAngularVelocity(0.0),
         physicalMinLinearVelocity(0.0),
 
+        pathFollowAdaptiveLookAhead(true),
         pathFollowGoalReachedDistance(0.0),
         pathFollowKv(1.0),
         pathFollowKw(1.0),
@@ -68,8 +67,6 @@ struct RobotProfile
     virtual ~RobotProfile()
     {}
 
-    bool adaptiveLookAhead;
-
     double bodyWidth; // [m]
     double bodyDepth; // [m]
 
@@ -90,6 +87,7 @@ struct RobotProfile
     double physicalMinAngularVelocity; // [rad/s]
     double physicalMinLinearVelocity; // [m/s]
 
+    bool pathFollowAdaptiveLookAhead;
     double pathFollowGoalReachedDistance; // [m]
     double pathFollowKv; // []
     double pathFollowKw; // []

@@ -17,8 +17,6 @@ struct Chuck : RobotProfile
     Chuck() :
         RobotProfile()
     {
-        adaptiveLookAhead = true;
-
         bodyWidth = MeasurementMath::inch2m<double>(24.375); // 0.619 [m]
         bodyDepth = MeasurementMath::inch2m<double>(38.474); // 0.977 [m]
 
@@ -39,13 +37,14 @@ struct Chuck : RobotProfile
         physicalMinAngularVelocity = AngleMath::deg2rad(0.05); // 0.0008 [rad/s]
         physicalMinLinearVelocity = 0.005; // [m/s]
 
+        pathFollowAdaptiveLookAhead = false;
         pathFollowGoalReachedDistance = 0.025; // [m]
         pathFollowKv = 1.0; // []
         pathFollowKw = 1.0; // []
         pathFollowLandingDepth = 1.0; // [m]
         pathFollowLandingWidth = 1.0; // [m]
         pathFollowLinearAcceleration =  0.250; // [m/s^2]
-        pathFollowMaxAngularVelocity = AngleMath::deg2rad<double>(57); // 1.000 [rad/s]
+        pathFollowMaxAngularVelocity = AngleMath::deg2rad<double>(40); // 0.7000 [rad/s]
         pathFollowMaxLinearVelocity = 1.000; // [m]
         pathFollowMaxLookAheadDistance = 1.100; // [m]
         pathFollowMinLinearVelocity = 0.010; // [m/s]
@@ -53,7 +52,7 @@ struct Chuck : RobotProfile
         pathFollowSmallStraightDistance = 3.0; // [m]
         pathFollowTurningVelocity = 0.300; // [m/s]
         pathFollowTurningZoneRadius = 0.500; // [m]
-        pathFollowZeroLookAheadDistance = 0.5; // [m]
+        pathFollowZeroLookAheadDistance = 1.000; // [m]
 
         rotationGoalReachedAngle = AngleMath::deg2rad<double>(1.0); // 0.0175 [rad]
         rotationKd = 0.0; // []

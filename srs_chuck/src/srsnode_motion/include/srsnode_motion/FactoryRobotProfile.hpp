@@ -19,8 +19,6 @@ struct FactoryRobotProfile
     {
         RobotProfile robot;
 
-        robot.adaptiveLookAhead = configuration.adaptive_lookahead_enabled;
-
         robot.emergencyKv = configuration.emergency_controller_kv;
         robot.emergencyKw = configuration.emergency_controller_kw;
         robot.emergencyMaxAngularVelocity = configuration.emergency_controller_max_angular_velocity;
@@ -38,6 +36,7 @@ struct FactoryRobotProfile
         robot.physicalMinAngularVelocity = configuration.physical_min_angular_velocity;
         robot.physicalMinLinearVelocity = configuration.physical_min_linear_velocity;
 
+        robot.pathFollowAdaptiveLookAhead = configuration.pathfollow_controller_adaptive_lookahead_enabled;
         robot.pathFollowGoalReachedDistance = configuration.pathfollow_controller_goal_reached_distance;
         robot.pathFollowKv = configuration.pathfollow_controller_kv;
         robot.pathFollowKw = configuration.pathfollow_controller_kw;

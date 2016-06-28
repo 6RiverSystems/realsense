@@ -57,6 +57,7 @@ enum class LED_ENTITIES
 	PAUSE  		= 101,
 	TAIL_LEFT  	= 201,
 	TAIL_RIGHT 	= 202,
+	SCANNER 	= 203,
 	UNKNOWN
 };
 
@@ -70,6 +71,7 @@ enum class LED_MODE
 	BRAKE 		= 100,
 	TURN 		= 101,
 	SELECT 		= 102,
+	RAPID_BLINK = 103,
 	UNKNOWN
 };
 

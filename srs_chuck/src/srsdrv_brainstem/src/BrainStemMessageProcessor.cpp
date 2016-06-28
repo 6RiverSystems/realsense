@@ -33,6 +33,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_mapEntityButton[LED_ENTITIES::PAUSE]		= "PAUSE";
 	m_mapEntityButton[LED_ENTITIES::TAIL_LEFT]	= "TAIL_LEFT";
 	m_mapEntityButton[LED_ENTITIES::TAIL_RIGHT]	= "TAIL_RIGHT";
+	m_mapEntityButton[LED_ENTITIES::SCANNER]	= "SCANNER";
 
 	m_mapLedMode["OFF"] 					= LED_MODE::OFF;
 	m_mapLedMode["ON"] 						= LED_MODE::ON;
@@ -42,6 +43,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_mapLedMode["BRAKE"] 					= LED_MODE::BRAKE;
 	m_mapLedMode["TURN"] 					= LED_MODE::TURN;
 	m_mapLedMode["SELECT"] 					= LED_MODE::SELECT;
+	m_mapLedMode["RAPID_BLINK"] 			= LED_MODE::RAPID_BLINK;
 
 	m_mapMotionStatus["WIRELESS_E_STOP"]	= MOTION_STATUS::WIRELESS_E_STOP;
 	m_mapMotionStatus["BUMP_SENSOR"]		= MOTION_STATUS::BUMP_SENSOR;

@@ -11,6 +11,7 @@
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/ros/tap/RosTapMap.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_GoalArrived.hpp>
+#include <srslib_framework/ros/tap/RosTapInternal_RobotPose.hpp>
 
 #include <srsnode_executive/tap/RosTapCmd_Goal.hpp>
 #include <srsnode_executive/tap/RosTapCmd_InitialPose.hpp>
@@ -72,6 +73,7 @@ private:
     RosTapCmd_Pause tapCmdPause_;
     RosTapCmd_Shutdown tapCmdShutdown_;
     RosTapInternal_GoalArrived tapInternal_GoalArrived_;
+    RosTapInternal_RobotPose tapInternal_RobotPose_;
 
     RosTapMap tapMap_;
 };

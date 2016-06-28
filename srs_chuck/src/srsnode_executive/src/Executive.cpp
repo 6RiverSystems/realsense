@@ -27,6 +27,8 @@ Executive::Executive(string nodeName) :
 
     robotInitialPose_ = Pose<>(0, 3.0, 3.0, 0);
     robotCurrentPose_ = robotInitialPose_;
+
+    publishInternalInitialPose(robotInitialPose_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,6 +40,8 @@ void Executive::run()
     while (ros::ok())
     {
         ros::spinOnce();
+
+        robotCurrentPose_ = tapInternal_RobotPose_.getPose();
 
         stepExecutiveFunctions();
 
@@ -57,6 +61,7 @@ void Executive::connectAllTaps()
     tapCmdPause_.connectTap();
     tapCmdShutdown_.connectTap();
     tapInternal_GoalArrived_.connectTap();
+    tapInternal_RobotPose_.connectTap();
 
     tapMap_.connectTap();
 }
@@ -70,6 +75,7 @@ void Executive::disconnectAllTaps()
     tapCmdPause_.disconnectTap();
     tapCmdShutdown_.disconnectTap();
     tapInternal_GoalArrived_.disconnectTap();
+    tapInternal_RobotPose_.disconnectTap();
 
     tapMap_.disconnectTap();
 }
@@ -87,6 +93,7 @@ void Executive::executeArrived()
 void Executive::executeInitialPose(Pose<> initialPose)
 {
     robotInitialPose_ = initialPose;
+    publishInternalInitialPose(robotInitialPose_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,20 +109,25 @@ void Executive::executePlanToGoal(Pose<> goal)
     // The requested goal is transformed so that it coincides with
     // where the robot screen will be
     currentGoal_ = PoseMath::transform<double>(goal, chuck.bodyDepth / 2);
+    publishInternalGoal(currentGoal_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::executePlanToMove(Pose<> goal)
 {
-//    Chuck chuck;
-//    double angle = PoseMath::measureAngle(goal, robotCurrentPose_);
-//
-//    // Keep the goal in line with current robot pose
-//    goalPose.x = (abs(goalPose.x - robotPose.x) < chuck.bodyWidth / 2) ? robotPose.x : goalPose.x;
-//    goalPose.y = (abs(goalPose.y - robotPose.y) < chuck.bodyDepth / 2) ? robotPose.y : goalPose.y;
-//
-//
-    currentGoal_ = goal;
+    Pose<> newGoal = goal;
+
+    if (abs(PoseMath::measureAngle(newGoal, robotCurrentPose_)) < 0.2)
+    {
+        Pose<> newPose = robotCurrentPose_;
+        newPose.theta = goal.theta;
+
+        double distance = PoseMath::euclidean<double>(goal, robotCurrentPose_);
+        newGoal = PoseMath::transform<double>(newPose, distance);
+    }
+
+    currentGoal_ = newGoal;
+    publishInternalGoal(currentGoal_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -204,20 +216,17 @@ void Executive::stepExecutiveFunctions()
     if (tapCmdMove_.newDataAvailable())
     {
         executePlanToMove(tapCmdMove_.getPose());
-        publishInternalGoal(currentGoal_);
     }
 
     // If there is a new goal to reach
     if (tapCmdGoal_.newDataAvailable())
     {
         executePlanToGoal(tapCmdGoal_.getPose());
-        publishInternalGoal(currentGoal_);
     }
 
     if (tapCmdInitialPose_.newDataAvailable())
     {
         executeInitialPose(tapCmdInitialPose_.getPose());
-        publishInternalInitialPose(robotInitialPose_);
     }
 
     if (tapCmdPause_.isNewValueTrue())

@@ -15,11 +15,11 @@ using namespace std;
 
 namespace srs {
 
-class RosTapInternal_InitialPose :
+class RosTapInternal_RobotPose :
     public RosTapMsgPose
 {
 public:
-    RosTapInternal_InitialPose() :
+    RosTapInternal_RobotPose() :
         RosTapMsgPose("/internal/state/robot_pose", "Internal robot pose")
     {}
 };

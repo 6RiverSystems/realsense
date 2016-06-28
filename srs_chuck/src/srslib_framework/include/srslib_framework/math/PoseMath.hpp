@@ -28,6 +28,12 @@ struct PoseMath
     }
 
     template<typename TYPE = double>
+    inline static TYPE dot(Pose<TYPE> p1, Pose<TYPE> p2)
+    {
+        return p1.x * p2.x + p1.y * p2.y;
+    }
+
+    template<typename TYPE = double>
     inline static TYPE euclidean(Pose<TYPE> p1, Pose<TYPE> p2)
     {
         TYPE deltaX = p1.x - p2.x;
@@ -60,6 +66,20 @@ struct PoseMath
 
         return (P2_P3.dot(PC - P2_P3) <= 0.0 && P2_P3.dot(PC + P2_P3) >= 0.0) &&
                (P0_P3.dot(PC - P0_P3) <= 0.0 && P0_P3.dot(PC + P0_P3) >= 0.0);
+    }
+
+    template<typename TYPE = double>
+    inline static TYPE measureAngle(Pose<TYPE> p1, Pose<TYPE> p2)
+    {
+        return AngleMath::normalizeAngleRad(
+            acos(PoseMath::dot<TYPE>(p1, p2) /
+                (PoseMath::norm<TYPE>(p1) * PoseMath::norm<TYPE>(p2))));
+    }
+
+    template<typename TYPE = double>
+    inline static TYPE norm(Pose<TYPE> p)
+    {
+        return sqrt(PoseMath::dot<TYPE>(p, p));
     }
 
     // TODO: Better implement this function. The type of R should not be fixed but

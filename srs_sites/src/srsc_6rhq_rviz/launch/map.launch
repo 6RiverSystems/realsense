@@ -38,6 +38,6 @@
     <include file="$(find srsbot_chuck)/launch/robot.launch">
         <arg name="target_map" value="$(find srsc_6rhq)/map/$(arg customer_map)" />
         <arg name="target_anchors" value="$(find srsc_6rhq)/map/$(arg customer_anchors)" />
-        <arg name="robot_configuration" value="$(find srsc_6rhq_norviz)/robots/$(arg robot_configuration)" />
+        <arg name="robot_configuration" value="$(find srsc_6rhq_rviz)/robots/$(arg robot_configuration)" />
     </include>
 </launch>

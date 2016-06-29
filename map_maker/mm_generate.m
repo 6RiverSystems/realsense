@@ -1,13 +1,5 @@
 function map = mm_generate(map)
 
-    RGB_RED = 1;
-    RGB_GREEN = 2;
-    RGB_BLUE = 3;
-    
-    BIT_OD = 8;
-    BIT_GO_SLOW = 7;
-    BIT_NO_ROTATIONS = 6;
-
     MAX_VALUE = intmax('uint8');
     
     for r = 1:map.heightCells
@@ -19,7 +11,7 @@ function map = mm_generate(map)
             % - no static-obstacle
             % - OD is enabled
             % - general cost is 0
-            pixel = uint8([0, 128, 0]);
+            red = uint8(0);
             
             cost = data.cost;
             if isempty(cost)
@@ -30,24 +22,15 @@ function map = mm_generate(map)
             end
             
             if checkFlag(data, 'STATIC_OBSTACLE')
-                pixel(RGB_RED) = MAX_VALUE;
+                red = MAX_VALUE;
                 cost = 0;
             end
-            if checkFlag(data, 'OD')
-                bitset(pixel(RGB_GREEN), BIT_OD, data.('OD'));
-            end
-            if checkFlag(data, 'GO_SLOW')
-                bitset(pixel(RGB_GREEN), BIT_GO_SLOW, true);
-            end
-            if checkFlag(data, 'NO_ROTATIONS')
-                bitset(pixel(RGB_GREEN), BIT_NO_ROTATIONS, true);
-            end
+            green = calculateGreen(data);
+            blue = uint8(cost);
             
-            pixel(RGB_BLUE) = uint8(cost);
-            
-            map.image(r, c, 1) = pixel(RGB_RED);
-            map.image(r, c, 2) = pixel(RGB_GREEN);
-            map.image(r, c, 3) = pixel(RGB_BLUE);
+            map.image(r, c, 1) = red;
+            map.image(r, c, 2) = green;
+            map.image(r, c, 3) = blue;
         end
     end
     
@@ -62,4 +45,37 @@ function flag = checkFlag(data, field)
             flag = data.(field);
         end
     end 
+end
+
+function green = calculateGreen(data)
+
+    BIT_OD = 8;
+    BIT_GO_SLOW = 7;
+    BIT_NO_ROTATIONS = 6;
+    
+    BIT_PREFERRED_2 = 5;
+    BIT_PREFERRED_1 = 4;
+    BIT_PREFERRED_0 = 3;
+
+    green = bitset(0, BIT_OD, true);
+    
+    if checkFlag(data, 'OD')
+        green = bitset(green, BIT_OD, data.('OD'));
+    end
+    if checkFlag(data, 'GO_SLOW')
+        green = bitset(green, BIT_GO_SLOW, true);
+    end
+    if checkFlag(data, 'NO_ROTATIONS')
+        green = bitset(green, BIT_NO_ROTATIONS, true);
+    end
+    if checkFlag(data, 'PREFERRED_180')
+        green = bitset(green, BIT_PREFERRED_2, true);
+        green = bitset(green, BIT_PREFERRED_1, true);
+        green = bitset(green, BIT_PREFERRED_0, false);
+    end
+    if checkFlag(data, 'PREFERRED_0')
+        green = bitset(green, BIT_PREFERRED_2, true);
+        green = bitset(green, BIT_PREFERRED_1, false);
+        green = bitset(green, BIT_PREFERRED_0, false);
+    end
 end

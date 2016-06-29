@@ -40,19 +40,20 @@ struct SearchAction
     static array<ActionEnum, 5> ACTIONS;
 
     static SearchAction<GRAPH>* instanceOf(ActionEnum action,
-        GRAPH* graph, SearchNode<GRAPH>* associatedNode)
+        GRAPH* graph, SearchNode<GRAPH>* parentNode)
     {
         switch (action)
         {
-            case FORWARD: return addForward(graph, associatedNode);
-            case BACKWARD: return addBackward(graph, associatedNode);
-            case ROTATE_M90: return addRotation(graph, associatedNode, ROTATE_M90, -90);
-            case ROTATE_P90: return addRotation(graph, associatedNode, ROTATE_P90, 90);
-            case ROTATE_180: return addRotation(graph, associatedNode, ROTATE_180, 180);
+            case FORWARD: return addForward(graph, parentNode);
+            case BACKWARD: return addBackward(graph, parentNode);
+            case ROTATE_M90: return addRotation(graph, parentNode, ROTATE_M90, -90);
+            case ROTATE_P90: return addRotation(graph, parentNode, ROTATE_P90, 90);
+            case ROTATE_180: return addRotation(graph, parentNode, ROTATE_180, 180);
         }
 
-        return new SearchAction(action, associatedNode->action->position,
-            associatedNode->action->g, associatedNode->action->h);
+        return new SearchAction(action,
+            parentNode->action->position,
+            parentNode->action->g, parentNode->action->h);
     }
 
     static SearchAction<GRAPH>* instanceOf(ActionEnum action,
@@ -97,13 +98,13 @@ private:
 
     static unordered_map<int, string> ENUM_NAMES;
 
-    static SearchAction<GRAPH>* addBackward(GRAPH* graph, SearchNode<GRAPH>* associatedNode)
+    static SearchAction<GRAPH>* addBackward(GRAPH* graph, SearchNode<GRAPH>* parentNode)
     {
-        int currentOrientation = associatedNode->action->position.orientation;
+        int currentOrientation = parentNode->action->position.orientation;
         int direction = AngleMath::normalizeAngleDeg(currentOrientation - 180);
 
         typename GRAPH::LocationType neighbor;
-        if (graph->getNeighbor(associatedNode->action->position.location, direction, neighbor))
+        if (graph->getNeighbor(parentNode->action->position.location, direction, neighbor))
         {
             SearchAction<GRAPH>* newAction = new SearchAction<GRAPH>(BACKWARD);
             SearchPosition<GRAPH> newPosition(neighbor, currentOrientation);
@@ -113,12 +114,12 @@ private:
             unsigned int locationCost = graph->getCost(neighbor);
             locationCost = getLocationCost(locationCost, note);
 
-            unsigned int commandCost = getCommandCost(BACKWARD, note);
+            unsigned int commandCost = getCommandCost(BACKWARD, currentOrientation, note);
             unsigned int totalCost = BasicMath::noOverflowAdd(locationCost, commandCost);
 
             newAction->position = newPosition;
-            newAction->g = BasicMath::noOverflowAdd(associatedNode->action->g, totalCost);
-            newAction->h = associatedNode->action->h;
+            newAction->g = BasicMath::noOverflowAdd(parentNode->action->g, totalCost);
+            newAction->h = parentNode->action->h;
 
             return newAction;
         }
@@ -126,12 +127,12 @@ private:
         return nullptr;
     }
 
-    static SearchAction<GRAPH>* addForward(GRAPH* graph, SearchNode<GRAPH>* associatedNode)
+    static SearchAction<GRAPH>* addForward(GRAPH* graph, SearchNode<GRAPH>* parentNode)
     {
-        int currentOrientation = associatedNode->action->position.orientation;
+        int currentOrientation = parentNode->action->position.orientation;
 
         typename GRAPH::LocationType neighbor;
-        if (graph->getNeighbor(associatedNode->action->position.location, currentOrientation, neighbor))
+        if (graph->getNeighbor(parentNode->action->position.location, currentOrientation, neighbor))
         {
             SearchAction<GRAPH>* newAction = new SearchAction<GRAPH>(FORWARD);
             SearchPosition<GRAPH> newPosition(neighbor, currentOrientation);
@@ -141,12 +142,12 @@ private:
             unsigned int locationCost = graph->getCost(neighbor);
             locationCost = getLocationCost(locationCost, note);
 
-            unsigned int commandCost = getCommandCost(FORWARD, note);
+            unsigned int commandCost = getCommandCost(FORWARD, currentOrientation, note);
             unsigned int totalCost = BasicMath::noOverflowAdd(locationCost, commandCost);
 
             newAction->position = newPosition;
-            newAction->g = BasicMath::noOverflowAdd(associatedNode->action->g, totalCost);
-            newAction->h = associatedNode->action->h;
+            newAction->g = BasicMath::noOverflowAdd(parentNode->action->g, totalCost);
+            newAction->h = parentNode->action->h;
 
             return newAction;
         }
@@ -154,28 +155,28 @@ private:
         return nullptr;
     }
 
-    static SearchAction<GRAPH>* addRotation(GRAPH* graph, SearchNode<GRAPH>* associatedNode,
+    static SearchAction<GRAPH>* addRotation(GRAPH* graph, SearchNode<GRAPH>* parentNode,
         ActionEnum actionEnum, int angle)
     {
         SearchAction<GRAPH>* newAction = new SearchAction<GRAPH>(actionEnum);
-        int currentOrientation = associatedNode->action->position.orientation;
+        int currentOrientation = parentNode->action->position.orientation;
 
         int newOrientation = AngleMath::normalizeAngleDeg(currentOrientation + angle);
-        SearchPosition<GRAPH> newPosition(associatedNode->action->position, newOrientation);
+        SearchPosition<GRAPH> newPosition(parentNode->action->position, newOrientation);
 
         const MapNote* note = reinterpret_cast<const MapNote*>(
-            graph->getNote(associatedNode->action->position.location));
+            graph->getNote(parentNode->action->position.location));
 
-        unsigned int commandCost = getCommandCost(actionEnum, note);
+        unsigned int commandCost = getCommandCost(actionEnum, newOrientation, note);
 
         newAction->position = newPosition;
-        newAction->g = BasicMath::noOverflowAdd(associatedNode->action->g, commandCost);
-        newAction->h = associatedNode->action->h;
+        newAction->g = BasicMath::noOverflowAdd(parentNode->action->g, commandCost);
+        newAction->h = parentNode->action->h;
 
         return newAction;
     }
 
-    static unsigned int getCommandCost(ActionEnum action, const MapNote* MapNote)
+    static unsigned int getCommandCost(ActionEnum action, int orientation, const MapNote* mapNote)
     {
         unsigned int forward = 1;
         unsigned int backward = 40;
@@ -183,13 +184,21 @@ private:
         unsigned int rotateP90 = 4;
         unsigned int rotate180 = 4;
 
-        if (MapNote)
+        if (mapNote)
         {
-            if (MapNote->noRotations())
+            if (mapNote->noRotations())
             {
                 rotateM90 = MAX_COST;
                 rotateP90 = MAX_COST;
                 rotate180 = MAX_COST;
+            }
+
+            if (mapNote->preferred())
+            {
+                if (orientation != mapNote->preferredAngle())
+                {
+                    forward += 10;
+                }
             }
         }
 
@@ -203,13 +212,13 @@ private:
         }
     }
 
-    static unsigned int getLocationCost(unsigned int locationCost, const MapNote* MapNote)
+    static unsigned int getLocationCost(unsigned int locationCost, const MapNote* mapNote)
     {
         unsigned int staticObstacle = 0;
 
-        if (MapNote)
+        if (mapNote)
         {
-            staticObstacle = MapNote->staticObstacle() ? MAX_COST : 0;
+            staticObstacle = mapNote->staticObstacle() ? MAX_COST : 0;
         }
 
         return BasicMath::noOverflowAdd(locationCost, staticObstacle);
@@ -219,10 +228,10 @@ private:
 template<typename GRAPH>
 array<typename SearchAction<GRAPH>::ActionEnum, 5> SearchAction<GRAPH>::ACTIONS = {
     FORWARD,
-    BACKWARD,
+//    BACKWARD,
     ROTATE_M90,
     ROTATE_P90,
-    ROTATE_180
+//    ROTATE_180
 };
 
 template<typename GRAPH>

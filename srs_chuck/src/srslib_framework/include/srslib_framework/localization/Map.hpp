@@ -78,13 +78,6 @@ public:
     void setGrid(const vector<int8_t>& costsGrid, const vector<int8_t>& notesGrid);
 
 private:
-    const unsigned char FLAG_OD = 0x80;
-    const unsigned char FLAG_GO_SLOW = 0x40;
-    const unsigned char FLAG_NO_ROTATIONS = 0x20;
-    const unsigned char FLAG_STATIC_OBSTACLE = 0x01;
-
-    MapNote* createNote(unsigned char flags, MapNote* note = nullptr);
-
     void loadConfiguration();
     void loadCosts();
 

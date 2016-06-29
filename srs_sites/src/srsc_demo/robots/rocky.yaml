@@ -4,5 +4,8 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 
-image: empty.png
-resolution: 0.100
+# Robot calibration parameters
+wheel_diameter: {left: 0, y: 0}
+
+# Stargazer calibration
+stargazer_offset: {x: -0.1365720914, y: 0.1182569879}

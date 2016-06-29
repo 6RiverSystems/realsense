@@ -8,12 +8,12 @@
   *
 -->
 <package>
-    <name>srsc_6rhq_rviz</name>
+    <name>srsc_demo</name>
     <version>1.0.0</version>
-    <description>Customer package: 6RS HQ - no constraints</description>
+    <description>Customer package: 6RS HQ - direction constraints in the central aisle</description>
 
-    <author email="dan@6river.com">Dan Winkler</author> -->
-    <maintainer email="dan@6river.com">Dan Winkler</maintainer>
+    <author email="fsantini@6river.com">Fabrizio Santini</author>
+    <maintainer email="fsantini@6river.com">Fabrizio Santini</maintainer>
 
     <license>TODO</license>
 

@@ -96,7 +96,7 @@ void Map::getCostsGrid(vector<int8_t>& costsGrid)
                 // This is only for visualization purposes as
                 // a static obstacle information is carried by the map note
                 MapNote* note = reinterpret_cast<MapNote*>(grid_->getNote(location));
-                if (note->staticObstacle())
+                if (note && note->staticObstacle())
                 {
                     cost = 100.0;
                 }
@@ -120,30 +120,10 @@ void Map::getNotesGrid(vector<int8_t>& notesGrid)
             {
                 Grid2dLocation location = Grid2dLocation(col, row);
 
-                int8_t notes = 0;
                 MapNote* note = reinterpret_cast<MapNote*>(grid_->getNote(location));
+                int8_t flags = note ? note->getFlags() : 0;
 
-                if (note->od())
-                {
-                    notes |= FLAG_OD;
-                }
-
-                if (note->noRotations())
-                {
-                    notes |= FLAG_NO_ROTATIONS;
-                }
-
-                if (note->goSlow())
-                {
-                    notes |= FLAG_GO_SLOW;
-                }
-
-                if (note->staticObstacle())
-                {
-                    notes |= FLAG_STATIC_OBSTACLE;
-                }
-
-                notesGrid.push_back(static_cast<int8_t>(notes));
+                notesGrid.push_back(flags);
             }
         }
     }
@@ -181,12 +161,19 @@ void Map::setGrid(const vector<int8_t>& costsGrid, const vector<int8_t>& notesGr
             {
                 Grid2dLocation location = Grid2dLocation(col, row);
 
-                MapNote* note = reinterpret_cast<MapNote*>(grid_->getNote(location));
-
-                char notes = *notesIterator;
+                char flags = *notesIterator;
                 float cost = (static_cast<float>(*costsIterator) / 100) * 255;
 
-                note = createNote(notes, note);
+                MapNote* note = reinterpret_cast<MapNote*>(grid_->getNote(location));
+                if (note)
+                {
+                    note->add(flags);
+                }
+                else
+                {
+                    note = MapNote::instanceOf(flags);
+                }
+
                 grid_->addValue(location, static_cast<unsigned int>(cost), note);
 
                 costsIterator++;
@@ -198,42 +185,7 @@ void Map::setGrid(const vector<int8_t>& costsGrid, const vector<int8_t>& notesGr
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-MapNote* Map::createNote(unsigned char flags, MapNote* note)
-{
-    if (!note)
-    {
-        note = new MapNote();
-    }
-    note->reset();
-
-    if (flags & FLAG_GO_SLOW)
-    {
-        note->add(MapNote::GO_SLOW);
-    }
-
-    if (flags & FLAG_NO_ROTATIONS)
-    {
-        note->add(MapNote::NO_ROTATIONS);
-    }
-
-    if (flags & FLAG_OD)
-    {
-        note->add(MapNote::ENABLE_OD);
-    }
-    else
-    {
-        note->add(MapNote::DISABLE_OD);
-    }
-
-    if (flags & FLAG_STATIC_OBSTACLE)
-    {
-        note->add(MapNote::STATIC_OBSTACLE);
-    }
-
-    return note;
-}
+//
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Map::loadConfiguration()
@@ -327,12 +279,12 @@ void Map::loadCosts()
             unsigned char alpha = *(pixel + 3);
 
             Grid2dLocation location = Grid2dLocation(col, heightC_ - row - 1);
-            MapNote* note = createNote(green);
+            MapNote* note = MapNote::instanceOf(green);
 
             // Static obstacles have priority on every other note.
             if (red > 0)
             {
-                note->add(MapNote::STATIC_OBSTACLE);
+                note->join(MapNote::STATIC_OBSTACLE);
             }
 
             unsigned int cost = static_cast<unsigned int>(blue);

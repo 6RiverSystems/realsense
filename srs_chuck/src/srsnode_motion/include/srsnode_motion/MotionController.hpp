@@ -118,10 +118,14 @@ private:
     typedef SolutionNode<Grid2d> SolutionNodeType;
     typedef pair<int, SolutionType*> WorkType;
 
+    void aggregateInitialRotations(Pose<> pose, SolutionType*& solution, SolutionType*& rotation);
+    void aggregateFinalRotations(SolutionType*& solution, SolutionType*& rotation);
+
     void checkMotionStatus();
     void cleanWorkQueue();
 
     void executeCommand(bool enforce, CommandEnum command, const Velocity<>* velocity = nullptr);
+    void executeFinalRotation();
 
     bool isEmergencyControllerActive()
     {
@@ -182,14 +186,13 @@ private:
         return false;
     }
 
-    void optimizeRotations();
-
     string printWorkToString();
     void popWorkItem(TaskEnum& task, SolutionType& solution);
     void prependWorkItem(TaskEnum task, SolutionType* solution = nullptr);
     void publishLookAheadDistance();
     void pumpWorkFromQueue();
     void pushWorkItem(TaskEnum task, SolutionType* solution = nullptr);
+    void pushWorkSolution(SolutionType& solution);
 
     void selectController(TaskEnum task);
 

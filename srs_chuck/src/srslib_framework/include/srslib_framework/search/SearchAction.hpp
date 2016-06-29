@@ -37,7 +37,7 @@ struct SearchAction
         START
     };
 
-    static array<ActionEnum, 5> ACTIONS;
+    static array<ActionEnum, 5> ALLOWED_ACTIONS;
 
     static SearchAction<GRAPH>* instanceOf(ActionEnum action,
         GRAPH* graph, SearchNode<GRAPH>* parentNode)
@@ -226,12 +226,10 @@ private:
 };
 
 template<typename GRAPH>
-array<typename SearchAction<GRAPH>::ActionEnum, 5> SearchAction<GRAPH>::ACTIONS = {
+array<typename SearchAction<GRAPH>::ActionEnum, 5> SearchAction<GRAPH>::ALLOWED_ACTIONS = {
     FORWARD,
-//    BACKWARD,
     ROTATE_M90,
-    ROTATE_P90,
-//    ROTATE_180
+    ROTATE_P90
 };
 
 template<typename GRAPH>

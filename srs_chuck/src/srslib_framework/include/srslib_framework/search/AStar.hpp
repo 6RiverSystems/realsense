@@ -118,7 +118,7 @@ public:
                 toX, toY);
 
             toTheta = AngleMath::deg2rad<double>(toCursor->action->position.orientation);
-            toPose = Pose<>(toX, toY, toTheta);
+            toPose = Pose<>(toX, toY, AngleMath::normalizeAngleRad<double>(toTheta));
 
             if (fromCursor)
             {
@@ -127,7 +127,7 @@ public:
                     fromX, fromY);
 
                 fromTheta = AngleMath::deg2rad<double>(fromCursor->action->position.orientation);
-                fromPose = Pose<>(fromX, fromY, fromTheta);
+                fromPose = Pose<>(fromX, fromY, AngleMath::normalizeAngleRad<double>(fromTheta));
             }
 
             switch (toCursor->action->actionType)
@@ -236,7 +236,7 @@ public:
                 return true;
             }
 
-            for (auto action : SearchActionType::ACTIONS)
+            for (auto action : SearchActionType::ALLOWED_ACTIONS)
             {
                 SearchActionType* searchAction = SearchActionType::instanceOf(
                     action,

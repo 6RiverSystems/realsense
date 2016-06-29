@@ -96,68 +96,9 @@ void MotionController::execute(SolutionType solution)
 
     if (!solution.empty())
     {
-        // Create a copy of the specified solution
-        SolutionType* pathSolution = new SolutionType(solution);
-
-        // TODO: Make sure that it can handle multiple rotations.
-        // Is there a use case like that?: In theory A* can generate a solution
-        // with multiple rotations at the beginning to avoid the costly 180 rotation
-
-        SolutionType* initialRotationSolution = nullptr;
-        SolutionType* finalRotationSolution = nullptr;
-
-        // Check if the solution starts with a rotation. If that is the case
-        // replace it with rotation that takes in account the current pose
-        // of the robot
-        SolutionNodeType startNode = pathSolution->getStart();
-        if (startNode.actionType == SolutionNodeType::ROTATE)
-        {
-            startNode.fromPose = currentPose_;
-            initialRotationSolution = new SolutionType(startNode);
-
-            // Remove the rotation from the original solution
-            pathSolution->erase(pathSolution->begin());
-        }
-
-        // Check if the solution ends with a rotation. If that is the case
-        // replace it with controlled rotation
-        if (!pathSolution->empty())
-        {
-            SolutionNodeType goalNode = pathSolution->getGoal();
-            if (goalNode.actionType == SolutionNodeType::ROTATE)
-            {
-                finalRotationSolution = new SolutionType(goalNode);
-
-                // Remove the rotation from the original solution
-                pathSolution->erase(pathSolution->end() - 1);
-            }
-        }
-
-        // Push the solutions into the work queue
-        if (initialRotationSolution)
-        {
-            pushWorkItem(TaskEnum::ROTATE, initialRotationSolution);
-            currentFinalGoal_ = initialRotationSolution->getGoal().toPose;
-        }
-
-        // If the path solution is not empty, push it into
-        // the work queue
-        if (!pathSolution->empty())
-        {
-            pushWorkItem(TaskEnum::PATH_FOLLOW, pathSolution);
-            currentFinalGoal_ = pathSolution->getGoal().toPose;
-        }
-        else
-        {
-            // Otherwise get rid of it
-            delete pathSolution;
-        }
-
-        if (finalRotationSolution)
-        {
-            pushWorkItem(TaskEnum::ROTATE, finalRotationSolution);
-            currentFinalGoal_ = finalRotationSolution->getGoal().toPose;
-        }
+        // Decompose the solution in work items and
+        // push them in the queue
+        pushWorkSolution(solution);
     }
     else
     {
@@ -303,6 +244,78 @@ void MotionController::switchToAutonomous()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void MotionController::aggregateInitialRotations(Pose<> pose,
+    SolutionType*& solution, SolutionType*& rotation)
+{
+    // Do nothing if there is nothing in the solution to process
+    if (solution->empty())
+    {
+        return;
+    }
+
+    // Check if the solution starts with a rotation. If that is the case
+    // replace it with rotation that takes in account the specified initial pose
+    SolutionNodeType node = solution->getStart();
+    if (node.actionType != SolutionNodeType::ROTATE)
+    {
+        return;
+    }
+
+    Pose<> fromPose = Pose<>(node.fromPose.x, node.fromPose.y, pose.theta);
+
+    // Remove all the ROTATE nodes at the beginning of the solution
+    while (node.actionType == SolutionNodeType::ROTATE)
+    {
+        // Remove the rotation from the original solution
+        solution->erase(solution->begin());
+
+        // Try the next solution node
+        node = solution->getStart();
+    }
+
+    double theta = node.toPose.theta;
+    Pose<> toPose = Pose<>(fromPose.x, fromPose.y, AngleMath::normalizeAngleRad<double>(theta));
+
+    node = SolutionNodeType(SolutionNodeType::ROTATE, fromPose, toPose);
+    rotation = new SolutionType(node);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void MotionController::aggregateFinalRotations(SolutionType*& solution, SolutionType*& rotation)
+{
+    // Do nothing if there is nothing in the solution to process
+    if (solution->empty())
+    {
+        return;
+    }
+
+    // Check if the solution ends with a rotation
+    SolutionNodeType node = solution->getGoal();
+    if (node.actionType != SolutionNodeType::ROTATE)
+    {
+        return;
+    }
+
+    Pose<> toPose = node.toPose;
+
+    // Remove all the ROTATE nodes at the end of the solution
+    while (node.actionType == SolutionNodeType::ROTATE)
+    {
+        // Remove the rotation from the original solution
+        solution->erase(solution->end() - 1);
+
+        // Try the next solution node
+        node = solution->getGoal();
+    }
+
+    double theta = node.fromPose.theta;
+    Pose<> fromPose = Pose<>(toPose.x, toPose.y, AngleMath::normalizeAngleRad<double>(theta));
+
+    node = SolutionNodeType(SolutionNodeType::ROTATE, fromPose, toPose);
+    rotation = new SolutionType(node);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::executeCommand(bool enforce, CommandEnum command, const Velocity<>* velocity)
 {
     geometry_msgs::Twist messageTwist;
@@ -345,6 +358,43 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void MotionController::executeFinalRotation()
+{
+    double finalTheta = 0.0;
+
+    if (isScheduledNext(TaskEnum::ROTATE))
+    {
+        // Remove the scheduled rotation from the work queue
+        TaskEnum rotateTask;
+        SolutionType rotateSolution;
+
+        popWorkItem(rotateTask, rotateSolution);
+
+        // Extract the final theta from the goal
+        finalTheta = rotateSolution.getGoal().toPose.theta;
+    }
+    else
+    {
+        finalTheta = activeController_->getGoal().theta;
+    }
+
+    // If the current angle of the robot is not what was asked
+    if (!AngleMath::equalRad<double>(finalTheta, currentPose_.theta,
+        robot_.rotationGoalReachedAngle))
+    {
+        ROS_DEBUG_STREAM_NAMED("MotionController", "Rotation needed from: " <<
+            AngleMath::rad2deg<double>(currentPose_.theta) << "deg to: " <<
+            AngleMath::rad2deg<double>(finalTheta) << "deg");
+
+        SolutionType* solution = SolutionGenerator<Grid2d>::fromRotation(
+            currentPose_,
+            currentPose_.theta, finalTheta);
+
+        prependWorkItem(TaskEnum::ROTATE, solution);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::checkMotionStatus()
 {
     // If the stand controller is currently active and there is work in
@@ -377,7 +427,7 @@ void MotionController::checkMotionStatus()
         {
             // Try to optimize rotations checking the next work scheduled
             // and the current orientation of the robot
-            optimizeRotations();
+            executeFinalRotation();
         }
 
         // If the robot was using moving controllers, but everything has
@@ -417,43 +467,6 @@ void MotionController::cleanWorkQueue()
         {
             delete work.second;
         }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void MotionController::optimizeRotations()
-{
-    double finalTheta = 0.0;
-
-    if (isScheduledNext(TaskEnum::ROTATE))
-    {
-        // Remove the scheduled rotation from the work queue
-        TaskEnum rotateTask;
-        SolutionType rotateSolution;
-
-        popWorkItem(rotateTask, rotateSolution);
-
-        // Extract the final theta from the goal
-        finalTheta = rotateSolution.getGoal().toPose.theta;
-    }
-    else
-    {
-        finalTheta = activeController_->getGoal().theta;
-    }
-
-    // If the current angle of the robot is not what was asked
-    if (!AngleMath::equalRad<double>(finalTheta, currentPose_.theta,
-        robot_.rotationGoalReachedAngle))
-    {
-        ROS_DEBUG_STREAM_NAMED("MotionController", "Rotation needed from: " <<
-            AngleMath::rad2deg<double>(currentPose_.theta) << "deg to: " <<
-            AngleMath::rad2deg<double>(finalTheta) << "deg");
-
-        SolutionType* solution = SolutionGenerator<Grid2d>::fromRotation(
-            currentPose_,
-            currentPose_.theta, finalTheta);
-
-        prependWorkItem(TaskEnum::ROTATE, solution);
     }
 }
 
@@ -584,6 +597,45 @@ void MotionController::pushWorkItem(TaskEnum task, SolutionType* solution)
     }
 
     work_.push_back(WorkType(task, solution));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void MotionController::pushWorkSolution(SolutionType& solution)
+{
+    // Create a copy of the specified solution
+    SolutionType* pathSolution = new SolutionType(solution);
+
+    SolutionType* initialRotationSolution = nullptr;
+    aggregateInitialRotations(currentPose_, pathSolution, initialRotationSolution);
+
+    SolutionType* finalRotationSolution = nullptr;
+    aggregateFinalRotations(pathSolution, finalRotationSolution);
+
+    // Push the solutions into the work queue
+    if (initialRotationSolution)
+    {
+        pushWorkItem(TaskEnum::ROTATE, initialRotationSolution);
+        currentFinalGoal_ = initialRotationSolution->getGoal().toPose;
+    }
+
+    // If the path solution is not empty, push it into
+    // the work queue
+    if (!pathSolution->empty())
+    {
+        pushWorkItem(TaskEnum::PATH_FOLLOW, pathSolution);
+        currentFinalGoal_ = pathSolution->getGoal().toPose;
+    }
+    else
+    {
+        // Otherwise get rid of it
+        delete pathSolution;
+    }
+
+    if (finalRotationSolution)
+    {
+        pushWorkItem(TaskEnum::ROTATE, finalRotationSolution);
+        currentFinalGoal_ = finalRotationSolution->getGoal().toPose;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -52,7 +52,7 @@ struct Chuck : RobotProfile
         pathFollowSmallStraightDistance = 3.0; // [m]
         pathFollowTurningVelocity = 0.300; // [m/s]
         pathFollowTurningZoneRadius = 0.500; // [m]
-        pathFollowZeroLookAheadDistance = 1.000; // [m]
+        pathFollowZeroLookAheadDistance = 0.800; // [m]
 
         rotationGoalReachedAngle = AngleMath::deg2rad<double>(1.0); // 0.0175 [rad]
         rotationKd = 0.0; // []

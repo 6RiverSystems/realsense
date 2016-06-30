@@ -275,7 +275,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 	{
 		m_filter.reportDeadZone( );
 
-		ROS_DEBUG_NAMED( "transform", "Invalid or Unknown Tag: %04i (%2.2f, %2.2f, %2.2f) %2.2f degrees\n",
+		ROS_DEBUG_NAMED( "calibrate", "Invalid or Unknown Tag: %04i (%2.2f, %2.2f, %2.2f) %2.2f degrees\n",
 			nTagId, fX, fY, fZ, fAngleInDegrees );
 	}
 

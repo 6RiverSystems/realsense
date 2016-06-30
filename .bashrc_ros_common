@@ -1,5 +1,5 @@
 export ROS_HOSTNAME=$ROBOT_NAME
-export ROS_MAP=barrett
+export ROS_MAP=6rhq
 export ROSCONSOLE_CONFIG_FILE=~/.rosconsole.config
 export ROS_PACKAGE_PATH=
 export ROSLISP_PACKAGE_DIRECTORIES=

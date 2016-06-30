@@ -40,9 +40,9 @@ Motion::Motion(string nodeName) :
     isCustomActionEnabled_(false),
     isJoystickLatched_(false),
     rosNodeHandle_(nodeName),
+    pingTimer_(),
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
     motionController_(1.0 / REFRESH_RATE_HZ),
-    pingDecimator_(0),
     simulatedT_(0.0)
 {
     positionEstimator_.addSensor(tapAps_.getSensor());
@@ -83,6 +83,10 @@ void Motion::run()
     tapInitialPose_.set(TimeMath::time2number(currentTime_), 3.0, 3.0, 0);
     reset(tapInitialPose_.getPose());
 
+    // Start the ping timer
+    pingTimer_ = rosNodeHandle_.createTimer(ros::Duration(1.0 / PING_HZ),
+    	boost::bind(&Motion::pingCallback, this, _1));
+
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
     {
@@ -98,13 +102,14 @@ void Motion::run()
         stepNode();
 
         publishOdometry();
-        publishPing();
         publishPose();
         publishAccumulatedOdometry();
         publishGoalLanding();
 
         refreshRate.sleep();
     }
+
+    pingTimer_.stop();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -437,20 +442,6 @@ void Motion::publishOdometry()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::publishPing()
-{
-    constexpr uint32_t frequencyDivisor = uint32_t(REFRESH_RATE_HZ / PING_HZ);
-
-    if ((pingDecimator_ % frequencyDivisor) == 0)
-    {
-        std_msgs::Bool message;
-        message.data = true;
-
-        pubPing_.publish(message);
-    }
-
-    pingDecimator_++;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishPose()
@@ -463,6 +454,14 @@ void Motion::publishPose()
     message.y = currentPose.y;
     message.theta = AngleMath::rad2deg<double>(currentPose.theta);
     pubRobotPose_.publish(message);
+}
+
+void Motion::pingCallback(const ros::TimerEvent& event)
+{
+    std_msgs::Bool message;
+    message.data = true;
+
+    pubPing_.publish(message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

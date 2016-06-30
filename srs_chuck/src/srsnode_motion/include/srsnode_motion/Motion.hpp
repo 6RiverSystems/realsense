@@ -61,8 +61,9 @@ private:
     void publishGoalInformation();
     void publishGoalLanding();
     void publishOdometry();
-    void publishPing();
     void publishPose();
+
+    void pingCallback(const ros::TimerEvent& event);
 
     void reset(Pose<> pose0);
 
@@ -94,11 +95,11 @@ private:
     ros::Publisher pubStatusGoalLanding_;
     ros::Publisher pubStatusGoalPlan_;
 
-    uint32_t pingDecimator_;
-
     ros::NodeHandle rosNodeHandle_;
     tf::TransformBroadcaster rosTfBroadcaster_;
     Chuck robot_;
+
+    ros::Timer pingTimer_;
 
     double simulatedT_;
 

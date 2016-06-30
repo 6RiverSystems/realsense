@@ -4,31 +4,25 @@
 % This is proprietary software, unauthorized distribution is not permitted.
 %
 
-map = mm_create(25, 28, 0.10);
+map = mm_create(35, 28, 0.10);
 
 % Full border
-map = mm_addCustomBorder(map, 0.00, 0.00, 21.16, 26.92, 0.4);
+map = mm_addCustomBorder(map, 11.201, 1.50, 29.420, 27.137, 0.4);
 
-% Obstacle A
-map = mm_addStaticObstacle(map, 0.00, 0.00, 21.16, 1.52, 0.4);
+% Obstacle RE02
+map = mm_addStaticObstacle(map, 14.113, 5.007, 16.485, 23.759, 0.4);
 
-% Obstacle B
-map = mm_addStaticObstacle(map, 12.07, 3.10, 12.88, 3.35, 0.5);
+% Obstacle RE03
+map = mm_addStaticObstacle(map, 18.307, 5.007, 20.674, 23.759, 0.5);
 
-% Obstacle C
-map = mm_addStaticObstacle(map, 2.92, 4.80, 5.28, 23.55, 0.5);
+% Obstacle RE04
+map = mm_addStaticObstacle(map, 22.491, 5.007, 25.048, 23.759, 0.5);
 
-% Obstacle D
-map = mm_addStaticObstacle(map, 7.11, 4.80, 9.47, 23.55, 0.5);
+% Obstacle RE05
+map = mm_addStaticObstacle(map, 26.869, 5.007, 29.420, 23.759, 0.5);
 
-% Obstacle E
-map = mm_addStaticObstacle(map, 11.30, 4.80, 13.67, 23.55, 0.5);
-
-% Obstacle F
-map = mm_addStaticObstacle(map, 15.67, 4.80, 18.03, 23.55, 0.5);
-
-% Obstacle G
-map = mm_addStaticObstacle(map, 19.76, 4.80, 21.16, 23.55, 0.5);
+% Obstacle OB01
+map = mm_addStaticObstacle(map, 23.253, 2.981, 24.006, 3.235, 0.5);
 
 map = mm_generate(map);
 mm_save(map, '../../srs_sites/src/srsc_barrett/map', 'barrett');

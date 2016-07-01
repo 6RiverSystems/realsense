@@ -22,7 +22,7 @@ map = mm_addStaticObstacle(map, 22.491, 5.007, 25.048, 23.759, 0.8);
 map = mm_addStaticObstacle(map, 26.869, 5.007, 29.420, 23.759, 0.8);
 
 % Obstacle OB01
-map = mm_addStaticObstacle(map, 23.253, 2.981, 24.006, 3.235, 0.5);
+map = mm_addStaticObstacle(map, 23.253, 3.281, 24.006, 3.535, 0.5);
 
 map = mm_generate(map);
 mm_save(map, '../../srs_sites/src/srsc_barrett/map', 'barrett');

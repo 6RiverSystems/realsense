@@ -11,9 +11,6 @@ using namespace std;
 
 #include <ros/ros.h>
 
-#include <srslib_framework/MapCoordinates.h>
-using namespace srslib_framework;
-
 #include <srslib_framework/localization/Map.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
 
@@ -33,8 +30,6 @@ private:
 
     void evaluateTriggers();
 
-    bool onMapCoordinatesRequested(MapCoordinates::Request& req, MapCoordinates::Response& resp);
-
     void publishMap();
 
     Map map_;
@@ -44,8 +39,6 @@ private:
     ros::Publisher pubMapMetadata_;
     ros::Publisher pubMapOccupancyGrid_;
     ros::Publisher pubMapCompleteMap_;
-
-    ros::ServiceServer srvMapCoordinates_;
 
     ros::NodeHandle rosNodeHandle_;
 

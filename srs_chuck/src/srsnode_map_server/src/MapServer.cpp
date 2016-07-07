@@ -42,9 +42,6 @@ MapServer::MapServer(string nodeName) :
         "/internal/state/map/grid", 1, true);
     pubMapCompleteMap_ = rosNodeHandle_.advertise<srslib_framework::MsgMap>(
         "/internal/state/map/complete", 1, true);
-
-    srvMapCoordinates_ = rosNodeHandle_.advertiseService("map_coordinates",
-        &MapServer::onMapCoordinatesRequested, this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,21 +75,6 @@ void MapServer::evaluateTriggers()
     {
         ros::shutdown();
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-bool MapServer::onMapCoordinatesRequested(MapCoordinates::Request& req,
-    MapCoordinates::Response& resp)
-{
-    int r = 0;
-    int c = 0;
-
-    map_.getMapCoordinates(req.x, req.y, c, r);
-
-    resp.c = c;
-    resp.r = r;
-
-    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

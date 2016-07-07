@@ -37,7 +37,6 @@ set(${PROJECT_NAME}_MSGS
 )
 
 set(${PROJECT_NAME}_SRVS
-    MapCoordinates.srv
 )
 
 set(TEST_SOURCES_DATASTRUCTURE

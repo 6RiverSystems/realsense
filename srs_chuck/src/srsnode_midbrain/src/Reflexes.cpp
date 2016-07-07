@@ -67,7 +67,7 @@ void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 		}
 	}
 
-	if( numberOfObstacles > 10 )
+	if( numberOfObstacles > 20 )
 	{
 		ROS_DEBUG_THROTTLE( 0.3, "Obstacles detected: %d", numberOfObstacles);
 

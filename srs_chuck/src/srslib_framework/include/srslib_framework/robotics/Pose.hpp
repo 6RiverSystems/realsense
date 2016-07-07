@@ -12,8 +12,10 @@ using namespace std;
 
 #include <opencv2/opencv.hpp>
 
-#include <srslib_framework/platform/Object.hpp>
+#include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
+
+#include <srslib_framework/platform/Object.hpp>
 
 namespace srs {
 
@@ -21,6 +23,10 @@ template<typename TYPE = double>
 struct Pose : public Object
 {
     typedef TYPE BaseType;
+
+    static const Pose<TYPE> INVALID;
+    static const Pose<TYPE> ZERO;
+
 
     Pose(double arrivalTime, BaseType x, BaseType y, BaseType theta) :
         arrivalTime(arrivalTime),
@@ -46,6 +52,17 @@ struct Pose : public Object
     virtual ~Pose()
     {}
 
+    BaseType getThetaDegrees()
+    {
+        return AngleMath::rad2deg<TYPE>(theta);
+    }
+
+    bool isValid()
+    {
+        return !BasicMath::isNan<TYPE>(x) && !BasicMath::isNan<TYPE>(y) &&
+            !BasicMath::isNan<TYPE>(theta);
+    }
+
     friend ostream& operator<<(ostream& stream, const Pose& pose)
     {
         stream << "Pose {@: " << pose.arrivalTime <<
@@ -66,6 +83,17 @@ struct Pose : public Object
     BaseType y;
     BaseType theta;
 };
+
+template<typename TYPE>
+const Pose<TYPE> Pose<TYPE>::INVALID = Pose<TYPE>(
+    numeric_limits<TYPE>::quiet_NaN(),
+    numeric_limits<TYPE>::quiet_NaN(),
+    numeric_limits<TYPE>::quiet_NaN()
+);
+
+template<typename TYPE>
+const Pose<TYPE> Pose<TYPE>::ZERO = Pose<TYPE>(TYPE(), TYPE(), TYPE());
+
 
 } // namespace srs
 

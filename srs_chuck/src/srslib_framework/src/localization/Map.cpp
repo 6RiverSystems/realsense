@@ -28,6 +28,7 @@ Map::Map() :
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
 Map::Map(double widthC, double heightC, double resolution) :
         grid_(nullptr),
         heightC_(heightC),
@@ -127,6 +128,17 @@ void Map::getNotesGrid(vector<int8_t>& notesGrid)
             }
         }
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Map::getWorldCoordinates(int c, int r, double& x, double& y)
+{
+    x = static_cast<double>(c) * resolution_;
+    y = static_cast<double>(r) * resolution_;
+
+    // The precision is down to 1mm
+    x = round(x * 1000) / 1000;
+    y = round(y * 1000) / 1000;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

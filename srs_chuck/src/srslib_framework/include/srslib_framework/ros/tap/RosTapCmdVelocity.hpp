@@ -6,9 +6,6 @@
 #ifndef ROSTAPCMDVELOCITY_HPP_
 #define ROSTAPCMDVELOCITY_HPP_
 
-#include <string>
-using namespace std;
-
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 

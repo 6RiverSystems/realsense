@@ -6,9 +6,6 @@
 #ifndef ROSTAPBRAINSTEM_HPP_
 #define ROSTAPBRAINSTEM_HPP_
 
-#include <string>
-using namespace std;
-
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 

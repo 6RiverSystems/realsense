@@ -71,6 +71,8 @@ public:
         return widthM_;
     }
 
+    void getWorldCoordinates(int c, int r, double& x, double& y);
+
     void load(string filename);
 
     friend ostream& operator<<(ostream& stream, const Map& map);

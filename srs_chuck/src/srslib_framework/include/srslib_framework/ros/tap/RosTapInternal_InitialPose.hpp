@@ -6,11 +6,6 @@
 #ifndef ROSTAPINTERNAL_INITIALPOSE_HPP_
 #define ROSTAPINTERNAL_INITIALPOSE_HPP_
 
-#include <string>
-using namespace std;
-
-#include <ros/ros.h>
-
 #include <srslib_framework/ros/tap/RosTapMsgPose.hpp>
 
 namespace srs {

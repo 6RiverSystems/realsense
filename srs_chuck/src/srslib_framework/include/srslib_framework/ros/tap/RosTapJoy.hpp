@@ -6,7 +6,6 @@
 #ifndef ROSTAPJOY_HPP_
 #define ROSTAPJOY_HPP_
 
-#include <string>
 #include <algorithm>
 using namespace std;
 

@@ -18,8 +18,6 @@ using namespace std;
 #include <srslib_framework/search/SearchPosition.hpp>
 using namespace srs;
 
-typedef SolutionNode<Grid2d> SolutionType;
-
 TEST(Test_Yoshizawa, Usage)
 {
 //    SolutionType SOLUTION_00 = SolutionType(SolutionType::START,

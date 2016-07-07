@@ -6,7 +6,6 @@
 #ifndef ROSTAPJOYADAPTER_HPP_
 #define ROSTAPJOYADAPTER_HPP_
 
-#include <string>
 #include <algorithm>
 using namespace std;
 

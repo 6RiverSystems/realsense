@@ -12,6 +12,8 @@ using namespace std;
 
 #include <opencv2/opencv.hpp>
 
+#include <srslib_framework/math/BasicMath.hpp>
+
 #include <srslib_framework/platform/Object.hpp>
 
 namespace srs {
@@ -20,6 +22,9 @@ template<typename TYPE = double>
 struct Velocity : public Object
 {
     typedef TYPE BaseType;
+
+    static const Velocity<TYPE> INVALID;
+    static const Velocity<TYPE> ZERO;
 
     Velocity(double arrivalTime, BaseType linear, BaseType angular) :
         arrivalTime(arrivalTime),
@@ -42,6 +47,11 @@ struct Velocity : public Object
     virtual ~Velocity()
     {}
 
+    bool isValid()
+    {
+        return !BasicMath::isNan<TYPE>(linear) && !BasicMath::isNan<TYPE>(angular);
+    }
+
     friend ostream& operator<<(ostream& stream, const Velocity& velocity)
     {
         stream << "Velocity {@: " << velocity.arrivalTime <<
@@ -55,6 +65,15 @@ struct Velocity : public Object
     BaseType linear;
     BaseType angular;
 };
+
+template<typename TYPE>
+const Velocity<TYPE> Velocity<TYPE>::INVALID = Velocity<TYPE>(
+    numeric_limits<TYPE>::quiet_NaN(),
+    numeric_limits<TYPE>::quiet_NaN()
+);
+
+template<typename TYPE>
+const Velocity<TYPE> Velocity<TYPE>::ZERO = Velocity<TYPE>(TYPE(), TYPE());
 
 } // namespace srs
 

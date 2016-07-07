@@ -37,7 +37,7 @@ TEST(Test_AStar, SearchCreation)
     Grid2d::LocationType goal(GRID_SIZE - 1, GRID_SIZE - 1);
 
     algorithm.search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 0));
-    Solution<Grid2d> solution = algorithm.getSolution(1.0);
-
-    ROS_DEBUG_STREAM(solution);
+//    Solution<Grid2d> solution = algorithm.getSolution(1.0);
+//
+//    ROS_DEBUG_STREAM(solution);
 }

@@ -6,11 +6,6 @@
 #ifndef ROSTAPINTERNALGOAL_HPP_
 #define ROSTAPINTERNALGOAL_HPP_
 
-#include <string>
-using namespace std;
-
-#include <ros/ros.h>
-
 #include <srslib_framework/ros/tap/RosTapMsgPose.hpp>
 
 namespace srs {

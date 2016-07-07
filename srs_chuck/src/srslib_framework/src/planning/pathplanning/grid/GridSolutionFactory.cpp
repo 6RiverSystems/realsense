@@ -117,6 +117,7 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(SearchNode<Grid2d>* 
 
         solutionItem.fromPose = fromPose;
         solutionItem.toPose = toPose;
+        solutionItem.cost = toCursor->action->getTotalCost();
 
         if (insertNode)
         {

@@ -24,14 +24,14 @@ public:
         vector<NodeType>::push_back(firstNode);
     }
 
-    NodeType getStart()
-    {
-        return *vector<NodeType>::begin();
-    }
-
     NodeType getGoal()
     {
         return *(vector<NodeType>::end() - 1);
+    }
+
+    NodeType getStart()
+    {
+        return *vector<NodeType>::begin();
     }
 
     friend ostream& operator<<(ostream& stream, const Solution& solution)

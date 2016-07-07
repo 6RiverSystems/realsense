@@ -9,6 +9,7 @@
 #include <srslib_framework/math/PoseMath.hpp>
 
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
+#include <srslib_framework/planning/pathplanning/grid/PoseAdapter.hpp>
 
 #include <srslib_framework/ros/message/SolutionMessageFactory.hpp>
 
@@ -123,18 +124,14 @@ void Executive::executePlanToGoal(Pose<> goalPose)
     algorithm_.setGraph(map->getGrid());
 
     // Prepare the start position for the search
-    int fromR = 0;
-    int fromC = 0;
-    map->getMapCoordinates(currentRobotPose_.x, currentRobotPose_.y, fromC, fromR);
-    Grid2d::LocationType internalStart(fromC, fromR);
-    int startAngle = AngleMath::normalizeRad2deg90(currentRobotPose_.theta);
+    Grid2d::LocationType internalStart;
+    int startAngle;
+    PoseAdapter::pose2Map(currentRobotPose_, map, internalStart, startAngle);
 
     // Prepare the goal position for the search
-    int toR = 0;
-    int toC = 0;
-    map->getMapCoordinates(currentGoal_.x, currentGoal_.y, toC, toR);
-    Grid2d::LocationType internalGoal(toC, toR);
-    int goalAngle = AngleMath::normalizeRad2deg90(currentGoal_.theta);
+    Grid2d::LocationType internalGoal;
+    int goalAngle;
+    PoseAdapter::pose2Map(currentGoal_, map, internalGoal, goalAngle);
 
     ROS_DEBUG_STREAM_NAMED("Motion", "Looking for a path between " << currentRobotPose_ << " (" <<
         fromC << "," << fromR << "," << startAngle <<

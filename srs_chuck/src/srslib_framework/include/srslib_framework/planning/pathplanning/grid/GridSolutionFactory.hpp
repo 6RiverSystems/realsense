@@ -18,14 +18,20 @@ using namespace std;
 
 #include <srslib_framework/robotics/Pose.hpp>
 
-#include <srslib_framework/search/SearchNode.hpp>
+#include <srslib_framework/search/AStar.hpp>
 
 namespace srs {
 
 struct GridSolutionFactory
 {
     static Solution<GridSolutionItem>* fromRotation(Pose<> pose, double theta0, double thetaf);
-    static Solution<GridSolutionItem>* fromSearch(SearchNode<Grid2d>* goalNode, Map* map);
+    static Solution<GridSolutionItem>* fromSearch(AStar<Grid2d>::SearchNodeType* goalNode, Map* map);
+
+    static double getTotalCost(Solution<GridSolutionItem>* solution)
+    {
+        GridSolutionItem lastNode = solution->getGoal();
+        return lastNode.cost;
+    }
 };
 
 } // namespace srs

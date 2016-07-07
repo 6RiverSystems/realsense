@@ -4,19 +4,21 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
-#include <ros/ros.h>
 
 #include <vector>
 using namespace std;
 
-#include <boost/filesystem.hpp>
 #include <ros/ros.h>
+#include <boost/filesystem.hpp>
+
+#include <srslib_framework/math/AngleMath.hpp>
 
 #include <srslib_framework/localization/Map.hpp>
 
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/grid/PoseAdapter.hpp>
 
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 
@@ -26,29 +28,39 @@ using namespace srs;
 
 TEST(Test_Trajectory, Map)
 {
-    Grid2d::LocationType start(60, 54);
-    Grid2d::LocationType goal(95, 54);
+    Pose<> robotPose = Pose<>(18.1335, 5.24097, 0.0189141);
+    Pose<> goalPose = Pose<>(18.1335, 5.24097, 0);
 
     boost::filesystem::path filePath = boost::filesystem::canonical(
-        "../../../srs_sites/src/srsc_6rhq/map/6rhq.yaml");
-
+        "../../../srs_sites/src/srsc_6rhq_rviz/map/6rhq.yaml");
     Map* map = new Map();
     map->load(filePath.generic_string());
 
-    AStar<Grid2d>* algorithm = new AStar<Grid2d>(map->getGrid());
-    algorithm->search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 0));
+    // Prepare the start position for the search
+    Grid2d::LocationType internalStart;
+    int startAngle;
+    PoseAdapter::pose2Map(robotPose, map, internalStart, startAngle);
 
-    SearchNode<Grid2d>* solution = algorithm->getSolution();
+    // Prepare the goal position for the search
+    Grid2d::LocationType internalGoal;
+    int goalAngle;
+    PoseAdapter::pose2Map(goalPose, map, internalGoal, goalAngle);
+
+    AStar<Grid2d> algorithm(map->getGrid());
+    ROS_DEBUG_STREAM("Found: " <<
+        algorithm.search(SearchPosition<Grid2d>(internalStart, startAngle),
+            SearchPosition<Grid2d>(internalGoal, goalAngle)));
+
+    AStar<Grid2d>::SearchNodeType* solution = algorithm.getSolution();
     Solution<GridSolutionItem>* gridSolution = GridSolutionFactory::fromSearch(solution, map);
+    Solution<GridSolutionItem> gridSolution2 = *gridSolution;
 
-    ROS_DEBUG_STREAM(*gridSolution);
+    cout << gridSolution2 << endl;
 
     Chuck chuck;
     Trajectory<> trajectory;
 
     GridTrajectoryGenerator solutionConverter(chuck);
-
-    Solution<GridSolutionItem> gridSolution2 = *gridSolution;
     solutionConverter.fromSolution(gridSolution2);
     solutionConverter.getTrajectory(trajectory);
 

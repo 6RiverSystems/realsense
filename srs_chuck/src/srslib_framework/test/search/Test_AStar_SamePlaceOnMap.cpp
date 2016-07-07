@@ -4,16 +4,26 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
-#include <ros/ros.h>
 
 #include <vector>
 using namespace std;
 
+#include <ros/ros.h>
+#include <boost/filesystem.hpp>
+
+#include <srslib_framework/math/AngleMath.hpp>
+
 #include <srslib_framework/localization/Map.hpp>
+
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
-#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/grid/PoseAdapter.hpp>
+
+#include <srslib_framework/robotics/robot/Chuck.hpp>
+
 #include <srslib_framework/search/AStar.hpp>
-#include <srslib_framework/localization/MapNote.hpp>
+
 using namespace srs;
 
 // Path not found between Pose {@: 0, x: 18.1335, y: 5.24097, t: 0.0189141} (181,52,0) and
@@ -24,22 +34,20 @@ TEST(Test_AStar, SamePlaceOnMap)
     Pose<> robotPose = Pose<>(18.1335, 5.24097, 0.0189141);
     Pose<> goalPose = Pose<>(18.1335, 5.24097, 0);
 
+    boost::filesystem::path filePath = boost::filesystem::canonical(
+        "../../../srs_sites/src/srsc_6rshq_rviz/map/6rshq.yaml");
     Map* map = new Map();
-    map->load("6rhq.yaml");
+    map->load(filePath.generic_string());
 
     // Prepare the start position for the search
-    int fromR = 0;
-    int fromC = 0;
-    map->getMapCoordinates(robotPose.x, robotPose.y, fromC, fromR);
-    Grid2d::LocationType internalStart(fromC, fromR);
-    int startAngle = AngleMath::normalizeRad2deg90(robotPose.theta);
+    Grid2d::LocationType internalStart;
+    int startAngle;
+    PoseAdapter::pose2Map(robotPose, map, internalStart, startAngle);
 
     // Prepare the goal position for the search
-    int toR = 0;
-    int toC = 0;
-    map->getMapCoordinates(goalPose.x, goalPose.y, toC, toR);
-    Grid2d::LocationType internalGoal(toC, toR);
-    int goalAngle = AngleMath::normalizeRad2deg90(goalPose.theta);
+    Grid2d::LocationType internalGoal;
+    int goalAngle;
+    PoseAdapter::pose2Map(goalPose, map, internalGoal, goalAngle);
 
     AStar<Grid2d>* algorithm = new AStar<Grid2d>(map->getGrid());
     ROS_DEBUG_STREAM("Found: " <<

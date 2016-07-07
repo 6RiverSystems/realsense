@@ -53,9 +53,9 @@ Motion::Motion(string nodeName) :
     pubPing_ = rosNodeHandle_.advertise<std_msgs::Bool>(
         "/internal/state/ping", 1);
 
-    pubRobotAccOdometry_ = rosNodeHandle_.advertise<MsgPose>(
+    pubRobotAccOdometry_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
         "/internal/state/robto/acc_odometry", 100);
-    pubRobotPose_ = rosNodeHandle_.advertise<MsgPose>(
+    pubRobotPose_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
         "/internal/state/robot/pose", 100);
 
     pubStatusGoalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
@@ -348,7 +348,8 @@ void Motion::pingCallback(const ros::TimerEvent& event)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishAccumulatedOdometry()
 {
-    MsgPose message = PoseMessageFactory::pose2Msg(positionEstimator_.getAccumulatedOdometry());
+    srslib_framework::MsgPose message = PoseMessageFactory::pose2Msg(
+        positionEstimator_.getAccumulatedOdometry());
     pubRobotAccOdometry_.publish(message);
 }
 
@@ -456,7 +457,7 @@ void Motion::publishOdometry()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishPose()
 {
-    MsgPose message = PoseMessageFactory::pose2Msg(positionEstimator_.getPose());
+    srslib_framework::MsgPose message = PoseMessageFactory::pose2Msg(positionEstimator_.getPose());
     pubRobotPose_.publish(message);
 }
 

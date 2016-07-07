@@ -21,8 +21,6 @@ set(${PROJECT_NAME}_SOURCES
 
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp
-
-    src/ros/tap/RosTapMap.cpp
 )
 
 set(${PROJECT_NAME}_MSGS

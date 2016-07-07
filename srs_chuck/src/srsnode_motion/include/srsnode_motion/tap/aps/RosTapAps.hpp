@@ -80,7 +80,7 @@ protected:
     }
 
 private:
-    void onAps(const MsgPoseConstPtr& message)
+    void onAps(const srslib_framework::MsgPoseConstPtr& message)
     {
         set(TimeMath::time2number(message->header.stamp),
             static_cast<double>(message->x),

@@ -5,7 +5,7 @@
  *      Author: dan
  */
 #include "gtest/gtest.h"
-#include <srslib_framework/OperationalState.h>
+#include <srslib_framework/MsgOperationalState.h>
 
 namespace srs {
 

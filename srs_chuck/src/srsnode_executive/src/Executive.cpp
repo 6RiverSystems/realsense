@@ -241,7 +241,7 @@ void Executive::publishInternalGoalSolution(Solution<GridSolutionItem>* solution
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::publishInternalInitialPose(Pose<> initialPose)
 {
-    MsgPose message = PoseMessageFactory::pose2Msg(initialPose);
+    srslib_framework::MsgPose message = PoseMessageFactory::pose2Msg(initialPose);
     pubInternalInitialPose_.publish(message);
 }
 

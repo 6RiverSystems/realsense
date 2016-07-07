@@ -6,13 +6,12 @@
 #ifndef ROSTAPMAP_HPP_
 #define ROSTAPMAP_HPP_
 
-#include <nav_msgs/GetMap.h>
-
 #include <srslib_framework/MsgMap.h>
-using namespace srslib_framework;
 
 #include <srslib_framework/localization/Map.hpp>
+
 #include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/message/MapMessageFactory.hpp>
 
 namespace srs {
 
@@ -44,7 +43,15 @@ protected:
     }
 
 private:
-    void onMap(const MsgMapConstPtr& message);
+    void onMap(const srslib_framework::MsgMapConstPtr& message)
+    {
+        if (map_)
+        {
+            delete map_;
+        }
+
+        map_ = MapMessageFactory::msg2Map(message);
+    }
 
     Map* map_;
 };

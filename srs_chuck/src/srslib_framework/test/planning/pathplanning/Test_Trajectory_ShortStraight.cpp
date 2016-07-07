@@ -9,23 +9,22 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
+
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
-#include <srslib_framework/planning/pathplanning/TrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
+
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
-#include <srslib_framework/search/SearchPosition.hpp>
 using namespace srs;
-
-typedef SolutionNode<Grid2d> SolutionNodeType;
 
 TEST(Test_Trajectory, ShortStraight)
 {
-    SolutionNodeType SOLUTION_00 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_00 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(3, 3, 0), Pose<>(3, 4, 0));
 
-    Solution<Grid2d> solution;
+    Solution<GridSolutionItem> solution;
     solution.push_back(SOLUTION_00);
 
     ROS_DEBUG_STREAM(solution);
@@ -33,7 +32,7 @@ TEST(Test_Trajectory, ShortStraight)
     Chuck chuck;
     Trajectory<> trajectory;
 
-    TrajectoryGenerator solutionConverter(chuck);
+    GridTrajectoryGenerator solutionConverter(chuck);
     solutionConverter.fromSolution(solution);
     solutionConverter.getTrajectory(trajectory);
 

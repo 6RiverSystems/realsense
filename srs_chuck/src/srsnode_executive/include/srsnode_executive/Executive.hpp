@@ -6,12 +6,18 @@
 #ifndef EXECUTIVE_HPP_
 #define EXECUTIVE_HPP_
 
-#include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
-#include <srslib_framework/search/AStar.hpp>
+
+#include <srslib_framework/planning/pathplanning/Solution.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
+
+#include <srslib_framework/robotics/Pose.hpp>
+
 #include <srslib_framework/ros/tap/RosTapMap.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_GoalArrived.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_RobotPose.hpp>
+
+#include <srslib_framework/search/AStar.hpp>
 
 #include <srsnode_executive/tap/RosTapCmd_Goal.hpp>
 #include <srsnode_executive/tap/RosTapCmd_InitialPose.hpp>
@@ -51,7 +57,7 @@ private:
     void executeShutdown();
 
     void publishInternalInitialPose(Pose<> initialPose);
-    void publishInternalGoal(Pose<> goal);
+    void publishInternalGoalSolution(Solution<GridSolutionItem>* solution);
 
     void stepExecutiveFunctions();
 
@@ -59,12 +65,14 @@ private:
 
     ros::Publisher pubExternalArrived_;
     ros::Publisher pubInternalInitialPose_;
-    ros::Publisher pubInternalGoal_;
+    ros::Publisher pubInternalGoalSolution_;
+    ros::Publisher pubStatusGoalPlan_;
 
-    Pose<> robotCurrentPose_;
-    Pose<> robotInitialPose_;
+    Pose<> currentRobotPose_;
     Pose<> currentGoal_;
+    Solution<GridSolutionItem>* currentSolution_;
 
+    Pose<> robotInitialPose_;
     ros::NodeHandle rosNodeHandle_;
 
     RosTapCmd_Goal tapCmdGoal_;

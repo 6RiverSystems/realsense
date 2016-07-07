@@ -20,8 +20,8 @@ using namespace srsnode_motion;
 #include <srslib_framework/robotics/Velocity.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
 
 #include <srslib_framework/robotics/controller/CMUPathController.hpp>
 #include <srslib_framework/robotics/controller/EmergencyController.hpp>
@@ -37,6 +37,8 @@ namespace srs {
 class MotionController
 {
 public:
+    typedef Solution<GridSolutionItem> SolutionType;
+
     MotionController(double dT);
 
     ~MotionController()
@@ -44,7 +46,7 @@ public:
 
     void emergencyStop();
 
-    void execute(Solution<Grid2d> solution);
+    void execute(SolutionType solution);
 
     Velocity<> getExecutingCommand() const
     {
@@ -114,8 +116,6 @@ private:
 
     static unordered_map<int, string> TASK_NAMES;
 
-    typedef Solution<Grid2d> SolutionType;
-    typedef SolutionNode<Grid2d> SolutionNodeType;
     typedef pair<int, SolutionType*> WorkType;
 
     void aggregateInitialRotations(Pose<> pose, SolutionType*& solution, SolutionType*& rotation);

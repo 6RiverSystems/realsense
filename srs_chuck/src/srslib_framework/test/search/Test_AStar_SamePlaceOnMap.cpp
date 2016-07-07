@@ -9,8 +9,9 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/Map.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
+#include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/localization/MapNote.hpp>
 using namespace srs;
@@ -44,7 +45,4 @@ TEST(Test_AStar, SamePlaceOnMap)
     ROS_DEBUG_STREAM("Found: " <<
         algorithm->search(SearchPosition<Grid2d>(internalStart, startAngle),
             SearchPosition<Grid2d>(internalGoal, goalAngle)));
-
-    Solution<Grid2d> solution = algorithm->getSolution(map->getResolution());
-    ROS_DEBUG_STREAM(solution);
 }

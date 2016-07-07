@@ -9,13 +9,18 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
-#include <srslib_framework/localization/Map.hpp>
-#include <srslib_framework/search/AStar.hpp>
-#include <srslib_framework/planning/pathplanning/TrajectoryGenerator.hpp>
-#include <srslib_framework/robotics/robot/Chuck.hpp>
 #include <boost/filesystem.hpp>
 #include <ros/ros.h>
+
+#include <srslib_framework/localization/Map.hpp>
+
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
+
+#include <srslib_framework/robotics/robot/Chuck.hpp>
+
+#include <srslib_framework/search/AStar.hpp>
 
 using namespace srs;
 
@@ -24,23 +29,27 @@ TEST(Test_Trajectory, Map)
     Grid2d::LocationType start(60, 54);
     Grid2d::LocationType goal(95, 54);
 
-	boost::filesystem::path filePath( boost::filesystem::current_path( ) );
+    boost::filesystem::path filePath = boost::filesystem::canonical(
+        "../../../srs_sites/src/srsc_6rhq/map/6rhq.yaml");
 
     Map* map = new Map();
-    map->load("6rhq.yaml");
+    map->load(filePath.generic_string());
 
     AStar<Grid2d>* algorithm = new AStar<Grid2d>(map->getGrid());
     algorithm->search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 0));
 
-    Solution<Grid2d> solution = algorithm->getSolution(map->getResolution());
+    SearchNode<Grid2d>* solution = algorithm->getSolution();
+    Solution<GridSolutionItem>* gridSolution = GridSolutionFactory::fromSearch(solution, map);
 
-    ROS_DEBUG_STREAM(solution);
+    ROS_DEBUG_STREAM(*gridSolution);
 
     Chuck chuck;
     Trajectory<> trajectory;
 
-    TrajectoryGenerator solutionConverter(chuck);
-    solutionConverter.fromSolution(solution);
+    GridTrajectoryGenerator solutionConverter(chuck);
+
+    Solution<GridSolutionItem> gridSolution2 = *gridSolution;
+    solutionConverter.fromSolution(gridSolution2);
     solutionConverter.getTrajectory(trajectory);
 
     ROS_DEBUG_STREAM(trajectory);

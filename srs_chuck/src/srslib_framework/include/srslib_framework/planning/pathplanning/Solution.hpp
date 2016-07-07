@@ -7,58 +7,14 @@
 #define SOLUTION_HPP_
 
 #include <iomanip>
-#include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
 
-// TODO: The Solution node should be a solution only for the Grid2d graph.
-// Each graph type should have its own solution node.
-template<typename GRAPH>
-struct SolutionNode
-{
-    enum ActionEnum {
-        MOVE,
-        NONE,
-        ROTATE};
-
-    SolutionNode() :
-        actionType(NONE),
-        fromPose(Pose<>()),
-        toPose(Pose<>()),
-        cost(0.0)
-    {}
-
-    SolutionNode(ActionEnum actionType, Pose<> fromPose, Pose<> toPose, double cost = 0.0) :
-        actionType(actionType),
-        fromPose(fromPose),
-        toPose(toPose),
-        cost(cost)
-    {}
-
-    friend ostream& operator<<(ostream& stream, const SolutionNode& solutionNode)
-    {
-        return stream << " (" << ENUM_NAMES[solutionNode.actionType] <<
-            ", " << solutionNode.fromPose << " -> " <<
-                    solutionNode.toPose << ", " << solutionNode.cost << ")";
-    }
-
-    ActionEnum actionType;
-
-    double cost;
-
-    Pose<> fromPose;
-
-    Pose<> toPose;
-
-private:
-    static unordered_map<int, string> ENUM_NAMES;
-};
-
-template<typename GRAPH>
-class Solution : public vector<SolutionNode<GRAPH>>
+template<typename SOLUTION_ITEM>
+class Solution : public vector<SOLUTION_ITEM>
 {
 public:
-    typedef SolutionNode<GRAPH> NodeType;
+    typedef SOLUTION_ITEM NodeType;
 
     Solution()
     {}
@@ -90,13 +46,6 @@ public:
 
         return stream << "}";
     }
-};
-
-template<typename GRAPH>
-unordered_map<int, string> SolutionNode<GRAPH>::ENUM_NAMES = {
-    {SolutionNode<GRAPH>::MOVE, "MOVE"},
-    {SolutionNode<GRAPH>::NONE, "NONE"},
-    {SolutionNode<GRAPH>::ROTATE, "ROTATE"},
 };
 
 } // namespace srs

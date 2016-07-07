@@ -6,12 +6,9 @@
 #ifndef ROSTAPMAP_HPP_
 #define ROSTAPMAP_HPP_
 
-#include <string>
-using namespace std;
-
 #include <nav_msgs/GetMap.h>
 
-#include <srslib_framework/CompleteMap.h>
+#include <srslib_framework/MsgMap.h>
 using namespace srslib_framework;
 
 #include <srslib_framework/localization/Map.hpp>
@@ -47,7 +44,7 @@ protected:
     }
 
 private:
-    void onMap(const CompleteMapConstPtr& message);
+    void onMap(const MsgMapConstPtr& message);
 
     Map* map_;
 };

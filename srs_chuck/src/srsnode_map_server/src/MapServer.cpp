@@ -10,7 +10,7 @@ using namespace std;
 #include <nav_msgs/MapMetaData.h>
 #include <nav_msgs/OccupancyGrid.h>
 
-#include <srslib_framework/CompleteMap.h>
+#include <srslib_framework/MsgMap.h>
 
 #include <tf/LinearMath/Quaternion.h>
 
@@ -40,7 +40,7 @@ MapServer::MapServer(string nodeName) :
         "/internal/state/map/metadata", 1, true);
     pubMapOccupancyGrid_ = rosNodeHandle_.advertise<nav_msgs::OccupancyGrid>(
         "/internal/state/map/grid", 1, true);
-    pubMapCompleteMap_ = rosNodeHandle_.advertise<CompleteMap>(
+    pubMapCompleteMap_ = rosNodeHandle_.advertise<srslib_framework::MsgMap>(
         "/internal/state/map/complete", 1, true);
 
     srvMapCoordinates_ = rosNodeHandle_.advertiseService("map_coordinates",
@@ -127,7 +127,7 @@ void MapServer::publishMap()
 
     pubMapOccupancyGrid_.publish(occupancyMessage);
 
-    CompleteMap mapMessage;
+    srslib_framework::MsgMap mapMessage;
 
     mapMessage.header.stamp = ros::Time::now();
     mapMessage.info = metadataMessage;

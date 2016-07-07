@@ -77,119 +77,9 @@ public:
         return open_.size();
     }
 
-    // TODO: Instead of passing the resolution an object with the map coordinate transformation should be passed
-    // TODO: Also this conversion should be done elsewhere.
-    // TODO: Change the format of the solution to aggregate similar maneuvers: like consecutive forwards/backwards, and consecutive rotations
-    Solution<GRAPH> getSolution(double graphResolution)
+    SearchNodeType* getSolution()
     {
-        Solution<GRAPH> result;
-
-        // If no path was found in the previous search,
-        // exit immediately and return an empty solution
-        if (!lastNode_)
-        {
-            return result;
-
-        }
-
-        SolutionNode<GRAPH> solutionNode;
-        Pose<> fromPose;
-        Pose<> toPose;
-
-        double fromX = 0;
-        double fromY = 0;
-        double fromTheta = 0;
-
-        double toX = 0;
-        double toY = 0;
-        double toTheta = 0;
-
-        SearchNode<GRAPH>* toCursor = lastNode_;
-        SearchNode<GRAPH>* fromCursor = lastNode_->parent;
-
-        bool insertNode;
-
-        while (toCursor)
-        {
-            insertNode = true;
-
-            getWorldCoordinates(graphResolution,
-                toCursor->action->position.location.x, toCursor->action->position.location.y,
-                toX, toY);
-
-            toTheta = AngleMath::deg2rad<double>(toCursor->action->position.orientation);
-            toPose = Pose<>(toX, toY, AngleMath::normalizeAngleRad<double>(toTheta));
-
-            if (fromCursor)
-            {
-                getWorldCoordinates(graphResolution,
-                    fromCursor->action->position.location.x, fromCursor->action->position.location.y,
-                    fromX, fromY);
-
-                fromTheta = AngleMath::deg2rad<double>(fromCursor->action->position.orientation);
-                fromPose = Pose<>(fromX, fromY, AngleMath::normalizeAngleRad<double>(fromTheta));
-            }
-
-            switch (toCursor->action->actionType)
-            {
-                case SearchAction<GRAPH>::START:
-                    insertNode = false;
-                    break;
-
-                case SearchAction<GRAPH>::GOAL:
-                    insertNode = false;
-                    break;
-
-                case SearchAction<GRAPH>::FORWARD:
-                    solutionNode.actionType = SolutionNode<GRAPH>::MOVE;
-                    break;
-
-                case SearchAction<GRAPH>::BACKWARD:
-                    solutionNode.actionType = SolutionNode<GRAPH>::MOVE;
-                    break;
-
-                case SearchAction<GRAPH>::ROTATE_M90:
-                    solutionNode.actionType = SolutionNode<GRAPH>::ROTATE;
-                    fromTheta = AngleMath::normalizeAngleRad<double>(
-                        toTheta + AngleMath::deg2rad<double>(90));
-                    fromPose = Pose<>(toX, toY, fromTheta);
-                    break;
-
-                case SearchAction<GRAPH>::ROTATE_P90:
-                    solutionNode.actionType = SolutionNode<GRAPH>::ROTATE;
-                    fromTheta = AngleMath::normalizeAngleRad<double>(
-                        toTheta - AngleMath::deg2rad<double>(90));
-                    fromPose = Pose<>(toX, toY, fromTheta);
-                    break;
-
-                case SearchAction<GRAPH>::ROTATE_180:
-                    solutionNode.actionType = SolutionNode<GRAPH>::ROTATE;
-                    fromTheta = AngleMath::normalizeAngleRad<double>(
-                        toTheta - AngleMath::deg2rad<double>(180));
-                    fromPose = Pose<>(toX, toY, fromTheta);
-                    break;
-
-                default:
-                    // It should never see a NONE
-                    throw;
-            }
-
-            solutionNode.fromPose = fromPose;
-            solutionNode.toPose = toPose;
-
-            if (insertNode)
-            {
-                result.insert(result.begin(), solutionNode);
-            }
-
-            toCursor = toCursor->parent;
-            if (fromCursor)
-            {
-                fromCursor = fromCursor->parent;
-            }
-        }
-
-        return result;
+        return lastNode_;
     }
 
     bool search(SearchPosition<GRAPH> start, SearchPosition<GRAPH> goal)
@@ -273,17 +163,6 @@ public:
     }
 
 private:
-    // TODO: This should be in the map
-    void getWorldCoordinates(double resolution, int c, int r, double& x, double& y)
-    {
-        x = static_cast<double>(c) * resolution;
-        y = static_cast<double>(r) * resolution;
-
-        // The precision is down to 1mm
-        x = round(x * 1000) / 1000;
-        y = round(y * 1000) / 1000;
-    }
-
     void pushSearchNode(SearchNodeType* node)
     {
         if (!closed_.count(node))

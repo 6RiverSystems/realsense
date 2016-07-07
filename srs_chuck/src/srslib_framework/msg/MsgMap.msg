@@ -3,7 +3,7 @@
 #
 # This is proprietary software, unauthorized distribution is not permitted.
 #
-Header header
-float32 x
-float32 y
-float32 theta
+Header header 
+nav_msgs/MapMetaData info
+int8[] costs
+int8[] notes

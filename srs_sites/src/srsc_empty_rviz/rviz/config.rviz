@@ -4,6 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /Path1
         - /Polygon1
       Splitter Ratio: 0.416318
     Tree Height: 618
@@ -231,7 +232,7 @@ Visualization Manager:
         X: 0
         Y: 0
         Z: 0
-      Topic: /internal/state/current_goal/plan
+      Topic: /internal/state/goal/path
       Unreliable: false
       Value: true
     - Angle Tolerance: 0.1
@@ -267,7 +268,7 @@ Visualization Manager:
       Color: 255; 255; 0
       Enabled: true
       Name: Polygon
-      Topic: /internal/state/current_goal/landing
+      Topic: /internal/state/goal/landing
       Unreliable: false
       Value: true
   Enabled: true
@@ -286,7 +287,7 @@ Visualization Manager:
     - Class: rviz/SetInitialPose
       Topic: /request/initial_pose
     - Class: rviz/SetGoal
-      Topic: /request/move
+      Topic: /request/goal
     - Class: rviz/PublishPoint
       Single click: true
       Topic: ""
@@ -302,7 +303,7 @@ Visualization Manager:
         Value: false
       Name: Current View
       Near Clip Distance: 0.01
-      Scale: 70.6832
+      Scale: 47.2729
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
       X: 11.1412
@@ -355,5 +356,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 2404
-  X: 81
-  Y: 652
+  X: 55
+  Y: 483

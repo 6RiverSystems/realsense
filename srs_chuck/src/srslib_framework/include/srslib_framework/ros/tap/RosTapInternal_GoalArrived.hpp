@@ -6,9 +6,6 @@
 #ifndef ROSTAPINTERNAL_GOALARRIVED_HPP_
 #define ROSTAPINTERNAL_GOALARRIVED_HPP_
 
-#include <string>
-using namespace std;
-
 #include <srslib_framework/ros/tap/RosTapBool.hpp>
 
 namespace srs {
@@ -18,7 +15,7 @@ class RosTapInternal_GoalArrived :
 {
 public:
     RosTapInternal_GoalArrived() :
-        RosTapBool("/internal/state/current_goal/arrived", "ARRIVED to goal")
+        RosTapBool("/internal/state/goal/arrived", "ARRIVED to goal")
     {}
 };
 

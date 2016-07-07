@@ -4,6 +4,4 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 Header header
-float32 x
-float32 y
-float32 theta
+MsgSolutionItem[] items

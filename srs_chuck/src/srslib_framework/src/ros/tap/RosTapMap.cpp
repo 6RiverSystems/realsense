@@ -9,7 +9,7 @@ namespace srs {
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void RosTapMap::onMap(const CompleteMapConstPtr& message)
+void RosTapMap::onMap(const MsgMapConstPtr& message)
 {
     if (map_)
     {

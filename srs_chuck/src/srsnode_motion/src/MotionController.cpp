@@ -11,8 +11,9 @@ using namespace std;
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/math/VelocityMath.hpp>
-#include <srslib_framework/planning/pathplanning/TrajectoryGenerator.hpp>
-#include <srslib_framework/planning/pathplanning/SolutionGenerator.hpp>
+
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
 
 #include <srsnode_motion/FactoryRobotProfile.hpp>
 
@@ -255,8 +256,8 @@ void MotionController::aggregateInitialRotations(Pose<> pose,
 
     // Check if the solution starts with a rotation. If that is the case
     // replace it with rotation that takes in account the specified initial pose
-    SolutionNodeType node = solution->getStart();
-    if (node.actionType != SolutionNodeType::ROTATE)
+    GridSolutionItem node = solution->getStart();
+    if (node.actionType != GridSolutionItem::ROTATE)
     {
         return;
     }
@@ -264,7 +265,7 @@ void MotionController::aggregateInitialRotations(Pose<> pose,
     Pose<> fromPose = Pose<>(node.fromPose.x, node.fromPose.y, pose.theta);
 
     // Remove all the ROTATE nodes at the beginning of the solution
-    while (node.actionType == SolutionNodeType::ROTATE)
+    while (node.actionType == GridSolutionItem::ROTATE)
     {
         // Remove the rotation from the original solution
         solution->erase(solution->begin());
@@ -276,7 +277,7 @@ void MotionController::aggregateInitialRotations(Pose<> pose,
     double theta = node.toPose.theta;
     Pose<> toPose = Pose<>(fromPose.x, fromPose.y, AngleMath::normalizeAngleRad<double>(theta));
 
-    node = SolutionNodeType(SolutionNodeType::ROTATE, fromPose, toPose);
+    node = GridSolutionItem(GridSolutionItem::ROTATE, fromPose, toPose);
     rotation = new SolutionType(node);
 }
 
@@ -290,8 +291,8 @@ void MotionController::aggregateFinalRotations(SolutionType*& solution, Solution
     }
 
     // Check if the solution ends with a rotation
-    SolutionNodeType node = solution->getGoal();
-    if (node.actionType != SolutionNodeType::ROTATE)
+    GridSolutionItem node = solution->getGoal();
+    if (node.actionType != GridSolutionItem::ROTATE)
     {
         return;
     }
@@ -299,7 +300,7 @@ void MotionController::aggregateFinalRotations(SolutionType*& solution, Solution
     Pose<> toPose = node.toPose;
 
     // Remove all the ROTATE nodes at the end of the solution
-    while (node.actionType == SolutionNodeType::ROTATE)
+    while (node.actionType == GridSolutionItem::ROTATE)
     {
         // Remove the rotation from the original solution
         solution->erase(solution->end() - 1);
@@ -311,7 +312,7 @@ void MotionController::aggregateFinalRotations(SolutionType*& solution, Solution
     double theta = node.fromPose.theta;
     Pose<> fromPose = Pose<>(toPose.x, toPose.y, AngleMath::normalizeAngleRad<double>(theta));
 
-    node = SolutionNodeType(SolutionNodeType::ROTATE, fromPose, toPose);
+    node = GridSolutionItem(GridSolutionItem::ROTATE, fromPose, toPose);
     rotation = new SolutionType(node);
 }
 
@@ -386,7 +387,7 @@ void MotionController::executeFinalRotation()
             AngleMath::rad2deg<double>(currentPose_.theta) << "deg to: " <<
             AngleMath::rad2deg<double>(finalTheta) << "deg");
 
-        SolutionType* solution = SolutionGenerator<Grid2d>::fromRotation(
+        SolutionType* solution = GridSolutionFactory::fromRotation(
             currentPose_,
             currentPose_.theta, finalTheta);
 
@@ -707,7 +708,7 @@ void MotionController::taskPathFollow()
 
         // Calculate the trajectory
         Trajectory<> trajectory;
-        TrajectoryGenerator converter(robot_);
+        GridTrajectoryGenerator converter(robot_);
 
         converter.fromSolution(currentSolution_);
         converter.getTrajectory(trajectory);

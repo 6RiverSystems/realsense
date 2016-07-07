@@ -33,6 +33,7 @@ class PositionEstimator
 public:
     PositionEstimator(double dT) :
         dT_(dT),
+        initialized_(false),
         ukf_(robot_),
         previousReadingTime_(-1.0)
     {}
@@ -52,27 +53,48 @@ public:
 
     Pose<> getPose()
     {
-        StatePe<> currentState = StatePe<>(ukf_.getX());
-        return currentState.getPose();
+        if (initialized_)
+        {
+            StatePe<> currentState = StatePe<>(ukf_.getX());
+            return currentState.getPose();
+        }
+
+        return Pose<>::INVALID;
     }
 
     Velocity<> getVelocity()
     {
-        StatePe<> currentState = StatePe<>(ukf_.getX());
-        return currentState.getVelocity();
+        if (initialized_)
+        {
+            StatePe<> currentState = StatePe<>(ukf_.getX());
+            return currentState.getVelocity();
+        }
+
+        return Velocity<>::INVALID;
+    }
+
+    bool isPoseValid()
+    {
+        Pose<> currentPose = getPose();
+        return currentPose.isValid();
     }
 
     void reset(Pose<> initialPose)
     {
-        StatePe<> currentState = StatePe<>(initialPose);
-        cv::Mat currentCovariance = robot_.getQ();
+        if (initialPose.isValid())
+        {
+            initialized_ = true;
 
-        ukf_.reset(currentState.getVectorForm(), currentCovariance);
+            StatePe<> currentState = StatePe<>(initialPose);
+            cv::Mat currentCovariance = robot_.getQ();
+
+            ukf_.reset(currentState.getVectorForm(), currentCovariance);
+        }
     }
 
     void resetAccumulatedOdometry()
     {
-        accumulatedOdometry_ = Pose<>();
+        accumulatedOdometry_ = Pose<>::ZERO;
     }
 
     void run(Odometry<>* odometry);
@@ -89,6 +111,8 @@ private:
     Pose<> accumulatedOdometry_;
 
     double dT_;
+
+    bool initialized_;
 
     double previousReadingTime_;
 

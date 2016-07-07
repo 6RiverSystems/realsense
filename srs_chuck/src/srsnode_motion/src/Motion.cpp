@@ -12,18 +12,18 @@
 #include <tf/transform_broadcaster.h>
 
 #include <srslib_framework/MsgPose.h>
-using namespace srslib_framework;
 
 #include <srsnode_motion/MotionConfig.h>
 using namespace srsnode_motion;
 
 #include <srslib_framework/math/AngleMath.hpp>
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
-#include <srslib_framework/search/SearchPosition.hpp>
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
+
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
+
+#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
 #include <srsnode_motion/tap/aps/FactoryApsNoise.hpp>
 #include <srsnode_motion/tap/odometry/FactoryOdometryNoise.hpp>
@@ -35,7 +35,6 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Motion::Motion(string nodeName) :
-    firstLocalization_(true),
     isApsAvailable_(false),
     isCustomActionEnabled_(false),
     isJoystickLatched_(false),
@@ -52,23 +51,18 @@ Motion::Motion(string nodeName) :
     pubOdometry_ = rosNodeHandle_.advertise<nav_msgs::Odometry>(
         "/internal/sensors/odometry/velocity", 50);
 
-    pubStatusGoalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
-        "/internal/state/current_goal/arrived", 1);
-    pubStatusGoalGoal_ = rosNodeHandle_.advertise<MsgPose>(
-        "/internal/state/current_goal/goal", 1);
-    pubStatusGoalLanding_ = rosNodeHandle_.advertise<geometry_msgs::PolygonStamped>(
-        "/internal/state/current_goal/landing", 1);
-    pubStatusGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>(
-        "/internal/state/current_goal/plan", 1);
-
     pubPing_ = rosNodeHandle_.advertise<std_msgs::Bool>(
         "/internal/state/ping", 1);
 
+    pubRobotAccOdometry_ = rosNodeHandle_.advertise<MsgPose>(
+        "/internal/state/robto/acc_odometry", 100);
     pubRobotPose_ = rosNodeHandle_.advertise<MsgPose>(
-        "/internal/state/robot_pose", 100);
+        "/internal/state/robot/pose", 100);
 
-    pubAccOdometry_ = rosNodeHandle_.advertise<MsgPose>(
-        "/internal/state/acc_odometry", 100);
+    pubStatusGoalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
+        "/internal/state/current_goal/arrived", 1);
+    pubStatusGoalLanding_ = rosNodeHandle_.advertise<geometry_msgs::PolygonStamped>(
+        "/internal/state/current_goal/landing", 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,14 +72,9 @@ void Motion::run()
 
     currentTime_ = ros::Time::now();
 
-    // Establish an "acceptable" initial position, at least until the
-    // Position Estimator can get its bearings
-    tapInitialPose_.set(TimeMath::time2number(currentTime_), 3.0, 3.0, 0);
-    reset(tapInitialPose_.getPose());
-
     // Start the ping timer
     pingTimer_ = rosNodeHandle_.createTimer(ros::Duration(1.0 / PING_HZ),
-    	boost::bind(&Motion::pingCallback, this, _1));
+        boost::bind(&Motion::pingCallback, this, _1));
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
@@ -100,6 +89,7 @@ void Motion::run()
         publishArrived();
 
         stepNode();
+        stepEmulation();
 
         publishOdometry();
         publishPose();
@@ -123,7 +113,7 @@ void Motion::connectAllTaps()
     tapInitialPose_.connectTap();
     tapJoyAdapter_.connectTap();
     tapAps_.connectTap();
-    tapInternalGoal_.connectTap();
+    tapInternalGoalSolution_.connectTap();
     tapMap_.connectTap();
 
     triggerStop_.connectService();
@@ -138,7 +128,7 @@ void Motion::disconnectAllTaps()
     tapInitialPose_.disconnectTap();
     tapJoyAdapter_.disconnectTap();
     tapAps_.disconnectTap();
-    tapInternalGoal_.disconnectTap();
+    tapInternalGoalSolution_.disconnectTap();
     tapMap_.disconnectTap();
 }
 
@@ -148,6 +138,24 @@ void Motion::evaluateTriggers()
     if (triggerShutdown_.isTriggerRequested())
     {
         ros::shutdown();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::executeSolution(Solution<GridSolutionItem> solution)
+{
+    if (!solution.empty())
+    {
+        ROS_DEBUG_STREAM_NAMED("Motion", "Communicated solution: " << endl << solution);
+
+        motionController_.execute(solution);
+        positionEstimator_.resetAccumulatedOdometry();
+
+        simulatedT_ = 0.0;
+    }
+    else
+    {
+        ROS_WARN_STREAM_NAMED("Motion", "An empty solution is being discarded.");
     }
 }
 
@@ -167,137 +175,182 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 
     isCustomActionEnabled_ = config.custom_action_enabled;
 
-    ROS_INFO_STREAM_NAMED("Motion", "Custom action enabled [t/f]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Custom action enabled [t/f]: " <<
         config.custom_action_enabled);
 
-    ROS_INFO_STREAM_NAMED("Motion", "Emergency Controller: linear velocity gain []: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Emergency Controller: linear velocity gain []: " <<
         config.emergency_controller_kv);
-    ROS_INFO_STREAM_NAMED("Motion", "Emergency Controller: angular velocity gain []: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Emergency Controller: angular velocity gain []: " <<
         config.emergency_controller_kw);
-    ROS_INFO_STREAM_NAMED("Motion", "Emergency Controller: maximum angular velocity in emergency mode [rad/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Emergency Controller: maximum angular velocity in emergency mode [rad/s]: " <<
         config.emergency_controller_max_angular_velocity);
-    ROS_INFO_STREAM_NAMED("Motion", "Emergency Controller: maximum linear velocity in emergency mode [m/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Emergency Controller: maximum linear velocity in emergency mode [m/s]: " <<
         config.emergency_controller_max_linear_velocity);
 
-    ROS_INFO_STREAM_NAMED("Motion", "Manual Controller: linear velocity gain []: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Manual Controller: linear velocity gain []: " <<
         config.manual_controller_kv);
-    ROS_INFO_STREAM_NAMED("Motion", "Manual Controller: angular velocity gain []: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Manual Controller: angular velocity gain []: " <<
         config.manual_controller_kw);
-    ROS_INFO_STREAM_NAMED("Motion", "Manual Controller: maximum angular velocity in manual mode [rad/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Manual Controller: maximum angular velocity in manual mode [rad/s]: " <<
         config.manual_controller_max_angular_velocity);
-    ROS_INFO_STREAM_NAMED("Motion", "Manual Controller: maximum linear velocity in manual mode [m/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Manual Controller: maximum linear velocity in manual mode [m/s]: " <<
         config.manual_controller_max_linear_velocity);
 
-    ROS_INFO_STREAM_NAMED("Motion", "Maximum physical angular acceleration [rad/s^2]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Maximum physical angular acceleration [rad/s^2]: " <<
         config.physical_max_angular_acceleration);
-    ROS_INFO_STREAM_NAMED("Motion", "Maximum physical angular velocity [rad/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Maximum physical angular velocity [rad/s]: " <<
         config.physical_max_angular_velocity);
-    ROS_INFO_STREAM_NAMED("Motion", "Maximum physical linear acceleration [m/s^2]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Maximum physical linear acceleration [m/s^2]: " <<
         config.physical_max_linear_acceleration);
-    ROS_INFO_STREAM_NAMED("Motion", "Maximum physical linear velocity [m/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Maximum physical linear velocity [m/s]: " <<
         config.physical_max_linear_velocity);
-    ROS_INFO_STREAM_NAMED("Motion", "Minimum physical angular velocity [rad/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Minimum physical angular velocity [rad/s]: " <<
         config.physical_min_angular_velocity);
-    ROS_INFO_STREAM_NAMED("Motion", "Minimum physical linear velocity [m/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Minimum physical linear velocity [m/s]: " <<
         config.physical_min_linear_velocity);
 
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: adaptive look-ahead enabled [t/f]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: adaptive look-ahead enabled [t/f]: " <<
         config.pathfollow_controller_adaptive_lookahead_enabled);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: distance used to check if the goal was reached [m]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: distance used to check if the goal was reached [m]: " <<
         config.pathfollow_controller_goal_reached_distance);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: linear velocity gain []: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: linear velocity gain []: " <<
         config.pathfollow_controller_kv);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: angular velocity gain []: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: angular velocity gain []: " <<
         config.pathfollow_controller_kw);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: depth of the landing zone [m]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: depth of the landing zone [m]: " <<
         config.pathfollow_controller_landing_depth);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: width of the landing zone [m]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: width of the landing zone [m]: " <<
         config.pathfollow_controller_landing_width);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: linear acceleration [m/s^2]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: linear acceleration [m/s^2]: " <<
         config.pathfollow_controller_linear_acceleration);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: maximum angular velocity [rad/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: maximum angular velocity [rad/s]: " <<
         config.pathfollow_controller_max_angular_velocity);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: maximum linear velocity [m/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: maximum linear velocity [m/s]: " <<
         config.pathfollow_controller_max_linear_velocity);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: maximum look-ahead distance [m]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: maximum look-ahead distance [m]: " <<
         config.pathfollow_controller_max_look_ahead_distance);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: minimum linear velocity allowed [m/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: minimum linear velocity allowed [m/s]: " <<
         config.pathfollow_controller_min_linear_velocity);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: minimum look-ahead distance [m]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: minimum look-ahead distance [m]: " <<
         config.pathfollow_controller_min_look_ahead_distance);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: straight distance that is considered small [m]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: straight distance that is considered small [m]: " <<
         config.pathfollow_controller_small_straight_distance);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: travel linear velocity during turns [m/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: travel linear velocity during turns [m/s]: " <<
         config.pathfollow_controller_turning_linear_velocity);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: travel reduced velocity radius during turns [m]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: travel reduced velocity radius during turns [m]: " <<
         config.pathfollow_controller_turning_zone_radius);
-    ROS_INFO_STREAM_NAMED("Motion", "Path-follow Controller: zero-point look-ahead distance [m]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Path-follow Controller: zero-point look-ahead distance [m]: " <<
         config.pathfollow_controller_zero_look_ahead_distance);
 
-    ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: angle used to check if the goal was reached [rad]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Rotation Controller: angle used to check if the goal was reached [rad]: " <<
         config.rotation_controller_goal_reached_angle);
-    ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: derivative constant []: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Rotation Controller: derivative constant []: " <<
         config.rotation_controller_kd);
-    ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: integral constant []: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Rotation Controller: integral constant []: " <<
         config.rotation_controller_ki);
-    ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: proportional constant []: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Rotation Controller: proportional constant []: " <<
         config.rotation_controller_kp);
-    ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: linear velocity gain []: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Rotation Controller: linear velocity gain []: " <<
         config.rotation_controller_kv);
-    ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: angular velocity gain []: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Rotation Controller: angular velocity gain []: " <<
         config.rotation_controller_kw);
-    ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: minimum angular velocity during motion [rad/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Rotation Controller: minimum angular velocity during motion [rad/s]: " <<
         config.rotation_controller_min_angular_velocity);
-    ROS_INFO_STREAM_NAMED("Motion", "Rotation Controller: rotation velocity [rad/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Rotation Controller: rotation velocity [rad/s]: " <<
         config.rotation_controller_rotation_velocity);
 
-    ROS_INFO_STREAM_NAMED("Motion", "APS enabled: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "APS enabled: " <<
         config.sensor_aps_enabled);
-    ROS_INFO_STREAM_NAMED("Motion", "ODOMETRY enabled: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "ODOMETRY enabled: " <<
         config.sensor_odometry_enabled);
 
-    ROS_INFO_STREAM_NAMED("Motion", "Stop Controller: minimum linear velocity allowed [m/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Stop Controller: minimum linear velocity allowed [m/s]: " <<
         config.stop_controller_min_linear_velocity);
-    ROS_INFO_STREAM_NAMED("Motion", "Stop Controller: normal deceleration [m/s^2]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Stop Controller: normal deceleration [m/s^2]: " <<
         config.stop_controller_normal_linear_deceleration);
 
-    ROS_INFO_STREAM_NAMED("Motion", "Heading component of the APS noise [rad]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Heading component of the APS noise [rad]: " <<
         config.ukf_aps_error_heading);
-    ROS_INFO_STREAM_NAMED("Motion", "Location (X and Y) component of the APS noise [m]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Location (X and Y) component of the APS noise [m]: " <<
         config.ukf_aps_error_location);
-    ROS_INFO_STREAM_NAMED("Motion", "Angular velocity component of the odometry noise [rad/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Angular velocity component of the odometry noise [rad/s]: " <<
         config.ukf_odometry_error_angular);
-    ROS_INFO_STREAM_NAMED("Motion", "Linear velocity component of the odometry noise [m/s]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Linear velocity component of the odometry noise [m/s]: " <<
         config.ukf_odometry_error_linear);
-    ROS_INFO_STREAM_NAMED("Motion", "Heading component of the robot noise [rad]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Heading component of the robot noise [rad]: " <<
         config.ukf_robot_error_heading);
-    ROS_INFO_STREAM_NAMED("Motion", "Location (X and Y) component of the robot noise [m]: " <<
+    ROS_INFO_STREAM_NAMED("Motion",
+        "Location (X and Y) component of the robot noise [m]: " <<
         config.ukf_robot_error_location);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::performCustomAction()
 {
-    if (isCustomActionEnabled_)
-    {
-        Pose<> currentPose = positionEstimator_.getPose();
+}
 
-        Pose<> goalPose = PoseMath::add<double>(currentPose, Pose<>(0.0, 0.0, M_PI));
-        executePlanToGoal(goalPose);
-    }
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::pingCallback(const ros::TimerEvent& event)
+{
+    std_msgs::Bool message;
+    message.data = true;
+
+    pubPing_.publish(message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishAccumulatedOdometry()
 {
-    Pose<> accOdometry = positionEstimator_.getAccumulatedOdometry();
-    MsgPose message;
-
-    message.header.stamp = ros::Time::now();
-    message.x = accOdometry.x;
-    message.y = accOdometry.y;
-    message.theta = AngleMath::rad2deg<double>(accOdometry.theta);
-    pubAccOdometry_.publish(message);
+    MsgPose message = PoseMessageFactory::pose2Msg(positionEstimator_.getAccumulatedOdometry());
+    pubRobotAccOdometry_.publish(message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -324,50 +377,6 @@ void Motion::publishArrived()
 
         pubStatusGoalArrived_.publish(messageGoalArrived);
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::publishGoalInformation()
-{
-    ros::Time planningTime = ros::Time::now();
-
-    Pose<> goal = motionController_.getFinalGoal();
-
-    MsgPose messageGoal;
-    messageGoal.header.stamp = planningTime;
-    messageGoal.x = goal.x;
-    messageGoal.y = goal.y;
-    messageGoal.theta = goal.theta;
-
-    pubStatusGoalGoal_.publish(messageGoal);
-
-    Solution<Grid2d> solution = algorithm_.getSolution(tapMap_.getMap()->getResolution());
-
-    nav_msgs::Path messageGoalPlan;
-    messageGoalPlan.header.frame_id = "map";
-    messageGoalPlan.header.stamp = planningTime;
-
-    vector<geometry_msgs::PoseStamped> planPoses;
-
-    for (auto solutionNode : solution)
-    {
-        geometry_msgs::PoseStamped poseStamped;
-        tf::Quaternion quaternion = tf::createQuaternionFromYaw(solutionNode.toPose.theta);
-
-        poseStamped.pose.position.x = solutionNode.toPose.x;
-        poseStamped.pose.position.y = solutionNode.toPose.y;
-        poseStamped.pose.position.z = 0.0;
-        poseStamped.pose.orientation.x = quaternion.x();
-        poseStamped.pose.orientation.y = quaternion.y();
-        poseStamped.pose.orientation.z = quaternion.z();
-        poseStamped.pose.orientation.w = quaternion.w();
-
-        planPoses.push_back(poseStamped);
-    }
-
-    messageGoalPlan.poses = planPoses;
-
-    pubStatusGoalPlan_.publish(messageGoalPlan);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -400,68 +409,64 @@ void Motion::publishGoalLanding()
 void Motion::publishOdometry()
 {
     Pose<> currentPose = positionEstimator_.getPose();
-    Velocity<> currentVelocity = positionEstimator_.getVelocity();
 
-    geometry_msgs::Quaternion orientation = tf::createQuaternionMsgFromYaw(currentPose.theta);
+    if (currentPose.isValid())
+    {
+        Velocity<> currentVelocity = positionEstimator_.getVelocity();
 
-    // Publish the TF of the pose
-    geometry_msgs::TransformStamped messagePoseTf;
-    messagePoseTf.header.frame_id = "srsnode_motion/odometry";
-    messagePoseTf.child_frame_id = "base_footprint";
+        geometry_msgs::Quaternion orientation = tf::createQuaternionMsgFromYaw(currentPose.theta);
 
-    messagePoseTf.header.stamp = currentTime_;
-    messagePoseTf.transform.translation.x = currentPose.x;
-    messagePoseTf.transform.translation.y = currentPose.y;
-    messagePoseTf.transform.translation.z = 0.0;
-    messagePoseTf.transform.rotation = orientation;
+        // Publish the TF of the pose
+        geometry_msgs::TransformStamped messagePoseTf;
+        messagePoseTf.header.frame_id = "srsnode_motion/odometry";
+        messagePoseTf.child_frame_id = "base_footprint";
 
-    rosTfBroadcaster_.sendTransform(messagePoseTf);
+        messagePoseTf.header.stamp = currentTime_;
+        messagePoseTf.transform.translation.x = currentPose.x;
+        messagePoseTf.transform.translation.y = currentPose.y;
+        messagePoseTf.transform.translation.z = 0.0;
+        messagePoseTf.transform.rotation = orientation;
 
-    // Publish the required odometry for the planners
-    nav_msgs::Odometry messageOdometry;
-    messageOdometry.header.stamp = currentTime_;
-    messageOdometry.header.frame_id = "srsnode_motion/odometry";
-    messageOdometry.child_frame_id = "base_footprint";
+        rosTfBroadcaster_.sendTransform(messagePoseTf);
 
-    // Position
-    messageOdometry.pose.pose.position.x = currentPose.x;
-    messageOdometry.pose.pose.position.y = currentPose.y;
-    messageOdometry.pose.pose.position.z = 0.0;
-    messageOdometry.pose.pose.orientation = orientation;
+        // Publish the required odometry for the planners
+        nav_msgs::Odometry messageOdometry;
+        messageOdometry.header.stamp = currentTime_;
+        messageOdometry.header.frame_id = "srsnode_motion/odometry";
+        messageOdometry.child_frame_id = "base_footprint";
 
-    // Velocity
-    messageOdometry.twist.twist.linear.x = currentVelocity.linear;
-    messageOdometry.twist.twist.linear.y = 0.0;
-    messageOdometry.twist.twist.linear.z = 0.0;
-    messageOdometry.twist.twist.angular.x = 0.0;
-    messageOdometry.twist.twist.angular.y = 0.0;
-    messageOdometry.twist.twist.angular.z = currentVelocity.angular;
+        // Position
+        messageOdometry.pose.pose.position.x = currentPose.x;
+        messageOdometry.pose.pose.position.y = currentPose.y;
+        messageOdometry.pose.pose.position.z = 0.0;
+        messageOdometry.pose.pose.orientation = orientation;
 
-    // Publish the Odometry
-    pubOdometry_.publish(messageOdometry);
+        // Velocity
+        messageOdometry.twist.twist.linear.x = currentVelocity.linear;
+        messageOdometry.twist.twist.linear.y = 0.0;
+        messageOdometry.twist.twist.linear.z = 0.0;
+        messageOdometry.twist.twist.angular.x = 0.0;
+        messageOdometry.twist.twist.angular.y = 0.0;
+        messageOdometry.twist.twist.angular.z = currentVelocity.angular;
+
+        // Publish the Odometry
+        pubOdometry_.publish(messageOdometry);
+    }
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishPose()
 {
-    Pose<> currentPose = positionEstimator_.getPose();
-    MsgPose message;
-
-    message.header.stamp = ros::Time::now();
-    message.x = currentPose.x;
-    message.y = currentPose.y;
-    message.theta = AngleMath::rad2deg<double>(currentPose.theta);
+    MsgPose message = PoseMessageFactory::pose2Msg(positionEstimator_.getPose());
     pubRobotPose_.publish(message);
 }
 
-void Motion::pingCallback(const ros::TimerEvent& event)
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::reset(Pose<> pose0)
 {
-    std_msgs::Bool message;
-    message.data = true;
-
-    pubPing_.publish(message);
+    positionEstimator_.reset(pose0);
+    motionController_.reset();
+    simulatedT_ = 0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -469,12 +474,11 @@ void Motion::scanTapsForData()
 {
     // If APS has reported a position and it is the first time that Motion
     // gets it, make sure that the Position Estimator knows of it.
-    if (!tapAps_.hasNeverReported() && firstLocalization_)
+    if (!tapAps_.hasNeverReported() && !positionEstimator_.isPoseValid())
     {
         ROS_DEBUG_STREAM("Reporting its first position: " << tapAps_.getPose());
 
         reset(tapAps_.getPose());
-        firstLocalization_ = false;
     }
 
     if (tapInitialPose_.newDataAvailable())
@@ -482,7 +486,6 @@ void Motion::scanTapsForData()
         ROS_DEBUG_STREAM("Received initial pose: " << tapInitialPose_.getPose());
 
         reset(tapInitialPose_.getPose());
-        firstLocalization_ = false;
     }
 
     // If the joystick was touched, read the state of the latch
@@ -504,19 +507,12 @@ void Motion::scanTapsForData()
         isJoystickLatched_ = tapJoyAdapter_.getLatchState();
     }
 
-    // if (tapMap_.getMap() && !motionController_.isMoving() && !motionController_.hasArrived())
-    // {
-    //      executePlanToGoal(tapInternalGoal_.getPose());
-    //      publishGoal();
-    // }
-
-    // If there is a new goal to reach
-    if (tapInternalGoal_.newDataAvailable())
+    // If there is a new solution has been communicated
+    if (tapInternalGoalSolution_.newDataAvailable())
     {
         if (!isJoystickLatched_)
         {
-            executePlanToGoal(tapInternalGoal_.getPose());
-            publishGoalInformation();
+            executeSolution(tapInternalGoalSolution_.getSolution());
         }
     }
 
@@ -526,11 +522,30 @@ void Motion::scanTapsForData()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::reset(Pose<> pose0)
+void Motion::stepEmulation()
 {
-    positionEstimator_.reset(pose0);
-    motionController_.reset();
-    simulatedT_ = 0.0;
+    // If the brain stem is disconnected, emulate odometry and initial position
+    // feeding the odometer with the commanded velocity
+    if (!tapBrainStem_.isBrainStemConnected())
+    {
+        ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
+            "Brainstem disconnected. Using simulated odometry");
+
+        Velocity<> currentCommand = motionController_.getExecutingCommand();
+
+        simulatedT_ += 1.0 / REFRESH_RATE_HZ;
+        tapOdometry_.set(simulatedT_,
+            currentCommand.linear,
+            currentCommand.angular);
+
+        if (!positionEstimator_.isPoseValid())
+        {
+            // Establish an "acceptable" initial position, at least until the
+            // Position Estimator can get its bearings
+            tapInitialPose_.set(Pose<>(TimeMath::time2number(currentTime_), 3.0, 3.0, 0));
+            reset(tapInitialPose_.getPose());
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -571,73 +586,12 @@ void Motion::stepNode()
         positionEstimator_.run(isOdometryAvailable_ ? &currentOdometry : nullptr);
     }
 
+    // Run the motion controller if the estimated position is valid. No
+    // motion is allowed if a position has been established
     Pose<> currentPose = positionEstimator_.getPose();
-
-    // Run the motion controller
-    motionController_.run(currentPose, currentOdometry, currentJoystickCommand);
-
-    // If the brain stem is disconnected and the motion controller is moving, simulate odometry
-    // feeding the odometer with the commanded velocity
-    if (!tapBrainStem_.isBrainStemConnected())
+    if (currentPose.isValid())
     {
-        ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
-            "Brainstem disconnected. Using simulated odometry");
-
-        Velocity<> currentCommand = motionController_.getExecutingCommand();
-
-        simulatedT_ += 1.0 / REFRESH_RATE_HZ;
-        tapOdometry_.set(simulatedT_,
-            currentCommand.linear,
-            currentCommand.angular);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// TODO: should this be in Executive
-void Motion::executePlanToGoal(Pose<> goalPose)
-{
-    Pose<> robotPose = positionEstimator_.getPose();
-
-    algorithm_.setGraph(tapMap_.getMap()->getGrid());
-
-    // Prepare the start position for the search
-    int fromR = 0;
-    int fromC = 0;
-    tapMap_.getMap()->getMapCoordinates(robotPose.x, robotPose.y, fromC, fromR);
-    Grid2d::LocationType internalStart(fromC, fromR);
-    int startAngle = AngleMath::normalizeRad2deg90(robotPose.theta);
-
-    // Prepare the goal position for the search
-    int toR = 0;
-    int toC = 0;
-    tapMap_.getMap()->getMapCoordinates(goalPose.x, goalPose.y, toC, toR);
-    Grid2d::LocationType internalGoal(toC, toR);
-    int goalAngle = AngleMath::normalizeRad2deg90(goalPose.theta);
-
-    ROS_DEBUG_STREAM_NAMED("Motion", "Looking for a path between " << robotPose << " (" <<
-        fromC << "," << fromR << "," << startAngle
-        << ") and " << goalPose << " (" << toC << "," << toR << "," << goalAngle << ")");
-
-    bool foundSolution = algorithm_.search(
-        SearchPosition<Grid2d>(internalStart, startAngle),
-        SearchPosition<Grid2d>(internalGoal, goalAngle));
-
-    Solution<Grid2d> solution = algorithm_.getSolution(tapMap_.getMap()->getResolution());
-
-    if (foundSolution)
-    {
-        ROS_DEBUG_STREAM_NAMED("Motion", "Found solution: " << endl << solution);
-
-        motionController_.execute(solution);
-        positionEstimator_.resetAccumulatedOdometry();
-
-        simulatedT_ = 0.0;
-    }
-    else
-    {
-        ROS_ERROR_STREAM_NAMED("Motion", "Path not found between " <<
-            robotPose << " (" << fromC << "," << fromR << "," << startAngle << ") and " <<
-            goalPose << " (" << toC << "," << toR << "," << goalAngle << ")");
+        motionController_.run(currentPose, currentOdometry, currentJoystickCommand);
     }
 }
 

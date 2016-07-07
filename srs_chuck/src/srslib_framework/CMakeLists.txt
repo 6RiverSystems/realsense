@@ -8,7 +8,13 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srslib_framework)
 
 set(${PROJECT_NAME}_SOURCES
-	src/io/SerialIO.cpp
+    src/io/SerialIO.cpp
+
+    src/planning/pathplanning/grid/GridSolutionItem.cpp
+    src/planning/pathplanning/grid/GridSolutionFactory.cpp
+
+    src/robotics/controller/BaseController.cpp
+    src/robotics/controller/CMUPathController.cpp
 
     src/localization/Map.cpp
     src/localization/MapNote.cpp
@@ -20,11 +26,14 @@ set(${PROJECT_NAME}_SOURCES
 )
 
 set(${PROJECT_NAME}_MSGS
-    Aps.msg
-    CompleteMap.msg
+    Command.msg
     HardwareInfo.msg
+    MsgMap.msg
     MsgPose.msg
+    MsgSolution.msg
+    MsgSolutionItem.msg
     OperationalState.msg
+    UpdateLight.msg
 )
 
 set(${PROJECT_NAME}_SRVS

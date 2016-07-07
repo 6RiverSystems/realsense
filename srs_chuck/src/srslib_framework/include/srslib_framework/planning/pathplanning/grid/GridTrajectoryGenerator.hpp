@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef TRAJECTORYGENERATOR_HPP_
-#define TRAJECTORYGENERATOR_HPP_
+#ifndef GRIDTRAJECTORYGENERATOR_HPP_
+#define GRIDTRAJECTORYGENERATOR_HPP_
 
 #include <vector>
 using namespace std;
@@ -13,9 +13,8 @@ using namespace std;
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/math/VelocityMath.hpp>
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
-
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
 
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
@@ -25,14 +24,14 @@ using namespace srs;
 
 namespace srs {
 
-class TrajectoryGenerator
+class GridTrajectoryGenerator
 {
 public:
-    TrajectoryGenerator(RobotProfile& robot) :
+    GridTrajectoryGenerator(RobotProfile& robot) :
         robot_(robot)
     {}
 
-    void fromSolution(Solution<Grid2d>& solution)
+    void fromSolution(Solution<GridSolutionItem>& solution)
     {
         trajectory_.clear();
         originalPath_.clear();
@@ -110,13 +109,13 @@ private:
         spacing = max(minimumSpacing, maximumSpacing);
     }
 
-    void extractPath(Solution<Grid2d>& solution, PathType& path)
+    void extractPath(Solution<GridSolutionItem>& solution, PathType& path)
     {
         path.clear();
 
         // Push the first node of the solution as initial waypoint
         // only if it not a rotate
-        if (solution.getStart().actionType != SolutionNode<Grid2d>::ROTATE)
+        if (solution.getStart().actionType != GridSolutionItem::ROTATE)
         {
             path.push_back(solution.getStart().fromPose);
         }
@@ -126,10 +125,10 @@ private:
         {
             switch (solutionNode.actionType)
             {
-                case SolutionNode<Grid2d>::MOVE:
+                case GridSolutionItem::MOVE:
                     break;
 
-                case SolutionNode<Grid2d>::ROTATE:
+                case GridSolutionItem::ROTATE:
                     path.push_back(solutionNode.toPose);
                     break;
             }
@@ -137,7 +136,7 @@ private:
 
         // Push the last node of the solution as final waypoint
         // only if it is not a rotate
-        if (solution.getGoal().actionType != SolutionNode<Grid2d>::ROTATE)
+        if (solution.getGoal().actionType != GridSolutionItem::ROTATE)
         {
             path.push_back(solution.getGoal().toPose);
         }
@@ -295,4 +294,4 @@ private:
 
 } // namespace srs
 
-#endif // TRAJECTORYGENERATOR_HPP_
+#endif // GRIDTRAJECTORYGENERATOR_HPP_

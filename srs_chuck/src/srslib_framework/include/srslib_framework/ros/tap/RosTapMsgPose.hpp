@@ -9,12 +9,15 @@
 #include <string>
 using namespace std;
 
-#include <srslib_framework/math/TimeMath.hpp>
-#include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/ros/RosTap.hpp>
-
 #include <srslib_framework/MsgPose.h>
 using namespace srslib_framework;
+
+#include <srslib_framework/math/TimeMath.hpp>
+
+#include <srslib_framework/robotics/Pose.hpp>
+
+#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
 namespace srs {
 
@@ -42,12 +45,12 @@ public:
     void reset()
     {
         RosTap::reset();
-        set(TimeMath::time2number(ros::Time::now()), 0.0, 0.0, 0.0);
+        set(Pose<>::ZERO);
     }
 
-    void set(double arrivalTime, BaseType x, BaseType y, BaseType theta)
+    void set(Pose<> newPose)
     {
-        currentPose_ = Pose<>(arrivalTime, x, y, theta);
+        currentPose_ = newPose;
         setNewData(true);
     }
 
@@ -61,10 +64,7 @@ protected:
 private:
     void onPose(const MsgPoseConstPtr message)
     {
-        set(TimeMath::time2number(message->header.stamp),
-            message->x,
-            message->y,
-            AngleMath::deg2rad<double>(message->theta));
+        set(PoseMessageFactory::msg2Pose(message));
     }
 
     Pose<> currentPose_;

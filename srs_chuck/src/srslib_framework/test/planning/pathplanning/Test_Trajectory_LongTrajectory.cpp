@@ -9,70 +9,70 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
+
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
-#include <srslib_framework/planning/pathplanning/TrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
+
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 using namespace srs;
-
-typedef SolutionNode<Grid2d> SolutionNodeType;
 
 TEST(Test_Trajectory, LongTrajectory)
 {
     constexpr double DEG0 = 0.0;
     constexpr double DEG90 = AngleMath::deg2rad<double>(90);
 
-    SolutionNodeType SOLUTION_00 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_00 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(0, 0, DEG0), Pose<>(1, 0, DEG0));
 
-    SolutionNodeType SOLUTION_01 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_01 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(1, 0, DEG0), Pose<>(2, 0, DEG0));
 
-    SolutionNodeType SOLUTION_02 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_02 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(2, 0, DEG0), Pose<>(3, 0, DEG0));
 
-    SolutionNodeType SOLUTION_03 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_03 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(3, 0, DEG0), Pose<>(4, 0, DEG0));
 
-    SolutionNodeType SOLUTION_04 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_04 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(4, 0, DEG0), Pose<>(5, 0, DEG0));
 
-    SolutionNodeType SOLUTION_05 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_05 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(5, 0, DEG0), Pose<>(6, 0, DEG0));
 
-    SolutionNodeType SOLUTION_06 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_06 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(6, 0, DEG0), Pose<>(7, 0, DEG0));
 
-    SolutionNodeType SOLUTION_07 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_07 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(7, 0, DEG0), Pose<>(8, 0, DEG0));
 
-    SolutionNodeType SOLUTION_08 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_08 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(8, 0, DEG0), Pose<>(9, 0, DEG0));
 
-    SolutionNodeType SOLUTION_09 = SolutionNodeType(SolutionNodeType::ROTATE,
+    GridSolutionItem SOLUTION_09 = GridSolutionItem(GridSolutionItem::ROTATE,
         Pose<>(9, 0, DEG0), Pose<>(9, 0, DEG90));
 
-    SolutionNodeType SOLUTION_10 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_10 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(9, 0, DEG90), Pose<>(9, 1, DEG90));
 
-    SolutionNodeType SOLUTION_11 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_11 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(9, 1, DEG90), Pose<>(9, 2, DEG90));
 
-    SolutionNodeType SOLUTION_12 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_12 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(9, 2, DEG90), Pose<>(9, 3, DEG90));
 
-    SolutionNodeType SOLUTION_13 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_13 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(9, 3, DEG90), Pose<>(9, 4, DEG90));
 
-    SolutionNodeType SOLUTION_14 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_14 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(9, 4, DEG90), Pose<>(9, 5, DEG90));
 
-    SolutionNodeType SOLUTION_15 = SolutionNodeType(SolutionNodeType::MOVE,
+    GridSolutionItem SOLUTION_15 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(9, 5, DEG90), Pose<>(9, 6, DEG90));
 
-    Solution<Grid2d> solution;
+    Solution<GridSolutionItem> solution;
     solution.push_back(SOLUTION_00);
     solution.push_back(SOLUTION_01);
     solution.push_back(SOLUTION_02);
@@ -95,7 +95,7 @@ TEST(Test_Trajectory, LongTrajectory)
     Chuck chuck;
     Trajectory<> trajectory;
 
-    TrajectoryGenerator solutionConverter(chuck);
+    GridTrajectoryGenerator solutionConverter(chuck);
     solutionConverter.fromSolution(solution);
     solutionConverter.getTrajectory(trajectory);
 

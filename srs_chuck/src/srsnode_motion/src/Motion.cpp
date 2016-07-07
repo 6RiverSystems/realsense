@@ -13,9 +13,6 @@
 
 #include <srslib_framework/MsgPose.h>
 
-#include <srsnode_motion/MotionConfig.h>
-using namespace srsnode_motion;
-
 #include <srslib_framework/math/AngleMath.hpp>
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
@@ -27,6 +24,8 @@ using namespace srsnode_motion;
 
 #include <srsnode_motion/tap/aps/FactoryApsNoise.hpp>
 #include <srsnode_motion/tap/odometry/FactoryOdometryNoise.hpp>
+
+#include <srsnode_motion/MotionConfig.h>
 
 namespace srs {
 

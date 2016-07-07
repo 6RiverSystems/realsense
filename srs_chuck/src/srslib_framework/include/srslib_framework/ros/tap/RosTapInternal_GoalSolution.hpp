@@ -8,9 +8,7 @@
 
 #include <ros/ros.h>
 
-#include <srslib_framework/MsgPose.h>
 #include <srslib_framework/MsgSolution.h>
-using namespace srslib_framework;
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
 
@@ -61,7 +59,7 @@ protected:
     }
 
 private:
-    void onSolution(const MsgSolutionConstPtr message)
+    void onSolution(const srslib_framework::MsgSolutionConstPtr message)
     {
         Solution<GridSolutionItem> solution = SolutionMessageFactory::msg2Solution(message);
         set(solution);

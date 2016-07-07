@@ -26,14 +26,12 @@ set(${PROJECT_NAME}_SOURCES
 )
 
 set(${PROJECT_NAME}_MSGS
-    Command.msg
-    HardwareInfo.msg
+    MsgHardwareInfo.msg
     MsgMap.msg
+    MsgOperationalState.msg
     MsgPose.msg
     MsgSolution.msg
     MsgSolutionItem.msg
-    OperationalState.msg
-    UpdateLight.msg
 )
 
 set(${PROJECT_NAME}_SRVS

@@ -16,7 +16,6 @@
 #include <yaml-cpp/yaml.h>
 
 #include <srslib_framework/MsgPose.h>
-using namespace srslib_framework;
 
 namespace srs
 {
@@ -29,7 +28,7 @@ namespace srs
 
 StarGazer::StarGazer( const std::string& strNodeName, const std::string& strSerialPort, const std::string& strApsTopic ) :
 	m_rosNodeHandle( strNodeName ),
-    m_rosApsPublisher(m_rosNodeHandle.advertise<MsgPose>(strApsTopic, 1000)),
+    m_rosApsPublisher(m_rosNodeHandle.advertise<srslib_framework::MsgPose>(strApsTopic, 1000)),
 	m_pSerialIO( new SerialIO( "stargazer" ) ),
 	m_messageProcessor( m_pSerialIO ),
 	m_sleeper( REFRESH_RATE_HZ / 1000.0 ),
@@ -177,7 +176,7 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
         poseStampedTFToMsg(stampedPose, msg);
 
         // Create our internal message
-        MsgPose message;
+        srslib_framework::MsgPose message;
 
         message.header = msg.header;
         message.x = msg.pose.position.x;

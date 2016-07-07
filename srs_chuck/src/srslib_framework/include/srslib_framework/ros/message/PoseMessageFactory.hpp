@@ -12,7 +12,6 @@
 #include <geometry_msgs/PoseStamped.h>
 
 #include <srslib_framework/MsgPose.h>
-using namespace srslib_framework;
 
 namespace srs {
 
@@ -25,7 +24,7 @@ struct PoseMessageFactory
      *
      * @return Pose generated from the specified MsgPose
      */
-    static Pose<> msg2Pose(MsgPose message)
+    static Pose<> msg2Pose(srslib_framework::MsgPose message)
     {
         Pose<> pose;
 
@@ -44,7 +43,7 @@ struct PoseMessageFactory
      *
      * @return Pose generated from the specified MsgPose
      */
-    static Pose<> msg2Pose(MsgPoseConstPtr message)
+    static Pose<> msg2Pose(srslib_framework::MsgPoseConstPtr message)
     {
         return PoseMessageFactory::msg2Pose(*message);
     }
@@ -57,9 +56,9 @@ struct PoseMessageFactory
      *
      * @return MsgPose generated from the specified Pose
      */
-    static MsgPose pose2Msg(Pose<> pose, ros::Time timestamp = ros::Time::now())
+    static srslib_framework::MsgPose pose2Msg(Pose<> pose, ros::Time timestamp = ros::Time::now())
     {
-        MsgPose msgPose;
+        srslib_framework::MsgPose msgPose;
         msgPose.header.stamp = timestamp;
 
         msgPose.x = pose.x;

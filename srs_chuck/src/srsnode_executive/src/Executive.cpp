@@ -5,7 +5,6 @@
 
 #include <srslib_framework/MsgPose.h>
 #include <srslib_framework/MsgSolution.h>
-using namespace srslib_framework;
 
 #include <srslib_framework/math/PoseMath.hpp>
 
@@ -26,10 +25,14 @@ Executive::Executive(string nodeName) :
     currentSolution_(nullptr),
     rosNodeHandle_(nodeName)
 {
-    pubInternalInitialPose_ = rosNodeHandle_.advertise<MsgPose>("/internal/command/initial_pose", 1);
-    pubInternalGoalSolution_ = rosNodeHandle_.advertise<MsgSolution>("/internal/state/goal/solution", 1);
-    pubStatusGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>("/internal/state/goal/path", 1);
-    pubExternalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>("/response/arrived", 1);
+    pubInternalInitialPose_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
+        "/internal/command/initial_pose", 1);
+    pubInternalGoalSolution_ = rosNodeHandle_.advertise<srslib_framework::MsgSolution>(
+        "/internal/state/goal/solution", 1);
+    pubStatusGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>(
+        "/internal/state/goal/path", 1);
+    pubExternalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
+        "/response/arrived", 1);
 
     robotInitialPose_ = Pose<>(0, 3.0, 3.0, 0);
     currentRobotPose_ = robotInitialPose_;

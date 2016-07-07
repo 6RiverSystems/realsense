@@ -10,7 +10,6 @@
 using namespace std;
 
 #include <srslib_framework/MsgPose.h>
-using namespace srslib_framework;
 
 #include <srslib_framework/math/TimeMath.hpp>
 
@@ -62,7 +61,7 @@ protected:
     }
 
 private:
-    void onPose(const MsgPoseConstPtr message)
+    void onPose(const srslib_framework::MsgPoseConstPtr message)
     {
         set(PoseMessageFactory::msg2Pose(message));
     }

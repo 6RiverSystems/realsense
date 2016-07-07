@@ -8,7 +8,6 @@
 
 #include <srslib_framework/MsgPose.h>
 #include <srslib_framework/MsgSolutionItem.h>
-using namespace srslib_framework;
 
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
@@ -24,9 +23,9 @@ struct SolutionMessageFactory
      *
      * @return MsgSolutionItem generated from the specified GridSolutionItem
      */
-    static MsgSolutionItem gridSolutionItem2Msg(GridSolutionItem gridSolutionItem)
+    static srslib_framework::MsgSolutionItem gridSolutionItem2Msg(GridSolutionItem gridSolutionItem)
     {
-        MsgSolutionItem msgSolutionItem;
+        srslib_framework::MsgSolutionItem msgSolutionItem;
 
         msgSolutionItem.action = gridSolutionItem.actionType;
         msgSolutionItem.fromPose = PoseMessageFactory::pose2Msg(gridSolutionItem.fromPose);
@@ -43,7 +42,7 @@ struct SolutionMessageFactory
      *
      * @return GridSolutionItem generated from the specified MsgSolutionItem
      */
-    static GridSolutionItem msg2GridSolutionItem(MsgSolutionItem message)
+    static GridSolutionItem msg2GridSolutionItem(srslib_framework::MsgSolutionItem message)
     {
         GridSolutionItem gridSolutionItem;
 
@@ -62,7 +61,7 @@ struct SolutionMessageFactory
      *
      * @return GridSolutionItem generated from the specified MsgSolutionItem
      */
-    static GridSolutionItem msg2GridSolutionItem(MsgSolutionItemConstPtr message)
+    static GridSolutionItem msg2GridSolutionItem(srslib_framework::MsgSolutionItemConstPtr message)
     {
         return SolutionMessageFactory::msg2GridSolutionItem(*message);
     }
@@ -74,7 +73,7 @@ struct SolutionMessageFactory
      *
      * @return Solution of GridSolutionItem generated from the specified MsgSolution
      */
-    static Solution<GridSolutionItem> msg2Solution(MsgSolutionConstPtr message)
+    static Solution<GridSolutionItem> msg2Solution(srslib_framework::MsgSolutionConstPtr message)
     {
         Solution<GridSolutionItem> solution;
 
@@ -97,13 +96,13 @@ struct SolutionMessageFactory
      *
      * @return MsgSolution generated from the specified Solution of GridSolutionItem
      */
-    static MsgSolution gridSolution2Msg(Solution<GridSolutionItem>& solution,
+    static srslib_framework::MsgSolution gridSolution2Msg(Solution<GridSolutionItem>& solution,
         ros::Time timestamp = ros::Time::now())
     {
-        MsgSolution msgSolution;
+        srslib_framework::MsgSolution msgSolution;
         msgSolution.header.stamp = timestamp;
 
-        vector<MsgSolutionItem> items;
+        vector<srslib_framework::MsgSolutionItem> items;
 
         for (auto solutionItem : solution)
         {

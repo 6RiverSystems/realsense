@@ -8,8 +8,8 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Float32.h>
-#include <srslib_framework/HardwareInfo.h>
-#include <srslib_framework/OperationalState.h>
+#include <srslib_framework/MsgHardwareInfo.h>
+#include <srslib_framework/MsgOperationalState.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <srslib_framework/io/SerialIO.hpp>
 #include <srslib_framework/platform/Thread.hpp>
@@ -205,7 +205,7 @@ void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t chassisGeneration,
 		", chassisGeneration: " << unsigned( chassisGeneration ) << ", brainstemHwVersion: " << unsigned( brainstemHwVersion ) <<
 		", brainstemSwVersion: " << strBrainstemSwVersion );
 
-	srslib_framework::HardwareInfo msg;;
+	srslib_framework::MsgHardwareInfo msg;
 	msg.name = strName;
 	msg.uid = pszUid;
 	msg.chassisGeneration = chassisGeneration;
@@ -238,7 +238,7 @@ void BrainStem::OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_
 
 	ROS_INFO_STREAM( strData );
 
-	srslib_framework::OperationalState msg;
+	srslib_framework::MsgOperationalState msg;
 	msg.frontEStop = motionStatus.frontEStop;
 	msg.backEStop = motionStatus.backEStop;
 	msg.wirelessEStop = motionStatus.wirelessEStop;
@@ -280,9 +280,11 @@ void BrainStem::CreatePublishers( )
 {
 	m_connectedPublisher = m_rosNodeHandle.advertise<std_msgs::Bool>( CONNECTED_TOPIC, 1, true );
 
-	m_hardwareInfoPublisher = m_rosNodeHandle.advertise<srslib_framework::HardwareInfo>( HARDWARE_INFO_TOPIC, 1, true );
+	m_hardwareInfoPublisher = m_rosNodeHandle.advertise<srslib_framework::MsgHardwareInfo>(
+	    HARDWARE_INFO_TOPIC, 1, true );
 
-	m_operationalStatePublisher = m_rosNodeHandle.advertise<srslib_framework::OperationalState>( OPERATIONAL_STATE_TOPIC, 1, true );
+	m_operationalStatePublisher = m_rosNodeHandle.advertise<srslib_framework::MsgOperationalState>(
+	    OPERATIONAL_STATE_TOPIC, 1, true );
 
 	m_voltagePublisher = m_rosNodeHandle.advertise<std_msgs::Float32>( VOLTAGE_TOPIC, 1, true );
 

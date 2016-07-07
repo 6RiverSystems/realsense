@@ -16,7 +16,6 @@ using namespace std;
 #include <srsnode_motion/tap/aps/ApsSensor.hpp>
 
 #include <srslib_framework/MsgPose.h>
-using namespace srslib_framework;
 
 namespace srs {
 

@@ -33,7 +33,7 @@ private:
 
     RosTriggerShutdown triggerShutdown_;
     RosTriggerPause triggerPause_;
-//    Reflexes reflexes_;
+    Reflexes reflexes_;
 };
 
 } // namespace srs

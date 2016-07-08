@@ -10,8 +10,8 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Midbrain::Midbrain(string nodeName) :
-    rosNodeHandle_(nodeName)
-//    ,reflexes_(rosNodeHandle_)
+    rosNodeHandle_(nodeName),
+    reflexes_(rosNodeHandle_)
 {
 }
 

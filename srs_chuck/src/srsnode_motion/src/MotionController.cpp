@@ -335,7 +335,7 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
                 messageTwist.angular.y = 0;
                 messageTwist.angular.z = currentCommand_.angular;
 
-                ROS_DEBUG_STREAM_NAMED("MotionController", "Sending VELOCITY: " << currentCommand_);
+                ROS_DEBUG_STREAM_NAMED("motion_controller", "Sending VELOCITY: " << currentCommand_);
                 pubCmdVel_.publish(messageTwist);
             }
             break;
@@ -352,7 +352,7 @@ void MotionController::executeCommand(bool enforce, CommandEnum command, const V
             messageTwist.angular.y = 0;
             messageTwist.angular.z = currentCommand_.angular;
 
-            ROS_DEBUG_STREAM_NAMED("MotionController", "Sending BRAKE");
+            ROS_DEBUG_STREAM_NAMED("motion_controller", "Sending BRAKE");
             pubCmdVel_.publish(messageTwist);
             break;
     }
@@ -383,7 +383,7 @@ void MotionController::executeFinalRotation()
     if (!AngleMath::equalRad<double>(finalTheta, currentPose_.theta,
         robot_.rotationGoalReachedAngle))
     {
-        ROS_DEBUG_STREAM_NAMED("MotionController", "Rotation needed from: " <<
+        ROS_DEBUG_STREAM_NAMED("motion_controller", "Rotation needed from: " <<
             AngleMath::rad2deg<double>(currentPose_.theta) << "deg to: " <<
             AngleMath::rad2deg<double>(finalTheta) << "deg");
 
@@ -412,12 +412,12 @@ void MotionController::checkMotionStatus()
     {
         if (activeController_->isCanceled())
         {
-            ROS_DEBUG_STREAM_NAMED("MotionController", "Controller " <<
+            ROS_DEBUG_STREAM_NAMED("motion_controller", "Controller " <<
                 activeController_->getName() << " goal canceled");
         }
         else
         {
-            ROS_DEBUG_STREAM_NAMED("MotionController", "Controller " <<
+            ROS_DEBUG_STREAM_NAMED("motion_controller", "Controller " <<
                 activeController_->getName() << " reached its goal");
         }
 
@@ -519,16 +519,16 @@ void MotionController::popWorkItem(TaskEnum& task, SolutionType& solution)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::prependWorkItem(TaskEnum task, SolutionType* solution)
 {
-    ROS_DEBUG_STREAM_NAMED("MotionController", printWorkToString());
+    ROS_DEBUG_STREAM_NAMED("motion_controller", printWorkToString());
 
-    ROS_DEBUG_STREAM_NAMED("MotionController", "Pushing task: " << TASK_NAMES[task]);
+    ROS_DEBUG_STREAM_NAMED("motion_controller", "Pushing task: " << TASK_NAMES[task]);
     if (solution)
     {
-        ROS_DEBUG_STREAM_NAMED("MotionController", "Pushing solution: " << *solution);
+        ROS_DEBUG_STREAM_NAMED("motion_controller", "Pushing solution: " << *solution);
     }
     else
     {
-        ROS_DEBUG_STREAM_NAMED("MotionController", "Pushing solution: (null)");
+        ROS_DEBUG_STREAM_NAMED("motion_controller", "Pushing solution: (null)");
     }
 
     work_.push_back(WorkType(task, solution));
@@ -554,7 +554,7 @@ void MotionController::pumpWorkFromQueue()
 
     switch (currentTask_)
     {
-        ROS_DEBUG_STREAM_NAMED("MotionController", "Requested task: " << TASK_NAMES[currentTask_]);
+        ROS_DEBUG_STREAM_NAMED("motion_controller", "Requested task: " << TASK_NAMES[currentTask_]);
 
         case TaskEnum::EMERGENCY_STOP:
             taskEmergencyStop();
@@ -585,16 +585,16 @@ void MotionController::pumpWorkFromQueue()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::pushWorkItem(TaskEnum task, SolutionType* solution)
 {
-    ROS_DEBUG_STREAM_NAMED("MotionController", printWorkToString());
+    ROS_DEBUG_STREAM_NAMED("motion_controller", printWorkToString());
 
-    ROS_DEBUG_STREAM_NAMED("MotionController", "Pushing task: " << TASK_NAMES[task]);
+    ROS_DEBUG_STREAM_NAMED("motion_controller", "Pushing task: " << TASK_NAMES[task]);
     if (solution)
     {
-        ROS_DEBUG_STREAM_NAMED("MotionController", "Pushing solution: " << *solution);
+        ROS_DEBUG_STREAM_NAMED("motion_controller", "Pushing solution: " << *solution);
     }
     else
     {
-        ROS_DEBUG_STREAM_NAMED("MotionController", "Pushing solution: (null)");
+        ROS_DEBUG_STREAM_NAMED("motion_controller", "Pushing solution: (null)");
     }
 
     work_.push_back(WorkType(task, solution));
@@ -672,7 +672,7 @@ void MotionController::selectController(TaskEnum task)
             throw;
     }
 
-    ROS_DEBUG_STREAM_NAMED("MotionController", "Switching to controller " <<
+    ROS_DEBUG_STREAM_NAMED("motion_controller", "Switching to controller " <<
         activeController_->getName());
 
     // Before using the new controller, make sure that
@@ -713,7 +713,7 @@ void MotionController::taskPathFollow()
         converter.fromSolution(currentSolution_);
         converter.getTrajectory(trajectory);
 
-        ROS_DEBUG_STREAM_NAMED("MotionController", "Trajectory: " << trajectory);
+        ROS_DEBUG_STREAM_NAMED("motion_controller", "Trajectory: " << trajectory);
 
         // Pass the trajectory to the path controller
         pathController_->setTrajectory(trajectory, currentPose_);

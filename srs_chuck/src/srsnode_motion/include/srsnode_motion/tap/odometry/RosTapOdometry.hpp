@@ -66,7 +66,7 @@ public:
 
         if (!sensor_->isEnabled())
         {
-            ROS_DEBUG_STREAM_NAMED("RosTapOdometry", "ODOMETRY disabled. Ignoring readings.");
+            ROS_DEBUG_STREAM_NAMED("ros_tap_odometry", "ODOMETRY disabled. Ignoring readings.");
         }
 
         setNewData(sensor_->newDataAvailable());

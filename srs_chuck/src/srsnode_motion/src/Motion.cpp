@@ -145,7 +145,7 @@ void Motion::executeSolution(Solution<GridSolutionItem> solution)
 {
     if (!solution.empty())
     {
-        ROS_DEBUG_STREAM_NAMED("Motion", "Communicated solution: " << endl << solution);
+        ROS_DEBUG_STREAM_NAMED("motion", "Communicated solution: " << endl << solution);
 
         motionController_.execute(solution);
         positionEstimator_.resetAccumulatedOdometry();
@@ -154,7 +154,7 @@ void Motion::executeSolution(Solution<GridSolutionItem> solution)
     }
     else
     {
-        ROS_WARN_STREAM_NAMED("Motion", "An empty solution is being discarded.");
+        ROS_WARN_STREAM_NAMED("motion", "An empty solution is being discarded.");
     }
 }
 
@@ -174,159 +174,159 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 
     isCustomActionEnabled_ = config.custom_action_enabled;
 
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Custom action enabled [t/f]: " <<
         config.custom_action_enabled);
 
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Emergency Controller: linear velocity gain []: " <<
         config.emergency_controller_kv);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Emergency Controller: angular velocity gain []: " <<
         config.emergency_controller_kw);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Emergency Controller: maximum angular velocity in emergency mode [rad/s]: " <<
         config.emergency_controller_max_angular_velocity);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Emergency Controller: maximum linear velocity in emergency mode [m/s]: " <<
         config.emergency_controller_max_linear_velocity);
 
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Manual Controller: linear velocity gain []: " <<
         config.manual_controller_kv);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Manual Controller: angular velocity gain []: " <<
         config.manual_controller_kw);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Manual Controller: maximum angular velocity in manual mode [rad/s]: " <<
         config.manual_controller_max_angular_velocity);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Manual Controller: maximum linear velocity in manual mode [m/s]: " <<
         config.manual_controller_max_linear_velocity);
 
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Maximum physical angular acceleration [rad/s^2]: " <<
         config.physical_max_angular_acceleration);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Maximum physical angular velocity [rad/s]: " <<
         config.physical_max_angular_velocity);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Maximum physical linear acceleration [m/s^2]: " <<
         config.physical_max_linear_acceleration);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Maximum physical linear velocity [m/s]: " <<
         config.physical_max_linear_velocity);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Minimum physical angular velocity [rad/s]: " <<
         config.physical_min_angular_velocity);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Minimum physical linear velocity [m/s]: " <<
         config.physical_min_linear_velocity);
 
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: adaptive look-ahead enabled [t/f]: " <<
         config.pathfollow_controller_adaptive_lookahead_enabled);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: distance used to check if the goal was reached [m]: " <<
         config.pathfollow_controller_goal_reached_distance);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: linear velocity gain []: " <<
         config.pathfollow_controller_kv);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: angular velocity gain []: " <<
         config.pathfollow_controller_kw);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: depth of the landing zone [m]: " <<
         config.pathfollow_controller_landing_depth);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: width of the landing zone [m]: " <<
         config.pathfollow_controller_landing_width);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: linear acceleration [m/s^2]: " <<
         config.pathfollow_controller_linear_acceleration);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: maximum angular velocity [rad/s]: " <<
         config.pathfollow_controller_max_angular_velocity);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: maximum linear velocity [m/s]: " <<
         config.pathfollow_controller_max_linear_velocity);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: maximum look-ahead distance [m]: " <<
         config.pathfollow_controller_max_look_ahead_distance);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: minimum linear velocity allowed [m/s]: " <<
         config.pathfollow_controller_min_linear_velocity);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: minimum look-ahead distance [m]: " <<
         config.pathfollow_controller_min_look_ahead_distance);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: straight distance that is considered small [m]: " <<
         config.pathfollow_controller_small_straight_distance);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: travel linear velocity during turns [m/s]: " <<
         config.pathfollow_controller_turning_linear_velocity);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: travel reduced velocity radius during turns [m]: " <<
         config.pathfollow_controller_turning_zone_radius);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: zero-point look-ahead distance [m]: " <<
         config.pathfollow_controller_zero_look_ahead_distance);
 
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Rotation Controller: angle used to check if the goal was reached [rad]: " <<
         config.rotation_controller_goal_reached_angle);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Rotation Controller: derivative constant []: " <<
         config.rotation_controller_kd);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Rotation Controller: integral constant []: " <<
         config.rotation_controller_ki);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Rotation Controller: proportional constant []: " <<
         config.rotation_controller_kp);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Rotation Controller: linear velocity gain []: " <<
         config.rotation_controller_kv);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Rotation Controller: angular velocity gain []: " <<
         config.rotation_controller_kw);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Rotation Controller: minimum angular velocity during motion [rad/s]: " <<
         config.rotation_controller_min_angular_velocity);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Rotation Controller: rotation velocity [rad/s]: " <<
         config.rotation_controller_rotation_velocity);
 
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "APS enabled: " <<
         config.sensor_aps_enabled);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "ODOMETRY enabled: " <<
         config.sensor_odometry_enabled);
 
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Stop Controller: minimum linear velocity allowed [m/s]: " <<
         config.stop_controller_min_linear_velocity);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Stop Controller: normal deceleration [m/s^2]: " <<
         config.stop_controller_normal_linear_deceleration);
 
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Heading component of the APS noise [rad]: " <<
         config.ukf_aps_error_heading);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Location (X and Y) component of the APS noise [m]: " <<
         config.ukf_aps_error_location);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Angular velocity component of the odometry noise [rad/s]: " <<
         config.ukf_odometry_error_angular);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Linear velocity component of the odometry noise [m/s]: " <<
         config.ukf_odometry_error_linear);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Heading component of the robot noise [rad]: " <<
         config.ukf_robot_error_heading);
-    ROS_INFO_STREAM_NAMED("Motion",
+    ROS_INFO_STREAM_NAMED("motion",
         "Location (X and Y) component of the robot noise [m]: " <<
         config.ukf_robot_error_location);
 }
@@ -365,13 +365,13 @@ void Motion::publishArrived()
         if (motionController_.hasArrived())
         {
             messageGoalArrived.data = true;
-            ROS_DEBUG_STREAM_NAMED("Motion", "Arrived at goal: " <<
+            ROS_DEBUG_STREAM_NAMED("motion", "Arrived at goal: " <<
                 motionController_.getFinalGoal());
         }
         else
         {
             messageGoalArrived.data = false;
-            ROS_DEBUG_STREAM_NAMED("Motion", "Departed for goal: " <<
+            ROS_DEBUG_STREAM_NAMED("motion", "Departed for goal: " <<
                 motionController_.getFinalGoal());
         }
 

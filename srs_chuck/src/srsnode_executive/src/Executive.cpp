@@ -133,7 +133,7 @@ void Executive::executePlanToGoal(Pose<> goalPose)
     int goalAngle;
     PoseAdapter::pose2Map(currentGoal_, map, internalGoal, goalAngle);
 
-    ROS_DEBUG_STREAM_NAMED("Motion", "Looking for a path between " << currentRobotPose_ << " (" <<
+    ROS_DEBUG_STREAM_NAMED("executive", "Looking for a path between " << currentRobotPose_ << " (" <<
         fromC << "," << fromR << "," << startAngle <<
         ") and " << goalPose << " (" << toC << "," << toR << "," << goalAngle << ")");
 
@@ -146,11 +146,11 @@ void Executive::executePlanToGoal(Pose<> goalPose)
         SearchNode<Grid2d>* goalNode = algorithm_.getSolution();
 
         currentSolution_ = GridSolutionFactory::fromSearch(goalNode, map);
-        ROS_DEBUG_STREAM_NAMED("Executive", "Found solution: " << endl << currentSolution_);
+        ROS_DEBUG_STREAM_NAMED("executive", "Found solution: " << endl << currentSolution_);
     }
     else
     {
-        ROS_ERROR_STREAM_NAMED("Motion", "Path not found between " <<
+        ROS_ERROR_STREAM_NAMED("executive", "Path not found between " <<
             currentRobotPose_ << " (" << fromC << "," << fromR << "," << startAngle << ") and " <<
             goalPose << " (" << toC << "," << toR << "," << goalAngle << ")");
      }

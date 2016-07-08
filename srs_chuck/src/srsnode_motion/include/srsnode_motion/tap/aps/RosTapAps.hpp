@@ -64,7 +64,7 @@ public:
 
         if (!sensor_->isEnabled())
         {
-            ROS_DEBUG_STREAM_NAMED("RosTapAps", "APS disabled. Ignoring readings.");
+            ROS_DEBUG_STREAM_NAMED("ros_tap_aps", "APS disabled. Ignoring readings.");
         }
 
         setNewData(sensor_->newDataAvailable());

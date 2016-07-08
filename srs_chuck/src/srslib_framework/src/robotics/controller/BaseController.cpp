@@ -43,10 +43,10 @@ void BaseController::step(double dT, Pose<> currentPose, Odometry<> currentOdome
 bool BaseController::checkGoalReached(Pose<> currentPose)
 {
     double distanceToGoal = PoseMath::euclidean(currentPose, getGoal());
-    ROS_DEBUG_STREAM_NAMED("CMUPathController", "Distance to goal line: " << distanceToGoal);
+    ROS_DEBUG_STREAM_NAMED("base_controller", "Distance to goal line: " << distanceToGoal);
 
     bool isIntersecting = PoseMath::intersection(goalLanding_, currentPose);
-    ROS_DEBUG_STREAM_NAMED("CMUPathController", "Inside landing zone: " << isIntersecting);
+    ROS_DEBUG_STREAM_NAMED("base_controller", "Inside landing zone: " << isIntersecting);
 
     return isIntersecting;
 }

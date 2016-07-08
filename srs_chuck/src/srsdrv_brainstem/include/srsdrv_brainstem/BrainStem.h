@@ -62,6 +62,27 @@ private:
 
 private:
 
+	static constexpr auto REFRESH_RATE_HZ = 100;
+
+	static constexpr auto HARDWARE_INFO_TOPIC = "/info/hardware";
+
+	static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/operational_state";
+
+	static constexpr auto VOLTAGE_TOPIC = "/info/voltage";
+
+	static constexpr auto CONNECTED_TOPIC = "/internal/drivers/brainstem/connected";
+
+	static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
+
+	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
+
+	static constexpr auto PING_TOPIC = "/internal/state/ping";
+
+	// TODO: Remove/Replace with proper messages
+	static constexpr auto COMMAND_TOPIC = "/cmd_ll";
+
+	static constexpr auto EVENT_TOPIC = "/ll_event";
+
 	ros::NodeHandle 			m_rosNodeHandle;
 
 	ros::Subscriber				m_llcmdSubscriber;

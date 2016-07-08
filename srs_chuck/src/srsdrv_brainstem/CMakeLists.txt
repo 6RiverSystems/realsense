@@ -36,6 +36,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Boost REQUIRED)
 
 include_directories(include 
+    include/srsdrv_brainstem/
     src/
     ${catkin_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}

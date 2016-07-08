@@ -29,6 +29,10 @@ private:
 
     void evaluateTriggers();
 
+    void createSubscribers();
+
+    void createPublishers();
+
     ros::NodeHandle rosNodeHandle_;
 
     RosTriggerShutdown triggerShutdown_;

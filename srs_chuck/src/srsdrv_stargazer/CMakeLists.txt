@@ -45,6 +45,7 @@ endif(NEW_YAMLCPP_FOUND)
 find_package(Boost REQUIRED)
 
 include_directories(include 
+    include/srsdrv_stargazer/
     src/
     ${catkin_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}

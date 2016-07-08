@@ -133,9 +133,11 @@ void Executive::executePlanToGoal(Pose<> goalPose)
     int goalAngle;
     PoseAdapter::pose2Map(currentGoal_, map, internalGoal, goalAngle);
 
-    ROS_DEBUG_STREAM_NAMED("executive", "Looking for a path between " << currentRobotPose_ << " (" <<
-        fromC << "," << fromR << "," << startAngle <<
-        ") and " << goalPose << " (" << toC << "," << toR << "," << goalAngle << ")");
+    ROS_DEBUG_STREAM_NAMED("executive", "Looking for a path between " <<
+        currentRobotPose_ <<
+        " (" << internalStart.x << "," << internalStart.y << "," << startAngle << ") and " <<
+        goalPose <<
+        " (" << internalGoal.x << "," << internalGoal.y << "," << goalAngle << ")");
 
     bool foundSolution = algorithm_.search(
         SearchPosition<Grid2d>(internalStart, startAngle),
@@ -150,9 +152,11 @@ void Executive::executePlanToGoal(Pose<> goalPose)
     }
     else
     {
-        ROS_ERROR_STREAM_NAMED("executive", "Path not found between " <<
-            currentRobotPose_ << " (" << fromC << "," << fromR << "," << startAngle << ") and " <<
-            goalPose << " (" << toC << "," << toR << "," << goalAngle << ")");
+        ROS_DEBUG_STREAM_NAMED("executive", "Path not found between " <<
+            currentRobotPose_ <<
+            " (" << internalStart.x << "," << internalStart.y << "," << startAngle << ") and " <<
+            goalPose <<
+            " (" << internalGoal.x << "," << internalGoal.y << "," << goalAngle << ")");
      }
 }
 

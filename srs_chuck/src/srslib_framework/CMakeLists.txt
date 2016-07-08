@@ -32,8 +32,8 @@ set(${PROJECT_NAME}_MSGS
     MsgSolutionItem.msg
 )
 
-set(${PROJECT_NAME}_SRVS
-)
+# set(${PROJECT_NAME}_SRVS
+# )
 
 set(TEST_SOURCES_DATASTRUCTURE
     test/datastructure/Test_MappedPriorityQueue_Basic.cpp
@@ -124,10 +124,10 @@ add_message_files(
     ${${PROJECT_NAME}_MSGS}
 )
 
-add_service_files(
-    FILES
-    ${${PROJECT_NAME}_SRVS}
-)
+# add_service_files(
+#     FILES
+#     ${${PROJECT_NAME}_SRVS}
+# )
 
 generate_messages(
     DEPENDENCIES std_msgs nav_msgs

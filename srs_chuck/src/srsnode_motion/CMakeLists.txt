@@ -17,9 +17,9 @@ set(${PROJECT_NAME}_SOURCES
 
 set(${PROJECT_NAME}_TEST_SOURCES
 
-    test/Test_Motion_11ConstantSteps.cpp
-    test/Test_Motion_Diagonal.cpp
-    test/Test_Motion_Straight.cpp
+#    test/Test_Motion_11ConstantSteps.cpp
+#    test/Test_Motion_Diagonal.cpp
+#    test/Test_Motion_Straight.cpp
 )
 
 ####################################################################################################

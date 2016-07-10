@@ -9,7 +9,6 @@
 using namespace std;
 
 #include <ros/ros.h>
-#include <boost/filesystem.hpp>
 
 #include <srslib_framework/math/AngleMath.hpp>
 
@@ -31,10 +30,8 @@ TEST(Test_Trajectory, Map)
     Pose<> robotPose = Pose<>(18.1335, 5.24097, 0.0189141);
     Pose<> goalPose = Pose<>(18.1335, 5.24097, 0);
 
-    boost::filesystem::path filePath = boost::filesystem::canonical(
-        "../../../srs_sites/src/srsc_6rhq_rviz/map/6rhq.yaml");
     Map* map = new Map();
-    map->load(filePath.generic_string());
+	map->load("/tmp/srslib_framework/data/6rhq.yaml");
 
     // Prepare the start position for the search
     Grid2d::LocationType internalStart;

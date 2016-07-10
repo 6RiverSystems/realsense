@@ -187,6 +187,8 @@ TEST_F( ReflexesTest, TestNoObstacleNoVelocity )
 {
 	m_reflexes.OnLaserScan( m_laserScan );
 
+	WaitForMessage( );
+
 	EXPECT_FALSE( subscriber.receivedMessage ); // This may or may not be true
 }
 
@@ -206,7 +208,8 @@ TEST_F( ReflexesTest, TestObstacleNoVelocity )
 int main(int argc, char **argv)
 {
 	testing::InitGoogleTest(&argc, argv);
+
 	ros::init(argc, argv, "reflexes_unit_test");
-	ros::NodeHandle nh;
+
 	return RUN_ALL_TESTS();
 }

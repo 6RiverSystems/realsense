@@ -20,7 +20,7 @@ TEST(Test_Map, Reconstruction)
     test::MemoryWatch memoryWatch;
 
     Map* map = new Map();
-    map->load("empty.yaml");
+    map->load("/tmp/srslib_framework/data/empty.yaml");
 
     ROS_DEBUG_STREAM(*map);
 

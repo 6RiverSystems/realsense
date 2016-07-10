@@ -59,14 +59,15 @@ target_link_libraries(${PROJECT_NODE}
 # Tests
 
 if (CATKIN_ENABLE_TESTING)
-    catkin_add_gtest(TestSuite_Reflexes
-    	test/Test_Reflexes.cpp
+    find_package(rostest REQUIRED)
+
+    add_rostest_gtest(Test_Reflexes 
+        test/launch/reflexes.xml 
         ${${PROJECT_NAME}_SOURCES}
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/data
+        test/Test_Reflexes.cpp
     )
-    target_link_libraries(TestSuite_Reflexes
+
+    target_link_libraries(Test_Reflexes
         ${catkin_LIBRARIES}
-        ${boost_LIBRARIES}
-        ${srslib_framework_LIBRARIES}
     )
 endif()

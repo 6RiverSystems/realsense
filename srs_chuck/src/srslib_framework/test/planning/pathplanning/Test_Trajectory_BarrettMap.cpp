@@ -9,7 +9,6 @@
 using namespace std;
 
 #include <ros/ros.h>
-#include <boost/filesystem.hpp>
 
 #include <srslib_framework/math/AngleMath.hpp>
 
@@ -99,24 +98,25 @@ void calculateSolution(Map* map, Pose<> fromPose, Pose<> toPose, double correctC
             SearchPosition<Grid2d>(internalGoal, goalAngle)) << endl;
 
     AStar<Grid2d>::SearchNodeType* solution = algorithm.getSolution();
+
+    ASSERT_TRUE(solution != nullptr) << "No solution exists for search.";
+
     Solution<GridSolutionItem>* gridSolution = GridSolutionFactory::fromSearch(solution, map);
 
-    double totalCost = GridSolutionFactory::getTotalCost(gridSolution);
+	double totalCost = GridSolutionFactory::getTotalCost(gridSolution);
 
-    Solution<GridSolutionItem> gridSolution2 = *gridSolution;
+	Solution<GridSolutionItem> gridSolution2 = *gridSolution;
 
-    cout << gridSolution2 << endl;
-    cout << "Total cost: " << totalCost << endl;
+	cout << gridSolution2 << endl;
+	cout << "Total cost: " << totalCost << endl;
 
-    ASSERT_EQ(correctCost, totalCost) << "The cost is not as expected.";
+	ASSERT_EQ(correctCost, totalCost) << "The cost is not as expected.";
 }
 
 TEST(Test_Trajectory, BarrettMap)
 {
-    boost::filesystem::path filePath = boost::filesystem::canonical(
-        "../../../srs_sites/src/srsc_barrett_rviz/map/barrett.yaml");
     Map* map = new Map();
-    map->load(filePath.generic_string());
+    map->load("/tmp/srslib_framework/data/barrett.yaml");
 
     // A ---> B
     Pose<> robotPose = Pose<>(13.113, 24.759, AngleMath::deg2rad<double>(270));

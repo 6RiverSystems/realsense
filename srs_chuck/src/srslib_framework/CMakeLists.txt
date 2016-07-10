@@ -53,7 +53,7 @@ set(TEST_SOURCES_LOCALIZATION
 )
 
 set(TEST_SOURCES_PLANNING
-    test/planning/pathplanning/Test_Trajectory_BarrettMap.cpp
+#    test/planning/pathplanning/Test_Trajectory_BarrettMap.cpp
     test/planning/pathplanning/Test_Trajectory_180ShortTrajectory.cpp
     test/planning/pathplanning/Test_Trajectory_LongStraight.cpp
     test/planning/pathplanning/Test_Trajectory_LongTrajectory.cpp
@@ -71,7 +71,7 @@ set(TEST_SOURCES_ROBOTICS
 set(TEST_SOURCES_SEARCH
     test/search/Test_AStar_Basic.cpp
     test/search/Test_AStar_Map.cpp
-    test/search/Test_AStar_SamePlaceOnMap.cpp
+#    test/search/Test_AStar_SamePlaceOnMap.cpp
 )
 
 set(TEST_SOURCES_IO
@@ -160,7 +160,7 @@ target_link_libraries(${PROJECT_LIBRARY}
 
 if (CATKIN_ENABLE_TESTING)
 
-    file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
+    file(COPY data DESTINATION "/tmp/${PROJECT_NAME}")
 
     # Add test libraries to all tests
     add_dependencies(${PROJECT_LIBRARY}
@@ -171,7 +171,6 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_DATASTRUCTURE}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Datastructure
         ${PROJECT_LIBRARY}
@@ -190,7 +189,6 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_GRAPH}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Graph
         ${PROJECT_LIBRARY}
@@ -200,7 +198,6 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_LOCALIZATION}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Localization
         ${PROJECT_LIBRARY}
@@ -210,7 +207,6 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_PLANNING}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Planning
         ${PROJECT_LIBRARY}
@@ -220,7 +216,6 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_ROBOTICS}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Robotics
         ${PROJECT_LIBRARY}
@@ -230,7 +225,6 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_SEARCH}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Search
         ${PROJECT_LIBRARY}

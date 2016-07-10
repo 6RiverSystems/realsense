@@ -149,10 +149,12 @@ void Executive::executePlanToGoal(Pose<> goalPose)
 
         currentSolution_ = GridSolutionFactory::fromSearch(goalNode, map);
         ROS_DEBUG_STREAM_NAMED("executive", "Found solution: " << endl << currentSolution_);
+        ROS_INFO_STREAM_NAMED("executive", "Found path for goal:" << goalPose.x << "," << goalPose.y << "," << goalPose << " => offset goal"
+        	<< currentGoal_.x << "," << currentGoal_.y << "," << currentGoal_.theta);
     }
     else
     {
-        ROS_DEBUG_STREAM_NAMED("executive", "Path not found between " <<
+        ROS_ERROR_STREAM_NAMED("executive", "Path not found between " <<
             currentRobotPose_ <<
             " (" << internalStart.x << "," << internalStart.y << "," << startAngle << ") and " <<
             goalPose <<

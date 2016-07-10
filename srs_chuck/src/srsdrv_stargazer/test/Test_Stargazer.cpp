@@ -1,8 +1,7 @@
 /*
- * Test_Stargazer.cpp
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
  *
- *  Created on: Apr 4, 2016
- *      Author: dan
+ * This is proprietary software, unauthorized distribution is not permitted.
  */
 
 #include <StarGazerPointTransformer.h>

@@ -17,20 +17,29 @@ namespace srs
 class Reflexes
 {
 public:
-	Reflexes(ros::NodeHandle nodeHandle);
+	Reflexes();
 	virtual ~Reflexes();
 
-private:
+	void Initialize( ros::NodeHandle& nodeHandle );
 
-	void CreateSubscribers( );
+// Configuration Options
 
-	void CreatePublishers( );
+	void SetObjectThreshold( uint32_t objectThreshold );
+
+// Topic Callbacks
 
 	void OnOperationalStateChanged( const srslib_framework::MsgOperationalState::ConstPtr& operationalState );
 
 	void OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity );
 
 	void OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan );
+
+
+private:
+
+	void CreateSubscribers( ros::NodeHandle& nodeHandle );
+
+	void CreatePublishers( ros::NodeHandle& nodeHandle );
 
 	static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/operational_state";
 
@@ -40,11 +49,7 @@ private:
 
 	static constexpr auto EVENT_TOPIC = "/ll_event";
 
-	ros::NodeHandle 						m_nodeHandle;
-
-	uint32_t 								m_detectedObjectsLimit;
-
-	double 									m_safetyFactor;
+	uint32_t 								m_objectThreshold;
 
 	double 									m_maxLinearVelocity;
 

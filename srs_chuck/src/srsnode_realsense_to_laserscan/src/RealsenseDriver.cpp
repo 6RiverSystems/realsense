@@ -62,6 +62,7 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan,
 
 	infrared2Publisher_.publish( cvImage2->toImageMsg( ) );
 
+
 	ThresholdImage( combinedIRImage );
 
 	cv_bridge::CvImage combinedMsg;
@@ -69,6 +70,7 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan,
 	combinedMsg.encoding = infraredImage2->encoding;
 	combinedMsg.image    = combinedIRImage;
 
+	ROS_INFO( "Publishing combined IR" );
 	infraredPublisher_.publish( combinedMsg );
 
 	const uint32_t numberOfScans = scan->ranges.size( );

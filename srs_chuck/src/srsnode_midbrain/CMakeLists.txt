@@ -22,6 +22,8 @@ set(PROJECT_NODE ${PROJECT_NAME})
 set(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_BUILD_TYPE Debug)
 
+set(Boost_ADDITIONAL_VERSIONS "1.61" "1.61.0")
+
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
     srslib_framework
@@ -30,6 +32,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 include_directories(include
     src/
+    include/srsnode_midbrain/
     ${catkin_INCLUDE_DIRS}
     ${srslib_framework_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
@@ -54,3 +57,16 @@ target_link_libraries(${PROJECT_NODE}
 
 ####################################################################################################
 # Tests
+
+if (CATKIN_ENABLE_TESTING)
+    catkin_add_gtest(TestSuite_Reflexes
+    	test/Test_Reflexes.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/data
+    )
+    target_link_libraries(TestSuite_Reflexes
+        ${catkin_LIBRARIES}
+        ${boost_LIBRARIES}
+        ${srslib_framework_LIBRARIES}
+    )
+endif()

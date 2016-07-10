@@ -13,9 +13,8 @@
 namespace srs
 {
 
-Reflexes::Reflexes(ros::NodeHandle nodeHandle) :
-	m_nodeHandle( nodeHandle ),
-	m_detectedObjectsLimit( 20 ),
+Reflexes::Reflexes() :
+	m_objectThreshold( 20 ),
 	m_maxLinearVelocity( 0.5f ),
 	m_maxAngularVelocity( 0.7f ),
 	m_chuckWidth_( 0.619125 ),
@@ -32,10 +31,6 @@ Reflexes::Reflexes(ros::NodeHandle nodeHandle) :
 {
 	ROS_INFO( "Reflex: half width: %f, yOffset: %f, safeDistance: %f/%f",
 		m_chuckHalfWidth, m_yPaddedOffset, m_minSafeDistance, m_maxSafeDistance );
-
-	CreateSubscribers( );
-
-	CreatePublishers( );
 }
 
 Reflexes::~Reflexes( )
@@ -43,22 +38,25 @@ Reflexes::~Reflexes( )
 
 }
 
-void Reflexes::CreateSubscribers( )
+void Reflexes::Initialize( ros::NodeHandle& nodeHandle )
 {
-	m_operationalStateSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgOperationalState>(
-		OPERATIONAL_STATE_TOPIC, 10, std::bind( &Reflexes::OnOperationalStateChanged, this, std::placeholders::_1 ) );
+	CreateSubscribers( nodeHandle );
 
-	m_laserScanSubscriber = m_nodeHandle.subscribe<sensor_msgs::LaserScan>(
-		SCAN_TOPIC, 10, std::bind( &Reflexes::OnLaserScan, this, std::placeholders::_1 ) );
-
-	m_velocitySubscriber = m_nodeHandle.subscribe<geometry_msgs::Twist>( VELOCITY_TOPIC, 1,
-	    std::bind( &Reflexes::OnChangeVelocity, this, std::placeholders::_1 ) );
+	CreatePublishers( nodeHandle );
 }
 
-void Reflexes::CreatePublishers( )
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Configuration Options
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Reflexes::SetObjectThreshold( uint32_t objectThreshold )
 {
-	m_commandPublisher = m_nodeHandle.advertise<std_msgs::String>( EVENT_TOPIC, 1, true );
+	m_objectThreshold = objectThreshold;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Topic Callbacks
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Reflexes::OnOperationalStateChanged( const srslib_framework::MsgOperationalState::ConstPtr& operationalState )
 {
@@ -120,10 +118,10 @@ void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 		}
 	}
 
-	ROS_DEBUG_THROTTLE( 0.3, "linear vel: %0.2f, safetyThrottle: %.02f, safeDistance: %.02f, Obstacles detected: %d, points: %s",
+	ROS_DEBUG_THROTTLE_NAMED( 0.3, "reflexes", "linear vel: %0.2f, safetyThrottle: %.02f, safeDistance: %.02f, Obstacles detected: %d, points: %s",
 		m_velocity.linear.x, safetyThrottle, safeDistance, numberOfObstacles, strPoints.c_str( ) );
 
-	if( numberOfObstacles > m_detectedObjectsLimit )
+	if( numberOfObstacles > m_objectThreshold )
 	{
 		// Only send a hard stop if we are paused
 		if( !m_operationalState.pause )
@@ -135,6 +133,23 @@ void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 			m_commandPublisher.publish( msg );
 		}
 	}
+}
+
+void Reflexes::CreateSubscribers( ros::NodeHandle& nodeHandle )
+{
+	m_operationalStateSubscriber = nodeHandle.subscribe<srslib_framework::MsgOperationalState>(
+		OPERATIONAL_STATE_TOPIC, 10, std::bind( &Reflexes::OnOperationalStateChanged, this, std::placeholders::_1 ) );
+
+	m_laserScanSubscriber = nodeHandle.subscribe<sensor_msgs::LaserScan>(
+		SCAN_TOPIC, 10, std::bind( &Reflexes::OnLaserScan, this, std::placeholders::_1 ) );
+
+	m_velocitySubscriber = nodeHandle.subscribe<geometry_msgs::Twist>( VELOCITY_TOPIC, 1,
+	    std::bind( &Reflexes::OnChangeVelocity, this, std::placeholders::_1 ) );
+}
+
+void Reflexes::CreatePublishers( ros::NodeHandle& nodeHandle )
+{
+	m_commandPublisher = nodeHandle.advertise<std_msgs::String>( EVENT_TOPIC, 1, true );
 }
 
 

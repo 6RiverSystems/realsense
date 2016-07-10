@@ -113,7 +113,14 @@
 			<target name="catkin_make" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
 				<buildArguments>-DCMAKE_BUILD_TYPE=Debug -j8</buildArguments>
-				<buildTarget/>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="run_tests_srsnode_midbrain" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>run_tests_srsnode_midbrain -DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildTarget>run_tests_srsnode_midbrain</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>

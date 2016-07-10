@@ -32,7 +32,13 @@ void PositionEstimator::run(Odometry<>* odometry)
         updateAccumulatedOdometry(dT, *odometry);
     }
 
-    ukf_.run(dT, odometry);
+    // Do not run the UKF if the position estimator was not
+    // correctly initialized with a position (manually provided
+    // or by the APS
+    if (initialized_)
+    {
+        ukf_.run(dT, odometry);
+    }
 }
 
 

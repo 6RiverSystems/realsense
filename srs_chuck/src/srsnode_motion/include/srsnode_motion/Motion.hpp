@@ -62,6 +62,7 @@ private:
     void publishArrived();
     void publishGoalLanding();
     void publishOdometry();
+    void publishLocalized();
     void publishPose();
 
     void reset(Pose<> pose0);
@@ -91,6 +92,7 @@ private:
     ros::Publisher pubRobotPose_;
     ros::Publisher pubStatusGoalArrived_;
     ros::Publisher pubStatusGoalLanding_;
+    ros::Publisher pubRobotLocalized_;
 
     ros::NodeHandle rosNodeHandle_;
     tf::TransformBroadcaster rosTfBroadcaster_;

@@ -6,7 +6,9 @@
 
 map = mm_create(35, 28, 0.10);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Full border
+
 map = mm_addCustomBorder(map, 11.201, 1.50, 29.420, 27.137, 0.4);
 
 % Obstacle RE02
@@ -26,3 +28,4 @@ map = mm_addStaticObstacle(map, 23.253, 3.281, 24.006, 3.535, 0.5);
 
 map = mm_generate(map);
 mm_save(map, '../../srs_sites/src/srsc_barrett/map', 'barrett');
+mm_save(map, '../../srs_sites/src/srsc_barrett_rviz/map', 'barrett');

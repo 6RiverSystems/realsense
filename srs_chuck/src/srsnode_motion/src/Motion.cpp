@@ -54,14 +54,16 @@ Motion::Motion(string nodeName) :
         "/internal/state/ping", 1);
 
     pubRobotAccOdometry_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
-        "/internal/state/robto/acc_odometry", 100);
+        "/internal/state/robot/acc_odometry", 100);
     pubRobotPose_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
         "/internal/state/robot/pose", 100);
+    pubRobotLocalized_ = rosNodeHandle_.advertise<std_msgs::Bool>(
+        "/internal/state/robot/localized", 1, true);
 
     pubStatusGoalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
-        "/internal/state/current_goal/arrived", 1);
+        "/internal/state/goal/arrived", 1);
     pubStatusGoalLanding_ = rosNodeHandle_.advertise<geometry_msgs::PolygonStamped>(
-        "/internal/state/current_goal/landing", 1);
+        "/internal/state/goal/landing", 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,6 +96,7 @@ void Motion::run()
         publishPose();
         publishAccumulatedOdometry();
         publishGoalLanding();
+        publishLocalized();
 
         refreshRate.sleep();
     }
@@ -452,6 +455,14 @@ void Motion::publishOdometry()
         // Publish the Odometry
         pubOdometry_.publish(messageOdometry);
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::publishLocalized()
+{
+    std_msgs::Bool messageRobotLocalized;
+    messageRobotLocalized.data = positionEstimator_.isPoseValid();
+    pubRobotLocalized_.publish(messageRobotLocalized);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

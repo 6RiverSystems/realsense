@@ -176,7 +176,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 				dfMapRotationDegrees += 360.0f;
 			}
 
-			stream << "Stargazer Data: " << nTagId << std::fixed << endl <<
+			stream << "Stargazer Data: " << nTagId << std::fixed << ", " <<
 				tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
 				stargazerOffset.getX( ) << ", " << stargazerOffset.getY( ) << ", " << stargazerOffset.getZ( ) << ", " <<
 				totalCameraOffset.getX( ) << ", " << totalCameraOffset.getY( ) << ", " << totalCameraOffset.getZ( ) << ", " <<
@@ -229,7 +229,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 			{
 				std::ostringstream stream;
 
-				stream << "Stargazer Data: " << nTagId << std::fixed << endl <<
+				stream << "Stargazer Data: " << nTagId << std::fixed << ", " <<
 					tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
 					median( accLocalX ) << ", " << median( accLocalY ) << ", " << median( accLocalZ ) << ", " <<
 					median( accCameraX ) << ", " << median( accCameraY ) << ", " << median( accCameraZ ) << ", " <<

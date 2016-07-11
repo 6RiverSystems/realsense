@@ -377,11 +377,10 @@ void BrainStemMessageProcessor::SetMotionStatus( const std::bitset<8>& motionSta
 
 void BrainStemMessageProcessor::OnHardStop( )
 {
-	ROS_DEBUG( "OnHardStop" );
+	std::bitset<8> hardStopSet;
+	hardStopSet.set( MOTION_STATUS::HARD_STOP, true );
 
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::HARD_STOP );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
+	SetMotionStatus( hardStopSet, true );
 }
 
 void BrainStemMessageProcessor::OnResetBatteryHours( )

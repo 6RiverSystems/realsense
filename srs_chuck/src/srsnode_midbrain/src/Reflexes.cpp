@@ -13,7 +13,8 @@
 namespace srs
 {
 
-Reflexes::Reflexes() :
+Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
+	m_nodeHandle( nodeHandle ),
 	m_objectThreshold( 20 ),
 	m_maxLinearVelocity( 0.5f ),
 	m_maxAngularVelocity( 0.7f ),
@@ -31,6 +32,8 @@ Reflexes::Reflexes() :
 {
 	ROS_INFO( "Reflex: half width: %f, yOffset: %f, safeDistance: %f/%f",
 		m_chuckHalfWidth, m_yPaddedOffset, m_minSafeDistance, m_maxSafeDistance );
+
+	Enable( true );
 }
 
 Reflexes::~Reflexes( )
@@ -38,16 +41,25 @@ Reflexes::~Reflexes( )
 
 }
 
-void Reflexes::Initialize( ros::NodeHandle& nodeHandle )
-{
-	CreateSubscribers( nodeHandle );
-
-	CreatePublishers( nodeHandle );
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Configuration Options
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Reflexes::Enable( bool enable )
+{
+	if( enable )
+	{
+		CreateSubscribers( );
+
+		CreatePublishers( );
+	}
+	else
+	{
+		DestroySubscribers( );
+
+		DestroyPublishers( );
+	}
+}
 
 void Reflexes::SetObjectThreshold( uint32_t objectThreshold )
 {
@@ -135,22 +147,42 @@ void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 	}
 }
 
-void Reflexes::CreateSubscribers( ros::NodeHandle& nodeHandle )
+void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t level)
 {
-	m_operationalStateSubscriber = nodeHandle.subscribe<srslib_framework::MsgOperationalState>(
+	SetObjectThreshold( config.object_threshold );
+
+	Enable( config.enable_obstacle_detection );
+}
+
+void Reflexes::CreateSubscribers( )
+{
+	m_operationalStateSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgOperationalState>(
 		OPERATIONAL_STATE_TOPIC, 10, std::bind( &Reflexes::OnOperationalStateChanged, this, std::placeholders::_1 ) );
 
-	m_laserScanSubscriber = nodeHandle.subscribe<sensor_msgs::LaserScan>(
+	m_laserScanSubscriber = m_nodeHandle.subscribe<sensor_msgs::LaserScan>(
 		SCAN_TOPIC, 10, std::bind( &Reflexes::OnLaserScan, this, std::placeholders::_1 ) );
 
-	m_velocitySubscriber = nodeHandle.subscribe<geometry_msgs::Twist>( VELOCITY_TOPIC, 1,
+	m_velocitySubscriber = m_nodeHandle.subscribe<geometry_msgs::Twist>( VELOCITY_TOPIC, 1,
 	    std::bind( &Reflexes::OnChangeVelocity, this, std::placeholders::_1 ) );
 }
 
-void Reflexes::CreatePublishers( ros::NodeHandle& nodeHandle )
+void Reflexes::DestroySubscribers( )
 {
-	m_commandPublisher = nodeHandle.advertise<std_msgs::String>( EVENT_TOPIC, 1, true );
+	m_operationalStateSubscriber.shutdown( );
+
+	m_laserScanSubscriber.shutdown( );
+
+	m_velocitySubscriber.shutdown( );
 }
 
+void Reflexes::CreatePublishers( )
+{
+	m_commandPublisher = m_nodeHandle.advertise<std_msgs::String>( EVENT_TOPIC, 1, true );
+}
+
+void Reflexes::DestroyPublishers( )
+{
+	m_commandPublisher.shutdown( );
+}
 
 } /* namespace srs */

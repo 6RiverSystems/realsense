@@ -71,12 +71,13 @@ public:
 public:
 
 	ReflexesTest( ) :
-		m_reflexes( ),
+		m_nodeHandle( ),
+		m_reflexes( m_nodeHandle ),
 		m_finished( false ),
 		subscriber( m_nodeHandle, m_finished )
 
 	{
-		m_reflexes.Initialize( m_nodeHandle );
+
 	}
 
 	~ReflexesTest( )

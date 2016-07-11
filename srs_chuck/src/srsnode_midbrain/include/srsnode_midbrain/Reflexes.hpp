@@ -7,9 +7,13 @@
 #define MIDBRAIN_REFLEXES_HPP_
 
 #include <ros/ros.h>
+#include <dynamic_reconfigure/server.h>
+
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 #include <srslib_framework/MsgOperationalState.h>
+#include <dynamic_reconfigure/server.h>
+#include <srsnode_midbrain/ReflexesConfig.h>
 
 namespace srs
 {
@@ -17,12 +21,12 @@ namespace srs
 class Reflexes
 {
 public:
-	Reflexes();
-	virtual ~Reflexes();
-
-	void Initialize( ros::NodeHandle& nodeHandle );
+	Reflexes( ros::NodeHandle& nodeHandle );
+	virtual ~Reflexes( );
 
 // Configuration Options
+
+	void Enable( bool enable );
 
 	void SetObjectThreshold( uint32_t objectThreshold );
 
@@ -34,12 +38,15 @@ public:
 
 	void OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan );
 
-
 private:
 
-	void CreateSubscribers( ros::NodeHandle& nodeHandle );
+    void onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t level);
 
-	void CreatePublishers( ros::NodeHandle& nodeHandle );
+	void CreateSubscribers( );
+	void DestroySubscribers( );
+
+	void CreatePublishers( );
+	void DestroyPublishers( );
 
 	static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/operational_state";
 
@@ -48,6 +55,10 @@ private:
 	static constexpr auto SCAN_TOPIC = "/camera/depth/scan";
 
 	static constexpr auto EVENT_TOPIC = "/ll_event";
+
+	dynamic_reconfigure::Server<srsnode_midbrain::ReflexesConfig> server;
+
+	ros::NodeHandle&						m_nodeHandle;
 
 	uint32_t 								m_objectThreshold;
 

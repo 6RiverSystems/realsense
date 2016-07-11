@@ -215,7 +215,7 @@ void BrainStem::OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_
 
 	std::string strData =  stream.str( );
 
-	ROS_INFO_STREAM( strData );
+	ROS_DEBUG_STREAM( strData );
 
 	srslib_framework::MsgOperationalState msg;
 	msg.frontEStop = motionStatus.frontEStop;
@@ -235,7 +235,7 @@ void BrainStem::OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_
 
 void BrainStem::OnVoltageChanged( float fVoltage )
 {
-	ROS_INFO_STREAM( "Voltage => " << fVoltage );
+	ROS_DEBUG_STREAM( "Voltage => " << fVoltage );
 
 	std_msgs::Float32 msg;
 	msg.data = fVoltage;

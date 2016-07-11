@@ -9,9 +9,7 @@ function getChuckDirectory() {
     baseDirectory="/home/rivs/projects/$ENV/ros"
   fi
 
-  export ROS_LOG_DIR="$baseDirectory/log"
-
-  logFile="$ROS_LOG_DIR/latest/rosout.log"
+  logFile="$baseDirectory/log/ros.log"
 
   echo -e "${BLUE}*************************************************************"
   echo -e "${BLUE}*** ${YELLOW}ENV: $ENV"
@@ -56,7 +54,7 @@ function runChuck() {
   echo -e "${BLUE}*************************************************************"
   echo -e "${NC}"
 
-  roslaunch "srsc_$ROS_MAP" map.launch
+  roslaunch "srsc_$ROS_MAP" map.launch | tee $logFile
 }
 
 function cleanChuck() {

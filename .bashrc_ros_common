@@ -4,5 +4,6 @@ export ROSCONSOLE_CONFIG_FILE=~/.rosconsole.config
 export ROS_PACKAGE_PATH=
 export ROSLISP_PACKAGE_DIRECTORIES=
 export ENV=ros
+unset GTK_IM_MODULE
 source ~/ros/.bash_aliases
 source /opt/ros/indigo/setup.bash

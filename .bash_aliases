@@ -54,7 +54,7 @@ function runChuck() {
   echo -e "${BLUE}*************************************************************"
   echo -e "${NC}"
 
-  roslaunch "srsc_$ROS_MAP" map.launch | tee $logFile
+  exec roslaunch "srsc_$ROS_MAP" map.launch 2>&1 | tee $logFile
 }
 
 function cleanChuck() {

@@ -1,6 +1,7 @@
 #include <srsnode_motion/Motion.hpp>
 
 #include <ros/ros.h>
+
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/PolygonStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
@@ -26,6 +27,7 @@
 #include <srsnode_motion/tap/odometry/FactoryOdometryNoise.hpp>
 
 #include <srsnode_motion/MotionConfig.h>
+
 
 namespace srs {
 
@@ -346,6 +348,15 @@ void Motion::pingCallback(const ros::TimerEvent& event)
     message.data = true;
 
     pubPing_.publish(message);
+
+    double delay = (event.current_real - event.current_expected).toSec();
+
+    // We should never be falling behind by more than 500ms
+    if ( delay > (1.0f / PING_HZ) * MAX_ALLOWED_PING_DELAY)
+    {
+        ROS_ERROR_STREAM_NAMED("motion", "Motion ping exceeded allowable delay: " << delay );
+    }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

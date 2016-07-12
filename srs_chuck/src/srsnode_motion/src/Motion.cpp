@@ -468,8 +468,13 @@ void Motion::publishLocalized()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishPose()
 {
-    srslib_framework::MsgPose message = PoseMessageFactory::pose2Msg(positionEstimator_.getPose());
-    pubRobotPose_.publish(message);
+    Pose<> robotPose = positionEstimator_.getPose();
+
+    if (robotPose.isValid())
+    {
+        srslib_framework::MsgPose message = PoseMessageFactory::pose2Msg(robotPose);
+        pubRobotPose_.publish(message);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

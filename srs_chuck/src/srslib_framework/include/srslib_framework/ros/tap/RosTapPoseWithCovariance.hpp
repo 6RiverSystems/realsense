@@ -25,8 +25,11 @@ public:
     typedef typename Pose<>::BaseType BaseType;
 
     RosTapPoseWithCovariance(string topic, string description = "Pose With Covariance Tap") :
-        RosTap(topic, description)
-    {}
+        RosTap(topic, description),
+        currentPose_(Pose<>::INVALID)
+    {
+        RosTap::reset();
+    }
 
     ~RosTapPoseWithCovariance()
     {

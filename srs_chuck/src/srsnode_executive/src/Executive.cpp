@@ -35,10 +35,7 @@ Executive::Executive(string nodeName) :
     pubExternalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
         "/response/arrived", 1);
 
-    robotInitialPose_ = Pose<>(0, 3.0, 3.0, 0);
-    currentRobotPose_ = robotInitialPose_;
-
-    publishInternalInitialPose(robotInitialPose_);
+    executeInitialPose(Pose<>::INVALID);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,6 +111,20 @@ void Executive::executePause()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::executePlanToGoal(Pose<> goalPose)
 {
+    if (!currentRobotPose_.isValid())
+    {
+        ROS_ERROR_STREAM_NAMED("executive", "Attempting to plan to goal " << goalPose <<
+            " from invalid starting pose");
+        return;
+    }
+
+    if (!goalPose.isValid())
+    {
+        ROS_ERROR_STREAM_NAMED("executive",
+            "Attempting to plan to an invalid goal from pose " << currentRobotPose_);
+        return;
+    }
+
     Chuck chuck;
 
     // The requested goal is transformed so that it coincides with
@@ -229,21 +240,35 @@ void Executive::findActiveNodes(vector<string>& nodes)
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::publishInternalGoalSolution(Solution<GridSolutionItem>* solution)
 {
-    ros::Time planningTime = ros::Time::now();
+    if (solution)
+    {
+        ros::Time planningTime = ros::Time::now();
 
-    srslib_framework::MsgSolution messageSolution =
-        SolutionMessageFactory::gridSolution2Msg(*solution);
-    pubInternalGoalSolution_.publish(messageSolution);
+        srslib_framework::MsgSolution messageSolution =
+            SolutionMessageFactory::gridSolution2Msg(*solution);
+        pubInternalGoalSolution_.publish(messageSolution);
 
-    nav_msgs::Path messagePath = SolutionMessageFactory::gridSolution2PathMsg(*solution);
-    pubStatusGoalPlan_.publish(messagePath);
+        nav_msgs::Path messagePath = SolutionMessageFactory::gridSolution2PathMsg(*solution);
+        pubStatusGoalPlan_.publish(messagePath);
+    }
+    else
+    {
+        ROS_ERROR_NAMED("executive", "Trying to publish a null solution");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::publishInternalInitialPose(Pose<> initialPose)
 {
-    srslib_framework::MsgPose message = PoseMessageFactory::pose2Msg(initialPose);
-    pubInternalInitialPose_.publish(message);
+    if (initialPose.isValid())
+    {
+        srslib_framework::MsgPose message = PoseMessageFactory::pose2Msg(initialPose);
+        pubInternalInitialPose_.publish(message);
+    }
+    else
+    {
+        ROS_ERROR_NAMED("executive", "Trying to publish a invalid initial pose");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

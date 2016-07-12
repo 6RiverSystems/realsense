@@ -94,6 +94,37 @@ struct PoseMessageFactory
 
         return poseStamped;
     }
+
+    /**
+     * @brief Convert a PoseStamped type into a Pose.
+     *
+     * @param message PoseStamped to convert
+     *
+     * @return Pose generated from the specified PoseStamped
+     */
+    static Pose<> poseStamped2Pose(geometry_msgs::PoseStamped message)
+    {
+        Pose<> pose;
+
+        pose.arrivalTime = TimeMath::time2number(message.header.stamp);
+        pose.x = message.pose.position.x;
+        pose.y = message.pose.position.y;
+        pose.theta = tf::getYaw(message.pose.orientation);
+
+        return pose;
+    }
+
+    /**
+     * @brief Convert a PoseStampedConstPtr type into a Pose.
+     *
+     * @param message PoseStampedConstPtr to convert
+     *
+     * @return Pose generated from the specified PoseStampedConstPtr
+     */
+    static Pose<> poseStamped2Pose(geometry_msgs::PoseStampedConstPtr message)
+    {
+        return PoseMessageFactory::poseStamped2Pose(*message);
+    }
 };
 
 } // namespace srs

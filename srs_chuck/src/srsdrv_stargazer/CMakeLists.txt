@@ -25,7 +25,7 @@ project(${PROJECT_NAME})
 
 set(PROJECT_NODE ${PROJECT_NAME})
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++11 -pthread -Werror ${CMAKE_CXX_FLAGS}")
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
@@ -73,8 +73,12 @@ target_link_libraries(${PROJECT_NODE}
 
 ####################################################################################################
 # Tests
-
 if (CATKIN_ENABLE_TESTING)
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -fprofile-arcs -ftest-coverage")
+    set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
+    set(CMAKE_EXE_LINKER_FLAGS "-fprofile-arcs -ftest-coverage")
+
     catkin_add_gtest(TestSuite_Stargazer
     	test/Test_Stargazer.cpp
         ${${PROJECT_NAME}_SOURCES}

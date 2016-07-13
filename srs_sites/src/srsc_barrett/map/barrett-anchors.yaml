@@ -11,3 +11,12 @@ anchors:
     - {id: "0338", location: [20.17198,  4.58865, 6.3600000], orientation: 89.2325 }
     - {id: "0198", location: [15.99728,  4.61931, 6.3600000], orientation: 92.940 }
     - {id: "0326", location: [28.73131,  4.55947, 6.3600000], orientation: 88.485 }
+    - {id: "0048", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
+    - {id: "0022", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
+    - {id: "0036", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
+    - {id: "0020", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
+    - {id: "0034", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
+    - {id: "0038", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
+    - {id: "0002", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
+    - {id: "0050", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
+    - {id: "0260", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }

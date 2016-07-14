@@ -89,7 +89,7 @@ function restartChuck() {
   sudo service mfp-bridge stop
 
   echo "Waiting for services to completely stop"
-  sleep 2s
+  sleep 5s
 
   echo "Starting mfp-ros service"
   sudo service mfp-ros start

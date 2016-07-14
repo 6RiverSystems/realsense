@@ -15,7 +15,7 @@ namespace srs
 
 Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_nodeHandle( nodeHandle ),
-	m_objectThreshold( 20 ),
+	m_objectThreshold( 0 ),
 	m_maxLinearVelocity( 0.5f ),
 	m_maxAngularVelocity( 0.7f ),
 	m_chuckWidth_( 0.619125 ),

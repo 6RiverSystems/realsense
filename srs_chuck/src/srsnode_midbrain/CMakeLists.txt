@@ -75,7 +75,9 @@ if (CATKIN_ENABLE_TESTING)
         ${${PROJECT_NAME}_SOURCES}
         test/Test_Reflexes.cpp
     )
-
+    add_dependencies(Test_Reflexes
+        ${srsnode_midbrain_EXPORTED_TARGETS}
+    )
     target_link_libraries(Test_Reflexes
         ${catkin_LIBRARIES}
     )

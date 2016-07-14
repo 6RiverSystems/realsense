@@ -64,10 +64,6 @@ StarGazer::StarGazer( const std::string& strNodeName, const std::string& strSeri
 	};
 
 	pSerialIO->Open( strSerialPort.c_str( ), connectionChanged, processMessage );
-
-	int* pTest = nullptr;
-
-	*pTest = 1976;
 }
 
 StarGazer::~StarGazer( )

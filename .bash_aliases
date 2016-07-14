@@ -70,6 +70,17 @@ function cleanChuck() {
   popd
 }
 
+function showChuck() {
+  source /opt/ros/indigo/setup.bash
+
+  killall electron
+  killall electron
+
+  export DISPLAY=:0
+
+  rviz -d ~/ros/srs_sites/src/srsc_6rhq_rviz/rviz/config.rviz
+}
+
 logChuck() {
   getChuckDirectory &&
 
@@ -81,3 +92,4 @@ alias chuckupdate=updateChuck
 alias chuckclean=cleanChuck
 alias chuckbuild=buildChuck
 alias chuckrun=runChuck
+alias chuckshow=showChuck

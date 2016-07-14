@@ -104,7 +104,7 @@ find_package(PkgConfig)
 pkg_check_modules(NEW_YAMLCPP yaml-cpp>=0.5)
 
 pkg_check_modules( UNWIND libunwind )
-#find_library(EXECINFO_LIBRARIES NAMES execinfo)
+find_library(EXECINFO_LIBRARIES NAMES execinfo)
 
 include_directories(
     include/

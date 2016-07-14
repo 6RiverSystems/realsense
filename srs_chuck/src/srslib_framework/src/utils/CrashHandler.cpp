@@ -150,11 +150,14 @@ private:
 	{
 		printStackTrace( );
 
-		abort( );
+		exit( EXIT_FAILURE );
  	}
 
 	static void printStackTrace( )
 	{
+		char unwindMethod[] = "UNW_ARM_UNWIND_METHOD=4";
+		putenv( unwindMethod );
+
 		std::string name;
 		unw_word_t ip, sp, offp;
 

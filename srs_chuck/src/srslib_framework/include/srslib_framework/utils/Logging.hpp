@@ -8,23 +8,15 @@
 
 #include <boost/algorithm/hex.hpp>
 #include <cstdio>
+#include <stdarg.h>
+#include <memory>
 
 namespace srs
 {
 
-inline std::string ToHex( const std::vector<char>& data )
-{
-	std::string strDebug;
+std::string ToHex( const std::vector<char>& data );
 
-	for( char c : data )
-	{
-		char pszFormat[64] = { '\0' };
-		snprintf( pszFormat, 64, " 0x%.2x", (unsigned char)c );
-		strDebug += pszFormat;
-	}
-
-	return strDebug;
-}
+std::string string_format(const std::string fmt_str, ...);
 
 } // namespace srs
 

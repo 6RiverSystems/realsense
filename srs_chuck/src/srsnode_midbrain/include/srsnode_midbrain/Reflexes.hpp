@@ -60,6 +60,8 @@ private:
 
 	ros::NodeHandle&						m_nodeHandle;
 
+	bool	 								m_sendHardStop;
+
 	uint32_t 								m_objectThreshold;
 
 	double 									m_maxLinearVelocity;

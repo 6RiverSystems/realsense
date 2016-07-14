@@ -152,6 +152,8 @@ void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t
 	SetObjectThreshold( config.object_threshold );
 
 	Enable( config.enable_obstacle_detection );
+
+	m_sendHardStop = config.enable_hard_stop;
 }
 
 void Reflexes::CreateSubscribers( )

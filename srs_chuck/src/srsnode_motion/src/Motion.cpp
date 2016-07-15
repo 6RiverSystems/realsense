@@ -148,19 +148,12 @@ void Motion::evaluateTriggers()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::executeSolution(Solution<GridSolutionItem> solution)
 {
-    if (!solution.empty())
-    {
-        ROS_DEBUG_STREAM_NAMED("motion", "Communicated solution: " << endl << solution);
+    ROS_DEBUG_STREAM_NAMED("motion", "Communicated solution: " << endl << solution);
 
-        motionController_.execute(solution);
-        positionEstimator_.resetAccumulatedOdometry();
+    motionController_.execute(solution);
+    positionEstimator_.resetAccumulatedOdometry();
 
-        simulatedT_ = 0.0;
-    }
-    else
-    {
-        ROS_WARN_STREAM_NAMED("motion", "An empty solution is being discarded.");
-    }
+    simulatedT_ = 0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -479,8 +472,13 @@ void Motion::publishLocalized()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishPose()
 {
-    srslib_framework::MsgPose message = PoseMessageFactory::pose2Msg(positionEstimator_.getPose());
-    pubRobotPose_.publish(message);
+    Pose<> robotPose = positionEstimator_.getPose();
+
+    if (robotPose.isValid())
+    {
+        srslib_framework::MsgPose message = PoseMessageFactory::pose2Msg(robotPose);
+        pubRobotPose_.publish(message);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

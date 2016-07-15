@@ -27,8 +27,11 @@ public:
     typedef typename Pose<>::BaseType BaseType;
 
     RosTapMsgPose(string topic, string description = "Pose Tap") :
-        RosTap(topic, description)
-    {}
+        RosTap(topic, description),
+        currentPose_(Pose<>::INVALID)
+    {
+        RosTap::reset();
+    }
 
     ~RosTapMsgPose()
     {
@@ -44,7 +47,7 @@ public:
     void reset()
     {
         RosTap::reset();
-        set(Pose<>::ZERO);
+        set(Pose<>::INVALID);
     }
 
     void set(Pose<> newPose)

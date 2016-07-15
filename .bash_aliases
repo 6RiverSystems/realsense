@@ -9,9 +9,7 @@ function getChuckDirectory() {
     baseDirectory="/home/rivs/projects/$ENV/ros"
   fi
 
-  export ROS_LOG_DIR="$baseDirectory/log"
-
-  logFile="$ROS_LOG_DIR/latest/rosout.log"
+  logFile="$baseDirectory/log/ros.log"
 
   echo -e "${BLUE}*************************************************************"
   echo -e "${BLUE}*** ${YELLOW}ENV: $ENV"
@@ -56,7 +54,7 @@ function runChuck() {
   echo -e "${BLUE}*************************************************************"
   echo -e "${NC}"
 
-  roslaunch "srsc_$ROS_MAP" map.launch
+  unbuffer roslaunch "srsc_$ROS_MAP" map.launch 2>&1 | tee $logFile
 }
 
 function cleanChuck() {
@@ -72,6 +70,34 @@ function cleanChuck() {
   popd
 }
 
+function showChuck() {
+  source /opt/ros/indigo/setup.bash
+
+  killall electron
+  killall electron
+
+  export DISPLAY=:0
+
+  rviz -d ~/ros/srs_sites/src/srsc_6rhq_rviz/rviz/config.rviz
+}
+
+function restartChuck() {
+  echo "Stopping mfp-ros service"
+  sudo service mfp-ros stop
+  
+  echo "Stopping mfp-bridge service"
+  sudo service mfp-bridge stop
+
+  echo "Waiting for services to completely stop"
+  sleep 5s
+
+  echo "Starting mfp-ros service"
+  sudo service mfp-ros start
+
+  echo "Stopping mfp-bridge service"
+  sudo service mfp-bridge start
+}
+
 logChuck() {
   getChuckDirectory &&
 
@@ -83,3 +109,5 @@ alias chuckupdate=updateChuck
 alias chuckclean=cleanChuck
 alias chuckbuild=buildChuck
 alias chuckrun=runChuck
+alias chuckrestart=restartChuck
+alias chuckshow=showChuck

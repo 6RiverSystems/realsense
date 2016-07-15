@@ -6,15 +6,11 @@
 #ifndef ROSTAPPOSESTAMPED_HPP_
 #define ROSTAPPOSESTAMPED_HPP_
 
-#include <string>
-using namespace std;
-
-#include <tf/tf.h>
 #include <geometry_msgs/PoseStamped.h>
 
-#include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
 namespace srs {
 
@@ -25,8 +21,11 @@ public:
     typedef typename Pose<>::BaseType BaseType;
 
     RosTapPoseStamped(string topic, string description = "Pose Stamped Tap") :
-        RosTap(topic, description)
-    {}
+        RosTap(topic, description),
+        currentPose_(Pose<>::INVALID)
+    {
+        RosTap::reset();
+    }
 
     ~RosTapPoseStamped()
     {
@@ -42,12 +41,12 @@ public:
     void reset()
     {
         RosTap::reset();
-        set(TimeMath::time2number(ros::Time::now()), 0.0, 0.0, 0.0);
+        set(Pose<>::INVALID);
     }
 
-    void set(double arrivalTime, BaseType x, BaseType y, BaseType theta)
+    void set(Pose<> newPose)
     {
-        currentPose_ = Pose<>(arrivalTime, x, y, theta);
+        currentPose_ = newPose;
         setNewData(true);
     }
 
@@ -61,10 +60,7 @@ protected:
 private:
     void onPose(const geometry_msgs::PoseStampedConstPtr message)
     {
-        set(TimeMath::time2number(message->header.stamp),
-            message->pose.position.x,
-            message->pose.position.y,
-            tf::getYaw(message->pose.orientation));
+        set(PoseMessageFactory::poseStamped2Pose(message));
     }
 
     Pose<> currentPose_;

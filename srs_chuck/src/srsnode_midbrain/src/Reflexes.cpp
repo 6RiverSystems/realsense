@@ -145,6 +145,7 @@ void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 			m_commandPublisher.publish( msg );
 		}
 	}
+*/
 }
 
 void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t level)

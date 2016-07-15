@@ -8,6 +8,9 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srslib_framework)
 
 set(${PROJECT_NAME}_SOURCES
+    src/utils/Logging.cpp
+    src/utils/CrashHandler.cpp
+
     src/io/SerialIO.cpp
 
     src/planning/pathplanning/grid/GridSolutionItem.cpp
@@ -100,6 +103,9 @@ find_package(Boost REQUIRED)
 find_package(PkgConfig)
 pkg_check_modules(NEW_YAMLCPP yaml-cpp>=0.5)
 
+pkg_check_modules( UNWIND libunwind )
+find_library(EXECINFO_LIBRARIES NAMES execinfo)
+
 include_directories(
     include/
     src/
@@ -153,6 +159,7 @@ add_dependencies(${PROJECT_LIBRARY}
 
 target_link_libraries(${PROJECT_LIBRARY}
     ${PROJECT_LIBRARIES}
+    ${UNWIND_LIBRARIES}
 )
 
 ####################################################################################################

@@ -16,11 +16,9 @@ namespace srs
 Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_nodeHandle( nodeHandle ),
 	m_objectThreshold( 0 ),
-	m_maxLinearVelocity( 0.5f ),
-	m_maxAngularVelocity( 0.7f ),
 	m_chuckWidth_( 0.619125 ),
 	m_chuckHalfWidth( m_chuckWidth_ / 2.0f ),
-	m_yPaddedOffset( m_chuckHalfWidth * 1.2 ),
+	m_yPaddedOffset( m_chuckHalfWidth * 1.1 ),
 	m_minSafeDistance( 0.35f ),
 	m_maxSafeDistance( 0.5f ),
 	m_operationalState( ),
@@ -86,16 +84,22 @@ void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 
 	uint32_t numberOfScans = scan->ranges.size( );
 
-	double safetyThrottle = m_velocity.linear.x / m_maxLinearVelocity;
+	// Calculated from actual measurments and polynomial regression fitting
+	// https://docs.google.com/a/6river.com/spreadsheets/d/1wUPgpESlp-MVbnMGCmFDGH22qyO39D8kzvi7IPZ1Q1c/edit?usp=sharing
+	// http://www.xuru.org/rt/PR.asp#CopyPaste
+	double safeDistance = 0.3518981019f * pow( m_velocity.linear.x, 2 ) - 0.03806193806f * m_velocity.linear.x + 0.01804195804f;
 
-	double safeDistance = m_maxSafeDistance * safetyThrottle;
+	std::string strPoints;
 
+	char point[255] = { '\0' };
+	sprintf( point, "Safe distance (velocity: %.2f): %.2f: ", m_velocity.linear.x, safeDistance );
+	strPoints += point;
+
+	// Apply min/max to the safe distance
 	safeDistance = std::min( safeDistance, m_maxSafeDistance );
 	safeDistance = std::max( safeDistance, m_minSafeDistance );
 
-	std::string strPoints;
-	char point[255] = { '\0' };
-	sprintf( point, "Safe (throttle: %.2f): %.2f: ", safeDistance, safetyThrottle );
+	sprintf( point, "Safe distance clamped (velocity: %.2f): %.2f: ", m_velocity.linear.x, safeDistance );
 	strPoints += point;
 
 	for( int x = 0; x < numberOfScans; x++ )
@@ -130,22 +134,25 @@ void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 		}
 	}
 
-	ROS_DEBUG_THROTTLE_NAMED( 0.3, "reflexes", "linear vel: %0.2f, safetyThrottle: %.02f, safeDistance: %.02f, Obstacles detected: %d, points: %s",
-		m_velocity.linear.x, safetyThrottle, safeDistance, numberOfObstacles, strPoints.c_str( ) );
+	ROS_DEBUG_THROTTLE_NAMED( 0.3, "reflexes", "linear vel: %0.2f, safeDistance: %.02f, Obstacles detected: %d, points: %s",
+		m_velocity.linear.x, safeDistance, numberOfObstacles, strPoints.c_str( ) );
 
 	if( numberOfObstacles > m_objectThreshold )
 	{
 		// Only send a hard stop if we are paused
 		if( !m_operationalState.pause )
 		{
-			// Send the hard stop
-			std_msgs::String msg;
-			msg.data = "STOP";
 
-			m_commandPublisher.publish( msg );
+			if( m_sendHardStop )
+			{
+				// Send the hard stop
+				std_msgs::String msg;
+				msg.data = "STOP";
+
+				m_commandPublisher.publish( msg );
+			}
 		}
 	}
-*/
 }
 
 void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t level)

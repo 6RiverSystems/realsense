@@ -53,6 +53,12 @@ public:
 	std_msgs::StringConstPtr message;
 };
 
+struct stopping_distance_t
+{
+	double velocity;
+	double stoppingDistance;
+};
+
 class ReflexesTest : public ::testing::Test
 {
 public:
@@ -67,6 +73,7 @@ public:
 
 	sensor_msgs::LaserScan::Ptr m_laserScan;
 
+	std::vector<stopping_distance_t> m_vecStoppingDistances;
 
 public:
 
@@ -75,9 +82,19 @@ public:
 		m_reflexes( m_nodeHandle ),
 		m_finished( false ),
 		subscriber( m_nodeHandle, m_finished )
-
 	{
-
+		m_vecStoppingDistances.push_back( { 0.40, 0.07 } );
+		m_vecStoppingDistances.push_back( { 0.60, 0.12 } );
+		m_vecStoppingDistances.push_back( { 0.80, 0.21 } );
+		m_vecStoppingDistances.push_back( { 1.00, 0.34 } );
+		m_vecStoppingDistances.push_back( { 1.20, 0.47 } );
+		m_vecStoppingDistances.push_back( { 1.40, 0.65 } );
+		m_vecStoppingDistances.push_back( { 1.60, 0.86 } );
+		m_vecStoppingDistances.push_back( { 1.80, 1.08 } );
+		m_vecStoppingDistances.push_back( { 2.00, 1.34 } );
+		m_vecStoppingDistances.push_back( { 2.20, 1.62 } );
+		m_vecStoppingDistances.push_back( { 2.40, 2.05 } );
+		m_vecStoppingDistances.push_back( { 2.60, 2.24 } );
 	}
 
 	~ReflexesTest( )
@@ -112,15 +129,13 @@ public:
 		return laserScan;
 	}
 
-	void AddObject( )
+	void AddObject( segment_t lineSegment )
 	{
 		sensor_msgs::LaserScan::Ptr laserScan = CreateLaserScan( );
 
 		uint32_t numberOfScans = m_laserScan->ranges.size( );
 
 		double lineDistance = 100000.0f;
-
-		segment_t objectLine( point_t( 0.3, -0.3 ), point_t( 0.3, 0.3 ) );
 
 		for( int x = 0; x < numberOfScans; x++ )
 		{
@@ -130,7 +145,7 @@ public:
 			segment_t laserLine( point_t( 0.0, 0.0), point_t( lineDistance * cos( angle ), lineDistance * sin( angle ) ) );
 
 			std::vector<point_t> output;
-			boost::geometry::intersection( objectLine, laserLine, output );
+			boost::geometry::intersection( lineSegment, laserLine, output );
 
 //			ROS_DEBUG_NAMED( "reflexes", "Laser Line: %.2f, %.2f - %.2f, %.2f, Object Line: %.2f, %.2f = %.2f, %.2f",
 //				laserLine.first.get<0>( ), laserLine.first.get<1>( ), laserLine.second.get<0>( ), laserLine.second.get<1>( ),
@@ -182,6 +197,12 @@ public:
 		    }
 		}
 	}
+
+	segment_t CreateSegment( double distance, double offset, double length )
+	{
+		return segment_t( point_t( distance, offset + ( length / 2.0f) ),
+			point_t( distance, offset + (length / 2.0f) ) );
+	}
 };
 
 TEST_F( ReflexesTest, TestNoObstacleNoVelocity )
@@ -190,18 +211,55 @@ TEST_F( ReflexesTest, TestNoObstacleNoVelocity )
 
 	WaitForMessage( );
 
-	EXPECT_FALSE( subscriber.receivedMessage ); // This may or may not be true
+	EXPECT_FALSE( subscriber.receivedMessage );
 }
 
 TEST_F( ReflexesTest, TestObstacleNoVelocity )
 {
-	AddObject( );
+	std::vector<segment_t> vecSegments;
 
-	m_reflexes.OnLaserScan( m_laserScan );
+	vecSegments.push_back( CreateSegment( 0.01, 0.0, 0.3 ) );
+	vecSegments.push_back( CreateSegment( 0.3, 0.0, 0.3 ) );
+	vecSegments.push_back( CreateSegment( 0.5, 0.0, 0.3 ) );
+	vecSegments.push_back( CreateSegment( 1.0, 0.0, 0.3 ) );
+	vecSegments.push_back( CreateSegment( 5.0, 0.0, 0.3 ) );
+	vecSegments.push_back( CreateSegment( 10.0, 0.0, 0.3 ) );
 
-	WaitForMessage( );
+	for( auto lineSegment : vecSegments )
+	{
+		AddObject( lineSegment );
 
-	EXPECT_TRUE( subscriber.receivedMessage ); // This may or may not be true
+		m_reflexes.OnLaserScan( m_laserScan );
+
+		WaitForMessage( );
+
+		EXPECT_FALSE( subscriber.receivedMessage );
+	}
+}
+
+TEST_F( ReflexesTest, TestMovingObstacle )
+{
+	SetVelocity( 1.0f, 0.0f );
+
+	std::vector<segment_t> vecSegments;
+
+	vecSegments.push_back( CreateSegment( 0.01, 0.0, 0.3 ) );
+	vecSegments.push_back( CreateSegment( 0.3, 0.0, 0.3 ) );
+	vecSegments.push_back( CreateSegment( 0.5, 0.0, 0.3 ) );
+	vecSegments.push_back( CreateSegment( 1.0, 0.0, 0.3 ) );
+	vecSegments.push_back( CreateSegment( 5.0, 0.0, 0.3 ) );
+	vecSegments.push_back( CreateSegment( 10.0, 0.0, 0.3 ) );
+
+	for( auto lineSegment : vecSegments )
+	{
+		AddObject( lineSegment );
+
+		m_reflexes.OnLaserScan( m_laserScan );
+
+		WaitForMessage( );
+
+		EXPECT_FALSE( subscriber.receivedMessage );
+	}
 }
 
 }  // namespace

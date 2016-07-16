@@ -70,7 +70,6 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan,
 	combinedMsg.encoding = infraredImage2->encoding;
 	combinedMsg.image    = combinedIRImage;
 
-	ROS_INFO( "Publishing combined IR" );
 	infraredPublisher_.publish( combinedMsg );
 
 	const uint32_t numberOfScans = scan->ranges.size( );

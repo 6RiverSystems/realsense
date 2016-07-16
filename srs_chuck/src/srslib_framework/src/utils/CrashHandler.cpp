@@ -141,6 +141,8 @@ private:
 
 	static void errorHandler( int sig_num, siginfo_t * info, void * ucontext )
 	{
+	    ROS_ERROR( "%s crashed (signal: %d)", m_applicationName.c_str( ), sig_num );
+
 		printStackTrace( );
 
 		exit( EXIT_FAILURE );
@@ -148,6 +150,8 @@ private:
 
 	static void onUncaughtException( )
 	{
+	    ROS_ERROR( "%s crashed (uncaught exception)", m_applicationName.c_str( ) );
+
 		printStackTrace( );
 
 		exit( EXIT_FAILURE );

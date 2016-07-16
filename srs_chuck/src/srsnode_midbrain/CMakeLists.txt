@@ -71,12 +71,9 @@ if (CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
 
     add_rostest_gtest(Test_Reflexes 
-        test/launch/reflexes.xml 
+        test/launch/reflexes.xml
         ${${PROJECT_NAME}_SOURCES}
         test/Test_Reflexes.cpp
-    )
-    add_dependencies(Test_Reflexes
-        ${srsnode_midbrain_EXPORTED_TARGETS}
     )
     target_link_libraries(Test_Reflexes
         ${catkin_LIBRARIES}

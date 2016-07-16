@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
-#include <Reflexes.hpp>
+#include <srsnode_midbrain/Reflexes.hpp>
 #include <std_msgs/String.h>
 #include <boost/timer.hpp>
 #include <boost/geometry.hpp>

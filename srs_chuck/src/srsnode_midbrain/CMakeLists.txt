@@ -37,7 +37,6 @@ generate_dynamic_reconfigure_options(
 
 include_directories(include
     include/
-    include/srsnode_midbrain/
     ${catkin_INCLUDE_DIRS}
     ${srslib_framework_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
@@ -59,6 +58,11 @@ add_dependencies(${PROJECT_NODE}
     ${PROJECT_NAME}_gencfg
 )
 
+add_dependencies(${PROJECT_NODE}
+    ${catkin_EXPORTED_TARGETS}
+    ${srsnode_midbrain_EXPORTED_TARGETS}
+)
+
 target_link_libraries(${PROJECT_NODE}
     ${catkin_LIBRARIES}
     ${srslib_framework_LIBRARIES}
@@ -74,6 +78,10 @@ if (CATKIN_ENABLE_TESTING)
         test/launch/reflexes.xml
         ${${PROJECT_NAME}_SOURCES}
         test/Test_Reflexes.cpp
+    )
+    add_dependencies(Test_Reflexes
+        ${catkin_EXPORTED_TARGETS}
+        ${srsnode_midbrain_EXPORTED_TARGETS}
     )
     target_link_libraries(Test_Reflexes
         ${catkin_LIBRARIES}

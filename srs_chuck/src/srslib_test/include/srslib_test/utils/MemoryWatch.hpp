@@ -15,35 +15,17 @@ namespace test {
 class MemoryWatch
 {
 public:
-    MemoryWatch()
-    {
-        startStats_ = mallinfo();
-        updateStats();
-    }
+    MemoryWatch();
 
-    ~MemoryWatch()
-    {}
+    ~MemoryWatch();
 
-    long getMemoryUsage()
-    {
-        updateStats();
-        return memoryUsed_;
-    }
+    long getMemoryUsage();
 
-    bool isZero()
-    {
-        updateStats();
-        return memoryUsed_ == 0;
-    }
+    bool isZero();
 
 private:
 
-    void updateStats()
-    {
-        struct mallinfo currentStats = mallinfo();
-        memoryUsed_ = (currentStats.uordblks - startStats_.uordblks) +
-            (currentStats.hblkhd - startStats_.hblkhd);
-    }
+    void updateStats();
 
     long memoryUsed_;
     struct mallinfo startStats_;

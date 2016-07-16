@@ -97,14 +97,12 @@ find_package(catkin REQUIRED COMPONENTS
     nav_msgs
 )
 find_package(OpenCV REQUIRED)
-find_package(srslib_test REQUIRED)
 find_package(Boost REQUIRED)
+find_package(srslib_test REQUIRED)
 
 find_package(PkgConfig)
 pkg_check_modules(NEW_YAMLCPP yaml-cpp>=0.5)
-
-pkg_check_modules( UNWIND libunwind )
-find_library(EXECINFO_LIBRARIES NAMES execinfo)
+pkg_check_modules(UNWIND libunwind)
 
 include_directories(
     include/
@@ -118,6 +116,7 @@ include_directories(
 set(PROJECT_LIBRARIES
     ${roscpp_LIBRARIES}
     ${OpenCV_LIBRARIES}
+    ${srslib_test_LIBRARIES}
     yaml-cpp
     SDL SDL_image
 )
@@ -145,7 +144,7 @@ generate_messages(
 catkin_package(
     INCLUDE_DIRS src include
     LIBRARIES ${PROJECT_LIBRARY}
-    DEPENDS opencv message_runtime std_msgs nav_msgs
+    DEPENDS opencv message_runtime std_msgs nav_msgs srslib_test
 )
 
 add_library(${PROJECT_LIBRARY}
@@ -168,11 +167,6 @@ target_link_libraries(${PROJECT_LIBRARY}
 if (CATKIN_ENABLE_TESTING)
 
     file(COPY data DESTINATION "/tmp/${PROJECT_NAME}")
-
-    # Add test libraries to all tests
-    add_dependencies(${PROJECT_LIBRARY}
-        ${srslib_test_LIBRARIES}
-    )
 
     catkin_add_gtest(TestSuite_Datastructure
         test/TestSuite.cpp

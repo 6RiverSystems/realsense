@@ -8,12 +8,7 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srslib_test)
 
 set(${PROJECT_NAME}_SOURCES
-
-    include/${PROJECT_NAME}/graph/grid2d/Grid2dUtils.hpp
-
-    include/${PROJECT_NAME}/utils/Compare.hpp
-    include/${PROJECT_NAME}/utils/MemoryWatch.hpp
-    include/${PROJECT_NAME}/utils/Print.hpp
+    src/utils/MemoryWatch.cpp
 )
 
 ####################################################################################################
@@ -54,8 +49,6 @@ target_link_libraries(${PROJECT_LIBRARY}
     ${roscpp_LIBRARIES}
     ${OpenCV_LIBRARIES}
 )
-
-set_target_properties(${PROJECT_LIBRARY} PROPERTIES LINKER_LANGUAGE CXX)
 
 ####################################################################################################
 # Tests

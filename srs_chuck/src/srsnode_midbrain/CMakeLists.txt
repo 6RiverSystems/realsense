@@ -9,6 +9,7 @@ set(PROJECT_NAME srsnode_midbrain)
 set(PROJECT_MAIN src/midbrain_node.cpp)
 set(${PROJECT_NAME}_SOURCES
     src/Midbrain.cpp
+    src/ObstacleDetector.cpp
     src/Reflexes.cpp
 )
 
@@ -26,6 +27,7 @@ set(Boost_ADDITIONAL_VERSIONS "1.61" "1.61.0")
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
+    rostest
     dynamic_reconfigure
     srslib_framework
     srslib_test
@@ -46,7 +48,7 @@ include_directories(include
 # Target
 
 catkin_package(
-    DEPENDS srslib_framework
+    CATKIN_DEPENDS srslib_framework
 )
 
 add_executable(${PROJECT_NODE} 
@@ -72,18 +74,11 @@ target_link_libraries(${PROJECT_NODE}
 # Tests
 
 if (CATKIN_ENABLE_TESTING)
-    find_package(rostest REQUIRED)
-
-    add_rostest_gtest(Test_Reflexes 
-        test/launch/reflexes.xml
-        ${${PROJECT_NAME}_SOURCES}
-        test/Test_Reflexes.cpp
-    )
-    add_dependencies(Test_Reflexes
-        ${catkin_EXPORTED_TARGETS}
-        ${srsnode_midbrain_EXPORTED_TARGETS}
+    catkin_add_gtest(Test_Reflexes
+    	test/Test_Reflexes.cpp
+        src/ObstacleDetector.cpp
     )
     target_link_libraries(Test_Reflexes
-        ${catkin_LIBRARIES}
+        ${srslib_framework_LIBRARIES}
     )
 endif()

@@ -8,6 +8,7 @@
 
 #include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
+#include <srsnode_midbrain/ObstacleDetector.hpp>
 
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
@@ -58,37 +59,19 @@ private:
 
 	dynamic_reconfigure::Server<srsnode_midbrain::ReflexesConfig> server;
 
-	ros::NodeHandle&						m_nodeHandle;
+	ros::NodeHandle&	m_nodeHandle;
 
-	bool	 								m_sendHardStop;
+	bool	 			m_sendHardStop;
 
-	uint32_t 								m_objectThreshold;
+	ObstacleDetector 	m_obstacleDetector;
 
-	double 									m_maxLinearVelocity;
+	ros::Subscriber		m_operationalStateSubscriber;
 
-	double 									m_maxAngularVelocity;
+	ros::Subscriber		m_laserScanSubscriber;
 
-	double									m_chuckWidth_;
+	ros::Subscriber		m_velocitySubscriber;
 
-	double 									m_chuckHalfWidth;
-
-	double 									m_yPaddedOffset;
-
-	double 									m_minSafeDistance;
-
-	double 									m_maxSafeDistance;
-
-	srslib_framework::MsgOperationalState	m_operationalState;
-
-	geometry_msgs::Twist					m_velocity;
-
-	ros::Subscriber							m_operationalStateSubscriber;
-
-	ros::Subscriber							m_laserScanSubscriber;
-
-	ros::Subscriber							m_velocitySubscriber;
-
-	ros::Publisher							m_commandPublisher;
+	ros::Publisher		m_commandPublisher;
 
 };
 

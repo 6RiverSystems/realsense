@@ -61,7 +61,7 @@ private:
 
 	static constexpr auto DANGER_ZONE_TOPIC = "/internal/state/reflexes/danger_zone";
 
-	static constexpr auto EVENT_TOPIC = "/ll_event";
+	static constexpr auto COMMAND_TOPIC = "/cmd_ll";
 
 	// TODO: Get footprint from robot model (lookup topic, load urdf, etc.)
 	static constexpr auto ROBOT_WIDTH = 0.64f;

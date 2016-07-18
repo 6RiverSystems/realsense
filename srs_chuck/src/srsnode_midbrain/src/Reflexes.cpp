@@ -121,10 +121,8 @@ void Reflexes::PublishDangerZone( ) const
 
 void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t level)
 {
-	ROS_INFO_STREAM_NAMED( "obstacle_detection", "Midbrain Configuration changed: \
-		enable_obstacle_detection: " << config.enable_obstacle_detection <<
-		", enable_hard_stop: " << config.enable_hard_stop <<
-		", object_threshold: " << config.object_threshold );
+	ROS_INFO_NAMED( "obstacle_detection", "Midbrain config changed: od enabled: %d, hardStop: %d, threshold: %d",
+		config.enable_obstacle_detection, config.enable_hard_stop, config.object_threshold );
 
 	SetObjectThreshold( config.object_threshold );
 
@@ -135,16 +133,16 @@ void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t
 
 void Reflexes::OnObstacleDetected( )
 {
-	ROS_INFO_STREAM_NAMED( "obstacle_detection", "OnObstacleDetected: \
-		m_operationalState.pause: " << m_operationalState.pause <<
-		", m_enable: " << m_enable <<
-		", m_sendHardStop: " << m_sendHardStop );
+	ROS_INFO_NAMED( "obstacle_detection", "OnObstacleDetected: paused: %d, enabled: %d, hardStop: %d",
+		m_operationalState.pause, m_enable, m_sendHardStop );
 
 	// Only send a hard stop if we are paused
 	if( !m_operationalState.pause &&
 		m_enable &&
 		m_sendHardStop )
 	{
+		ROS_INFO_STREAM_NAMED( "obstacle_detection", "OnObstacleDetected: Sending STOP" );
+
 		// Send the hard stop
 		std_msgs::String msg;
 		msg.data = "STOP";
@@ -176,9 +174,9 @@ void Reflexes::DestroySubscribers( )
 
 void Reflexes::CreatePublishers( )
 {
-	m_commandPublisher = m_nodeHandle.advertise<std_msgs::String>( EVENT_TOPIC, 1, true );
+	m_commandPublisher = m_nodeHandle.advertise<std_msgs::String>( COMMAND_TOPIC, 1, true );
 
-	m_dangerZonePublisher = m_nodeHandle.advertise<geometry_msgs::PolygonStamped>(DANGER_ZONE_TOPIC, 1);
+	m_dangerZonePublisher = m_nodeHandle.advertise<geometry_msgs::PolygonStamped>( DANGER_ZONE_TOPIC, 1 );
 }
 
 void Reflexes::DestroyPublishers( )

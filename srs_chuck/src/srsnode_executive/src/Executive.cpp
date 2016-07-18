@@ -190,7 +190,7 @@ void Executive::executePlanToGoal()
 
         currentSolution_ = GridSolutionFactory::fromSearch(goalNode, map);
         ROS_DEBUG_STREAM_NAMED("executive", "Found solution: " << endl << *currentSolution_);
-        ROS_INFO_STREAM_NAMED("executive", "Found path for goal:" << goalPose.x << "," << goalPose.y << "," << goalPose << " => offset goal"
+        ROS_INFO_STREAM_NAMED("executive", "Found path for goal:" << internalGoal.x << "," << internalGoal.y << "," << goalAngle << " => offset goal"
         	<< currentGoal_.x << "," << currentGoal_.y << "," << currentGoal_.theta);
     }
     else

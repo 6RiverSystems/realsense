@@ -43,11 +43,7 @@ public:
         }
 
         extractPath(solution, originalPath_);
-
-        double spacing;
-        calculateSpacing(originalPath_, reducedPath_, spacing);
-
-        interpolatePath(reducedPath_, spacing);
+        interpolatePath(reducedPath_);
     }
 
     void getTrajectory(Trajectory<>& trajectory)
@@ -62,51 +58,6 @@ private:
     double calculateDirection(double from, double to)
     {
         return BasicMath::sgn<double>(to - from);
-    }
-
-    void calculateMinMaxMean(PathType& path, double& minD, double& maxD, double& meanD)
-    {
-        minD = numeric_limits<double>::max();
-        maxD = numeric_limits<double>::min();
-        meanD = 0;
-        int meanCount = 0;
-
-        Pose<> previousWaypoint = path.front();
-        for (auto waypoint : path)
-        {
-            double d = PoseMath::euclidean(previousWaypoint, waypoint);
-            if (d > 0)
-            {
-                minD = min(minD, d);
-                maxD = max(maxD, d);
-
-                meanD += d;
-                meanCount++;
-            }
-
-            previousWaypoint = waypoint;
-        }
-
-        meanD /= meanCount;
-    }
-
-    void calculateSpacing(PathType& path, PathType& reducedPath, double& spacing)
-    {
-        double minDistance;
-        double maxDistance;
-        double meanDistance;
-
-        calculateMinMaxMean(path, minDistance, maxDistance, meanDistance);
-
-        double minimumSpacing = 0.0001 * meanDistance;
-        double maximumSpacing = 0.005 * meanDistance;
-
-        filterPath(path, minimumSpacing, reducedPath);
-
-        calculateMinMaxMean(reducedPath, minDistance, maxDistance, meanDistance);
-
-        maximumSpacing = min(maximumSpacing, minDistance);
-        spacing = max(minimumSpacing, maximumSpacing);
     }
 
     void extractPath(Solution<GridSolutionItem>& solution, PathType& path)
@@ -142,24 +93,7 @@ private:
         }
     }
 
-    void filterPath(PathType& path, double minDistance, PathType& reducedPath)
-    {
-        Pose<> previousWaypoint = path.front();
-        reducedPath.push_back(previousWaypoint);
-
-        for (auto waypoint : path)
-        {
-            double d = PoseMath::euclidean(previousWaypoint, waypoint);
-            if (d > minDistance)
-            {
-                reducedPath.push_back(waypoint);
-            }
-
-            previousWaypoint = waypoint;
-        }
-    }
-
-    void interpolatePath(PathType& path, double spacing)
+    void interpolatePath(PathType& path)
     {
         if (path.size() < 2)
         {
@@ -180,7 +114,6 @@ private:
 
             // Interpolate the trajectory between the two waypoints
             interpolateBetweenWaypoints(*fromWaypoint, *toWaypoint,
-                spacing,
                 isFirstStretch, isLastStretch);
 
             // Make sure that the destination waypoint is there
@@ -198,7 +131,6 @@ private:
     }
 
     void interpolateBetweenWaypoints(WaypointType fromWaypoint, WaypointType toWaypoint,
-        double spacing,
         bool isFirstStretch, bool isLastStretch)
     {
         // Calculate the direction of the motion
@@ -243,6 +175,7 @@ private:
 
         // Calculate the change in pose that depend on the
         // direction of motion and the specified spacing
+        double spacing = robot_.pathFollowGoalReachedDistance / 5.0;
         Pose<> deltaPose = Pose<>(
             movingOnX ? directionX * spacing : 0.0,
             movingOnY ? directionY * spacing : 0.0,

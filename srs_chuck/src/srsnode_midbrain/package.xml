@@ -15,12 +15,15 @@
     <author email="fsantini@6river.com">Fabrizio Santini</author>
     <maintainer email="fsantini@6river.com">Fabrizio Santini</maintainer>
 
-    <license>TODO</license>
+    <license>Proprietary</license>
 
     <buildtool_depend>catkin</buildtool_depend>
  
     <build_depend>std_msgs</build_depend>
     <run_depend>std_msgs</run_depend>
+ 
+    <build_depend>roscpp</build_depend>
+    <run_depend>roscpp</run_depend>
 
     <build_depend>geometry_msgs</build_depend>
     <run_depend>geometry_msgs</run_depend>
@@ -30,6 +33,9 @@
 
     <build_depend>srslib_framework</build_depend>
     <run_depend>srslib_framework</run_depend>
+
+    <build_depend>dynamic_reconfigure</build_depend>
+    <run_depend>dynamic_reconfigure</run_depend>
 
     <test_depend>rosunit</test_depend>
     <test_depend>srslib_test</test_depend>

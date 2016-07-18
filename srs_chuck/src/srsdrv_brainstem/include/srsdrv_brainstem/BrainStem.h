@@ -8,6 +8,8 @@
 #define BRAINSTEM_HPP_
 
 #include <ros/ros.h>
+#include <boost/timer.hpp>
+
 #include <std_msgs/String.h>
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
@@ -58,13 +60,40 @@ private:
 
 	void OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity );
 
+	void OnRace( const geometry_msgs::Twist::ConstPtr& velocity );
+
 	void OnRosCallback( const std_msgs::String::ConstPtr& msg );
 
 private:
 
+	static constexpr auto REFRESH_RATE_HZ = 100;
+
+	static constexpr auto HARDWARE_INFO_TOPIC = "/info/hardware";
+
+	static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/operational_state";
+
+	static constexpr auto VOLTAGE_TOPIC = "/info/voltage";
+
+	static constexpr auto CONNECTED_TOPIC = "/internal/drivers/brainstem/connected";
+
+	static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
+
+	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
+
+	static constexpr auto PING_TOPIC = "/internal/state/ping";
+	
+	static constexpr auto RACE_TOPIC = "/internal/command/race";
+
+	// TODO: Remove/Replace with proper messages
+	static constexpr auto COMMAND_TOPIC = "/cmd_ll";
+
+	static constexpr auto EVENT_TOPIC = "/ll_event";
+
 	ros::NodeHandle 			m_rosNodeHandle;
 
 	ros::Subscriber				m_llcmdSubscriber;
+
+	ros::Subscriber				m_raceSubscriber;
 
 	ros::Subscriber				m_pingSubscriber;
 
@@ -81,6 +110,10 @@ private:
 	ros::Publisher				m_connectedPublisher;
 
 	ros::Publisher				m_odometryRawPublisher;
+
+	boost::timer				m_raceTimer;
+
+	geometry_msgs::Twist::Ptr	m_raceVelocity;
 
 	std::shared_ptr<IO>			m_pSerialIO;
 

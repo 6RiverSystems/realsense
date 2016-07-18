@@ -9,7 +9,6 @@
 using namespace std;
 
 #include <ros/ros.h>
-#include <boost/filesystem.hpp>
 
 #include <srslib_framework/math/AngleMath.hpp>
 
@@ -113,10 +112,8 @@ void calculateSolution(Map* map, Pose<> fromPose, Pose<> toPose, double correctC
 
 TEST(Test_Trajectory, BarrettMap)
 {
-    boost::filesystem::path filePath = boost::filesystem::canonical(
-        "../../../srs_sites/src/srsc_barrett_rviz/map/barrett.yaml");
     Map* map = new Map();
-    map->load(filePath.generic_string());
+    map->load("/tmp/srslib_framework/data/barrett.yaml");
 
     // A ---> B
     Pose<> robotPose = Pose<>(13.113, 24.759, AngleMath::deg2rad<double>(270));

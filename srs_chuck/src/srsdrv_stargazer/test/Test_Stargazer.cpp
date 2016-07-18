@@ -1,8 +1,7 @@
 /*
- * Test_Stargazer.cpp
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
  *
- *  Created on: Apr 4, 2016
- *      Author: dan
+ * This is proprietary software, unauthorized distribution is not permitted.
  */
 
 #include <StarGazerPointTransformer.h>
@@ -135,8 +134,6 @@ public:
 
 TEST_F( StargazerTest, TestTransforms )
 {
-	uint32_t testIndex = 0;
-
 	for( auto stargazerOffset : m_vecStargazerOffsets )
 	{
 		tf::Transform stargazerTransform( tf::Quaternion::getIdentity( ), tf::Vector3( stargazerOffset.x,
@@ -171,10 +168,6 @@ TEST_F( StargazerTest, TestTransforms )
 				double dfAngleLeftDegrees = GetLeftHandAngle( testPoint.angle );
 
 				tf::Quaternion rotation = m_pointTransformer.ConvertAngle( dfAngleLeftDegrees );
-
-				double dfAngleRightRadians = tf::getYaw( rotation );
-
-				double dfAngleRightDegrees = dfAngleRightRadians * 180.0f / M_PI;
 
 				tf::Vector3 cameraOffset = m_pointTransformer.GetCameraOffset( rotation );
 

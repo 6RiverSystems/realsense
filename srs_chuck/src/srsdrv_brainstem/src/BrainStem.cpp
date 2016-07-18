@@ -14,35 +14,15 @@
 #include <srslib_framework/io/SerialIO.hpp>
 #include <srslib_framework/platform/Thread.hpp>
 #include <bitset>
+#include <boost/test/floating_point_comparison.hpp>
 
-bool approximatively_equal(double x, double y, int ulp)
+bool approximatively_equal( double a, double b, double percentage )
 {
-   return fabs(x-y) <= ulp*DBL_EPSILON*std::max(fabs(x), fabs(y));
+   return boost::test_tools::check_is_close( a, b, boost::test_tools::percent_tolerance(percentage) );
 }
 
 namespace srs
 {
-
-static constexpr auto REFRESH_RATE_HZ = 100;
-
-static constexpr auto HARDWARE_INFO_TOPIC = "/info/hardware";
-
-static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/operational_state";
-
-static constexpr auto VOLTAGE_TOPIC = "/info/voltage";
-
-static constexpr auto CONNECTED_TOPIC = "/internal/drivers/brainstem/connected";
-
-static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
-
-static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
-
-static constexpr auto PING_TOPIC = "/internal/state/ping";
-
-// TODO: Remove/Replace with proper messages
-static constexpr auto COMMAND_TOPIC = "/cmd_ll";
-
-static constexpr auto EVENT_TOPIC = "/ll_event";
 
 BrainStem::BrainStem( const std::string& strSerialPort ) :
 	m_rosNodeHandle( ),
@@ -51,6 +31,7 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
     m_odometryRawPublisher( ),
     m_connectedPublisher( ),
 	m_llcmdSubscriber( ),
+	m_raceSubscriber( ),
 	m_llEventPublisher( ),
 	m_hardwareInfoPublisher( ),
 	m_operationalStatePublisher( ),
@@ -141,6 +122,13 @@ void BrainStem::OnButtonEvent( LED_ENTITIES eButtonId )
 	}
 }
 
+double dfX = 0.0f;
+double dfY = 0.0f;
+double dfTheta = 0.0f;
+
+double dfStartX = 0.0f;
+double dfStartY = 0.0f;
+
 void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, float fAngularVelocity )
 {
 	ros::Time currentTime = ros::Time::now( );
@@ -181,6 +169,16 @@ void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, 
 
 	m_odometryRawPublisher.publish( odometry );
 
+	double dfTimeDelta = (currentTime - sLastTime).toSec( );
+
+	double dfXDelta = odometry.twist.linear.x * cos( dfTheta ) * dfTimeDelta;
+	double dfYDelta = odometry.twist.linear.x * sin( dfTheta ) * dfTimeDelta;
+	double dfThetaDelta = odometry.twist.angular.z * dfTimeDelta;
+
+	dfX += dfXDelta;
+	dfY += dfYDelta;
+	dfTheta += dfThetaDelta;
+
 	double dfClockDiff = currentTime.toSec( ) - m_rosOdomTime.toSec( );
 
 	if( dfClockDiff > 0.05 )
@@ -191,6 +189,54 @@ void BrainStem::OnOdometryChanged( uint32_t dwTimeStamp, float fLinearVelocity, 
 	m_dwLastOdomTime = dwTimeStamp;
 
 	sLastTime = currentTime;
+
+	if( m_raceVelocity )
+	{
+		static bool velocityReached = false;
+
+		// Wait until we have reached our desired velocity
+		if( !velocityReached &&
+			( fLinearVelocity >= m_raceVelocity->linear.x - 0.01f ) &&
+			( fAngularVelocity >= m_raceVelocity->angular.z - 0.01f ) )
+		{
+			velocityReached = true;
+
+			ROS_INFO( "Reached race velocity in: %.4f (x: %.4f, y: %.4f, theta: %.4f)  seconds => HARDSTOP!!!",
+				m_raceTimer.elapsed( ), dfX, dfY, dfTheta );
+
+			m_raceTimer.restart( );
+
+			// We have come to a stop, release the hard stop
+			m_raceVelocity->linear.x = 0;
+			m_raceVelocity->angular.z = 0;
+
+			// We have reached our desired velocity => STOP (as fast as possible)
+			m_messageProcessor.OnHardStop( );
+
+			dfStartX = dfX;
+			dfStartY = dfY;
+		}
+
+		// Wait for stopped
+		if( velocityReached &&
+			( fLinearVelocity <= 0.01f ) &&
+			( fAngularVelocity <= 0.01f ) )
+		{
+			ROS_INFO( "Race stopped in: %.4f seconds dX: %.4f, dY: %.4f (x: %.4f, y: %.4f, theta: %.4f)",
+				m_raceTimer.elapsed( ), fabs( dfStartX - dfX ), fabs( dfStartY - dfY ), dfX, dfY, dfTheta );
+
+			m_messageProcessor.SetVelocity( m_raceVelocity->linear.x, m_raceVelocity->angular.z );
+
+			std::bitset<8> clearHardStopSet;
+			clearHardStopSet.set( MOTION_STATUS::HARD_STOP, true );
+
+			m_messageProcessor.SetMotionStatus( clearHardStopSet, false );
+
+			m_raceVelocity.reset( );
+
+			velocityReached = false;
+		}
+	}
 }
 
 void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t chassisGeneration, uint8_t brainstemHwVersion,
@@ -274,6 +320,9 @@ void BrainStem::CreateSubscribers( )
 
 	m_llcmdSubscriber = m_rosNodeHandle.subscribe<std_msgs::String>( COMMAND_TOPIC, 100,
 	    std::bind( &BrainStem::OnRosCallback, this, std::placeholders::_1 ) );
+
+	m_llcmdSubscriber = m_rosNodeHandle.subscribe<geometry_msgs::Twist>( RACE_TOPIC, 100,
+	    std::bind( &BrainStem::OnRace, this, std::placeholders::_1 ) );
 }
 
 void BrainStem::CreatePublishers( )
@@ -331,6 +380,18 @@ void BrainStem::OnPing( )
 void BrainStem::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity )
 {
 	m_messageProcessor.SetVelocity( velocity->linear.x, velocity->angular.z );
+}
+
+void BrainStem::OnRace( const geometry_msgs::Twist::ConstPtr& velocity )
+{
+	ROS_INFO( "Get ready...  set... go... (x: %.4f, y: %.4f, theta: %.4f) => linear: %.4f, angular: %.4f",
+		dfX, dfY, dfTheta, velocity->linear.x, velocity->angular.z );
+
+	m_raceVelocity.reset( new geometry_msgs::Twist( *velocity ) );
+
+	m_raceTimer.restart( );
+
+	m_messageProcessor.SetVelocity( m_raceVelocity->linear.x, m_raceVelocity->angular.z );
 }
 
 void BrainStem::OnRosCallback( const std_msgs::String::ConstPtr& msg )

@@ -23,7 +23,7 @@ TEST(Test_AStar, WithMap)
     Grid2d::LocationType goal(87, 48);
 
     Map* map = new Map();
-    map->load("6rhq.yaml");
+    map->load("/tmp/srslib_framework/data/6rhq.yaml");
 
     vector<int8_t> costGrid;
     vector<int8_t> notesGrid;

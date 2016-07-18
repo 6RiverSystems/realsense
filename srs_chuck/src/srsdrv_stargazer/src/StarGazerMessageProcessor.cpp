@@ -23,14 +23,14 @@ namespace srs
 static const std::string FLASH_WRITE_DONE = "ParameterUpdate";
 
 StarGazerMessageProcessor::StarGazerMessageProcessor( std::shared_ptr<IO> pIO ) :
-	m_readCallback( ),
-	m_odometryCallback( ),
 	m_pSerialIO( pIO ),
+	m_highrezclk( ),
 	m_queueOutgoingMessages( ),
 	m_mapPendingResponses( ),
 	m_odometryRegex( ),
 	m_messageRegex( ),
-	m_highrezclk( ),
+	m_readCallback( ),
+	m_odometryCallback( ),
 	m_bIsStarted( false )
 {
 	// Protect against odd compiler versions (boost seems to fix the regex bugs in gcc 4.8.4)

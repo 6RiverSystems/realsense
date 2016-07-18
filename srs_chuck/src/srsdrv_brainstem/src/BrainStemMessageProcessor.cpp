@@ -217,7 +217,7 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 
 void BrainStemMessageProcessor::GetOperationalState( )
 {
-	ROS_INFO( "GetOperationalState" );
+	ROS_DEBUG( "GetOperationalState" );
 
 	COMMAND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_OPERATIONAL_STATE) };
 
@@ -227,7 +227,7 @@ void BrainStemMessageProcessor::GetOperationalState( )
 
 void BrainStemMessageProcessor::GetHardwareInformation( )
 {
-	ROS_INFO( "GetHardwareInformation" );
+	ROS_DEBUG( "GetHardwareInformation" );
 
 	COMMAND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_HARDWARE_INFO ) };
 
@@ -377,11 +377,10 @@ void BrainStemMessageProcessor::SetMotionStatus( const std::bitset<8>& motionSta
 
 void BrainStemMessageProcessor::OnHardStop( )
 {
-	ROS_DEBUG( "OnHardStop" );
+	std::bitset<8> hardStopSet;
+	hardStopSet.set( MOTION_STATUS::HARD_STOP, true );
 
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::HARD_STOP );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
+	SetMotionStatus( hardStopSet, true );
 }
 
 void BrainStemMessageProcessor::OnResetBatteryHours( )
@@ -464,7 +463,7 @@ void BrainStemMessageProcessor::OnPause( std::vector<std::string> vecParams )
 
 void BrainStemMessageProcessor::ClearMotionStatus( )
 {
-	ROS_INFO( "Clearing motion status." );
+	ROS_DEBUG( "Clearing motion status." );
 
 	std::bitset<8> clearSet;
 	clearSet.set( MOTION_STATUS::WIRELESS_E_STOP, true );

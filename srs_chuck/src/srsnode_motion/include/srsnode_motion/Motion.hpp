@@ -47,6 +47,7 @@ public:
 private:
     constexpr static double REFRESH_RATE_HZ = 100;
     constexpr static double PING_HZ = 10;
+    constexpr static double MAX_ALLOWED_PING_DELAY = 0.5f; // 50% of the duty cycle
 
     void connectAllTaps();
 

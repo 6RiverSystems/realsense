@@ -1,3 +1,9 @@
+/*
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
+ *
+ * This is proprietary software, unauthorized distribution is not permitted.
+ */
+
 #include <srsnode_midbrain/Midbrain.hpp>
 
 #include <ros/ros.h>
@@ -13,6 +19,7 @@ Midbrain::Midbrain(string nodeName) :
     rosNodeHandle_(nodeName),
     reflexes_(rosNodeHandle_)
 {
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,6 +34,8 @@ void Midbrain::run()
         ros::spinOnce();
 
         evaluateTriggers();
+
+        reflexes_.PublishDangerZone();
 
         refreshRate.sleep();
     }

@@ -105,16 +105,6 @@ namespace srs {
 				else 
 				{
 					ROS_DEBUG_NAMED( "filter", "vel: %7.4f (%1.0f) acc: %6.2f (%1.0f) jerk: %7.1f (%1.0f) <", absVel, m_velocityLimitCMpS, absAcc, m_accelerationLimitCMpS2, absJerk, m_jerkLimitCMpS3);
-
-					int vm = absVel / m_velocityLimitCMpS;
-					int am = absAcc / m_accelerationLimitCMpS2;
-					int jm = absJerk / m_jerkLimitCMpS3;
-
-//					int mag = vm > am ? vm > jm ? vm : jm : am > jm ? am : jm;
-//					for (int i = 0; i <= mag; i++) {
-//						printf("-");
-//					}
-//					printf("\n");
 				}
 			}
 

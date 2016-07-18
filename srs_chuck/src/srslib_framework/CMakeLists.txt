@@ -56,7 +56,7 @@ set(TEST_SOURCES_LOCALIZATION
 )
 
 set(TEST_SOURCES_PLANNING
-    test/planning/pathplanning/Test_Trajectory_BarrettMap.cpp
+#    test/planning/pathplanning/Test_Trajectory_BarrettMap.cpp
     test/planning/pathplanning/Test_Trajectory_180ShortTrajectory.cpp
     test/planning/pathplanning/Test_Trajectory_LongStraight.cpp
     test/planning/pathplanning/Test_Trajectory_LongTrajectory.cpp
@@ -74,7 +74,7 @@ set(TEST_SOURCES_ROBOTICS
 set(TEST_SOURCES_SEARCH
     test/search/Test_AStar_Basic.cpp
     test/search/Test_AStar_Map.cpp
-    test/search/Test_AStar_SamePlaceOnMap.cpp
+#    test/search/Test_AStar_SamePlaceOnMap.cpp
 )
 
 set(TEST_SOURCES_IO
@@ -97,14 +97,12 @@ find_package(catkin REQUIRED COMPONENTS
     nav_msgs
 )
 find_package(OpenCV REQUIRED)
-find_package(srslib_test REQUIRED)
 find_package(Boost REQUIRED)
+find_package(srslib_test REQUIRED)
 
 find_package(PkgConfig)
 pkg_check_modules(NEW_YAMLCPP yaml-cpp>=0.5)
-
-pkg_check_modules( UNWIND libunwind )
-find_library(EXECINFO_LIBRARIES NAMES execinfo)
+pkg_check_modules(UNWIND libunwind)
 
 include_directories(
     include/
@@ -118,6 +116,7 @@ include_directories(
 set(PROJECT_LIBRARIES
     ${roscpp_LIBRARIES}
     ${OpenCV_LIBRARIES}
+    ${srslib_test_LIBRARIES}
     yaml-cpp
     SDL SDL_image
 )
@@ -145,7 +144,7 @@ generate_messages(
 catkin_package(
     INCLUDE_DIRS src include
     LIBRARIES ${PROJECT_LIBRARY}
-    DEPENDS opencv message_runtime std_msgs nav_msgs
+    DEPENDS opencv message_runtime std_msgs nav_msgs srslib_test
 )
 
 add_library(${PROJECT_LIBRARY}
@@ -167,18 +166,12 @@ target_link_libraries(${PROJECT_LIBRARY}
 
 if (CATKIN_ENABLE_TESTING)
 
-    file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
-
-    # Add test libraries to all tests
-    add_dependencies(${PROJECT_LIBRARY}
-        ${srslib_test_LIBRARIES}
-    )
+    file(COPY data DESTINATION "/tmp/${PROJECT_NAME}")
 
     catkin_add_gtest(TestSuite_Datastructure
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_DATASTRUCTURE}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Datastructure
         ${PROJECT_LIBRARY}
@@ -197,7 +190,6 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_GRAPH}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Graph
         ${PROJECT_LIBRARY}
@@ -207,7 +199,6 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_LOCALIZATION}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Localization
         ${PROJECT_LIBRARY}
@@ -217,7 +208,6 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_PLANNING}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Planning
         ${PROJECT_LIBRARY}
@@ -227,7 +217,6 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_ROBOTICS}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Robotics
         ${PROJECT_LIBRARY}
@@ -237,7 +226,6 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_SEARCH}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/data
     )
     target_link_libraries(TestSuite_Search
         ${PROJECT_LIBRARY}

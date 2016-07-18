@@ -76,7 +76,7 @@ target_link_libraries(${PROJECT_NODE}
 if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(Test_Reflexes
         test/Test_Reflexes.cpp
-        ObstacleDetector.cpp
+        src/ObstacleDetector.cpp
     )
     add_dependencies(Test_Reflexes
         ${catkin_EXPORTED_TARGETS}

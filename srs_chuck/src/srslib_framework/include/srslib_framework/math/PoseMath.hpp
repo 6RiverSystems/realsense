@@ -105,6 +105,36 @@ struct PoseMath
         return R;
     }
 
+    template<typename TYPE = double>
+    static vector<Pose<>> pose2polygon(const Pose<TYPE> center, TYPE offset, TYPE width, TYPE depth)
+    {
+        Pose<> reflection = PoseMath::rotate(center, M_PI);
+        Pose<> p = PoseMath::transform(reflection, offset);
+
+        reflection = PoseMath::rotate(p, M_PI_2);
+        Pose<> p0 = PoseMath::transform(reflection, width / 2);
+
+        reflection = PoseMath::rotate(p, -M_PI_2);
+        Pose<> p1 = PoseMath::transform(reflection, width / 2);
+
+        reflection = p1;
+        reflection.theta = center.theta;
+        Pose<> p2 = PoseMath::transform(reflection, depth);
+
+        reflection = p0;
+        reflection.theta = center.theta;
+        Pose<> p3 = PoseMath::transform(reflection, depth);
+
+        vector<Pose<>> polygon;
+        polygon.clear();
+        polygon.push_back(p0);
+        polygon.push_back(p1);
+        polygon.push_back(p2);
+        polygon.push_back(p3);
+
+        return polygon;
+    }
+
     /**
      * @brief Perform a pose rotation around itself.
      *

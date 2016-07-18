@@ -16,6 +16,7 @@
 #include <srslib_framework/ros/tap/RosTapMap.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_GoalArrived.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_RobotPose.hpp>
+#include <srslib_framework/ros/tap/RosTapOperationalState.hpp>
 
 #include <srslib_framework/search/AStar.hpp>
 
@@ -50,26 +51,32 @@ private:
     void findActiveNodes(vector<string>& nodes);
 
     void executeArrived();
-    void executeInitialPose(Pose<> initialPose);
+    void executeInitialPose();
     void executePause();
-    void executePlanToGoal(Pose<> goal);
-    void executePlanToMove(Pose<> goal);
+    void executePlanToGoal();
+    void executePlanToMove();
     void executeShutdown();
+    void executeUnpause();
 
     void publishInternalInitialPose(Pose<> initialPose);
     void publishInternalGoalSolution(Solution<GridSolutionItem>* solution);
+    void publishGoalTarget(Pose<> goalTargetArea);
 
     void stepExecutiveFunctions();
 
     AStar<Grid2d> algorithm_;
+    bool arrived_;
 
     ros::Publisher pubExternalArrived_;
     ros::Publisher pubInternalInitialPose_;
     ros::Publisher pubInternalGoalSolution_;
     ros::Publisher pubStatusGoalPlan_;
+    ros::Publisher pubStatusGoal_;
+    ros::Publisher pubStatusGoalTarget_;
 
     Pose<> currentRobotPose_;
     Pose<> currentGoal_;
+    Pose<> currentTarget_;
     Solution<GridSolutionItem>* currentSolution_;
 
     Pose<> robotInitialPose_;
@@ -78,10 +85,10 @@ private:
     RosTapCmd_Goal tapCmdGoal_;
     RosTapCmd_InitialPose tapCmdInitialPose_;
     RosTapCmd_Move tapCmdMove_;
-    RosTapCmd_Pause tapCmdPause_;
     RosTapCmd_Shutdown tapCmdShutdown_;
     RosTapInternal_GoalArrived tapInternal_GoalArrived_;
     RosTapInternal_RobotPose tapInternal_RobotPose_;
+    RosTapOperationalState tapOperationalState_;
 
     RosTapMap tapMap_;
 };

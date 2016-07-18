@@ -118,6 +118,7 @@ void Motion::connectAllTaps()
     tapInternalGoalSolution_.connectTap();
     tapMap_.connectTap();
 
+    triggerPause_.connectService();
     triggerStop_.connectService();
     triggerShutdown_.connectService();
 }
@@ -140,6 +141,20 @@ void Motion::evaluateTriggers()
     if (triggerShutdown_.isTriggerRequested())
     {
         ros::shutdown();
+    }
+
+    if (triggerPause_.newRequestPending())
+    {
+        // Depending on the state of the pause button, enable or disable
+        // the autonomous mode
+        if (triggerPause_.getRequest())
+        {
+            motionController_.switchToManual();
+        }
+        else
+        {
+            motionController_.switchToAutonomous();
+        }
     }
 }
 

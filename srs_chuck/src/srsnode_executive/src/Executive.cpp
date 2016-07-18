@@ -1,7 +1,7 @@
 #include <srsnode_executive/Executive.hpp>
 
 #include <ros/ros.h>
-#include <std_srvs/Empty.h>
+#include <geometry_msgs/PolygonStamped.h>
 
 #include <srslib_framework/MsgPose.h>
 #include <srslib_framework/MsgSolution.h>
@@ -12,6 +12,7 @@
 #include <srslib_framework/planning/pathplanning/grid/PoseAdapter.hpp>
 
 #include <srslib_framework/ros/message/SolutionMessageFactory.hpp>
+#include <srslib_framework/ros/service/RosServiceCall.hpp>
 
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 
@@ -24,18 +25,25 @@ namespace srs {
 Executive::Executive(string nodeName) :
     currentGoal_(),
     currentSolution_(nullptr),
-    rosNodeHandle_(nodeName)
+    rosNodeHandle_(nodeName),
+    arrived_(true),
+    robotInitialPose_(Pose<>::INVALID)
 {
     pubInternalInitialPose_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
         "/internal/command/initial_pose", 1);
     pubInternalGoalSolution_ = rosNodeHandle_.advertise<srslib_framework::MsgSolution>(
         "/internal/state/goal/solution", 1);
-    pubStatusGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>(
-        "/internal/state/goal/path", 1);
     pubExternalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
         "/response/arrived", 1);
+    pubStatusGoal_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
+        "/internal/state/goal/goal", 1);
 
-    executeInitialPose(Pose<>::INVALID);
+    pubStatusGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>(
+        "/internal/state/goal/path", 1);
+    pubStatusGoalTarget_ = rosNodeHandle_.advertise<geometry_msgs::PolygonStamped>(
+        "/internal/state/goal/target_area", 1);
+
+    executeInitialPose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,12 +73,12 @@ void Executive::connectAllTaps()
     tapCmdGoal_.connectTap();
     tapCmdInitialPose_.connectTap();
     tapCmdMove_.connectTap();
-    tapCmdPause_.connectTap();
     tapCmdShutdown_.connectTap();
     tapInternal_GoalArrived_.connectTap();
     tapInternal_RobotPose_.connectTap();
 
     tapMap_.connectTap();
+    tapOperationalState_.connectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,46 +87,62 @@ void Executive::disconnectAllTaps()
     tapCmdGoal_.disconnectTap();
     tapCmdInitialPose_.disconnectTap();
     tapCmdMove_.disconnectTap();
-    tapCmdPause_.disconnectTap();
     tapCmdShutdown_.disconnectTap();
     tapInternal_GoalArrived_.disconnectTap();
     tapInternal_RobotPose_.disconnectTap();
 
     tapMap_.disconnectTap();
+    tapOperationalState_.disconnectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::executeArrived()
 {
     std_msgs::Bool messageGoalArrived;
-    messageGoalArrived.data = tapInternal_GoalArrived_.getBool();
+    messageGoalArrived.data = arrived_;
 
     pubExternalArrived_.publish(messageGoalArrived);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Executive::executeInitialPose(Pose<> initialPose)
+void Executive::executeInitialPose()
 {
-    robotInitialPose_ = initialPose;
     publishInternalInitialPose(robotInitialPose_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::executePause()
 {
+    if (RosServiceCall::callSetBool("srsnode_motion", "/trigger/pause", true))
+    {
+        if (currentSolution_)
+        {
+            // Reset the solution and publish it
+            // so that every display can update as well. The final
+            // goal remains, so that replan can be executed upon
+            // an resume command
+            currentSolution_->clear();
+            publishInternalGoalSolution(currentSolution_);
+
+            // Remove the current solution as it will have to be calculated
+            // again once the robot is unpaused
+            delete currentSolution_;
+            currentSolution_ = nullptr;
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Executive::executePlanToGoal(Pose<> goalPose)
+void Executive::executePlanToGoal()
 {
     if (!currentRobotPose_.isValid())
     {
-        ROS_ERROR_STREAM_NAMED("executive", "Attempting to plan to goal " << goalPose <<
+        ROS_ERROR_STREAM_NAMED("executive", "Attempting to plan to goal " << currentGoal_ <<
             " from invalid starting pose");
         return;
     }
 
-    if (!goalPose.isValid())
+    if (!currentGoal_.isValid())
     {
         ROS_ERROR_STREAM_NAMED("executive",
             "Attempting to plan to an invalid goal from pose " << currentRobotPose_);
@@ -129,7 +153,7 @@ void Executive::executePlanToGoal(Pose<> goalPose)
 
     // The requested goal is transformed so that it coincides with
     // where the robot screen will be
-    currentGoal_ = PoseMath::transform<double>(goalPose, chuck.bodyDepth / 2);
+    currentTarget_ = PoseMath::transform<double>(currentGoal_, chuck.bodyDepth / 2);
 
     Map* map = tapMap_.getMap();
     algorithm_.setGraph(map->getGrid());
@@ -142,12 +166,12 @@ void Executive::executePlanToGoal(Pose<> goalPose)
     // Prepare the goal position for the search
     Grid2d::LocationType internalGoal;
     int goalAngle;
-    PoseAdapter::pose2Map(currentGoal_, map, internalGoal, goalAngle);
+    PoseAdapter::pose2Map(currentTarget_, map, internalGoal, goalAngle);
 
     ROS_DEBUG_STREAM_NAMED("executive", "Looking for a path between " <<
         currentRobotPose_ <<
         " (" << internalStart.x << "," << internalStart.y << "," << startAngle << ") and " <<
-        goalPose <<
+        currentTarget_ << " - " << currentGoal_ << " " <<
         " (" << internalGoal.x << "," << internalGoal.y << "," << goalAngle << ")");
 
     bool foundSolution = algorithm_.search(
@@ -158,21 +182,27 @@ void Executive::executePlanToGoal(Pose<> goalPose)
     {
         SearchNode<Grid2d>* goalNode = algorithm_.getSolution();
 
+        // Deallocate the current solution if there is one
+        if (currentSolution_)
+        {
+            delete currentSolution_;
+        }
+
         currentSolution_ = GridSolutionFactory::fromSearch(goalNode, map);
-        ROS_DEBUG_STREAM_NAMED("executive", "Found solution: " << endl << currentSolution_);
+        ROS_DEBUG_STREAM_NAMED("executive", "Found solution: " << endl << *currentSolution_);
     }
     else
     {
         ROS_DEBUG_STREAM_NAMED("executive", "Path not found between " <<
             currentRobotPose_ <<
             " (" << internalStart.x << "," << internalStart.y << "," << startAngle << ") and " <<
-            goalPose <<
+            currentGoal_ <<
             " (" << internalGoal.x << "," << internalGoal.y << "," << goalAngle << ")");
      }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Executive::executePlanToMove(Pose<> goal)
+void Executive::executePlanToMove()
 {
 //    Pose<> newGoal = goal;
 //
@@ -197,23 +227,22 @@ void Executive::executeShutdown()
 
     for (auto node : nodes)
     {
-        string fullServiceName = node + "/trigger/shutdown";
-
-        ros::ServiceClient client = rosNodeHandle_.serviceClient<std_srvs::Empty>(fullServiceName);
-        std_srvs::Empty::Request req;
-        std_srvs::Empty::Response resp;
-
-        if (client.call(req, resp))
-        {
-            ROS_INFO_STREAM("The node " << node << " responded to a shutdown request.");
-        }
-        else
-        {
-            ROS_ERROR_STREAM("The node " << node << " did not responded to a shutdown request.");
-        }
+        RosServiceCall::callEmpty(node, "/trigger/shutdown");
     }
 
     ros::shutdown();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::executeUnpause()
+{
+    RosServiceCall::callSetBool("srsnode_motion", "/trigger/pause", false);
+
+    if (!arrived_)
+    {
+        executePlanToGoal();
+        publishInternalGoalSolution(currentSolution_);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -235,6 +264,32 @@ void Executive::findActiveNodes(vector<string>& nodes)
             ROS_INFO_STREAM(node);
         }
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::publishGoalTarget(Pose<> goalTargetArea)
+{
+    vector<Pose<>> targetArea = PoseMath::pose2polygon(goalTargetArea, 0.0, 0.2, 0.2);
+
+    geometry_msgs::PolygonStamped messageLanding;
+
+    messageLanding.header.frame_id = "map";
+    messageLanding.header.stamp = ros::Time::now();
+
+    vector<geometry_msgs::Point32> polygon;
+
+    for (auto pose : targetArea)
+    {
+        geometry_msgs::Point32 corner;
+        corner.x = pose.x;
+        corner.y = pose.y;
+        corner.z = 0.0;
+
+        polygon.push_back(corner);
+    }
+    messageLanding.polygon.points = polygon;
+
+    pubStatusGoalTarget_.publish(messageLanding);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -282,30 +337,44 @@ void Executive::stepExecutiveFunctions()
     // If there is a new goal to reach
     if (tapCmdMove_.newDataAvailable())
     {
-        executePlanToMove(tapCmdMove_.getPose());
+        currentGoal_ = tapCmdMove_.getPose();
+        executePlanToMove();
     }
 
     // If there is a new goal to reach
     if (tapCmdGoal_.newDataAvailable())
     {
-        executePlanToGoal(tapCmdGoal_.getPose());
+        currentGoal_ = tapCmdGoal_.getPose();
+        executePlanToGoal();
+        publishGoalTarget(currentGoal_);
         publishInternalGoalSolution(currentSolution_);
     }
 
     if (tapCmdInitialPose_.newDataAvailable())
     {
-        executeInitialPose(tapCmdInitialPose_.getPose());
-    }
-
-    if (tapCmdPause_.isNewValueTrue())
-    {
-        executePause();
+        robotInitialPose_ = tapCmdInitialPose_.getPose();
+        executeInitialPose();
     }
 
     if (tapInternal_GoalArrived_.newDataAvailable())
     {
+        arrived_ = tapInternal_GoalArrived_.getBool();
         executeArrived();
     }
+
+    if (tapOperationalState_.newDataAvailable())
+    {
+        ROS_INFO("State changed");
+        if (tapOperationalState_.isPauseChanged() && tapOperationalState_.getPause())
+        {
+            executePause();
+        }
+
+        if (tapOperationalState_.isPauseChanged() && !tapOperationalState_.getPause())
+        {
+            executeUnpause();
+        }
+}
 }
 
 } // namespace srs

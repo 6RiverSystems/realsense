@@ -37,7 +37,7 @@ unordered_map<int, string> MotionController::TASK_NAMES = {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 MotionController::MotionController(double dT) :
     dT_(dT),
-    hasArrived_(false),
+    hasArrived_(true),
     hasArrivedChanged_(false),
     rosNodeHandle_()
 {
@@ -149,7 +149,7 @@ void MotionController::reset()
 
     currentOdometry_ = Odometry<>();
 
-    hasArrived_ = false;
+    hasArrived_ = true;
     hasArrivedChanged_ = false;
 
     cleanWorkQueue();
@@ -410,32 +410,32 @@ void MotionController::checkMotionStatus()
     // the work has not been canceled for some reason
     if (activeController_->isGoalReached())
     {
-        if (activeController_->isCanceled())
+        if (!activeController_->isCanceled())
         {
             ROS_DEBUG_STREAM_NAMED("motion_controller", "Controller " <<
-                activeController_->getName() << " goal canceled");
+                activeController_->getName() << " reached its goal");
+
+            // If the active controller is the path controller, it is not
+            // guaranteed that the final angle of the robot matches the angle
+            // of the goal. In that case, a rotation is added to complete the movement
+            if (isPathControllerActive())
+            {
+                // Try to optimize rotations checking the next work scheduled
+                // and the current orientation of the robot
+                executeFinalRotation();
+            }
+
+            // If the robot was using moving controllers, but everything has
+            // been completed, declare that the requested goal was reached
+            if (isMovingControllerActive() && !isWorkPending())
+            {
+                setHasArrived(true);
+            }
         }
         else
         {
             ROS_DEBUG_STREAM_NAMED("motion_controller", "Controller " <<
-                activeController_->getName() << " reached its goal");
-        }
-
-        // If the active controller is the path controller, it is not
-        // guaranteed that the final angle of the robot matches the angle
-        // of the goal. In that case, a rotation is added to complete the movement
-        if (isPathControllerActive() && !activeController_->isCanceled())
-        {
-            // Try to optimize rotations checking the next work scheduled
-            // and the current orientation of the robot
-            executeFinalRotation();
-        }
-
-        // If the robot was using moving controllers, but everything has
-        // been completed, declare that the requested goal was reached
-        if (isMovingControllerActive() && !isWorkPending())
-        {
-            setHasArrived(true);
+                activeController_->getName() << " goal canceled");
         }
 
         // If no emergency has been declared, consider more work

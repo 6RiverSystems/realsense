@@ -61,28 +61,9 @@ void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CMUPathController::calculateLanding(Pose<> goal)
 {
-    Pose<> reflection = PoseMath::rotate(goal, M_PI);
-    Pose<> p = PoseMath::transform(reflection, robot_.pathFollowGoalReachedDistance);
-
-    reflection = PoseMath::rotate(p, M_PI_2);
-    Pose<> p0 = PoseMath::transform(reflection, robot_.pathFollowLandingWidth / 2);
-
-    reflection = PoseMath::rotate(p, -M_PI_2);
-    Pose<> p1 = PoseMath::transform(reflection, robot_.pathFollowLandingWidth / 2);
-
-    reflection = p1;
-    reflection.theta = goal.theta;
-    Pose<> p2 = PoseMath::transform(reflection, robot_.pathFollowLandingDepth);
-
-    reflection = p0;
-    reflection.theta = goal.theta;
-    Pose<> p3 = PoseMath::transform(reflection, robot_.pathFollowLandingDepth);
-
-    goalLanding_.clear();
-    goalLanding_.push_back(p0);
-    goalLanding_.push_back(p1);
-    goalLanding_.push_back(p2);
-    goalLanding_.push_back(p3);
+    goalLanding_ = PoseMath::pose2polygon(goal,
+        robot_.pathFollowGoalReachedDistance,
+        robot_.pathFollowLandingWidth, robot_.pathFollowLandingDepth);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

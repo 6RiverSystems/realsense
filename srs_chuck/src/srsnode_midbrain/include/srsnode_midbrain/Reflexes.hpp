@@ -39,6 +39,8 @@ public:
 
 	void OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan );
 
+	void PublishDangerZone( ) const;
+
 private:
 
     void onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t level);
@@ -57,7 +59,12 @@ private:
 
 	static constexpr auto SCAN_TOPIC = "/camera/depth/scan";
 
+	static constexpr auto DANGER_ZONE_TOPIC = "/internal/state/reflexes/danger_zone";
+
 	static constexpr auto EVENT_TOPIC = "/ll_event";
+
+	// TODO: Get footprint from robot model (lookup topic, load urdf, etc.)
+	static constexpr auto ROBOT_WIDTH = 0.64f;
 
 	dynamic_reconfigure::Server<srsnode_midbrain::ReflexesConfig> server;
 
@@ -78,6 +85,8 @@ private:
 	ros::Subscriber							m_velocitySubscriber;
 
 	ros::Publisher							m_commandPublisher;
+
+    ros::Publisher							m_dangerZonePublisher;
 
 };
 

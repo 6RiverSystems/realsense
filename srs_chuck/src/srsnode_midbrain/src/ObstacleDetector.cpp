@@ -10,6 +10,38 @@
 #include <std_msgs/String.h>
 #include <tgmath.h>
 
+std::ostream& operator<<( std::ostream& os, const Segment& segment )
+{
+	os << segment.first.x << ", " << segment.first.y;
+	os << " - ";
+	os << segment.second.x << ", " << segment.second.y;
+
+	return os;
+}
+
+std::ostream& operator<<( std::ostream& os, const Polygon& polygon )
+{
+	os << "(";
+
+	bool first = true;
+
+	for( auto point : polygon )
+	{
+		if( !first )
+		{
+			os << " => ";
+		}
+
+		os << point.x << ", " << point.y;
+
+		first = false;
+	}
+
+	os << ")";
+
+	return os;
+}
+
 namespace srs
 {
 
@@ -96,7 +128,7 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 		}
 	}
 
-//	ROS_DEBUG_THROTTLE_NAMED( 0.3, "reflexes", "linear vel: %0.2f, safeDistance: %.02f, Obstacles detected: %d",
+//	ROS_DEBUG_THROTTLE_NAMED( 0.3, "obstacle_detection", "linear vel: %0.2f, safeDistance: %.02f, Obstacles detected: %d",
 //		m_linearVelocity, safeDistance, numberOfObstacles );
 
 	if( numberOfObstacles > m_objectThreshold )
@@ -126,6 +158,21 @@ double ObstacleDetector::GetSafeDistance( double velocity ) const
 double ObstacleDetector::GetFootprint( ) const
 {
 	return m_footprint;
+}
+
+Polygon ObstacleDetector::GetDangerZone( ) const
+{
+	double safeDistance = GetSafeDistance( m_linearVelocity );
+
+	Polygon dangerZone({
+		{ 0.0, -m_footprint },
+		{ safeDistance, -m_footprint },
+		{ safeDistance, m_footprint },
+		{ 0.0, m_footprint }
+	});
+
+	return dangerZone;
+
 }
 
 } /* namespace srs */

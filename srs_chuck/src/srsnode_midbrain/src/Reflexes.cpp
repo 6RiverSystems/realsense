@@ -8,7 +8,9 @@
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <geometry_msgs/PolygonStamped.h>
 #include <tgmath.h>
+#include <boost/range/adaptor/reversed.hpp>
 
 namespace srs
 {
@@ -18,7 +20,7 @@ Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_enable( false ),
 	m_sendHardStop( false ),
 	m_operationalState( ),
-	m_obstacleDetector( 0.64f ),
+	m_obstacleDetector( ROBOT_WIDTH / 2.0f ),
 	m_operationalStateSubscriber( ),
 	m_laserScanSubscriber( ),
 	m_velocitySubscriber( ),
@@ -86,6 +88,44 @@ void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 	m_obstacleDetector.ProcessScan( scan );
 }
 
+void Reflexes::PublishDangerZone( ) const
+{
+	geometry_msgs::PolygonStamped messageLanding;
+
+	messageLanding.header.frame_id = "laser_frame";
+	messageLanding.header.stamp = ros::Time::now( );
+
+	std::vector<geometry_msgs::Point32> polygon;
+
+	Polygon dangerZone = m_obstacleDetector.GetDangerZone( );
+
+	for( const Point& point : dangerZone )
+	{
+		geometry_msgs::Point32 corner;
+		corner.x = point.x;
+		corner.y = point.y;
+		corner.z = 0.0;
+
+		polygon.push_back( corner );
+	}
+
+	for( const Point& point : boost::adaptors::reverse( dangerZone ) )
+	{
+		geometry_msgs::Point32 corner;
+		corner.x = point.x;
+		corner.y = point.y;
+		corner.z = 1.0f;
+
+		polygon.push_back( corner );
+	}
+
+	messageLanding.polygon.points = polygon;
+
+	ROS_DEBUG_STREAM_THROTTLE_NAMED( 0.3, "obstacle_detection", "Danger Zone: " << dangerZone );
+
+	m_dangerZonePublisher.publish( messageLanding );
+}
+
 void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t level)
 {
 	SetObjectThreshold( config.object_threshold );
@@ -134,6 +174,8 @@ void Reflexes::DestroySubscribers( )
 void Reflexes::CreatePublishers( )
 {
 	m_commandPublisher = m_nodeHandle.advertise<std_msgs::String>( EVENT_TOPIC, 1, true );
+
+	m_dangerZonePublisher = m_nodeHandle.advertise<geometry_msgs::PolygonStamped>(DANGER_ZONE_TOPIC, 1);
 }
 
 void Reflexes::DestroyPublishers( )

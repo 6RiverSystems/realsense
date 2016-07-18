@@ -35,6 +35,8 @@ void Midbrain::run()
 
         evaluateTriggers();
 
+        reflexes_.PublishDangerZone();
+
         refreshRate.sleep();
     }
 }

@@ -9,83 +9,7 @@
 #include <srsnode_midbrain/ObstacleDetector.hpp>
 #include <std_msgs/String.h>
 #include <boost/timer.hpp>
-#include <boost/geometry.hpp>
-#include <boost/geometry/core/cs.hpp>
-#include <boost/geometry/io/io.hpp>
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
-#include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/algorithms/intersection.hpp>
-#include <boost/geometry/geometries/register/point.hpp>
-#include <boost/geometry/geometries/register/ring.hpp>
-#include <fstream>
-#include <iostream>
-
-namespace bg = boost::geometry;
-
-class Point {
-public:
-    double _x, _y;
-    Point():_x(),_y(){}
-    Point(double x, double y):_x(x),_y(y){}
-
-    Point& operator+=(const Point& rhs)
-	{
-    	return *this;
-	}
-
-    friend Point operator+(Point lhs, const Point& rhs)
-	{
-		lhs += rhs;
-		return lhs;
-	}
-
-	friend std::ostream& operator<<( std::ostream& os, const Point& point )
-    {
-    	os << point._x << ", " << point._y;
-    }
-
-};
-
-typedef bg::model::segment<Point> segment_t;
-typedef bg::model::ring<Point> ring_t;
-typedef std::vector<Point> Polygon;
-
-std::ostream& operator<<( std::ostream& os, const Polygon& polygon )
-{
-	os << "(";
-
-	bool first = true;
-
-	for( auto point : polygon )
-	{
-		if( !first )
-		{
-			os << " => ";
-		}
-
-		os << point._x << ", " << point._y;
-
-		first = false;
-	}
-
-	os << ")";
-
-	return os;
-}
-
-std::ostream& operator<<( std::ostream& os, const segment_t& segment )
-{
-	os << segment.first._x << ", " << segment.first._y;
-	os << " - ";
-	os << segment.second._x << ", " << segment.second._y;
-
-	return os;
-}
-
-BOOST_GEOMETRY_REGISTER_POINT_2D(Point, double, bg::cs::cartesian, _x, _y)
-BOOST_GEOMETRY_REGISTER_RING(Polygon)
 
 namespace srs {
 
@@ -190,7 +114,7 @@ public:
 		return laserScan;
 	}
 
-	void AddObject( sensor_msgs::LaserScan::Ptr laserScan, segment_t lineSegment )
+	void AddObject( sensor_msgs::LaserScan::Ptr laserScan, Segment lineSegment )
 	{
 		uint32_t numberOfScans = laserScan->ranges.size( );
 
@@ -210,16 +134,16 @@ public:
 			double fEndY = lineDistance * sin( angle );
 
 			// Create a very large line based on the laser scan
-			segment_t laserLine( Point( fStartX, fStartY ), Point( fEndX, fEndY ) );
+			Segment laserLine( Point( fStartX, fStartY ), Point( fEndX, fEndY ) );
 
 			std::vector<Point> output;
-			boost::geometry::intersection( lineSegment, laserLine, output );
+			bg::intersection( lineSegment, laserLine, output );
 
 			if( output.size( ) )
 			{
 				numberOfLaserPoints++;
 
-				laserScan->ranges[i] = boost::geometry::distance( Point( 0.0, 0.0 ), output[0] );
+				laserScan->ranges[i] = bg::distance( Point( 0.0, 0.0 ), output[0] );
 
 //				ROS_DEBUG_STREAM_NAMED( "obstacle_detection", "Laser Intersects Object (" <<  output.size( ) << ") " << lineSegment <<
 //					" @ Angle: " << angle * 180.0f / M_PI << " Distance: " <<  laserScan->ranges[i] );
@@ -236,9 +160,9 @@ public:
 //		m_reflexes.OnOperationalStateChanged( operationalState );
 	}
 
-	segment_t CreateSegment( double distance, double offset, double length )
+	Segment CreateSegment( double distance, double offset, double length )
 	{
-		return segment_t( Point( distance, offset - ( length / 2.0f) ),
+		return Segment( Point( distance, offset - ( length / 2.0f) ),
 			Point( distance, offset + (length / 2.0f) ) );
 	}
 };
@@ -262,7 +186,7 @@ public:
 //{
 //	for( auto distance : m_vecDistances )
 //	{
-//		segment_t lineSegment = CreateSegment( distance, 0.0, m_lineWidth );
+//		Segment lineSegment = CreateSegment( distance, 0.0, m_lineWidth );
 //
 //		sensor_msgs::LaserScan::Ptr laserScan = CreateLaserScan( );
 //
@@ -296,7 +220,7 @@ TEST_F( ReflexesTest, TestMovingWithObstacle )
 
 			for( auto distance : m_vecDistances )
 			{
-				segment_t lineSegment = CreateSegment( distance, offset, m_lineWidth );
+				Segment lineSegment = CreateSegment( distance, offset, m_lineWidth );
 
 				sensor_msgs::LaserScan::Ptr laserScan = CreateLaserScan( );
 
@@ -323,8 +247,8 @@ TEST_F( ReflexesTest, TestMovingWithObstacle )
 
 				Polygon lineRing( {
 					{ lineSegment.first },
-					{ Point( lineSegment.first._x + 0.2, lineSegment.first._y ) },
-					{ Point( lineSegment.second._x + 0.2, lineSegment.second._y ) },
+					{ Point( lineSegment.first.x + 0.2, lineSegment.first.y ) },
+					{ Point( lineSegment.second.x + 0.2, lineSegment.second.y ) },
 					{ lineSegment.second },
 				} );
 
@@ -342,7 +266,7 @@ TEST_F( ReflexesTest, TestMovingWithObstacle )
 
 				char pszFile[1024] = { '\0' };
 				sprintf( pszFile, "/tmp/test-%d-speed-%.1f-safe_distance-%.2f-obstacle_distance-%.2f.svg", index++,
-					velocity, safeDistance, lineSegment.first._x);
+					velocity, safeDistance, lineSegment.first.x);
 
 				std::ofstream svg( pszFile );
 				boost::geometry::svg_mapper<Point> mapper( svg, 400, 400 );
@@ -395,7 +319,7 @@ TEST_F( ReflexesTest, TestMovingWithObstacle )
 					}
 				}
 
-				ROS_DEBUG_STREAM_NAMED( "obstacle_detection", "Object @ distance: " << lineSegment.first._x << " with footprint " <<
+				ROS_DEBUG_STREAM_NAMED( "obstacle_detection", "Object @ distance: " << lineSegment.first.x << " with footprint " <<
 					footprint << (intersects ? " is" : " is not") << " going to collide with chuck [safe distance: " <<
 					safeDistance << "] (" << pszFile << ")" );
 

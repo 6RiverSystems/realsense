@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2015-2016 River Systems, all rights reserved
+# (c) Copyright 2015-2016 6 River Systems, all rights reserved
 #
 # This is proprietary software, unauthorized distribution is not permitted.
 #
@@ -8,15 +8,16 @@ anchors:
     - {id: "0354", location: [22.44702, 23.45175, 6.3600000], orientation: 92.720 }
     - {id: "0438", location: [26.80522, 23.47811, 6.3600000], orientation: 91.615 }
     - {id: "0084", location: [24.36166,  4.57227, 6.3600000], orientation: 91.160 }
-    - {id: "0338", location: [20.17198,  4.58865, 6.3600000], orientation: 89.2325 }
+    - {id: "0338", location: [20.17198,  4.58865, 6.3600000], orientation: 89.233 }
     - {id: "0198", location: [15.99728,  4.61931, 6.3600000], orientation: 92.940 }
     - {id: "0326", location: [28.73131,  4.55947, 6.3600000], orientation: 88.485 }
-    - {id: "0048", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
-    - {id: "0022", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
-    - {id: "0036", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
-    - {id: "0020", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
-    - {id: "0034", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
-    - {id: "0038", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
-    - {id: "0002", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
-    - {id: "0050", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
-    - {id: "0260", location: [ 0.00000,  0.00000, 0.0000000], orientation: 90.000 }
+    - {id: "0260", location: [29.72149, 27.81989, 6.3600000], orientation: 82.795 }    
+    - {id: "0050", location: [32.14850, 27.81989, 6.3600000], orientation: 90.000 }
+    - {id: "0036", location: [31.16777, 59.44332, 6.3600000], orientation: 90.052 }
+    - {id: "0022", location: [23.19142, 59.43105, 6.3600000], orientation: 87.548 }
+    - {id: "0048", location: [16.53325, 59.44240, 6.3600000], orientation: 89.510 }
+    - {id: "0020", location: [31.12210, 86.35790, 6.3600000], orientation: 86.868 }
+    - {id: "0034", location: [23.15664, 86.36353, 6.3600000], orientation: 86.215 }
+    - {id: "0038", location: [16.51476, 86.34906, 6.3600000], orientation: 84.393 }
+    - {id: "0002", location: [5.517250, 86.25456, 6.3600000], orientation: 88.353 }
+    

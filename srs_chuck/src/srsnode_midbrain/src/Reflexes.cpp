@@ -109,15 +109,6 @@ void Reflexes::PublishDangerZone( ) const
 		polygon.push_back( corner );
 	}
 
-	for( const Point& point : boost::adaptors::reverse( dangerZone ) )
-	{
-		geometry_msgs::Point32 corner;
-		corner.x = point.x;
-		corner.y = point.y;
-		corner.z = 1.0f;
-
-		polygon.push_back( corner );
-	}
 
 	messageLanding.polygon.points = polygon;
 

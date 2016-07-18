@@ -78,6 +78,10 @@ if (CATKIN_ENABLE_TESTING)
     	test/Test_Reflexes.cpp
         src/ObstacleDetector.cpp
     )
+    add_dependencies(Test_Reflexes
+        ${catkin_EXPORTED_TARGETS}
+        ${srsnode_midbrain_EXPORTED_TARGETS}
+    )
     target_link_libraries(Test_Reflexes
         ${srslib_framework_LIBRARIES}
     )

@@ -15,7 +15,7 @@ namespace srs
 
 class ObstacleDetector
 {
-	typedef std::function<void(uint32_t)> ObstacleDetectedFn;
+	typedef std::function<void()> ObstacleDetectedFn;
 
 public:
 	ObstacleDetector( double footprint );
@@ -28,6 +28,8 @@ public:
 	void SetObjectThreshold( uint32_t objectThreshold );
 
 	void ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan );
+
+	double GetSafeDistance( double velocity ) const;
 
 	double GetFootprint( ) const;
 

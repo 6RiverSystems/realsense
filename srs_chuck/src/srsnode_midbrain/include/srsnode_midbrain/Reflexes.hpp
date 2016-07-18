@@ -43,6 +43,8 @@ private:
 
     void onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t level);
 
+    void OnObstacleDetected( );
+
 	void CreateSubscribers( );
 	void DestroySubscribers( );
 

@@ -21,6 +21,11 @@ Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_velocitySubscriber( ),
 	m_commandPublisher( )
 {
+
+	bool obstacleDetected = false;
+
+	m_obstacleDetector.SetDetectionCallback( std::bind( &Reflexes::OnObstacleDetected, this, std::placeholders::_1 );
+
 	Enable( true );
 }
 

@@ -20,6 +20,7 @@
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/geometries/register/ring.hpp>
 #include <fstream>
+#include <iostream>
 
 namespace bg = boost::geometry;
 
@@ -39,11 +40,49 @@ public:
 		lhs += rhs;
 		return lhs;
 	}
+
+	friend std::ostream& operator<<( std::ostream& os, const Point& point )
+    {
+    	os << point._x << ", " << point._y;
+    }
+
 };
 
 typedef bg::model::segment<Point> segment_t;
 typedef bg::model::ring<Point> ring_t;
 typedef std::vector<Point> Polygon;
+
+std::ostream& operator<<( std::ostream& os, const Polygon& polygon )
+{
+	os << "(";
+
+	bool first = true;
+
+	for( auto point : polygon )
+	{
+		if( !first )
+		{
+			os << " => ";
+		}
+
+		os << point._x << ", " << point._y;
+
+		first = false;
+	}
+
+	os << ")";
+
+	return os;
+}
+
+std::ostream& operator<<( std::ostream& os, const segment_t& segment )
+{
+	os << segment.first._x << ", " << segment.first._y;
+	os << " - ";
+	os << segment.second._x << ", " << segment.second._y;
+
+	return os;
+}
 
 BOOST_GEOMETRY_REGISTER_POINT_2D(Point, double, bg::cs::cartesian, _x, _y)
 BOOST_GEOMETRY_REGISTER_RING(Polygon)
@@ -62,28 +101,28 @@ public:
 
 	ObstacleDetector m_detector;
 
-	std::vector<stopping_distance_t> m_vecStoppingDistances;
+	std::vector<double> m_vecVelocities;
 
 public:
 
 	ReflexesTest( ) :
 		m_detector( 0.619125 / 2.0 ),
-		m_vecStoppingDistances( )
+		m_vecVelocities( )
 	{
-		m_vecStoppingDistances.push_back( { 0.00, 0.00 } );
-		m_vecStoppingDistances.push_back( { 0.20, 0.02 } );
-		m_vecStoppingDistances.push_back( { 0.40, 0.07 } );
-		m_vecStoppingDistances.push_back( { 0.60, 0.12 } );
-		m_vecStoppingDistances.push_back( { 0.80, 0.21 } );
-		m_vecStoppingDistances.push_back( { 1.00, 0.34 } );
-		m_vecStoppingDistances.push_back( { 1.20, 0.47 } );
-		m_vecStoppingDistances.push_back( { 1.40, 0.65 } );
-		m_vecStoppingDistances.push_back( { 1.60, 0.86 } );
-		m_vecStoppingDistances.push_back( { 1.80, 1.08 } );
-		m_vecStoppingDistances.push_back( { 2.00, 1.34 } );
-		m_vecStoppingDistances.push_back( { 2.20, 1.62 } );
-		m_vecStoppingDistances.push_back( { 2.40, 2.05 } );
-		m_vecStoppingDistances.push_back( { 2.60, 2.24 } );
+		m_vecVelocities.push_back( 0.00 );
+		m_vecVelocities.push_back( 0.20 );
+		m_vecVelocities.push_back( 0.40 );
+		m_vecVelocities.push_back( 0.60 );
+		m_vecVelocities.push_back( 0.80 );
+		m_vecVelocities.push_back( 1.00 );
+		m_vecVelocities.push_back( 1.20 );
+		m_vecVelocities.push_back( 1.40 );
+		m_vecVelocities.push_back( 1.60 );
+		m_vecVelocities.push_back( 1.80 );
+		m_vecVelocities.push_back( 2.00 );
+		m_vecVelocities.push_back( 2.20 );
+		m_vecVelocities.push_back( 2.40 );
+		m_vecVelocities.push_back( 2.60 );
 	}
 
 	~ReflexesTest( )
@@ -128,12 +167,15 @@ public:
 
 		uint32_t lastScan = 0;
 
-		for( int x = 0; x < numberOfScans; x++ )
+		for( int i = 0; i < numberOfScans; i++ )
 		{
-			double angle = ((double)x * laserScan->angle_increment) + laserScan->angle_min;
+			double angle = ((double)i * laserScan->angle_increment) + laserScan->angle_min;
+
+			double fX = lineDistance * cos( angle );
+			double fY = lineDistance * sin( angle );
 
 			// Create a very large line based on the laser scan
-			segment_t laserLine( Point( 0.0, 0.0), Point( lineDistance * cos( angle ), lineDistance * sin( angle ) ) );
+			segment_t laserLine( Point( 0.0, 0.0 ), Point( fX, fY ) );
 
 			std::vector<Point> output;
 			boost::geometry::intersection( lineSegment, laserLine, output );
@@ -142,14 +184,10 @@ public:
 			{
 				numberOfLaserPoints++;
 
-				laserScan->ranges[x] = boost::geometry::distance( Point( 0.0, 0.0), output[0]);
-			}
+				laserScan->ranges[i] = boost::geometry::distance( Point( 0.0, 0.0 ), output[0] );
 
-			if( output.size( ) != lastScan )
-			{
-//				std::cout << "Laser Intersects Object " << bg::wkt( lineSegment ) << " @ Angle: " << angle * 180.0f / M_PI << " Distance: " <<  laserScan->ranges[x] << std::endl;
-
-				lastScan = output.size( );
+//				ROS_DEBUG_STREAM_NAMED( "obstacle_detection", "Laser Intersects Object (" <<  output.size( ) << ") " << lineSegment <<
+//					" @ Angle: " << angle * 180.0f / M_PI << " Distance: " <<  laserScan->ranges[i] );
 			}
 		}
 	}
@@ -176,7 +214,7 @@ TEST_F( ReflexesTest, TestNoObstacleNoVelocity )
 
 	bool obstacleDetected = false;
 
-	m_detector.SetDetectionCallback( [&](uint32_t) {
+	m_detector.SetDetectionCallback( [&]() {
 		obstacleDetected = true;
 	});
 
@@ -205,7 +243,7 @@ TEST_F( ReflexesTest, TestObstacleNoVelocity )
 
 		bool obstacleDetected = false;
 
-		m_detector.SetDetectionCallback( [&](uint32_t) {
+		m_detector.SetDetectionCallback( [&]() {
 			obstacleDetected = true;
 		});
 
@@ -217,15 +255,15 @@ TEST_F( ReflexesTest, TestObstacleNoVelocity )
 
 TEST_F( ReflexesTest, TestMovingWithSquareObstacle )
 {
-	boost::geometry::strategy::transform::scale_transformer<Point, Point> scale( 1000.0f );
+	boost::geometry::strategy::transform::scale_transformer<Point, Point> scale( 10.0f, 10.0f );
 
 	double footprint = m_detector.GetFootprint( );
 
 	int index = 0;
 
-	for( auto stoppingDistance : m_vecStoppingDistances )
+	for( auto velocity : m_vecVelocities )
 	{
-		m_detector.SetVelocity( stoppingDistance.velocity, 0.0f );
+		m_detector.SetVelocity( velocity, 0.0f );
 
 		std::vector<segment_t> vecSegments;
 
@@ -257,7 +295,7 @@ TEST_F( ReflexesTest, TestMovingWithSquareObstacle )
 
 			bool obstacleDetected = false;
 
-			m_detector.SetDetectionCallback( [&](uint32_t) {
+			m_detector.SetDetectionCallback( [&]() {
 				obstacleDetected = true;
 			});
 
@@ -265,17 +303,19 @@ TEST_F( ReflexesTest, TestMovingWithSquareObstacle )
 
 			using Ring = std::vector<Point>;
 
+			double safeDistance = m_detector.GetSafeDistance( velocity );
+
 			Polygon dangerZone({
 				{ 0.0, -footprint },
-				{ stoppingDistance.distance, -footprint },
-				{ stoppingDistance.distance, footprint },
+				{ safeDistance, -footprint },
+				{ safeDistance, footprint },
 				{ 0.0, footprint }
 			});
 
 			Polygon lineRing( {
 				{ lineSegment.first },
-				{ Point( lineSegment.first._x + 2, lineSegment.first._y ) },
-				{ Point( lineSegment.second._x + 2, lineSegment.second._y ) },
+				{ Point( lineSegment.first._x + 0.2, lineSegment.first._y ) },
+				{ Point( lineSegment.second._x + 0.2, lineSegment.second._y ) },
 				{ lineSegment.second },
 			} );
 
@@ -283,8 +323,8 @@ TEST_F( ReflexesTest, TestMovingWithSquareObstacle )
 			boost::geometry::correct( dangerZone );
 			boost::geometry::correct( lineRing );
 
-//		    std::cout << "Danger Zone: " << bg::wkt(dangerZone) << std::endl;
-//		    std::cout << "Object: " << bg::wkt(lineRing) << std::endl;
+//			ROS_DEBUG_STREAM_NAMED( "obstacle_detection", "Danger Zone: " << dangerZone );
+//			ROS_DEBUG_STREAM_NAMED( "obstacle_detection", "Object: " << lineRing );
 
 			std::deque<Polygon> intersection;
 			bg::intersection( dangerZone, lineRing, intersection );
@@ -293,10 +333,10 @@ TEST_F( ReflexesTest, TestMovingWithSquareObstacle )
 
 			char pszFile[1024] = { '\0' };
 			sprintf( pszFile, "/tmp/test-%d-speed-%.1f-safe_distance-%.2f-obstacle_distance-%.2f.svg", index++,
-				stoppingDistance.velocity, stoppingDistance.distance, lineSegment.first._x);
+				velocity, safeDistance, lineSegment.first._x);
 
 			std::ofstream svg( pszFile );
-			boost::geometry::svg_mapper<Point> mapper( svg, 10000, 10000 );
+			boost::geometry::svg_mapper<Point> mapper( svg, 400, 400 );
 
 			Polygon scaledDangerZone;
 			boost::geometry::transform( dangerZone, scaledDangerZone, scale );
@@ -310,7 +350,7 @@ TEST_F( ReflexesTest, TestMovingWithSquareObstacle )
 
 			for( auto polygon : intersection )
 			{
-//			    std::cout << "Intersection: " << bg::wkt(polygon) << std::endl;
+//				ROS_DEBUG_STREAM_NAMED( "obstacle_detection", "Intersection: " << polygon );
 
 				Polygon scaledIntersection;
 				boost::geometry::transform( polygon, scaledIntersection, scale );
@@ -318,6 +358,7 @@ TEST_F( ReflexesTest, TestMovingWithSquareObstacle )
 				mapper.map( scaledIntersection, "fill-opacity:1;fill:rgb(212,0,0);stroke:none" );
 			}
 
+			// Add laser scan points to debug svg file
 			uint32_t numberOfScans = laserScan->ranges.size( );
 			for( int x = 0; x < numberOfScans; x++ )
 			{
@@ -345,8 +386,9 @@ TEST_F( ReflexesTest, TestMovingWithSquareObstacle )
 				}
 			}
 
-			std::cout << "Object @ distance: " << stoppingDistance.distance << " with footprint " <<
-				footprint << (intersects ? " is not" : " is") << " going to collide with chuck (" << pszFile << ")" << std::endl;
+			ROS_DEBUG_STREAM_NAMED( "obstacle_detection", "Object @ distance: " << lineSegment.first._x << " with footprint " <<
+				footprint << (intersects ? " is" : " is not") << " going to collide with chuck [safe distance: " <<
+				safeDistance << "] (" << pszFile << ")" );
 
 			if( intersects )
 			{

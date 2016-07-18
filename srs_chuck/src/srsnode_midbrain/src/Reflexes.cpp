@@ -15,6 +15,9 @@ namespace srs
 
 Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_nodeHandle( nodeHandle ),
+	m_enable( false ),
+	m_sendHardStop( false ),
+	m_operationalState( ),
 	m_obstacleDetector( 0.64f ),
 	m_operationalStateSubscriber( ),
 	m_laserScanSubscriber( ),
@@ -24,7 +27,7 @@ Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 
 	bool obstacleDetected = false;
 
-	m_obstacleDetector.SetDetectionCallback( std::bind( &Reflexes::OnObstacleDetected, this, std::placeholders::_1 );
+	m_obstacleDetector.SetDetectionCallback( std::bind( &Reflexes::OnObstacleDetected, this ) );
 
 	Enable( true );
 }
@@ -40,17 +43,22 @@ Reflexes::~Reflexes( )
 
 void Reflexes::Enable( bool enable )
 {
-	if( enable )
+	if( m_enable != enable )
 	{
-		CreateSubscribers( );
+		if( enable )
+		{
+			CreateSubscribers( );
 
-		CreatePublishers( );
-	}
-	else
-	{
-		DestroySubscribers( );
+			CreatePublishers( );
+		}
+		else
+		{
+			DestroySubscribers( );
 
-		DestroyPublishers( );
+			DestroyPublishers( );
+		}
+
+		m_enable = enable;
 	}
 }
 
@@ -65,7 +73,7 @@ void Reflexes::SetObjectThreshold( uint32_t objectThreshold )
 
 void Reflexes::OnOperationalStateChanged( const srslib_framework::MsgOperationalState::ConstPtr& operationalState )
 {
-//	m_obstacleDetector.Enable( );
+	m_operationalState = *operationalState;
 }
 
 void Reflexes::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity )
@@ -85,6 +93,21 @@ void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t
 	Enable( config.enable_obstacle_detection );
 
 	m_sendHardStop = config.enable_hard_stop;
+}
+
+void Reflexes::OnObstacleDetected( )
+{
+	// Only send a hard stop if we are paused
+	if( !m_operationalState.pause &&
+		m_enable &&
+		m_sendHardStop )
+	{
+		// Send the hard stop
+		std_msgs::String msg;
+		msg.data = "STOP";
+
+		m_commandPublisher.publish( msg );
+	}
 }
 
 void Reflexes::CreateSubscribers( )

@@ -59,12 +59,6 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 
 	double safeDistance = GetSafeDistance( m_linearVelocity );
 
-	std::string strPoints;
-
-	char point[255] = { '\0' };
-	sprintf( point, "Safe distance (velocity: %.2f): %.2f: ", m_linearVelocity, safeDistance );
-	strPoints += point;
-
 	std::string strDangerZone;
 	std::string strDangerZoneXOnly;
 	std::string strNotDanerZone;
@@ -88,31 +82,22 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 			double fX = scanDistance * cos( angle );
 			double fY = scanDistance * sin( angle );
 
-			sprintf( point, "Angle: %.4f, Distance: %.4f\n", angle * 180 / M_PI, fX );
-
+			// TODO: Use polygon trajectory path for more accuracy
+			// laser scan in polygon to determine if we have a  hit
+			// possibly also use raw point cloud (3d space) to see how
+			// many points are in the area (possibly better heuristic)
 			if( fX <= safeDistance )
 			{
 				if( fabs( fY ) <= m_footprint )
 				{
-					strPoints += point;
-
 					numberOfObstacles++;
 				}
-				else
-				{
-					strDangerZoneXOnly += point;
-				}
-			}
-			else
-			{
-				strNotDanerZone += point;
 			}
 		}
 	}
 
-//	ROS_DEBUG_THROTTLE_NAMED( 0.3, "reflexes", "linear vel: %0.2f, safeDistance: %.02f, Obstacles detected: %d, \
-//		\ndanger zone points: \n%s\ndanger zone x points: \n%s\nnot danager zone points: \n%s",
-//		m_linearVelocity, safeDistance, numberOfObstacles, strPoints.c_str( ), strDangerZoneXOnly.c_str( ), strNotDanerZone.c_str( ) );
+//	ROS_DEBUG_THROTTLE_NAMED( 0.3, "reflexes", "linear vel: %0.2f, safeDistance: %.02f, Obstacles detected: %d",
+//		m_linearVelocity, safeDistance, numberOfObstacles );
 
 	if( numberOfObstacles > m_objectThreshold )
 	{
@@ -120,20 +105,6 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 		{
 			m_obstacleDetectedCallback( );
 		}
-
-//		// Only send a hard stop if we are paused
-//		if( !m_operationalState.pause )
-//		{
-//
-//			if( m_sendHardStop )
-//			{
-//				// Send the hard stop
-//				std_msgs::String msg;
-//				msg.data = "STOP";
-//
-//				m_commandPublisher.publish( msg );
-//			}
-//		}
 	}
 }
 

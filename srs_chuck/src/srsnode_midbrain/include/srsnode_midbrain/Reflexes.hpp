@@ -61,19 +61,23 @@ private:
 
 	dynamic_reconfigure::Server<srsnode_midbrain::ReflexesConfig> server;
 
-	ros::NodeHandle&	m_nodeHandle;
+	ros::NodeHandle&						m_nodeHandle;
 
-	bool	 			m_sendHardStop;
+	bool									m_enable;
 
-	ObstacleDetector 	m_obstacleDetector;
+	bool	 								m_sendHardStop;
 
-	ros::Subscriber		m_operationalStateSubscriber;
+	srslib_framework::MsgOperationalState	m_operationalState;
 
-	ros::Subscriber		m_laserScanSubscriber;
+	ObstacleDetector 						m_obstacleDetector;
 
-	ros::Subscriber		m_velocitySubscriber;
+	ros::Subscriber							m_operationalStateSubscriber;
 
-	ros::Publisher		m_commandPublisher;
+	ros::Subscriber							m_laserScanSubscriber;
+
+	ros::Subscriber							m_velocitySubscriber;
+
+	ros::Publisher							m_commandPublisher;
 
 };
 

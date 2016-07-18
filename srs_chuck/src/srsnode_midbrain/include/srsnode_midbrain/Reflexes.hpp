@@ -57,7 +57,7 @@ private:
 
 	static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
 
-	static constexpr auto SCAN_TOPIC = "/camera/depth/scan";
+	static constexpr auto SCAN_TOPIC = "/camera/scan";
 
 	static constexpr auto DANGER_ZONE_TOPIC = "/internal/state/reflexes/danger_zone";
 
@@ -66,7 +66,7 @@ private:
 	// TODO: Get footprint from robot model (lookup topic, load urdf, etc.)
 	static constexpr auto ROBOT_WIDTH = 0.64f;
 
-	dynamic_reconfigure::Server<srsnode_midbrain::ReflexesConfig> server;
+    dynamic_reconfigure::Server<srsnode_midbrain::ReflexesConfig> m_configServer;
 
 	ros::NodeHandle&						m_nodeHandle;
 

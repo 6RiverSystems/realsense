@@ -128,8 +128,8 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 		}
 	}
 
-//	ROS_DEBUG_THROTTLE_NAMED( 0.3, "obstacle_detection", "linear vel: %0.2f, safeDistance: %.02f, Obstacles detected: %d",
-//		m_linearVelocity, safeDistance, numberOfObstacles );
+	ROS_DEBUG_THROTTLE_NAMED( 0.3, "obstacle_detection", "linear vel: %0.2f, m_footprint: %0.2f, safeDistance: %.02f, Obstacles detected: %d",
+		m_linearVelocity, m_footprint, safeDistance, numberOfObstacles );
 
 	if( numberOfObstacles > m_objectThreshold )
 	{
@@ -149,7 +149,7 @@ double ObstacleDetector::GetSafeDistance( double velocity ) const
 		// Calculated from actual measurements and polynomial regression fitting
 		// https://docs.google.com/a/6river.com/spreadsheets/d/1wUPgpESlp-MVbnMGCmFDGH22qyO39D8kzvi7IPZ1Q1c/edit?usp=sharing
 		// http://www.xuru.org/rt/PR.asp#CopyPaste
-		safeDistance = ( 0.3518981019f * pow( velocity, 2 ) - 0.03806193806f * velocity + 0.01804195804f );
+		safeDistance = ( 0.3518981019f * pow( velocity, 2 ) - 0.03806193806f * velocity + 0.01804195804f ) * 1.2;
 	}
 
 	return safeDistance;

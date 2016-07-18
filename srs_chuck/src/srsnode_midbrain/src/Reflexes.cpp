@@ -26,12 +26,11 @@ Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_velocitySubscriber( ),
 	m_commandPublisher( )
 {
-
 	bool obstacleDetected = false;
 
 	m_obstacleDetector.SetDetectionCallback( std::bind( &Reflexes::OnObstacleDetected, this ) );
 
-	Enable( true );
+	m_configServer.setCallback( boost::bind( &Reflexes::onConfigChange, this, _1, _2 ) );
 }
 
 Reflexes::~Reflexes( )
@@ -49,12 +48,16 @@ void Reflexes::Enable( bool enable )
 	{
 		if( enable )
 		{
+			ROS_INFO_NAMED( "obstacle_detection", "Enabling Obstacle Detection" );
+
 			CreateSubscribers( );
 
 			CreatePublishers( );
 		}
 		else
 		{
+			ROS_INFO_NAMED( "obstacle_detection", "Disabling Obstacle Detection" );
+
 			DestroySubscribers( );
 
 			DestroyPublishers( );
@@ -75,6 +78,8 @@ void Reflexes::SetObjectThreshold( uint32_t objectThreshold )
 
 void Reflexes::OnOperationalStateChanged( const srslib_framework::MsgOperationalState::ConstPtr& operationalState )
 {
+	ROS_INFO_STREAM_NAMED( "obstacle_detection", "OnOperationalStateChanged: " << operationalState->pause );
+
 	m_operationalState = *operationalState;
 }
 
@@ -109,16 +114,18 @@ void Reflexes::PublishDangerZone( ) const
 		polygon.push_back( corner );
 	}
 
-
 	messageLanding.polygon.points = polygon;
-
-	ROS_DEBUG_STREAM_THROTTLE_NAMED( 0.3, "obstacle_detection", "Danger Zone: " << dangerZone );
 
 	m_dangerZonePublisher.publish( messageLanding );
 }
 
 void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t level)
 {
+	ROS_INFO_STREAM_NAMED( "obstacle_detection", "Midbrain Configuration changed: \
+		enable_obstacle_detection: " << config.enable_obstacle_detection <<
+		", enable_hard_stop: " << config.enable_hard_stop <<
+		", object_threshold: " << config.object_threshold );
+
 	SetObjectThreshold( config.object_threshold );
 
 	Enable( config.enable_obstacle_detection );
@@ -128,6 +135,11 @@ void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t
 
 void Reflexes::OnObstacleDetected( )
 {
+	ROS_INFO_STREAM_NAMED( "obstacle_detection", "OnObstacleDetected: \
+		m_operationalState.pause: " << m_operationalState.pause <<
+		", m_enable: " << m_enable <<
+		", m_sendHardStop: " << m_sendHardStop );
+
 	// Only send a hard stop if we are paused
 	if( !m_operationalState.pause &&
 		m_enable &&

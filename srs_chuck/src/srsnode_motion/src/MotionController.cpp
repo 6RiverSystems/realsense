@@ -720,9 +720,13 @@ void MotionController::taskPathFollow()
     }
     else
     {
-        // If an empty solution was passed to the Path Controller
-        // cancel the movement right away. The next cycle will set the flag ARRIVED
-        pathController_->cancel();
+        // Store what goal the controller is going to work on
+        currentShortTermGoal_ = currentPose_;
+
+        // If an empty solution was passed, the goal that the
+        // Path Controller is going to work on is the current
+        // position. In the next cycle, the controller itself will declare
+        // that the robot has arrived to the goal
     }
 }
 

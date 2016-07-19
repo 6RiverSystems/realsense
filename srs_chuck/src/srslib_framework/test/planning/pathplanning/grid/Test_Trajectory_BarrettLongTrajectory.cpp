@@ -24,7 +24,7 @@ using namespace std;
 
 #include <srslib_framework/search/AStar.hpp>
 
-#include <srslib_test/planning/localization/MapUtils.hpp>
+#include <srslib_test/localization/MapUtils.hpp>
 #include <srslib_test/planning/pathplanning/PathPlanningUtils.hpp>
 
 using namespace srs;
@@ -40,5 +40,5 @@ TEST(Test_Trajectory, BarrettLongTrajectory)
 
     Pose<> robotPose = Pose<>(14.7855, 4.65954, 1.53943);
     Pose<> goalPose = Pose<>(33.215, 51.703, 1.5708);
-    Solution<GridSolutionItem>* solution = PathPlanningUtils::pose2Solution(map, robotPose, goalPose);
+    Solution<GridSolutionItem>* solution = test::PathPlanningUtils::pose2Solution(map, robotPose, goalPose);
 }

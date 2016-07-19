@@ -57,7 +57,7 @@ set(TEST_SOURCES_LOCALIZATION
 
 set(TEST_SOURCES_PLANNING
     test/planning/pathplanning/grid/Test_Trajectory_180ShortTrajectory.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_BarrettLongMap.cpp
+    test/planning/pathplanning/grid/Test_Trajectory_BarrettLongTrajectory.cpp
     test/planning/pathplanning/grid/Test_Trajectory_BarrettMap.cpp
     test/planning/pathplanning/grid/Test_Trajectory_LongStraight.cpp
     test/planning/pathplanning/grid/Test_Trajectory_LongTrajectory.cpp

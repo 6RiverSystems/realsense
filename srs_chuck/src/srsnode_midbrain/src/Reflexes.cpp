@@ -138,6 +138,7 @@ void Reflexes::OnObstacleDetected( )
 
 	// Only send a hard stop if we are paused
 	if( !m_operationalState.pause &&
+		!m_operationalState.hardStop &&
 		m_enable &&
 		m_sendHardStop )
 	{

@@ -57,7 +57,7 @@ private:
 
 	static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
 
-	static constexpr auto SCAN_TOPIC = "/camera/scan";
+	static constexpr auto SCAN_TOPIC = "/camera/depth/scan";
 
 	static constexpr auto DANGER_ZONE_TOPIC = "/internal/state/reflexes/danger_zone";
 

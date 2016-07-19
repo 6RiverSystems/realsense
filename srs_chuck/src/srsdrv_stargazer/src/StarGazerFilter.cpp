@@ -100,11 +100,11 @@ namespace srs {
 				{
 					returnValue = true;
 
-					ROS_DEBUG_NAMED( "filter", "vel: %7.4f (%1.0f) acc: %6.2f (%1.0f) jerk: %7.1f (%1.0f)", absVel, m_velocityLimitCMpS, absAcc, m_accelerationLimitCMpS2, absJerk, m_jerkLimitCMpS3);
+					ROS_DEBUG_NAMED( "filter", "Stargazer: vel: %7.4f (%1.0f) acc: %6.2f (%1.0f) jerk: %7.1f (%1.0f)", absVel, m_velocityLimitCMpS, absAcc, m_accelerationLimitCMpS2, absJerk, m_jerkLimitCMpS3);
 				}
 				else 
 				{
-					ROS_DEBUG_NAMED( "filter", "vel: %7.4f (%1.0f) acc: %6.2f (%1.0f) jerk: %7.1f (%1.0f) <", absVel, m_velocityLimitCMpS, absAcc, m_accelerationLimitCMpS2, absJerk, m_jerkLimitCMpS3);
+					ROS_DEBUG_NAMED( "filter", "Stargazer: vel: %7.4f (%1.0f) acc: %6.2f (%1.0f) jerk: %7.1f (%1.0f) <", absVel, m_velocityLimitCMpS, absAcc, m_accelerationLimitCMpS2, absJerk, m_jerkLimitCMpS3);
 				}
 			}
 

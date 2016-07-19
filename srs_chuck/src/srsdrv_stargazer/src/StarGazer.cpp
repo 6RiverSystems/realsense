@@ -88,7 +88,7 @@ void StarGazer::Run( )
 
 void StarGazer::OnConnectionChanged( bool bIsConnected )
 {
-	ROS_DEBUG_STREAM( "Connected" );
+	ROS_DEBUG_STREAM( "Stargazer: Connected" );
 
 	if( bIsConnected )
 	{
@@ -159,7 +159,7 @@ void StarGazer::PumpMessageProcessor( )
 
 void StarGazer::ReadCallback( std::string strType, std::string strValue )
 {
-	ROS_DEBUG_STREAM( strType << " = " << strValue );
+	ROS_DEBUG_STREAM( "Stargazer: " << strType << " = " << strValue );
 }
 
 void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, float fAngle )
@@ -203,7 +203,7 @@ void StarGazer::LoadTransforms( )
 		strTargetFrame = "/internal/state/map/grid";
 	}
 
-	ROS_INFO_STREAM( "Stargazer pose target frame: " << strTargetFrame );
+	ROS_INFO_STREAM( "Stargazer: Target frame: " << strTargetFrame );
 
 	tf::StampedTransform footprintTransform;
 	footprintTransform.setRotation( tf::Quaternion::getIdentity( ) );
@@ -227,7 +227,7 @@ void StarGazer::LoadTransforms( )
 	}
 	catch( const tf::TransformException& ex )
 	{
-		ROS_ERROR( "%s", ex.what( ) );
+		ROS_ERROR_STREAM( "Stargazer: Transform error: " << ex.what( ) );
 	}
 
 	tf::Transform stargazerTransform( tf::Quaternion::getIdentity( ) );
@@ -260,18 +260,18 @@ bool StarGazer::LoadCalibrationTransform( const std::string& strConfigurationFil
 			stargazer.setRotation( tf::Quaternion::getIdentity( ) );
 			stargazer.setOrigin( translation );
 
-			ROS_INFO_STREAM( "Stargazer calibration (" << strConfigurationFile << "): x=" << translation.getX( ) << ", y=" << translation.getY( ) );
+			ROS_INFO_STREAM( "Stargazer: Calibration (" << strConfigurationFile << "): x=" << translation.getX( ) << ", y=" << translation.getY( ) );
 		}
 		else
 		{
-			ROS_ERROR_STREAM( "Stargazer calibration file not found: " << strConfigurationFile );
+			ROS_ERROR_STREAM( "Stargazer: Calibration file not found: " << strConfigurationFile );
 
 			bSuccess = false;
 		}
 	}
 	catch( const std::runtime_error& e )
 	{
-		ROS_ERROR_STREAM( "Could not parse yaml file for Stargazer calibration: " <<
+		ROS_ERROR_STREAM( "Stargazer: Could not parse yaml file for Stargazer calibration: " <<
 			strConfigurationFile << " " << e.what( ) );
 
 		bSuccess = false;

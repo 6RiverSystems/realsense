@@ -264,8 +264,10 @@ void MotionController::aggregateInitialRotations(Pose<> pose,
 
     Pose<> fromPose = Pose<>(node.fromPose.x, node.fromPose.y, pose.theta);
 
-    // Remove all the ROTATE nodes at the beginning of the solution
-    while (node.actionType == GridSolutionItem::ROTATE)
+    // Remove all the ROTATE nodes at the beginning of the solution. Check
+    // if the solution is empty while doing that in case it was composed exclusively by
+    // ROTATE commands
+    while (node.actionType == GridSolutionItem::ROTATE && !solution->empty())
     {
         // Remove the rotation from the original solution
         solution->erase(solution->begin());

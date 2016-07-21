@@ -6,6 +6,7 @@
 #include <srslib_framework/MsgPose.h>
 #include <srslib_framework/MsgSolution.h>
 
+#include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
@@ -189,9 +190,11 @@ void Executive::executePlanToGoal()
         }
 
         currentSolution_ = GridSolutionFactory::fromSearch(goalNode, map);
+
         ROS_DEBUG_STREAM_NAMED("executive", "Found solution: " << endl << *currentSolution_);
-        ROS_INFO_STREAM_NAMED("executive", "Found path for goal:" << internalGoal.x << "," << internalGoal.y << "," << goalAngle << " => offset goal"
-        	<< currentGoal_.x << "," << currentGoal_.y << "," << currentGoal_.theta);
+
+        ROS_INFO_STREAM_NAMED("executive", "Found path for goal: " << internalGoal.x << ", " << internalGoal.y << ", " << goalAngle << " => offset goal: "
+        	<< currentGoal_.x << ", " << currentGoal_.y << ", " << AngleMath::deg2rad( currentGoal_.theta ));
     }
     else
     {

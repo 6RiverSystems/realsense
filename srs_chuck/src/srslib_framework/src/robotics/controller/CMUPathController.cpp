@@ -29,16 +29,18 @@ void CMUPathController::reset()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void CMUPathController::setTrajectory(Trajectory<> trajectory, Pose<> robotPose)
+void CMUPathController::setTrajectory(Pose<> robotPose, Trajectory<> trajectory, Pose<> goal)
 {
     reset();
 
+    // Store the trajectory
     currentTrajectory_ = trajectory;
+
+    // Set the goal in the controller
+    setGoal(goal);
+
     if (!currentTrajectory_.empty())
     {
-        // Find the goal of the trajectory
-        setGoal(currentTrajectory_.getGoal());
-
         // Find the first reference point on the given trajectory
         int referenceIndex = currentTrajectory_.findClosestPose(robotPose);
         referencePose_ = currentTrajectory_.getPose(referenceIndex);

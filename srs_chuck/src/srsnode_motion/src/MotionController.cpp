@@ -703,22 +703,20 @@ void MotionController::taskNormalStop()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::taskPathFollow()
 {
+    Trajectory<> trajectory;
+
     if (!currentSolution_.empty())
     {
         // Store what goal the controller is going to work on
         currentShortTermGoal_ = currentSolution_.getGoal().toPose;
 
         // Calculate the trajectory
-        Trajectory<> trajectory;
         GridTrajectoryGenerator converter(robot_);
 
         converter.fromSolution(currentSolution_);
         converter.getTrajectory(trajectory);
 
         ROS_DEBUG_STREAM_NAMED("motion_controller", "Trajectory: " << trajectory);
-
-        // Pass the trajectory to the path controller
-        pathController_->setTrajectory(trajectory, currentPose_);
     }
     else
     {
@@ -730,6 +728,9 @@ void MotionController::taskPathFollow()
         // position. In the next cycle, the controller itself will declare
         // that the robot has arrived to the goal
     }
+
+    // Pass the trajectory to the path controller
+    pathController_->setTrajectory(currentPose_, trajectory, currentShortTermGoal_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

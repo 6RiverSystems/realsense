@@ -127,7 +127,13 @@ recordChuck() {
   else
     rosbag record -O "$1" /camera/color/camera_info /camera/color/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
 
-   tar -czvf "$1.tar.gz" "$1"
+    sleep 1s
+
+    echo "$1.tar.gz" "$1.bag"
+
+    tar -czvf "$1.tar.gz" "$1.bag"
+
+    rm "$1.bag"
   fi
 }
 

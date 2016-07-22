@@ -29,9 +29,9 @@ function updateChuck() {
 }
 
 function buildChuck() {
-  stopChuck &&
+  stopChuck
 
-  cleanChuck &&
+  cleanChuck
 
   getChuckDirectory &&
 

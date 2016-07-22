@@ -6,40 +6,48 @@
   *
 -->
 <launch>
-
-	<node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager" output="screen"/>
-
-    <arg name="serial_no" default="" />
-	<arg name="mode" default="manual" />
-	<arg name="color_height" default="240" />
-	<arg name="color_width" default="320" />
-	<arg name="depth_height" default="252" />
-	<arg name="depth_width" default="332" />
+	<arg name="manager" default="manager" />
+	<arg name="camera" default="camera" />
+	<arg name="camera_type" default="R200" />
 	<arg name="enable_depth" default="true" />
 	<arg name="enable_color" default="true" />
 	<arg name="enable_pointcloud" default="true" />
 	<arg name="enable_tf" default="false" />
+	<arg name="color_height" default="240" />
+	<arg name="color_width" default="320" />
+	<arg name="depth_height" default="252" />
+	<arg name="depth_width" default="332" />
 	<arg name="depth_fps" default="30" />
 	<arg name="color_fps" default="30" />	
 	<arg name="r200_lr_gain" default="100" />
+	<arg name="r200_lr_exposure" default="300" />
 
-    <node pkg="nodelet" type="nodelet" name="RealsenseNodelet"
-        args="load realsense_camera/RealsenseNodelet standalone_nodelet">
-        <param name="serial_no"         type="str"  value="$(arg serial_no)" />
-        <param name="mode"              type="str"  value="$(arg mode)" />
-        <param name="enable_depth"      type="bool" value="$(arg enable_depth)" />
-        <param name="enable_color"      type="bool" value="$(arg enable_color)" />
-        <param name="enable_pointcloud" type="bool" value="$(arg enable_pointcloud)" />
-        <param name="enable_tf"         type="bool" value="$(arg enable_tf)" />
-        <param name="depth_width"       type="int"  value="$(arg depth_width)" />
-        <param name="depth_height"      type="int"  value="$(arg depth_height)" />
-        <param name="color_width"       type="int"  value="$(arg color_width)" />
-        <param name="color_height"      type="int"  value="$(arg color_height)" />
-        <param name="depth_fps"         type="int"  value="$(arg depth_fps)" />
-        <param name="color_fps"         type="int"  value="$(arg color_fps)" />
-        <param name="r200_lr_auto_exposure_enabled"		type="bool"  value="false" />
-        <param name="r200_lr_gain"		type="int"  value="100" />
-        <param name="r200_lr_exposure"		type="int"  value="330" />
+	<param name="$(arg camera)/enable_depth"      type="bool" value="$(arg enable_depth)" />
+	<param name="$(arg camera)/enable_color"      type="bool" value="$(arg enable_color)" />
+	<param name="$(arg camera)/enable_pointcloud" type="bool" value="$(arg enable_pointcloud)" />
+	<param name="$(arg camera)/enable_tf"         type="bool" value="$(arg enable_tf)" />
+	<param name="$(arg camera)/depth_width"       type="int"  value="$(arg depth_width)" />
+	<param name="$(arg camera)/depth_height"      type="int"  value="$(arg depth_height)" />
+	<param name="$(arg camera)/color_width"       type="int"  value="$(arg color_width)" />
+	<param name="$(arg camera)/color_height"      type="int"  value="$(arg color_height)" />
+	<param name="$(arg camera)/depth_fps"         type="int"  value="$(arg depth_fps)" />
+	<param name="$(arg camera)/color_fps"         type="int"  value="$(arg color_fps)" />
+	
+	<node pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" output="screen"/>
+
+	<node pkg="nodelet" type="nodelet" name="$(arg camera)"
+        args="load realsense_camera/$(arg camera_type)Nodelet $(arg manager)">
+        <param name="depth"					type="bool" value="$(arg enable_depth)" />
+        <param name="rgb"					type="bool" value="$(arg enable_color)" />
+        <param name="ir"					type="bool" value="$(arg enable_pointcloud)" />
+        <param name="ir2"					type="bool" value="$(arg enable_tf)" />
+		<param name="depth_width"			type="int"  value="$(arg depth_width)" />
+        <param name="depth_height"			type="int"  value="$(arg depth_height)" />
+        <param name="color_width"			type="int"  value="$(arg color_width)" />
+        <param name="color_height"			type="int"  value="$(arg color_height)" />
+        <param name="depth_fps"				type="int"  value="$(arg depth_fps)" />
+        <param name="color_fps"				type="int"  value="$(arg color_fps)" />
+        <param name="r200_lr_gain"			type="int"  value="$(arg r200_lr_gain)" />
     </node>
 
 	<node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />

@@ -1,3 +1,4 @@
+
 #!/bin/bash
 function getChuckDirectory() {
   BLUE='\033[0;34m'
@@ -28,6 +29,10 @@ function updateChuck() {
 }
 
 function buildChuck() {
+  stopChuck &&
+
+  cleanChuck &&
+
   getChuckDirectory &&
 
   pushd "$baseDirectory/srs_chuck" &&
@@ -38,6 +43,8 @@ function buildChuck() {
   catkin_make &&
   source devel/setup.bash &&
   popd
+
+  startChuck
 }
 
 function runChuck() {
@@ -81,21 +88,29 @@ function showChuck() {
   rviz -d ~/ros/srs_sites/src/srsc_6rhq_rviz/rviz/config.rviz
 }
 
-function restartChuck() {
+function stopChuck() {
   echo "Stopping mfp-ros service"
   sudo service mfp-ros stop
   
   echo "Stopping mfp-bridge service"
   sudo service mfp-bridge stop
+}
 
-  echo "Waiting for services to completely stop"
-  sleep 5s
-
+function startChuck() {
   echo "Starting mfp-ros service"
   sudo service mfp-ros start
 
   echo "Stopping mfp-bridge service"
   sudo service mfp-bridge start
+}
+
+function restartChuck() {
+  stopChuck
+
+  echo "Waiting for services to completely stop"
+  sleep 10s
+
+  startChuck
 }
 
 logChuck() {
@@ -104,10 +119,25 @@ logChuck() {
   tail -n 1000 -f "$logFile" -f ~/mfp_bridge/log/bridge.log
 }
 
+recordChuck() {
+  getChuckDirectory
+
+  if [ -z "$1" ]; then
+      echo "No argument supplied"
+  else
+    rosbag record -O "$1" /camera/color/camera_info /camera/color/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
+
+   tar -czvf "$1.tar.gz" "$1"
+  fi
+}
+
 alias chucklog=logChuck
 alias chuckupdate=updateChuck
 alias chuckclean=cleanChuck
 alias chuckbuild=buildChuck
 alias chuckrun=runChuck
+alias chuckstart=stopChuck
+alias chuckstop=startChuck
 alias chuckrestart=restartChuck
 alias chuckshow=showChuck
+alias chuckrecord=recordChuck

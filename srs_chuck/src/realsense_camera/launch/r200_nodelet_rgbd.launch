@@ -25,6 +25,7 @@
   <arg name="depth"            default="depth" />
   <arg name="rgb"              default="rgb" />
   <arg name="ir"               default="ir" />
+  <arg name="ir2"              default="ir2" />
   <arg name="depth_registered" default="depth_registered" />
   <arg name="projector"        default="projector" />
 
@@ -78,6 +79,7 @@
       <arg name="depth"                     value="$(arg depth)" />
       <arg name="rgb"                       value="$(arg rgb)" />
       <arg name="ir"                        value="$(arg ir)" />
+      <arg name="ir2"                       value="$(arg ir2)" />
       <arg name="depth_processing"          value="$(arg depth_processing)" />
       <arg name="rgb_processing"            value="$(arg rgb_processing)" />
       <arg name="ir_processing"             value="$(arg ir_processing)" />

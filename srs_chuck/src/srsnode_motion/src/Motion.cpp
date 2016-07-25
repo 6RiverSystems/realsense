@@ -557,28 +557,28 @@ void Motion::scanTapsForData()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::stepEmulation()
 {
-//    // If the brain stem is disconnected, emulate odometry and initial position
-//    // feeding the odometer with the commanded velocity
-//    if (!tapBrainStem_.isBrainStemConnected())
-//    {
-//        ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
-//            "Brainstem disconnected. Using simulated odometry");
-//
-//        Velocity<> currentCommand = motionController_.getExecutingCommand();
-//
-//        simulatedT_ += 1.0 / REFRESH_RATE_HZ;
-//        tapOdometry_.set(simulatedT_,
-//            currentCommand.linear,
-//            currentCommand.angular);
-//
-//        if (!positionEstimator_.isPoseValid())
-//        {
-//            // Establish an "acceptable" initial position, at least until the
-//            // Position Estimator can get its bearings
-//            tapInitialPose_.set(Pose<>(TimeMath::time2number(currentTime_), 3.0, 3.0, 0));
-//            reset(tapInitialPose_.getPose());
-//        }
-//    }
+    // If the brain stem is disconnected, emulate odometry and initial position
+    // feeding the odometer with the commanded velocity
+    if (!tapBrainStem_.isBrainStemConnected())
+    {
+        ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
+            "Brainstem disconnected. Using simulated odometry");
+
+        Velocity<> currentCommand = motionController_.getExecutingCommand();
+
+        simulatedT_ += 1.0 / REFRESH_RATE_HZ;
+        tapOdometry_.set(simulatedT_,
+            currentCommand.linear,
+            currentCommand.angular);
+
+        if (!positionEstimator_.isPoseValid())
+        {
+            // Establish an "acceptable" initial position, at least until the
+            // Position Estimator can get its bearings
+            tapInitialPose_.set(Pose<>(TimeMath::time2number(currentTime_), 3.0, 3.0, 0));
+            reset(tapInitialPose_.getPose());
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

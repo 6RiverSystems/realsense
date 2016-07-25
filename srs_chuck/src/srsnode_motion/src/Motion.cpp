@@ -622,10 +622,7 @@ void Motion::stepNode()
     // Run the motion controller if the estimated position is valid. No
     // motion is allowed if a position has been established
     Pose<> currentPose = positionEstimator_.getPose();
-    if (currentPose.isValid())
-    {
-        motionController_.run(currentPose, currentOdometry, currentJoystickCommand);
-    }
+    motionController_.run(currentPose, currentOdometry, currentJoystickCommand);
 }
 
 } // namespace srs

@@ -400,6 +400,19 @@ void MotionController::executeFinalRotation()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::checkMotionStatus()
 {
+    // If the pose is not valid
+    if (!currentPose_.isValid())
+    {
+        // Switch to manual
+        switchToManual();
+
+        // Evaluate the new tasks right away
+        pumpWorkFromQueue();
+
+        // Leave without performing any additional operation
+        return;
+    }
+
     // If the stand controller is currently active and there is work in
     // the queue, cancel work in the controller and pump work from the queue
     if (isStandControllerActive() && isWorkPending())

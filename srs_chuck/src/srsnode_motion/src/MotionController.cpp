@@ -226,8 +226,8 @@ void MotionController::switchToManual()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::switchToAutonomous()
 {
-    // Ignore the request request if an
-    // emergency has been declared
+    // Ignore the request request if an emergency has been declared
+    // or the motion controller has an invalid robot pose
     if (isEmergencyDeclared())
     {
         return;
@@ -399,35 +399,6 @@ void MotionController::executeFinalRotation()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::checkMotionStatus()
 {
-    // If the pose is not valid
-    if (!currentPose_.isValid())
-    {
-        // Ignore the situation if an emergency has been declared
-        if (isEmergencyDeclared())
-        {
-            return;
-        }
-
-        // If this the first time, the manual follow was not scheduled
-        // then schedule it and evaluate the additional work right away
-        if (!isScheduled(TaskEnum::MANUAL_FOLLOW) && !isManualControllerActive())
-        {
-            // Cancel the current activity and clear the work queue
-            activeController_->cancel();
-            cleanWorkQueue();
-
-            // Schedule a normal stop followed by a manual follow
-            pushWorkItem(TaskEnum::NORMAL_STOP);
-            pushWorkItem(TaskEnum::MANUAL_FOLLOW);
-
-            // Evaluate the new tasks right away
-            pumpWorkFromQueue();
-        }
-
-        // Leave without performing any additional operation
-        return;
-    }
-
     // If the stand controller is currently active and there is work in
     // the queue, cancel work in the controller and pump work from the queue
     if (isStandControllerActive() && isWorkPending())

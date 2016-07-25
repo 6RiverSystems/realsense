@@ -598,9 +598,9 @@ void Motion::stepNode()
     }
     else
     {
-        // Depending on the state of the joystick latch, enable or disable
-        // the autonomous mode
-        if (isJoystickLatched_)
+        // If the joystick has been latched or the current robot pose
+        // is not valid switch to manual mode
+        if (isJoystickLatched_ || !positionEstimator_.isPoseValid())
         {
             motionController_.switchToManual();
         }

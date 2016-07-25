@@ -204,8 +204,7 @@ void MotionController::setConfiguration(MotionConfig& configuration)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::switchToManual()
 {
-    // Ignore the request request if an
-    // emergency has been declared
+    // Ignore the request if an emergency has been declared
     if (isEmergencyDeclared())
     {
         return;
@@ -403,11 +402,27 @@ void MotionController::checkMotionStatus()
     // If the pose is not valid
     if (!currentPose_.isValid())
     {
-        // Switch to manual
-        switchToManual();
+        // Ignore the situation if an emergency has been declared
+        if (isEmergencyDeclared())
+        {
+            return;
+        }
 
-        // Evaluate the new tasks right away
-        pumpWorkFromQueue();
+        // If this the first time, the manual follow was not scheduled
+        // then schedule it and evaluate the additional work right away
+        if (!isScheduled(TaskEnum::MANUAL_FOLLOW) && !isManualControllerActive())
+        {
+            // Cancel the current activity and clear the work queue
+            activeController_->cancel();
+            cleanWorkQueue();
+
+            // Schedule a normal stop followed by a manual follow
+            pushWorkItem(TaskEnum::NORMAL_STOP);
+            pushWorkItem(TaskEnum::MANUAL_FOLLOW);
+
+            // Evaluate the new tasks right away
+            pumpWorkFromQueue();
+        }
 
         // Leave without performing any additional operation
         return;
@@ -512,22 +527,31 @@ string MotionController::printWorkToString()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::popWorkItem(TaskEnum& task, SolutionType& solution)
 {
-    // First, find the work to do
-    WorkType work = work_.front();
-    work_.pop_front();
-
-    // Schedule the next task
-    task = static_cast<TaskEnum>(work.first);
-
-    // Specify the next solution (if any)
-    if (work.second)
+    if (!work_.empty())
     {
-        solution = *work.second;
-        delete work.second;
+        // First, find the work to do
+        WorkType work = work_.front();
+        work_.pop_front();
+
+        // Schedule the next task
+        task = static_cast<TaskEnum>(work.first);
+
+        // Specify the next solution (if any)
+        if (work.second)
+        {
+            solution = *work.second;
+            delete work.second;
+        }
+        else
+        {
+            solution.clear();
+        }
     }
     else
     {
-        solution.clear();
+        // It should never get here
+        // TODO: Make sure to add an exception for this situation
+        throw;
     }
 }
 

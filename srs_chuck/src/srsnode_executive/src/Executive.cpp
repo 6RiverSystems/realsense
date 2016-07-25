@@ -249,7 +249,7 @@ void Executive::executeUnpause()
     {
         executePlanToGoal();
         publishInternalGoalSolution(currentSolution_);
-        RosCallEmpty::call("srsnode_motion", "/trigger/execute_solution");
+        RosCallSolution::call("srsnode_motion", "/trigger/execute_solution", currentSolution_);
     }
 }
 

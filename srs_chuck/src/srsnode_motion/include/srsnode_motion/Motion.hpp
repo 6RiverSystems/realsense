@@ -19,9 +19,10 @@
 #include <srslib_framework/ros/tap/RosTapInternal_InitialPose.hpp>
 #include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
 #include <srslib_framework/ros/tap/RosTapMap.hpp>
+#include <srslib_framework/ros/service/RosServiceExecuteSolution.hpp>
+#include <srslib_framework/ros/service/RosTriggerPause.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
 #include <srslib_framework/ros/service/RosTriggerStop.hpp>
-#include <srslib_framework/ros/service/RosTriggerPause.hpp>
 
 #include <srslib_framework/search/AStar.hpp>
 
@@ -110,6 +111,7 @@ private:
     RosTapMap tapMap_;
     RosTapOdometry tapOdometry_;
 
+    RosServiceExecuteSolution triggerExecuteSolution_;
     RosTriggerPause triggerPause_;
     RosTriggerStop triggerStop_;
     RosTriggerShutdown triggerShutdown_;

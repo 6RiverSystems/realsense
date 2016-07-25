@@ -122,6 +122,7 @@ void Motion::connectAllTaps()
     triggerPause_.connectService();
     triggerStop_.connectService();
     triggerShutdown_.connectService();
+    triggerExecuteSolution_.connectService();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,6 +156,15 @@ void Motion::evaluateTriggers()
         else
         {
             motionController_.switchToAutonomous();
+        }
+    }
+
+    // TODO: Convert this into a ROS action
+    if (triggerExecuteSolution_.newRequestPending())
+    {
+        if (!isJoystickLatched_)
+        {
+            executeSolution(triggerExecuteSolution_.getRequest());
         }
     }
 }
@@ -538,15 +548,6 @@ void Motion::scanTapsForData()
 
         // Store the latch state for later use
         isJoystickLatched_ = tapJoyAdapter_.getLatchState();
-    }
-
-    // If there is a new solution has been communicated
-    if (tapInternalGoalSolution_.newDataAvailable())
-    {
-        if (!isJoystickLatched_)
-        {
-            executeSolution(tapInternalGoalSolution_.getSolution());
-        }
     }
 
     // Check if odometry or APS data is available

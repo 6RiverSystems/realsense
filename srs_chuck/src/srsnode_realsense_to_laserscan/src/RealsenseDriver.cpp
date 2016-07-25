@@ -17,13 +17,13 @@ namespace srs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 RealsenseDriver::RealsenseDriver( ) :
 	rosNodeHandle_( ),
-	infrared1Subscriber_( rosNodeHandle_, "/camera/ir/image_raw", 10 ),
-	infrared2Subscriber_( rosNodeHandle_, "/camera/ir2/image_raw", 10 ),
+	infrared1Subscriber_( rosNodeHandle_, "/camera/infrared1/image_raw", 10 ),
+	infrared2Subscriber_( rosNodeHandle_, "/camera/infrared2/image_raw", 10 ),
 	laserScanSubscriber_( rosNodeHandle_, "/camera/depth/scan", 10 ),
-	infrared1Publisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/ir/image_near", 10 ) ),
-	infrared2Publisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/ir2/image_near", 10 ) ),
-	infraredPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/ir/image_near", 10 ) ),
-	infraredScanPublisher_( rosNodeHandle_.advertise<sensor_msgs::LaserScan>( "/camera/ir/scan", 10 ) ),
+	infrared1Publisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/infrared1/image_near", 10 ) ),
+	infrared2Publisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/infrared2/image_near", 10 ) ),
+	infraredPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/infrared/image_near", 10 ) ),
+	infraredScanPublisher_( rosNodeHandle_.advertise<sensor_msgs::LaserScan>( "/camera/infrared/scan", 10 ) ),
 	combinedScanPublisher_( rosNodeHandle_.advertise<sensor_msgs::LaserScan>( "/camera/scan", 10 ) ),
 	synchronizer_( new ImageSyncronizer( laserScanSubscriber_, infrared1Subscriber_, infrared2Subscriber_, 10 ) )
 {

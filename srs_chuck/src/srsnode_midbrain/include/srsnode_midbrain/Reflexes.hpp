@@ -27,9 +27,9 @@ public:
 
 // Configuration Options
 
-	void Enable( bool enable );
+	void Enable(  bool enableIrDetection, bool enableDepthDetection );
 
-	void SetObjectThreshold( uint32_t objectThreshold );
+	void SetObjectThreshold( uint32_t irThreshold, uint32_t depthThreshold );
 
 // Topic Callbacks
 
@@ -37,7 +37,7 @@ public:
 
 	void OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity );
 
-	void OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan );
+	void OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan );
 
 	void PublishDangerZone( ) const;
 
@@ -57,7 +57,9 @@ private:
 
 	static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
 
-	static constexpr auto SCAN_TOPIC = "/camera/depth/scan";
+	static constexpr auto DEPTH_SCAN_TOPIC = "/camera/depth/scan";
+
+	static constexpr auto IR_SCAN_TOPIC = "/camera/infrared/scan";
 
 	static constexpr auto DANGER_ZONE_TOPIC = "/internal/state/reflexes/danger_zone";
 
@@ -70,7 +72,9 @@ private:
 
 	ros::NodeHandle&						m_nodeHandle;
 
-	bool									m_enable;
+	bool									m_enableIrDetection;
+
+	bool									m_enableDepthDetection;
 
 	bool	 								m_sendHardStop;
 
@@ -80,7 +84,9 @@ private:
 
 	ros::Subscriber							m_operationalStateSubscriber;
 
-	ros::Subscriber							m_laserScanSubscriber;
+	ros::Subscriber							m_irScanSubscriber;
+
+	ros::Subscriber							m_depthScanSubscriber;
 
 	ros::Subscriber							m_velocitySubscriber;
 

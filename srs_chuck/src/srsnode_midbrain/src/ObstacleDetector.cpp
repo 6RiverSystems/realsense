@@ -49,7 +49,8 @@ ObstacleDetector::ObstacleDetector( double footprint ) :
 	m_obstacleDetectedCallback( ),
 	m_linearVelocity( 0.0f ),
 	m_angularVelocity( 0.0f ),
-	m_objectThreshold( 0 ),
+	m_irThreshold( 0 ),
+	m_depthThreshold( 0 ),
 	m_footprint( footprint )
 {
 
@@ -72,18 +73,21 @@ void ObstacleDetector::SetVelocity( double linear, double angular )
 	m_angularVelocity = angular;
 }
 
-void ObstacleDetector::SetObjectThreshold( uint32_t objectThreshold )
+void ObstacleDetector::SetThreshold( uint32_t irThreshold, uint32_t depthThreshold )
 {
-	m_objectThreshold = objectThreshold;
+	m_irThreshold = irThreshold;
+	m_depthThreshold = depthThreshold;
 }
 
-void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan )
+void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan )
 {
 	if( m_linearVelocity == 0.0f &&
 		m_angularVelocity == 0.0f )
 	{
 		return;
 	}
+
+	uint32_t threshold = isIrScan ? m_irThreshold : m_depthThreshold;
 
 	uint32_t numberOfObstacles = 0;
 
@@ -133,7 +137,7 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 
 	ROS_DEBUG_NAMED( "obstacle_detection", "frame: %s, scans: %d, linear vel: %0.2f, m_footprint: %0.2f, safeDistance: %.02f, Obstacles detected: %d, points: %s", scan->header.frame_id.c_str( ), numberOfScans, m_linearVelocity, m_footprint, safeDistance, numberOfObstacles, strPoints.c_str( ) );
 
-	if( numberOfObstacles > m_objectThreshold )
+	if( numberOfObstacles > threshold )
 	{
 		if( m_obstacleDetectedCallback )
 		{

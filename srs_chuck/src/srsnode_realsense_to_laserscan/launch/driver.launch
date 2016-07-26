@@ -6,111 +6,47 @@
   *
 -->
 <launch>
+	<arg name="camera" default="camera" />
+	<arg name="simulation" default="false" />
 
-	<node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager" output="screen"/>
+	<include unless="$(arg simulation)" file="$(find realsense_camera)/launch/r200_nodelet_rgbd.launch">
+		<arg name="camera"          value="$(arg camera)" />
+		<arg name="publish_tf"		value="true" />
+		<arg name="depth"			value="depth" />
+		<arg name="rgb"				value="color" />
+		<arg name="ir"				value="infrared1" />
+		<arg name="ir2"				value="infrared2" />
+		<arg name="color_height"	value="240" />
+		<arg name="color_width"		value="320" />
+		<arg name="depth_height"	value="252" />
+		<arg name="depth_width" 	value="332" />
+		<arg name="depth_fps"       value="30" />
+		<arg name="color_fps"       value="30" />
+	</include>
 
-    <arg name="serial_no" default="" />
-	<arg name="mode" default="manual" />
-	<arg name="color_height" default="240" />
-	<arg name="color_width" default="320" />
-	<arg name="depth_height" default="252" />
-	<arg name="depth_width" default="332" />
-	<arg name="enable_depth" default="true" />
-	<arg name="enable_color" default="true" />
-	<arg name="enable_pointcloud" default="true" />
-	<arg name="enable_tf" default="false" />
-	<arg name="depth_fps" default="30" />
-	<arg name="color_fps" default="30" />	
-	<arg name="r200_lr_gain" default="100" />
+	<node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
 
-    <node pkg="nodelet" type="nodelet" name="RealsenseNodelet"
-        args="load realsense_camera/RealsenseNodelet standalone_nodelet">
-        <param name="serial_no"         type="str"  value="$(arg serial_no)" />
-        <param name="mode"              type="str"  value="$(arg mode)" />
-        <param name="enable_depth"      type="bool" value="$(arg enable_depth)" />
-        <param name="enable_color"      type="bool" value="$(arg enable_color)" />
-        <param name="enable_pointcloud" type="bool" value="$(arg enable_pointcloud)" />
-        <param name="enable_tf"         type="bool" value="$(arg enable_tf)" />
-        <param name="depth_width"       type="int"  value="$(arg depth_width)" />
-        <param name="depth_height"      type="int"  value="$(arg depth_height)" />
-        <param name="color_width"       type="int"  value="$(arg color_width)" />
-        <param name="color_height"      type="int"  value="$(arg color_height)" />
-        <param name="depth_fps"         type="int"  value="$(arg depth_fps)" />
-        <param name="color_fps"         type="int"  value="$(arg color_fps)" />
-        <param name="r200_lr_auto_exposure_enabled"		type="bool"  value="false" />
-        <param name="r200_lr_gain"		type="int"  value="100" />
-        <param name="r200_lr_exposure"		type="int"  value="330" />
+    <!-- push depthimage_to_laserscan nodelet into sensor's nodelet manager-->
+	<node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet laserscan_nodelet_manager">
+        <remap from="image" to="/camera/depth/image_raw"/>
+        <remap from="scan" to="/camera/depth/scan"/>
+        
+		<param name="scan_height" value="10"/>
+		<param name="scan_time" value="0.033"/>
+		<param name="output_frame_id" value="/laser_frame"/>
+		<param name="range_min" value="0.01"/>
+		<param name="range_max" value="8.00"/>
+		<param name="concurrency_level" value="0"/>
     </node>
 
-	<node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+	<node name="srsnode_realsense_to_laserscan" pkg="srsnode_realsense_to_laserscan" type="srsnode_realsense_to_laserscan"
+		output="screen" respawn="true"/>
 
-	<!-- Run a VoxelGrid filter to clean NaNs and downsample the data -->
-    <node pkg="nodelet" type="nodelet" name="VoxelGrid" args="load pcl/VoxelGrid pcl_manager" output="screen">
-        <remap from="~input" to="/camera/depth/points" />
-        <rosparam>
-            filter_field_name: z
-            filter_limit_min: -0.1
-            filter_limit_max: 1000
-            filter_limit_negative: False
-            leaf_size: 0.025
-        </rosparam>
- 	</node>
-
-   <!-- <node pkg="nodelet" type="nodelet" name="PassThrough" args="load pcl/PassThrough pcl_manager" output="screen">
-        <remap from="~input" to="/camera/depth/points"/>
-        <rosparam>
-            filter_field_name: z
-            filter_limit_min: 0.02
-            filter_limit_max: 3.5
-            filter_limit_negative: False
-        </rosparam>
-	</node> -->
-
-	<node pkg="nodelet" type="nodelet" name="StatisticalOutlier" args="load pcl/StatisticalOutlierRemoval pcl_manager" output="screen">
-        <remap from="~input" to="/VoxelGrid/output"/>
-        <rosparam>
-               mean_k: 10
-               stddev: 0.05
-        </rosparam>
+	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter">
+		<remap from="scan" to="/camera/scan" />
+		<remap from="scan_filtered" to="/camera/scan_filtered" />
+		<rosparam command="load" file="$(find srsnode_realsense_to_laserscan)/launch/laser_filter.yaml" />
 	</node>
 
-	<!-- <node pkg="nodelet" type="nodelet" name="RadiusOutlier" args="load pcl/RadiusOutlierRemoval pcl_manager" output="screen">
-        <remap from="~input" to="/VoxelGrid/output"/>
-        <rosparam>
-               radius_search: 0.05
-               min_neighbors: 20
-        </rosparam>
-	</node> -->
-    
-    <!-- push pointcloud_to_laserscan nodelet into sensor's nodelet manager-->
-    <node pkg="nodelet" type="nodelet" name="pointcloud_to_laserscan" args="load pointcloud_to_laserscan/pointcloud_to_laserscan_nodelet standalone_nodelet">
-
-        <remap from="cloud_in" to="/StatisticalOutlier/output"/>
-        <remap from="scan" to="/camera/depth/scan"/>
-        <rosparam>
-            target_frame: laser_frame # Leave disabled to output scan in pointcloud frame
-            transform_tolerance: 0.05
-            min_height: 0.03
-            max_height: 2.0
-            angle_min: -1.5708 # -M_PI/2
-            angle_max: 1.5708 # M_PI/2
-            angle_increment: 0.008 # M_PI/360.0
-            scan_time: 0.3333
-            range_min: 0.3
-            range_max: 8.0
-            use_inf: true
-
-            # Concurrency level, affects number of pointclouds queued for processing, thread number governed by nodelet manager
-            # 0 : Detect number of cores
-            # 1 : Single threaded
-            # 2->inf : Parallelism level
-            concurrency_level: 0
-        </rosparam>
-    </node>
-
-	<node name="srsnode_realsense_to_laserscan" 
-        pkg="srsnode_realsense_to_laserscan"
-        type="srsnode_realsense_to_laserscan"
-        output="screen" respawn="true"/>
 </launch>
 

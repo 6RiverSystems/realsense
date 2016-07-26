@@ -6,3 +6,4 @@ export ENV=ros
 unset GTK_IM_MODULE
 source ~/ros/.bash_aliases
 source /opt/ros/indigo/setup.bash
+source ~/ros/srs_sites/devel/setup.bash

@@ -17,12 +17,14 @@ namespace srs
 
 Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_nodeHandle( nodeHandle ),
-	m_enable( false ),
+	m_enableIrDetection( false ),
+	m_enableDepthDetection( false ),
 	m_sendHardStop( false ),
 	m_operationalState( ),
 	m_obstacleDetector( ROBOT_WIDTH / 2.0f ),
 	m_operationalStateSubscriber( ),
-	m_laserScanSubscriber( ),
+	m_irScanSubscriber( ),
+	m_depthScanSubscriber( ),
 	m_velocitySubscriber( ),
 	m_commandPublisher( )
 {
@@ -31,6 +33,10 @@ Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_obstacleDetector.SetDetectionCallback( std::bind( &Reflexes::OnObstacleDetected, this ) );
 
 	m_configServer.setCallback( boost::bind( &Reflexes::onConfigChange, this, _1, _2 ) );
+
+	CreateSubscribers( );
+
+	CreatePublishers( );
 }
 
 Reflexes::~Reflexes( )
@@ -42,34 +48,50 @@ Reflexes::~Reflexes( )
 // Configuration Options
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Reflexes::Enable( bool enable )
+void Reflexes::Enable( bool enableIrDetection, bool enableDepthDetection )
 {
-	if( m_enable != enable )
+	if( m_enableIrDetection != enableIrDetection )
 	{
-		if( enable )
+		if( enableIrDetection )
 		{
-			ROS_INFO_NAMED( "obstacle_detection", "Enabling Obstacle Detection" );
+			ROS_INFO_NAMED( "obstacle_detection", "Enabling IR Detection" );
 
-			CreateSubscribers( );
-
-			CreatePublishers( );
+			m_irScanSubscriber = m_nodeHandle.subscribe<sensor_msgs::LaserScan>(
+					IR_SCAN_TOPIC, 10, std::bind( &Reflexes::OnLaserScan, this, std::placeholders::_1, true ) );
 		}
 		else
 		{
-			ROS_INFO_NAMED( "obstacle_detection", "Disabling Obstacle Detection" );
+			ROS_INFO_NAMED( "obstacle_detection", "Disabling IR Detection" );
 
-			DestroySubscribers( );
-
-			DestroyPublishers( );
+			m_irScanSubscriber.shutdown( );
 		}
 
-		m_enable = enable;
+		m_enableIrDetection = enableIrDetection;
+	}
+
+	if( m_enableDepthDetection != enableDepthDetection )
+	{
+		if( enableDepthDetection )
+		{
+			ROS_INFO_NAMED( "obstacle_detection", "Enabling Depth Detection" );
+
+			m_depthScanSubscriber = m_nodeHandle.subscribe<sensor_msgs::LaserScan>(
+					DEPTH_SCAN_TOPIC, 10, std::bind( &Reflexes::OnLaserScan, this, std::placeholders::_1, false ) );
+		}
+		else
+		{
+			ROS_INFO_NAMED( "obstacle_detection", "Disabling Depth Detection" );
+
+			m_depthScanSubscriber.shutdown( );
+		}
+
+		m_enableDepthDetection = enableDepthDetection;
 	}
 }
 
-void Reflexes::SetObjectThreshold( uint32_t objectThreshold )
+void Reflexes::SetObjectThreshold( uint32_t irThreshold, uint32_t depthThreshold )
 {
-	m_obstacleDetector.SetObjectThreshold( objectThreshold );
+	m_obstacleDetector.SetThreshold( irThreshold, depthThreshold );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,9 +110,9 @@ void Reflexes::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity 
 	m_obstacleDetector.SetVelocity( velocity->linear.x, velocity->angular.z );
 }
 
-void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
+void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan )
 {
-	m_obstacleDetector.ProcessScan( scan );
+	m_obstacleDetector.ProcessScan( scan, isIrScan );
 }
 
 void Reflexes::PublishDangerZone( ) const
@@ -121,25 +143,24 @@ void Reflexes::PublishDangerZone( ) const
 
 void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t level)
 {
-	ROS_INFO_NAMED( "obstacle_detection", "Midbrain config changed: od enabled: %d, hardStop: %d, threshold: %d",
-		config.enable_obstacle_detection, config.enable_hard_stop, config.object_threshold );
+	ROS_INFO_NAMED( "obstacle_detection", "Midbrain config changed: hardStop: %d, ir scan: %d, depth scan: %d, ir threshold: %d, depth threshold: %d",
+		config.enable_ir_scan, config.depth_threshold, config.enable_hard_stop, config.ir_threshold, config.depth_threshold );
 
-	SetObjectThreshold( config.object_threshold );
+	SetObjectThreshold( config.ir_threshold, config.depth_threshold );
 
-	Enable( config.enable_obstacle_detection );
+	Enable( config.enable_ir_scan, config.enable_depth_scan );
 
 	m_sendHardStop = config.enable_hard_stop;
 }
 
 void Reflexes::OnObstacleDetected( )
 {
-	ROS_INFO_NAMED( "obstacle_detection", "OnObstacleDetected: paused: %d, enabled: %d, hardStop: %d",
-		m_operationalState.pause, m_enable, m_sendHardStop );
+	ROS_INFO_NAMED( "obstacle_detection", "OnObstacleDetected: paused: %d, hardStop: %d",
+		m_operationalState.pause, m_sendHardStop );
 
 	// Only send a hard stop if we are paused
 	if( !m_operationalState.pause &&
 		!m_operationalState.hardStop &&
-		m_enable &&
 		m_sendHardStop )
 	{
 		ROS_INFO_STREAM_NAMED( "obstacle_detection", "OnObstacleDetected: Sending STOP" );
@@ -157,9 +178,6 @@ void Reflexes::CreateSubscribers( )
 	m_operationalStateSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgOperationalState>(
 		OPERATIONAL_STATE_TOPIC, 10, std::bind( &Reflexes::OnOperationalStateChanged, this, std::placeholders::_1 ) );
 
-	m_laserScanSubscriber = m_nodeHandle.subscribe<sensor_msgs::LaserScan>(
-		SCAN_TOPIC, 10, std::bind( &Reflexes::OnLaserScan, this, std::placeholders::_1 ) );
-
 	m_velocitySubscriber = m_nodeHandle.subscribe<geometry_msgs::Twist>( VELOCITY_TOPIC, 1,
 	    std::bind( &Reflexes::OnChangeVelocity, this, std::placeholders::_1 ) );
 }
@@ -168,7 +186,9 @@ void Reflexes::DestroySubscribers( )
 {
 	m_operationalStateSubscriber.shutdown( );
 
-	m_laserScanSubscriber.shutdown( );
+	m_irScanSubscriber.shutdown( );
+
+	m_depthScanSubscriber.shutdown( );
 
 	m_velocitySubscriber.shutdown( );
 }

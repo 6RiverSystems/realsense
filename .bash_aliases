@@ -115,7 +115,22 @@ logChuck() {
 recordChuck() {
   getChuckDirectory
 
+<<<<<<< HEAD
   rosbag record --split --size=100 /camera/color/camera_info /camera/color/image_raw /camera/depth/camera_info /camera/depth/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
+=======
+  if [ -z "$1" ]; then
+      echo "No argument supplied"
+  else
+    echo "Recording realsense bag: $1.bag"
+    rosbag record -O "$1.bag" /camera/color/camera_info /camera/color/image_raw /camera/depth/camera_info /camera/depth/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
+
+    echo "Compressing bag: $1.bag => $1.tar.gz"
+    tar -czvf "$1.tar.gz" "$1.bag"
+
+    echo "Removing uncompressed bag $1"
+    rm "$1.bag"
+  fi
+>>>>>>> 67e22ca7b53c5fe5a2a5260ccb105bec2e067a85
 }
 
 alias chucklog=logChuck

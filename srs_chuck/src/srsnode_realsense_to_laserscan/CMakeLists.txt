@@ -36,6 +36,7 @@ find_package(PCL REQUIRED)
 
 include_directories(include 
     src/
+    include/
     ${catkin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
 	${PCL_INCLUDE_DIRS}

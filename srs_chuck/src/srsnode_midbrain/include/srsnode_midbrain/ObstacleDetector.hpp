@@ -69,9 +69,9 @@ public:
 
 	void SetVelocity( double linear, double angular );
 
-	void SetObjectThreshold( uint32_t objectThreshold );
+	void SetThreshold( uint32_t irThreshold, uint32_t depthThreshold );
 
-	void ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan );
+	void ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan );
 
 	double GetSafeDistance( double velocity ) const;
 
@@ -87,7 +87,9 @@ private:
 
 	double				m_angularVelocity;
 
-	uint32_t			m_objectThreshold;
+	uint32_t			m_irThreshold;
+
+	uint32_t			m_depthThreshold;
 
 	double				m_footprint;
 

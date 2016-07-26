@@ -19,7 +19,7 @@ namespace srs {
 
 class RealsenseDriver
 {
-	typedef message_filters::TimeSynchronizer<sensor_msgs::LaserScan, sensor_msgs::Image, sensor_msgs::Image> ImageSyncronizer;
+	typedef message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image> ImageSyncronizer;
 
 	typedef boost::shared_ptr<ImageSyncronizer> ImageSyncronizerPtr;
 
@@ -35,7 +35,7 @@ public:
 
 private:
 
-    void OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan, const sensor_msgs::Image::ConstPtr& infraredImage1,
+    void OnInfraredData( const sensor_msgs::Image::ConstPtr& infraredImage1,
     	const sensor_msgs::Image::ConstPtr& infraredImage2 );
 
 private:
@@ -47,6 +47,7 @@ private:
     void CombineImages( cv::Mat& image1, cv::Mat& image2, cv::Mat& result ) const;
 
     constexpr static unsigned int REFRESH_RATE_HZ = 50;
+    constexpr static unsigned int THRESHOLD_VALUE = 255;
 
     ros::NodeHandle 									rosNodeHandle_;
 
@@ -54,17 +55,9 @@ private:
 
     message_filters::Subscriber<sensor_msgs::Image> 	infrared2Subscriber_;
 
-    message_filters::Subscriber<sensor_msgs::LaserScan> laserScanSubscriber_;
-
-    ros::Publisher 										infrared1Publisher_;
-
-    ros::Publisher 										infrared2Publisher_;
-
     ros::Publisher 										infraredPublisher_;
 
     ros::Publisher 										infraredScanPublisher_;
-
-    ros::Publisher 										combinedScanPublisher_;
 
     ImageSyncronizerPtr									synchronizer_;
 

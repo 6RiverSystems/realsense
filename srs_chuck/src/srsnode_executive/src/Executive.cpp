@@ -13,7 +13,9 @@
 #include <srslib_framework/planning/pathplanning/grid/PoseAdapter.hpp>
 
 #include <srslib_framework/ros/message/SolutionMessageFactory.hpp>
-#include <srslib_framework/ros/service/RosServiceCall.hpp>
+#include <srslib_framework/ros/service/RosCallEmpty.hpp>
+#include <srslib_framework/ros/service/RosCallSetBool.hpp>
+#include <srslib_framework/ros/service/RosCallSolution.hpp>
 
 #include <srslib_framework/robotics/robot/Chuck.hpp>
 
@@ -114,7 +116,7 @@ void Executive::executeInitialPose()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::executePause()
 {
-    if (RosServiceCall::callSetBool("srsnode_motion", "/trigger/pause", true))
+    if (RosCallSetBool::call("srsnode_motion", "/trigger/pause", true))
     {
         if (currentSolution_)
         {
@@ -203,7 +205,7 @@ void Executive::executePlanToGoal()
             " (" << internalStart.x << "," << internalStart.y << "," << startAngle << ") and " <<
             currentGoal_ <<
             " (" << internalGoal.x << "," << internalGoal.y << "," << goalAngle << ")");
-     }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -232,7 +234,7 @@ void Executive::executeShutdown()
 
     for (auto node : nodes)
     {
-        RosServiceCall::callEmpty(node, "/trigger/shutdown");
+        RosCallEmpty::call(node, "/trigger/shutdown");
     }
 
     ros::shutdown();
@@ -241,12 +243,13 @@ void Executive::executeShutdown()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::executeUnpause()
 {
-    RosServiceCall::callSetBool("srsnode_motion", "/trigger/pause", false);
+    RosCallSetBool::call("srsnode_motion", "/trigger/pause", false);
 
     if (!arrived_)
     {
         executePlanToGoal();
         publishInternalGoalSolution(currentSolution_);
+        RosCallSolution::call("srsnode_motion", "/trigger/execute_solution", currentSolution_);
     }
 }
 
@@ -297,17 +300,11 @@ void Executive::publishGoalTarget(Pose<> goalTargetArea)
     pubStatusGoalTarget_.publish(messageLanding);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::publishInternalGoalSolution(Solution<GridSolutionItem>* solution)
 {
     if (solution)
     {
-        ros::Time planningTime = ros::Time::now();
-
-        srslib_framework::MsgSolution messageSolution =
-            SolutionMessageFactory::gridSolution2Msg(*solution);
-        pubInternalGoalSolution_.publish(messageSolution);
-
         nav_msgs::Path messagePath = SolutionMessageFactory::gridSolution2PathMsg(*solution);
         pubStatusGoalPlan_.publish(messagePath);
     }
@@ -353,6 +350,11 @@ void Executive::stepExecutiveFunctions()
         executePlanToGoal();
         publishGoalTarget(currentGoal_);
         publishInternalGoalSolution(currentSolution_);
+
+        if (currentSolution_)
+        {
+            RosCallSolution::call("srsnode_motion", "/trigger/execute_solution", currentSolution_);
+        }
     }
 
     if (tapCmdInitialPose_.newDataAvailable())

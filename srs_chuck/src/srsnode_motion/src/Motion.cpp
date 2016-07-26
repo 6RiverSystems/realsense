@@ -122,6 +122,7 @@ void Motion::connectAllTaps()
     triggerPause_.connectService();
     triggerStop_.connectService();
     triggerShutdown_.connectService();
+    triggerExecuteSolution_.connectService();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,6 +156,15 @@ void Motion::evaluateTriggers()
         else
         {
             motionController_.switchToAutonomous();
+        }
+    }
+
+    // TODO: Convert this into a ROS action
+    if (triggerExecuteSolution_.newRequestPending())
+    {
+        if (!isJoystickLatched_)
+        {
+            executeSolution(triggerExecuteSolution_.getRequest());
         }
     }
 }
@@ -540,15 +550,6 @@ void Motion::scanTapsForData()
         isJoystickLatched_ = tapJoyAdapter_.getLatchState();
     }
 
-    // If there is a new solution has been communicated
-    if (tapInternalGoalSolution_.newDataAvailable())
-    {
-        if (!isJoystickLatched_)
-        {
-            executeSolution(tapInternalGoalSolution_.getSolution());
-        }
-    }
-
     // Check if odometry or APS data is available
     isOdometryAvailable_ = tapOdometry_.newDataAvailable();
     isApsAvailable_ = tapAps_.newDataAvailable();
@@ -598,9 +599,9 @@ void Motion::stepNode()
     }
     else
     {
-        // Depending on the state of the joystick latch, enable or disable
-        // the autonomous mode
-        if (isJoystickLatched_)
+        // If the joystick has been latched or the current robot pose
+        // is not valid switch to manual mode
+        if (isJoystickLatched_ || !positionEstimator_.isPoseValid())
         {
             motionController_.switchToManual();
         }
@@ -622,10 +623,7 @@ void Motion::stepNode()
     // Run the motion controller if the estimated position is valid. No
     // motion is allowed if a position has been established
     Pose<> currentPose = positionEstimator_.getPose();
-    if (currentPose.isValid())
-    {
-        motionController_.run(currentPose, currentOdometry, currentJoystickCommand);
-    }
+    motionController_.run(currentPose, currentOdometry, currentJoystickCommand);
 }
 
 } // namespace srs

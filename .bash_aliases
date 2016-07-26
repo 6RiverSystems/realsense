@@ -30,7 +30,6 @@ function updateChuck() {
 
 function buildChuck() {
   getChuckDirectory &&
-
   pushd "$baseDirectory/srs_chuck" &&
   catkin_make &&
   source devel/setup.bash &&
@@ -135,8 +134,8 @@ alias chuckupdate=updateChuck
 alias chuckclean=cleanChuck
 alias chuckbuild=buildChuck
 alias chuckrun=runChuck
-alias chuckstart=stopChuck
-alias chuckstop=startChuck
+alias chuckstart=startChuck
+alias chuckstop=stopChuck
 alias chuckrestart=restartChuck
 alias chuckshow=showChuck
 alias chuckrecord=recordChuck

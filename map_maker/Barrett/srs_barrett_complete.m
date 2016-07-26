@@ -24,7 +24,7 @@ map = mm_addStaticObstacle(map, 0.0, 59.67, 13.79, 86.40 + OBSTACLE, 0.7);
 map = mm_addStaticObstacle(map, 13.23, 0.0, 28.90, 1.52, 0.7);
 
 % OB03
-map = mm_addStaticObstacle(map, 25.29, 2.98, 26.10, 3.24, 0.4);
+map = mm_addStaticObstacle(map, 25.35, 3.21, 26.25, 3.61, 0.6);
 
 % OB04
 map = mm_addStaticObstacle(map, 28.90, 0.0, 36.36, 23.76 + OBSTACLE, 0.7);

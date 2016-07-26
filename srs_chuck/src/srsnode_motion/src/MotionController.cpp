@@ -204,8 +204,7 @@ void MotionController::setConfiguration(MotionConfig& configuration)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::switchToManual()
 {
-    // Ignore the request request if an
-    // emergency has been declared
+    // Ignore the request if an emergency has been declared
     if (isEmergencyDeclared())
     {
         return;
@@ -227,8 +226,8 @@ void MotionController::switchToManual()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::switchToAutonomous()
 {
-    // Ignore the request request if an
-    // emergency has been declared
+    // Ignore the request request if an emergency has been declared
+    // or the motion controller has an invalid robot pose
     if (isEmergencyDeclared())
     {
         return;
@@ -499,22 +498,31 @@ string MotionController::printWorkToString()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::popWorkItem(TaskEnum& task, SolutionType& solution)
 {
-    // First, find the work to do
-    WorkType work = work_.front();
-    work_.pop_front();
-
-    // Schedule the next task
-    task = static_cast<TaskEnum>(work.first);
-
-    // Specify the next solution (if any)
-    if (work.second)
+    if (!work_.empty())
     {
-        solution = *work.second;
-        delete work.second;
+        // First, find the work to do
+        WorkType work = work_.front();
+        work_.pop_front();
+
+        // Schedule the next task
+        task = static_cast<TaskEnum>(work.first);
+
+        // Specify the next solution (if any)
+        if (work.second)
+        {
+            solution = *work.second;
+            delete work.second;
+        }
+        else
+        {
+            solution.clear();
+        }
     }
     else
     {
-        solution.clear();
+        // It should never get here
+        // TODO: Make sure to add an exception for this situation
+        throw;
     }
 }
 

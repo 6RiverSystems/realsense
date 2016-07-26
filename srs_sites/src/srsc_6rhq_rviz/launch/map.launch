@@ -39,5 +39,6 @@
         <arg name="target_map" value="$(find srsc_6rhq_rviz)/map/$(arg customer_map)" />
         <arg name="target_anchors" value="$(find srsc_6rhq_rviz)/map/$(arg customer_anchors)" />
         <arg name="robot_configuration" value="$(find srsc_6rhq_rviz)/robots/$(arg robot_configuration)" />
+        <arg name="simulation" value="$(arg use_sim_time)" />
     </include>
 </launch>

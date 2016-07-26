@@ -29,10 +29,6 @@ function updateChuck() {
 }
 
 function buildChuck() {
-  stopChuck &&
-
-  cleanChuck &&
-
   getChuckDirectory &&
 
   pushd "$baseDirectory/srs_chuck" &&
@@ -43,8 +39,6 @@ function buildChuck() {
   catkin_make &&
   source devel/setup.bash &&
   popd
-
-  startChuck
 }
 
 function runChuck() {
@@ -125,14 +119,13 @@ recordChuck() {
   if [ -z "$1" ]; then
       echo "No argument supplied"
   else
-    rosbag record -O "$1" /camera/color/camera_info /camera/color/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
+    echo "Recording realsense bag: $1.bag"
+    rosbag record -O "$1.bag" /camera/color/camera_info /camera/color/image_raw /camera/depth/camera_info /camera/depth/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
 
-    sleep 1s
-
-    echo "$1.tar.gz" "$1.bag"
-
+    echo "Compressing bag: $1.bag => $1.tar.gz"
     tar -czvf "$1.tar.gz" "$1.bag"
 
+    echo "Removing uncompressed bag $1"
     rm "$1.bag"
   fi
 }

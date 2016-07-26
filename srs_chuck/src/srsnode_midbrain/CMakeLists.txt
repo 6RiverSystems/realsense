@@ -23,11 +23,10 @@ set(PROJECT_NODE ${PROJECT_NAME})
 set(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_BUILD_TYPE Debug)
 
-set(Boost_ADDITIONAL_VERSIONS "1.61" "1.61.0")
+#set(Boost_ADDITIONAL_VERSIONS "1.61" "1.61.0")
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
-    rostest
     dynamic_reconfigure
     srslib_framework
     srslib_test
@@ -38,6 +37,7 @@ generate_dynamic_reconfigure_options(
 )
 
 include_directories(include
+    src/
     include/
     ${catkin_INCLUDE_DIRS}
     ${srslib_framework_INCLUDE_DIRS}
@@ -48,7 +48,7 @@ include_directories(include
 # Target
 
 catkin_package(
-    CATKIN_DEPENDS srslib_framework
+    DEPENDS srslib_framework
 )
 
 add_executable(${PROJECT_NODE} 
@@ -75,7 +75,7 @@ target_link_libraries(${PROJECT_NODE}
 
 if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(Test_Reflexes
-    	test/Test_Reflexes.cpp
+        test/Test_Reflexes.cpp
         src/ObstacleDetector.cpp
     )
     add_dependencies(Test_Reflexes

@@ -87,7 +87,7 @@ private:
 
 	double				m_angularVelocity;
 
-	uint32_t 			m_objectThreshold;
+	uint32_t			m_objectThreshold;
 
 	double				m_footprint;
 

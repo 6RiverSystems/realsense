@@ -70,13 +70,13 @@
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="clean" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="make" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
-				<buildArguments>clean</buildArguments>
-				<buildTarget>clean</buildTarget>
+				<buildArguments/>
+				<buildTarget/>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
-				<runAllBuilders>true</runAllBuilders>
+				<runAllBuilders>false</runAllBuilders>
 			</target>
 			<target name="run_tests_srslib_framework" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>

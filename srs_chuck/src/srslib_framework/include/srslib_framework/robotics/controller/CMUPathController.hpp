@@ -47,7 +47,7 @@ public:
         BaseController::setRobotProfile(robot, robot.pathFollowKv, robot.pathFollowKw);
     }
 
-    void setTrajectory(Trajectory<> trajectory, Pose<> robotPose);
+    void setTrajectory(Pose<> robotPose, Trajectory<> trajectory, Pose<> goal);
 
 protected:
     void calculateLanding(Pose<> goal);

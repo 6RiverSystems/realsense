@@ -53,7 +53,7 @@ public:
 		m_strAnchorFile = currentPath.c_str( );
 		m_strAnchorFile += "/anchors.yaml";
 
-		ROS_DEBUG_NAMED( "transform", "Anchor file: %s", m_strAnchorFile.c_str( ) );
+		ROS_DEBUG_NAMED( "transform", "Stargazer: Anchor file: %s", m_strAnchorFile.c_str( ) );
 
 		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, 0.0f } );
 		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, 90.0f } );
@@ -154,7 +154,7 @@ TEST_F( StargazerTest, TestTransforms )
 
 			tf::Vector3 origin = anchorTransform.getOrigin( );
 
-			ROS_DEBUG_NAMED( "transform", "Testing anchor: id: %d, x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
+			ROS_DEBUG_NAMED( "transform", "Stargazer: Testing anchor: id: %d, x: %2.5f y: %2.5f z: %2.5f angle: %2.5f",
 				anchorId, origin.getX( ), origin.getY( ), origin.getZ( ), dfAngle );
 
 			for( auto point : m_vecTestPoints )

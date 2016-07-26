@@ -26,12 +26,11 @@ Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_velocitySubscriber( ),
 	m_commandPublisher( )
 {
-
 	bool obstacleDetected = false;
 
 	m_obstacleDetector.SetDetectionCallback( std::bind( &Reflexes::OnObstacleDetected, this ) );
 
-	Enable( true );
+	m_configServer.setCallback( boost::bind( &Reflexes::onConfigChange, this, _1, _2 ) );
 }
 
 Reflexes::~Reflexes( )
@@ -49,12 +48,16 @@ void Reflexes::Enable( bool enable )
 	{
 		if( enable )
 		{
+			ROS_INFO_NAMED( "obstacle_detection", "Enabling Obstacle Detection" );
+
 			CreateSubscribers( );
 
 			CreatePublishers( );
 		}
 		else
 		{
+			ROS_INFO_NAMED( "obstacle_detection", "Disabling Obstacle Detection" );
+
 			DestroySubscribers( );
 
 			DestroyPublishers( );
@@ -75,6 +78,8 @@ void Reflexes::SetObjectThreshold( uint32_t objectThreshold )
 
 void Reflexes::OnOperationalStateChanged( const srslib_framework::MsgOperationalState::ConstPtr& operationalState )
 {
+	ROS_INFO_STREAM_NAMED( "obstacle_detection", "OnOperationalStateChanged: " << operationalState->pause );
+
 	m_operationalState = *operationalState;
 }
 
@@ -109,16 +114,16 @@ void Reflexes::PublishDangerZone( ) const
 		polygon.push_back( corner );
 	}
 
-
 	messageLanding.polygon.points = polygon;
-
-	ROS_DEBUG_STREAM_THROTTLE_NAMED( 0.3, "obstacle_detection", "Danger Zone: " << dangerZone );
 
 	m_dangerZonePublisher.publish( messageLanding );
 }
 
 void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t level)
 {
+	ROS_INFO_NAMED( "obstacle_detection", "Midbrain config changed: od enabled: %d, hardStop: %d, threshold: %d",
+		config.enable_obstacle_detection, config.enable_hard_stop, config.object_threshold );
+
 	SetObjectThreshold( config.object_threshold );
 
 	Enable( config.enable_obstacle_detection );
@@ -128,11 +133,17 @@ void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t
 
 void Reflexes::OnObstacleDetected( )
 {
+	ROS_INFO_NAMED( "obstacle_detection", "OnObstacleDetected: paused: %d, enabled: %d, hardStop: %d",
+		m_operationalState.pause, m_enable, m_sendHardStop );
+
 	// Only send a hard stop if we are paused
 	if( !m_operationalState.pause &&
+		!m_operationalState.hardStop &&
 		m_enable &&
 		m_sendHardStop )
 	{
+		ROS_INFO_STREAM_NAMED( "obstacle_detection", "OnObstacleDetected: Sending STOP" );
+
 		// Send the hard stop
 		std_msgs::String msg;
 		msg.data = "STOP";
@@ -164,9 +175,9 @@ void Reflexes::DestroySubscribers( )
 
 void Reflexes::CreatePublishers( )
 {
-	m_commandPublisher = m_nodeHandle.advertise<std_msgs::String>( EVENT_TOPIC, 1, true );
+	m_commandPublisher = m_nodeHandle.advertise<std_msgs::String>( COMMAND_TOPIC, 1, true );
 
-	m_dangerZonePublisher = m_nodeHandle.advertise<geometry_msgs::PolygonStamped>(DANGER_ZONE_TOPIC, 1);
+	m_dangerZonePublisher = m_nodeHandle.advertise<geometry_msgs::PolygonStamped>( DANGER_ZONE_TOPIC, 1 );
 }
 
 void Reflexes::DestroyPublishers( )

@@ -9,16 +9,16 @@
 #include <string>
 using namespace std;
 
-#include <srslib_framework/ros/service/RosServiceTrigger.hpp>
+#include <srslib_framework/ros/service/RosServiceBoolTrigger.hpp>
 
 namespace srs {
 
 class RosTriggerPause :
-    public RosServiceTrigger
+    public RosServiceBoolTrigger
 {
 public:
     RosTriggerPause() :
-        RosServiceTrigger("pause", "Trigger: Pause")
+        RosServiceBoolTrigger("pause", "Trigger: Pause")
     {}
 };
 

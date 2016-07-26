@@ -80,7 +80,7 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan,
 	const uint32_t xStart = xDiff/2;
 
 	const double irRange = 0.3f;
-	const double distanceFromBot = 0.3f;
+	const double distanceFromBot = 0.01f;
 	const double cameraFOV = 70.0f;
 	// Calculate the maximum FOV width based on the ir range
 	const double cameraMaxYOffset = irRange * tan( cameraFOV / 2.0f * M_PI / 180.0f );

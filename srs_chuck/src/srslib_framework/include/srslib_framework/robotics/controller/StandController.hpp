@@ -6,9 +6,6 @@
 #ifndef STANDCONTROLLER_HPP_
 #define STANDCONTROLLER_HPP_
 
-#include <srslib_framework/math/AngleMath.hpp>
-#include <srslib_framework/math/BasicMath.hpp>
-
 #include <srslib_framework/robotics/controller/BaseController.hpp>
 
 namespace srs {

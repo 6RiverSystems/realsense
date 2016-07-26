@@ -47,9 +47,9 @@ void Midbrain::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Midbrain::evaluateTriggers()
 {
-    if (triggerPause_.isTriggerRequested())
-    {
-    }
+//    if (triggerPause_.isTriggerRequested())
+//    {
+//    }
 
     if (triggerShutdown_.isTriggerRequested())
     {

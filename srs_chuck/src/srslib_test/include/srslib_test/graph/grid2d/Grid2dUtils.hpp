@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef COMPARE_HPP_
-#define COMPARE_HPP_
+#ifndef GRID2DUTILS_HPP_
+#define GRID2DUTILS_HPP_
 
 #include <iostream>
 using namespace std;
@@ -40,4 +40,4 @@ struct Grid2dUtils
 } // namespace test
 } // namespace srs
 
-#endif // COMPARE_HPP_
+#endif // GRID2DUTILS_HPP_

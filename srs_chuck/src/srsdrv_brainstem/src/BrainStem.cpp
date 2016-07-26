@@ -118,7 +118,7 @@ void BrainStem::OnButtonEvent( LED_ENTITIES eButtonId )
 	}
 	else
 	{
-		ROS_ERROR( "Usnknown button entity %d", eButtonId );
+		ROS_ERROR( "Unknown button entity %d", eButtonId );
 	}
 }
 
@@ -321,7 +321,7 @@ void BrainStem::CreateSubscribers( )
 	m_llcmdSubscriber = m_rosNodeHandle.subscribe<std_msgs::String>( COMMAND_TOPIC, 100,
 	    std::bind( &BrainStem::OnRosCallback, this, std::placeholders::_1 ) );
 
-	m_llcmdSubscriber = m_rosNodeHandle.subscribe<geometry_msgs::Twist>( RACE_TOPIC, 100,
+	m_raceSubscriber = m_rosNodeHandle.subscribe<geometry_msgs::Twist>( RACE_TOPIC, 100,
 	    std::bind( &BrainStem::OnRace, this, std::placeholders::_1 ) );
 }
 

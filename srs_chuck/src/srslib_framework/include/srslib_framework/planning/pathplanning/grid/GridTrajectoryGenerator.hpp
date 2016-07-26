@@ -34,16 +34,15 @@ public:
     void fromSolution(Solution<GridSolutionItem>& solution)
     {
         trajectory_.clear();
-        originalPath_.clear();
-        reducedPath_.clear();
+        path_.clear();
 
         if (solution.empty())
         {
             return;
         }
 
-        extractPath(solution, originalPath_);
-        interpolatePath(reducedPath_);
+        extractPath(solution, path_);
+        interpolatePath(path_);
     }
 
     void getTrajectory(Trajectory<>& trajectory)
@@ -217,8 +216,7 @@ private:
         trajectory_.push_back(waypoint, annotation);
     }
 
-    PathType originalPath_;
-    PathType reducedPath_;
+    PathType path_;
 
     RobotProfile& robot_;
 

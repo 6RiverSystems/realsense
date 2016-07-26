@@ -85,7 +85,7 @@ bool StarGazerPointTransformer::Load( const std::string& strTargetFrame,
 
 	tf::Vector3 origin = m_footprintTransform.getOrigin( );
 
-	ROS_DEBUG_STREAM( "Stargazer footprint transform: x=" << origin.getX( ) << ", y=" << origin.getY( ) <<
+	ROS_DEBUG_STREAM( "Stargazer: Footprint transform: x=" << origin.getX( ) << ", y=" << origin.getY( ) <<
 		", z=" << origin.getZ( )  << ", orientation=" << tf::getYaw( m_footprintTransform.getRotation( ) ) );
 
 	return LoadAnchors( strAnchorsFile );
@@ -176,7 +176,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 				dfMapRotationDegrees += 360.0f;
 			}
 
-			stream << "Stargazer Data: " << nTagId << std::fixed << ", " <<
+			stream << "Stargazer: OM Data" << nTagId << std::fixed << ", " <<
 				tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
 				stargazerOffset.getX( ) << ", " << stargazerOffset.getY( ) << ", " << stargazerOffset.getZ( ) << ", " <<
 				totalCameraOffset.getX( ) << ", " << totalCameraOffset.getY( ) << ", " << totalCameraOffset.getZ( ) << ", " <<
@@ -186,7 +186,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 			std::string strData =  stream.str( );
 
-			ROS_DEBUG_NAMED( "transform", "%s", strData.c_str( ) );
+			ROS_DEBUG_STREAM_NAMED( "transform", strData );
 
 			static double_acc accLocalX;
 			static double_acc accLocalY;
@@ -229,7 +229,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 			{
 				std::ostringstream stream;
 
-				stream << "Stargazer Data: " << nTagId << std::fixed << ", " <<
+				stream << "Stargazer: OM Calibration Data => " << nTagId << std::fixed << ", " <<
 					tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
 					median( accLocalX ) << ", " << median( accLocalY ) << ", " << median( accLocalZ ) << ", " <<
 					median( accCameraX ) << ", " << median( accCameraY ) << ", " << median( accCameraZ ) << ", " <<
@@ -242,7 +242,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 				std::string strData =  stream.str( );
 
-				ROS_INFO_NAMED( "calibrate", "%s", strData.c_str( ) );
+				ROS_INFO_STREAM_NAMED( "calibrate", strData );
 
 				// reset accumulators
 				accLocalX = double_acc( );
@@ -267,7 +267,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 		}
 		else
 		{
-			ROS_DEBUG_NAMED( "transform", "Rejected anchor position: %04i (%2.2f, %2.2f, %2.2f) %2.2f degrees\n",
+			ROS_DEBUG_NAMED( "transform", "Stargazer: Rejected anchor position: %04i (%2.2f, %2.2f, %2.2f) %2.2f degrees\n",
 				nTagId, fX, fY, fZ, fAngleInDegrees );
 		}
 	}
@@ -275,7 +275,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 	{
 		m_filter.reportDeadZone( );
 
-		ROS_DEBUG_NAMED( "calibrate", "Invalid or Unknown Tag: %04i (%2.2f, %2.2f, %2.2f) %2.2f degrees\n",
+		ROS_DEBUG_NAMED( "calibrate", "Stargazer: Invalid or Unknown Tag: %04i (%2.2f, %2.2f, %2.2f) %2.2f degrees\n",
 			nTagId, fX, fY, fZ, fAngleInDegrees );
 	}
 
@@ -319,14 +319,14 @@ bool StarGazerPointTransformer::LoadAnchors( const std::string& strAnchorsFile )
 
 					tf::Transform transform( orientation, origin );
 
-					ROS_INFO_STREAM( "Stargazer anchor: x=" << origin.getX( ) << ", y=" << origin.getY( ) <<
+					ROS_INFO_STREAM( "Stargazer: anchor: x=" << origin.getX( ) << ", y=" << origin.getY( ) <<
 						", z=" << origin.getZ( )  << ", orientation=" << tf::getYaw( orientation ) * 180.0f / M_PI );
 
 					m_mapTransforms[anchorId] = transform;
 				}
 				catch( const boost::bad_lexical_cast& e )
 				{
-					ROS_ERROR_STREAM( "Could not convert anchor id to int: " << anchor.id << " " << e.what( ) );
+					ROS_ERROR_STREAM( "Stargazer: Could not convert anchor id to int: " << anchor.id << " " << e.what( ) );
 
 					bSuccess = false;
 				}
@@ -334,14 +334,14 @@ bool StarGazerPointTransformer::LoadAnchors( const std::string& strAnchorsFile )
 		}
 		else
 		{
-			ROS_ERROR_STREAM( "Configuration file not found: " << strAnchorsFile );
+			ROS_ERROR_STREAM( "Stargazer: Configuration file not found: " << strAnchorsFile );
 
 			bSuccess = false;
 		}
 	}
 	catch( const std::runtime_error& e )
 	{
-		ROS_ERROR_STREAM( "Could not parse yaml file for anchors: " << strAnchorsFile << " " << e.what( ) );
+		ROS_ERROR_STREAM( "Stargazer: Could not parse yaml file for anchors: " << strAnchorsFile << " " << e.what( ) );
 
 		bSuccess = false;
 	}

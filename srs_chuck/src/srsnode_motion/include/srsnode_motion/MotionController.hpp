@@ -198,8 +198,11 @@ private:
 
     void setHasArrived(bool newValue)
     {
-        hasArrived_ = newValue;
-        hasArrivedChanged_ = true;
+        if (newValue != hasArrived_)
+        {
+            hasArrived_ = newValue;
+            hasArrivedChanged_ = true;
+        }
     }
 
     void taskEmergencyStop();

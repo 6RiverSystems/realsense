@@ -37,7 +37,7 @@ unordered_map<int, string> MotionController::TASK_NAMES = {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 MotionController::MotionController(double dT) :
     dT_(dT),
-    hasArrived_(false),
+    hasArrived_(true),
     hasArrivedChanged_(false),
     rosNodeHandle_()
 {
@@ -149,7 +149,7 @@ void MotionController::reset()
 
     currentOdometry_ = Odometry<>();
 
-    hasArrived_ = false;
+    hasArrived_ = true;
     hasArrivedChanged_ = false;
 
     cleanWorkQueue();
@@ -264,8 +264,10 @@ void MotionController::aggregateInitialRotations(Pose<> pose,
 
     Pose<> fromPose = Pose<>(node.fromPose.x, node.fromPose.y, pose.theta);
 
-    // Remove all the ROTATE nodes at the beginning of the solution
-    while (node.actionType == GridSolutionItem::ROTATE)
+    // Remove all the ROTATE nodes at the beginning of the solution. Check
+    // if the solution is empty while doing that in case it was composed exclusively by
+    // ROTATE commands
+    while (node.actionType == GridSolutionItem::ROTATE && !solution->empty())
     {
         // Remove the rotation from the original solution
         solution->erase(solution->begin());
@@ -410,32 +412,32 @@ void MotionController::checkMotionStatus()
     // the work has not been canceled for some reason
     if (activeController_->isGoalReached())
     {
-        if (activeController_->isCanceled())
+        if (!activeController_->isCanceled())
         {
             ROS_DEBUG_STREAM_NAMED("motion_controller", "Controller " <<
-                activeController_->getName() << " goal canceled");
+                activeController_->getName() << " reached its goal");
+
+            // If the active controller is the path controller, it is not
+            // guaranteed that the final angle of the robot matches the angle
+            // of the goal. In that case, a rotation is added to complete the movement
+            if (isPathControllerActive())
+            {
+                // Try to optimize rotations checking the next work scheduled
+                // and the current orientation of the robot
+                executeFinalRotation();
+            }
+
+            // If the robot was using moving controllers, but everything has
+            // been completed, declare that the requested goal was reached
+            if (isMovingControllerActive() && !isWorkPending())
+            {
+                setHasArrived(true);
+            }
         }
         else
         {
             ROS_DEBUG_STREAM_NAMED("motion_controller", "Controller " <<
-                activeController_->getName() << " reached its goal");
-        }
-
-        // If the active controller is the path controller, it is not
-        // guaranteed that the final angle of the robot matches the angle
-        // of the goal. In that case, a rotation is added to complete the movement
-        if (isPathControllerActive() && !activeController_->isCanceled())
-        {
-            // Try to optimize rotations checking the next work scheduled
-            // and the current orientation of the robot
-            executeFinalRotation();
-        }
-
-        // If the robot was using moving controllers, but everything has
-        // been completed, declare that the requested goal was reached
-        if (isMovingControllerActive() && !isWorkPending())
-        {
-            setHasArrived(true);
+                activeController_->getName() << " goal canceled");
         }
 
         // If no emergency has been declared, consider more work
@@ -701,29 +703,34 @@ void MotionController::taskNormalStop()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::taskPathFollow()
 {
+    Trajectory<> trajectory;
+
     if (!currentSolution_.empty())
     {
         // Store what goal the controller is going to work on
         currentShortTermGoal_ = currentSolution_.getGoal().toPose;
 
         // Calculate the trajectory
-        Trajectory<> trajectory;
         GridTrajectoryGenerator converter(robot_);
 
         converter.fromSolution(currentSolution_);
         converter.getTrajectory(trajectory);
 
         ROS_DEBUG_STREAM_NAMED("motion_controller", "Trajectory: " << trajectory);
-
-        // Pass the trajectory to the path controller
-        pathController_->setTrajectory(trajectory, currentPose_);
     }
     else
     {
-        // If an empty solution was passed to the Path Controller
-        // cancel the movement right away. The next cycle will set the flag ARRIVED
-        pathController_->cancel();
+        // Store what goal the controller is going to work on
+        currentShortTermGoal_ = currentPose_;
+
+        // If an empty solution was passed, the goal that the
+        // Path Controller is going to work on is the current
+        // position. In the next cycle, the controller itself will declare
+        // that the robot has arrived to the goal
     }
+
+    // Pass the trajectory to the path controller
+    pathController_->setTrajectory(currentPose_, trajectory, currentShortTermGoal_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -19,7 +19,7 @@
   <arg name="depth_width"     default="480" />
   <arg name="depth_height"    default="360" />
   <arg name="depth_fps"       default="30" />
-  <arg name="color_fps"       default="30" />
+  <arg name="color_fps"       default="30" />sdfd
 
   <!-- Arguments for remapping all device namespaces -->
   <arg name="depth"            default="depth" />

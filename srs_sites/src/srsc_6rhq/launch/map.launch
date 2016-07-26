@@ -10,12 +10,6 @@
     <arg name="customer_anchors" value="6rhq-anchors.yaml" />
     <arg name="robot_configuration" value="$(optenv ROBOT_NAME development).yaml" />
 
-    <arg name="paused" default="false" />
-    <arg name="use_sim_time" default="true" />
-    <arg name="gui" default="true" />
-    <arg name="headless" default="false" />
-    <arg name="debug" default="true" />
-
     <!-- Launch the robot with the specified cost parameters -->
     <include file="$(find srsbot_chuck)/launch/robot.launch">
         <arg name="target_map" value="$(find srsc_6rhq)/map/$(arg customer_map)" />

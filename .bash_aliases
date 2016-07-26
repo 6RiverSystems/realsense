@@ -29,13 +29,7 @@ function updateChuck() {
 }
 
 function buildChuck() {
-  stopChuck &&
-
-  cleanChuck &&
-
-  getChuckDirectory &&
-
-  pushd "$baseDirectory/srs_chuck" &&
+ pushd "$baseDirectory/srs_chuck" &&
   catkin_make &&
   source devel/setup.bash &&
   popd &&
@@ -43,8 +37,6 @@ function buildChuck() {
   catkin_make &&
   source devel/setup.bash &&
   popd
-
-  startChuck
 }
 
 function runChuck() {

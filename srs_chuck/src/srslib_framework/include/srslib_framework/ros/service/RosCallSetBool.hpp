@@ -3,8 +3,8 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSSERVICECALL_HPP_
-#define ROSSERVICECALL_HPP_
+#ifndef ROSCALLSETBOOL_HPP_
+#define ROSCALLSETBOOL_HPP_
 
 #include <string>
 using namespace std;
@@ -15,34 +15,10 @@ using namespace std;
 
 namespace srs {
 
-struct RosServiceCall
+struct RosCallSetBool
 {
 public:
-    static bool callEmpty(string node, string trigger)
-    {
-        ros::NodeHandle rosNodeHandle;
-
-        string fullServiceName = node + trigger;
-
-        ros::ServiceClient client = rosNodeHandle.serviceClient<std_srvs::Empty>(fullServiceName);
-        std_srvs::Empty::Request req;
-        std_srvs::Empty::Response resp;
-
-        if (client.call(req, resp))
-        {
-            ROS_DEBUG_STREAM_NAMED("ros_service_call", "The node " << node <<
-                " responded to a " << trigger << " request.");
-
-            return true;
-        }
-
-        ROS_DEBUG_STREAM_NAMED("ros_service_call", "The node " << node <<
-            " did not respond to a " << trigger << " request.");
-
-        return false;
-    }
-
-    static bool callSetBool(string node, string trigger, bool value)
+    static bool call(string node, string trigger, bool value)
     {
         ros::NodeHandle rosNodeHandle;
 
@@ -70,4 +46,4 @@ public:
 
 } // namespace srs
 
-#endif // ROSSERVICECALL_HPP_
+#endif // ROSCALLSETBOOL_HPP_

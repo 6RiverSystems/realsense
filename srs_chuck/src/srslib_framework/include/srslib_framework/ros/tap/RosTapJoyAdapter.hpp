@@ -10,6 +10,7 @@
 using namespace std;
 
 #include <std_msgs/Bool.h>
+#include <geometry_msgs/Twist.h>
 
 #include <srslib_framework/ros/RosTap.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>

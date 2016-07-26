@@ -73,11 +73,11 @@ struct SolutionMessageFactory
      *
      * @return Solution of GridSolutionItem generated from the specified MsgSolution
      */
-    static Solution<GridSolutionItem> msg2Solution(srslib_framework::MsgSolutionConstPtr message)
+    static Solution<GridSolutionItem> msg2Solution(srslib_framework::MsgSolution message)
     {
         Solution<GridSolutionItem> solution;
 
-        for (auto solutionItem : message->items)
+        for (auto solutionItem : message.items)
         {
             GridSolutionItem gridSolutionItem = SolutionMessageFactory::msg2GridSolutionItem(
                 solutionItem);
@@ -86,6 +86,18 @@ struct SolutionMessageFactory
         }
 
         return solution;
+    }
+
+    /**
+     * @brief Convert a MsgSolutionConstPtr type into a Solution of GridSolutionItem.
+     *
+     * @param message Solution message to convert
+     *
+     * @return Solution of GridSolutionItem generated from the specified MsgSolutionConstPtr
+     */
+    static Solution<GridSolutionItem> msg2Solution(srslib_framework::MsgSolutionConstPtr message)
+    {
+        return SolutionMessageFactory::msg2Solution(*message);
     }
 
     /**

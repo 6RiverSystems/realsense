@@ -350,7 +350,11 @@ void Executive::stepExecutiveFunctions()
         executePlanToGoal();
         publishGoalTarget(currentGoal_);
         publishInternalGoalSolution(currentSolution_);
-        RosCallSolution::call("srsnode_motion", "/trigger/execute_solution", currentSolution_);
+
+        if (currentSolution_)
+        {
+            RosCallSolution::call("srsnode_motion", "/trigger/execute_solution", currentSolution_);
+        }
     }
 
     if (tapCmdInitialPose_.newDataAvailable())

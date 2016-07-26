@@ -76,7 +76,8 @@ void RealsenseDriver::OnInfraredData( const sensor_msgs::Image::ConstPtr& infrar
 	const double irMaxHeight = 0.5f; // 50%
 
 	sensor_msgs::LaserScan irScan;
-	irScan.header.frame_id = "laser_frame";
+	irScan.header.frame_id = "infraredImage1laser_frame";
+	irScan.header.stamp = infraredImage1->header.stamp;
 	irScan.angle_min		= -(realsenseHorizontalFOV / 2.0f);
 	irScan.angle_max		=  (realsenseHorizontalFOV / 2.0f);
 	irScan.angle_increment	= (irScan.angle_max - irScan.angle_min) / (double)numberOfScans;

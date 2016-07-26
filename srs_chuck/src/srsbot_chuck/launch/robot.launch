@@ -32,9 +32,7 @@
         <arg name="target_anchors" value="$(arg target_anchors)" />
     </include>
 
-    <include file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" >
-        <arg name="simulation" value="$(arg simulation)" />
-    </include>
+    <include file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" />
 
     <!-- Launch all the robot nodes -->
     <include file="$(find srsnode_joystick_adapter)/launch/node.launch" /> 

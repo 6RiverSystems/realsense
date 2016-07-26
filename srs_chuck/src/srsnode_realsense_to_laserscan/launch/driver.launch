@@ -7,9 +7,8 @@
 -->
 <launch>
 	<arg name="camera" default="camera" />
-	<arg name="simulation" default="false" />
 
-	<include unless="$(arg simulation)" file="$(find realsense_camera)/launch/r200_nodelet_rgbd.launch">
+	<include file="$(find realsense_camera)/launch/r200_nodelet_rgbd.launch">
 		<arg name="camera"          value="$(arg camera)" />
 		<arg name="publish_tf"		value="true" />
 		<arg name="depth"			value="depth" />

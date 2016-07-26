@@ -135,7 +135,9 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 		}
 	}
 
-	ROS_DEBUG_NAMED( "obstacle_detection", "frame: %s, scans: %d, linear vel: %0.2f, m_footprint: %0.2f, safeDistance: %.02f, Obstacles detected: %d, points: %s", scan->header.frame_id.c_str( ), numberOfScans, m_linearVelocity, m_footprint, safeDistance, numberOfObstacles, strPoints.c_str( ) );
+	ROS_DEBUG_NAMED( "obstacle_detection", "%s Scan:, scans: %d, linear vel: %0.2f, m_footprint: %0.2f, " \
+		"safeDistance: %.02f, Obstacles detected: %d, points: %s", isIrScan ? "IR" : "Depth", numberOfScans,
+		m_linearVelocity, m_footprint, safeDistance, numberOfObstacles, strPoints.c_str( ) );
 
 	if( numberOfObstacles > threshold )
 	{

@@ -63,11 +63,10 @@ void RealsenseDriver::OnInfraredData( const sensor_msgs::Image::ConstPtr& infrar
 	combinedMsg.encoding = infraredImage2->encoding;
 	combinedMsg.image    = combinedIRImage;
 
+	const uint32_t numberOfScans = combinedIRImage.cols;
 
-	const uint32_t xDiff = combinedIRImage.cols - numberOfScans;
-
-	// TODO:  We currently have a problem if the image is than the number of scans
-	const uint32_t xStart = xDiff/2;
+	const double realsenseHorizontalFOV = 70.0f;
+	const double realsenseVerticalFOV = 43.0f;
 
 	const double irRange = 0.3f;
 	const double distanceFromBot = 0.01f;
@@ -77,12 +76,12 @@ void RealsenseDriver::OnInfraredData( const sensor_msgs::Image::ConstPtr& infrar
 	const double irMaxHeight = 0.5f; // 50%
 
 	sensor_msgs::LaserScan irScan;
-	irScan.header			= scan->header;
-	irScan.angle_min		= scan->angle_min;
-	irScan.angle_max		= scan->angle_max;
-	irScan.angle_increment	= scan->angle_increment;
-	irScan.time_increment	= scan->time_increment;
-	irScan.scan_time		= scan->scan_time;
+	irScan.header.frame_id = "laser_frame";
+	irScan.angle_min		= -(realsenseHorizontalFOV / 2.0f);
+	irScan.angle_max		=  (realsenseHorizontalFOV / 2.0f);
+	irScan.angle_increment	= (irScan.angle_max - irScan.angle_min) / (double)numberOfScans;
+	irScan.time_increment	= 0.033;
+	irScan.scan_time		= 0.033;
 	irScan.range_min		= 0.0f;
 	// Max distance should be the hypotenuse of the triangle
 	irScan.range_max		= sqrt((cameraMaxYOffset*cameraMaxYOffset)+(distanceFromBot*distanceFromBot));
@@ -102,7 +101,7 @@ void RealsenseDriver::OnInfraredData( const sensor_msgs::Image::ConstPtr& infrar
 
 		for( int y = 0; y < maxHeight; y++ )
 		{
-			if( combinedIRImage.at<uint8_t>(y, x + xStart) == THRESHOLD_VALUE )
+			if( combinedIRImage.at<uint8_t>(y, x) == THRESHOLD_VALUE )
 			{
 				//            y Offset
 				//             ------

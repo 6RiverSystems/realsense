@@ -33,7 +33,7 @@
         
 		<param name="scan_height" value="10"/>
 		<param name="scan_time" value="0.033"/>
-		<param name="output_frame_id" value="/camera_depth_frame"/>
+		<param name="output_frame_id" value="/laser_frame"/>
 		<param name="range_min" value="0.01"/>
 		<param name="range_max" value="8.00"/>
 		<param name="concurrency_level" value="0"/>

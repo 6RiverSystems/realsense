@@ -29,7 +29,8 @@ function updateChuck() {
 }
 
 function buildChuck() {
- pushd "$baseDirectory/srs_chuck" &&
+  getChuckDirectory &&
+  pushd "$baseDirectory/srs_chuck" &&
   catkin_make &&
   source devel/setup.bash &&
   popd &&

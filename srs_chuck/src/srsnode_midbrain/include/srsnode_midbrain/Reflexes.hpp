@@ -48,18 +48,16 @@ private:
     void OnObstacleDetected( );
 
 	void CreateSubscribers( );
-	void DestroySubscribers( );
 
 	void CreatePublishers( );
-	void DestroyPublishers( );
 
 	static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/operational_state";
 
 	static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
 
-	static constexpr auto DEPTH_SCAN_TOPIC = "/camera/depth/scan";
+	static constexpr auto DEPTH_SCAN_TOPIC = "/camera/depth/scan_filtered";
 
-	static constexpr auto IR_SCAN_TOPIC = "/camera/infrared/scan";
+	static constexpr auto IR_SCAN_TOPIC = "/camera/infrared/scan_filtered";
 
 	static constexpr auto DANGER_ZONE_TOPIC = "/internal/state/reflexes/danger_zone";
 

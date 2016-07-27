@@ -56,7 +56,7 @@ void RealsenseDriver::OnInfraredData( const sensor_msgs::Image::ConstPtr& infrar
 	//CombineImages( cvImage1->image, cvImage2->image, combinedIRImage );
 
 	combinedIRImage = cvImage1->image -  cvImage2->image;
-	//	cv::medianBlur( combinedIRImage, combinedIRImage, 7 );
+	v::medianBlur( combinedIRImage, combinedIRImage, 7 );
 
 	cv_bridge::CvImage combinedMsg;
 	combinedMsg.header   = infraredImage2->header;
@@ -158,7 +158,7 @@ cv_bridge::CvImagePtr RealsenseDriver::GetCvImage( const sensor_msgs::Image::Con
 void RealsenseDriver::ThresholdImage( cv::Mat& image ) const
 {
 	// Apply a binary threshold filter to remove all but the saturated pixels
-	cv::threshold( image, image, 80, THRESHOLD_VALUE, cv::THRESH_BINARY );
+	cv::threshold( image, image, 150, THRESHOLD_VALUE, cv::THRESH_BINARY );
 }
 
 void RealsenseDriver::CombineImages( cv::Mat& image1, cv::Mat& image2, cv::Mat& result ) const

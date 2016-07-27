@@ -42,9 +42,15 @@
 	<node name="srsnode_realsense_to_laserscan" pkg="srsnode_realsense_to_laserscan" type="srsnode_realsense_to_laserscan"
 		output="screen" respawn="true"/>
 
-	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter">
-		<remap from="scan" to="/camera/scan" />
-		<remap from="scan_filtered" to="/camera/scan_filtered" />
+	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="ir_laser_filter">
+		<remap from="scan" to="/camera/infrared/scan" />
+		<remap from="scan_filtered" to="/camera/infrared/scan_filtered" />
+		<rosparam command="load" file="$(find srsnode_realsense_to_laserscan)/launch/laser_filter.yaml" />
+	</node>
+
+	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="depth_laser_filter">
+		<remap from="scan" to="/camera/depth/scan" />
+		<remap from="scan_filtered" to="/camera/depth/scan_filtered" />
 		<rosparam command="load" file="$(find srsnode_realsense_to_laserscan)/launch/laser_filter.yaml" />
 	</node>
 

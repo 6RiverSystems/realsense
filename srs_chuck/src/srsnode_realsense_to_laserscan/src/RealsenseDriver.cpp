@@ -56,7 +56,7 @@ void RealsenseDriver::OnInfraredData( const sensor_msgs::Image::ConstPtr& infrar
 	//CombineImages( cvImage1->image, cvImage2->image, combinedIRImage );
 
 	combinedIRImage = cvImage1->image -  cvImage2->image;
-	v::medianBlur( combinedIRImage, combinedIRImage, 7 );
+	cv::medianBlur( combinedIRImage, combinedIRImage, 7 );
 
 	cv_bridge::CvImage combinedMsg;
 	combinedMsg.header   = infraredImage2->header;

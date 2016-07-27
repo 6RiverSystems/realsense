@@ -87,9 +87,8 @@ void RealsenseDriver::OnInfraredData( const sensor_msgs::Image::ConstPtr& infrar
 	ThresholdImage( cvImage2->image );
 
 	cv::Mat combinedIRImage;
-	//CombineImages( cvImage1->image, cvImage2->image, combinedIRImage );
+	CombineImages( cvImage1->image, cvImage2->image, combinedIRImage );
 
-	combinedIRImage = cvImage1->image -  cvImage2->image;
 	cv::medianBlur( combinedIRImage, combinedIRImage, 7 );
 
 	cv_bridge::CvImage combinedMsg;
@@ -196,20 +195,22 @@ void RealsenseDriver::ThresholdImage( cv::Mat& image ) const
 	cv::threshold( image, image, 150, THRESHOLD_VALUE, cv::THRESH_BINARY );
 }
 
-void RealsenseDriver::CombineImages( cv::Mat& image1, cv::Mat& image2, cv::Mat& result ) const
+void RealsenseDriver::CombineImages( cv::Mat& imageLeft, cv::Mat& imageRight, cv::Mat& result ) const
 {
-	if( image1.cols == image2.cols &&
-		image1.rows == image2.rows )
+	if( imageLeft.cols == imageRight.cols &&
+		imageLeft.rows == imageRight.rows )
 	{
 		constexpr uint32_t irOffset = 70;
 
 		// Further optimization: Use stitching algorithm to align images (not sure it's worth the cycles though)
-		cv::Mat combined( image1.rows, image1.cols + irOffset, image1.type( ) );
+		cv::Mat expandedLeft( imageLeft.rows, imageLeft.cols + irOffset, imageRight.type( ) );
+		cv::Mat expandedRight( imageLeft.rows, imageLeft.cols + irOffset, imageRight.type( ) );
 
-		image1.copyTo( combined( cv::Rect( 0, 0, image1.cols, image1.rows ) ) );
-		image2.copyTo( combined( cv::Rect( irOffset, 0, image2.cols, image2.rows ) ) );
+		imageLeft.copyTo( expandedLeft( cv::Rect( 0, 0, imageLeft.cols, imageLeft.rows ) ) );
 
-		result = combined;
+		imageRight.copyTo( expandedRight( cv::Rect( irOffset, 0, imageRight.cols, imageRight.rows ) ) );
+
+		result = imageLeft - imageRight;
 	}
 }
 

@@ -51,7 +51,8 @@ ObstacleDetector::ObstacleDetector( double footprint ) :
 	m_angularVelocity( 0.0f ),
 	m_irThreshold( 0 ),
 	m_depthThreshold( 0 ),
-	m_footprint( footprint )
+	m_footprint( footprint ),
+	m_testMode( false )
 {
 
 }
@@ -64,6 +65,16 @@ ObstacleDetector::~ObstacleDetector( )
 void ObstacleDetector::SetDetectionCallback( ObstacleDetectedFn obstacleDetectedCallback )
 {
 	m_obstacleDetectedCallback = obstacleDetectedCallback;
+}
+
+void ObstacleDetector::SetTestMode( bool testMode )
+{
+	m_testMode = testMode;
+}
+
+bool ObstacleDetector::GetTestMode( ) const
+{
+	return m_testMode;
 }
 
 void ObstacleDetector::SetVelocity( double linear, double angular )
@@ -81,11 +92,12 @@ void ObstacleDetector::SetThreshold( uint32_t irThreshold, uint32_t depthThresho
 
 void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan )
 {
-	// if( m_linearVelocity == 0.0f &&
-	// 	m_angularVelocity == 0.0f )
-	// {
-	// 	return;
-	// }
+	if( !GetTestMode( ) &&
+		m_linearVelocity == 0.0f &&
+	 	m_angularVelocity == 0.0f )
+	 {
+	 	return;
+	 }
 
 	uint32_t threshold = isIrScan ? m_irThreshold : m_depthThreshold;
 
@@ -161,7 +173,8 @@ double ObstacleDetector::GetSafeDistance( double velocity ) const
 {
 	double safeDistance = 0.0f;
 
-	if( velocity >= 0.2f )
+	if( velocity >= 0.1f ||
+		GetTestMode( ) )
 	{
 		// Calculated from actual measurements and polynomial regression fitting
 		// https://docs.google.com/a/6river.com/spreadsheets/d/1wUPgpESlp-MVbnMGCmFDGH22qyO39D8kzvi7IPZ1Q1c/edit?usp=sharing

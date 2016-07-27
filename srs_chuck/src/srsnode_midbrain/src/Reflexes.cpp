@@ -151,26 +151,30 @@ void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t
 	Enable( config.enable_ir_scan, config.enable_depth_scan );
 
 	m_sendHardStop = config.enable_hard_stop;
+
+	m_obstacleDetector.SetTestMode( config.test_mode );
 }
 
 void Reflexes::OnObstacleDetected( )
 {
-	return;
-	ROS_INFO_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: paused: %d, hardStop: %d",
-		m_operationalState.pause, m_sendHardStop );
-
-	// Only send a hard stop if we are paused
-	if( !m_operationalState.pause &&
-		!m_operationalState.hardStop &&
-		m_sendHardStop )
+	if( !m_obstacleDetector.GetTestMode( ) )
 	{
-		ROS_INFO_STREAM_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: Sending STOP" );
+		ROS_INFO_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: paused: %d, hardStop: %d",
+			m_operationalState.pause, m_sendHardStop );
 
-		// Send the hard stop
-		std_msgs::String msg;
-		msg.data = "STOP";
+		// Only send a hard stop if we are paused
+		if( !m_operationalState.pause &&
+			!m_operationalState.hardStop &&
+			m_sendHardStop )
+		{
+			ROS_INFO_STREAM_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: Sending STOP" );
 
-		m_commandPublisher.publish( msg );
+			// Send the hard stop
+			std_msgs::String msg;
+			msg.data = "STOP";
+
+			m_commandPublisher.publish( msg );
+		}
 	}
 }
 

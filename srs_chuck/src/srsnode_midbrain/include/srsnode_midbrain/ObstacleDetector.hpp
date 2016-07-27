@@ -67,6 +67,9 @@ public:
 
 	void SetDetectionCallback( ObstacleDetectedFn obstacleDetectedCallback );
 
+	void SetTestMode( bool testMode );
+	bool GetTestMode( ) const;
+
 	void SetVelocity( double linear, double angular );
 
 	void SetThreshold( uint32_t irThreshold, uint32_t depthThreshold );
@@ -82,6 +85,8 @@ public:
 private:
 
 	ObstacleDetectedFn	m_obstacleDetectedCallback;
+
+	bool				m_testMode;
 
 	double				m_linearVelocity;
 

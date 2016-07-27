@@ -118,9 +118,6 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 			double fX = scanDistance * cos( angle );
 			double fY = scanDistance * sin( angle );
 
-			sprintf( pszPoints, "%.1f, ", scanDistance );
-			strPoints += pszPoints;
-
 			// TODO: Use polygon trajectory path for more accuracy
 			// laser scan in polygon to determine if we have a  hit
 			// possibly also use raw point cloud (3d space) to see how
@@ -129,21 +126,33 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 			{
 				if( fabs( fY ) <= m_footprint )
 				{
+					sprintf( pszPoints, "%.1f, ", scanDistance );
+					strPoints += pszPoints;
+
 					numberOfObstacles++;
 				}
 			}
 		}
 	}
 
-	ROS_DEBUG_NAMED( "obstacle_detection", "%s Scan:, scans: %d, linear vel: %0.2f, m_footprint: %0.2f, " \
-		"safeDistance: %.02f, Obstacles detected: %d, points: %s", isIrScan ? "IR" : "Depth", numberOfScans,
-		m_linearVelocity, m_footprint, safeDistance, numberOfObstacles, strPoints.c_str( ) );
-
 	if( numberOfObstacles > threshold )
 	{
+		ROS_ERROR_NAMED( "obstacle_detection", "%s Scan:, scans: %d, linear vel: %0.2f, m_footprint: %0.2f, " \
+			"safeDistance: %.02f, Obstacles detected: %d, points: %s", isIrScan ? "IR" : "Depth", numberOfScans,
+			m_linearVelocity, m_footprint, safeDistance, numberOfObstacles, strPoints.c_str( ) );
+
 		if( m_obstacleDetectedCallback )
 		{
 			m_obstacleDetectedCallback( );
+		}
+	}
+	else
+	{
+		if( strPoints.size( ) )
+		{
+			ROS_DEBUG_THROTTLE_NAMED( 1.0, "obstacle_detection", "%s Scan:, scans: %d, linear vel: %0.2f, m_footprint: %0.2f, " \
+				"safeDistance: %.02f, Obstacles detected: %d, points: %s", isIrScan ? "IR" : "Depth", numberOfScans,
+				m_linearVelocity, m_footprint, safeDistance, numberOfObstacles, strPoints.c_str( ) );
 		}
 	}
 }

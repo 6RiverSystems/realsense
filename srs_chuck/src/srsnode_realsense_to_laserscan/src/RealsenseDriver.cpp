@@ -8,7 +8,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <sensor_msgs/point_cloud2_iterator.h>
 #include <sensor_msgs/LaserScan.h>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/contrib/contrib.hpp>
 
 namespace srs
 {
@@ -20,6 +20,9 @@ RealsenseDriver::RealsenseDriver( ) :
 	rosNodeHandle_( ),
 	infrared1Subscriber_( rosNodeHandle_, "/camera/infrared1/image_raw", 10 ),
 	infrared2Subscriber_( rosNodeHandle_, "/camera/infrared2/image_raw", 10 ),
+	depthSubscriber_( rosNodeHandle_.subscribe<sensor_msgs::Image>( "/camera/depth/image_raw", 100,
+		std::bind( &RealsenseDriver::OnDepthData, this, std::placeholders::_1 ) ) ),
+	depthPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/depth/image_color", 10 ) ),
 	infraredPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/infrared/image_near", 10 ) ),
 	infraredScanPublisher_( rosNodeHandle_.advertise<sensor_msgs::LaserScan>( "/camera/infrared/scan", 10 ) ),
 	synchronizer_( new ImageSyncronizer( infrared1Subscriber_, infrared2Subscriber_, 10 ) )
@@ -39,6 +42,37 @@ void RealsenseDriver::run( )
 
 		refreshRate.sleep( );
 	}
+}
+
+void RealsenseDriver::OnDepthData( const sensor_msgs::Image::ConstPtr& depthImage )
+{
+	cv_bridge::CvImagePtr cvDepthImage = GetCvImage( depthImage );
+
+	double max = 1.5f;
+
+	double sum=0;
+	for( int i = 0; i < cvDepthImage->image.rows; i++ )
+	{
+	    uint16_t* Mi = cvDepthImage->image.ptr<uint16_t>(i);
+
+	    for( int j = 0; j < cvDepthImage->image.cols; j++ )
+	    {
+	    	if( Mi[j] > max * 1000 )
+			{
+	    		Mi[j] = std::numeric_limits<uint16_t>::quiet_NaN();
+			}
+	    }
+	}
+
+	cv::Mat adjMap;
+	cvDepthImage->image.convertTo( adjMap, CV_8UC1, 255.0 / max );
+
+	cv::Mat colorMap;
+	cv::applyColorMap( adjMap, colorMap, cv::COLORMAP_JET );
+
+	cv_bridge::CvImage colorImage(depthImage->header, "bgr8", colorMap);
+
+	depthPublisher_.publish( colorImage.toImageMsg() );
 }
 
 void RealsenseDriver::OnInfraredData( const sensor_msgs::Image::ConstPtr& infraredImage1,
@@ -145,7 +179,8 @@ cv_bridge::CvImagePtr RealsenseDriver::GetCvImage( const sensor_msgs::Image::Con
 
 	try
 	{
-		cv_ptr = cv_bridge::toCvCopy( image, sensor_msgs::image_encodings::TYPE_8UC1 );
+
+		cv_ptr = cv_bridge::toCvCopy( image, image->encoding );
 	}
 	catch( cv_bridge::Exception& e )
 	{

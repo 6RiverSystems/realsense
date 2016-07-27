@@ -35,6 +35,8 @@ public:
 
 private:
 
+    void OnDepthData( const sensor_msgs::Image::ConstPtr& infraredImage1 );
+
     void OnInfraredData( const sensor_msgs::Image::ConstPtr& infraredImage1,
     	const sensor_msgs::Image::ConstPtr& infraredImage2 );
 
@@ -51,9 +53,13 @@ private:
 
     ros::NodeHandle 									rosNodeHandle_;
 
+    ros::Subscriber						 				depthSubscriber_;
+
     message_filters::Subscriber<sensor_msgs::Image> 	infrared1Subscriber_;
 
     message_filters::Subscriber<sensor_msgs::Image> 	infrared2Subscriber_;
+
+    ros::Publisher 										depthPublisher_;
 
     ros::Publisher 										infraredPublisher_;
 

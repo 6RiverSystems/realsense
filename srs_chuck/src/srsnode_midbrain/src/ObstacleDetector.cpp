@@ -138,7 +138,7 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 			{
 				if( fabs( fY ) <= m_footprint )
 				{
-					sprintf( pszPoints, "%.1f, ", scanDistance );
+					sprintf( pszPoints, "%.2f, ", scanDistance );
 					strPoints += pszPoints;
 
 					numberOfObstacles++;

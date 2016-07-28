@@ -29,10 +29,9 @@ sudo apt-get install ros-indigo-rosbridge-server -y
 sudo apt-get install ros-indigo-pointcloud-to-laserscan ros-indigo-depthimage-to-laserscan
 sudo apt-get install ros-indigo-robot-state-publisher
 
+sudo apt-get install ros-jade-rgbd-launch ros-jade-depthimage-to-laserscan ros-jade-laser-filters ros-jade-navigation ros-jade-robot-model ros-jade-xacro ros-jade-tf2 ros-jade-tf2-sensor-msgs ros-jade-camera-info-manager ros-jade-joy ros-jade-rosbridge-server ros-jade-pointcloud-to-laserscan ros-jade-depthimage-to-laserscan ros-jade-robot-state-publisher ros-jade-rqt  ros-jade-rviz ros-jade-rqt-*
+
 # Optional dev dependencies
-sudo apt-get install ros-indigo-rqt
-sudo apt-get install ros-indigo-rviz
-sudo apt-get install ros-indigo-rqt-*
 rqt --force-discover
 
 sudo rosdep init
@@ -137,8 +136,12 @@ npm run electron:clean
 npm run electron:webpack
 npm run electron:asar
 
-# Start the GUI
-export DISPLAY=:0 ./start-gui.sh &
+sudo vim /etc/default/locale 
+LANG=”en_US.UTF-8” 
+
+GLLINK=-L/usr/lib/aarch64-linux-gnu/tegra make 
+
+FILTER_OUT := 0_Simple/cdpSimplePrint/Makefile 0_Simple/cdpSimpleQuicksort/Makefile 2_Graphics/bindlessTexture/Makefile6_Advanced/cdpBezierTessellation/Makefile 6_Advanced/cdpQuadtree/Makefile 6_Advanced/cdpLUDecomposition/Makefile 6_Advanced/cdpAdvancedQuicksort/Makefile 7_CUDALibraries/simpleDevLibCUBLAS/Makefile 2_Graphics/simpleGLES_EGLOutput/Makefile 2_Graphics/simpleGLES/Makefile 5_Simulations/nbody_opengles/Makefile 5_Simulations/fluidsGLES/Makefile 0_Simple/simpleMPI/Makefile 
 
 # Refresh the bash console:
 source ~/.bashrc

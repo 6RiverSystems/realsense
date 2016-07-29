@@ -29,7 +29,7 @@
 #include <srsnode_motion/PositionEstimator.hpp>
 #include <srsnode_motion/MotionController.hpp>
 #include <srsnode_motion/tap/sensor_frame/aps/RosTapAps.hpp>
-#include <srsnode_motion/tap/sensor_frame/odometry/RosTapOdometry.hpp>
+#include <srsnode_motion/tap/sensor_frame/RosTapSensorFrame.hpp>
 
 namespace srs {
 
@@ -46,7 +46,7 @@ public:
     void run();
 
 private:
-    constexpr static double REFRESH_RATE_HZ = 100;
+    constexpr static double REFRESH_RATE_HZ = 120;
     constexpr static double PING_HZ = 10;
     constexpr static double MAX_ALLOWED_PING_DELAY = 0.5f; // 50% of the duty cycle
 
@@ -59,11 +59,11 @@ private:
 
     void onConfigChange(MotionConfig& config, uint32_t level);
 
-    void performCustomAction();
     void pingCallback(const ros::TimerEvent& event);
     void publishAccumulatedOdometry();
     void publishArrived();
     void publishGoalLanding();
+    void publishImu();
     void publishOdometry();
     void publishLocalized();
     void publishPose();
@@ -74,12 +74,18 @@ private:
     void stepNode();
     void stepEmulation();
 
+    void updateCalibratedImu();
+    void updateImuDeltaYaw(Pose<> pose);
+
     AStar<Grid2d> algorithm_;
 
     dynamic_reconfigure::Server<MotionConfig> configServer_;
     ros::Time currentTime_;
+    Imu<> calibratedImu_;
 
     bool isApsAvailable_;
+    bool isEmulationEnabled_;
+    bool isImuAvailable_;
     bool isJoystickLatched_;
     bool isOdometryAvailable_;
     bool isCustomActionEnabled_;
@@ -97,6 +103,8 @@ private:
     ros::Publisher pubStatusGoalLanding_;
     ros::Publisher pubRobotLocalized_;
 
+    ros::Publisher pubImu_;
+
     ros::NodeHandle rosNodeHandle_;
     tf::TransformBroadcaster rosTfBroadcaster_;
     Chuck robot_;
@@ -105,16 +113,18 @@ private:
 
     RosTapAps tapAps_;
     RosTapBrainStem tapBrainStem_;
+    RosTapSensorFrame tapSensorFrame_;
     RosTapInternal_GoalSolution tapInternalGoalSolution_;
     RosTapInternal_InitialPose tapInitialPose_;
     RosTapJoyAdapter tapJoyAdapter_;
     RosTapMap tapMap_;
-    RosTapOdometry tapOdometry_;
 
     RosServiceExecuteSolution triggerExecuteSolution_;
     RosTriggerPause triggerPause_;
     RosTriggerStop triggerStop_;
     RosTriggerShutdown triggerShutdown_;
+
+    double imuDeltaYaw_;
 };
 
 } // namespace srs

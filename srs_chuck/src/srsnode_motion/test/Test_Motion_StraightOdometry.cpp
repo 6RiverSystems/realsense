@@ -9,6 +9,7 @@
 using namespace std;
 
 #include <srslib_test/utils/Compare.hpp>
+#include <srslib_test/utils/Print.hpp>
 
 #include <srslib_framework/filter/FilterState.hpp>
 #include <srslib_framework/filter/Command.hpp>
@@ -16,30 +17,55 @@ using namespace std;
 #include <srslib_framework/filter/ukf/UnscentedKalmanFilter.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
+#include <srslib_framework/robotics/Imu.hpp>
 
 #include <srsnode_motion/PositionUkf.hpp>
 #include <srsnode_motion/Robot.hpp>
 #include <srsnode_motion/StatePe.hpp>
 #include <srsnode_motion/CmdVelocity.hpp>
 
+#include <srsnode_motion/tap/sensor_frame/odometry/OdometrySensor.hpp>
+#include <srsnode_motion/tap/sensor_frame/imu/ImuSensor.hpp>
+
 using namespace srs;
 
 constexpr unsigned int UKF_STATE_SIZE = 5;
-constexpr unsigned int UKF_COMMAND_SIZE = 2;
+constexpr double DT = 1.0 / 100.0;
 
-constexpr double DT = 0.016;
+#include "data/UkfTestData_StraightOdometry.hpp"
 
-#include "data/UkfTestData_Straight.hpp"
-
-// TODO: Fix this test with the new development of the Position UKF
-TEST(Test_Motion, Straight)
+TEST(Test_Motion, StraightOdometry)
 {
-    // Create standard robot process model
-    Robot<> robot;
+    cv::Mat ROBOT_Q = cv::Mat::diag((cv::Mat_<double>(1, UKF_STATE_SIZE) <<
+        pow(0.0007, 2.0), // [m^2]
+        pow(0.0007, 2.0), // [m^2]
+        pow(0.0017, 2.0), // [rad^2]
+        0.0, // [m^2/s^2]
+        0.0 // [m^2/s^2]
+    ));
+
+    cv::Mat ODOMETRY_R = cv::Mat::diag((cv::Mat_<double>(1, UKF_STATE_SIZE) <<
+        0.0, // [m^2]
+        0.0, // [m^2]
+        0.0, // [rad^2]
+        pow(0.000005, 2.0), // [m^2/s^2]
+        0.0 // [m^2/s^2]
+    ));
+
+    cv::Mat IMU_R = cv::Mat::diag((cv::Mat_<double>(1, UKF_STATE_SIZE) <<
+        0.0, // [m^2]
+        0.0, // [m^2]
+        0.0, // [rad^2]
+        0.0, // [m^2/s^2]
+        pow(0.00001, 2.0) // [m^2/s^2]
+    ));
+
+    // Create standard robot process model and initialize the process noise matrix
+    Robot<> robot(ROBOT_Q + ODOMETRY_R);
     PositionUkf ukf(robot);
 
-    // Create the sequence of measurements
-    vector<const Odometry<>*> measurements = {
+    // Create the sequence of odometry readings
+    vector<const Odometry<>*> odometryReadings = {
         &ODOMETRY_STEP_00,
         &ODOMETRY_STEP_01,
         &ODOMETRY_STEP_02,
@@ -74,24 +100,21 @@ TEST(Test_Motion, Straight)
     };
 
     // Prepare the initial state
-    Pose<double> pose0;
-    pose0.setThetaDegrees(90.0);
-
+    Pose<double> pose0 = Pose<>(1, 1, 0);
     StatePe<> stateT0(pose0);
-    cv::Mat covarianceT0 = robot.getQ();
-    ukf.reset(stateT0.getVectorForm(), covarianceT0);
 
-    for (unsigned int t = 0; t < measurements.size(); ++t)
+    cv::Mat P0 = ROBOT_Q + ODOMETRY_R + IMU_R;
+    ukf.reset(stateT0.getVectorForm(), P0);
+
+    for (unsigned int t = 0; t < odometryReadings.size(); ++t)
     {
         // Push the simulated measurement
-        auto odometry = *measurements.at(t);
-
-        ROS_DEBUG_STREAM(odometry);
+        auto odometryData = *odometryReadings.at(t);
 
         // Run the step of the UKF
-        ukf.run(DT, &odometry);
+        ukf.run(DT, &odometryData);
 
-        // ASSERT_TRUE(test::Compare::similar<>(ukf.getX(), correctStates[t], 1e-1)) <<
-        //    " State vector at time-step " << t;
+        ASSERT_TRUE(test::Compare::similar<>(ukf.getX(), correctStates[t], 1e-2)) <<
+            " State vector at time-step " << t;
     }
 }

@@ -163,11 +163,11 @@ void MotionController::run(Pose<> currentPose, Odometry<> currentOdometry, Veloc
     hasArrivedChanged_ = false;
 
     currentPose_ = currentPose;
-    ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "MotionController",
+    ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "motion_controller",
         "Reported robot pose: " << currentPose_);
 
     currentOdometry_ = currentOdometry;
-    ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "MotionController",
+    ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "motion_controller",
         "Reported odometry: " << currentOdometry_);
 
     checkMotionStatus();
@@ -404,7 +404,7 @@ void MotionController::checkMotionStatus()
     // the queue, cancel work in the controller and pump work from the queue
     if (isStandControllerActive() && isWorkPending())
     {
-        ROS_DEBUG_NAMED("MotionController", "Abandoned STAND");
+        ROS_DEBUG_NAMED("motion_controller", "Abandoned STAND");
         activeController_->cancel();
     }
 
@@ -446,7 +446,7 @@ void MotionController::checkMotionStatus()
             // If there is nothing else to do, simply stand still
             if (!isWorkPending())
             {
-                ROS_DEBUG_NAMED("MotionController", "No work was found");
+                ROS_DEBUG_NAMED("motion_controller", "No work was found");
                 pushWorkItem(TaskEnum::STAND);
             }
 

@@ -24,7 +24,9 @@
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
 #include <srsnode_motion/tap/sensor_frame/aps/FactoryApsNoise.hpp>
+#include <srsnode_motion/tap/sensor_frame/imu/FactoryImuNoise.hpp>
 #include <srsnode_motion/tap/sensor_frame/odometry/FactoryOdometryNoise.hpp>
+#include <srsnode_motion/FactoryRobotNoise.hpp>
 
 #include <srsnode_motion/MotionConfig.h>
 
@@ -42,17 +44,22 @@ Motion::Motion(string nodeName) :
     pingTimer_(),
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
     motionController_(1.0 / REFRESH_RATE_HZ),
-    simulatedT_(0.0)
+    simulatedT_(0.0),
+    calibratedImu_()
 {
     positionEstimator_.addSensor(tapAps_.getSensor());
+  //  positionEstimator_.addSensor(tapSensorFrame_.getSensorImu());
 
     configServer_.setCallback(boost::bind(&Motion::onConfigChange, this, _1, _2));
 
     pubOdometry_ = rosNodeHandle_.advertise<nav_msgs::Odometry>(
-        "/internal/sensors/odometry/velocity", 50);
+        "/internal/state/robot/twist", 50);
 
     pubPing_ = rosNodeHandle_.advertise<std_msgs::Bool>(
         "/internal/state/ping", 1);
+
+    pubImu_ = rosNodeHandle_.advertise<srslib_framework::Imu>(
+        "/internal/sensors/imu/calibrated", 100);
 
     pubRobotAccOdometry_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
         "/internal/state/robot/acc_odometry", 100);
@@ -65,6 +72,10 @@ Motion::Motion(string nodeName) :
         "/internal/state/goal/arrived", 1);
     pubStatusGoalLanding_ = rosNodeHandle_.advertise<geometry_msgs::PolygonStamped>(
         "/internal/state/goal/landing", 1);
+
+    rosNodeHandle_.param("emulation", isEmulationEnabled_, false);
+
+    imuDeltaYaw_ = 0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,13 +97,16 @@ void Motion::run()
         previousTime_ = currentTime_;
         currentTime_ = ros::Time::now();
 
+        stepEmulation();
+
         evaluateTriggers();
+
         scanTapsForData();
         publishArrived();
 
         stepNode();
-        stepEmulation();
 
+        publishImu();
         publishOdometry();
         publishPose();
         publishAccumulatedOdometry();
@@ -112,14 +126,13 @@ void Motion::run()
 void Motion::connectAllTaps()
 {
     tapBrainStem_.connectTap();
-    tapOdometry_.connectTap();
+    tapSensorFrame_.connectTap();
     tapInitialPose_.connectTap();
     tapJoyAdapter_.connectTap();
     tapAps_.connectTap();
     tapInternalGoalSolution_.connectTap();
     tapMap_.connectTap();
 
-    triggerPause_.connectService();
     triggerStop_.connectService();
     triggerShutdown_.connectService();
     triggerExecuteSolution_.connectService();
@@ -129,7 +142,7 @@ void Motion::connectAllTaps()
 void Motion::disconnectAllTaps()
 {
     tapBrainStem_.disconnectTap();
-    tapOdometry_.disconnectTap();
+    tapSensorFrame_.disconnectTap();
     tapInitialPose_.disconnectTap();
     tapJoyAdapter_.disconnectTap();
     tapAps_.disconnectTap();
@@ -191,8 +204,8 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     tapAps_.getSensor()->enable(config.sensor_aps_enabled);
 
     R = FactoryOdometryNoise::fromConfiguration(config);
-    tapOdometry_.getSensor()->setR(R);
-    tapOdometry_.getSensor()->enable(config.sensor_odometry_enabled);
+    tapSensorFrame_.getSensorOdometry()->setR(R);
+    tapSensorFrame_.getSensorOdometry()->enable(config.sensor_odometry_enabled);
 
     isCustomActionEnabled_ = config.custom_action_enabled;
 
@@ -323,6 +336,9 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
         "APS enabled: " <<
         config.sensor_aps_enabled);
     ROS_INFO_STREAM_NAMED("motion",
+        "IMU enabled: " <<
+        config.sensor_imu_enabled);
+    ROS_INFO_STREAM_NAMED("motion",
         "ODOMETRY enabled: " <<
         config.sensor_odometry_enabled);
 
@@ -351,11 +367,6 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     ROS_INFO_STREAM_NAMED("motion",
         "Location (X and Y) component of the robot noise [m]: " <<
         config.ukf_robot_error_location);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::performCustomAction()
-{
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -436,6 +447,13 @@ void Motion::publishGoalLanding()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::publishImu()
+{
+    srslib_framework::Imu message = ImuMessageFactory::imu2Msg(calibratedImu_);
+    pubImu_.publish(message);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishOdometry()
 {
     Pose<> currentPose = positionEstimator_.getPose();
@@ -510,6 +528,11 @@ void Motion::reset(Pose<> pose0)
     positionEstimator_.reset(pose0);
     motionController_.reset();
     simulatedT_ = 0.0;
+
+    // ###FS
+    // Calculate the delta between the yaw returned by the IMU and the Stargazer,
+    // only if the robot is not moving
+    // updateImuDeltaYaw(pose0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -541,36 +564,37 @@ void Motion::scanTapsForData()
             motionController_.emergencyStop();
         }
 
-        if (tapJoyAdapter_.getCustomActionState())
-        {
-            performCustomAction();
-        }
-
         // Store the latch state for later use
         isJoystickLatched_ = tapJoyAdapter_.getLatchState();
     }
 
     // Check if odometry or APS data is available
-    isOdometryAvailable_ = tapOdometry_.newDataAvailable();
+    isOdometryAvailable_ = tapSensorFrame_.newOdometryDataAvailable();
     isApsAvailable_ = tapAps_.newDataAvailable();
+    isImuAvailable_ = tapSensorFrame_.newImuDataAvailable();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::stepEmulation()
 {
-    // If the brain stem is disconnected, emulate odometry and initial position
-    // feeding the odometer with the commanded velocity
-    if (!tapBrainStem_.isBrainStemConnected())
+    // If emulation is enabled, feed velocity commands back to the
+    // odometry sensor, and initialize the first pose
+    if (isEmulationEnabled_)
     {
-        ROS_WARN_STREAM_ONCE_NAMED(rosNodeHandle_.getNamespace().c_str(),
-            "Brainstem disconnected. Using simulated odometry");
+        ROS_WARN_STREAM_ONCE_NAMED("motion", "Emulation enabled");
 
         Velocity<> currentCommand = motionController_.getExecutingCommand();
+        Pose<> currentPose = positionEstimator_.getPose();
 
         simulatedT_ += 1.0 / REFRESH_RATE_HZ;
-        tapOdometry_.set(simulatedT_,
+        tapSensorFrame_.setOdometry(Odometry<>(Velocity<>(
+            simulatedT_,
             currentCommand.linear,
-            currentCommand.angular);
+            currentCommand.angular)));
+        tapSensorFrame_.setImu(Imu<>(
+            simulatedT_,
+            AngleMath::normalizeAngleRad<double>(currentPose.theta - imuDeltaYaw_), 0.0, 0.0,
+            currentCommand.angular, 0.0, 0.0));
 
         if (!positionEstimator_.isPoseValid())
         {
@@ -579,6 +603,10 @@ void Motion::stepEmulation()
             tapInitialPose_.set(Pose<>(TimeMath::time2number(currentTime_), 3.0, 3.0, 0));
             reset(tapInitialPose_.getPose());
         }
+    }
+    else
+    {
+        ROS_WARN_STREAM_ONCE_NAMED("motion", "Emulation disabled");
     }
 }
 
@@ -611,19 +639,61 @@ void Motion::stepNode()
         }
     }
 
-    // TODO: Move the odometry to be a sensor of the UKF and not a command
-    Odometry<> currentOdometry = tapOdometry_.getOdometry();
+    // TODO: Move the odometry and IMU to be a sensor of the UKF and not a command
+    Odometry<> currentOdometry = tapSensorFrame_.getOdometry();
+
+    // Adjust the yaw returned by the IMU using the latest delta yaw
+    updateCalibratedImu();
+    ROS_DEBUG_STREAM("Calibrated IMU: " << calibratedImu_);
+
+    // If the odometry is zero, we can assume that the robot is not slowly rotating
+    // on its yaw. Therefore, we can ignore the IMU yaw ROT
+    if (!VelocityMath::equal(currentOdometry.velocity, Velocity<>::ZERO))
+    {
+        // currentOdometry.velocity.angular = tapSensorFrame_.getImu().yawRot;
+    }
+    else
+    {
+        // ###FS
+        // Calculate the delta between the yaw returned by the IMU and the stargazer,
+        // only if the robot is not moving
+        if (isApsAvailable_)
+        {
+            updateImuDeltaYaw(tapAps_.getPose());
+        }
+    }
 
     // Provide the command to the position estimator if available
     if (isOdometryAvailable_ || isApsAvailable_)
     {
-        positionEstimator_.run(isOdometryAvailable_ ? &currentOdometry : nullptr);
+        positionEstimator_.run(isOdometryAvailable_ ? &currentOdometry : nullptr, calibratedImu_);
     }
 
     // Run the motion controller if the estimated position is valid. No
     // motion is allowed if a position has been established
     Pose<> currentPose = positionEstimator_.getPose();
     motionController_.run(currentPose, currentOdometry, currentJoystickCommand);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::updateCalibratedImu()
+{
+    calibratedImu_ = tapSensorFrame_.getImu();
+    if (calibratedImu_.isValid())
+    {
+        calibratedImu_.yaw = AngleMath::normalizeAngleRad<double>(calibratedImu_.yaw + imuDeltaYaw_);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::updateImuDeltaYaw(Pose<> pose)
+{
+    calibratedImu_ = tapSensorFrame_.getImu();
+    if (pose.isValid() && calibratedImu_.isValid())
+    {
+        imuDeltaYaw_ = AngleMath::normalizeAngleRad<double>(pose.theta - calibratedImu_.yaw);
+        ROS_DEBUG_STREAM("Calculated IMU delta: " << imuDeltaYaw_);
+    }
 }
 
 } // namespace srs

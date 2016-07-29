@@ -36,6 +36,7 @@ unordered_map<int, string> MotionController::TASK_NAMES = {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 MotionController::MotionController(double dT) :
+    currentOdometry_(Odometry<>::ZERO),
     dT_(dT),
     hasArrived_(true),
     hasArrivedChanged_(false),
@@ -147,7 +148,7 @@ void MotionController::reset()
     currentTask_ = TaskEnum::NONE;
     selectController(TaskEnum::STAND);
 
-    currentOdometry_ = Odometry<>();
+    currentOdometry_ = Odometry<>::ZERO;
 
     hasArrived_ = true;
     hasArrivedChanged_ = false;

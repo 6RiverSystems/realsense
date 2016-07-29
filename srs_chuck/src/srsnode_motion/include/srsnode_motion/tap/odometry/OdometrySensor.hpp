@@ -22,7 +22,7 @@ public:
 
     OdometrySensor() :
         Sensor<STATE_SIZE, TYPE>(),
-        currentData_(Odometry<BaseType>(0.0, 0.0, 0.0))
+        currentData_(Odometry<BaseType>::ZERO)
     {
         reset();
     }
@@ -40,7 +40,7 @@ public:
 
     void reset()
     {
-        currentData_ = Odometry<BaseType>(0.0, 0.0, 0.0);
+        currentData_ = Odometry<BaseType>::ZERO;
         Sensor<STATE_SIZE, TYPE>::setNewData(false);
     }
 
@@ -48,7 +48,7 @@ public:
     {
         if (Sensor<STATE_SIZE, TYPE>::isEnabled())
         {
-            currentData_ = Odometry<BaseType>(arrivalTime, linear, angular);
+            currentData_ = Odometry<BaseType>(Velocity<>(arrivalTime, linear, angular));
             Sensor<STATE_SIZE, TYPE>::setNewData(true);
         }
     }

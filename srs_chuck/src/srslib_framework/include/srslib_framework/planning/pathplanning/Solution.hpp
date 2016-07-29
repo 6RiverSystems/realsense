@@ -24,12 +24,12 @@ public:
         vector<NodeType>::push_back(firstNode);
     }
 
-    NodeType getGoal()
+    NodeType getGoal() const
     {
         return *(vector<NodeType>::end() - 1);
     }
 
-    NodeType getStart()
+    NodeType getStart() const
     {
         return *vector<NodeType>::begin();
     }

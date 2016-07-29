@@ -3,52 +3,52 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef APS_HPP_
-#define APS_HPP_
+#ifndef ODOMETRYSENSOR_HPP_
+#define ODOMETRYSENSOR_HPP_
 
 #include <ros/ros.h>
 
 #include <srslib_framework/filter/Sensor.hpp>
-#include <srslib_framework/math/AngleMath.hpp>
-#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/robotics/Odometry.hpp>
 
 namespace srs {
 
 template<unsigned int STATE_SIZE = 5, int TYPE = CV_64F>
-class ApsSensor :
+class OdometrySensor :
     public Sensor<STATE_SIZE, TYPE>
 {
 public:
     typedef typename Sensor<STATE_SIZE, TYPE>::BaseType BaseType;
 
-    ApsSensor() :
+    OdometrySensor() :
         Sensor<STATE_SIZE, TYPE>(),
-        currentData_(Pose<BaseType>(0.0, 0.0, 0.0))
+        currentData_(Odometry<BaseType>::ZERO)
     {
         reset();
     }
 
-    virtual ~ApsSensor()
+    virtual ~OdometrySensor()
     {}
 
     virtual cv::Mat getCurrentData();
 
-    Pose<BaseType> getPose()
+    Odometry<BaseType> getOdometry()
     {
+        Sensor<STATE_SIZE, TYPE>::setNewData(false);
         return currentData_;
     }
 
     void reset()
     {
-        currentData_ = Pose<BaseType>(0.0, 0.0, 0.0);
+        currentData_ = Odometry<BaseType>::ZERO;
         Sensor<STATE_SIZE, TYPE>::setNewData(false);
     }
 
-    void set(double arrivalTime, BaseType x, BaseType y, BaseType theta)
+    void set(double arrivalTime, BaseType linear, BaseType angular)
     {
         if (Sensor<STATE_SIZE, TYPE>::isEnabled())
         {
-            currentData_ = Pose<BaseType>(arrivalTime, x, y, theta);
+            currentData_ = Odometry<BaseType>(Velocity<>(arrivalTime, linear, angular));
             Sensor<STATE_SIZE, TYPE>::setNewData(true);
         }
     }
@@ -56,11 +56,11 @@ public:
     virtual cv::Mat H(const cv::Mat stateVector);
 
 private:
-    Pose<BaseType> currentData_;
+    Odometry<BaseType> currentData_;
 };
 
 } // namespace srs
 
-#include <tap/aps/ApsSensor.cpp>
+#include <tap/sensor_frame/odometry/OdometrySensor.cpp>
 
-#endif // APS_HPP_
+#endif // ODOMETRYSENSOR_HPP_

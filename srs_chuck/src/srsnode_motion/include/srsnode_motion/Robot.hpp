@@ -26,10 +26,14 @@ class Robot : public Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VE
 public:
     typedef typename Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>::BaseType BaseType;
 
-    constexpr static double ANGULAR_VELOCITY_EPSILON = 0.001; // [rad/s] (0.0573 [deg/s])
+    constexpr static double ANGULAR_VELOCITY_EPSILON = 0.000001; // [rad/s] (0.0573 [deg/s])
 
     Robot() :
         Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>()
+    {}
+
+    Robot(cv::Mat Q) :
+        Process<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>(Q)
     {}
 
     virtual ~Robot()

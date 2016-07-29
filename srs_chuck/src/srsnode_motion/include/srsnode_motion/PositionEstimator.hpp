@@ -16,6 +16,7 @@ using namespace srsnode_motion;
 #include <srslib_framework/filter/Sensor.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
+#include <srslib_framework/robotics/Imu.hpp>
 
 #include <srsnode_motion/Configuration.hpp>
 #include <srsnode_motion/FactoryRobotNoise.hpp>
@@ -31,15 +32,8 @@ namespace srs {
 class PositionEstimator
 {
 public:
-    PositionEstimator(double dT) :
-        dT_(dT),
-        initialized_(false),
-        ukf_(robot_),
-        previousReadingTime_(-1.0)
-    {}
-
-    ~PositionEstimator()
-    {}
+    PositionEstimator(double dT);
+    ~PositionEstimator();
 
     void addSensor(Sensor<>* sensor)
     {
@@ -97,7 +91,7 @@ public:
         accumulatedOdometry_ = Pose<>::ZERO;
     }
 
-    void run(Odometry<>* odometry);
+    void run(Odometry<>* odometry, Imu<> imu);
 
     void setConfiguration(MotionConfig& configuration)
     {
@@ -119,6 +113,8 @@ private:
     Robot<> robot_;
 
     PositionUkf ukf_;
+
+    Imu<> imu_;
 };
 
 } // namespace srs

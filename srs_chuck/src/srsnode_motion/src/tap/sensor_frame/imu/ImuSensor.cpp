@@ -9,28 +9,27 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, int TYPE>
-cv::Mat OdometrySensor<STATE_SIZE, TYPE>::getCurrentData()
+cv::Mat ImuSensor<STATE_SIZE, TYPE>::getCurrentData()
 {
+    Sensor<STATE_SIZE, TYPE>::setNewData(false);
+
     // Transfer the value that the odometer care about to the new state
     StatePe<TYPE> state = StatePe<TYPE>();
 
-    state.velocity = currentData_.velocity;
-    // state.velocity.linear = currentData_.velocity.linear;
-
-    Sensor<STATE_SIZE, TYPE>::setNewData(false);
+    state.velocity.angular = currentData_.yawRot;
 
     return state.getVectorForm();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<unsigned int STATE_SIZE, int TYPE>
-cv::Mat OdometrySensor<STATE_SIZE, TYPE>::H(const cv::Mat stateVector)
+cv::Mat ImuSensor<STATE_SIZE, TYPE>::H(const cv::Mat stateVector)
 {
     StatePe<TYPE> state = StatePe<TYPE>(stateVector);
 
-    // Transfer the value that the odometer care about to the new state
+    // Transfer the value that the IMU angular velocity to the new state
     cv::Mat result = MatrixMath::zeros(stateVector);
-    result.at<BaseType>(StatePe<TYPE>::STATE_LINEAR) = state.velocity.linear;
+
     result.at<BaseType>(StatePe<TYPE>::STATE_ANGULAR) = state.velocity.angular;
 
     return result;

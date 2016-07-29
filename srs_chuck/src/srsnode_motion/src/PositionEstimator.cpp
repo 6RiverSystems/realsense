@@ -6,13 +6,29 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void PositionEstimator::run(Odometry<>* odometry)
+PositionEstimator::PositionEstimator(double dT) :
+    dT_(dT),
+    initialized_(false),
+    ukf_(robot_),
+    previousReadingTime_(-1.0)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+PositionEstimator::~PositionEstimator()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void PositionEstimator::run(Odometry<>* odometry, Imu<> imu)
 {
     double dT = dT_;
 
+    imu_ = imu;
+
     if (odometry)
     {
-        ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "PositionEstimator",
+        ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "position_estimator",
             "Position Estimator Odometry: " << *odometry);
 
         // Calculate the elapsed time between odometry readings
@@ -25,7 +41,7 @@ void PositionEstimator::run(Odometry<>* odometry)
         previousReadingTime_ = currentTime;
 
         ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0,
-            "PositionEstimator", "Calculated dT: " << dT);
+            "position_estimator", "Calculated dT: " << dT);
 
         // Update the accumulated odometry
         // using the physical model of the robot
@@ -37,6 +53,7 @@ void PositionEstimator::run(Odometry<>* odometry)
     // or by the APS
     if (initialized_)
     {
+        //ukf_.setTheta(imu_.yaw);
         ukf_.run(dT, odometry);
     }
 }

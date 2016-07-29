@@ -34,6 +34,11 @@ public:
     virtual ~PositionUkf()
     {}
 
+    void setTheta(double theta)
+    {
+        UkfType::x_.at<double>(2) = theta;
+    }
+
     void run(double dT, Odometry<>* odometry)
     {
         if (odometry)

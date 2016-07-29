@@ -8,9 +8,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
-#include <sensor_msgs/LaserScan.h>
 #include <message_filters/subscriber.h>
-#include <message_filters/time_synchronizer.h>
 #include <cv_bridge/cv_bridge.h>
 
 using namespace std;
@@ -19,17 +17,11 @@ namespace srs {
 
 class RealsenseDriver
 {
-	typedef message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image> ImageSyncronizer;
-
-	typedef boost::shared_ptr<ImageSyncronizer> ImageSyncronizerPtr;
 
 public:
     RealsenseDriver();
 
-    ~RealsenseDriver()
-    {
-
-    }
+    ~RealsenseDriver() { };
 
     void run();
 
@@ -37,35 +29,23 @@ private:
 
     void OnDepthData( const sensor_msgs::Image::ConstPtr& infraredImage1 );
 
-    void OnInfraredData( const sensor_msgs::Image::ConstPtr& infraredImage1,
-    	const sensor_msgs::Image::ConstPtr& infraredImage2 );
-
 private:
 
     cv_bridge::CvImagePtr GetCvImage( const sensor_msgs::Image::ConstPtr& image ) const;
 
-    void ThresholdImage( cv::Mat& image ) const;
-
     void CombineImages( cv::Mat& image1, cv::Mat& image2, cv::Mat& result ) const;
 
     constexpr static unsigned int REFRESH_RATE_HZ = 50;
-    constexpr static unsigned int THRESHOLD_VALUE = 255;
 
     ros::NodeHandle 									rosNodeHandle_;
 
     ros::Subscriber						 				depthSubscriber_;
 
-    message_filters::Subscriber<sensor_msgs::Image> 	infrared1Subscriber_;
+    ros::Publisher 										depthColorPublisher_;
 
-    message_filters::Subscriber<sensor_msgs::Image> 	infrared2Subscriber_;
+    ros::Publisher 										depthMedianFilterPublisher_;
 
-    ros::Publisher 										depthPublisher_;
-
-    ros::Publisher 										infraredPublisher_;
-
-    ros::Publisher 										infraredScanPublisher_;
-
-    ImageSyncronizerPtr									synchronizer_;
+    ros::Publisher 										depthBilateralFilterPublisher_;
 
 };
 

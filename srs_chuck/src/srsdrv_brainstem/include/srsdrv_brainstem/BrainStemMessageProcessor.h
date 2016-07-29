@@ -4,16 +4,21 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 
+#ifndef BRAINSTEM_MESSAGEPROCESSOR_H_
+#define BRAINSTEM_MESSAGEPROCESSOR_H_
+
 #include <vector>
 #include <map>
 #include <functional>
 #include <memory>
-#include <BrainStemMessages.h>
-#include <srslib_framework/io/IO.hpp>
 #include <bitset>
+using namespace std;
 
-#ifndef BRAINSTEM_MESSAGEPROCESSOR_H_
-#define BRAINSTEM_MESSAGEPROCESSOR_H_
+#include <srslib_framework/io/IO.hpp>
+
+#include <srsdrv_brainstem/BrainStemMessages.h>
+#include <srsdrv_brainstem/hw_message/BrainstemMessageHandler.hpp>
+#include <srsdrv_brainstem/hw_message/SensorFrameHandler.hpp>
 
 namespace srs {
 
@@ -27,7 +32,11 @@ struct Handler
 	uint32_t										dwNumParams;
 };
 
-class BrainStemMessageProcessor {
+class BrainStemMessageProcessor
+{
+public:
+    void processHardwareMessage(vector<char> buffer);
+    void processRosMessage(const string& strMessage);
 
 	typedef std::function<void(bool)> ConnectionChangedFn;
 
@@ -61,8 +70,6 @@ private:
 
 	ButtonCallbackFn						m_buttonCallback;
 
-	OdometryCallbackFn						m_odometryCallback;
-
 	HardwareInfoCallbackFn					m_hardwareInfoCallback;
 
 	OperationalStateCallbackFn				m_operationalStateCallback;
@@ -81,8 +88,6 @@ public:
 
 	void SetButtonCallback( ButtonCallbackFn buttonCallback );
 
-	void SetOdometryCallback( OdometryCallbackFn odometryCallback );
-
 	void SetHardwareInfoCallback( HardwareInfoCallbackFn hardwareInfoCallback );
 
 	void SetOperationalStateCallback( OperationalStateCallbackFn operationalStateCallback );
@@ -90,10 +95,6 @@ public:
 	void SetVoltageCallback( VoltageCallbackFn voltageCallback );
 
 // Message Processing
-
-	void ProcessBrainStemMessage( std::vector<char> buffer );
-
-	void ProcessRosMessage( const std::string& strMessage );
 
 	void GetOperationalState( );
 
@@ -105,10 +106,6 @@ public:
 
 	void SetConnected( bool bIsConnected );
 
-	void OnHardStop( );
-
-	void SetMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues );
-
 	void Shutdown( );
 
 // Helper
@@ -118,6 +115,10 @@ public:
 private:
 
 // Bridge Callbacks
+
+	void SetMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues );
+
+	void OnHardStop( );
 
 	void OnResetBatteryHours( );
 
@@ -141,6 +142,9 @@ private:
 
 	void Pause( bool bPause );
 
+    vector<BrainstemMessageHandler*> hwMessageHandlers_;
+
+    SensorFrameHandler sensorFrameHandler_;
 };
 
 } /* namespace srs */

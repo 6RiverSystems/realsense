@@ -16,6 +16,7 @@
 #include <srslib_framework/ros/tap/RosTapMap.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_GoalArrived.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_RobotPose.hpp>
+#include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
 #include <srslib_framework/ros/tap/RosTapOperationalState.hpp>
 
 #include <srslib_framework/search/AStar.hpp>
@@ -51,6 +52,7 @@ private:
     void findActiveNodes(vector<string>& nodes);
 
     void executeArrived();
+    void executeCustomAction();
     void executeInitialPose();
     void executePause();
     void executePlanToGoal();
@@ -65,7 +67,14 @@ private:
     void stepExecutiveFunctions();
 
     AStar<Grid2d> algorithm_;
-    bool arrived_;
+	bool arrived_;
+
+    Pose<> currentRobotPose_;
+    Pose<> currentGoal_;
+    Solution<GridSolutionItem>* currentSolution_;
+    Pose<> currentTarget_;
+
+    bool isJoystickLatched_;
 
     ros::Publisher pubExternalArrived_;
     ros::Publisher pubInternalInitialPose_;
@@ -73,11 +82,6 @@ private:
     ros::Publisher pubStatusGoalPlan_;
     ros::Publisher pubStatusGoal_;
     ros::Publisher pubStatusGoalTarget_;
-
-    Pose<> currentRobotPose_;
-    Pose<> currentGoal_;
-    Pose<> currentTarget_;
-    Solution<GridSolutionItem>* currentSolution_;
 
     Pose<> robotInitialPose_;
     ros::NodeHandle rosNodeHandle_;
@@ -89,6 +93,7 @@ private:
     RosTapInternal_GoalArrived tapInternal_GoalArrived_;
     RosTapInternal_RobotPose tapInternal_RobotPose_;
     RosTapOperationalState tapOperationalState_;
+	RosTapJoyAdapter tapJoyAdapter_;
 
     RosTapMap tapMap_;
 };

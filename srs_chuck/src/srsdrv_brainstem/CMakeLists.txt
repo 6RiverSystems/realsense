@@ -10,6 +10,7 @@ set(PROJECT_MAIN src/BrainStem.cpp)
 set(${PROJECT_NAME}_SOURCES
     src/BrainStemMessageProcessor.cpp
     src/BrainStem.cpp
+    src/hw_message/SensorFrameHandler.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES

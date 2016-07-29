@@ -30,7 +30,9 @@ Executive::Executive(string nodeName) :
     currentSolution_(nullptr),
     rosNodeHandle_(nodeName),
     arrived_(true),
-    robotInitialPose_(Pose<>::INVALID)
+    robotInitialPose_(Pose<>::INVALID),
+    isJoystickLatched_(false)
+
 {
     pubInternalInitialPose_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
         "/internal/command/initial_pose", 1);
@@ -79,6 +81,7 @@ void Executive::connectAllTaps()
     tapCmdShutdown_.connectTap();
     tapInternal_GoalArrived_.connectTap();
     tapInternal_RobotPose_.connectTap();
+    tapJoyAdapter_.connectTap();
 
     tapMap_.connectTap();
     tapOperationalState_.connectTap();
@@ -93,6 +96,7 @@ void Executive::disconnectAllTaps()
     tapCmdShutdown_.disconnectTap();
     tapInternal_GoalArrived_.disconnectTap();
     tapInternal_RobotPose_.disconnectTap();
+    tapJoyAdapter_.disconnectTap();
 
     tapMap_.disconnectTap();
     tapOperationalState_.disconnectTap();
@@ -105,6 +109,24 @@ void Executive::executeArrived()
     messageGoalArrived.data = arrived_;
 
     pubExternalArrived_.publish(messageGoalArrived);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::executeCustomAction()
+{
+//    Pose<> P1 = Pose<>(6.7, 2.1, 0);
+//    Pose<> P2 = Pose<>(16.4, 2.1, 0);
+//
+//    if (PoseMath::euclidean(currentRobotPose_, P1) < 1.0)
+//    {
+//        executePlanToGoal(P2);
+//    }
+//    else
+//    {
+//        executePlanToGoal(P1);
+//    }
+//
+//    publishInternalGoalSolution(currentSolution_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -385,7 +407,19 @@ void Executive::stepExecutiveFunctions()
         {
             executeUnpause();
         }
-}
+    }
+
+    // If the joystick was touched, check if a custom action was requested
+    if (tapJoyAdapter_.newDataAvailable())
+    {
+        if (tapJoyAdapter_.getCustomActionState())
+        {
+            executeCustomAction();
+        }
+
+        // Store the latch state for later use
+        isJoystickLatched_ = tapJoyAdapter_.getLatchState();
+    }
 }
 
 } // namespace srs

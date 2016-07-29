@@ -4,10 +4,14 @@ sudo apt-get install git -y
 # Connect to a wireless network
 sudo nmcli d wifi connect <network> password <password> iface wlan0
 
-# Boost and some of the ROS tools require that the system locale be set. You can set it with:
-sudo update-locale LANG=C LANGUAGE=C LC_ALL=C LC_MESSAGES=POSIX
-
 # Install ROS
+
+!!!!! NEW INSTRUCTIONS
+
+http://wiki.ros.org/indigo/Installation/UbuntuARM
+
+!!!!! OLD INSTRUCTIONS
+
 sudo rm -rf /var/cache/apt/archives && sudo ln -s ~/.apt-cache /var/cache/apt/archives && mkdir -p ~/.apt-cache/partial
 gpg --keyserver pgp.mit.edu --recv-keys 749D6EEC0353B12C
 gpg --export --armor 749D6EEC0353B12C | sudo apt-key add -
@@ -20,16 +24,16 @@ sudo apt-get install ros-indigo-depthimage-to-laserscan -y
 sudo apt-get install ros-indigo-laser-filters -y
 sudo apt-get install ros-indigo-navigation -y
 sudo apt-get install ros-indigo-robot-model -y
+sudo apt-get install ros-indigo-urdf -y
 sudo apt-get install ros-indigo-xacro -y
+sudo apt-get install ros-indigo-t2 -y
 sudo apt-get install ros-indigo-tf2 -y
 sudo apt-get install ros-indigo-tf2-sensor-msgs -y
 sudo apt-get install ros-indigo-camera-info-manager -y
 sudo apt-get install ros-indigo-joy -y
 sudo apt-get install ros-indigo-rosbridge-server -y
-sudo apt-get install ros-indigo-pointcloud-to-laserscan ros-indigo-depthimage-to-laserscan
-sudo apt-get install ros-indigo-robot-state-publisher
-
-sudo apt-get install ros-jade-rgbd-launch ros-jade-depthimage-to-laserscan ros-jade-laser-filters ros-jade-navigation ros-jade-robot-model ros-jade-xacro ros-jade-tf2 ros-jade-tf2-sensor-msgs ros-jade-camera-info-manager ros-jade-joy ros-jade-rosbridge-server ros-jade-pointcloud-to-laserscan ros-jade-depthimage-to-laserscan ros-jade-robot-state-publisher ros-jade-rqt  ros-jade-rviz ros-jade-rqt-*
+sudo apt-get install ros-indigo-depthimage-to-laserscan -y
+sudo apt-get install ros-indigo-robot-state-publisher -y
 
 # Optional dev dependencies
 rqt --force-discover
@@ -61,9 +65,8 @@ echo export LIBOVERLAY_SCROLLBAR=0 | sudo tee -a /etc/X11/Xsession.d/99disable-o
 
 # Install librealsense
 git clone https://github.com/6RiverSystems/librealsense.git
-cd ~/librealsense/librealsense
-git checkout feature/working-sync 
-sudo apt-get install libusb-1.0-0-dev
+cd ~/librealsense/
+sudo apt-get install libusb-1.0-0-dev -y
 ./scripts/install_glfw3.sh
 sudo cp ./config/99-realsense-libusb.rules /etc/udev/rules.d/
 sudo cp config/uvc.conf /etc/modprobe.d/
@@ -75,23 +78,30 @@ sudo dmesg | tail -n 1000
 sudo rm /usr/lib/arm-linux-gnueabihf/libGL.so 
 sudo ln -s /usr/lib/arm-linux-gnueabihf/tegra/libGL.so /usr/lib/arm-linux-gnueabihf/libGL.so
 cd ~/librealsense
+make BACKEND=LIBUVC
+sudo make install
 
 # Install other development dependencies
 sudo apt-get install libsdl-image1.2-dev socat socat ccache python-gevent=1.0-1ubuntu1 libunwind8-dev expect-dev -y
 
-echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
 echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:${PYTHONPATH}" >> ~/.bashrc
 echo "export PATH=/usr/lib/ccache:$PATH" >> ~/.bashrc
 echo "export ROS_PARALLEL_JOBS=-j8" >> ~/.bashrc
-
 echo "source ~/.bashrc_ros" >> ~/.bashrc
-echo "export ROS_HOSTNAME=dan-x1.local" >> ~/.bashrc_ros
-echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc_ros
 
-# Install Eclipse
+echo "export ROBOT_NAME=dan-x1" >> ~/.bashrc_ros
+echo "export ROS_MAP=6rhq" >> ~/.bashrc_ros
+echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc_ros
 
 # Change all network interfaces to default to eth0 and wlan0
 sudo rm /etc/udev/rules.d/70-persistent-net.rules
+
+git clone https://github.com/6RiverSystems/ros.git ~/ros
+sudo cp ~/ros/start-mfp-ros.sh /etc/init
+
+sudo find /opt/ros -type f -exec sed -i 's/\.so\.2\.4\.8/.so/g' {} \;
+sudo find /opt/ros -type f -exec sed -i 's/\/arm-linux-gnueabihf\/libopencv_/\/libopencv_/g' {} \;
+sudo find /opt/ros -type f -exec sed -i 's/\/usr\/lib\/libopencv_ocl\.so;//g' {} \;
 
 # Copy default logging config
 cp ~/ros/.rosconsole.config ~/
@@ -102,7 +112,8 @@ curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 # Install the bridge
-git clone https://github.com/6RiverSystems/mfp_bridge.git ~/
+git clone https://github.com/6RiverSystems/mfp_bridge.git ~/mfp_bridge
+sudo cp ~/mfp_bridge/start-mfp-node.sh /etc/init
 
 sudo service mfp-bridge stop
 
@@ -119,7 +130,7 @@ sudo service mfp-bridge start
 git describe # Capture this version in the spreadsheet
 
 # Install the graphical interface
-git clone https://github.com/6RiverSystems/graphical_interface.git ~/
+git clone https://github.com/6RiverSystems/graphical_interface.git ~/graphical_interface
 
 cd ~/graphical_interface
 

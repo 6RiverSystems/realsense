@@ -13,8 +13,6 @@ set(CMAKE_EXE_LINKER_FLAGS "-pie -z noexecstack -z relro -z now")
 # Flags shared libraries
 set(CMAKE_SHARED_LINKER_FLAGS "-z noexecstack -z relro -z now")
 
-find_package(PCL REQUIRED)
-
 find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   roscpp
@@ -45,13 +43,11 @@ generate_dynamic_reconfigure_options(
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
-  ${PCL_INCLUDE_DIRS}
 )
 
 add_library(realsense_camera_nodelet src/realsense_camera_nodelet.cpp)
 target_link_libraries(realsense_camera_nodelet
   ${catkin_LIBRARIES}
-  ${PCL_LIBRARIES}
   /usr/local/lib/librealsense.so
 )
 add_dependencies(realsense_camera_nodelet realsense_camera_generate_messages_cpp ${PROJECT_NAME}_gencfg)

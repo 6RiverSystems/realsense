@@ -10,6 +10,8 @@ dependencies:
     - sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 0xB01FA116
     - sudo apt-get update
     - sudo apt-get install ros-indigo-desktop-full
+    - sudo apt-get install ros-indigo-rgbd-launch
+    - sudo apt-get install ros-indigo-depthimage-to-laserscan
     - sudo rosdep init
     - rosdep update
     - sudo apt-get install libsdl-image1.2-dev

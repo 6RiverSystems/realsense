@@ -32,14 +32,11 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(OpenCV 1.7 REQUIRED)
 
-find_package(PCL REQUIRED)
-
 include_directories(include 
     src/
     include/
     ${catkin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
-	${PCL_INCLUDE_DIRS}
 )
 
 ####################################################################################################
@@ -57,7 +54,6 @@ add_executable(${PROJECT_NODE}
 target_link_libraries(${PROJECT_NODE}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBRARIES}
-    ${PCL_LIBRARIES}
 )
 
 ####################################################################################################

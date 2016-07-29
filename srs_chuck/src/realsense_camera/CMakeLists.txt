@@ -14,9 +14,6 @@ set(CMAKE_EXE_LINKER_FLAGS "-pie -z noexecstack -z relro -z now")
 # Flags shared libraries
 set(CMAKE_SHARED_LINKER_FLAGS "-z noexecstack -z relro -z now")
 
-find_library(REALSENSE_LIB realsense)
-
-# This is optional until the first release of librealsense as a ROS package
 find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   roscpp
@@ -28,9 +25,6 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
   sensor_msgs
-  rostest
-  pcl_ros
-)
 
 add_service_files(
   FILES

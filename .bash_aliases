@@ -29,6 +29,8 @@ function updateChuck() {
 }
 
 function buildChuck() {
+  source /opt/ros/indigo/setup.bash
+
   getChuckDirectory &&
   pushd "$baseDirectory/srs_chuck" &&
   catkin_make &&
@@ -38,6 +40,8 @@ function buildChuck() {
   catkin_make &&
   source devel/setup.bash &&
   popd
+
+  source ~/ros/srs_sites/devel/setup.bash
 }
 
 function runChuck() {

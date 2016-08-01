@@ -10,6 +10,7 @@
     <arg name="target_map" />
     <arg name="target_anchors" />
     <arg name="robot_configuration" />
+    <arg name="emulation" />
 
     <rosparam param="target_map" subst_value="True">
         $(arg target_map)
@@ -40,7 +41,10 @@
         <arg name="target_map" value="$(arg target_map)" />
     </include>
 
-    <include file="$(find srsnode_motion)/launch/node.launch" />
+    <include file="$(find srsnode_motion)/launch/node.launch">
+        <arg name="emulation" value="$(arg emulation)" />
+    </include>
+
     <include file="$(find srsnode_midbrain)/launch/node.launch" />
     <include file="$(find srsnode_executive)/launch/node.launch" />
 

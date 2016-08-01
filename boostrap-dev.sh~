@@ -150,7 +150,6 @@ npm run electron:asar
 
 # Disable unnecessary services
 echo manual | sudo tee /etc/init/avahi-daemon.override
-sudo apt-get remove cups
 
 
 

@@ -1,13 +1,20 @@
 #!/bin/bash
 sudo apt-get install git -y
 
+git clone https://github.com/6RiverSystems/ros.git ~/ros
+
+# Instructions => ~/ros/bootstrap-dev.sh
+
 # Connect to a wireless network
 sudo nmcli d wifi connect <network> password <password> iface wlan0
 
-# Change the locale to english
-sudo vim /etc/default/locale 
-LANG=”en_US.UTF-8” 
+sudo add-apt-repository universe
+sudo add-apt-repository restricted
+sudo add-apt-repository multiverse
 
+sudo apt-get install python-rosdep
+sudo rosdep init
+rosdep update
 
 ############# ARM ROS #############
 # Install ROS (http://wiki.ros.org/indigo/Installation/UbuntuARM)
@@ -26,7 +33,16 @@ sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 0xB01FA
 
 sudo apt-get update
 
-sudo apt-get install ros-indigo-desktop-full ros-indigo-rgbd-launch os-indigo-depthimage-to-laserscan ros-indigo-laser-filters ros-indigo-navigation ros-indigo-robot-model ros-indigo-urdf ros-indigo-urdf ros-indigo-xacro ros-indigo-tf ros-indigo-tf2 ros-indigo-tf2-sensor-msgs ros-indigo-camera-info-manager ros-indigo-joy ros-indigo-rosbridge-server ros-indigo-robot-state-publisher -y
+sudo apt-get install ros-indigo-ros-base ros-indigo-rgbd-launch ros-indigo-depthimage-to-laserscan ros-indigo-laser-filters ros-indigo-navigation ros-indigo-robot-model ros-indigo-urdf ros-indigo-urdf ros-indigo-xacro ros-indigo-tf ros-indigo-tf2 ros-indigo-tf2-sensor-msgs ros-indigo-camera-info-manager ros-indigo-joy ros-indigo-rosbridge-server ros-indigo-robot-state-publisher -y
+
+echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:${PYTHONPATH}" >> ~/.bashrc
+echo "export PATH=/usr/lib/ccache:$PATH" >> ~/.bashrc
+echo "export ROS_PARALLEL_JOBS=-j8" >> ~/.bashrc
+echo "source ~/.bashrc_ros" >> ~/.bashrc
+
+echo "export ROBOT_NAME=dan-x1" >> ~/.bashrc_ros
+echo "export ROS_MAP=6rhq" >> ~/.bashrc_ros
+echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc_ros
 
 # Optional dev dependencies
 sudo apt-get install ros-indigo-rqt* ros-indigo-rviz -y
@@ -62,7 +78,7 @@ make BACKEND=LIBUVC
 sudo make install
 
 # Install other development dependencies
-sudo apt-get install libsdl-image1.2-dev socat socat ccache python-gevent=1.0-1ubuntu1 libunwind8-dev expect-dev -y
+sudo apt-get install libsdl-image1.2-dev socat socat ccache python-gevent=1.0-1ubuntu1 libunwind8-dev expect-dev network-manager-openvpn-gnome -y
 
 echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:${PYTHONPATH}" >> ~/.bashrc
 echo "export PATH=/usr/lib/ccache:$PATH" >> ~/.bashrc
@@ -72,6 +88,7 @@ echo "source ~/.bashrc_ros" >> ~/.bashrc
 echo "export ROBOT_NAME=dan-x1" >> ~/.bashrc_ros
 echo "export ROS_MAP=6rhq" >> ~/.bashrc_ros
 echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc_ros
+echo "source ~/ros/.bashrc_ros_common" >> ~/.bashrc_ros
 
 # Change all network interfaces to default to eth0 and wlan0
 sudo rm /etc/udev/rules.d/70-persistent-net.rules

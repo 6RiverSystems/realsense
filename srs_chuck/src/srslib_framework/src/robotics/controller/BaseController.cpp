@@ -17,6 +17,8 @@ void BaseController::reset()
 {
     canceled_ = false;
 
+    firstRun_ = true;
+
     goal_ = ZERO_POSE;
     goalReached_ = false;
 
@@ -34,6 +36,8 @@ void BaseController::step(double dT, Pose<> currentPose, Odometry<> currentOdome
 
     // Call the controller
     stepController(dT, currentPose, currentOdometry);
+
+    firstRun_ = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

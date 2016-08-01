@@ -29,6 +29,7 @@ public:
     BaseController(string name) :
         canceled_(false),
         executingCommand_(ZERO_VELOCITY),
+        firstRun_(true),
         goal_(ZERO_POSE),
         goalReached_(false),
         Kv_(1.0),
@@ -70,6 +71,11 @@ public:
     bool isCanceled() const
     {
         return canceled_;
+    }
+
+    bool isFirstRun() const
+    {
+        return firstRun_;
     }
 
     bool isGoalReached() const
@@ -124,6 +130,8 @@ private:
     bool canceled_;
 
     Velocity<> executingCommand_;
+
+    bool firstRun_;
 
     Pose<> goal_;
     bool goalReached_;

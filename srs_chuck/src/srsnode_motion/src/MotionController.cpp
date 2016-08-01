@@ -653,6 +653,16 @@ void MotionController::pushWorkSolution(SolutionType& solution)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::selectController(TaskEnum task)
 {
+    if (activeController_)
+    {
+        ROS_DEBUG_STREAM_NAMED("motion_controller", "Switching from " <<
+            activeController_->getName());
+    }
+    else
+    {
+        ROS_DEBUG_STREAM_NAMED("motion_controller", "Switching from (null)");
+    }
+
     switch (task)
     {
         case EMERGENCY_STOP:
@@ -683,7 +693,7 @@ void MotionController::selectController(TaskEnum task)
             throw;
     }
 
-    ROS_DEBUG_STREAM_NAMED("motion_controller", "Switching to controller " <<
+    ROS_DEBUG_STREAM_NAMED("motion_controller", "to controller " <<
         activeController_->getName());
 
     // Before using the new controller, make sure that

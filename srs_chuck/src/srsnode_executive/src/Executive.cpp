@@ -397,15 +397,16 @@ void Executive::stepExecutiveFunctions()
 
     if (tapOperationalState_.newDataAvailable())
     {
-        ROS_INFO("State changed");
-        if (tapOperationalState_.isPauseChanged() && tapOperationalState_.getPause())
+        if (tapOperationalState_.isPauseChanged())
         {
-            executePause();
-        }
-
-        if (tapOperationalState_.isPauseChanged() && !tapOperationalState_.getPause())
-        {
-            executeUnpause();
+            if (tapOperationalState_.getPause())
+            {
+                executePause();
+            }
+            else
+            {
+                executeUnpause();
+            }
         }
     }
 

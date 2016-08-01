@@ -44,11 +44,10 @@ Motion::Motion(string nodeName) :
     pingTimer_(),
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
     motionController_(1.0 / REFRESH_RATE_HZ),
-    simulatedT_(0.0),
-    calibratedImu_()
+    simulatedT_(0.0)
 {
     positionEstimator_.addSensor(tapAps_.getSensor());
-  //  positionEstimator_.addSensor(tapSensorFrame_.getSensorImu());
+    positionEstimator_.addSensor(tapSensorFrame_.getSensorImu());
 
     configServer_.setCallback(boost::bind(&Motion::onConfigChange, this, _1, _2));
 
@@ -74,8 +73,6 @@ Motion::Motion(string nodeName) :
         "/internal/state/goal/landing", 1);
 
     rosNodeHandle_.param("emulation", isEmulationEnabled_, false);
-
-    imuDeltaYaw_ = 0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,6 +132,7 @@ void Motion::connectAllTaps()
 
     triggerStop_.connectService();
     triggerShutdown_.connectService();
+    triggerPause_.connectService();
     triggerExecuteSolution_.connectService();
 }
 
@@ -355,12 +353,21 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     ROS_INFO_STREAM_NAMED("motion",
         "Location (X and Y) component of the APS noise [m]: " <<
         config.ukf_aps_error_location);
+
     ROS_INFO_STREAM_NAMED("motion",
         "Angular velocity component of the odometry noise [rad/s]: " <<
         config.ukf_odometry_error_angular);
     ROS_INFO_STREAM_NAMED("motion",
         "Linear velocity component of the odometry noise [m/s]: " <<
         config.ukf_odometry_error_linear);
+
+    ROS_INFO_STREAM_NAMED("motion",
+        "Yaw component of the IMU noise [rad]: " <<
+        config.ukf_imu_error_yaw);
+    ROS_INFO_STREAM_NAMED("motion",
+        "Yaw velocity component of the IMU noise [rad/s]: " <<
+        config.ukf_imu_error_yaw_rot);
+
     ROS_INFO_STREAM_NAMED("motion",
         "Heading component of the robot noise [rad]: " <<
         config.ukf_robot_error_heading);
@@ -449,7 +456,7 @@ void Motion::publishGoalLanding()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishImu()
 {
-    srslib_framework::Imu message = ImuMessageFactory::imu2Msg(calibratedImu_);
+    srslib_framework::Imu message = ImuMessageFactory::imu2Msg(tapSensorFrame_.getCalibratedImu());
     pubImu_.publish(message);
 }
 
@@ -527,12 +534,8 @@ void Motion::reset(Pose<> pose0)
 {
     positionEstimator_.reset(pose0);
     motionController_.reset();
-    simulatedT_ = 0.0;
 
-    // ###FS
-    // Calculate the delta between the yaw returned by the IMU and the Stargazer,
-    // only if the robot is not moving
-    // updateImuDeltaYaw(pose0);
+    simulatedT_ = 0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -591,9 +594,9 @@ void Motion::stepEmulation()
             simulatedT_,
             currentCommand.linear,
             currentCommand.angular)));
-        tapSensorFrame_.setImu(Imu<>(
+        tapSensorFrame_.setRawImu(Imu<>(
             simulatedT_,
-            AngleMath::normalizeAngleRad<double>(currentPose.theta - imuDeltaYaw_), 0.0, 0.0,
+            currentPose.theta, 0.0, 0.0,
             currentCommand.angular, 0.0, 0.0));
 
         if (!positionEstimator_.isPoseValid())
@@ -639,61 +642,26 @@ void Motion::stepNode()
         }
     }
 
-    // TODO: Move the odometry and IMU to be a sensor of the UKF and not a command
+    // TODO: Move the odometry to be a sensor of the UKF and not a command
     Odometry<> currentOdometry = tapSensorFrame_.getOdometry();
 
-    // Adjust the yaw returned by the IMU using the latest delta yaw
-    updateCalibratedImu();
-    ROS_DEBUG_STREAM("Calibrated IMU: " << calibratedImu_);
-
-    // If the odometry is zero, we can assume that the robot is not slowly rotating
-    // on its yaw. Therefore, we can ignore the IMU yaw ROT
-    if (!VelocityMath::equal(currentOdometry.velocity, Velocity<>::ZERO))
+    // If the odometry is zero, calculate the delta between the yaw returned by the IMU and
+    // the stargazer
+    if (isApsAvailable_ && VelocityMath::equal(currentOdometry.velocity, Velocity<>::ZERO))
     {
-        // currentOdometry.velocity.angular = tapSensorFrame_.getImu().yawRot;
-    }
-    else
-    {
-        // ###FS
-        // Calculate the delta between the yaw returned by the IMU and the stargazer,
-        // only if the robot is not moving
-        if (isApsAvailable_)
-        {
-            updateImuDeltaYaw(tapAps_.getPose());
-        }
+        tapSensorFrame_.setTrueYaw(tapAps_.getPose().theta);
     }
 
     // Provide the command to the position estimator if available
     if (isOdometryAvailable_ || isApsAvailable_)
     {
-        positionEstimator_.run(isOdometryAvailable_ ? &currentOdometry : nullptr, calibratedImu_);
+        positionEstimator_.run(isOdometryAvailable_ ? &currentOdometry : nullptr);
     }
 
     // Run the motion controller if the estimated position is valid. No
     // motion is allowed if a position has been established
     Pose<> currentPose = positionEstimator_.getPose();
     motionController_.run(currentPose, currentOdometry, currentJoystickCommand);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::updateCalibratedImu()
-{
-    calibratedImu_ = tapSensorFrame_.getImu();
-    if (calibratedImu_.isValid())
-    {
-        calibratedImu_.yaw = AngleMath::normalizeAngleRad<double>(calibratedImu_.yaw + imuDeltaYaw_);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::updateImuDeltaYaw(Pose<> pose)
-{
-    calibratedImu_ = tapSensorFrame_.getImu();
-    if (pose.isValid() && calibratedImu_.isValid())
-    {
-        imuDeltaYaw_ = AngleMath::normalizeAngleRad<double>(pose.theta - calibratedImu_.yaw);
-        ROS_DEBUG_STREAM("Calculated IMU delta: " << imuDeltaYaw_);
-    }
 }
 
 } // namespace srs

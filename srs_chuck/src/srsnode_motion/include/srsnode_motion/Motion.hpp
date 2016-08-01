@@ -74,14 +74,10 @@ private:
     void stepNode();
     void stepEmulation();
 
-    void updateCalibratedImu();
-    void updateImuDeltaYaw(Pose<> pose);
-
     AStar<Grid2d> algorithm_;
 
     dynamic_reconfigure::Server<MotionConfig> configServer_;
     ros::Time currentTime_;
-    Imu<> calibratedImu_;
 
     bool isApsAvailable_;
     bool isEmulationEnabled_;
@@ -123,8 +119,6 @@ private:
     RosTriggerPause triggerPause_;
     RosTriggerStop triggerStop_;
     RosTriggerShutdown triggerShutdown_;
-
-    double imuDeltaYaw_;
 };
 
 } // namespace srs

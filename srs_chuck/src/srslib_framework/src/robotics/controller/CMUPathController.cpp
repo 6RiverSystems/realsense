@@ -71,14 +71,22 @@ void CMUPathController::calculateLanding(Pose<> goal)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
 {
+    // If the controller has received a cancel signal exit right away
+    if (isCanceled())
+    {
+        ROS_DEBUG_STREAM_NAMED("cmu_path_controller", "CMU Controller canceled");
+
+        setGoalReached(true);
+        return;
+    }
+
     // If the controller has no work to do, or it has received a cancel signal or
     // the distance to the goal is smaller than the threshold
     // declare that the goal was reached
-    if (currentTrajectory_.empty() || isCanceled() || checkGoalReached(currentPose))
+    if (currentTrajectory_.empty() || checkGoalReached(currentPose))
     {
         setGoalReached(true);
         executeCommand(ZERO_VELOCITY);
-
         return;
     }
 
@@ -87,10 +95,10 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     updateParameters(currentPose);
 
     double distanceToReference = PoseMath::euclidean(currentPose, referencePose_);
-    ROS_DEBUG_STREAM_NAMED("cmu_base_controller", "Distance to reference: " << distanceToReference);
+    ROS_DEBUG_STREAM_NAMED("cmu_path_controller", "Distance to reference: " << distanceToReference);
 
     double distanceToChange = PoseMath::euclidean(currentPose, velocityChangePose_);
-    ROS_DEBUG_STREAM_NAMED("cmu_base_controller", "Distance to change: " << distanceToChange);
+    ROS_DEBUG_STREAM_NAMED("cmu_path_controller", "Distance to change: " << distanceToChange);
 
     // Calculate what would be the velocity change based on the set acceleration
     double deltaVelocity = robot_.pathFollowLinearAcceleration * dT;
@@ -103,10 +111,10 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     double changingTime = (velocityChange_ - linear) / robot_.pathFollowLinearAcceleration;
     double changingDistance = 0.5 * (velocityChange_ + linear) * abs(changingTime);
 
-    ROS_DEBUG_STREAM_NAMED("cmu_base_controller", "Current max velocity: " << velocityCurrentMax_);
-    ROS_DEBUG_STREAM_NAMED("cmu_base_controller", "Next velocity change: " << velocityChange_);
-    ROS_DEBUG_STREAM_NAMED("cmu_base_controller", "Changing time: " << changingTime);
-    ROS_DEBUG_STREAM_NAMED("cmu_base_controller", "Changing distance: " << changingDistance);
+    ROS_DEBUG_STREAM_NAMED("cmu_path_controller", "Current max velocity: " << velocityCurrentMax_);
+    ROS_DEBUG_STREAM_NAMED("cmu_path_controller", "Next velocity change: " << velocityChange_);
+    ROS_DEBUG_STREAM_NAMED("cmu_path_controller", "Changing time: " << changingTime);
+    ROS_DEBUG_STREAM_NAMED("cmu_path_controller", "Changing distance: " << changingDistance);
 
     // If the robot is sufficiently far away from the changing point
     // the velocity can be increased. Otherwise, the deceleration must commence
@@ -116,7 +124,7 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
         linear = BasicMath::saturate<double>(linear, velocityCurrentMax_, 0.0);
         currentVelocity_ = linear;
 
-        ROS_DEBUG_STREAM_NAMED("cmu_base_controller",
+        ROS_DEBUG_STREAM_NAMED("cmu_path_controller",
             "Free increase velocity to: " << linear);
     }
     else
@@ -128,7 +136,7 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
             currentVelocity_ = BasicMath::threshold<double>(currentVelocity_ - deltaVelocity,
                 robot_.pathFollowMinLinearVelocity, 0.0);
 
-            ROS_DEBUG_STREAM_NAMED("cmu_base_controller",
+            ROS_DEBUG_STREAM_NAMED("cmu_path_controller",
                 "Decreasing velocity: " << currentVelocity_);
         }
         else
@@ -138,7 +146,7 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
             linear = BasicMath::saturate<double>(linear, velocityCurrentMax_, 0.0);
             currentVelocity_ = linear;
 
-            ROS_DEBUG_STREAM_NAMED("cmu_base_controller",
+            ROS_DEBUG_STREAM_NAMED("cmu_path_controller",
                 "Increasing velocity: " << linear);
         }
     }
@@ -221,7 +229,7 @@ void CMUPathController::updateParameters(Pose<> currentPose)
         lookAheadDistance_ = BasicMath::saturate(lookAheadDistance_,
             robot_.pathFollowMaxLookAheadDistance, robot_.pathFollowMinLookAheadDistance);
 
-        ROS_DEBUG_STREAM_NAMED("cmu_base_controller", "Look-ahead distance: " << lookAheadDistance_);
+        ROS_DEBUG_STREAM_NAMED("cmu_path_controller", "Look-ahead distance: " << lookAheadDistance_);
     }
 }
 

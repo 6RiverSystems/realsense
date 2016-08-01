@@ -28,6 +28,8 @@ public:
     {
         sensorImu_ = new ImuSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>();
         sensorOdometry_ = new OdometrySensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>();
+
+        currentRawImu_ = Imu<>::ZERO;
     }
 
     ~RosTapSensorFrame()
@@ -36,9 +38,14 @@ public:
         delete sensorImu_;
     }
 
-    Imu<> getImu() const
+    Imu<> getCalibratedImu() const
     {
         return sensorImu_->getImu();
+    }
+
+    Imu<> getRawImu() const
+    {
+        return currentRawImu_;
     }
 
     Odometry<> getOdometry()
@@ -58,7 +65,7 @@ public:
 
     bool newImuDataAvailable() const
     {
-        return sensorImu_->newDataAvailable();
+        return newDataAvailable(); // sensorImu_->newDataAvailable();
     }
 
     bool newOdometryDataAvailable() const
@@ -73,7 +80,7 @@ public:
         RosTap::reset();
     }
 
-    void setImu(Imu<> imu)
+    void setCalibratedImu(Imu<> imu)
     {
         sensorImu_->set(imu);
 
@@ -97,6 +104,17 @@ public:
         setNewData(sensorOdometry_->newDataAvailable());
    }
 
+    void setRawImu(Imu<> imu)
+    {
+        currentRawImu_ = imu;
+        setNewData(true);
+    }
+
+    void setTrueYaw(double newValue)
+    {
+        imuDeltaYaw_ = AngleMath::normalizeAngleRad<double>(newValue - currentRawImu_.yaw);
+    }
+
 protected:
     bool connect()
     {
@@ -109,12 +127,22 @@ protected:
 private:
     void onSensorFrame(const srslib_framework::SensorFrameConstPtr& message)
     {
-        setImu(ImuMessageFactory::msg2Imu(message->imu));
+        setRawImu(ImuMessageFactory::msg2Imu(message->imu));
         setOdometry(Odometry<>(VelocityMessageFactory::msg2Velocity(message->odometry)));
+
+        Imu<> calibratedImu = Imu<>(
+            0.0,
+            AngleMath::normalizeAngleRad<double>(currentRawImu_.yaw + imuDeltaYaw_),
+            0.0, 0.0,
+            currentRawImu_.yawRot, 0.0, 0.0);
+        setCalibratedImu(calibratedImu);
     }
 
+    Imu<> currentRawImu_;
     ImuSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensorImu_;
     OdometrySensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensorOdometry_;
+
+    double imuDeltaYaw_;
 };
 
 } // namespace srs

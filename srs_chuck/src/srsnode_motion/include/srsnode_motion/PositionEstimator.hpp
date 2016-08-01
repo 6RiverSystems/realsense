@@ -91,7 +91,7 @@ public:
         accumulatedOdometry_ = Pose<>::ZERO;
     }
 
-    void run(Odometry<>* odometry, Imu<> imu);
+    void run(Odometry<>* odometry);
 
     void setConfiguration(MotionConfig& configuration)
     {
@@ -113,8 +113,6 @@ private:
     Robot<> robot_;
 
     PositionUkf ukf_;
-
-    Imu<> imu_;
 };
 
 } // namespace srs

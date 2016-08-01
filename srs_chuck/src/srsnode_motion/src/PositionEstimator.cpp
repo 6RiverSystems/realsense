@@ -20,11 +20,9 @@ PositionEstimator::~PositionEstimator()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void PositionEstimator::run(Odometry<>* odometry, Imu<> imu)
+void PositionEstimator::run(Odometry<>* odometry)
 {
     double dT = dT_;
-
-    imu_ = imu;
 
     if (odometry)
     {

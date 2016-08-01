@@ -28,7 +28,7 @@ struct FactoryRobotNoise
             pow(configuration.ukf_robot_error_location, 2.0), // [m^2]
             pow(configuration.ukf_robot_error_heading, 2.0), // [rad^2]
             pow(configuration.ukf_odometry_error_linear, 2.0), // [m^2/s^2]
-            pow(configuration.ukf_imu_error_angular, 2.0) // [m^2/s^2]
+            pow(configuration.ukf_imu_error_yaw_rot, 2.0) // [m^2/s^2]
         );
 
         return cv::Mat::diag(Q);

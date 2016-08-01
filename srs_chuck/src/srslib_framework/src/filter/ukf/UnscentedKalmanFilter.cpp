@@ -12,11 +12,11 @@ namespace srs {
 template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
 UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::UnscentedKalmanFilter(
     Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process,
-    BaseType alpha, BaseType beta) :
+    BaseType alpha, BaseType kappa, BaseType beta) :
         BaseKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>(process),
         alpha_(alpha),
         beta_(beta),
-        kappa_(BaseType()),
+        kappa_(kappa),
         lambda_(BaseType())
 {
     initializeWeights();
@@ -70,8 +70,11 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::initializeWeights()
     BaseType alpha2 = pow(alpha_, BaseType(2.0));
 
     // o.kappa = 3 - o.n;
+    // Currently Kappa is specified in the constructor of the filter. There
+    // are conflicting papers about how to correctly initialize this value
+    // kappa_ = BaseType(3.0) - STATE_SIZE;
+
     // o.lambda = o.alpha ^ 2 * (o.n + o.kappa) - o.n;
-    kappa_ = BaseType(3.0) - STATE_SIZE;
     lambda_ = alpha2 * (STATE_SIZE + kappa_) - STATE_SIZE;
 
     // o.WM = zeros(2 * o.n + 1, 1);

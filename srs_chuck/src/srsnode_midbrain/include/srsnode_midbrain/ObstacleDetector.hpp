@@ -12,6 +12,7 @@
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/multi/geometries/multi_polygon.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/geometries/register/ring.hpp>
@@ -48,6 +49,7 @@ public:
 
 typedef std::vector<Point> Polygon;
 typedef bg::model::segment<Point> Segment;
+typedef bg::model::multi_polygon<Polygon> MuliPolygon;
 
 BOOST_GEOMETRY_REGISTER_POINT_2D(Point, double, bg::cs::cartesian, x, y)
 BOOST_GEOMETRY_REGISTER_RING(Polygon)

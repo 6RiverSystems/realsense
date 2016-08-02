@@ -7,6 +7,7 @@
 #include <srsnode_midbrain/Reflexes.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
+#include <boost/geometry/algorithms/union.hpp>
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
@@ -224,7 +225,23 @@ void ObstacleDetector::UpdateDangerZone( )
 		// Build the danger zone from the solution
 		for( auto solutionItem : m_solution.items )
 		{
-			std::vector<Pose<>> targetArea = PoseMath::pose2polygon(PoseMessageFactory::msg2Pose(solutionItem.toPose), 0.0, 0.2, 0.2);
+			std::vector<Pose<>> footPrintPolygon = PoseMath::pose2polygon(PoseMessageFactory::msg2Pose(solutionItem.toPose),
+				0.0, m_footprint, m_footprint*2);
+
+			Polygon footprintPoints;
+
+			for( auto point : footPrintPolygon )
+			{
+				footprintPoints.push_back( { point.x, point.y } );
+			}
+
+			std::vector<Polygon> combinedZone;
+
+			bg::union_(dangerZone, footprintPoints, std::back_inserter(combinedZone));
+
+			assert(combinedZone.size() == 1);
+
+			dangerZone = combinedZone[0];
 		}
 	}
 

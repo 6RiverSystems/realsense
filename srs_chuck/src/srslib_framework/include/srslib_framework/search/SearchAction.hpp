@@ -229,7 +229,8 @@ template<typename GRAPH>
 array<typename SearchAction<GRAPH>::ActionEnum, 5> SearchAction<GRAPH>::ALLOWED_ACTIONS = {
     FORWARD,
     ROTATE_M90,
-    ROTATE_P90
+    ROTATE_P90,
+    ROTATE_180
 };
 
 template<typename GRAPH>

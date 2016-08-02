@@ -61,6 +61,6 @@ private:
 
 } // namespace srs
 
-#include <tap/aps/ApsSensor.cpp>
+#include <tap/sensor_frame/aps/ApsSensor.cpp>
 
 #endif // APS_HPP_

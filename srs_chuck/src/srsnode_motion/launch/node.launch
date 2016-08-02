@@ -6,7 +6,11 @@
   *
 -->
 <launch>
+    <arg name="emulation" />
+
     <node name="srsnode_motion"
         pkg="srsnode_motion" type="srsnode_motion"
-        output="screen" />
+        output="screen">
+        <param name="emulation" type="bool" value="$(arg emulation)" />
+    </node>
 </launch>

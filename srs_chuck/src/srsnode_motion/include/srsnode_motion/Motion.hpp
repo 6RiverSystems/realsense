@@ -28,8 +28,8 @@
 
 #include <srsnode_motion/PositionEstimator.hpp>
 #include <srsnode_motion/MotionController.hpp>
-#include <srsnode_motion/tap/aps/RosTapAps.hpp>
-#include <srsnode_motion/tap/odometry/RosTapOdometry.hpp>
+#include <srsnode_motion/tap/sensor_frame/aps/RosTapAps.hpp>
+#include <srsnode_motion/tap/sensor_frame/odometry/RosTapOdometry.hpp>
 
 namespace srs {
 

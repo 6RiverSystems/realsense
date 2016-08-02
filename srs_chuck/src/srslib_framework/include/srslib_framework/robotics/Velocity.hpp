@@ -44,6 +44,12 @@ struct Velocity : public Object
         angular(other.angular)
     {}
 
+    Velocity(double arrivalTime, const Velocity<BaseType>& other) :
+        arrivalTime(arrivalTime),
+        linear(other.linear),
+        angular(other.angular)
+    {}
+
     virtual ~Velocity()
     {}
 

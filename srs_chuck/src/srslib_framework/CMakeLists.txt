@@ -27,12 +27,15 @@ set(${PROJECT_NAME}_SOURCES
 )
 
 set(${PROJECT_NAME}_MSGS
+    Imu.msg
     MsgHardwareInfo.msg
     MsgMap.msg
     MsgOperationalState.msg
     MsgPose.msg
     MsgSolution.msg
     MsgSolutionItem.msg
+    SensorFrame.msg
+    Velocity.msg
 )
 
 set(${PROJECT_NAME}_SRVS

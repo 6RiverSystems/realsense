@@ -27,7 +27,6 @@ struct Pose : public Object
     static const Pose<TYPE> INVALID;
     static const Pose<TYPE> ZERO;
 
-
     Pose(double arrivalTime, BaseType x, BaseType y, BaseType theta) :
         arrivalTime(arrivalTime),
         x(x),
@@ -44,6 +43,13 @@ struct Pose : public Object
 
     Pose(const Pose<BaseType>& other) :
         arrivalTime(other.arrivalTime),
+        x(other.x),
+        y(other.y),
+        theta(other.theta)
+    {}
+
+    Pose(double arrivalTime, const Pose<BaseType>& other) :
+        arrivalTime(arrivalTime),
         x(other.x),
         y(other.y),
         theta(other.theta)
@@ -93,7 +99,6 @@ const Pose<TYPE> Pose<TYPE>::INVALID = Pose<TYPE>(
 
 template<typename TYPE>
 const Pose<TYPE> Pose<TYPE>::ZERO = Pose<TYPE>(TYPE(), TYPE(), TYPE());
-
 
 } // namespace srs
 

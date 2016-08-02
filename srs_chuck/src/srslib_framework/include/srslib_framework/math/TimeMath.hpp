@@ -27,6 +27,13 @@ struct TimeMath
     {
         return static_cast<TYPE>(time.nsec) * 1.0e-9 + static_cast<TYPE>(time.sec);
     }
+
+    template<typename TYPE = double>
+    inline static bool isTimeElapsed(TYPE difference,
+        const ros::Time& t1, const ros::Time& t2 = ros::Time::now())
+    {
+        return (t2.toSec() - t1.toSec()) > difference;
+    }
 };
 
 } // namespace srs

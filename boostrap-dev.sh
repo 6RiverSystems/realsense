@@ -147,12 +147,5 @@ npm run electron:clean
 npm run electron:webpack
 npm run electron:asar
 
-sudo vim /etc/default/locale 
-LANG=”en_US.UTF-8” 
-
-GLLINK=-L/usr/lib/aarch64-linux-gnu/tegra make 
-
-FILTER_OUT := 0_Simple/cdpSimplePrint/Makefile 0_Simple/cdpSimpleQuicksort/Makefile 2_Graphics/bindlessTexture/Makefile6_Advanced/cdpBezierTessellation/Makefile 6_Advanced/cdpQuadtree/Makefile 6_Advanced/cdpLUDecomposition/Makefile 6_Advanced/cdpAdvancedQuicksort/Makefile 7_CUDALibraries/simpleDevLibCUBLAS/Makefile 2_Graphics/simpleGLES_EGLOutput/Makefile 2_Graphics/simpleGLES/Makefile 5_Simulations/nbody_opengles/Makefile 5_Simulations/fluidsGLES/Makefile 0_Simple/simpleMPI/Makefile 
-
 # Refresh the bash console:
 source ~/.bashrc

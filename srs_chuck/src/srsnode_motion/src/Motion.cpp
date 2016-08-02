@@ -657,9 +657,10 @@ void Motion::stepNode()
     }
 
     // Provide the command to the position estimator if available
-    if (isOdometryAvailable_ || isApsAvailable_)
+    if (isOdometryAvailable_ || isApsAvailable_ || isImuAvailable_)
     {
-        positionEstimator_.run(isOdometryAvailable_ ? &currentOdometry : nullptr);
+        positionEstimator_.run(isOdometryAvailable_ ? &currentOdometry : nullptr,
+            tapSensorFrame_.getCalibratedImu());
     }
 
     // Run the motion controller if the estimated position is valid. No

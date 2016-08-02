@@ -50,6 +50,11 @@ public:
         }
     }
 
+    void setTheta(double newValue)
+    {
+        BaseKFType::x_.at<double>(2) = newValue;
+    }
+
 protected:
     cv::Mat addWeighted(const cv::Mat W, const cv::Mat X);
 

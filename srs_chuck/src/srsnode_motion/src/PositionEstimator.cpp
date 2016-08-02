@@ -20,7 +20,7 @@ PositionEstimator::~PositionEstimator()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void PositionEstimator::run(Odometry<>* odometry)
+void PositionEstimator::run(Odometry<>* odometry, Imu<> imu)
 {
     double dT = dT_;
 
@@ -51,7 +51,7 @@ void PositionEstimator::run(Odometry<>* odometry)
     // or by the APS
     if (initialized_)
     {
-        //ukf_.setTheta(imu_.yaw);
+        ukf_.setTheta(imu.yaw);
         ukf_.run(dT, odometry);
     }
 }

@@ -91,7 +91,7 @@ public:
         accumulatedOdometry_ = Pose<>::ZERO;
     }
 
-    void run(Odometry<>* odometry);
+    void run(Odometry<>* odometry, Imu<> imu);
 
     void setRobotQ(cv::Mat Q)
     {

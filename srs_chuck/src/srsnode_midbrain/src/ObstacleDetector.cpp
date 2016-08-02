@@ -129,17 +129,23 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 
 	if( numberOfObstacles > threshold )
 	{
-		ROS_ERROR_NAMED( "obstacle_detection", "%s Scan:, scans: %d, linear vel: %0.2f, m_footprint: %0.2f, " \
-			"safeDistance: %.02f, Obstacles detected: %d, points: %s", isIrScan ? "IR" : "Depth", numberOfScans,
-			m_linearVelocity, m_footprint, safeDistance, numberOfObstacles, strPoints.c_str( ) );
-
-		if( m_obstacleDetectedCallback )
+		if( m_linearVelocity != 0.0f &&
+		    m_angularVelocity != 0.0f )
 		{
-			if( m_linearVelocity != 0.0f &&
-			 	m_angularVelocity != 0.0f )
-			 {
+			ROS_INFO_NAMED( "obstacle_detection", "%s Scan:, scans: %d, linear vel: %0.2f, m_footprint: %0.2f, " \
+				"safeDistance: %.02f, Obstacles detected: %d, points: %s", isIrScan ? "IR" : "Depth", numberOfScans,
+				m_linearVelocity, m_footprint, safeDistance, numberOfObstacles, strPoints.c_str( ) );
+
+			if( m_obstacleDetectedCallback )
+			{
 				m_obstacleDetectedCallback( );
-			 }
+			}
+		}
+		else
+		{
+			ROS_DEBUG_NAMED( "obstacle_detection", "%s Scan:, scans: %d, linear vel: %0.2f, m_footprint: %0.2f, " \
+				"safeDistance: %.02f, Obstacles detected: %d, points: %s", isIrScan ? "IR" : "Depth", numberOfScans,
+				m_linearVelocity, m_footprint, safeDistance, numberOfObstacles, strPoints.c_str( ) );
 		}
 	}
 	else

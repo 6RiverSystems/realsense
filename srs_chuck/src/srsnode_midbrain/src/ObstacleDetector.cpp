@@ -50,8 +50,7 @@ ObstacleDetector::ObstacleDetector( double footprint ) :
 	m_linearVelocity( 0.0f ),
 	m_angularVelocity( 0.0f ),
 	m_depthThreshold( 0 ),
-	m_footprint( footprint ),
-	m_testMode( false )
+	m_footprint( footprint )
 {
 
 }
@@ -64,16 +63,6 @@ ObstacleDetector::~ObstacleDetector( )
 void ObstacleDetector::SetDetectionCallback( ObstacleDetectedFn obstacleDetectedCallback )
 {
 	m_obstacleDetectedCallback = obstacleDetectedCallback;
-}
-
-void ObstacleDetector::SetTestMode( bool testMode )
-{
-	m_testMode = testMode;
-}
-
-bool ObstacleDetector::GetTestMode( ) const
-{
-	return m_testMode;
 }
 
 void ObstacleDetector::SetVelocity( double linear, double angular )
@@ -90,13 +79,6 @@ void ObstacleDetector::SetThreshold( uint32_t depthThreshold )
 
 void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan )
 {
-	if( !GetTestMode( ) &&
-		m_linearVelocity == 0.0f &&
-	 	m_angularVelocity == 0.0f )
-	 {
-	 	return;
-	 }
-
 	uint32_t threshold = m_depthThreshold;
 
 	uint32_t numberOfObstacles = 0;
@@ -153,7 +135,11 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 
 		if( m_obstacleDetectedCallback )
 		{
-			m_obstacleDetectedCallback( );
+			if( m_linearVelocity != 0.0f &&
+			 	m_angularVelocity != 0.0f )
+			 {
+				m_obstacleDetectedCallback( );
+			 }
 		}
 	}
 	else
@@ -171,16 +157,12 @@ double ObstacleDetector::GetSafeDistance( double velocity ) const
 {
 	double safeDistance = 0.0f;
 
-	if( velocity >= 0.1f ||
-		GetTestMode( ) )
-	{
-		// Calculated from actual measurements and polynomial regression fitting
-		// https://docs.google.com/a/6river.com/spreadsheets/d/1wUPgpESlp-MVbnMGCmFDGH22qyO39D8kzvi7IPZ1Q1c/edit?usp=sharing
-		// http://www.xuru.org/rt/PR.asp#CopyPaste
-		safeDistance = ( 0.3518981019f * pow( velocity, 2 ) - 0.03806193806f * velocity + 0.01804195804f ) * 1.2;
+	// Calculated from actual measurements and polynomial regression fitting
+	// https://docs.google.com/a/6river.com/spreadsheets/d/1wUPgpESlp-MVbnMGCmFDGH22qyO39D8kzvi7IPZ1Q1c/edit?usp=sharing
+	// http://www.xuru.org/rt/PR.asp#CopyPaste
+	safeDistance = ( 0.3518981019f * pow( velocity, 2 ) - 0.03806193806f * velocity + 0.01804195804f ) * 1.2;
 
-		safeDistance = std::max( safeDistance, 0.45 );
-	}
+	safeDistance = std::max( safeDistance, 0.45 );
 
 	return safeDistance;
 }

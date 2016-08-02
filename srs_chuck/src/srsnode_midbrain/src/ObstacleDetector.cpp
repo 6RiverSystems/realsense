@@ -85,9 +85,10 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 
 	uint32_t numberOfScans = scan->ranges.size( );
 
-	double safeDistance = GetSafeDistance( m_linearVelocity );
+	double safeDistance = GetSafeDistance( m_linearVelocity, m_angularVelocity );
 
-	std::string strPoints;
+	std::string strObstaclePoints;
+	std::string strValidPoints;
 	char pszPoints[255] = { '\0' };
 
 
@@ -119,56 +120,59 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 				if( fabs( fY ) <= m_footprint )
 				{
 					sprintf( pszPoints, "%.2f, ", scanDistance );
-					strPoints += pszPoints;
+					strObstaclePoints += pszPoints;
 
 					numberOfObstacles++;
 				}
+				else
+				{
+					sprintf( pszPoints, "%.2f, ", scanDistance );
+					strValidPoints += pszPoints;
+				}
+			}
+			else
+			{
+				sprintf( pszPoints, "%.2f, ", scanDistance );
+				strValidPoints += pszPoints;
 			}
 		}
 	}
 
 	if( numberOfObstacles > threshold )
 	{
-		if( m_linearVelocity != 0.0f &&
-		    m_angularVelocity != 0.0f )
-		{
-			ROS_INFO_NAMED( "obstacle_detection", "%s Scan:, scans: %d, linear vel: %0.2f, m_footprint: %0.2f, " \
-				"safeDistance: %.02f, Obstacles detected: %d, points: %s", isIrScan ? "IR" : "Depth", numberOfScans,
-				m_linearVelocity, m_footprint, safeDistance, numberOfObstacles, strPoints.c_str( ) );
+		ROS_INFO_NAMED( "obstacle_detection", "Scans: %d, linear vel: %0.2f, angular vel: %0.2f, m_footprint: %0.2f, safeDistance: %.02f, Obstacles detected: %d, points: %s", numberOfScans, m_linearVelocity, m_angularVelocity, m_footprint, safeDistance, numberOfObstacles, strObstaclePoints.c_str( ) );
 
-			if( m_obstacleDetectedCallback )
-			{
-				m_obstacleDetectedCallback( );
-			}
-		}
-		else
+		if( m_obstacleDetectedCallback )
 		{
-			ROS_DEBUG_NAMED( "obstacle_detection", "%s Scan:, scans: %d, linear vel: %0.2f, m_footprint: %0.2f, " \
-				"safeDistance: %.02f, Obstacles detected: %d, points: %s", isIrScan ? "IR" : "Depth", numberOfScans,
-				m_linearVelocity, m_footprint, safeDistance, numberOfObstacles, strPoints.c_str( ) );
+			m_obstacleDetectedCallback( );
 		}
 	}
 	else
 	{
-		if( strPoints.size( ) )
+		if( strValidPoints.size( ) )
 		{
-			ROS_DEBUG_THROTTLE_NAMED( 1.0, "obstacle_detection", "%s Scan:, scans: %d, linear vel: %0.2f, m_footprint: %0.2f, " \
-				"safeDistance: %.02f, Obstacles detected: %d, points: %s", isIrScan ? "IR" : "Depth", numberOfScans,
-				m_linearVelocity, m_footprint, safeDistance, numberOfObstacles, strPoints.c_str( ) );
+			ROS_DEBUG_THROTTLE_NAMED( 1.0, "obstacle_detection", "Scans: %d, linear vel: %0.2f, angular vel: %0.2f, m_footprint: %0.2f, safeDistance: %.02f, Objects detected: %d, points: %s",
+				numberOfScans, m_linearVelocity, m_angularVelocity, m_footprint, safeDistance, numberOfObstacles, strValidPoints.c_str( ) );
 		}
 	}
 }
 
-double ObstacleDetector::GetSafeDistance( double velocity ) const
+double ObstacleDetector::GetSafeDistance( double linearVelocity, double angularVelocity ) const
 {
 	double safeDistance = 0.0f;
 
-	// Calculated from actual measurements and polynomial regression fitting
-	// https://docs.google.com/a/6river.com/spreadsheets/d/1wUPgpESlp-MVbnMGCmFDGH22qyO39D8kzvi7IPZ1Q1c/edit?usp=sharing
-	// http://www.xuru.org/rt/PR.asp#CopyPaste
-	safeDistance = ( 0.3518981019f * pow( velocity, 2 ) - 0.03806193806f * velocity + 0.01804195804f ) * 1.2;
+	if( linearVelocity > 0.1 && angularVelocity < .1 )
+	{
 
-	safeDistance = std::max( safeDistance, 0.45 );
+		// Calculated from actual measurements and polynomial regression fitting
+		// https://docs.google.com/a/6river.com/spreadsheets/d/1wUPgpESlp-MVbnMGCmFDGH2/2qyO39D8kzvi7IPZ1Q1c/edit?usp=sharing
+		// http://www.xuru.org/rt/PR.asp#CopyPaste
+		double calculatedSafeDistance = ( 0.3518981019f * pow( linearVelocity, 2 ) - 0.03806193806f * linearVelocity + 0.01804195804f ) * 1.5;
+
+		safeDistance = std::max( calculatedSafeDistance, 0.45 );
+
+		ROS_DEBUG_THROTTLE_NAMED( 1.0f, "obstacle_detection", "calculatedSafeDistance: %0.2f, safeDistance: %0.2f", calculatedSafeDistance, safeDistance ); 
+	}
 
 	return safeDistance;
 }
@@ -180,7 +184,7 @@ double ObstacleDetector::GetFootprint( ) const
 
 Polygon ObstacleDetector::GetDangerZone( ) const
 {
-	double safeDistance = GetSafeDistance( m_linearVelocity );
+	double safeDistance = GetSafeDistance( m_linearVelocity, m_angularVelocity );
 
 	Polygon dangerZone({
 		{ 0.0, -m_footprint },

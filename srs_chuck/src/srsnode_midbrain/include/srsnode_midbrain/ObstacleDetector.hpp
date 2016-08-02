@@ -76,7 +76,7 @@ public:
 
 	void ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan );
 
-	double GetSafeDistance( double velocity ) const;
+	double GetSafeDistance( double linearVelocity, double angularVelocity ) const;
 
 	double GetFootprint( ) const;
 

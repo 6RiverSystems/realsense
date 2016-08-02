@@ -25,7 +25,7 @@ struct FactoryOdometryNoise
             0.0, // [m^2]
             0.0, // [rad^2]
             pow(configuration.ukf_odometry_error_linear, 2.0), // [m^2/s^2]
-            0.0 // [m^2/s^2]
+            pow(configuration.ukf_odometry_error_angular, 2.0) // [rad^2/s^2]
         );
 
         return cv::Mat::diag(R);

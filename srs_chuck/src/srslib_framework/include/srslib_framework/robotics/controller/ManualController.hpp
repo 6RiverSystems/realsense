@@ -25,7 +25,7 @@ public:
     {
         BaseController::reset();
 
-        userCommand_ = ZERO_VELOCITY;
+        userCommand_ = Velocity<>::ZERO;
     }
 
     void setRobotProfile(RobotProfile robot)

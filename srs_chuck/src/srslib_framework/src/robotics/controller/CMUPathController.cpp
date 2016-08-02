@@ -20,12 +20,12 @@ void CMUPathController::reset()
 
     currentVelocity_ = 0.0;
     velocityChange_ = 0.0;
-    velocityChangePose_ = ZERO_POSE;
+    velocityChangePose_ = Pose<>::ZERO;
     velocityCurrentMax_ = 0.0;
     currentTrajectory_.clear();
 
     projectionIndex_ = -1;
-    referencePose_ = ZERO_POSE;
+    referencePose_ = Pose<>::ZERO;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     if (currentTrajectory_.empty() || checkGoalReached(currentPose))
     {
         setGoalReached(true);
-        executeCommand(ZERO_VELOCITY);
+        executeCommand(Velocity<>::ZERO);
         return;
     }
 

@@ -23,14 +23,11 @@ namespace srs {
 class BaseController
 {
 public:
-    static const Velocity<> ZERO_VELOCITY;
-    static const Pose<> ZERO_POSE;
-
     BaseController(string name) :
         canceled_(false),
-        executingCommand_(ZERO_VELOCITY),
+        executingCommand_(Velocity<>::ZERO),
         firstRun_(true),
-        goal_(ZERO_POSE),
+        goal_(Pose<>::ZERO),
         goalReached_(false),
         Kv_(1.0),
         Kw_(1.0),

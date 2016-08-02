@@ -53,7 +53,7 @@ protected:
                 robot_.rotationGoalReachedAngle))
         {
             setGoalReached(true);
-            executeCommand(ZERO_VELOCITY);
+            executeCommand(Velocity<>::ZERO);
 
             return;
         }

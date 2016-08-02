@@ -53,7 +53,7 @@ protected:
         if (!isRobotMoving())
         {
             setGoalReached(true);
-            executeCommand(ZERO_VELOCITY);
+            executeCommand(Velocity<>::ZERO);
 
             return;
         }

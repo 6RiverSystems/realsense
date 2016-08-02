@@ -238,14 +238,14 @@ TEST_F( ReflexesTest, TestMovingWithObstacle )
 
 				double safeDistance = m_detector.GetSafeDistance( velocity );
 
-				Polygon dangerZone({
+				Ring dangerZone({
 					{ 0.0, -footprint },
 					{ safeDistance, -footprint },
 					{ safeDistance, footprint },
 					{ 0.0, footprint }
 				});
 
-				Polygon lineRing( {
+				Ring lineRing( {
 					{ lineSegment.first },
 					{ Point( lineSegment.first.x + 0.2, lineSegment.first.y ) },
 					{ Point( lineSegment.second.x + 0.2, lineSegment.second.y ) },
@@ -259,7 +259,7 @@ TEST_F( ReflexesTest, TestMovingWithObstacle )
 	//			ROS_DEBUG_STREAM_NAMED( "obstacle_detection", "Danger Zone: " << dangerZone );
 	//			ROS_DEBUG_STREAM_NAMED( "obstacle_detection", "Object: " << lineRing );
 
-				std::deque<Polygon> intersection;
+				std::deque<Ring> intersection;
 				bg::intersection( dangerZone, lineRing, intersection );
 
 				bool intersects = bg::intersects( dangerZone, lineRing );
@@ -271,12 +271,12 @@ TEST_F( ReflexesTest, TestMovingWithObstacle )
 				std::ofstream svg( pszFile );
 				boost::geometry::svg_mapper<Point> mapper( svg, 400, 400 );
 
-				Polygon scaledDangerZone;
+				Ring scaledDangerZone;
 				boost::geometry::transform( dangerZone, scaledDangerZone, scale );
 				mapper.add( scaledDangerZone );
 				mapper.map( scaledDangerZone, "fill-opacity:0.3;fill:rgb(0,212,0);stroke:none" );
 
-				Polygon scaledObstacle;
+				Ring scaledObstacle;
 				boost::geometry::transform( lineRing, scaledObstacle, scale );
 				mapper.add( scaledObstacle );
 				mapper.map( scaledObstacle, "fill-opacity:0.3;fill:rgb(0,0,212);stroke:none" );
@@ -285,7 +285,7 @@ TEST_F( ReflexesTest, TestMovingWithObstacle )
 				{
 	//				ROS_DEBUG_STREAM_NAMED( "obstacle_detection", "Intersection: " << polygon );
 
-					Polygon scaledIntersection;
+					Ring scaledIntersection;
 					boost::geometry::transform( polygon, scaledIntersection, scale );
 					mapper.add( scaledIntersection );
 					mapper.map( scaledIntersection, "fill-opacity:1;fill:rgb(212,0,0);stroke:none" );
@@ -305,14 +305,14 @@ TEST_F( ReflexesTest, TestMovingWithObstacle )
 
 						constexpr double width = 0.01f;
 
-						Polygon laserPoint({
+						Ring laserPoint({
 							{ x - width, y - width },
 							{ x - width, y + width },
 							{ x + width, y + width },
 							{ x + width, y - width },
 							{ x - width, y - width }
 						});
-						Polygon scaledLaserPoint;
+						Ring scaledLaserPoint;
 						boost::geometry::transform( laserPoint, scaledLaserPoint, scale );
 						mapper.add( scaledLaserPoint );
 						mapper.map( scaledLaserPoint, "fill-opacity:1;fill:rgb(255,20,147);stroke:none" );

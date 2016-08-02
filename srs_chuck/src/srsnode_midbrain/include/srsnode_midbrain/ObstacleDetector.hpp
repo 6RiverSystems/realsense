@@ -16,6 +16,7 @@
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/geometries/register/ring.hpp>
+#include <boost/geometry/multi/geometries/register/multi_polygon.hpp>
 #include <fstream>
 #include <iostream>
 #include <srslib_framework/MsgPose.h>
@@ -47,15 +48,15 @@ public:
 
 };
 
-typedef std::vector<Point> Polygon;
+typedef std::vector<Point> Ring;
 typedef bg::model::segment<Point> Segment;
-typedef bg::model::multi_polygon<Polygon> MuliPolygon;
+typedef bg::model::polygon<Point> Polygon;
 
 BOOST_GEOMETRY_REGISTER_POINT_2D(Point, double, bg::cs::cartesian, x, y)
-BOOST_GEOMETRY_REGISTER_RING(Polygon)
+BOOST_GEOMETRY_REGISTER_RING(Ring)
 
 std::ostream& operator<<( std::ostream& os, const Segment& segment );
-std::ostream& operator<<( std::ostream& os, const Polygon& polygon );
+std::ostream& operator<<( std::ostream& os, const Ring& ring );
 
 namespace srs
 {
@@ -87,7 +88,7 @@ public:
 
 	double GetFootprint( ) const;
 
-	Polygon GetDangerZone( ) const;
+	Ring GetDangerZone( ) const;
 
 private:
 

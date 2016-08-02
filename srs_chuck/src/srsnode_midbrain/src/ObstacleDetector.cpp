@@ -22,7 +22,7 @@ std::ostream& operator<<( std::ostream& os, const Segment& segment )
 	return os;
 }
 
-std::ostream& operator<<( std::ostream& os, const Polygon& polygon )
+std::ostream& operator<<( std::ostream& os, const Ring& polygon )
 {
 	os << "(";
 
@@ -202,11 +202,11 @@ double ObstacleDetector::GetFootprint( ) const
 	return m_footprint;
 }
 
-Polygon ObstacleDetector::GetDangerZone( ) const
+Ring ObstacleDetector::GetDangerZone( ) const
 {
 	double safeDistance = GetSafeDistance( m_linearVelocity, m_angularVelocity );
 
-	Polygon dangerZone({
+	Ring dangerZone({
 		{ 0.0, -m_footprint },
 		{ safeDistance, -m_footprint },
 		{ safeDistance, m_footprint },
@@ -228,16 +228,19 @@ void ObstacleDetector::UpdateDangerZone( )
 			std::vector<Pose<>> footPrintPolygon = PoseMath::pose2polygon(PoseMessageFactory::msg2Pose(solutionItem.toPose),
 				0.0, m_footprint, m_footprint*2);
 
-			Polygon footprintPoints;
+			Ring footprintPoints;
 
 			for( auto point : footPrintPolygon )
 			{
 				footprintPoints.push_back( { point.x, point.y } );
 			}
 
+			Polygon footprintPolygon;
+			boost::geometry::assign_points( footprintPolygon, footprintPoints );
+
 			std::vector<Polygon> combinedZone;
 
-			bg::union_(dangerZone, footprintPoints, std::back_inserter(combinedZone));
+			bg::union_(dangerZone, footprintPoints, combinedZone);
 
 			assert(combinedZone.size() == 1);
 

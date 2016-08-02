@@ -117,7 +117,7 @@ void Reflexes::PublishDangerZone( ) const
 
 	std::vector<geometry_msgs::Point32> polygon;
 
-	Polygon dangerZone = m_obstacleDetector.GetDangerZone( );
+	Ring dangerZone = m_obstacleDetector.GetDangerZone( );
 
 	for( const Point& point : dangerZone )
 	{

@@ -16,8 +16,6 @@ set(CMAKE_SHARED_LINKER_FLAGS "-z noexecstack -z relro -z now")
 
 find_library(REALSENSE_LIB realsense)
 
-# This is optional until the first release of librealsense as a ROS package
-find_package(catkin OPTIONAL_COMPONENTS librealsense)
 find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   roscpp
@@ -59,7 +57,7 @@ generate_dynamic_reconfigure_options(
 # DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS librealsense std_msgs message_runtime sensor_msgs
+  CATKIN_DEPENDS std_msgs message_runtime sensor_msgs
   LIBRARIES ${PROJECT_NAME}_nodelet
 )
 
@@ -72,7 +70,6 @@ include_directories(
 add_library(${PROJECT_NAME}_nodelet src/base_nodelet.cpp src/r200_nodelet.cpp src/f200_nodelet.cpp)
 target_link_libraries(${PROJECT_NAME}_nodelet
   ${catkin_LIBRARIES}
-  # This should be removed once librealsense is a required component
   ${REALSENSE_LIB}
 )
 add_dependencies(${PROJECT_NAME}_nodelet ${PROJECT_NAME}_generate_messages_cpp ${PROJECT_NAME}_gencfg)

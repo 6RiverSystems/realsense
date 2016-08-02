@@ -15,12 +15,12 @@
 #include <srsnode_motion/MotionConfig.h>
 using namespace srsnode_motion;
 
+template<typename TYPE = double>
 struct FactoryOdometryNoise
 {
     static cv::Mat fromConfiguration(MotionConfig& configuration)
     {
-        // TODO Fix this so that double comes from a template
-        cv::Mat R = (cv::Mat_<double>(1, STATIC_UKF_STATE_VECTOR_SIZE) <<
+        cv::Mat R = (cv::Mat_<TYPE>(1, STATIC_UKF_STATE_VECTOR_SIZE) <<
             0.0, // [m^2]
             0.0, // [m^2]
             0.0, // [rad^2]

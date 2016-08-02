@@ -15,11 +15,7 @@ using namespace std;
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
 
-#include <srsnode_motion/FactoryRobotProfile.hpp>
-
 namespace srs {
-
-const Velocity<> MotionController::ZERO_VELOCITY = Velocity<>(0.0, 0.0);
 
 unordered_map<int, string> MotionController::TASK_NAMES = {
     {TaskEnum::EMERGENCY_STOP, "EMERGENCY_STOP"},
@@ -133,8 +129,8 @@ void MotionController::reset()
 {
     // If the robot was moving for some reason,
     // stop it immediately
-    currentCommand_ = ZERO_VELOCITY;
-    executeCommand(true, CommandEnum::VELOCITY, &ZERO_VELOCITY);
+    currentCommand_ = Velocity<>::ZERO;
+    executeCommand(true, CommandEnum::VELOCITY, &Velocity<>::ZERO);
 
     // Reset all the controllers
     pathController_->reset();
@@ -188,18 +184,16 @@ void MotionController::run(Pose<> currentPose, Odometry<> currentOdometry, Veloc
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MotionController::setConfiguration(MotionConfig& configuration)
+void MotionController::setRobotProfile(RobotProfile robotProfile)
 {
-    RobotProfile robot = FactoryRobotProfile::fromConfiguration(configuration);
+    robot_ = robotProfile;
 
-    robot_ = robot;
-
-    pathController_->setRobotProfile(robot);
-    manualController_->setRobotProfile(robot);
-    rotationController_->setRobotProfile(robot);
-    standController_->setRobotProfile(robot);
-    stopController_->setRobotProfile(robot);
-    emergencyController_->setRobotProfile(robot);
+    pathController_->setRobotProfile(robotProfile);
+    manualController_->setRobotProfile(robotProfile);
+    rotationController_->setRobotProfile(robotProfile);
+    standController_->setRobotProfile(robotProfile);
+    stopController_->setRobotProfile(robotProfile);
+    emergencyController_->setRobotProfile(robotProfile);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

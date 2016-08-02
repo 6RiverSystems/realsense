@@ -102,7 +102,7 @@ public:
     }
 
     void step(double dT, Pose<> currentPose, Odometry<> currentOdometry);
-    virtual void setRobotProfile(RobotProfile robot) = 0;
+    virtual void setRobotProfile(RobotProfile robotProfile) = 0;
 
 protected:
     virtual void calculateLanding(Pose<> goal)
@@ -115,9 +115,9 @@ protected:
 
     virtual void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry) = 0;
 
-    void setRobotProfile(RobotProfile robot, double Kv, double Kw)
+    void setRobotProfile(RobotProfile robotProfile, double Kv, double Kw)
     {
-        robot_ = robot;
+        robot_ = robotProfile;
 
         Kv_ = Kv;
         Kw_ = Kw;

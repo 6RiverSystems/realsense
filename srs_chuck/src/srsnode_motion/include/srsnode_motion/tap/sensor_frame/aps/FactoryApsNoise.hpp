@@ -15,12 +15,12 @@
 #include <srsnode_motion/MotionConfig.h>
 using namespace srsnode_motion;
 
+template<typename TYPE = double>
 struct FactoryApsNoise
 {
     static cv::Mat fromConfiguration(MotionConfig& configuration)
     {
-        // TODO Fix this so that double comes from a template
-        cv::Mat R = (cv::Mat_<double>(1, STATIC_UKF_STATE_VECTOR_SIZE) <<
+        cv::Mat R = (cv::Mat_<TYPE>(1, STATIC_UKF_STATE_VECTOR_SIZE) <<
             pow(configuration.ukf_aps_error_location, 2.0), // [m^2]
             pow(configuration.ukf_aps_error_location, 2.0), // [m^2]
             pow(configuration.ukf_aps_error_heading, 2.0), // [rad^2]

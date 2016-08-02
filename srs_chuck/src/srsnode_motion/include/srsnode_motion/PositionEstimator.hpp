@@ -93,10 +93,9 @@ public:
 
     void run(Odometry<>* odometry);
 
-    void setConfiguration(MotionConfig& configuration)
+    void setRobotQ(cv::Mat Q)
     {
-        cv::Mat newQ = FactoryRobotNoise::fromConfiguration(configuration);
-        robot_.setQ(newQ);
+        robot_.setQ(Q);
     }
 
 private:

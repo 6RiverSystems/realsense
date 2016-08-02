@@ -27,6 +27,7 @@
 #include <srsnode_motion/tap/sensor_frame/imu/FactoryImuNoise.hpp>
 #include <srsnode_motion/tap/sensor_frame/odometry/FactoryOdometryNoise.hpp>
 #include <srsnode_motion/FactoryRobotNoise.hpp>
+#include <srsnode_motion/FactoryRobotProfile.hpp>
 
 #include <srsnode_motion/MotionConfig.h>
 
@@ -194,16 +195,19 @@ void Motion::executeSolution(Solution<GridSolutionItem> solution)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 {
-    positionEstimator_.setConfiguration(config);
-    motionController_.setConfiguration(config);
-
-    cv::Mat R = FactoryApsNoise::fromConfiguration(config);
-    tapAps_.getSensor()->setR(R);
+    cv::Mat apsR = FactoryApsNoise<double>::fromConfiguration(config);
+    tapAps_.getSensor()->setR(apsR);
     tapAps_.getSensor()->enable(config.sensor_aps_enabled);
 
-    R = FactoryOdometryNoise::fromConfiguration(config);
-    tapSensorFrame_.getSensorOdometry()->setR(R);
+    cv::Mat odometryR = FactoryOdometryNoise<double>::fromConfiguration(config);
+    tapSensorFrame_.getSensorOdometry()->setR(odometryR);
     tapSensorFrame_.getSensorOdometry()->enable(config.sensor_odometry_enabled);
+
+    cv::Mat robotQ = FactoryRobotNoise<double>::fromConfiguration(config);
+    positionEstimator_.setRobotQ(robotQ);
+
+    RobotProfile robotProfile = FactoryRobotProfile::fromConfiguration(config);
+    motionController_.setRobotProfile(robotProfile);
 
     isCustomActionEnabled_ = config.custom_action_enabled;
 

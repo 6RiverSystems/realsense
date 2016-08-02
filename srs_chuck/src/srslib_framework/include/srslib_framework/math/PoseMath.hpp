@@ -13,6 +13,7 @@ using namespace std;
 #include <opencv2/opencv.hpp>
 
 #include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/math/Base2Ocv.hpp>
 
 namespace srs {
 
@@ -82,12 +83,10 @@ struct PoseMath
         return sqrt(PoseMath::dot<TYPE>(p, p));
     }
 
-    // TODO: Better implement this function. The type of R should not be fixed but
-    // depending on TYPE (ocv2base in reverse)
     template<typename TYPE = double>
     static cv::Mat pose2mat(const Pose<TYPE> pose)
     {
-        cv::Mat R = cv::Mat::zeros(3, 1, CV_64F);
+        cv::Mat R = cv::Mat::zeros(3, 1, Base2Ocv<TYPE>::OCV_TYPE);
         R.at<TYPE>(0) = pose.x;
         R.at<TYPE>(1) = pose.y;
         R.at<TYPE>(2) = pose.theta;
@@ -98,7 +97,7 @@ struct PoseMath
     template<typename TYPE = double>
     static cv::Mat poseXY2mat(const Pose<TYPE> pose)
     {
-        cv::Mat R = cv::Mat::zeros(2, 1, CV_64F);
+        cv::Mat R = cv::Mat::zeros(2, 1, Base2Ocv<TYPE>::OCV_TYPE);
         R.at<TYPE>(0) = pose.x;
         R.at<TYPE>(1) = pose.y;
 
@@ -139,6 +138,7 @@ struct PoseMath
      * @brief Perform a pose rotation around itself.
      *
      * @tparam TYPE Basic type of the operation
+     *
      * @param p pose to rotate
      * @param angle Angle of the rotation
      *

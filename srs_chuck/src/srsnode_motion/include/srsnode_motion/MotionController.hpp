@@ -93,13 +93,11 @@ public:
     void reset();
     void run(Pose<> currentPose, Odometry<> currentOdometry, Velocity<> currentCommand);
 
-    void setConfiguration(MotionConfig& configuration);
+    void setRobotProfile(RobotProfile robotProfile);
     void switchToManual();
     void switchToAutonomous();
 
 private:
-    const static Velocity<> ZERO_VELOCITY;
-
     enum CommandEnum {
         BRAKE,
         VELOCITY

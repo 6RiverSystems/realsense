@@ -26,6 +26,8 @@ Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_irScanSubscriber( ),
 	m_depthScanSubscriber( ),
 	m_velocitySubscriber( ),
+	m_poseSubscriber( ),
+	m_solutionSubscriber( ),
 	m_commandPublisher( )
 {
 	bool obstacleDetected = false;
@@ -86,9 +88,19 @@ void Reflexes::OnOperationalStateChanged( const srslib_framework::MsgOperational
 	m_operationalState = *operationalState;
 }
 
-void Reflexes::OnChangeVelocity( const geometry_msgs::TwistStamped::ConstPtr& velocity )
+void Reflexes::OnVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity )
 {
 	m_obstacleDetector.SetVelocity( velocity->twist.linear.x, velocity->twist.angular.z );
+}
+
+void Reflexes::OnPoseChanged( const srslib_framework::MsgPose::ConstPtr& pose )
+{
+	m_obstacleDetector.SetPose( pose );
+}
+
+void Reflexes::OnSolutionChanged( const srslib_framework::MsgSolution::ConstPtr& solution )
+{
+	m_obstacleDetector.SetSolution( solution );
 }
 
 void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan )
@@ -159,8 +171,14 @@ void Reflexes::CreateSubscribers( )
 	m_operationalStateSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgOperationalState>(
 		OPERATIONAL_STATE_TOPIC, 10, std::bind( &Reflexes::OnOperationalStateChanged, this, std::placeholders::_1 ) );
 
-	m_velocitySubscriber = m_nodeHandle.subscribe<geometry_msgs::TwistStamped>( ODOMETRY_TOPIC, 1,
-	    std::bind( &Reflexes::OnChangeVelocity, this, std::placeholders::_1 ) );
+	m_poseSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgPose>(POSE_TOPIC, 10,
+		std::bind( &Reflexes::OnPoseChanged, this, std::placeholders::_1) );
+
+	m_solutionSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgSolution>(SOLUTION_TOPIC, 10,
+		std::bind( &Reflexes::OnSolutionChanged, this, std::placeholders::_1) );
+
+	m_velocitySubscriber = m_nodeHandle.subscribe<geometry_msgs::TwistStamped>(ODOMETRY_TOPIC, 1,
+	    std::bind( &Reflexes::OnVelocityChanged, this, std::placeholders::_1 ) );
 }
 
 void Reflexes::CreatePublishers( )

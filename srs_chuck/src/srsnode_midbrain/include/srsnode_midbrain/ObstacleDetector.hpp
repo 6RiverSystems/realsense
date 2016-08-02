@@ -17,9 +17,10 @@
 #include <boost/geometry/geometries/register/ring.hpp>
 #include <fstream>
 #include <iostream>
+#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/MsgSolution.h>
 
 namespace bg = boost::geometry;
-
 
 class Point {
 public:
@@ -72,6 +73,10 @@ public:
 
 	void SetVelocity( double linear, double angular );
 
+	void SetPose( const srslib_framework::MsgPose::ConstPtr& pose );
+
+	void SetSolution( const srslib_framework::MsgSolution::ConstPtr& solution );
+
 	void SetThreshold( uint32_t depthThreshold );
 
 	void ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan );
@@ -84,19 +89,23 @@ public:
 
 private:
 
-	ObstacleDetectedFn	m_obstacleDetectedCallback;
+	void UpdateDangerZone( );
 
-	bool				m_testMode;
+	ObstacleDetectedFn				m_obstacleDetectedCallback;
 
-	double				m_linearVelocity;
+	srslib_framework::MsgPose		m_pose;
 
-	double				m_angularVelocity;
+	srslib_framework::MsgSolution	m_solution;
 
-	uint32_t			m_irThreshold;
+	Polygon							m_dangerZone;
 
-	uint32_t			m_depthThreshold;
+	double							m_linearVelocity;
 
-	double				m_footprint;
+	double							m_angularVelocity;
+
+	uint32_t						m_depthThreshold;
+
+	double							m_footprint;
 
 };
 

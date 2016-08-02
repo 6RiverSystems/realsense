@@ -11,6 +11,7 @@
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/PoseStamped.h>
 
+#include <srslib_framework/TimeMath.h>
 #include <srslib_framework/MsgPose.h>
 
 namespace srs {

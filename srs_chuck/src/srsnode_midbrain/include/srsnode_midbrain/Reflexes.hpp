@@ -9,10 +9,12 @@
 #include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
 #include <srsnode_midbrain/ObstacleDetector.hpp>
-
 #include <sensor_msgs/LaserScan.h>
+#include <nav_msgs/Path.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <srslib_framework/MsgOperationalState.h>
+#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/MsgSolution.h>
 #include <dynamic_reconfigure/server.h>
 #include <srsnode_midbrain/ReflexesConfig.h>
 
@@ -25,7 +27,7 @@ public:
 	Reflexes( ros::NodeHandle& nodeHandle );
 	virtual ~Reflexes( );
 
-// Configuration Options
+// Configuration OptionsPathChanged
 
 	void Enable( bool enableDepthDetection );
 
@@ -35,7 +37,11 @@ public:
 
 	void OnOperationalStateChanged( const srslib_framework::MsgOperationalState::ConstPtr& operationalState );
 
-	void OnChangeVelocity( const geometry_msgs::TwistStamped::ConstPtr& velocity );
+	void OnVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity );
+
+	void OnPoseChanged( const srslib_framework::MsgPose::ConstPtr& pose );
+
+	void OnSolutionChanged( const srslib_framework::MsgSolution::ConstPtr& solution );
 
 	void OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan );
 
@@ -54,6 +60,10 @@ private:
 	static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/operational_state";
 
 	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
+
+	static constexpr auto SOLUTION_TOPIC = "/internal/state/goal/solution";
+
+	static constexpr auto POSE_TOPIC = "/internal/state/robot/pose";
 
 	static constexpr auto DEPTH_SCAN_TOPIC = "/camera/depth/scan";
 
@@ -85,6 +95,10 @@ private:
 	ros::Subscriber							m_depthScanSubscriber;
 
 	ros::Subscriber							m_velocitySubscriber;
+
+	ros::Subscriber							m_poseSubscriber;
+
+	ros::Subscriber							m_solutionSubscriber;
 
 	ros::Publisher							m_commandPublisher;
 

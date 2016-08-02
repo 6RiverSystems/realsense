@@ -5,6 +5,8 @@
  */
 
 #include <srsnode_midbrain/Reflexes.hpp>
+#include <srslib_framework/math/PoseMath.hpp>
+#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
@@ -47,6 +49,9 @@ namespace srs
 
 ObstacleDetector::ObstacleDetector( double footprint ) :
 	m_obstacleDetectedCallback( ),
+	m_pose( ),
+	m_solution( ),
+	m_dangerZone( ),
 	m_linearVelocity( 0.0f ),
 	m_angularVelocity( 0.0f ),
 	m_depthThreshold( 0 ),
@@ -70,6 +75,20 @@ void ObstacleDetector::SetVelocity( double linear, double angular )
 	m_linearVelocity = linear;
 
 	m_angularVelocity = angular;
+}
+
+void ObstacleDetector::SetPose( const srslib_framework::MsgPose::ConstPtr& pose )
+{
+	m_pose = *pose;
+
+	UpdateDangerZone( );
+}
+
+void ObstacleDetector::SetSolution( const srslib_framework::MsgSolution::ConstPtr& solution )
+{
+	m_solution = *solution;
+
+	UpdateDangerZone( );
 }
 
 void ObstacleDetector::SetThreshold( uint32_t depthThreshold )
@@ -194,7 +213,22 @@ Polygon ObstacleDetector::GetDangerZone( ) const
 	});
 
 	return dangerZone;
+}
 
+void ObstacleDetector::UpdateDangerZone( )
+{
+	Polygon dangerZone;
+
+	if( m_solution.items.size( ) )
+	{
+		// Build the danger zone from the solution
+		for( auto solutionItem : m_solution.items )
+		{
+			std::vector<Pose<>> targetArea = PoseMath::pose2polygon(PoseMessageFactory::msg2Pose(solutionItem.toPose), 0.0, 0.2, 0.2);
+		}
+	}
+
+	m_dangerZone = dangerZone;
 }
 
 } /* namespace srs */

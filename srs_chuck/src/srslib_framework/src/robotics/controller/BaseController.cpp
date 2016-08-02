@@ -74,7 +74,7 @@ void BaseController::executeCommand(double linear, double angular)
 
     executingCommand_ = Velocity<>(finalLinear, finalAngular);
 
-    ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "BaseController",
+    ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "base_controller",
         "Executing command: " << executingCommand_);
 }
 

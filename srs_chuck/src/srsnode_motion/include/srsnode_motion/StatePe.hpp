@@ -95,7 +95,9 @@ struct StatePe : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
 
     friend ostream& operator<<(ostream& stream, const StatePe& statePe)
     {
-        return "StatePe {" << statePe.pose << ", " << statePe.velocity << "}";
+        stream << "StatePe {" << statePe.pose << ", " << statePe.velocity << "}";
+
+        return stream;
     }
 
     Pose<BaseType> pose;

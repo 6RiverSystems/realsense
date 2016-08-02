@@ -107,8 +107,11 @@ void JoystickAdapter::run()
 
             if (requestLatch)
             {
+                if (!joystickLatched_)
+                {
+                    ROS_INFO("The joystick latch has been established");
+                }
                 joystickLatched_ = true;
-                ROS_INFO("The joystick latch has been established");
             }
 
             publishLatched(joystickLatched_);

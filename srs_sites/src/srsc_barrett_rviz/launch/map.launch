@@ -9,6 +9,7 @@
     <arg name="customer_map" value="barrett.yaml" />
     <arg name="customer_anchors" value="barrett-anchors.yaml" />
     <arg name="robot_configuration" value="$(optenv ROBOT_NAME development).yaml" />
+    <arg name="emulation" value="true" />
 
     <arg name="paused" default="false" />
     <arg name="use_sim_time" default="true" />
@@ -39,5 +40,6 @@
         <arg name="target_map" value="$(find srsc_barrett_rviz)/map/$(arg customer_map)" />
         <arg name="target_anchors" value="$(find srsc_barrett_rviz)/map/$(arg customer_anchors)" />
         <arg name="robot_configuration" value="$(find srsc_barrett_rviz)/robots/$(arg robot_configuration)" />
+        <arg name="emulation" value="$(arg emulation)" />
     </include>
 </launch>

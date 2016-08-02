@@ -17,7 +17,7 @@ using namespace std;
 
 #include <srsnode_motion/Configuration.hpp>
 
-#include <srsnode_motion/tap/odometry/OdometrySensor.hpp>
+#include <srsnode_motion/tap/sensor_frame/odometry/OdometrySensor.hpp>
 
 namespace srs {
 

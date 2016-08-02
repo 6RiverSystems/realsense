@@ -25,11 +25,6 @@ struct CmdVelocity : public Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>
 {
     typedef typename Ocv2Base<TYPE>::BaseType BaseType;
 
-    CmdVelocity(const BaseType linear, const BaseType angular) :
-        Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>(),
-        velocity(linear, angular)
-    {}
-
     CmdVelocity(const Velocity<BaseType> velocity) :
         Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>(),
         velocity(velocity)

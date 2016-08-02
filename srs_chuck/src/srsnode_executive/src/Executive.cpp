@@ -311,6 +311,10 @@ void Executive::publishInternalGoalSolution(Solution<GridSolutionItem>* solution
     {
         nav_msgs::Path messagePath = SolutionMessageFactory::gridSolution2PathMsg(*solution);
         pubStatusGoalPlan_.publish(messagePath);
+
+        srslib_framework::MsgSolution messageSolution =
+            SolutionMessageFactory::gridSolution2Msg(*solution);
+        pubInternalGoalSolution_.publish(messageSolution);
     }
     else
     {

@@ -243,41 +243,33 @@ void StarGazer::LoadTransforms( )
 bool StarGazer::LoadCalibrationTransform( const std::string& strConfigurationFile,
 	tf::Transform& stargazer )
 {
-	bool bSuccess = true;
+	// Default values
+	tf::Vector3 translation( 0.0308468412, -0.0687856119, 0.0f );
 
 	try
 	{
+		ROS_INFO_STREAM( "Stargazer: Calibration loading values from =>" << strConfigurationFile );
+
 		YAML::Node document = YAML::LoadFile( strConfigurationFile );
 
 		if( !document.IsNull( ) )
 		{
-			tf::Vector3 translation(
-				document["stargazer_offset"]["x"].as<double>( ),
-				document["stargazer_offset"]["y"].as<double>( ),
-				0.0f
-			);
-
-			stargazer.setRotation( tf::Quaternion::getIdentity( ) );
-			stargazer.setOrigin( translation );
-
-			ROS_INFO_STREAM( "Stargazer: Calibration (" << strConfigurationFile << "): x=" << translation.getX( ) << ", y=" << translation.getY( ) );
-		}
-		else
-		{
-			ROS_ERROR_STREAM( "Stargazer: Calibration file not found: " << strConfigurationFile );
-
-			bSuccess = false;
+			translation.setX( document["stargazer_offset"]["x"].as<double>( ) );
+			translation.setX( document["stargazer_offset"]["y"].as<double>( ) );
 		}
 	}
 	catch( const std::runtime_error& e )
 	{
-		ROS_ERROR_STREAM( "Stargazer: Could not parse yaml file for Stargazer calibration: " <<
-			strConfigurationFile << " " << e.what( ) );
-
-		bSuccess = false;
+		ROS_ERROR_STREAM( "Stargazer: Could not load or parse yaml file for Stargazer calibration: " <<
+			strConfigurationFile << ", using default values" );
 	}
 
-	return bSuccess;
+	stargazer.setRotation( tf::Quaternion::getIdentity( ) );
+	stargazer.setOrigin( translation );
+
+	ROS_INFO_STREAM( "Stargazer: Calibration x=" << translation.getX( ) << ", y=" << translation.getY( ) );
+
+	return true;
 }
 
 

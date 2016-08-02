@@ -18,18 +18,24 @@ namespace srs {
 
 struct VelocityMath
 {
+    /**
+     * @brief Return TRUE if the velocities are similar. In order to consider them
+     * similar:
+     *
+     * - The difference between linear velocities must be less than 0.001 m/s
+     * - The difference between angular velocities must be less than 0.005 deg/s
+     *
+     * @param lhv Left hand velocity
+     * @param rhv Right-hand velocity
+     *
+     * @return TRUE if the two velocities are similar
+     */
     template<typename TYPE = double>
     inline static bool equal(const Velocity<TYPE>& lhv, const Velocity<TYPE>& rhv)
     {
-        // The two velocities to be similar must:
-        //
-        // - difference in linear velocity must be less than 0.001 m/s
-        // - difference in angular velocity must be less than 0.05 deg/s
-        //
         return BasicMath::equal(lhv.linear, rhv.linear, 0.001) &&
             AngleMath::equalRad(lhv.angular, rhv.angular, 0.001);
     }
-
 };
 
 } // namespace srs

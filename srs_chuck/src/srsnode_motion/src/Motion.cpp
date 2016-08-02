@@ -23,8 +23,8 @@
 
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
-#include <srsnode_motion/tap/aps/FactoryApsNoise.hpp>
-#include <srsnode_motion/tap/odometry/FactoryOdometryNoise.hpp>
+#include <srsnode_motion/tap/sensor_frame/aps/FactoryApsNoise.hpp>
+#include <srsnode_motion/tap/sensor_frame/odometry/FactoryOdometryNoise.hpp>
 
 #include <srsnode_motion/MotionConfig.h>
 

@@ -49,7 +49,6 @@ ObstacleDetector::ObstacleDetector( double footprint ) :
 	m_obstacleDetectedCallback( ),
 	m_linearVelocity( 0.0f ),
 	m_angularVelocity( 0.0f ),
-	m_irThreshold( 0 ),
 	m_depthThreshold( 0 ),
 	m_footprint( footprint ),
 	m_testMode( false )
@@ -84,9 +83,8 @@ void ObstacleDetector::SetVelocity( double linear, double angular )
 	m_angularVelocity = angular;
 }
 
-void ObstacleDetector::SetThreshold( uint32_t irThreshold, uint32_t depthThreshold )
+void ObstacleDetector::SetThreshold( uint32_t depthThreshold )
 {
-	m_irThreshold = irThreshold;
 	m_depthThreshold = depthThreshold;
 }
 
@@ -99,7 +97,7 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 	 	return;
 	 }
 
-	uint32_t threshold = isIrScan ? m_irThreshold : m_depthThreshold;
+	uint32_t threshold = m_depthThreshold;
 
 	uint32_t numberOfObstacles = 0;
 

@@ -72,7 +72,7 @@ public:
 
 	void SetVelocity( double linear, double angular );
 
-	void SetThreshold( uint32_t irThreshold, uint32_t depthThreshold );
+	void SetThreshold( uint32_t depthThreshold );
 
 	void ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan );
 

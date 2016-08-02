@@ -11,7 +11,7 @@
 #include <srsnode_midbrain/ObstacleDetector.hpp>
 
 #include <sensor_msgs/LaserScan.h>
-#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/TwistStamped.h>
 #include <srslib_framework/MsgOperationalState.h>
 #include <dynamic_reconfigure/server.h>
 #include <srsnode_midbrain/ReflexesConfig.h>
@@ -27,15 +27,15 @@ public:
 
 // Configuration Options
 
-	void Enable(  bool enableIrDetection, bool enableDepthDetection );
+	void Enable( bool enableDepthDetection );
 
-	void SetObjectThreshold( uint32_t irThreshold, uint32_t depthThreshold );
+	void SetObjectThreshold( uint32_t depthThreshold );
 
 // Topic Callbacks
 
 	void OnOperationalStateChanged( const srslib_framework::MsgOperationalState::ConstPtr& operationalState );
 
-	void OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity );
+	void OnChangeVelocity( const geometry_msgs::TwistStamped::ConstPtr& velocity );
 
 	void OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan );
 
@@ -53,11 +53,9 @@ private:
 
 	static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/operational_state";
 
-	static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
+	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
 
-	static constexpr auto DEPTH_SCAN_TOPIC = "/camera/depth/scan_filtered";
-
-	static constexpr auto IR_SCAN_TOPIC = "/camera/infrared/scan_filtered";
+	static constexpr auto DEPTH_SCAN_TOPIC = "/camera/depth/scan";
 
 	static constexpr auto DANGER_ZONE_TOPIC = "/internal/state/reflexes/danger_zone";
 

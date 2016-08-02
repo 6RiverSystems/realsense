@@ -36,7 +36,7 @@ public:
     void receiveData(ros::Time currentTime, vector<char>& binaryData);
 
 private:
-    MESSAGE_BEGIN(SensorFrameData)
+    BRAINSTEM_MESSAGE_BEGIN(SensorFrameData)
         uint8_t cmd;
         uint32_t timestamp;
         float linear_velocity;
@@ -47,7 +47,7 @@ private:
         float yawRot;
         float pitchRot;
         float rollRot;
-    MESSAGE_END
+    BRAINSTEM_MESSAGE_END
 
     void publishImu();
     void publishOdometry();

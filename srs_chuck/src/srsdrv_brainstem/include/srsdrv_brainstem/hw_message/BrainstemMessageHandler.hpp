@@ -15,12 +15,12 @@ using namespace std;
 // brainstem message. The macro automatically define the
 // strict packing pragma and the struct for the
 // message data
-#define MESSAGE_BEGIN(name) \
+#define BRAINSTEM_MESSAGE_BEGIN(name) \
     _Pragma("pack(push, 1)") \
     struct name \
     {
 
-#define MESSAGE_END \
+#define BRAINSTEM_MESSAGE_END \
     }; \
     _Pragma("pack(pop)")
 

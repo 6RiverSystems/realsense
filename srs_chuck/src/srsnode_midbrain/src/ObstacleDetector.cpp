@@ -52,6 +52,7 @@ namespace srs
 ObstacleDetector::ObstacleDetector( double footprint ) :
 	m_obstacleDetectedCallback( ),
 	m_pose( ),
+	m_poseValid( false ),
 	m_posePolygon( ),
 	m_solution( ),
 	m_dangerZone( ),
@@ -91,6 +92,8 @@ void ObstacleDetector::SetActualVelocity( double linearVelocity, double angularV
 
 void ObstacleDetector::SetPose( const srslib_framework::MsgPose::ConstPtr& pose )
 {
+	m_poseValid = true;
+
 	m_posePolygon = Polygon( );
 
 	AddPoseToPolygon( PoseMessageFactory::msg2Pose(*pose), m_posePolygon );

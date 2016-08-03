@@ -104,6 +104,8 @@ private:
 
 	Pose<>							m_pose;
 
+	bool							m_poseValid;
+
 	Polygon							m_posePolygon;
 
 	Solution<GridSolutionItem>		m_solution;

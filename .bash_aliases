@@ -118,11 +118,7 @@ logChuck() {
 }
 
 recordChuck() {
-<<<<<<< HEAD
   rosbag record --split --buffsize=0 --duration=2m /camera/color/camera_info /camera/color/image_raw /camera/depth/camera_info /camera/depth/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
-=======
-  rosbag record --split --buffsize=0 --size=256 -j /camera/color/camera_info /camera/color/image_raw /camera/depth/camera_info /camera/depth/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
->>>>>>> develop
 }
 
 alias chucklog=logChuck

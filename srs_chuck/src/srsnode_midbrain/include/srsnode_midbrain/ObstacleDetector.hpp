@@ -68,7 +68,7 @@ class ObstacleDetector
 	typedef std::function<void()> ObstacleDetectedFn;
 
 public:
-	ObstacleDetector( double footprint );
+	ObstacleDetector( double footprintWidth, double footprintLength );
 	virtual ~ObstacleDetector( );
 
 	void SetDetectionCallback( ObstacleDetectedFn obstacleDetectedCallback );
@@ -90,13 +90,15 @@ public:
 
 	double GetSafeDistance( double linearVelocity, double angularVelocity ) const;
 
-	double GetFootprint( ) const;
+	double GetFootprintWidth( ) const;
+
+	double GetFootprintLength( ) const;
 
 	Ring GetDangerZone( ) const;
 
 private:
 
-	void AddPoseToPolygon( const Pose<>& pose, Polygon& polygon ) const;
+	void AddPoseToPolygon( const Pose<>& pose, Polygon& polygon, double width, double length ) const;
 
 	void UpdateDangerZone( );
 
@@ -106,11 +108,17 @@ private:
 
 	bool							m_poseValid;
 
+	Polygon							m_footprintPolygon;
+
 	Polygon							m_posePolygon;
 
 	Solution<GridSolutionItem>		m_solution;
 
 	Polygon							m_dangerZone;
+
+	double							m_footprintWidth;
+
+	double							m_footprintLength;
 
 	double							m_desiredLinearVelocity;
 
@@ -122,10 +130,9 @@ private:
 
 	uint32_t						m_depthThreshold;
 
-	double							m_footprint;
-
 };
 
 } /* namespace srs */
 
 #endif /* MIDBRAIN_OBSTACLE_DETECTOR_HPP_ */
+

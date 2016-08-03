@@ -83,7 +83,9 @@ function showChuck() {
 
   export DISPLAY=:0
 
-  rviz -d ~/ros/srs_sites/src/srsc_6rhq_rviz/rviz/config.rviz
+  rviz -d ~/ros/srs_sites/src/srsc_6rhq_rviz/rviz/config.rviz &
+
+  rqt &
 }
 
 function stopChuck() {

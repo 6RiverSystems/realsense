@@ -92,11 +92,13 @@ void ObstacleDetector::SetActualVelocity( double linearVelocity, double angularV
 
 void ObstacleDetector::SetPose( const srslib_framework::MsgPose::ConstPtr& pose )
 {
-	m_poseValid = true;
+	m_pose = PoseMessageFactory::msg2Pose(*pose);
 
 	m_posePolygon = Polygon( );
 
-	AddPoseToPolygon( PoseMessageFactory::msg2Pose(*pose), m_posePolygon );
+	AddPoseToPolygon( m_pose, m_posePolygon );
+
+	m_poseValid = true;
 }
 
 void ObstacleDetector::SetSolution( const srslib_framework::MsgSolution::ConstPtr& solution )
@@ -113,88 +115,91 @@ void ObstacleDetector::SetThreshold( uint32_t depthThreshold )
 
 void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 {
-	uint32_t numberOfObstacles = 0;
-
-	uint32_t numberOfScans = scan->ranges.size( );
-
-	double safeDistance = GetSafeDistance( m_actualLinearVelocity, m_actualAngularVelocity );
-
-	std::string strObstaclePoints;
-	std::string strValidPoints;
-	char pszPoints[255] = { '\0' };
-
-	// Translate from /base_footprint => /laser_frame (around the rotated robot)
-	Pose<> chuckPoseMap = PoseMath::translate( m_pose, 0.489, 0.0 );
-
-	ROS_DEBUG_STREAM_THROTTLE_NAMED( 1.0, "obstacle_detection", "Robot Pose: " << m_pose << ", Map: " << chuckPoseMap );
-
-	for( int x = 0; x < numberOfScans; x++ )
+	if( m_poseValid )
 	{
-		double angle = ((double)x * scan->angle_increment) + scan->angle_min;
+		uint32_t numberOfObstacles = 0;
 
-		double scanDistance = scan->ranges[x];
+		uint32_t numberOfScans = scan->ranges.size( );
 
-		if( std::isfinite( scanDistance ) )
+		double safeDistance = GetSafeDistance( m_actualLinearVelocity, m_actualAngularVelocity );
+
+		std::string strObstaclePoints;
+		std::string strValidPoints;
+		char pszPoints[255] = { '\0' };
+
+		// Translate from /base_footprint => /laser_frame (around the rotated robot)
+		Pose<> chuckPoseMap = PoseMath::translate( m_pose, 0.489, 0.0 );
+
+		ROS_DEBUG_STREAM_THROTTLE_NAMED( 1.0, "obstacle_detection", "Robot Pose: " << m_pose << ", Map: " << chuckPoseMap );
+
+		for( int x = 0; x < numberOfScans; x++ )
 		{
-			//               fY
-			//             ------
-			//             \    |
-			//              \   |
-			// scan distance \  | fX (Distance from chuck)
-			//                \0|
-			//                 \|
+			double angle = ((double)x * scan->angle_increment) + scan->angle_min;
 
-			// Rotate around the laser angle
-			Pose<> laserScanPose = PoseMath::rotate( chuckPoseMap, angle );
+			double scanDistance = scan->ranges[x];
 
-			// Translate by the scan distance
-			laserScanPose = PoseMath::translate( laserScanPose, scanDistance, 0.0 );
-
-			// Convert to boost geometry point
-			Point point( laserScanPose.x, laserScanPose.y );
-
-			// Calculate the distance from the robot polygon and the point (both in map space)
-			double distanceFromChuck = bg::distance( m_posePolygon, point );
-
-			sprintf( pszPoints, "(%.2f => %.2f, %.2f => %.2f) ", scanDistance, point.x, point.y, distanceFromChuck );
-
-			if( distanceFromChuck < safeDistance &&
-				boost::geometry::within( point, m_dangerZone ) )
+			if( std::isfinite( scanDistance ) )
 			{
-				strObstaclePoints += pszPoints;
+				//               fY
+				//             ------
+				//             \    |
+				//              \   |
+				// scan distance \  | fX (Distance from chuck)
+				//                \0|
+				//                 \|
 
-				numberOfObstacles++;
-			}
-			else
-			{
-				// Don't print out anything over double the safe distance (log spam)
-				if( distanceFromChuck < safeDistance * 2.0 )
+				// Rotate around the laser angle
+				Pose<> laserScanPose = PoseMath::rotate( chuckPoseMap, angle );
+
+				// Translate by the scan distance
+				laserScanPose = PoseMath::translate( laserScanPose, scanDistance, 0.0 );
+
+				// Convert to boost geometry point
+				Point point( laserScanPose.x, laserScanPose.y );
+
+				// Calculate the distance from the robot polygon and the point (both in map space)
+				double distanceFromChuck = bg::distance( m_posePolygon, point );
+
+				sprintf( pszPoints, "(%.2f => %.2f, %.2f => %.2f) ", scanDistance, point.x, point.y, distanceFromChuck );
+
+				if( distanceFromChuck < safeDistance &&
+					boost::geometry::within( point, m_dangerZone ) )
 				{
-					strValidPoints += pszPoints;
+					strObstaclePoints += pszPoints;
+
+					numberOfObstacles++;
+				}
+				else
+				{
+					// Don't print out anything over double the safe distance (log spam)
+					if( distanceFromChuck < safeDistance * 2.0 )
+					{
+						strValidPoints += pszPoints;
+					}
 				}
 			}
 		}
-	}
 
-	// Allow some number of spurious points that can make it through our filtering
-	if( numberOfObstacles > m_depthThreshold )
-	{
-		ROS_INFO_NAMED( "obstacle_detection", "Scans: %d, linear vel: %0.2f, angular vel: %0.2f, \
-			safeDistance: %.02f, Obstacles detected: %d, points: %s", numberOfScans,
-			m_actualLinearVelocity, m_actualAngularVelocity, safeDistance, numberOfObstacles, strObstaclePoints.c_str( ) );
-
-		if( m_obstacleDetectedCallback )
+		// Allow some number of spurious points that can make it through our filtering
+		if( numberOfObstacles > m_depthThreshold )
 		{
-			m_obstacleDetectedCallback( );
+			ROS_INFO_NAMED( "obstacle_detection", "Scans: %d, linear vel: %0.2f, angular vel: %0.2f, \
+				safeDistance: %.02f, Obstacles detected: %d, points: %s", numberOfScans,
+				m_actualLinearVelocity, m_actualAngularVelocity, safeDistance, numberOfObstacles, strObstaclePoints.c_str( ) );
+
+			if( m_obstacleDetectedCallback )
+			{
+				m_obstacleDetectedCallback( );
+			}
 		}
-	}
-	else
-	{
-		if( strValidPoints.size( ) )
+		else
 		{
-			ROS_DEBUG_THROTTLE_NAMED( 1.0, "obstacle_detection", "Scans: %d, linear vel: %0.2f, angular vel: %0.2f, \
-				safeDistance: %.02f, Objects detected: %d, points: %s", numberOfScans, m_actualLinearVelocity,
-				m_actualAngularVelocity, safeDistance, numberOfObstacles, strValidPoints.c_str( ) );
+			if( strValidPoints.size( ) )
+			{
+				ROS_DEBUG_THROTTLE_NAMED( 1.0, "obstacle_detection", "Scans: %d, linear vel: %0.2f, angular vel: %0.2f, \
+					safeDistance: %.02f, Objects detected: %d, points: %s", numberOfScans, m_actualLinearVelocity,
+					m_actualAngularVelocity, safeDistance, numberOfObstacles, strValidPoints.c_str( ) );
+			}
 		}
 	}
 }

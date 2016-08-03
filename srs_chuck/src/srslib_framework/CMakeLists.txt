@@ -100,7 +100,9 @@ find_package(catkin REQUIRED COMPONENTS
     message_generation
     std_msgs
     nav_msgs
+    cmake_modules
 )
+find_package(Eigen REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED)
 find_package(srslib_test REQUIRED)
@@ -114,7 +116,8 @@ include_directories(
     src/
     test/
     ${roscpp_INCLUDE_DIRS}
-    ${OpenCV_INCLUDE_DIRS} 
+	${Eigen_INCLUDE_DIRS}
+	${OpenCV_INCLUDE_DIRS} 
     ${srslib_test_INCLUDE_DIRS}
 )
 
@@ -165,6 +168,7 @@ add_dependencies(${PROJECT_LIBRARY}
 target_link_libraries(${PROJECT_LIBRARY}
     ${PROJECT_LIBRARIES}
     ${UNWIND_LIBRARIES}
+    ${Eigen_INCLUDE_DIRS}
 )
 
 ####################################################################################################

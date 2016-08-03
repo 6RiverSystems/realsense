@@ -37,13 +37,15 @@ public:
 
 	void OnOperationalStateChanged( const srslib_framework::MsgOperationalState::ConstPtr& operationalState );
 
-	void OnVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity );
+	void OnCommandVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity );
+
+	void OnOdomVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity );
 
 	void OnPoseChanged( const srslib_framework::MsgPose::ConstPtr& pose );
 
 	void OnSolutionChanged( const srslib_framework::MsgSolution::ConstPtr& solution );
 
-	void OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan );
+	void OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan );
 
 	void PublishDangerZone( ) const;
 
@@ -60,6 +62,8 @@ private:
 	static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/operational_state";
 
 	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
+
+	static constexpr auto CMD_VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
 
 	static constexpr auto SOLUTION_TOPIC = "/internal/state/goal/solution";
 
@@ -94,7 +98,9 @@ private:
 
 	ros::Subscriber							m_depthScanSubscriber;
 
-	ros::Subscriber							m_velocitySubscriber;
+	ros::Subscriber							m_commandVelocitySubscriber;
+
+	ros::Subscriber							m_odomVelocitySubscriber;
 
 	ros::Subscriber							m_poseSubscriber;
 

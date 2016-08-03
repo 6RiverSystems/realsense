@@ -25,7 +25,8 @@ Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_operationalStateSubscriber( ),
 	m_irScanSubscriber( ),
 	m_depthScanSubscriber( ),
-	m_velocitySubscriber( ),
+	m_commandVelocitySubscriber( ),
+	m_odomVelocitySubscriber( ),
 	m_poseSubscriber( ),
 	m_solutionSubscriber( ),
 	m_commandPublisher( )
@@ -59,7 +60,7 @@ void Reflexes::Enable( bool enableDepthDetection )
 			ROS_INFO_NAMED( "obstacle_detection", "Reflexes: Enabling Depth Detection" );
 
 			m_depthScanSubscriber = m_nodeHandle.subscribe<sensor_msgs::LaserScan>(
-					DEPTH_SCAN_TOPIC, 10, std::bind( &Reflexes::OnLaserScan, this, std::placeholders::_1, false ) );
+				DEPTH_SCAN_TOPIC, 10, std::bind( &Reflexes::OnLaserScan, this, std::placeholders::_1 ) );
 		}
 		else
 		{
@@ -88,9 +89,14 @@ void Reflexes::OnOperationalStateChanged( const srslib_framework::MsgOperational
 	m_operationalState = *operationalState;
 }
 
-void Reflexes::OnVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity )
+void Reflexes::OnCommandVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity )
 {
-	m_obstacleDetector.SetVelocity( velocity->twist.linear.x, velocity->twist.angular.z );
+	m_obstacleDetector.SetDesiredVelocity( velocity->twist.linear.x, velocity->twist.angular.z );
+}
+
+void Reflexes::OnOdomVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity )
+{
+	m_obstacleDetector.SetActualVelocity( velocity->twist.linear.x, velocity->twist.angular.z );
 }
 
 void Reflexes::OnPoseChanged( const srslib_framework::MsgPose::ConstPtr& pose )
@@ -103,16 +109,16 @@ void Reflexes::OnSolutionChanged( const srslib_framework::MsgSolution::ConstPtr&
 	m_obstacleDetector.SetSolution( solution );
 }
 
-void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan )
+void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 {
-	m_obstacleDetector.ProcessScan( scan, isIrScan );
+	m_obstacleDetector.ProcessScan( scan );
 }
 
 void Reflexes::PublishDangerZone( ) const
 {
 	geometry_msgs::PolygonStamped messageLanding;
 
-	messageLanding.header.frame_id = "laser_frame";
+	messageLanding.header.frame_id = "/map";
 	messageLanding.header.stamp = ros::Time::now( );
 
 	std::vector<geometry_msgs::Point32> polygon;
@@ -177,8 +183,11 @@ void Reflexes::CreateSubscribers( )
 	m_solutionSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgSolution>(SOLUTION_TOPIC, 10,
 		std::bind( &Reflexes::OnSolutionChanged, this, std::placeholders::_1) );
 
-	m_velocitySubscriber = m_nodeHandle.subscribe<geometry_msgs::TwistStamped>(ODOMETRY_TOPIC, 1,
-	    std::bind( &Reflexes::OnVelocityChanged, this, std::placeholders::_1 ) );
+	m_commandVelocitySubscriber = m_nodeHandle.subscribe<geometry_msgs::TwistStamped>(CMD_VELOCITY_TOPIC, 1,
+	    std::bind( &Reflexes::OnCommandVelocityChanged, this, std::placeholders::_1 ) );
+
+	m_odomVelocitySubscriber = m_nodeHandle.subscribe<geometry_msgs::TwistStamped>(ODOMETRY_TOPIC, 1,
+		std::bind( &Reflexes::OnOdomVelocityChanged, this, std::placeholders::_1 ) );
 }
 
 void Reflexes::CreatePublishers( )

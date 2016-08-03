@@ -21,6 +21,8 @@
 #include <iostream>
 #include <srslib_framework/MsgPose.h>
 #include <srslib_framework/MsgSolution.h>
+#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 
 namespace bg = boost::geometry;
 
@@ -74,7 +76,9 @@ public:
 	void SetTestMode( bool testMode );
 	bool GetTestMode( ) const;
 
-	void SetVelocity( double linear, double angular );
+	void SetDesiredVelocity( double linear, double angular );
+
+	void SetActualVelocity( double linear, double angular );
 
 	void SetPose( const srslib_framework::MsgPose::ConstPtr& pose );
 
@@ -82,7 +86,7 @@ public:
 
 	void SetThreshold( uint32_t depthThreshold );
 
-	void ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan, bool isIrScan );
+	void ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan );
 
 	double GetSafeDistance( double linearVelocity, double angularVelocity ) const;
 
@@ -92,19 +96,27 @@ public:
 
 private:
 
+	void AddPoseToPolygon( const Pose<>& pose, Polygon& polygon ) const;
+
 	void UpdateDangerZone( );
 
 	ObstacleDetectedFn				m_obstacleDetectedCallback;
 
-	srslib_framework::MsgPose		m_pose;
+	Pose<>							m_pose;
 
-	srslib_framework::MsgSolution	m_solution;
+	Polygon							m_posePolygon;
+
+	Solution<GridSolutionItem>		m_solution;
 
 	Polygon							m_dangerZone;
 
-	double							m_linearVelocity;
+	double							m_desiredLinearVelocity;
 
-	double							m_angularVelocity;
+	double							m_desiredAngularVelocity;
+
+	double							m_actualLinearVelocity;
+
+	double							m_actualAngularVelocity;
 
 	uint32_t						m_depthThreshold;
 

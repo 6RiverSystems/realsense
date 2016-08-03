@@ -106,24 +106,18 @@ struct PoseMath
     }
 
     template<typename TYPE = double>
-    static vector<Pose<>> pose2polygon(const Pose<TYPE> center, TYPE offset, TYPE width, TYPE depth)
+    static vector<Pose<>> pose2polygon(const Pose<TYPE> center, TYPE offsetX, TYPE offsetY, TYPE width, TYPE depth)
     {
-        Pose<> reflection = PoseMath::rotate(center, M_PI);
-        Pose<> p = PoseMath::transform(reflection, offset);
+    	// Pose coordinate system is rotated by -PI relative to the map
+        Pose<> rotatedPose = PoseMath::rotate(center, -M_PI);
 
-        reflection = PoseMath::rotate(p, M_PI_2);
-        Pose<> p0 = PoseMath::transform(reflection, width / 2);
+        // Translate by the offset
+        rotatedPose = PoseMath::translate(rotatedPose, offsetX, offsetY);
 
-        reflection = PoseMath::rotate(p, -M_PI_2);
-        Pose<> p1 = PoseMath::transform(reflection, width / 2);
-
-        reflection = p1;
-        reflection.theta = center.theta;
-        Pose<> p2 = PoseMath::transform(reflection, depth);
-
-        reflection = p0;
-        reflection.theta = center.theta;
-        Pose<> p3 = PoseMath::transform(reflection, depth);
+        Pose<> p0 = PoseMath::translate(rotatedPose,  depth / 2.0f, -width / 2.0f);
+        Pose<> p1 = PoseMath::translate(rotatedPose,  depth / 2.0f,  width / 2.0f);
+        Pose<> p2 = PoseMath::translate(rotatedPose, -depth / 2.0f,  width / 2.0f);
+        Pose<> p3 = PoseMath::translate(rotatedPose, -depth / 2.0f, -width / 2.0f);
 
         vector<Pose<>> polygon;
         polygon.clear();
@@ -154,11 +148,11 @@ struct PoseMath
     }
 
     template<typename TYPE = double>
-    inline static Pose<TYPE> transform(Pose<TYPE> p, TYPE distance)
+    inline static Pose<TYPE> translate(Pose<TYPE> p, TYPE x, TYPE y)
     {
         return Pose<TYPE>(
-            p.x + distance * cos(p.theta),
-            p.y + distance * sin(p.theta),
+            p.x + x * cos(p.theta) - y * sin(p.theta),
+            p.y + x * sin(p.theta) + y * cos(p.theta),
             p.theta);
     }
 };

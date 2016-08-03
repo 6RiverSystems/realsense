@@ -47,7 +47,7 @@
         <arg name="emulation" value="$(arg emulation)" />
     </include>
 
-    <!-- <include file="$(find srsnode_midbrain)/launch/node.launch" /> -->
+    <include file="$(find srsnode_midbrain)/launch/node.launch" />
     <include file="$(find srsnode_executive)/launch/node.launch" />
 
     <!-- Launch the ros-bridge -->

@@ -65,7 +65,7 @@ public:
 
     bool newImuDataAvailable() const
     {
-        return newDataAvailable(); // sensorImu_->newDataAvailable();
+        return newDataAvailable();
     }
 
     bool newOdometryDataAvailable() const

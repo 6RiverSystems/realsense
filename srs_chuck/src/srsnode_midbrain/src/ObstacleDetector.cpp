@@ -213,9 +213,9 @@ double ObstacleDetector::GetSafeDistance( double linearVelocity, double angularV
 		// Calculated from actual measurements and polynomial regression fitting
 		// https://docs.google.com/a/6river.com/spreadsheets/d/1wUPgpESlp-MVbnMGCmFDGH2/2qyO39D8kzvi7IPZ1Q1c/edit?usp=sharing
 		// http://www.xuru.org/rt/PR.asp#CopyPaste
-		double calculatedSafeDistance = ( 0.3518981019f * pow( linearVelocity, 2 ) - 0.03806193806f * linearVelocity + 0.01804195804f ) * 1.5;
+		double calculatedSafeDistance = ( 0.3518981019f * pow( linearVelocity, 2 ) - 0.03806193806f * linearVelocity + 0.01804195804f ) * 2.0;
 
-		safeDistance = std::max( calculatedSafeDistance, 0.45 );
+		safeDistance = std::max( calculatedSafeDistance, 0.75 );
 
 		ROS_DEBUG_THROTTLE_NAMED( 1.0f, "obstacle_detection", "calculatedSafeDistance: %0.2f, safeDistance: %0.2f", calculatedSafeDistance, safeDistance ); 
 	}

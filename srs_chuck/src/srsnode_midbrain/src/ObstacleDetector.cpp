@@ -49,19 +49,21 @@ std::ostream& operator<<( std::ostream& os, const Ring& polygon )
 namespace srs
 {
 
-ObstacleDetector::ObstacleDetector( double footprint ) :
+ObstacleDetector::ObstacleDetector( double footprintWidth, double footprintHeight ) :
 	m_obstacleDetectedCallback( ),
 	m_pose( ),
 	m_poseValid( false ),
+	m_footprintPolygon( ),
 	m_posePolygon( ),
 	m_solution( ),
 	m_dangerZone( ),
+	m_footprintWidth( footprintWidth ),
+	m_footprintLength( footprintHeight),
 	m_desiredLinearVelocity( 0.0f ),
 	m_desiredAngularVelocity( 0.0f ),
 	m_actualLinearVelocity( 0.0f ),
 	m_actualAngularVelocity( 0.0f ),
-	m_depthThreshold( 0 ),
-	m_footprint( footprint )
+	m_depthThreshold( 0 )
 {
 
 }
@@ -94,9 +96,11 @@ void ObstacleDetector::SetPose( const srslib_framework::MsgPose::ConstPtr& pose 
 {
 	m_pose = PoseMessageFactory::msg2Pose(*pose);
 
+	m_footprintPolygon = Polygon( );
 	m_posePolygon = Polygon( );
 
-	AddPoseToPolygon( m_pose, m_posePolygon );
+	AddPoseToPolygon( m_pose, m_footprintPolygon, m_footprintWidth, m_footprintLength );
+	AddPoseToPolygon( m_pose, m_posePolygon, m_footprintWidth, m_footprintWidth );
 
 	m_poseValid = true;
 }
@@ -128,9 +132,7 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 		char pszPoints[255] = { '\0' };
 
 		// Translate from /base_footprint => /laser_frame (around the rotated robot)
-		Pose<> chuckPoseMap = PoseMath::translate( m_pose, 0.489, 0.0 );
-
-		ROS_DEBUG_STREAM_THROTTLE_NAMED( 1.0, "obstacle_detection", "Robot Pose: " << m_pose << ", Map: " << chuckPoseMap );
+		Pose<> laserFramePoint = PoseMath::translate( m_pose, 0.489, 0.0 );
 
 		for( int x = 0; x < numberOfScans; x++ )
 		{
@@ -149,7 +151,7 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 				//                 \|
 
 				// Rotate around the laser angle
-				Pose<> laserScanPose = PoseMath::rotate( chuckPoseMap, angle );
+				Pose<> laserScanPose = PoseMath::rotate( laserFramePoint, angle );
 
 				// Translate by the scan distance
 				laserScanPose = PoseMath::translate( laserScanPose, scanDistance, 0.0 );
@@ -158,21 +160,19 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 				Point point( laserScanPose.x, laserScanPose.y );
 
 				// Calculate the distance from the robot polygon and the point (both in map space)
-				double distanceFromChuck = bg::distance( m_posePolygon, point );
+				double distanceFromChuck = bg::distance( m_footprintPolygon, point );
 
 				sprintf( pszPoints, "(%.2f => %.2f, %.2f => %.2f) ", scanDistance, point.x, point.y, distanceFromChuck );
 
-				if( distanceFromChuck < safeDistance &&
-					boost::geometry::within( point, m_dangerZone ) )
+				if( boost::geometry::within( point, m_dangerZone ) )
 				{
-					strObstaclePoints += pszPoints;
+					if( distanceFromChuck < safeDistance  )
+					{
+						strObstaclePoints += pszPoints;
 
-					numberOfObstacles++;
-				}
-				else
-				{
-					// Don't print out anything over double the safe distance (log spam)
-					if( distanceFromChuck < safeDistance * 2.0 )
+						numberOfObstacles++;
+					}
+					else if( distanceFromChuck < safeDistance* 2 )
 					{
 						strValidPoints += pszPoints;
 					}
@@ -223,9 +223,14 @@ double ObstacleDetector::GetSafeDistance( double linearVelocity, double angularV
 	return safeDistance;
 }
 
-double ObstacleDetector::GetFootprint( ) const
+double ObstacleDetector::GetFootprintWidth( ) const
 {
-	return m_footprint;
+	return m_footprintWidth;
+}
+
+double ObstacleDetector::GetFootprintLength( ) const
+{
+	return m_footprintLength;
 }
 
 Ring ObstacleDetector::GetDangerZone( ) const
@@ -233,9 +238,9 @@ Ring ObstacleDetector::GetDangerZone( ) const
 	return m_dangerZone.outer( );
 }
 
-void ObstacleDetector::AddPoseToPolygon( const Pose<>& pose, Polygon& polygon ) const
+void ObstacleDetector::AddPoseToPolygon( const Pose<>& pose, Polygon& polygon, double width, double length ) const
 {
-	std::vector<Pose<>> posePoly = PoseMath::pose2polygon(pose, 0.0, 0.0, m_footprint*2, m_footprint*2);
+	std::vector<Pose<>> posePoly = PoseMath::pose2polygon(pose, 0.0, 0.0, width, length );
 
 	Ring footprintPoints;
 
@@ -273,7 +278,7 @@ void ObstacleDetector::UpdateDangerZone( )
 		// Build the danger zone from the solution
 		for( auto solutionItem : m_solution )
 		{
-			AddPoseToPolygon( solutionItem.toPose, dangerZone );
+			AddPoseToPolygon( solutionItem.toPose, dangerZone, m_footprintWidth, m_footprintWidth );
 		}
 	}
 

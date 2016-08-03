@@ -76,7 +76,8 @@ private:
 	static constexpr auto COMMAND_TOPIC = "/cmd_ll";
 
 	// TODO: Get footprint from robot model (lookup topic, load urdf, etc.)
-	static constexpr auto ROBOT_WIDTH = 0.64f;
+	static constexpr auto ROBOT_WIDTH = 0.619125;
+	static constexpr auto ROBOT_LENGTH = 0.9772396;
 
     dynamic_reconfigure::Server<srsnode_midbrain::ReflexesConfig> m_configServer;
 

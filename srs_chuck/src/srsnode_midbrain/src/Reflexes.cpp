@@ -21,7 +21,7 @@ Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_enableDepthDetection( false ),
 	m_sendHardStop( false ),
 	m_operationalState( ),
-	m_obstacleDetector( ROBOT_WIDTH / 2.0f ),
+	m_obstacleDetector( ROBOT_WIDTH, ROBOT_LENGTH ),
 	m_operationalStateSubscriber( ),
 	m_irScanSubscriber( ),
 	m_depthScanSubscriber( ),

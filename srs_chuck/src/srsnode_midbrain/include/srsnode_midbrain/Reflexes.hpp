@@ -37,7 +37,7 @@ public:
 
 	void OnOperationalStateChanged( const srslib_framework::MsgOperationalState::ConstPtr& operationalState );
 
-	void OnCommandVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity );
+	void OnCommandVelocityChanged( const geometry_msgs::Twist::ConstPtr& velocity );
 
 	void OnOdomVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity );
 

@@ -120,6 +120,11 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 	std::string strValidPoints;
 	char pszPoints[255] = { '\0' };
 
+	// Translate from /base_footprint => /laser_frame (around the rotated robot)
+	Pose<> chuckPoseMap = PoseMath::translate( m_pose, 0.489, 0.0 );
+
+	ROS_DEBUG_STREAM_THROTTLE_NAMED( 1.0, "obstacle_detection", "Robot Pose: " << m_pose << ", Map: " << chuckPoseMap );
+
 	for( int x = 0; x < numberOfScans; x++ )
 	{
 		double angle = ((double)x * scan->angle_increment) + scan->angle_min;
@@ -136,25 +141,23 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 			//                \0|
 			//                 \|
 
-			// Translate from /base_footprint => /laser_frame (around the rotated robot)
-			Pose<> mapPose = PoseMath::translate( m_pose, 0.489, 0.0 );
-
 			// Rotate around the laser angle
-			mapPose = PoseMath::rotate( mapPose, angle );
+			Pose<> laserScanPose = PoseMath::rotate( chuckPoseMap, angle );
 
 			// Translate by the scan distance
-			mapPose = PoseMath::translate( m_pose, scanDistance, 0.0 );
+			laserScanPose = PoseMath::translate( laserScanPose, scanDistance, 0.0 );
 
 			// Convert to boost geometry point
-			Point point( mapPose.x, mapPose.y );
+			Point point( laserScanPose.x, laserScanPose.y );
 
 			// Calculate the distance from the robot polygon and the point (both in map space)
 			double distanceFromChuck = bg::distance( m_posePolygon, point );
 
+			sprintf( pszPoints, "(%.2f => %.2f, %.2f => %.2f) ", scanDistance, point.x, point.y, distanceFromChuck );
+
 			if( distanceFromChuck < safeDistance &&
 				boost::geometry::within( point, m_dangerZone ) )
 			{
-				sprintf( pszPoints, "%.2f, %.2f ", point.x, point.y );
 				strObstaclePoints += pszPoints;
 
 				numberOfObstacles++;
@@ -164,7 +167,6 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 				// Don't print out anything over double the safe distance (log spam)
 				if( distanceFromChuck < safeDistance * 2.0 )
 				{
-					sprintf( pszPoints, "(%.2f, %.2f ", point.x, point.y );
 					strValidPoints += pszPoints;
 				}
 			}
@@ -243,7 +245,7 @@ void ObstacleDetector::AddPoseToPolygon( const Pose<>& pose, Polygon& polygon ) 
 	bg::correct( footprintPolygon );
 	bg::correct( polygon );
 
-	// Create the combined polygon by unioning the new pose polygon
+	// Create the combined polygon by creating a union of the pose polygon and the input polygon
 	bg::union_( footprintPolygon, polygon, combinedZone );
 
 	assert( combinedZone.size( ) );

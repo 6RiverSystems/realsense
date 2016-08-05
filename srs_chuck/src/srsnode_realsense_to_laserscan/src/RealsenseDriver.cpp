@@ -49,15 +49,15 @@ cv::Mat applyCustomColorMap(cv::Mat& im_gray)
 		cv::Vec3b color;
 
 
-		if( i > 0 && i <= 64 )
+		if( i > 0 && i <= 96 )
 		{
-			double scale = 1.0f - ((double)64 - (double)i)/(double)64*0.5f;
-			color = cv::Vec3b(0,0,255*scale); // 1.0m => 2.0m;
+			double scale = 1.0f - ((double)96 - (double)i)/(double)96*0.5f;
+			color = cv::Vec3b(0,0,255*scale); // 0.0m => 0.75m;
 		}
 		else if( i <= 128 )
 		{
 			double scale = 1.0f - ((double)128 - (double)i)/(double)128*0.5f;
-			color = cv::Vec3b(0,255*scale,0); // 1.0m => 2.0m;
+			color = cv::Vec3b(0,255*scale,0); // 0.75m => 2.0m;
 		}
 		else
 		{
@@ -79,6 +79,8 @@ cv::Mat applyCustomColorMap(cv::Mat& im_gray)
 void RealsenseDriver::OnDepthData( const sensor_msgs::Image::ConstPtr& depthImage )
 {
 	cv_bridge::CvImagePtr cvDepthImage = GetCvImage( depthImage );
+
+	cv::flip(cvDepthImage->image, cvDepthImage->image, -1);
 
 	cv::Mat medianFilterImg;
 	cv::medianBlur( cvDepthImage->image, medianFilterImg, 5 );

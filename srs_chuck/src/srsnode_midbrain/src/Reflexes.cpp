@@ -17,13 +17,15 @@ namespace srs
 
 Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_nodeHandle( nodeHandle ),
-	m_enable( false ),
+	m_enabledetection( false ),
 	m_sendHardStop( false ),
 	m_operationalState( ),
-	m_obstacleDetector( ROBOT_WIDTH / 2.0f ),
+	m_obstacleDetector( ROBOT_WIDTH, ROBOT_LENGTH ),
 	m_operationalStateSubscriber( ),
-	m_laserScanSubscriber( ),
-	m_velocitySubscriber( ),
+	m_depthScanSubscriber( ),
+	m_odomVelocitySubscriber( ),
+	m_poseSubscriber( ),
+	m_solutionSubscriber( ),
 	m_commandPublisher( )
 {
 	bool obstacleDetected = false;
@@ -31,6 +33,10 @@ Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_obstacleDetector.SetDetectionCallback( std::bind( &Reflexes::OnObstacleDetected, this ) );
 
 	m_configServer.setCallback( boost::bind( &Reflexes::onConfigChange, this, _1, _2 ) );
+
+	CreateSubscribers( );
+
+	CreatePublishers( );
 }
 
 Reflexes::~Reflexes( )
@@ -42,34 +48,31 @@ Reflexes::~Reflexes( )
 // Configuration Options
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Reflexes::Enable( bool enable )
+void Reflexes::Enable( bool enableDetection )
 {
-	if( m_enable != enable )
+	if( m_enableDetection != enableDetection )
 	{
-		if( enable )
+		if( enableDetection )
 		{
-			ROS_INFO_NAMED( "obstacle_detection", "Enabling Obstacle Detection" );
+			ROS_INFO_NAMED( "obstacle_detection", "Reflexes: Enabling Depth Detection" );
 
-			CreateSubscribers( );
-
-			CreatePublishers( );
+			m_depthScanSubscriber = m_nodeHandle.subscribe<sensor_msgs::LaserScan>(
+				DEPTH_SCAN_TOPIC, 10, std::bind( &Reflexes::OnLaserScan, this, std::placeholders::_1 ) );
 		}
 		else
 		{
-			ROS_INFO_NAMED( "obstacle_detection", "Disabling Obstacle Detection" );
+			ROS_INFO_NAMED( "obstacle_detection", "Disabling Depth Detection" );
 
-			DestroySubscribers( );
-
-			DestroyPublishers( );
+			m_depthScanSubscriber.shutdown( );
 		}
 
-		m_enable = enable;
+		m_enableDetection = enableDetection;
 	}
 }
 
-void Reflexes::SetObjectThreshold( uint32_t objectThreshold )
+void Reflexes::SetObjectThreshold( uint32_t threshold )
 {
-	m_obstacleDetector.SetObjectThreshold( objectThreshold );
+	m_obstacleDetector.SetThreshold( threshold );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,14 +81,24 @@ void Reflexes::SetObjectThreshold( uint32_t objectThreshold )
 
 void Reflexes::OnOperationalStateChanged( const srslib_framework::MsgOperationalState::ConstPtr& operationalState )
 {
-	ROS_INFO_STREAM_NAMED( "obstacle_detection", "OnOperationalStateChanged: " << operationalState->pause );
+	ROS_INFO_STREAM_NAMED( "obstacle_detection", "Reflexes: OnOperationalStateChanged: " << operationalState->pause );
 
 	m_operationalState = *operationalState;
 }
 
-void Reflexes::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity )
+void Reflexes::OnOdomVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity )
 {
-	m_obstacleDetector.SetVelocity( velocity->linear.x, velocity->angular.z );
+	m_obstacleDetector.SetVelocity( velocity->twist.linear.x, velocity->twist.angular.z );
+}
+
+void Reflexes::OnPoseChanged( const srslib_framework::MsgPose::ConstPtr& pose )
+{
+	m_obstacleDetector.SetPose( pose );
+}
+
+void Reflexes::OnSolutionChanged( const srslib_framework::MsgSolution::ConstPtr& solution )
+{
+	m_obstacleDetector.SetSolution( solution );
 }
 
 void Reflexes::OnLaserScan( const sensor_msgs::LaserScan::ConstPtr& scan )
@@ -97,12 +110,12 @@ void Reflexes::PublishDangerZone( ) const
 {
 	geometry_msgs::PolygonStamped messageLanding;
 
-	messageLanding.header.frame_id = "laser_frame";
+	messageLanding.header.frame_id = "/map";
 	messageLanding.header.stamp = ros::Time::now( );
 
 	std::vector<geometry_msgs::Point32> polygon;
 
-	Polygon dangerZone = m_obstacleDetector.GetDangerZone( );
+	Ring dangerZone = m_obstacleDetector.GetDangerZone( );
 
 	for( const Point& point : dangerZone )
 	{
@@ -121,28 +134,27 @@ void Reflexes::PublishDangerZone( ) const
 
 void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t level)
 {
-	ROS_INFO_NAMED( "obstacle_detection", "Midbrain config changed: od enabled: %d, hardStop: %d, threshold: %d",
-		config.enable_obstacle_detection, config.enable_hard_stop, config.object_threshold );
+	ROS_INFO_NAMED( "obstacle_detection", "Reflexes: Midbrain config changed: hardStop: %d, depth scan: %d, depth threshold: %d",
+		config.threshold, config.enable_hard_stop, config.threshold );
 
-	SetObjectThreshold( config.object_threshold );
+	SetObjectThreshold( config.threshold );
 
-	Enable( config.enable_obstacle_detection );
+	Enable( config.enable_depth_scan );
 
 	m_sendHardStop = config.enable_hard_stop;
 }
 
 void Reflexes::OnObstacleDetected( )
 {
-	ROS_INFO_NAMED( "obstacle_detection", "OnObstacleDetected: paused: %d, enabled: %d, hardStop: %d",
-		m_operationalState.pause, m_enable, m_sendHardStop );
+	ROS_INFO_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: paused: %d, hardStop: %d",
+		m_operationalState.pause, m_sendHardStop );
 
 	// Only send a hard stop if we are paused
 	if( !m_operationalState.pause &&
 		!m_operationalState.hardStop &&
-		m_enable &&
 		m_sendHardStop )
 	{
-		ROS_INFO_STREAM_NAMED( "obstacle_detection", "OnObstacleDetected: Sending STOP" );
+		ROS_INFO_STREAM_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: Sending STOP" );
 
 		// Send the hard stop
 		std_msgs::String msg;
@@ -157,20 +169,14 @@ void Reflexes::CreateSubscribers( )
 	m_operationalStateSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgOperationalState>(
 		OPERATIONAL_STATE_TOPIC, 10, std::bind( &Reflexes::OnOperationalStateChanged, this, std::placeholders::_1 ) );
 
-	m_laserScanSubscriber = m_nodeHandle.subscribe<sensor_msgs::LaserScan>(
-		SCAN_TOPIC, 10, std::bind( &Reflexes::OnLaserScan, this, std::placeholders::_1 ) );
+	m_poseSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgPose>(POSE_TOPIC, 10,
+		std::bind( &Reflexes::OnPoseChanged, this, std::placeholders::_1) );
 
-	m_velocitySubscriber = m_nodeHandle.subscribe<geometry_msgs::Twist>( VELOCITY_TOPIC, 1,
-	    std::bind( &Reflexes::OnChangeVelocity, this, std::placeholders::_1 ) );
-}
+	m_solutionSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgSolution>(SOLUTION_TOPIC, 10,
+		std::bind( &Reflexes::OnSolutionChanged, this, std::placeholders::_1) );
 
-void Reflexes::DestroySubscribers( )
-{
-	m_operationalStateSubscriber.shutdown( );
-
-	m_laserScanSubscriber.shutdown( );
-
-	m_velocitySubscriber.shutdown( );
+	m_odomVelocitySubscriber = m_nodeHandle.subscribe<geometry_msgs::TwistStamped>(ODOMETRY_TOPIC, 1,
+		std::bind( &Reflexes::OnOdomVelocityChanged, this, std::placeholders::_1 ) );
 }
 
 void Reflexes::CreatePublishers( )
@@ -180,9 +186,5 @@ void Reflexes::CreatePublishers( )
 	m_dangerZonePublisher = m_nodeHandle.advertise<geometry_msgs::PolygonStamped>( DANGER_ZONE_TOPIC, 1 );
 }
 
-void Reflexes::DestroyPublishers( )
-{
-	m_commandPublisher.shutdown( );
-}
-
 } /* namespace srs */
+

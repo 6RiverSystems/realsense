@@ -48,7 +48,7 @@ void Robot<TYPE>::kinematics(StatePe<TYPE> sT0, BaseType dT, StatePe<TYPE>& sT1)
     }
     else
     {
-        sT1.pose = PoseMath::transform<double>(sT0.pose, v * dT);
+        sT1.pose = PoseMath::translate<double>(sT0.pose, v * dT, 0.0);
     }
 }
 

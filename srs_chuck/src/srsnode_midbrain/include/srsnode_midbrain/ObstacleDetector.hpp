@@ -12,14 +12,19 @@
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/multi/geometries/multi_polygon.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/geometries/register/ring.hpp>
+#include <boost/geometry/multi/geometries/register/multi_polygon.hpp>
 #include <fstream>
 #include <iostream>
+#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/MsgSolution.h>
+#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 
 namespace bg = boost::geometry;
-
 
 class Point {
 public:
@@ -45,14 +50,15 @@ public:
 
 };
 
-typedef std::vector<Point> Polygon;
+typedef std::vector<Point> Ring;
 typedef bg::model::segment<Point> Segment;
+typedef bg::model::polygon<Point> Polygon;
 
 BOOST_GEOMETRY_REGISTER_POINT_2D(Point, double, bg::cs::cartesian, x, y)
-BOOST_GEOMETRY_REGISTER_RING(Polygon)
+BOOST_GEOMETRY_REGISTER_RING(Ring)
 
 std::ostream& operator<<( std::ostream& os, const Segment& segment );
-std::ostream& operator<<( std::ostream& os, const Polygon& polygon );
+std::ostream& operator<<( std::ostream& os, const Ring& ring );
 
 namespace srs
 {
@@ -62,37 +68,62 @@ class ObstacleDetector
 	typedef std::function<void()> ObstacleDetectedFn;
 
 public:
-	ObstacleDetector( double footprint );
+	ObstacleDetector( double footprintWidth, double footprintLength );
 	virtual ~ObstacleDetector( );
 
 	void SetDetectionCallback( ObstacleDetectedFn obstacleDetectedCallback );
 
 	void SetVelocity( double linear, double angular );
 
-	void SetObjectThreshold( uint32_t objectThreshold );
+	void SetPose( const srslib_framework::MsgPose::ConstPtr& pose );
+
+	void SetSolution( const srslib_framework::MsgSolution::ConstPtr& solution );
+
+	void SetThreshold( uint32_t threshold );
 
 	void ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan );
 
-	double GetSafeDistance( double velocity ) const;
+	double GetSafeDistance( double linearVelocity, double angularVelocity ) const;
 
-	double GetFootprint( ) const;
+	double GetFootprintWidth( ) const;
 
-	Polygon GetDangerZone( ) const;
+	double GetFootprintLength( ) const;
+
+	Ring GetDangerZone( ) const;
 
 private:
 
-	ObstacleDetectedFn	m_obstacleDetectedCallback;
+	void AddPoseToPolygon( const Pose<>& pose, Polygon& polygon, double width, double length ) const;
 
-	double				m_linearVelocity;
+	void UpdateDangerZone( );
 
-	double				m_angularVelocity;
+	ObstacleDetectedFn				m_obstacleDetectedCallback;
 
-	uint32_t			m_objectThreshold;
+	Pose<>							m_pose;
 
-	double				m_footprint;
+	bool							m_poseValid;
+
+	Polygon							m_footprintPolygon;
+
+	Polygon							m_posePolygon;
+
+	Solution<GridSolutionItem>		m_solution;
+
+	Polygon							m_dangerZone;
+
+	double							m_footprintWidth;
+
+	double							m_footprintLength;
+
+	double							m_linearVelocity;
+
+	double							m_angularVelocity;
+
+	uint32_t						m_threshold;
 
 };
 
 } /* namespace srs */
 
 #endif /* MIDBRAIN_OBSTACLE_DETECTOR_HPP_ */
+

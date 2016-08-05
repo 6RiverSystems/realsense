@@ -29,7 +29,25 @@ struct AngleMath
     template<typename TYPE = int>
     inline static TYPE normalizeAngleDeg(TYPE deg)
     {
-        return deg < 0 ? 360 - (abs(deg) % 360) : deg % 360;
+    	while(deg < (TYPE)0)
+    	{
+    		deg += (TYPE)360;
+    	}
+
+    	while(deg > (TYPE)360)
+    	{
+    		deg -= (TYPE)360;
+    	}
+
+        return deg;
+    }
+
+    template<typename TYPE = int>
+    inline static TYPE normalizeRad2deg(TYPE rad)
+    {
+    	TYPE angle = AngleMath::rad2deg<TYPE>(rad);
+
+        return AngleMath::normalizeAngleDeg<TYPE>(static_cast<TYPE>(angle));
     }
 
     inline static unsigned int normalizeRad2deg90(double rad)

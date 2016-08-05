@@ -156,7 +156,7 @@ void Executive::executePlanToGoal()
 
     // The requested goal is transformed so that it coincides with
     // where the robot screen will be
-    currentTarget_ = PoseMath::transform<double>(currentGoal_, chuck.bodyDepth / 2);
+    currentTarget_ = PoseMath::translate<double>(currentGoal_, chuck.bodyDepth / 2.0, 0.0);
 
     Map* map = tapMap_.getMap();
     algorithm_.setGraph(map->getGrid());
@@ -200,7 +200,7 @@ void Executive::executePlanToGoal()
     }
     else
     {
-        ROS_DEBUG_STREAM_NAMED("executive", "Path not found between " <<
+        ROS_ERROR_STREAM_NAMED("executive", "Path not found between " <<
             currentRobotPose_ <<
             " (" << internalStart.x << "," << internalStart.y << "," << startAngle << ") and " <<
             currentGoal_ <<
@@ -281,7 +281,7 @@ void Executive::findActiveNodes(vector<string>& nodes)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::publishGoalTarget(Pose<> goalTargetArea)
 {
-    vector<Pose<>> targetArea = PoseMath::pose2polygon(goalTargetArea, 0.0, 0.2, 0.2);
+    vector<Pose<>> targetArea = PoseMath::pose2polygon(goalTargetArea, 0.0, 0.0, 0.2, 0.2);
 
     geometry_msgs::PolygonStamped messageLanding;
 

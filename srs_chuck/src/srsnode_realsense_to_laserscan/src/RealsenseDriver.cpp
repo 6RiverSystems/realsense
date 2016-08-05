@@ -1,8 +1,9 @@
-#include "../../srsnode_realsense_to_laserscan/include/RealsenseDriver.h"
+#include <RealsenseDriver.h>
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
+#include <opencv2/contrib/contrib.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <sensor_msgs/point_cloud2_iterator.h>
@@ -16,18 +17,13 @@ namespace srs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 RealsenseDriver::RealsenseDriver( ) :
 	rosNodeHandle_( ),
-	infrared1Subscriber_( rosNodeHandle_, "/camera/infrared1/image_raw", 10 ),
-	infrared2Subscriber_( rosNodeHandle_, "/camera/infrared2/image_raw", 10 ),
-	laserScanSubscriber_( rosNodeHandle_, "/camera/depth/scan", 10 ),
-	infrared1Publisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/infrared1/image_near", 10 ) ),
-	infrared2Publisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/infrared2/image_near", 10 ) ),
-	infraredPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/infrared/image_near", 10 ) ),
-	infraredScanPublisher_( rosNodeHandle_.advertise<sensor_msgs::LaserScan>( "/camera/infrared/scan", 10 ) ),
-	combinedScanPublisher_( rosNodeHandle_.advertise<sensor_msgs::LaserScan>( "/camera/scan", 10 ) ),
-	synchronizer_( new ImageSyncronizer( laserScanSubscriber_, infrared1Subscriber_, infrared2Subscriber_, 10 ) )
+	depthSubscriber_( rosNodeHandle_.subscribe<sensor_msgs::Image>( "/camera/depth/image_raw", 100,
+		std::bind( &RealsenseDriver::OnDepthData, this, std::placeholders::_1 ) ) ),
+	depthMedianFilterPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/depth/image_median_filter", 10 ) ),
+	depthHistogramPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/depth/histogram", 10 ) ),
+	depthColorPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>( "/camera/depth/image_color", 10 ) )
 {
-	synchronizer_->registerCallback(
-		std::bind( &RealsenseDriver::OnDepthData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,129 +39,91 @@ void RealsenseDriver::run( )
 	}
 }
 
-void RealsenseDriver::OnDepthData( const sensor_msgs::LaserScan::ConstPtr& scan, const sensor_msgs::Image::ConstPtr& infraredImage1,
-	const sensor_msgs::Image::ConstPtr& infraredImage2 )
+cv::Mat applyCustomColorMap(cv::Mat& im_gray)
 {
-	cv_bridge::CvImagePtr cvImage1 = GetCvImage( infraredImage1 );
+	// Create look-up-table:
+	cv::Mat lookUpTable(1, 256, CV_8UC3);
 
-	cv_bridge::CvImagePtr cvImage2 = GetCvImage( infraredImage2 );
-
-	cv::Mat combinedIRImage;
-	CombineImages( cvImage1->image, cvImage2->image, combinedIRImage );
-
-	ThresholdImage( cvImage1->image );
-
-	infrared1Publisher_.publish( cvImage1->toImageMsg( ) );
-
-	ThresholdImage( cvImage2->image );
-
-	infrared2Publisher_.publish( cvImage2->toImageMsg( ) );
-
-	ThresholdImage( combinedIRImage );
-
-	cv_bridge::CvImage combinedMsg;
-	combinedMsg.header   = infraredImage2->header;
-	combinedMsg.encoding = infraredImage2->encoding;
-	combinedMsg.image    = combinedIRImage;
-
-	infraredPublisher_.publish( combinedMsg );
-
-	const uint32_t numberOfScans = scan->ranges.size( );
-
-	const uint32_t xDiff = combinedIRImage.cols - numberOfScans;
-
-	// TODO:  We currently have a problem if the image is than the number of scans
-	const uint32_t xStart = xDiff/2;
-
-	const double irRange = 0.3f;
-	const double distanceFromBot = 0.01f;
-	const double cameraFOV = 70.0f;
-	// Calculate the maximum FOV width based on the ir range
-	const double cameraMaxYOffset = irRange * tan( cameraFOV / 2.0f * M_PI / 180.0f );
-	const double irMaxHeight = 0.5f; // 50%
-
-	sensor_msgs::LaserScan irScan;
-	irScan.header			= scan->header;
-	irScan.angle_min		= scan->angle_min;
-	irScan.angle_max		= scan->angle_max;
-	irScan.angle_increment	= scan->angle_increment;
-	irScan.time_increment	= scan->time_increment;
-	irScan.scan_time		= scan->scan_time;
-	irScan.range_min		= 0.0f;
-	// Max distance should be the hypotenuse of the triangle
-	irScan.range_max		= sqrt((cameraMaxYOffset*cameraMaxYOffset)+(distanceFromBot*distanceFromBot));
-	irScan.ranges.assign( numberOfScans, std::numeric_limits<double>::infinity( ) );
-
-	int maxHeight = combinedIRImage.rows / 2;
-
-	for( int x = 0; x < numberOfScans; x++ )
+	for( int i = 0; i < 256; ++i)
 	{
-		double angle = ((double)x * irScan.angle_increment) + irScan.angle_min;
+		cv::Vec3b color;
 
-		for( int y = 0; y < maxHeight; y++ )
+
+		if( i > 0 && i <= 96 )
 		{
-			if( combinedIRImage.at<uint8_t>(y, x + xStart) == 128 )
-			{
-				//            y Offset
-				//             ------
-				//             \    |
-				//              \   |
-				// scan distance \  | Distance from bot
-				//                \0|
-				//                 \|
-
-				double scanDistance = distanceFromBot / cos( angle );
-				double yOffset = abs( distanceFromBot * sin( angle ) );
-
-				// Only include data within the FOV of the camera
-				if( yOffset <= cameraMaxYOffset )
-				{
-					if( irScan.ranges[x] == std::numeric_limits<double>::infinity( ) )
-					{
-						irScan.ranges[x] = scanDistance;
-					}
-					else
-					{
-						irScan.ranges[x] = scanDistance > irScan.ranges[x] ? scanDistance : irScan.ranges[x];
-					}
-				}
-			}
+			double scale = 1.0f - ((double)96 - (double)i)/(double)96*0.5f;
+			color = cv::Vec3b(0,0,255*scale); // 0.0m => 0.75m;
 		}
-	}
-
-	infraredScanPublisher_.publish( irScan );
-
-	sensor_msgs::LaserScan irCombined;
-	irCombined.header			= scan->header;
-	irCombined.angle_min		= scan->angle_min;
-	irCombined.angle_max		= scan->angle_max;
-	irCombined.angle_increment	= scan->angle_increment;
-	irCombined.time_increment	= scan->time_increment;
-	irCombined.scan_time		= scan->scan_time;
-	irCombined.range_min		= std::min( irScan.range_min, scan->range_min );
-	irCombined.range_max		= std::max( irScan.range_max, scan->range_max );
-	irCombined.ranges.assign( numberOfScans, std::numeric_limits<double>::infinity( ) );
-
-	for( int x = 0; x < numberOfScans; x++ )
-	{
-		if( irScan.ranges[x] == std::numeric_limits<double>::infinity( ) )
+		else if( i <= 128 )
 		{
-			// Use the depth scan
-			irCombined.ranges[x] = scan->ranges[x];
-		}
-		else if( scan->ranges[x] == std::numeric_limits<double>::infinity( ) )
-		{
-			// Use the ir scan
-			irCombined.ranges[x] = irScan.ranges[x];
+			double scale = 1.0f - ((double)128 - (double)i)/(double)128*0.5f;
+			color = cv::Vec3b(0,255*scale,0); // 0.75m => 2.0m;
 		}
 		else
 		{
-			// Use the closests range
-			irCombined.ranges[x] = std::min( scan->ranges[x], irScan.ranges[x] );
+			color = cv::Vec3b(255,102,102);	 // 2.0m => 8.0m
 		}
+
+		lookUpTable.at<cv::Vec3b>(0,i) = color;
 	}
 
-	combinedScanPublisher_.publish( irCombined );
+	cv::Mat input8UC3;
+	cv::cvtColor( im_gray, input8UC3, CV_GRAY2BGR );
+
+	cv::Mat output;
+	cv::LUT(input8UC3, lookUpTable, output);
+
+	return output;
+}
+
+void RealsenseDriver::OnDepthData( const sensor_msgs::Image::ConstPtr& depthImage )
+{
+	cv_bridge::CvImagePtr cvDepthImage = GetCvImage( depthImage );
+
+	cv::flip(cvDepthImage->image, cvDepthImage->image, -1);
+
+	cv::Mat medianFilterImg;
+	cv::medianBlur( cvDepthImage->image, medianFilterImg, 5 );
+
+	cvDepthImage->image = medianFilterImg;
+	depthMedianFilterPublisher_.publish( cvDepthImage );
+
+	double maxDistance = 2000.0f;
+	cv::Mat adjMap;
+	cv::convertScaleAbs(medianFilterImg, adjMap, 255 / maxDistance);
+
+	// The number of bins
+	int histSize = 256;
+
+	// Set the ranges
+	float range[] = { 0, 256 } ;
+	const float* histRange = { range };
+
+	bool uniform = true; bool accumulate = false;
+
+	cv::Mat histMap;
+	cv::calcHist( &adjMap, 1, 0, cv::Mat(), histMap, 1, &histSize, &histRange, uniform, accumulate );
+
+	// Draw the histogram
+	int hist_w = 512; int hist_h = 400;
+	int bin_w = cvRound( (double) hist_w/histSize );
+
+	cv::Mat histImage( hist_h, hist_w, CV_8UC1, cv::Scalar(0,0,0) );
+	cv::normalize(histMap, histMap, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat() );
+
+	// Draw for each channel
+	for( int i = 1; i < histSize; i++ )
+	{
+		cv::line( histImage, cv::Point( bin_w*(i-1), hist_h - cvRound(histMap.at<float>(i-1)) ) ,
+			cv::Point( bin_w*(i), hist_h - cvRound(histMap.at<float>(i)) ),
+			cv::Scalar( 255), 2, 8, 0  );
+	}
+
+	cv::Mat colorMap = applyCustomColorMap( adjMap );
+
+	depthColorPublisher_.publish( cv_bridge::CvImage(depthImage->header, "bgr8", colorMap).toImageMsg() );
+
+	depthHistogramPublisher_.publish( cv_bridge::CvImage(depthImage->header, "mono8", histImage).toImageMsg() );
 }
 
 cv_bridge::CvImagePtr RealsenseDriver::GetCvImage( const sensor_msgs::Image::ConstPtr& image ) const
@@ -174,7 +132,7 @@ cv_bridge::CvImagePtr RealsenseDriver::GetCvImage( const sensor_msgs::Image::Con
 
 	try
 	{
-		cv_ptr = cv_bridge::toCvCopy( image, sensor_msgs::image_encodings::TYPE_8UC1 );
+		cv_ptr = cv_bridge::toCvCopy( image, image->encoding );
 	}
 	catch( cv_bridge::Exception& e )
 	{
@@ -182,29 +140,6 @@ cv_bridge::CvImagePtr RealsenseDriver::GetCvImage( const sensor_msgs::Image::Con
 	}
 
 	return cv_ptr;
-}
-
-void RealsenseDriver::ThresholdImage( cv::Mat& image ) const
-{
-	// Apply a binary threshold filter to remove all but the saturated pixels
-	cv::threshold( image, image, 254, 128, cv::THRESH_BINARY );
-}
-
-void RealsenseDriver::CombineImages( cv::Mat& image1, cv::Mat& image2, cv::Mat& result ) const
-{
-	if( image1.cols == image2.cols &&
-		image1.rows == image2.rows )
-	{
-		constexpr uint32_t irOffset = 70;
-
-		// Further optimization: Use stitching algorithm to align images (not sure it's worth the cycles though)
-		cv::Mat combined( image1.rows, image1.cols + irOffset, image1.type( ) );
-
-		image1.copyTo( combined( cv::Rect( 0, 0, image1.cols, image1.rows ) ) );
-		image2.copyTo( combined( cv::Rect( irOffset, 0, image2.cols, image2.rows ) ) );
-
-		result = combined;
-	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

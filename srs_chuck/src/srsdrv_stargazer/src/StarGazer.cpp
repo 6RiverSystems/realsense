@@ -255,7 +255,7 @@ bool StarGazer::LoadCalibrationTransform( const std::string& strConfigurationFil
 		if( !document.IsNull( ) )
 		{
 			translation.setX( document["stargazer_offset"]["x"].as<double>( ) );
-			translation.setX( document["stargazer_offset"]["y"].as<double>( ) );
+			translation.setY( document["stargazer_offset"]["y"].as<double>( ) );
 		}
 	}
 	catch( const std::runtime_error& e )

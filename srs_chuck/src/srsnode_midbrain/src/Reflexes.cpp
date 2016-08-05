@@ -17,7 +17,7 @@ namespace srs
 
 Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_nodeHandle( nodeHandle ),
-	m_enabledetection( false ),
+	m_enableDetection( false ),
 	m_sendHardStop( false ),
 	m_operationalState( ),
 	m_obstacleDetector( ROBOT_WIDTH, ROBOT_LENGTH ),

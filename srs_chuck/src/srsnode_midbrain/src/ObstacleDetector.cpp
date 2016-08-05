@@ -100,9 +100,9 @@ void ObstacleDetector::SetSolution( const srslib_framework::MsgSolution::ConstPt
 	UpdateDangerZone( );
 }
 
-void ObstacleDetector::SetThreshold( uint32_t depthThreshold )
+void ObstacleDetector::SetThreshold( uint32_t threshold )
 {
-	m_depthThreshold = depthThreshold;
+	m_threshold = threshold;
 }
 
 void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan )

@@ -62,14 +62,14 @@ public:
     void run(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command)
     {
         predict(dT, command);
-        update();
+        update(dT, command);
     }
 
 protected:
 
     virtual void predict(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command) = 0;
 
-    virtual void update() = 0;
+    virtual void update(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command) = 0;
 
     vector<Sensor<STATE_SIZE, TYPE>*> sensors_;
 

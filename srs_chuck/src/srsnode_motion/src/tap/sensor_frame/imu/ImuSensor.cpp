@@ -16,7 +16,7 @@ cv::Mat ImuSensor<STATE_SIZE, TYPE>::getCurrentData()
     // Transfer the value that the odometer care about to the new state
     StatePe<TYPE> state = StatePe<TYPE>();
 
-    state.velocity.angular = currentData_.yawRot;
+    state.pose.theta = currentData_.yaw;
 
     return state.getVectorForm();
 }
@@ -30,7 +30,7 @@ cv::Mat ImuSensor<STATE_SIZE, TYPE>::H(const cv::Mat stateVector)
     // Transfer the value that the IMU angular velocity to the new state
     cv::Mat result = MatrixMath::zeros(stateVector);
 
-    result.at<BaseType>(StatePe<TYPE>::STATE_ANGULAR) = state.velocity.angular;
+    result.at<BaseType>(StatePe<TYPE>::STATE_THETA) = state.pose.theta;
 
     return result;
 }

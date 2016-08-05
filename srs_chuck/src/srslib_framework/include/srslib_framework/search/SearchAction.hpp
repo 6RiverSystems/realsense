@@ -182,7 +182,7 @@ private:
         unsigned int backward = 40;
         unsigned int rotateM90 = 4;
         unsigned int rotateP90 = 4;
-        unsigned int rotate180 = 4;
+        unsigned int rotate180 = 3;
 
         if (mapNote)
         {

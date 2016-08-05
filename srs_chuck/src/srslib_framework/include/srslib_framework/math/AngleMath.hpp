@@ -32,7 +32,7 @@ struct AngleMath
         return deg < 0 ? 360 - (abs(deg) % 360) : deg % 360;
     }
 
-    inline static unsigned int normalizeRad2deg90(double rad)
+    inline static int normalizeRad2Deg90(double rad)
     {
         double angle = AngleMath::rad2deg<double>(rad);
         double ratio = angle / 90.0;
@@ -41,6 +41,11 @@ struct AngleMath
 
         angle = (upper - angle) > (angle - lower) ? lower : upper;
         return AngleMath::normalizeAngleDeg<int>(static_cast<int>(angle));
+    }
+
+    inline static double normalizeRad2Rad90(double rad)
+    {
+        return AngleMath::deg2rad<double>(AngleMath::normalizeRad2Deg90(rad));
     }
 
     /**

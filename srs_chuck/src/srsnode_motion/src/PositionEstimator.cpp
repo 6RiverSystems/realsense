@@ -22,28 +22,29 @@ PositionEstimator::~PositionEstimator()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void PositionEstimator::run(Odometry<>* odometry)
 {
-    double dT = dT_;
+    double currentTime = ros::Time::now().toSec();
+
+    // Calculate the elapsed time between odometry readings
+    double dT = currentTime - previousReadingTime_;
+    if (previousReadingTime_ < 0 || dT < 0)
+    {
+        ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0,
+            "position_estimator", "Synchronizing dT to " << dT_);
+        dT = dT_;
+    }
+    previousReadingTime_ = currentTime;
+
+    ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0,
+        "position_estimator", "Calculated dT: " << dT);
 
     if (odometry)
     {
         ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "position_estimator",
             "Position Estimator Odometry: " << *odometry);
 
-        // Calculate the elapsed time between odometry readings
-        double currentTime = odometry->velocity.arrivalTime;
-        dT = currentTime - previousReadingTime_;
-        if (previousReadingTime_ < 0 || dT < 0)
-        {
-            dT = dT_;
-        }
-        previousReadingTime_ = currentTime;
-
-        ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0,
-            "position_estimator", "Calculated dT: " << dT);
-
         // Update the accumulated odometry
         // using the physical model of the robot
-        updateAccumulatedOdometry(dT, *odometry);
+        updateAccumulatedOdometry(dT_, *odometry);
     }
 
     // Do not run the UKF if the position estimator was not
@@ -54,7 +55,6 @@ void PositionEstimator::run(Odometry<>* odometry)
         ukf_.run(dT, odometry);
     }
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods

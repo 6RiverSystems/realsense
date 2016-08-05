@@ -45,7 +45,7 @@ protected:
         {
             currentLinearVelocity_ = currentOdometry.velocity.linear;
 
-            ROS_DEBUG_STREAM_NAMED("stop_controller", "Set linear velocity: " <<
+            ROS_DEBUG_STREAM_NAMED("controller_stop", "Set linear velocity: " <<
                 currentLinearVelocity_);
         }
 

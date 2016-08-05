@@ -24,11 +24,11 @@ struct FactoryRobotNoise
     static cv::Mat fromConfiguration(MotionConfig& configuration)
     {
         cv::Mat Q = (cv::Mat_<TYPE>(1, STATIC_UKF_STATE_VECTOR_SIZE) <<
-            pow(configuration.ukf_robot_error_location, 2.0), // [m^2]
-            pow(configuration.ukf_robot_error_location, 2.0), // [m^2]
+            pow(configuration.ukf_robot_error_location_x, 2.0), // [m^2]
+            pow(configuration.ukf_robot_error_location_y, 2.0), // [m^2]
             pow(configuration.ukf_robot_error_heading, 2.0), // [rad^2]
-            pow(configuration.ukf_odometry_error_linear, 2.0), // [m^2/s^2]
-            pow(configuration.ukf_imu_error_yaw_rot, 2.0) // [m^2/s^2]
+            pow(configuration.ukf_robot_error_linear, 2.0), // [m^2/s^2]
+            pow(configuration.ukf_robot_error_angular, 2.0) // [rad^2/s^2]
         );
 
         return cv::Mat::diag(Q);

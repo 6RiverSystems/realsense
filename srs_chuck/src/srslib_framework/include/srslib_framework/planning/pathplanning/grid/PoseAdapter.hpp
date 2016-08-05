@@ -26,7 +26,7 @@ struct PoseAdapter
         map->getMapCoordinates(pose.x, pose.y, c, r);
 
         location = Grid2d::LocationType(c, r);
-        orientation = AngleMath::normalizeRad2deg90(pose.theta);
+        orientation = AngleMath::normalizeRad2Deg90(pose.theta);
     }
 };
 

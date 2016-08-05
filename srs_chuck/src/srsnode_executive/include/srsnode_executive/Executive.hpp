@@ -44,6 +44,7 @@ public:
 private:
     constexpr static double REFRESH_RATE_HZ = 5;
     constexpr static int GRID_SIZE = 60;
+    constexpr static double MAX_RELOCATION_THRESHOLD = 0.2;
 
     void connectAllTaps();
 
@@ -52,7 +53,6 @@ private:
     void findActiveNodes(vector<string>& nodes);
 
     void executeArrived();
-    void executeCustomAction();
     void executeInitialPose();
     void executePause();
     void executePlanToGoal();
@@ -60,11 +60,21 @@ private:
     void executeShutdown();
     void executeUnpause();
 
+    bool isExecutingSolution()
+    {
+        return !isJoystickLatched_ && !arrived_;
+    }
+
     void publishInternalInitialPose(Pose<> initialPose);
     void publishInternalGoalSolution(Solution<GridSolutionItem>* solution);
     void publishGoalTarget(Pose<> goalTargetArea);
 
+    void stepChecks();
     void stepExecutiveFunctions();
+
+    void taskCustomAction();
+    void taskPauseChange();
+    void taskPlanToGoal();
 
     AStar<Grid2d> algorithm_;
 	bool arrived_;

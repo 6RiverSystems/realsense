@@ -36,6 +36,7 @@ MotionController::MotionController(double dT) :
     dT_(dT),
     hasArrived_(true),
     hasArrivedChanged_(false),
+    activeController_(nullptr),
     rosNodeHandle_()
 {
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>(

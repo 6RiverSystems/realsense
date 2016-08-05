@@ -61,8 +61,7 @@ void Executive::run()
     {
         ros::spinOnce();
 
-        currentRobotPose_ = tapInternal_RobotPose_.getPose();
-
+        stepChecks();
         stepExecutiveFunctions();
 
         refreshRate.sleep();
@@ -109,24 +108,6 @@ void Executive::executeArrived()
     messageGoalArrived.data = arrived_;
 
     pubExternalArrived_.publish(messageGoalArrived);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Executive::executeCustomAction()
-{
-//    Pose<> P1 = Pose<>(6.7, 2.1, 0);
-//    Pose<> P2 = Pose<>(16.4, 2.1, 0);
-//
-//    if (PoseMath::euclidean(currentRobotPose_, P1) < 1.0)
-//    {
-//        executePlanToGoal(P2);
-//    }
-//    else
-//    {
-//        executePlanToGoal(P1);
-//    }
-//
-//    publishInternalGoalSolution(currentSolution_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -267,7 +248,7 @@ void Executive::executeUnpause()
 {
     RosCallSetBool::call("srsnode_motion", "/trigger/pause", false);
 
-    if (!arrived_)
+    if (isExecutingSolution())
     {
         executePlanToGoal();
         publishInternalGoalSolution(currentSolution_);
@@ -359,6 +340,27 @@ void Executive::publishInternalInitialPose(Pose<> initialPose)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::stepChecks()
+{
+    Pose<> updatedRobotPose = tapInternal_RobotPose_.getPose();
+
+    // Run these checks only if the joystick hasn't latched
+    if (isExecutingSolution())
+    {
+        // If the difference between the most updated robot pose and
+        // what Executive knew about the robot is greater than the
+        // specified threshold, something must have
+        // happened with the localization subsystem. Make sure to replan
+        if (PoseMath::euclidean(currentRobotPose_, updatedRobotPose) > MAX_RELOCATION_THRESHOLD)
+        {
+//            taskPlanToGoal();
+        }
+    }
+
+    currentRobotPose_ = updatedRobotPose;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::stepExecutiveFunctions()
 {
     if (tapCmdShutdown_.isNewValueTrue())
@@ -376,15 +378,12 @@ void Executive::stepExecutiveFunctions()
     // If there is a new goal to reach
     if (tapCmdGoal_.newDataAvailable())
     {
+        // Make sure that the current goal is properly
+        // initialized to the closest 90deg angle
         currentGoal_ = tapCmdGoal_.getPose();
-        executePlanToGoal();
-        publishGoalTarget(currentGoal_);
-        publishInternalGoalSolution(currentSolution_);
+        currentGoal_.theta = AngleMath::normalizeRad2Rad90(currentGoal_.theta);
 
-        if (currentSolution_)
-        {
-            RosCallSolution::call("srsnode_motion", "/trigger/execute_solution", currentSolution_);
-        }
+        taskPlanToGoal();
     }
 
     if (tapCmdInitialPose_.newDataAvailable())
@@ -403,14 +402,7 @@ void Executive::stepExecutiveFunctions()
     {
         if (tapOperationalState_.isPauseChanged())
         {
-            if (tapOperationalState_.getPause())
-            {
-                executePause();
-            }
-            else
-            {
-                executeUnpause();
-            }
+            taskPauseChange();
         }
     }
 
@@ -419,11 +411,55 @@ void Executive::stepExecutiveFunctions()
     {
         if (tapJoyAdapter_.getCustomActionState())
         {
-            executeCustomAction();
+            taskCustomAction();
         }
 
         // Store the latch state for later use
         isJoystickLatched_ = tapJoyAdapter_.getLatchState();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::taskCustomAction()
+{
+    //    Pose<> P1 = Pose<>(6.7, 2.1, 0);
+    //    Pose<> P2 = Pose<>(16.4, 2.1, 0);
+    //
+    //    if (PoseMath::euclidean(currentRobotPose_, P1) < 1.0)
+    //    {
+    //        executePlanToGoal(P2);
+    //    }
+    //    else
+    //    {
+    //        executePlanToGoal(P1);
+    //    }
+    //
+    //    publishInternalGoalSolution(currentSolution_);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::taskPauseChange()
+{
+    if (tapOperationalState_.getPause())
+    {
+        executePause();
+    }
+    else
+    {
+        executeUnpause();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::taskPlanToGoal()
+{
+    executePlanToGoal();
+    publishGoalTarget(currentGoal_);
+    publishInternalGoalSolution(currentSolution_);
+
+    if (currentSolution_)
+    {
+        RosCallSolution::call("srsnode_motion", "/trigger/execute_solution", currentSolution_);
     }
 }
 

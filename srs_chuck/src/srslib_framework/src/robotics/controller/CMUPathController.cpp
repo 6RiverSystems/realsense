@@ -85,6 +85,8 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
     // declare that the goal was reached
     if (currentTrajectory_.empty() || checkGoalReached(currentPose))
     {
+        ROS_DEBUG_STREAM_NAMED("cmu_path_controller", "CMU Controller reached goal");
+
         setGoalReached(true);
         executeCommand(Velocity<>::ZERO);
         return;

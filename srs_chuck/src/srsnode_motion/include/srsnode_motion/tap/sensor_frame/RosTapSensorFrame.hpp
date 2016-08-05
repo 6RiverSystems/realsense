@@ -30,12 +30,38 @@ public:
         sensorOdometry_ = new OdometrySensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>();
 
         currentRawImu_ = Imu<>::ZERO;
+
+        imuDeltaYaw_ = 0.0;
+
+        imuYawSumCosine_ = 0.0;
+        imuYawSumSine_ = 0.0;
+        imuYawPoints_ = 1;
+        accumulateYaws_ = false;
     }
 
     ~RosTapSensorFrame()
     {
         disconnectTap();
         delete sensorImu_;
+    }
+
+    void addTrueYaw(double trueYaw)
+    {
+        if (accumulateYaws_)
+        {
+            imuYawSumCosine_ += cos(trueYaw);
+            imuYawSumSine_ += sin(trueYaw);
+            imuYawPoints_ += 1;
+            if (!imuYawPoints_)
+            {
+                imuYawPoints_ = 1;
+            }
+
+            double averageAngle = atan2(
+                imuYawSumSine_ / imuYawPoints_,
+                imuYawSumCosine_ / imuYawPoints_);
+            setTrueYaw(averageAngle);
+        }
     }
 
     Imu<> getCalibratedImu() const
@@ -63,9 +89,14 @@ public:
         return sensorOdometry_;
     }
 
-    bool newImuDataAvailable() const
+    bool newImuRawDataAvailable() const
     {
         return newDataAvailable();
+    }
+
+    bool newImuCalibratedDataAvailable() const
+    {
+        return sensorImu_->newDataAvailable();
     }
 
     bool newOdometryDataAvailable() const
@@ -115,6 +146,22 @@ public:
         imuDeltaYaw_ = AngleMath::normalizeAngleRad<double>(newValue - currentRawImu_.yaw);
     }
 
+    void stopAccumulatingYaw()
+    {
+        accumulateYaws_ = false;
+    }
+
+    void startAccumulatingYaw()
+    {
+        if (!accumulateYaws_)
+        {
+            accumulateYaws_ = true;
+            imuYawSumCosine_ = 0.0;
+            imuYawSumSine_ = 0.0;
+            imuYawPoints_ = 0;
+        }
+    }
+
 protected:
     bool connect()
     {
@@ -131,7 +178,7 @@ private:
         setOdometry(Odometry<>(VelocityMessageFactory::msg2Velocity(message->odometry)));
 
         Imu<> calibratedImu = Imu<>(
-            0.0,
+            currentRawImu_.arrivalTime,
             AngleMath::normalizeAngleRad<double>(currentRawImu_.yaw + imuDeltaYaw_),
             0.0, 0.0,
             currentRawImu_.yawRot, 0.0, 0.0);
@@ -142,7 +189,12 @@ private:
     ImuSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensorImu_;
     OdometrySensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensorOdometry_;
 
+    double imuYawSumCosine_;
+    double imuYawSumSine_;
+
+    unsigned int imuYawPoints_;
     double imuDeltaYaw_;
+    bool accumulateYaws_;
 };
 
 } // namespace srs

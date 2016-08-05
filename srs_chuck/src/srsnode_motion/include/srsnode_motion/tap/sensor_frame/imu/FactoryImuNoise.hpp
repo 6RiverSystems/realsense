@@ -25,7 +25,7 @@ struct FactoryImuNoise
             0.0, // [m^2]
             pow(configuration.ukf_imu_error_yaw, 2.0), // [rad^2]
             0.0, // [m^2/s^2]
-            pow(configuration.ukf_imu_error_yaw_rot, 2.0) // [rad^2/s^2]
+            0.0  // [rad^2/s^2]
         );
 
         return cv::Mat::diag(R);

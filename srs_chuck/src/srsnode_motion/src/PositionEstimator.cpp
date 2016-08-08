@@ -7,12 +7,14 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 PositionEstimator::PositionEstimator(double dT) :
-    dT_(dT),
+    dTDefault_(dT),
     initialized_(false),
     naiveSensorFusion_(true),
     ukf_(robot_),
-    previousReadingTime_(-1.0),
-    previousOdometryTime_(-1.0)
+    previousNodeReadingTime_(-1.0),
+    previousOdometryTime_(-1.0),
+    dTNode_(0.0),
+    dTOdometry_(0.0)
 {
 }
 
@@ -24,43 +26,55 @@ PositionEstimator::~PositionEstimator()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void PositionEstimator::run(Odometry<>* odometry, Imu<>* imu, Pose<>* aps)
 {
+    // Calculate the elapsed time between node execution
     double currentTime = ros::Time::now().toSec();
-
-    // Calculate the elapsed time between odometry readings
-    double dT = currentTime - previousReadingTime_;
-    if (previousReadingTime_ < 0 || dT < 0)
+    dTNode_ = currentTime - previousNodeReadingTime_;
+    if (previousNodeReadingTime_ < 0 || dTNode_ < 0)
     {
         ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0,
-            "position_estimator", "Synchronizing dT to " << dT_);
-        dT = dT_;
+            "position_estimator", "Synchronizing dT to " << dTDefault_);
+        dTNode_ = dTDefault_;
     }
-    previousReadingTime_ = currentTime;
+    previousNodeReadingTime_ = currentTime;
 
     ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0,
-        "position_estimator", "Calculated dT: " << dT);
+        "position_estimator", "Calculated node dT: " << dTNode_);
 
     if (odometry)
     {
         ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "position_estimator",
             "Position Estimator Odometry: " << *odometry);
 
+        // Calculate the elapsed time between node execution
+        dTOdometry_ = odometry->velocity.arrivalTime - previousOdometryTime_;
+        if (previousOdometryTime_ < 0 || dTOdometry_ < 0)
+        {
+            ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0,
+                "position_estimator", "Synchronizing dT to " << dTDefault_);
+            dTOdometry_ = dTDefault_;
+        }
+        previousOdometryTime_ = odometry->velocity.arrivalTime;
+
+        ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0,
+            "position_estimator", "Calculated odometry dT: " << dTOdometry_);
+
         // Update the accumulated odometry
         // using the physical model of the robot
-        updateAccumulatedOdometry(dT_, *odometry);
+        updateAccumulatedOdometry(dTOdometry_, *odometry);
     }
 
-    if (naiveSensorFusion_)
+    // Do not run the UKF if the position estimator was not
+    // correctly initialized with a position (manually provided
+    // or by the APS
+    if (initialized_)
     {
-        runNaiveSensorFusion(dT, odometry, imu, aps);
-    }
-    else {
-        // Do not run the UKF if the position estimator was not
-        // correctly initialized with a position (manually provided
-        // or by the APS
-        if (initialized_)
+        if (naiveSensorFusion_)
         {
-            // dT *= 1.05;
-            ukf_.run(dT, odometry);
+            runNaiveSensorFusion(dTOdometry_, odometry, imu, aps);
+        }
+        else
+        {
+            ukf_.run(dTOdometry_/* ###FS dTNode_*/, odometry);
         }
     }
 }
@@ -70,59 +84,46 @@ void PositionEstimator::run(Odometry<>* odometry, Imu<>* imu, Pose<>* aps)
 
 void PositionEstimator::runNaiveSensorFusion(double dT, Odometry<>* odometry, Imu<>* imu, Pose<>* aps)
 {
-    ROS_INFO_STREAM("Running naive fusion");
-    if (isPoseValid())
+    ROS_INFO_STREAM("Valid pose naive");
+    StatePe<> currentState = StatePe<>(ukf_.getX());
+
+    if (aps)
     {
-        ROS_INFO_STREAM("Valid pose naive");
-        StatePe<> currentState = StatePe<>(ukf_.getX());
+        currentState.pose = *aps;
+        ROS_INFO_STREAM("New pose: " << *aps);
 
-        if (aps)
+        ukf_.reset(currentState.getVectorForm());
+    }
+    else
+    {
+        if (imu && odometry)
         {
-            currentState.pose = *aps;
-            ROS_INFO_STREAM("New pose: " << *aps);
+            currentState.pose.theta = imu->yaw;
+            ROS_INFO_STREAM("New theta: " << imu->yaw);
+
+            double angular = (imu->yaw - currentState.pose.theta) / dT;
+            currentState.velocity = Velocity<>(odometry->velocity.linear, angular);
+
+            ROS_INFO_STREAM("New velocity: " << currentState.velocity);
+
+            StatePe<> newState;
+            robot_.kinematics(currentState, dT, newState);
+
+            ROS_INFO_STREAM("New state: " << newState);
+
+            ukf_.reset(newState.getVectorForm());
         }
-        else
-        {
-            if (imu)
-            {
-                currentState.pose.theta = imu->yaw;
-                ROS_INFO_STREAM("New theta: " << imu->yaw);
-            }
-        }
-
-        if (/*imu && */odometry)
-        {
-            //double angular = (imu->yaw - currentState.pose.theta) / dT;
-            Velocity<> velocity = Velocity<>(odometry->velocity.linear, 0.0);
-
-            currentState.velocity = velocity;
-            ROS_INFO_STREAM("New velocity: " << velocity);
-        }
-
-        StatePe<> newState;
-        robot_.kinematics(currentState, dT, newState);
-
-        ROS_INFO_STREAM("New state: " << newState);
-
-        ukf_.reset(newState.getVectorForm(), robot_.getQ());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void PositionEstimator::updateAccumulatedOdometry(double dT, Odometry<> odometry)
 {
-    double internalDt = dT;
-    if (previousOdometryTime_ > 0)
-    {
-        internalDt = odometry.velocity.arrivalTime - previousOdometryTime_;
-    }
-    previousOdometryTime_ = odometry.velocity.arrivalTime;
-
     StatePe<> zeroState;
     zeroState.velocity = odometry.velocity;
 
     StatePe<> newState;
-    robot_.kinematics(zeroState, internalDt, newState);
+    robot_.kinematics(zeroState, dT, newState);
 
     accumulatedOdometry_ = PoseMath::add<double>(accumulatedOdometry_, newState.getPose());
 }

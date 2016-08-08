@@ -117,13 +117,15 @@ private:
 
     Pose<> accumulatedOdometry_;
 
-    double dT_;
+    double dTDefault_;
+    double dTOdometry_;
+    double dTNode_;
 
     bool initialized_;
 
     bool naiveSensorFusion_;
 
-    double previousReadingTime_;
+    double previousNodeReadingTime_;
     double previousOdometryTime_;
 
     Robot<> robot_;

@@ -51,6 +51,11 @@ public:
         return P_;
     }
 
+    void reset(cv::Mat x0)
+    {
+        x0.convertTo(x_, TYPE);
+    }
+
     void reset(cv::Mat x0, cv::Mat P0)
     {
         // Initialize the state of the filter with an adapted

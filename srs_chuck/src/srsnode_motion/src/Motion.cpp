@@ -187,7 +187,7 @@ void Motion::executeSolution(Solution<GridSolutionItem> solution)
     ROS_DEBUG_STREAM_NAMED("motion", "Communicated solution: " << endl << solution);
 
     motionController_.execute(solution);
-    positionEstimator_.resetAccumulatedOdometry();
+    positionEstimator_.resetAccumulatedOdometry(nullptr);
 
     simulatedT_ = 0.0;
 }
@@ -584,6 +584,12 @@ void Motion::scanTapsForData()
         if (tapJoyAdapter_.getEmergencyState())
         {
             motionController_.emergencyStop();
+        }
+
+        if (tapJoyAdapter_.getCustomActionState())
+        {
+            Pose<> pose = positionEstimator_.getPose();
+            positionEstimator_.resetAccumulatedOdometry(&pose);
         }
 
         // Store the latch state for later use

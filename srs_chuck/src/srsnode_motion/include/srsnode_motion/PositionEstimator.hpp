@@ -91,9 +91,16 @@ public:
         }
     }
 
-    void resetAccumulatedOdometry()
+    void resetAccumulatedOdometry(Pose<>* initialPose)
     {
-        accumulatedOdometry_ = Pose<>::ZERO;
+        if (initialPose)
+        {
+            accumulatedOdometry_ = *initialPose;
+        }
+        else
+        {
+            accumulatedOdometry_ = Pose<>::ZERO;
+        }
     }
 
     void run(Odometry<>* odometry, Imu<>* imu, Pose<>* aps);
@@ -117,6 +124,7 @@ private:
     bool naiveSensorFusion_;
 
     double previousReadingTime_;
+    double previousOdometryTime_;
 
     Robot<> robot_;
 

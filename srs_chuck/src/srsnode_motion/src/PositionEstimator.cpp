@@ -11,7 +11,8 @@ PositionEstimator::PositionEstimator(double dT) :
     initialized_(false),
     naiveSensorFusion_(true),
     ukf_(robot_),
-    previousReadingTime_(-1.0)
+    previousReadingTime_(-1.0),
+    previousOdometryTime_(-1.0)
 {
 }
 
@@ -110,11 +111,18 @@ void PositionEstimator::runNaiveSensorFusion(double dT, Odometry<>* odometry, Im
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void PositionEstimator::updateAccumulatedOdometry(double dT, Odometry<> odometry)
 {
+    double internalDt = dT;
+    if (previousOdometryTime_ > 0)
+    {
+        internalDt = odometry.velocity.arrivalTime - previousOdometryTime_;
+    }
+    previousOdometryTime_ = odometry.velocity.arrivalTime;
+
     StatePe<> zeroState;
     zeroState.velocity = odometry.velocity;
 
     StatePe<> newState;
-    robot_.kinematics(zeroState, dT, newState);
+    robot_.kinematics(zeroState, internalDt, newState);
 
     accumulatedOdometry_ = PoseMath::add<double>(accumulatedOdometry_, newState.getPose());
 }

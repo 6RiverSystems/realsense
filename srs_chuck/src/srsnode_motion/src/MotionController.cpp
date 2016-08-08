@@ -210,7 +210,10 @@ void MotionController::switchToManual()
     if (!isScheduled(TaskEnum::MANUAL_FOLLOW) && !isManualControllerActive())
     {
         // Cancel the current activity and clear the work queue
-        activeController_->cancel();
+        if (activeController_)
+        {
+            activeController_->cancel();
+        }
         cleanWorkQueue();
 
         // Schedule a normal stop followed by a manual follow
@@ -232,7 +235,10 @@ void MotionController::switchToAutonomous()
     if (isManualControllerActive())
     {
         // Cancel the current manual controller activity
-        activeController_->cancel();
+        if (activeController_)
+        {
+            activeController_->cancel();
+        }
     }
 }
 

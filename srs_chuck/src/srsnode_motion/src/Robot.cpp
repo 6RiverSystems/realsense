@@ -20,15 +20,15 @@ cv::Mat Robot<TYPE>::FB(
 
     if (command)
     {
-//        Velocity<> newVelocity = reinterpret_cast<CmdVelocity<>*>(command)->velocity;
-//        Velocity<> oldVelocity = oldState.velocity;
-//
-//        // Calculate the average of the velocity using the
-//        // velocity at the beginning and end of the time slice
-//        oldState.velocity = Velocity<>(
-//            (newVelocity.linear + oldVelocity.linear) / 2,
-//            (newVelocity.angular + oldVelocity.angular) / 2);
-        oldState.velocity = reinterpret_cast<CmdVelocity<>*>(command)->velocity;
+        Velocity<> newVelocity = reinterpret_cast<CmdVelocity<>*>(command)->velocity;
+        Velocity<> oldVelocity = oldState.velocity;
+
+        // Calculate the average of the velocity using the
+        // velocity at the beginning and end of the time slice
+        oldState.velocity = Velocity<>(
+            (newVelocity.linear + oldVelocity.linear) / 2,
+            (newVelocity.angular + oldVelocity.angular) / 2);
+//        oldState.velocity = reinterpret_cast<CmdVelocity<>*>(command)->velocity;
     }
 
     StatePe<TYPE> newState;

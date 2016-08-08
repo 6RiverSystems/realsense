@@ -40,6 +40,11 @@ public:
         ukf_.addSensor(sensor);
     }
 
+    void enableNaive(bool newState)
+    {
+        naiveSensorFusion_ = newState;
+    }
+
     Pose<> getAccumulatedOdometry()
     {
         return accumulatedOdometry_;
@@ -91,7 +96,7 @@ public:
         accumulatedOdometry_ = Pose<>::ZERO;
     }
 
-    void run(Odometry<>* odometry);
+    void run(Odometry<>* odometry, Imu<>* imu, Pose<>* aps);
 
     void setRobotQ(cv::Mat Q)
     {
@@ -99,6 +104,8 @@ public:
     }
 
 private:
+    void runNaiveSensorFusion(double dT, Odometry<>* odometry, Imu<>* imu, Pose<>* aps);
+
     void updateAccumulatedOdometry(double dT, Odometry<> odometry);
 
     Pose<> accumulatedOdometry_;
@@ -106,6 +113,8 @@ private:
     double dT_;
 
     bool initialized_;
+
+    bool naiveSensorFusion_;
 
     double previousReadingTime_;
 

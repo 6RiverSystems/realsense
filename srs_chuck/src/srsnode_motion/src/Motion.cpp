@@ -205,6 +205,7 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 
     cv::Mat robotQ = FactoryRobotNoise<double>::fromConfiguration(config);
     positionEstimator_.setRobotQ(robotQ);
+    positionEstimator_.enableNaive(config.naive_sensor_fusion_enabled);
 
     RobotProfile robotProfile = FactoryRobotProfile::fromConfiguration(config);
     motionController_.setRobotProfile(robotProfile);
@@ -214,6 +215,10 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     ROS_INFO_STREAM_NAMED("motion",
         "Custom action enabled [t/f]: " <<
         config.custom_action_enabled);
+
+    ROS_INFO_STREAM_NAMED("motion",
+        "Naive sensor fusion [t/f]: " <<
+        config.naive_sensor_fusion_enabled);
 
     ROS_INFO_STREAM_NAMED("motion",
         "Emergency Controller: linear velocity gain []: " <<
@@ -673,24 +678,23 @@ void Motion::stepNode()
             tapSensorFrame_.startAccumulatingYaw();
             tapSensorFrame_.addTrueYaw(tapAps_.getPose().theta);
         }
-
-        // Make sure that the position estimator
-        // will ignore the natural drift of the IMU
-        //tapSensorFrame_.getSensorImu()->enable(false);
     }
     else
     {
         tapSensorFrame_.stopAccumulatingYaw();
-
-        // Make sure that the IMU sensor is
-        // plugged in the UKF
-        //tapSensorFrame_.getSensorImu()->enable(true);
     }
 
     // Provide the command to the position estimator if available
     if (isOdometryAvailable_ || isApsAvailable_ || isImuAvailable_)
     {
-        positionEstimator_.run(isOdometryAvailable_ ? &currentOdometry : nullptr);
+        Imu<> currentImu = tapSensorFrame_.getCalibratedImu();
+        Pose<> currentAps = tapAps_.getPose();
+
+        positionEstimator_.run(
+            isOdometryAvailable_ ? &currentOdometry : nullptr,
+            isImuAvailable_ ? &currentImu : nullptr,
+            isApsAvailable_ ? &currentAps : nullptr
+        );
     }
 
     // Run the motion controller if the estimated position is valid. No

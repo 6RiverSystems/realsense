@@ -116,21 +116,20 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::predict(BaseType dT,
         T.copyTo(Y.col(i));
     }
 
-    // Calculate the predicted mean
-    cv::Mat S = MatrixMath::zeros(BaseKFType::P_);
-
     // Perform the average of the sigma points. The function
     // isolated so that it's possible to define a specific
     // function that depends on the type of data in the sigma points
     cv::Mat Ybar = addWeighted(WM_, Y);
 
     // Calculate the predicted covariance matrix
+    cv::Mat S = MatrixMath::zeros(BaseKFType::P_);
     for (unsigned int i = 0; i < Y.cols; ++i)
     {
         double weight = WC_.at<BaseType>(i);
         S += weight * residual(Y.col(i), Ybar) * residual(Y.col(i), Ybar).t();
     }
 
+    BaseKFType::x_ = Ybar;
     BaseKFType::P_ = S + BaseKFType::process_.getQ();
 }
 
@@ -250,6 +249,9 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::update(BaseType dT,
                 T.copyTo(Y.col(i));
             }
 
+            // Perform the average of the sigma points. The function
+            // isolated so that it's possible to define a specific
+            // function that depends on the type of data in the sigma points
             cv::Mat Ybar = addWeighted(WM_, Y);
 
             // Pass the sigma points through h()
@@ -265,20 +267,21 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::update(BaseType dT,
             // Perform the average of the sigma points. The function
             // isolated so that it's possible to define a specific
             // function that depends on the type of data in the sigma points
-            cv::Mat Zbar = addWeighted(WM_, Z);
+            cv::Mat muZ = addWeighted(WM_, Z);
 
-            // Calculate the predicted covariance matrix
             cv::Mat S = MatrixMath::zeros(BaseKFType::P_);
             S.setTo(0);
 
             cv::Mat C = MatrixMath::zeros(BaseKFType::P_);
             C.setTo(0);
 
-            for (unsigned int i = 0; i < Y.cols; ++i)
+            // Calculate the predicted covariance matrix
+            // and the cross covariance matrix
+            for (unsigned int i = 0; i < Z.cols; ++i)
             {
                 double weight = WC_.at<BaseType>(i);
-                S += weight * residual(Z.col(i), Zbar) * residual(Z.col(i), Zbar).t();
-                C += weight * residual(CHI.col(i), Ybar) * residual(Z.col(i), Zbar).t();
+                S += weight * residual(Z.col(i), muZ) * residual(Z.col(i), muZ).t();
+                C += weight * residual(CHI.col(i), Ybar) * residual(Z.col(i), muZ).t();
             }
 
             S += sensor->getR();
@@ -287,7 +290,7 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::update(BaseType dT,
 
             cv::Mat z = sensor->getCurrentData();
             cv::Mat K = C * S.inv();
-            BaseKFType::x_ += K * residual(z, Zbar);
+            BaseKFType::x_ += K * residual(z, muZ);
             BaseKFType::P_ -= K * S * K.t();
         }
     }

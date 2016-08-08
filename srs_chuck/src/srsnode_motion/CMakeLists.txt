@@ -20,7 +20,7 @@ set(${PROJECT_NAME}_TEST_SOURCES
 #    test/Test_Motion_11ConstantSteps.cpp
 #    test/Test_Motion_Diagonal.cpp
     test/Test_Motion_StraightOdometry.cpp
-    test/Test_Motion_StraightOdometryImu.cpp
+#    test/Test_Motion_StraightOdometryImu.cpp
 #    test/Test_Motion_Drift.cpp
 )
 

@@ -423,7 +423,7 @@ void Executive::stepExecutiveFunctions()
 void Executive::taskCustomAction()
 {
     currentGoal_ = AngleMath::equalRad<double>(currentRobotPose_.theta, 0.0, 1.0) ?
-        Pose<>(15.38, 5.26, 0) :
+        Pose<>(15.50, 5.26, 0) :
         Pose<>(6.38, 5.26, AngleMath::deg2rad<double>(180.0));
 
         taskPlanToGoal();

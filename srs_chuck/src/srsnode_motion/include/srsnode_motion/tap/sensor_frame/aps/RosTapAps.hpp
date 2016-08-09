@@ -26,7 +26,10 @@ public:
     typedef typename ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>::BaseType BaseType;
 
     RosTapAps() :
-        RosTap("Absolute Positioning System Tap")
+        RosTap("Absolute Positioning System Tap"),
+        thetaPoints_(0),
+        thetaSumCosine_(0.0),
+        thetaSumSine_(0.0)
     {
         sensor_ = new ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>();
     }
@@ -55,12 +58,17 @@ public:
     void reset()
     {
         sensor_->reset();
+
+        thetaSumCosine_ = 0.0;
+        thetaSumSine_ = 0.0;
+        thetaPoints_ = 0;
+
         RosTap::reset();
     }
 
-    void set(double arrivalTime, BaseType x, BaseType y, BaseType theta)
+    void set(Pose<> newAps)
     {
-        sensor_->set(arrivalTime, x, y, theta);
+        sensor_->set(newAps);
 
         if (!sensor_->isEnabled())
         {
@@ -82,13 +90,44 @@ protected:
 private:
     void onAps(const srslib_framework::MsgPoseConstPtr& message)
     {
-        set(TimeMath::time2number(message->header.stamp),
+        // If the tap hasn't heard from the physical sensor
+        // for more than 0.5 seconds, it's likely that the
+        // average values (sine and cosine) are not valid anymore.
+        // Reset the sums for the average
+        ros::Time currentTime = ros::Time::now();
+        if (TimeMath::isTimeElapsed(0.5, previousApsTime_, currentTime))
+        {
+            reset();
+        }
+        previousApsTime_ = currentTime;
+
+        double theta = AngleMath::deg2rad(message->theta);
+
+        thetaSumCosine_ += cos(theta);
+        thetaSumSine_ += sin(theta);
+        thetaPoints_ += 1;
+        if (!thetaPoints_)
+        {
+            thetaPoints_ = 1;
+        }
+
+        double averageAngle = atan2(
+            thetaSumSine_ / thetaPoints_,
+            thetaSumCosine_ / thetaPoints_);
+
+        set(Pose<>(TimeMath::time2number(message->header.stamp),
             static_cast<double>(message->x),
             static_cast<double>(message->y),
-            static_cast<double>(AngleMath::deg2rad(message->theta)));
+            static_cast<double>(averageAngle)));
     }
 
     ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensor_;
+
+    unsigned int thetaPoints_;
+    double thetaSumCosine_;
+    double thetaSumSine_;
+
+    ros::Time previousApsTime_;
 };
 
 } // namespace srs

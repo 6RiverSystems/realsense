@@ -35,7 +35,6 @@ public:
 
         imuYawSumCosine_ = 0.0;
         imuYawSumSine_ = 0.0;
-        imuYawPoints_ = 1;
         accumulateYaws_ = false;
     }
 
@@ -51,15 +50,8 @@ public:
         {
             imuYawSumCosine_ += cos(trueYaw);
             imuYawSumSine_ += sin(trueYaw);
-            imuYawPoints_ += 1;
-            if (!imuYawPoints_)
-            {
-                imuYawPoints_ = 1;
-            }
 
-            double averageAngle = atan2(
-                imuYawSumSine_ / imuYawPoints_,
-                imuYawSumCosine_ / imuYawPoints_);
+            double averageAngle = atan2(imuYawSumSine_, imuYawSumCosine_);
             setTrueYaw(averageAngle);
         }
     }
@@ -69,12 +61,13 @@ public:
         return sensorImu_->getImu();
     }
 
-    Imu<> getRawImu() const
+    Imu<> getRawImu()
     {
+        RosTap::setNewData(false);
         return currentRawImu_;
     }
 
-    Odometry<> getOdometry()
+    Odometry<> getOdometry() const
     {
         return sensorOdometry_->getOdometry();
     }
@@ -158,7 +151,6 @@ public:
             accumulateYaws_ = true;
             imuYawSumCosine_ = 0.0;
             imuYawSumSine_ = 0.0;
-            imuYawPoints_ = 0;
         }
     }
 
@@ -192,7 +184,6 @@ private:
     double imuYawSumCosine_;
     double imuYawSumSine_;
 
-    unsigned int imuYawPoints_;
     double imuDeltaYaw_;
     bool accumulateYaws_;
 };

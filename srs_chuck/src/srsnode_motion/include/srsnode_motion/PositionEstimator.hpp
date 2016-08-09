@@ -116,6 +116,13 @@ private:
     double previousNodeReadingTime_;
     double previousOdometryTime_;
 
+    double sumDeltaTheta_;
+    Imu<> previousImu_;
+    double correctedApsTheta_;
+    unsigned int apsCounter_;
+    unsigned int apsTimeout_;
+    bool neverSeenAps_;
+
     Robot<> robot_;
 
     PositionUkf ukf_;

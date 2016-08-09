@@ -10,12 +10,18 @@ PositionEstimator::PositionEstimator(double dT) :
     dTDefault_(dT),
     initialized_(false),
     naiveSensorFusion_(true),
+    neverSeenAps_(true),
     ukf_(robot_),
     previousNodeReadingTime_(-1.0),
     previousOdometryTime_(-1.0),
     dTNode_(0.0),
     dTOdometry_(0.0),
-    p0_(10.0)
+    p0_(10.0),
+    sumDeltaTheta_(0.0),
+    previousImu_(Imu<>::INVALID),
+    apsTimeout_(0),
+    apsCounter_(0),
+    correctedApsTheta_(0.0)
 {
 }
 
@@ -42,6 +48,13 @@ void PositionEstimator::reset(Pose<> initialPose)
         );
 
         ukf_.reset(currentState.getVectorForm(), cv::Mat::diag(P0));
+
+        apsTimeout_ = 0;
+        apsCounter_ = 0;
+        neverSeenAps_ = true;
+        previousImu_ = Imu<>::INVALID;
+        sumDeltaTheta_ = 0.0;
+        correctedApsTheta_ = 0.0;
     }
 }
 
@@ -121,34 +134,117 @@ void PositionEstimator::runNaiveSensorFusion(double dT, Odometry<>* odometry, Im
 {
     ROS_WARN_STREAM("Valid pose naive");
     StatePe<> currentState = StatePe<>(ukf_.getX());
+    ROS_WARN_STREAM("Current state: " << currentState);
 
-    if (aps)
+    double imuDelta = 0.0;
+
+    if (imu)
     {
+        if (previousImu_.isValid())
+        {
+            imuDelta = (imu->yaw - previousImu_.yaw);
+            sumDeltaTheta_ += imuDelta;
+        }
+        else
+        {
+            sumDeltaTheta_ = 0.0;
+        }
+
+        previousImu_ = *imu;
+
+        apsTimeout_++;
+
+        // ugly trick to reset the stargazer if we don't see a
+        // reading for 100 IMU readings
+        if (apsTimeout_ > 100)
+        {
+            neverSeenAps_ = true;
+            apsCounter_ = 0;
+            apsTimeout_ = 0;
+        }
+    }
+
+    if (aps && previousImu_.isValid())
+    {
+        apsCounter_++;
+        apsTimeout_ = 0;
+
+        double historicAngle;
+        if (neverSeenAps_)
+        {
+            historicAngle = aps->theta;
+            neverSeenAps_ = false;
+
+            ROS_WARN_STREAM("Initial APS pose: " << *aps);
+        }
+        else
+        {
+            historicAngle = correctedApsTheta_ + sumDeltaTheta_;
+        }
+        sumDeltaTheta_ = 0.0;
+
+        double currentSine = sin(aps->theta);
+        double currentCosine = cos(aps->theta);
+        double historicSine = sin(historicAngle);
+        double historicCosine = cos(historicAngle);
+
+        double averageSine = (historicSine * (apsCounter_ - 1) + currentSine) / apsCounter_;
+        double averageCosine = (historicCosine * (apsCounter_ - 1) + currentCosine) / apsCounter_;
+
+        correctedApsTheta_ = atan2(averageSine, averageCosine);
+
+        ROS_WARN_STREAM("Corrected stargazer theta: " << correctedApsTheta_);
+
         currentState.pose = *aps;
-        ROS_WARN_STREAM("New pose: " << *aps);
+        currentState.pose.theta = correctedApsTheta_;
 
         ukf_.reset(currentState.getVectorForm());
     }
-    else
+    else if (imu && odometry)
     {
-        if (imu && odometry)
-        {
-            currentState.pose.theta = imu->yaw;
-            ROS_WARN_STREAM("New theta: " << imu->yaw);
+        double angular = imuDelta / dT;
 
-            double angular = (imu->yaw - currentState.pose.theta) / dT;
-            currentState.velocity = Velocity<>(odometry->velocity.linear, angular);
+        currentState.pose.theta = correctedApsTheta_;
+        currentState.velocity = Velocity<>(odometry->velocity.linear, angular);
 
-            ROS_WARN_STREAM("New velocity: " << currentState.velocity);
+        ROS_WARN_STREAM("New velocity: " << currentState.velocity);
 
-            StatePe<> newState;
-            robot_.kinematics(currentState, dT, newState);
+        StatePe<> newState;
+        robot_.kinematics(currentState, dT, newState);
 
-            ROS_WARN_STREAM("New state: " << newState);
+        ROS_WARN_STREAM("New state: " << newState);
 
-            ukf_.reset(newState.getVectorForm());
-        }
+        ukf_.reset(newState.getVectorForm());
     }
+
+// ###FS
+//    if (aps)
+//    {
+//        currentState.pose = *aps;
+//        ROS_WARN_STREAM("New pose: " << *aps);
+//
+//        ukf_.reset(currentState.getVectorForm());
+//    }
+//    else
+//    {
+//        if (imu && odometry)
+//        {
+//            currentState.pose.theta = imu->yaw;
+//            ROS_WARN_STREAM("New theta: " << imu->yaw);
+//
+//            double angular = (imu->yaw - currentState.pose.theta) / dT;
+//            currentState.velocity = Velocity<>(odometry->velocity.linear, angular);
+//
+//            ROS_WARN_STREAM("New velocity: " << currentState.velocity);
+//
+//            StatePe<> newState;
+//            robot_.kinematics(currentState, dT, newState);
+//
+//            ROS_WARN_STREAM("New state: " << newState);
+//
+//            ukf_.reset(newState.getVectorForm());
+//        }
+//    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -723,7 +723,7 @@ void Motion::stepNode()
     // Provide the command to the position estimator if available
     if (isOdometryAvailable_ || isApsAvailable_ || isImuAvailable_)
     {
-        Imu<> currentImu = tapSensorFrame_.getCalibratedImu();
+        Imu<> currentImu = tapSensorFrame_.getRawImu(); // ###FS tapSensorFrame_.getCalibratedImu();
         Pose<> currentAps = tapAps_.getPose();
 
         positionEstimator_.run(

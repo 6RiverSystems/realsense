@@ -26,10 +26,9 @@ public:
     typedef typename ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>::BaseType BaseType;
 
     RosTapAps() :
-        RosTap("Absolute Positioning System Tap"),
-        thetaPoints_(0),
+        RosTap("Absolute Positioning System Tap")/* ###FS,
         thetaSumCosine_(0.0),
-        thetaSumSine_(0.0)
+        thetaSumSine_(0.0)*/
     {
         sensor_ = new ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>();
     }
@@ -59,9 +58,9 @@ public:
     {
         sensor_->reset();
 
-        thetaSumCosine_ = 0.0;
-        thetaSumSine_ = 0.0;
-        thetaPoints_ = 0;
+        // ###FS
+//        thetaSumCosine_ = 0.0;
+//        thetaSumSine_ = 0.0;
 
         RosTap::reset();
     }
@@ -90,44 +89,39 @@ protected:
 private:
     void onAps(const srslib_framework::MsgPoseConstPtr& message)
     {
-        // If the tap hasn't heard from the physical sensor
-        // for more than 0.5 seconds, it's likely that the
-        // average values (sine and cosine) are not valid anymore.
-        // Reset the sums for the average
-        ros::Time currentTime = ros::Time::now();
-        if (TimeMath::isTimeElapsed(1.0, previousApsTime_, currentTime))
-        {
-            reset();
-        }
-        previousApsTime_ = currentTime;
-
-        double theta = AngleMath::deg2rad(message->theta);
-
-        thetaSumCosine_ += cos(theta);
-        thetaSumSine_ += sin(theta);
-        thetaPoints_ += 1;
-        if (!thetaPoints_)
-        {
-            thetaPoints_ = 1;
-        }
-
-        double averageAngle = AngleMath::normalizeAngleRad<double>(atan2(
-            thetaSumSine_ / thetaPoints_,
-            thetaSumCosine_ / thetaPoints_));
+        // ###FS
+//        // If the tap hasn't heard from the physical sensor
+//        // for more than 0.5 seconds, it's likely that the
+//        // average values (sine and cosine) are not valid anymore.
+//        // Reset the sums for the average
+//        ros::Time currentTime = ros::Time::now();
+//        if (TimeMath::isTimeElapsed(1.0, previousApsTime_, currentTime))
+//        {
+//            reset();
+//        }
+//        previousApsTime_ = currentTime;
+//
+//        double theta = AngleMath::deg2rad(message->theta);
+//
+//        thetaSumCosine_ += cos(theta);
+//        thetaSumSine_ += sin(theta);
+//
+//        double averageAngle = AngleMath::normalizeAngleRad<double>(atan2(
+//            thetaSumSine_, thetaSumCosine_));
 
         set(Pose<>(TimeMath::time2number(message->header.stamp),
             static_cast<double>(message->x),
             static_cast<double>(message->y),
-            static_cast<double>(averageAngle)));
+            static_cast<double>(AngleMath::deg2rad(message->theta))));
     }
 
     ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensor_;
 
-    unsigned int thetaPoints_;
-    double thetaSumCosine_;
-    double thetaSumSine_;
-
-    ros::Time previousApsTime_;
+    // ###FS
+//    double thetaSumCosine_;
+//    double thetaSumSine_;
+//
+//    ros::Time previousApsTime_;
 };
 
 } // namespace srs

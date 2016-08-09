@@ -35,6 +35,7 @@ public:
 
     Pose<BaseType> getPose()
     {
+        Sensor<STATE_SIZE, TYPE>::setNewData(false);
         return currentData_;
     }
 

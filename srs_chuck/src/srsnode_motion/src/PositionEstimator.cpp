@@ -15,7 +15,7 @@ PositionEstimator::PositionEstimator(double dT) :
     previousOdometryTime_(-1.0),
     dTNode_(0.0),
     dTOdometry_(0.0),
-    p0_(1000.0)
+    p0_(10.0)
 {
 }
 
@@ -119,13 +119,13 @@ void PositionEstimator::run(Odometry<>* odometry, Imu<>* imu, Pose<>* aps)
 
 void PositionEstimator::runNaiveSensorFusion(double dT, Odometry<>* odometry, Imu<>* imu, Pose<>* aps)
 {
-    ROS_INFO_STREAM("Valid pose naive");
+    ROS_WARN_STREAM("Valid pose naive");
     StatePe<> currentState = StatePe<>(ukf_.getX());
 
     if (aps)
     {
         currentState.pose = *aps;
-        ROS_INFO_STREAM("New pose: " << *aps);
+        ROS_WARN_STREAM("New pose: " << *aps);
 
         ukf_.reset(currentState.getVectorForm());
     }
@@ -134,17 +134,17 @@ void PositionEstimator::runNaiveSensorFusion(double dT, Odometry<>* odometry, Im
         if (imu && odometry)
         {
             currentState.pose.theta = imu->yaw;
-            ROS_INFO_STREAM("New theta: " << imu->yaw);
+            ROS_WARN_STREAM("New theta: " << imu->yaw);
 
             double angular = (imu->yaw - currentState.pose.theta) / dT;
             currentState.velocity = Velocity<>(odometry->velocity.linear, angular);
 
-            ROS_INFO_STREAM("New velocity: " << currentState.velocity);
+            ROS_WARN_STREAM("New velocity: " << currentState.velocity);
 
             StatePe<> newState;
             robot_.kinematics(currentState, dT, newState);
 
-            ROS_INFO_STREAM("New state: " << newState);
+            ROS_WARN_STREAM("New state: " << newState);
 
             ukf_.reset(newState.getVectorForm());
         }

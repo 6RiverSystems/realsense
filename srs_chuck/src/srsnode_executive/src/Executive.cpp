@@ -422,19 +422,11 @@ void Executive::stepExecutiveFunctions()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::taskCustomAction()
 {
-    //    Pose<> P1 = Pose<>(6.7, 2.1, 0);
-    //    Pose<> P2 = Pose<>(16.4, 2.1, 0);
-    //
-    //    if (PoseMath::euclidean(currentRobotPose_, P1) < 1.0)
-    //    {
-    //        executePlanToGoal(P2);
-    //    }
-    //    else
-    //    {
-    //        executePlanToGoal(P1);
-    //    }
-    //
-    //    publishInternalGoalSolution(currentSolution_);
+    currentGoal_ = AngleMath::equalRad<double>(currentRobotPose_.theta, 0.0, 1.0) ?
+        Pose<>(15.38, 5.26, 0) :
+        Pose<>(6.38, 5.26, AngleMath::deg2rad<double>(180.0));
+
+        taskPlanToGoal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -39,8 +39,9 @@ public:
 
     virtual cv::Mat getCurrentData();
 
-    Imu<BaseType> getImu() const
+    Imu<BaseType> getImu()
     {
+        Sensor<STATE_SIZE, TYPE>::setNewData(false);
         return currentData_;
     }
 

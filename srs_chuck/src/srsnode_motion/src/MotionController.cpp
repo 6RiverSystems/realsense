@@ -403,7 +403,7 @@ void MotionController::checkMotionStatus()
 {
     // If the stand controller is currently active and there is work in
     // the queue, cancel work in the controller and pump work from the queue
-    if (isStandControllerActive() && isWorkPending())
+    if (isStandControllerActive() && isWorkPending() && !isScheduledNext(TaskEnum::STAND))
     {
         ROS_DEBUG_NAMED("motion_controller", "Abandoned STAND");
         activeController_->cancel();

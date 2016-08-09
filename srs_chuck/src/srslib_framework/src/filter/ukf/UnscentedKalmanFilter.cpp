@@ -105,8 +105,13 @@ template<unsigned int STATE_SIZE, unsigned int COMMAND_SIZE, int TYPE>
 void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::predict(BaseType dT,
     Command<COMMAND_SIZE, TYPE>* const command)
 {
+    // ###FS test::Print::print(BaseKFType::P_, "P");
+    // ###FS test::Print::print(BaseKFType::x_, "x");
+
     // Calculate the sigma points
     cv::Mat CHI = calculateSigmaPoints(BaseKFType::x_, BaseKFType::P_);
+
+    // ###FS test::Print::print(CHI, "CHI");
 
     // Pass the sigma points through g()
     cv::Mat Y = MatrixMath::zeros(CHI);
@@ -116,10 +121,14 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::predict(BaseType dT,
         T.copyTo(Y.col(i));
     }
 
+    // ###FS test::Print::print(Y, "Y");
+
     // Perform the average of the sigma points. The function
     // isolated so that it's possible to define a specific
     // function that depends on the type of data in the sigma points
     cv::Mat Ybar = addWeighted(WM_, Y);
+
+    // ###FS test::Print::print(Ybar, "Ybar");
 
     // Calculate the predicted covariance matrix
     cv::Mat S = MatrixMath::zeros(BaseKFType::P_);
@@ -129,8 +138,13 @@ void UnscentedKalmanFilter<STATE_SIZE, COMMAND_SIZE, TYPE>::predict(BaseType dT,
         S += weight * residual(Y.col(i), Ybar) * residual(Y.col(i), Ybar).t();
     }
 
+    // ###FS test::Print::print(S, "S");
+
     BaseKFType::x_ = Ybar;
     BaseKFType::P_ = S + BaseKFType::process_.getQ();
+
+    // ###FS test::Print::print(BaseKFType::P_, "P");
+    // ###FS test::Print::print(BaseKFType::x_, "x");
 }
 
 //{

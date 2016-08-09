@@ -95,7 +95,7 @@ private:
         // average values (sine and cosine) are not valid anymore.
         // Reset the sums for the average
         ros::Time currentTime = ros::Time::now();
-        if (TimeMath::isTimeElapsed(0.5, previousApsTime_, currentTime))
+        if (TimeMath::isTimeElapsed(1.0, previousApsTime_, currentTime))
         {
             reset();
         }
@@ -111,9 +111,9 @@ private:
             thetaPoints_ = 1;
         }
 
-        double averageAngle = atan2(
+        double averageAngle = AngleMath::normalizeAngleRad<double>(atan2(
             thetaSumSine_ / thetaPoints_,
-            thetaSumCosine_ / thetaPoints_);
+            thetaSumCosine_ / thetaPoints_));
 
         set(Pose<>(TimeMath::time2number(message->header.stamp),
             static_cast<double>(message->x),

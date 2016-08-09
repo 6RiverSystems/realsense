@@ -710,13 +710,14 @@ void Motion::stepNode()
         {
             // Tell the tap to start accumulating yaw values. This has no
             // effect if the tap had already started to accumulate
-            tapSensorFrame_.startAccumulatingYaw();
-            tapSensorFrame_.addTrueYaw(tapAps_.getPose().theta);
+            // ###FS tapSensorFrame_.startAccumulatingYaw();
+            tapSensorFrame_.setTrueYaw(tapAps_.getPose().theta);
+            // ###FS tapSensorFrame_.addTrueYaw(tapAps_.getPose().theta);
         }
     }
     else
     {
-        tapSensorFrame_.stopAccumulatingYaw();
+        // ###FS tapSensorFrame_.stopAccumulatingYaw();
     }
 
     // Provide the command to the position estimator if available

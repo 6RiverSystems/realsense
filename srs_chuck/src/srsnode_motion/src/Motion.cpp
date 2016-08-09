@@ -10,6 +10,7 @@
 #include <nav_msgs/Path.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float64.h>
+#include <std_msgs/Float64MultiArray.h>
 #include <tf/transform_broadcaster.h>
 
 #include <srslib_framework/MsgPose.h>
@@ -73,7 +74,10 @@ Motion::Motion(string nodeName) :
     pubStatusGoalLanding_ = rosNodeHandle_.advertise<geometry_msgs::PolygonStamped>(
         "/internal/state/goal/landing", 1);
 
-    rosNodeHandle_.param("emulation", isEmulationEnabled_, true);
+    pubCovariance_ = rosNodeHandle_.advertise<std_msgs::Float64MultiArray>(
+        "/internal/state/robot/covariance", 1);
+
+    rosNodeHandle_.param("emulation", isEmulationEnabled_, false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +114,7 @@ void Motion::run()
         publishAccumulatedOdometry();
         publishGoalLanding();
         publishLocalized();
+        publishCovariance();
 
         refreshRate.sleep();
     }
@@ -205,6 +210,7 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
 
     cv::Mat robotQ = FactoryRobotNoise<double>::fromConfiguration(config);
     positionEstimator_.setRobotQ(robotQ);
+    positionEstimator_.setP0Value(config.ukf_robot_p0);
     positionEstimator_.enableNaive(config.naive_sensor_fusion_enabled);
 
     RobotProfile robotProfile = FactoryRobotProfile::fromConfiguration(config);
@@ -389,6 +395,10 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     ROS_INFO_STREAM_NAMED("motion",
         "Angular velocity component of the robot noise [rad/s]: " <<
         config.ukf_robot_error_angular);
+
+    ROS_INFO_STREAM_NAMED("motion",
+        "Common value for the initialization of P0: " <<
+        config.ukf_robot_p0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -440,6 +450,25 @@ void Motion::publishArrived()
 
         pubStatusGoalArrived_.publish(messageGoalArrived);
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Motion::publishCovariance()
+{
+    cv::Mat covariance = positionEstimator_.getCovariance();
+
+    std_msgs::Float64MultiArray messageCovariance;
+    messageCovariance.data.clear();
+
+    for (int r = 0; r < covariance.rows; r++)
+    {
+        for (int c = 0; c < covariance.cols; c++)
+        {
+            messageCovariance.data.push_back(covariance.at<double>(r, c));
+        }
+    }
+
+    pubCovariance_.publish(messageCovariance);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

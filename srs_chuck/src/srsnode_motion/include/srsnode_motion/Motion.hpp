@@ -46,7 +46,7 @@ public:
     void run();
 
 private:
-    constexpr static double REFRESH_RATE_HZ = 90;
+    constexpr static double REFRESH_RATE_HZ = 120;
     constexpr static double PING_HZ = 10;
     constexpr static double MAX_ALLOWED_PING_DELAY = 0.5; // 50% of the duty cycle
 
@@ -67,6 +67,7 @@ private:
     void publishOdometry();
     void publishLocalized();
     void publishPose();
+    void publishCovariance();
 
     void reset(Pose<> pose0);
 
@@ -98,6 +99,7 @@ private:
     ros::Publisher pubStatusGoalArrived_;
     ros::Publisher pubStatusGoalLanding_;
     ros::Publisher pubRobotLocalized_;
+    ros::Publisher pubCovariance_;
 
     ros::Publisher pubImu_;
 

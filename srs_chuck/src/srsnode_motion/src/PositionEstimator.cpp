@@ -14,13 +14,48 @@ PositionEstimator::PositionEstimator(double dT) :
     previousNodeReadingTime_(-1.0),
     previousOdometryTime_(-1.0),
     dTNode_(0.0),
-    dTOdometry_(0.0)
+    dTOdometry_(0.0),
+    p0_(1000.0)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 PositionEstimator::~PositionEstimator()
 {
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void PositionEstimator::reset(Pose<> initialPose)
+{
+    if (initialPose.isValid())
+    {
+        initialized_ = true;
+
+        StatePe<> currentState = StatePe<>(initialPose);
+
+        cv::Mat P0 = (cv::Mat_<double>(1, STATIC_UKF_STATE_VECTOR_SIZE) <<
+            pow(p0_, 2.0),
+            pow(p0_, 2.0),
+            pow(p0_, 2.0),
+            pow(p0_, 2.0),
+            pow(p0_, 2.0)
+        );
+
+        ukf_.reset(currentState.getVectorForm(), cv::Mat::diag(P0));
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void PositionEstimator::resetAccumulatedOdometry(Pose<>* initialPose)
+{
+    if (initialPose)
+    {
+        accumulatedOdometry_ = *initialPose;
+    }
+    else
+    {
+        accumulatedOdometry_ = Pose<>::ZERO;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

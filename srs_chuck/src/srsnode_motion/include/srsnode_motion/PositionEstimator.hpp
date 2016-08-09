@@ -50,6 +50,11 @@ public:
         return accumulatedOdometry_;
     }
 
+    cv::Mat getCovariance()
+    {
+        return ukf_.getP();
+    }
+
     Pose<> getPose()
     {
         if (initialized_)
@@ -78,36 +83,18 @@ public:
         return currentPose.isValid();
     }
 
-    void reset(Pose<> initialPose)
-    {
-        if (initialPose.isValid())
-        {
-            initialized_ = true;
-
-            StatePe<> currentState = StatePe<>(initialPose);
-            cv::Mat currentCovariance = robot_.getQ();
-
-            ukf_.reset(currentState.getVectorForm(), currentCovariance);
-        }
-    }
-
-    void resetAccumulatedOdometry(Pose<>* initialPose)
-    {
-        if (initialPose)
-        {
-            accumulatedOdometry_ = *initialPose;
-        }
-        else
-        {
-            accumulatedOdometry_ = Pose<>::ZERO;
-        }
-    }
-
+    void reset(Pose<> initialPose);
+    void resetAccumulatedOdometry(Pose<>* initialPose);
     void run(Odometry<>* odometry, Imu<>* imu, Pose<>* aps);
 
     void setRobotQ(cv::Mat Q)
     {
         robot_.setQ(Q);
+    }
+
+    void setP0Value(double p0)
+    {
+        p0_ = p0;
     }
 
 private:
@@ -125,6 +112,7 @@ private:
 
     bool naiveSensorFusion_;
 
+    double p0_;
     double previousNodeReadingTime_;
     double previousOdometryTime_;
 

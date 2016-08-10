@@ -203,10 +203,9 @@ void PositionEstimator::runNaiveSensorFusion(double dT, Odometry<>* odometry, Im
     else if (imu && odometry)
     {
         double angular = imuDelta / dT;
-
-        currentState.pose.theta = correctedApsTheta_;
         currentState.velocity = Velocity<>(odometry->velocity.linear, angular);
 
+        ROS_WARN_STREAM("correctedApsTheta: " << correctedApsTheta_);
         ROS_WARN_STREAM("New velocity: " << currentState.velocity);
 
         StatePe<> newState;

@@ -34,6 +34,7 @@ find_package(OpenCV 1.7 REQUIRED)
 
 include_directories(include 
     src/
+    include/
     ${catkin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
 )

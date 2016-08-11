@@ -6,43 +6,40 @@
   *
 -->
 <launch>
+	<arg name="camera" default="camera" />
+	<arg name="simulation" default="false" />
 
-    <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager" output="screen"/>
+	<include unless="$(arg simulation)" file="$(find realsense_camera)/launch/r200_nodelet_modify_params.launch">
+		<arg name="enable_depth"      default="true" />
+		<arg name="enable_color"      default="true" />
+		<arg name="enable_pointcloud" default="false" />
+		<arg name="enable_tf"         default="false" />
+		<arg name="mode"              default="manual" />
+		<arg name="color_height"	value="480" />
+		<arg name="color_width"		value="640" />
+		<arg name="depth_height"	value="240" />
+		<arg name="depth_width" 	value="320" />
+		<arg name="depth_fps"       value="30" />
+		<arg name="color_fps"       value="30" />
+	</include>
 
-    <arg name="serial_no" default="" />
-	<arg name="mode" default="manual" />
-	<arg name="color_height" default="240" />
-	<arg name="color_width" default="320" />
-	<arg name="depth_height" default="252" />
-	<arg name="depth_width" default="332" />
-	<arg name="enable_depth" default="true" />
-	<arg name="enable_color" default="true" />
-	<arg name="enable_pointcloud" default="true" />
-	<arg name="enable_tf" default="false" />
-	<arg name="depth_fps" default="30" />
-	<arg name="color_fps" default="30" />	
-	<arg name="r200_lr_gain" default="100" />
+	<node name="srsnode_realsense_to_laserscan" pkg="srsnode_realsense_to_laserscan" type="srsnode_realsense_to_laserscan"
+		output="screen" respawn="true"/>
 
-    <node pkg="nodelet" type="nodelet" name="RealsenseNodelet"
-        args="load realsense_camera/RealsenseNodelet standalone_nodelet">
-        <param name="serial_no"         type="str"  value="$(arg serial_no)" />
-        <param name="mode"              type="str"  value="$(arg mode)" />
-        <param name="enable_depth"      type="bool" value="$(arg enable_depth)" />
-        <param name="enable_color"      type="bool" value="$(arg enable_color)" />
-        <param name="enable_pointcloud" type="bool" value="$(arg enable_pointcloud)" />
-        <param name="enable_tf"         type="bool" value="$(arg enable_tf)" />
-        <param name="depth_width"       type="int"  value="$(arg depth_width)" />
-        <param name="depth_height"      type="int"  value="$(arg depth_height)" />
-        <param name="color_width"       type="int"  value="$(arg color_width)" />
-        <param name="color_height"      type="int"  value="$(arg color_height)" />
-        <param name="depth_fps"         type="int"  value="$(arg depth_fps)" />
-        <param name="color_fps"         type="int"  value="$(arg color_fps)" />
-        <param name="r200_lr_auto_exposure_enabled"		type="bool"  value="false" />
-        <param name="r200_lr_gain"		type="int"  value="100" />
-        <param name="r200_lr_exposure"		type="int"  value="330" />
+	<node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
+
+	<!-- push depthimage_to_laserscan nodelet into sensor's nodelet manager-->
+	<node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet laserscan_nodelet_manager">
+        <remap from="image" to="/camera/depth/image_median_filter"/>
+        <remap from="scan" to="/camera/depth/scan"/>
+        
+		<param name="scan_height" value="20"/>
+		<param name="scan_time" value="0.033"/>
+		<param name="output_frame_id" value="/laser_frame"/>
+		<param name="range_min" value="0.01"/>
+		<param name="range_max" value="8.00"/>
+		<param name="concurrency_level" value="0"/>
     </node>
 
-    <node name="srsnode_realsense_to_laserscan" pkg="srsnode_realsense_to_laserscan"
-        type="srsnode_realsense_to_laserscan" output="screen" respawn="true"/>
 </launch>
 

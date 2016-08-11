@@ -29,6 +29,8 @@ function updateChuck() {
 }
 
 function buildChuck() {
+  source /opt/ros/indigo/setup.bash
+
   getChuckDirectory &&
   pushd "$baseDirectory/srs_chuck" &&
   catkin_make &&
@@ -37,6 +39,9 @@ function buildChuck() {
   pushd "$baseDirectory/srs_sites" &&
   catkin_make &&
   source devel/setup.bash &&
+
+  source ~/ros/srs_sites/devel/setup.bash
+
   popd
 }
 
@@ -78,7 +83,9 @@ function showChuck() {
 
   export DISPLAY=:0
 
-  rviz -d ~/ros/srs_sites/src/srsc_6rhq_rviz/rviz/config.rviz
+  rviz -d ~/ros/srs_sites/src/srsc_6rhq_rviz/rviz/config.rviz &
+
+  rqt &
 }
 
 function stopChuck() {
@@ -101,7 +108,7 @@ function restartChuck() {
   stopChuck
 
   echo "Waiting for services to completely stop"
-  sleep 10s
+  sleep 30s
 
   startChuck
 }
@@ -113,7 +120,7 @@ logChuck() {
 }
 
 recordChuck() {
-  rosbag record --split --buffsize=0 --duration=2m -j /camera/color/camera_info /camera/color/image_raw /camera/depth/camera_info /camera/depth/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
+  rosbag record --split --buffsize=0 --duration=2m /camera/color/camera_info /camera/color/image_raw /camera/depth/camera_info /camera/depth/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
 }
 
 alias chucklog=logChuck

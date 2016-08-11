@@ -64,7 +64,7 @@ void CMUPathController::setTrajectory(Pose<> robotPose, Trajectory<> trajectory,
 void CMUPathController::calculateLanding(Pose<> goal)
 {
     goalLanding_ = PoseMath::pose2polygon(goal,
-        robot_.pathFollowGoalReachedDistance,
+        robot_.pathFollowGoalReachedDistance, 0.0,
         robot_.pathFollowLandingWidth, robot_.pathFollowLandingDepth);
 }
 

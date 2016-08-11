@@ -112,7 +112,7 @@ private:
         set(Pose<>(TimeMath::time2number(message->header.stamp),
             static_cast<double>(message->x),
             static_cast<double>(message->y),
-            static_cast<double>(AngleMath::deg2rad(message->theta))));
+            static_cast<double>(AngleMath::deg2rad<double>(message->theta))));
     }
 
     ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensor_;

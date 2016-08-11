@@ -34,7 +34,7 @@ struct Chuck : RobotProfile
         physicalMaxAngularVelocity = AngleMath::deg2rad<double>(555.0); // 9.687 [rad/s]
         physicalMaxLinearAcceleration = 0.700; // [m/s^2]
         physicalMaxLinearVelocity = 2.600; // [m/s]
-        physicalMinAngularVelocity = AngleMath::deg2rad(0.05); // 0.0008 [rad/s]
+        physicalMinAngularVelocity = AngleMath::deg2rad<double>(0.05); // 0.0008 [rad/s]
         physicalMinLinearVelocity = 0.005; // [m/s]
 
         pathFollowAdaptiveLookAhead = false;
@@ -60,8 +60,8 @@ struct Chuck : RobotProfile
         rotationKp = 2.25; // []
         rotationKv = 1.0; // []
         rotationKw = 1.0; // []
-        rotationMinAngularVelocity = AngleMath::deg2rad(0.05); // 0.0008 [rad/s]
-        rotationRotationVelocity = AngleMath::deg2rad(40.0); // 0.7 [rad/s]
+        rotationMinAngularVelocity = AngleMath::deg2rad<double>(0.05); // 0.0008 [rad/s]
+        rotationRotationVelocity = AngleMath::deg2rad<double>(40.0); // 0.7 [rad/s]
 
         stopMinLinearVelocity = 0.010; // [m/s]
         stopNormalDeceleration = 0.650; // [m/s^2]

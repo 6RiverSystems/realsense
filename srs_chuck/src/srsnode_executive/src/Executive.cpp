@@ -198,8 +198,10 @@ void Executive::executePlanToGoal()
 
         ROS_DEBUG_STREAM_NAMED("executive", "Found solution: " << endl << *currentSolution_);
 
-        ROS_INFO_STREAM_NAMED("executive", "Found path for goal: " << internalGoal.x << ", " << internalGoal.y << ", " << goalAngle << " => offset goal: "
-        	<< currentGoal_.x << ", " << currentGoal_.y << ", " << AngleMath::deg2rad( currentGoal_.theta ));
+        ROS_INFO_STREAM_NAMED("executive", "Found path for goal: " <<
+            internalGoal.x << ", " << internalGoal.y << ", " << goalAngle << " => offset goal: " <<
+            currentGoal_.x << ", " << currentGoal_.y << ", " <<
+            AngleMath::deg2rad<double>(currentGoal_.theta));
     }
     else
     {

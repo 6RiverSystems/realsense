@@ -63,7 +63,7 @@ struct PoseMath
         cv::Mat P0_P3 = P0 - P3;
         cv::Mat P2_P3 = P2 - P3;
 
-        cv::Mat PC = 2.0 * P - P0 - P2;
+        cv::Mat PC = TYPE(2) * P - P0 - P2;
 
         return (P2_P3.dot(PC - P2_P3) <= 0.0 && P2_P3.dot(PC + P2_P3) >= 0.0) &&
                (P0_P3.dot(PC - P0_P3) <= 0.0 && P0_P3.dot(PC + P0_P3) >= 0.0);
@@ -107,16 +107,16 @@ struct PoseMath
     template<typename TYPE = double>
     static vector<Pose<>> pose2polygon(const Pose<TYPE> center, TYPE offsetX, TYPE offsetY, TYPE width, TYPE depth)
     {
-    	// Pose coordinate system is rotated by -PI relative to the map
+        // Pose coordinate system is rotated by -PI relative to the map
         Pose<> rotatedPose = PoseMath::rotate(center, -M_PI);
 
         // Translate by the offset
         rotatedPose = PoseMath::translate(rotatedPose, offsetX, offsetY);
 
-        Pose<> p0 = PoseMath::translate(rotatedPose,  depth / 2.0f, -width / 2.0f);
-        Pose<> p1 = PoseMath::translate(rotatedPose,  depth / 2.0f,  width / 2.0f);
-        Pose<> p2 = PoseMath::translate(rotatedPose, -depth / 2.0f,  width / 2.0f);
-        Pose<> p3 = PoseMath::translate(rotatedPose, -depth / 2.0f, -width / 2.0f);
+        Pose<> p0 = PoseMath::translate(rotatedPose,  depth / TYPE(2), -width / TYPE(2));
+        Pose<> p1 = PoseMath::translate(rotatedPose,  depth / TYPE(2),  width / TYPE(2));
+        Pose<> p2 = PoseMath::translate(rotatedPose, -depth / TYPE(2),  width / TYPE(2));
+        Pose<> p3 = PoseMath::translate(rotatedPose, -depth / TYPE(2), -width / TYPE(2));
 
         vector<Pose<>> polygon;
         polygon.clear();

@@ -132,9 +132,7 @@ void PositionEstimator::run(Odometry<>* odometry, Imu<>* imu, Pose<>* aps)
 
 void PositionEstimator::runNaiveSensorFusion(double dT, Odometry<>* odometry, Imu<>* imu, Pose<>* aps)
 {
-    ROS_WARN_STREAM("Valid pose naive");
     StatePe<> currentState = StatePe<>(ukf_.getX());
-    ROS_WARN_STREAM("Current state: " << currentState);
 
     double imuDelta = 0.0;
 
@@ -174,8 +172,6 @@ void PositionEstimator::runNaiveSensorFusion(double dT, Odometry<>* odometry, Im
         {
             historicAngle = aps->theta;
             neverSeenAps_ = false;
-
-            ROS_WARN_STREAM("Initial APS pose: " << *aps);
         }
         else
         {
@@ -193,8 +189,6 @@ void PositionEstimator::runNaiveSensorFusion(double dT, Odometry<>* odometry, Im
 
         correctedApsTheta_ = atan2(averageSine, averageCosine);
 
-        ROS_WARN_STREAM("Corrected stargazer theta: " << correctedApsTheta_);
-
         currentState.pose = *aps;
         currentState.pose.theta = correctedApsTheta_;
 
@@ -205,45 +199,11 @@ void PositionEstimator::runNaiveSensorFusion(double dT, Odometry<>* odometry, Im
         double angular = imuDelta / dT;
         currentState.velocity = Velocity<>(odometry->velocity.linear, angular);
 
-        ROS_WARN_STREAM("correctedApsTheta: " << correctedApsTheta_);
-        ROS_WARN_STREAM("New velocity: " << currentState.velocity);
-
         StatePe<> newState;
         robot_.kinematics(currentState, dT, newState);
 
-        ROS_WARN_STREAM("New state: " << newState);
-
         ukf_.reset(newState.getVectorForm());
     }
-
-// ###FS
-//    if (aps)
-//    {
-//        currentState.pose = *aps;
-//        ROS_WARN_STREAM("New pose: " << *aps);
-//
-//        ukf_.reset(currentState.getVectorForm());
-//    }
-//    else
-//    {
-//        if (imu && odometry)
-//        {
-//            currentState.pose.theta = imu->yaw;
-//            ROS_WARN_STREAM("New theta: " << imu->yaw);
-//
-//            double angular = (imu->yaw - currentState.pose.theta) / dT;
-//            currentState.velocity = Velocity<>(odometry->velocity.linear, angular);
-//
-//            ROS_WARN_STREAM("New velocity: " << currentState.velocity);
-//
-//            StatePe<> newState;
-//            robot_.kinematics(currentState, dT, newState);
-//
-//            ROS_WARN_STREAM("New state: " << newState);
-//
-//            ukf_.reset(newState.getVectorForm());
-//        }
-//    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

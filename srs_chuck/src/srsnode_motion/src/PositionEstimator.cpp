@@ -154,7 +154,7 @@ void PositionEstimator::runNaiveSensorFusion(double dT, Odometry<>* odometry, Im
 
         // ugly trick to reset the stargazer if we don't see a
         // reading for 100 IMU readings
-        if (apsTimeout_ > 100)
+        if (apsTimeout_ > 300)
         {
             neverSeenAps_ = true;
             apsCounter_ = 0;

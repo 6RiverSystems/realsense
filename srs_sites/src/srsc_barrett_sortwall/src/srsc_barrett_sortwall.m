@@ -38,17 +38,20 @@ map = mm_addStaticObstacle(map, 28.90, 0.0, 36.36, 23.76 + OBSTACLE, 0.7);
 % PACK01
 %map = mm_addStaticObstacle(map, 16.15, 27.14, 27.71, 38.59, 0.7);
 %map = mm_addStaticObstacle(map, 16.15, 27.14, 27.71, 41.00, 0.7);
-map = mm_addStaticObstacle(map, 16.15, 27.14, 27.71, 41.5, 0.7);
+%map = mm_addStaticObstacle(map, 16.15, 27.14, 27.71, 41.5, 0.7);
+map = mm_addStaticObstacle(map, 16.15, 27.14, 27.71, 43.50, 0.7);
 
 % PACK02
 %map = mm_addStaticObstacle(map, 19.81, 38.59, 27.71, 49.05, 0.3);
 %map = mm_addStaticObstacle(map, 19.81, 41.00, 27.71, 51.00, 0.3);
-map = mm_addStaticObstacle(map, 19.81, 41.50, 27.71, 47.70, 0.3);
+%map = mm_addStaticObstacle(map, 19.81, 41.50, 27.71, 47.70, 0.3);
+map = mm_addStaticObstacle(map, 19.81, 43.50, 27.71, 49.00, 0.3);
 
 % PACK03
 %map = mm_addStaticObstacle(map, 16.15, 49.05, 27.71, 56.37, 0.7);
 %map = mm_addStaticObstacle(map, 16.15, 51.00, 27.71, 56.37, 0.7);
-map = mm_addStaticObstacle(map, 16.15, 47.70, 27.71, 56.37, 0.7);
+%map = mm_addStaticObstacle(map, 16.15, 47.70, 27.71, 56.37, 0.7);
+map = mm_addStaticObstacle(map, 16.15, 49.00, 27.71, 56.37, 0.7);
 
 % RE02
 map = mm_addStaticObstacle(map, 16.15, 5.01 - OBSTACLE, 18.52, 23.76 + OBSTACLE, 0.7);
@@ -86,17 +89,20 @@ map = mm_addStaticObstacle(map, 0.0, 89.27, 36.36, 91.23, 0.7);
 % ST01
 %map = mm_addStaticObstacle(map, 16.55, 41.47, 17.00, 43.57, 0.2);
 %map = mm_addStaticObstacle(map, 16.55, 43.57, 17.00, 45.57, 0.2);
-map = mm_addStaticObstacle(map, 16.55, 42.75, 17.00, 44.50, 0.2);
+%map = mm_addStaticObstacle(map, 16.55, 42.75, 17.00, 44.50, 0.2);
+map = mm_addStaticObstacle(map, 16.55, 44.50, 17.00, 45.50, 0.2);
 
 % ST02
 %map = mm_addStaticObstacle(map, 16.55, 44.72, 17.00, 44.82, 0.2);
 %map = mm_addStaticObstacle(map, 16.55, 46.72, 17.00, 46.82, 0.2);
-map = mm_addStaticObstacle(map, 16.55, 45.50, 17.00, 45.60, 0.2);
+%map = mm_addStaticObstacle(map, 16.55, 45.50, 17.00, 45.60, 0.2);
+map = mm_addStaticObstacle(map, 16.55, 46.65, 17.00, 46.75, 0.2);
 
 % ST03
 %map = mm_addStaticObstacle(map, 16.55, 45.97, 17.00, 46.07, 0.2);
 %map = mm_addStaticObstacle(map, 16.55, 47.97, 17.00, 48.07, 0.2);
-map = mm_addStaticObstacle(map, 16.55, 46.60, 17.00, 46.70, 0.2);
+%map = mm_addStaticObstacle(map, 16.55, 46.60, 17.00, 46.70, 0.2);
+map = mm_addStaticObstacle(map, 16.55, 47.90, 17.00, 48.00, 0.2);
 
 map = mm_generate(map);
 mm_save(map, '../map', 'barrett_sortwall');

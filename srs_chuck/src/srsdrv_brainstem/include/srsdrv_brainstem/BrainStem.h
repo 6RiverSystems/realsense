@@ -73,10 +73,8 @@ private:
 
 	static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
 
-	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
-
 	static constexpr auto PING_TOPIC = "/internal/state/ping";
-	
+
 	static constexpr auto RACE_TOPIC = "/internal/command/race";
 
 	// TODO: Remove/Replace with proper messages

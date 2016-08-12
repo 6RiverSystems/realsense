@@ -26,5 +26,4 @@ map = mm_addStaticObstacle(map, 3.662, 8.664, 3.762, 9.664, 0.3);
 map = mm_addStaticObstacle(map, 4.912, 8.664, 5.012, 9.664, 0.3);
 
 map = mm_generate(map);
-mm_save(map, '../../srs_sites/src/srsc_6rhq_sortwall/map', '6rhq_sortwall');
-mm_save(map, '../../srs_sites/src/srsc_6rhq_sortwall_rviz/map', '6rhq_sortwall');
+mm_save(map, '../map', '6rhq_sortwall');

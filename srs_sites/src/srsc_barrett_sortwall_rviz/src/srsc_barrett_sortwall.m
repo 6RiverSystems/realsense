@@ -90,5 +90,4 @@ map = mm_addStaticObstacle(map, 16.55, 45.97, 17.00, 46.07, 0.2);
 map = mm_addStaticObstacle(map, 16.55, 47.22, 17.00, 47.32, 0.2);
 
 map = mm_generate(map);
-mm_save(map, '../../srs_sites/src/srsc_barrett_sortwall/map', 'barrett');
-mm_save(map, '../../srs_sites/src/srsc_barrett_sortwall_rviz/map', 'barrett');
+mm_save(map, '../map', 'barrett');

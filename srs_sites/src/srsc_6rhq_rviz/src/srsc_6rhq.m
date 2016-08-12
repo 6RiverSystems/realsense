@@ -15,5 +15,4 @@ map = mm_addStaticObstacle(map, 6.253, 3.168, 16.692, 4.387, 0.7);
 map = mm_addStaticObstacle(map, 3.662, 6.216, 16.692, 7.435, 0.7);
 
 map = mm_generate(map);
-mm_save(map, '../../srs_sites/src/srsc_6rhq/map', '6rhq');
-mm_save(map, '../../srs_sites/src/srsc_6rhq_rviz/map', '6rhq');
+mm_save(map, '../map', '6rhq');

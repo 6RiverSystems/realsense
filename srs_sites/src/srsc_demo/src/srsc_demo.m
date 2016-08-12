@@ -18,5 +18,4 @@ map = mm_addPreferred180(map, 6.253, 4.5, 16.692, 6.2);
 map = mm_addStaticObstacle(map, 3.662, 6.216, 16.692, 7.435, 0.7);
 
 map = mm_generate(map);
-mm_save(map, '../../srs_sites/src/srsc_demo/map', 'demo');
-mm_save(map, '../../srs_sites/src/srsc_demo_rviz/map', 'demo');
+mm_save(map, '../map', 'demo');

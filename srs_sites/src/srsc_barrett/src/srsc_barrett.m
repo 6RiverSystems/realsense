@@ -66,5 +66,4 @@ map = mm_addStaticObstacle(map, 31.39, 59.67 - OBSTACLE, 36.36, 86.40 + OBSTACLE
 map = mm_addStaticObstacle(map, 0.0, 89.27, 36.36, 91.23, 0.7);
 
 map = mm_generate(map);
-mm_save(map, '../../srs_sites/src/srsc_barrett/map', 'barrett');
-mm_save(map, '../../srs_sites/src/srsc_barrett_rviz/map', 'barrett');
+mm_save(map, '../map', 'barrett');

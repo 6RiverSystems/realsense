@@ -51,6 +51,7 @@ MotionController::MotionController(double dT) :
     stopController_ = new StopController();
     standController_ = new StandController();
     emergencyController_ = new EmergencyController();
+    dummyController_ = new DummyController();
 
     reset();
 }
@@ -143,7 +144,7 @@ void MotionController::reset()
 
     // No controller is active
     currentTask_ = TaskEnum::NONE;
-    selectController(TaskEnum::STAND);
+    selectController(TaskEnum::NONE);
 
     currentOdometry_ = Odometry<>::ZERO;
 
@@ -235,10 +236,7 @@ void MotionController::switchToAutonomous()
     if (isManualControllerActive())
     {
         // Cancel the current manual controller activity
-        if (activeController_)
-        {
-            activeController_->cancel();
-        }
+        activeController_->cancel();
     }
 }
 
@@ -591,6 +589,10 @@ void MotionController::pumpWorkFromQueue()
         case TaskEnum::STAND:
             taskStand();
             break;
+
+        case TaskEnum::NONE:
+            taskNone();
+            break;
     }
 }
 
@@ -659,10 +661,6 @@ void MotionController::selectController(TaskEnum task)
         ROS_DEBUG_STREAM_NAMED("motion_controller", "Switching from " <<
             activeController_->getName());
     }
-    else
-    {
-        ROS_DEBUG_STREAM_NAMED("motion_controller", "Switching from (null)");
-    }
 
     switch (task)
     {
@@ -690,6 +688,10 @@ void MotionController::selectController(TaskEnum task)
             activeController_ = standController_;
             break;
 
+        case NONE:
+            activeController_ = dummyController_;
+            break;
+
         default:
             throw;
     }
@@ -712,6 +714,13 @@ void MotionController::taskEmergencyStop()
 void MotionController::taskManualFollow()
 {
     // Nothing to do but follow the manual commands
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void MotionController::taskNone()
+{
+    // It should never get here
+    throw;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

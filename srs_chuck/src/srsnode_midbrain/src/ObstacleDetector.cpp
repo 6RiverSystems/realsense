@@ -217,7 +217,7 @@ double ObstacleDetector::GetSafeDistance( double linearVelocity, double angularV
 
 		safeDistance = std::max( calculatedSafeDistance, 0.75 );
 
-		ROS_DEBUG_THROTTLE_NAMED( 1.0f, "obstacle_detection", "calculatedSafeDistance: %0.2f, safeDistance: %0.2f", calculatedSafeDistance, safeDistance ); 
+		ROS_DEBUG_THROTTLE_NAMED( 1.0f, "obstacle_detection", "calculatedSafeDistance: %0.2f, safeDistance: %0.2f", calculatedSafeDistance, safeDistance );
 	}
 
 	return safeDistance;

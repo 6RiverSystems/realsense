@@ -106,7 +106,11 @@ public:
 
 	void SetConnected( bool bIsConnected );
 
-	void Shutdown( );
+    void SetMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues );
+
+    void OnHardStop( );
+
+    void Shutdown( );
 
 // Helper
 
@@ -115,10 +119,6 @@ public:
 private:
 
 // Bridge Callbacks
-
-	void SetMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues );
-
-	void OnHardStop( );
 
 	void OnResetBatteryHours( );
 

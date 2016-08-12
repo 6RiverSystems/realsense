@@ -154,7 +154,7 @@ void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t
 
 void Reflexes::OnObstacleDetected( )
 {
-	ROS_INFO_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: paused: %d, hardStop: %d",
+    ROS_INFO_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: paused: %d, hardStop: %d",
 		m_operationalState.pause, m_sendHardStop );
 
 	// Only send a hard stop if we are paused
@@ -162,11 +162,11 @@ void Reflexes::OnObstacleDetected( )
 		!m_operationalState.hardStop &&
 		m_sendHardStop )
 	{
-		ROS_INFO_STREAM_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: Sending STOP" );
+	    ROS_INFO_STREAM_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: Sending STOP" );
 
 		// Send the hard stop
 		std_msgs::String msg;
-		msg.data = "STOP";
+		msg.data = "STOP;";
 
 		m_commandPublisher.publish( msg );
 	}

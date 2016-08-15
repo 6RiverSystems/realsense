@@ -20,37 +20,33 @@ struct AngleMath
         return abs(AngleMath::normalizeAngleRad<TYPE>(a - b)) < threshold;
     }
 
+    /**
+     * @brief Convert degrees to radians.
+     *
+     * @tparam TYPE Basic type of the operation
+     * @param rad Angle to convert [degrees]
+     *
+     * @return converted angle [radians]
+     */
     template<typename TYPE = double>
     constexpr inline static TYPE deg2rad(TYPE deg)
     {
         return deg * TYPE(M_PI) / TYPE(180);
     }
 
-    template<typename TYPE = int>
+    template<typename TYPE = double>
     inline static TYPE normalizeAngleDeg(TYPE deg)
     {
-        while (deg < TYPE(0))
-        {
-            deg += TYPE(360);
-        }
-
-        while (deg > TYPE(360))
-        {
-            deg -= TYPE(360);
-        }
-
-        return deg;
+        return deg < 0 ? TYPE(360) - (fmod(fabs(deg), TYPE(360))) : fmod(deg, TYPE(360));
     }
 
-    template<typename TYPE = double>
-    inline static TYPE normalizeRad2deg(TYPE rad)
+    template<int>
+    inline static int normalizeAngleDeg(int deg)
     {
-        TYPE angle = AngleMath::rad2deg<TYPE>(rad);
-
-        return AngleMath::normalizeAngleDeg<TYPE>(static_cast<TYPE>(angle));
+        return deg < 0 ? 360 - (abs(deg) % 360) : deg % 360;
     }
 
-    inline static int normalizeRad2Deg90(double rad)
+    inline static double normalizeRad2Deg90(double rad)
     {
         double angle = AngleMath::rad2deg<double>(rad);
         double ratio = angle / 90.0;
@@ -58,7 +54,7 @@ struct AngleMath
         double lower = floor(ratio) * 90.0;
 
         angle = (upper - angle) > (angle - lower) ? lower : upper;
-        return AngleMath::normalizeAngleDeg<int>(static_cast<int>(angle));
+        return AngleMath::normalizeAngleDeg<double>(angle);
     }
 
     inline static double normalizeRad2Rad90(double rad)
@@ -67,10 +63,10 @@ struct AngleMath
     }
 
     /**
-     * @brief Normalize the specified angle [rad] to a [-pi, pi) range.
+     * @brief Normalize the specified angle to a [-pi, pi) range.
      *
      * @tparam TYPE Basic type of the operation
-     * @param rad Angle to normalize
+     * @param rad Angle to normalize [radians]
      *
      * @return normalized angle to a [-pi, pi) range
      */
@@ -80,6 +76,14 @@ struct AngleMath
         return rad - 2 * M_PI * floor((rad + M_PI) / (2 * M_PI));
     }
 
+    /**
+     * @brief Convert radians to degrees.
+     *
+     * @tparam TYPE Basic type of the operation
+     * @param rad Angle to convert [radians]
+     *
+     * @return converted angle [degrees]
+     */
     template<typename TYPE = double>
     constexpr inline static TYPE rad2deg(TYPE rad)
     {

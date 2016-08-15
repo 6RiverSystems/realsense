@@ -36,6 +36,8 @@
         <arg name="simulation" value="$(arg emulation)" />
     </include>
 
+	<include file="$(find sick_tim)/launch/sick_tim571_2050101.launch" />
+
     <!-- Launch all the robot nodes -->
     <include file="$(find srsnode_joystick_adapter)/launch/node.launch" /> 
 

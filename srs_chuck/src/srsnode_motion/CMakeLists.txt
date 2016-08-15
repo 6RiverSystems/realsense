@@ -40,7 +40,7 @@ find_package(catkin REQUIRED COMPONENTS
     srslib_test
 )
 
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 2.4 REQUIRED)
 
 generate_dynamic_reconfigure_options(
     cfg/Motion.cfg

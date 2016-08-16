@@ -33,19 +33,13 @@ private:
 
     cv_bridge::CvImagePtr GetCvImage( const sensor_msgs::Image::ConstPtr& image ) const;
 
-    void CombineImages( cv::Mat& image1, cv::Mat& image2, cv::Mat& result ) const;
-
     constexpr static unsigned int REFRESH_RATE_HZ = 50;
 
     ros::NodeHandle 									rosNodeHandle_;
 
     ros::Subscriber						 				depthSubscriber_;
 
-    ros::Publisher 										depthColorPublisher_;
-
     ros::Publisher 										depthMedianFilterPublisher_;
-
-    ros::Publisher 										depthBilateralFilterPublisher_;
 
 };
 

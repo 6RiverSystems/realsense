@@ -106,6 +106,7 @@
   	  <parent link="base_footprint" />
   	  <child link="laser_frame" />
   	</joint>
+ 
   	<link name="laser_frame" >
       <visual>
        <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -118,7 +119,13 @@
       </visual>
   	</link>
   	
-  	<xacro:sick_tim310 name="laser" ros_topic="scan" />
+    <sick_tim551 name="sick_lidar" ros_topic="scan" />
+
+  	<joint name="lidar_laser_frame_joint" type="fixed">
+  	  <origin xyz="${base_x_size/2} 0 0" rpy="0 0 0" />
+  	  <parent link="base_footprint" />
+  	  <child link="sick_lidar_mount_link" />
+  	</joint>
 
     <!-- Differential drive controller  -->
     <gazebo>
@@ -145,3 +152,4 @@
     </gazebo>
 
 </robot>
+

@@ -1,0 +1,13 @@
+#
+# (c) Copyright 2015-2016 River Systems, all rights reserved
+#
+# This is proprietary software, unauthorized distribution is not permitted.
+#
+anchors:
+    - {id: "0342", location: [16.20212, 23.47442, 6.3600000], orientation: 92.140 }
+    - {id: "0354", location: [20.44702, 23.45175, 6.3600000], orientation: 92.720 }
+    - {id: "0438", location: [24.80522, 23.47811, 6.3600000], orientation: 91.615 }
+    - {id: "0084", location: [22.36166,  4.57227, 6.3600000], orientation: 91.160 }
+    - {id: "0338", location: [18.17198,  4.58865, 6.3600000], orientation: 89.2325 }
+    - {id: "0198", location: [13.99728,  4.61931, 6.3600000], orientation: 92.940 }
+    - {id: "0326", location: [26.73131,  4.55947, 6.3600000], orientation: 88.485 }

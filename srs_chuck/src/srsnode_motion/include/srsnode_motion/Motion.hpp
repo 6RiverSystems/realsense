@@ -29,7 +29,7 @@
 #include <srsnode_motion/PositionEstimator.hpp>
 #include <srsnode_motion/MotionController.hpp>
 #include <srsnode_motion/tap/sensor_frame/aps/RosTapAps.hpp>
-#include <srsnode_motion/tap/sensor_frame/odometry/RosTapOdometry.hpp>
+#include <srsnode_motion/tap/sensor_frame/RosTapSensorFrame.hpp>
 
 namespace srs {
 
@@ -46,9 +46,9 @@ public:
     void run();
 
 private:
-    constexpr static double REFRESH_RATE_HZ = 100;
+    constexpr static double REFRESH_RATE_HZ = 120;
     constexpr static double PING_HZ = 10;
-    constexpr static double MAX_ALLOWED_PING_DELAY = 0.5f; // 50% of the duty cycle
+    constexpr static double MAX_ALLOWED_PING_DELAY = 0.5; // 50% of the duty cycle
 
     void connectAllTaps();
 
@@ -59,14 +59,15 @@ private:
 
     void onConfigChange(MotionConfig& config, uint32_t level);
 
-    void performCustomAction();
     void pingCallback(const ros::TimerEvent& event);
     void publishAccumulatedOdometry();
     void publishArrived();
     void publishGoalLanding();
+    void publishImu();
     void publishOdometry();
     void publishLocalized();
     void publishPose();
+    void publishCovariance();
 
     void reset(Pose<> pose0);
 
@@ -80,6 +81,8 @@ private:
     ros::Time currentTime_;
 
     bool isApsAvailable_;
+    bool isEmulationEnabled_;
+    bool isImuAvailable_;
     bool isJoystickLatched_;
     bool isOdometryAvailable_;
     bool isCustomActionEnabled_;
@@ -96,6 +99,9 @@ private:
     ros::Publisher pubStatusGoalArrived_;
     ros::Publisher pubStatusGoalLanding_;
     ros::Publisher pubRobotLocalized_;
+    ros::Publisher pubCovariance_;
+
+    ros::Publisher pubImu_;
 
     ros::NodeHandle rosNodeHandle_;
     tf::TransformBroadcaster rosTfBroadcaster_;
@@ -105,11 +111,11 @@ private:
 
     RosTapAps tapAps_;
     RosTapBrainStem tapBrainStem_;
+    RosTapSensorFrame tapSensorFrame_;
     RosTapInternal_GoalSolution tapInternalGoalSolution_;
     RosTapInternal_InitialPose tapInitialPose_;
     RosTapJoyAdapter tapJoyAdapter_;
     RosTapMap tapMap_;
-    RosTapOdometry tapOdometry_;
 
     RosServiceExecuteSolution triggerExecuteSolution_;
     RosTriggerPause triggerPause_;

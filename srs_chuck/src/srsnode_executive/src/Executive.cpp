@@ -30,7 +30,9 @@ Executive::Executive(string nodeName) :
     currentSolution_(nullptr),
     rosNodeHandle_(nodeName),
     arrived_(true),
-    robotInitialPose_(Pose<>::INVALID)
+    robotInitialPose_(Pose<>::INVALID),
+    isJoystickLatched_(false)
+
 {
     pubInternalInitialPose_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
         "/internal/command/initial_pose", 1);
@@ -59,8 +61,7 @@ void Executive::run()
     {
         ros::spinOnce();
 
-        currentRobotPose_ = tapInternal_RobotPose_.getPose();
-
+        stepChecks();
         stepExecutiveFunctions();
 
         refreshRate.sleep();
@@ -79,6 +80,7 @@ void Executive::connectAllTaps()
     tapCmdShutdown_.connectTap();
     tapInternal_GoalArrived_.connectTap();
     tapInternal_RobotPose_.connectTap();
+    tapJoyAdapter_.connectTap();
 
     tapMap_.connectTap();
     tapOperationalState_.connectTap();
@@ -93,6 +95,7 @@ void Executive::disconnectAllTaps()
     tapCmdShutdown_.disconnectTap();
     tapInternal_GoalArrived_.disconnectTap();
     tapInternal_RobotPose_.disconnectTap();
+    tapJoyAdapter_.disconnectTap();
 
     tapMap_.disconnectTap();
     tapOperationalState_.disconnectTap();
@@ -195,8 +198,10 @@ void Executive::executePlanToGoal()
 
         ROS_DEBUG_STREAM_NAMED("executive", "Found solution: " << endl << *currentSolution_);
 
-        ROS_INFO_STREAM_NAMED("executive", "Found path for goal: " << internalGoal.x << ", " << internalGoal.y << ", " << goalAngle << " => offset goal: "
-        	<< currentGoal_.x << ", " << currentGoal_.y << ", " << AngleMath::deg2rad( currentGoal_.theta ));
+        ROS_INFO_STREAM_NAMED("executive", "Found path for goal: " <<
+            internalGoal.x << ", " << internalGoal.y << ", " << goalAngle << " => offset goal: " <<
+            currentGoal_.x << ", " << currentGoal_.y << ", " <<
+            AngleMath::deg2rad<double>(currentGoal_.theta));
     }
     else
     {
@@ -245,7 +250,7 @@ void Executive::executeUnpause()
 {
     RosCallSetBool::call("srsnode_motion", "/trigger/pause", false);
 
-    if (!arrived_)
+    if (isExecutingSolution())
     {
         executePlanToGoal();
         publishInternalGoalSolution(currentSolution_);
@@ -337,6 +342,27 @@ void Executive::publishInternalInitialPose(Pose<> initialPose)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::stepChecks()
+{
+    Pose<> updatedRobotPose = tapInternal_RobotPose_.getPose();
+
+    // Run these checks only if the joystick hasn't latched
+    if (isExecutingSolution())
+    {
+        // If the difference between the most updated robot pose and
+        // what Executive knew about the robot is greater than the
+        // specified threshold, something must have
+        // happened with the localization subsystem. Make sure to replan
+        if (PoseMath::euclidean(currentRobotPose_, updatedRobotPose) > MAX_RELOCATION_THRESHOLD)
+        {
+//            taskPlanToGoal();
+        }
+    }
+
+    currentRobotPose_ = updatedRobotPose;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::stepExecutiveFunctions()
 {
     if (tapCmdShutdown_.isNewValueTrue())
@@ -354,15 +380,12 @@ void Executive::stepExecutiveFunctions()
     // If there is a new goal to reach
     if (tapCmdGoal_.newDataAvailable())
     {
+        // Make sure that the current goal is properly
+        // initialized to the closest 90deg angle
         currentGoal_ = tapCmdGoal_.getPose();
-        executePlanToGoal();
-        publishGoalTarget(currentGoal_);
-        publishInternalGoalSolution(currentSolution_);
+        currentGoal_.theta = AngleMath::normalizeRad2Rad90(currentGoal_.theta);
 
-        if (currentSolution_)
-        {
-            RosCallSolution::call("srsnode_motion", "/trigger/execute_solution", currentSolution_);
-        }
+        taskPlanToGoal();
     }
 
     if (tapCmdInitialPose_.newDataAvailable())
@@ -379,17 +402,59 @@ void Executive::stepExecutiveFunctions()
 
     if (tapOperationalState_.newDataAvailable())
     {
-        ROS_INFO("State changed");
-        if (tapOperationalState_.isPauseChanged() && tapOperationalState_.getPause())
+        if (tapOperationalState_.isPauseChanged())
         {
-            executePause();
+            taskPauseChange();
+        }
+    }
+
+    // If the joystick was touched, check if a custom action was requested
+    if (tapJoyAdapter_.newDataAvailable())
+    {
+        if (tapJoyAdapter_.getCustomActionState())
+        {
+            taskCustomAction();
         }
 
-        if (tapOperationalState_.isPauseChanged() && !tapOperationalState_.getPause())
-        {
-            executeUnpause();
-        }
+        // Store the latch state for later use
+        isJoystickLatched_ = tapJoyAdapter_.getLatchState();
+    }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::taskCustomAction()
+{
+    currentGoal_ = AngleMath::equalRad<double>(currentRobotPose_.theta, 0.0, 1.0) ?
+        Pose<>(15.50, 5.26, 0) :
+        Pose<>(6.38, 5.26, AngleMath::deg2rad<double>(180.0));
+
+        taskPlanToGoal();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::taskPauseChange()
+{
+    if (tapOperationalState_.getPause())
+    {
+        executePause();
+    }
+    else
+    {
+        executeUnpause();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::taskPlanToGoal()
+{
+    executePlanToGoal();
+    publishGoalTarget(currentGoal_);
+    publishInternalGoalSolution(currentSolution_);
+
+    if (currentSolution_)
+    {
+        RosCallSolution::call("srsnode_motion", "/trigger/execute_solution", currentSolution_);
+    }
 }
 
 } // namespace srs

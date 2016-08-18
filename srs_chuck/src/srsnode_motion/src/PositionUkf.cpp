@@ -33,7 +33,9 @@ cv::Mat PositionUkf::addWeighted(const cv::Mat W, const cv::Mat X)
         totalSine += weight * sin(theta);
     }
 
-    R.at<BaseType>(StatePe<>::STATE_THETA) = atan2(totalSine, totalCosine);
+    // ###FS Fixed range issues of atan2
+    R.at<BaseType>(StatePe<>::STATE_THETA) = AngleMath::normalizeAngleRad(
+        atan2(totalSine, totalCosine));
 
     return R;
 }

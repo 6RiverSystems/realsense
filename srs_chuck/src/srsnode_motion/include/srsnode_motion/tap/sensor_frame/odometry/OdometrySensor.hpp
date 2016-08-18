@@ -27,6 +27,13 @@ public:
         reset();
     }
 
+    OdometrySensor(cv::Mat R) :
+        Sensor<STATE_SIZE, TYPE>(R),
+        currentData_(Odometry<BaseType>::INVALID)
+    {
+        reset();
+    }
+
     virtual ~OdometrySensor()
     {}
 
@@ -44,11 +51,11 @@ public:
         Sensor<STATE_SIZE, TYPE>::setNewData(false);
     }
 
-    void set(double arrivalTime, BaseType linear, BaseType angular)
+    void set(Odometry<BaseType> newOdometry)
     {
         if (Sensor<STATE_SIZE, TYPE>::isEnabled())
         {
-            currentData_ = Odometry<BaseType>(Velocity<>(arrivalTime, linear, angular));
+            currentData_ = newOdometry;
             Sensor<STATE_SIZE, TYPE>::setNewData(true);
         }
     }

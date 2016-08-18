@@ -51,6 +51,11 @@ public:
         return P_;
     }
 
+    void reset(cv::Mat x0)
+    {
+        x0.convertTo(x_, TYPE);
+    }
+
     void reset(cv::Mat x0, cv::Mat P0)
     {
         // Initialize the state of the filter with an adapted
@@ -62,14 +67,14 @@ public:
     void run(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command)
     {
         predict(dT, command);
-        update();
+        update(dT, command);
     }
 
 protected:
 
     virtual void predict(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command) = 0;
 
-    virtual void update() = 0;
+    virtual void update(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command) = 0;
 
     vector<Sensor<STATE_SIZE, TYPE>*> sensors_;
 

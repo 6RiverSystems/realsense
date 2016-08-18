@@ -15,11 +15,7 @@ using namespace std;
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
 
-#include <srsnode_motion/FactoryRobotProfile.hpp>
-
 namespace srs {
-
-const Velocity<> MotionController::ZERO_VELOCITY = Velocity<>(0.0, 0.0);
 
 unordered_map<int, string> MotionController::TASK_NAMES = {
     {TaskEnum::EMERGENCY_STOP, "EMERGENCY_STOP"},
@@ -40,6 +36,7 @@ MotionController::MotionController(double dT) :
     dT_(dT),
     hasArrived_(true),
     hasArrivedChanged_(false),
+    activeController_(nullptr),
     rosNodeHandle_()
 {
     pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>(
@@ -54,6 +51,7 @@ MotionController::MotionController(double dT) :
     stopController_ = new StopController();
     standController_ = new StandController();
     emergencyController_ = new EmergencyController();
+    dummyController_ = new DummyController();
 
     reset();
 }
@@ -133,8 +131,8 @@ void MotionController::reset()
 {
     // If the robot was moving for some reason,
     // stop it immediately
-    currentCommand_ = ZERO_VELOCITY;
-    executeCommand(true, CommandEnum::VELOCITY, &ZERO_VELOCITY);
+    currentCommand_ = Velocity<>::ZERO;
+    executeCommand(true, CommandEnum::VELOCITY, &Velocity<>::ZERO);
 
     // Reset all the controllers
     pathController_->reset();
@@ -146,7 +144,7 @@ void MotionController::reset()
 
     // No controller is active
     currentTask_ = TaskEnum::NONE;
-    selectController(TaskEnum::STAND);
+    selectController(TaskEnum::NONE);
 
     currentOdometry_ = Odometry<>::ZERO;
 
@@ -163,11 +161,11 @@ void MotionController::run(Pose<> currentPose, Odometry<> currentOdometry, Veloc
     hasArrivedChanged_ = false;
 
     currentPose_ = currentPose;
-    ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "MotionController",
+    ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "motion_controller",
         "Reported robot pose: " << currentPose_);
 
     currentOdometry_ = currentOdometry;
-    ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "MotionController",
+    ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "motion_controller",
         "Reported odometry: " << currentOdometry_);
 
     checkMotionStatus();
@@ -188,18 +186,16 @@ void MotionController::run(Pose<> currentPose, Odometry<> currentOdometry, Veloc
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MotionController::setConfiguration(MotionConfig& configuration)
+void MotionController::setRobotProfile(RobotProfile robotProfile)
 {
-    RobotProfile robot = FactoryRobotProfile::fromConfiguration(configuration);
+    robot_ = robotProfile;
 
-    robot_ = robot;
-
-    pathController_->setRobotProfile(robot);
-    manualController_->setRobotProfile(robot);
-    rotationController_->setRobotProfile(robot);
-    standController_->setRobotProfile(robot);
-    stopController_->setRobotProfile(robot);
-    emergencyController_->setRobotProfile(robot);
+    pathController_->setRobotProfile(robotProfile);
+    manualController_->setRobotProfile(robotProfile);
+    rotationController_->setRobotProfile(robotProfile);
+    standController_->setRobotProfile(robotProfile);
+    stopController_->setRobotProfile(robotProfile);
+    emergencyController_->setRobotProfile(robotProfile);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -215,7 +211,10 @@ void MotionController::switchToManual()
     if (!isScheduled(TaskEnum::MANUAL_FOLLOW) && !isManualControllerActive())
     {
         // Cancel the current activity and clear the work queue
-        activeController_->cancel();
+        if (activeController_)
+        {
+            activeController_->cancel();
+        }
         cleanWorkQueue();
 
         // Schedule a normal stop followed by a manual follow
@@ -402,9 +401,9 @@ void MotionController::checkMotionStatus()
 {
     // If the stand controller is currently active and there is work in
     // the queue, cancel work in the controller and pump work from the queue
-    if (isStandControllerActive() && isWorkPending())
+    if (isStandControllerActive() && isWorkPending() && !isScheduledNext(TaskEnum::STAND))
     {
-        ROS_DEBUG_NAMED("MotionController", "Abandoned STAND");
+        ROS_DEBUG_NAMED("motion_controller", "Abandoned STAND");
         activeController_->cancel();
     }
 
@@ -446,7 +445,7 @@ void MotionController::checkMotionStatus()
             // If there is nothing else to do, simply stand still
             if (!isWorkPending())
             {
-                ROS_DEBUG_NAMED("MotionController", "No work was found");
+                ROS_DEBUG_NAMED("motion_controller", "No work was found");
                 pushWorkItem(TaskEnum::STAND);
             }
 
@@ -590,6 +589,10 @@ void MotionController::pumpWorkFromQueue()
         case TaskEnum::STAND:
             taskStand();
             break;
+
+        case TaskEnum::NONE:
+            taskNone();
+            break;
     }
 }
 
@@ -653,6 +656,12 @@ void MotionController::pushWorkSolution(SolutionType& solution)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::selectController(TaskEnum task)
 {
+    if (activeController_)
+    {
+        ROS_DEBUG_STREAM_NAMED("motion_controller", "Switching from " <<
+            activeController_->getName());
+    }
+
     switch (task)
     {
         case EMERGENCY_STOP:
@@ -679,11 +688,15 @@ void MotionController::selectController(TaskEnum task)
             activeController_ = standController_;
             break;
 
+        case NONE:
+            activeController_ = dummyController_;
+            break;
+
         default:
             throw;
     }
 
-    ROS_DEBUG_STREAM_NAMED("motion_controller", "Switching to controller " <<
+    ROS_DEBUG_STREAM_NAMED("motion_controller", "to controller " <<
         activeController_->getName());
 
     // Before using the new controller, make sure that
@@ -701,6 +714,13 @@ void MotionController::taskEmergencyStop()
 void MotionController::taskManualFollow()
 {
     // Nothing to do but follow the manual commands
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void MotionController::taskNone()
+{
+    // It should never get here
+    throw;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -36,10 +36,7 @@ public:
     void receiveData(ros::Time currentTime, vector<char>& binaryData);
 
 private:
-
-#pragma pack(push, 1)
-    struct SensorFrameData
-    {
+    BRAINSTEM_MESSAGE_BEGIN(SensorFrameData)
         uint8_t cmd;
         uint32_t timestamp;
         float linear_velocity;
@@ -50,8 +47,7 @@ private:
         float yawRot;
         float pitchRot;
         float rollRot;
-    };
-#pragma pack(pop)
+    BRAINSTEM_MESSAGE_END
 
     void publishImu();
     void publishOdometry();
@@ -61,8 +57,8 @@ private:
     ros::Publisher pubOdometry_;
     ros::Publisher pubSensorFrame_;
 
-    double lastHwSensorFrameTime_; // m_dwLastOdomTime;
-    ros::Time lastRosSensorFrameTime_; // m_rosOdomTime;
+    double lastHwSensorFrameTime_;
+    ros::Time lastRosSensorFrameTime_;
 
     Odometry<> currentOdometry_;
     Imu<> currentImu_;

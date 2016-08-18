@@ -16,6 +16,7 @@
 #include <srslib_framework/ros/tap/RosTapMap.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_GoalArrived.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_RobotPose.hpp>
+#include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
 #include <srslib_framework/ros/tap/RosTapOperationalState.hpp>
 
 #include <srslib_framework/search/AStar.hpp>
@@ -43,6 +44,7 @@ public:
 private:
     constexpr static double REFRESH_RATE_HZ = 5;
     constexpr static int GRID_SIZE = 60;
+    constexpr static double MAX_RELOCATION_THRESHOLD = 0.2;
 
     void connectAllTaps();
 
@@ -58,14 +60,31 @@ private:
     void executeShutdown();
     void executeUnpause();
 
+    bool isExecutingSolution()
+    {
+        return !isJoystickLatched_ && !arrived_;
+    }
+
     void publishInternalInitialPose(Pose<> initialPose);
     void publishInternalGoalSolution(Solution<GridSolutionItem>* solution);
     void publishGoalTarget(Pose<> goalTargetArea);
 
+    void stepChecks();
     void stepExecutiveFunctions();
 
+    void taskCustomAction();
+    void taskPauseChange();
+    void taskPlanToGoal();
+
     AStar<Grid2d> algorithm_;
-    bool arrived_;
+	bool arrived_;
+
+    Pose<> currentRobotPose_;
+    Pose<> currentGoal_;
+    Solution<GridSolutionItem>* currentSolution_;
+    Pose<> currentTarget_;
+
+    bool isJoystickLatched_;
 
     ros::Publisher pubExternalArrived_;
     ros::Publisher pubInternalInitialPose_;
@@ -73,11 +92,6 @@ private:
     ros::Publisher pubStatusGoalPlan_;
     ros::Publisher pubStatusGoal_;
     ros::Publisher pubStatusGoalTarget_;
-
-    Pose<> currentRobotPose_;
-    Pose<> currentGoal_;
-    Pose<> currentTarget_;
-    Solution<GridSolutionItem>* currentSolution_;
 
     Pose<> robotInitialPose_;
     ros::NodeHandle rosNodeHandle_;
@@ -89,6 +103,7 @@ private:
     RosTapInternal_GoalArrived tapInternal_GoalArrived_;
     RosTapInternal_RobotPose tapInternal_RobotPose_;
     RosTapOperationalState tapOperationalState_;
+	RosTapJoyAdapter tapJoyAdapter_;
 
     RosTapMap tapMap_;
 };

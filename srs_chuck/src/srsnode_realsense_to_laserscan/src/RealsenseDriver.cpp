@@ -47,10 +47,6 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::Image::ConstPtr& depthImag
 
 	cvDepthImage->image = medianFilterImg;
 	depthMedianFilterPublisher_.publish( cvDepthImage );
-
-	double maxDistance = 2000.0f;
-	cv::Mat adjMap;
-	cv::convertScaleAbs(medianFilterImg, adjMap, 255 / maxDistance);
 }
 
 cv_bridge::CvImagePtr RealsenseDriver::GetCvImage( const sensor_msgs::Image::ConstPtr& image ) const

@@ -61,10 +61,10 @@ public:
 		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, 180.0f } );
 		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, -90.0f } );
 
-		m_vecStargazerOffsets.push_back( { 3.0f, 5.0f } );
-		m_vecStargazerOffsets.push_back( { -3.0f, 5.0f } );
-		m_vecStargazerOffsets.push_back( { 3.0f, -5.0f } );
-		m_vecStargazerOffsets.push_back( { -3.0f, -5.0f } );
+		m_vecStargazerOffsets.push_back( { 3.0f, 5.0f, 0.0f, 0.0f } );
+		m_vecStargazerOffsets.push_back( { -3.0f, 5.0f, 0.0f, 90.0f } );
+		m_vecStargazerOffsets.push_back( { 3.0f, -5.0f, 0.0f, 180.0f } );
+		m_vecStargazerOffsets.push_back( { -3.0f, -5.0f, 0.0f, -90.0f } );
 	}
 
 	void SetUp( )
@@ -86,10 +86,14 @@ public:
 		const Point& rawPoint )
 	{
 		// Conversion works the same in both directions
-		double stargazerRotation = rawPoint.angle * M_PI / 180.0;
-		double anchorRotation = tf::getYaw( anchorTransform.getRotation( ) );
+		double markerToMapRotation = tf::getYaw( anchorTransform.getRotation( ) );
 
-		double combinedAngle = anchorRotation + stargazerRotation;
+		double cameraToMarkerRotation = AngleMath::normalizeDeg2Rad( rawPoint.angle );
+		double chuckToCameraRotation = tf::getYaw( stargazerTransform.getRotation( ) );
+
+		double chuckToMarkerRotation = chuckToCameraRotation + cameraToMarkerRotation;
+
+		double combinedAngle = AngleMath::normalizeAngleRad( markerToMapRotation + chuckToMarkerRotation );
 
 		tf::Vector3 anchorOrigin = anchorTransform.getOrigin( );
 
@@ -101,8 +105,8 @@ public:
 
 		// Calculate: stargazer offset => stargazer => base_footprint
 		tf::Vector3 rotatedOffset(
-			((combinedOffset.getX( ) * cos( stargazerRotation )) - (combinedOffset.getY( ) * sin( stargazerRotation ))),
-			((combinedOffset.getX( ) * sin( stargazerRotation )) + (combinedOffset.getY( ) * cos( stargazerRotation ))),
+			((combinedOffset.getX( ) * cos( chuckToMarkerRotation )) - (combinedOffset.getY( ) * sin( chuckToMarkerRotation ))),
+			((combinedOffset.getX( ) * sin( chuckToMarkerRotation )) + (combinedOffset.getY( ) * cos( chuckToMarkerRotation ))),
 			0.0f );
 
 		// Convert cm to m
@@ -114,8 +118,8 @@ public:
 
 		// Rotate: anchor => map
 		tf::Vector3 globalPoint(
-			((offsetFromStargazer.getX( ) * cos( anchorRotation )) - (offsetFromStargazer.getY( ) * sin( anchorRotation ))),
-			((offsetFromStargazer.getX( ) * sin( anchorRotation )) + (offsetFromStargazer.getY( ) * cos( anchorRotation ))),
+			((offsetFromStargazer.getX( ) * cos( markerToMapRotation )) - (offsetFromStargazer.getY( ) * sin( markerToMapRotation ))),
+			((offsetFromStargazer.getX( ) * sin( markerToMapRotation )) + (offsetFromStargazer.getY( ) * cos( markerToMapRotation ))),
 			offsetFromStargazer.getZ( ) );
 
 		// Translate: anchor => map
@@ -126,24 +130,60 @@ public:
 
 	double GetLeftHandAngle( double dfRightHandDegrees )
 	{
-		double dfLeftHandAngleInRadians = m_pointTransformer.ConvertToRightHandRule( dfRightHandDegrees * M_PI / 180 );
+		double dfLeftHandAngleInRadians = m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( dfRightHandDegrees ) );
 
-		return dfLeftHandAngleInRadians * 180 / M_PI;
+		return AngleMath::normalizeRad2Deg( dfLeftHandAngleInRadians );
 	}
 
 };
 
+TEST_F( StargazerTest, TestAverageAngle )
+{
+	tf::Transform stargazerTransform( tf::Quaternion::getIdentity( ), tf::Vector3( 0.0, 0.0, 0.0) );
+
+	m_pointTransformer.Load( "/internal/state/map/grid", stargazerTransform,
+		m_footprintTransform, m_strAnchorFile );
+
+	double fourtyFive = 45.0;
+	double negativeFourtyFive = -45.0;
+
+	for( int i = 0; i < 25; i++ )
+	{
+		tf::Pose pose( tf::createIdentityQuaternion( ) );
+
+		m_pointTransformer.TransformPoint( 1, 0.0, 0.0, 0.0, fourtyFive, pose, false );
+	}
+
+	for( int i = 0; i < 25; i++ )
+	{
+		tf::Pose pose( tf::createIdentityQuaternion( ) );
+
+		m_pointTransformer.TransformPoint( 1, 0.0, 0.0, 0.0, negativeFourtyFive, pose, false );
+	}
+}
+
+TEST_F( StargazerTest, TestCameraAngleCalibration )
+{
+	tf::Transform stargazerTransform( tf::Quaternion::getIdentity( ), tf::Vector3( 0.0, 0.0, 0.0) );
+
+	m_pointTransformer.Load( "/internal/state/map/grid", stargazerTransform,
+		m_footprintTransform, m_strAnchorFile );
+
+	tf::Pose pose( tf::createIdentityQuaternion( ) );
+	m_pointTransformer.TransformPoint( 1, 0.0, 0.0, 0.0, 0.0, pose, false );
+}
+
 TEST_F( StargazerTest, TestRightHandRuleConverstion )
 {
-	double df0Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 0.0f ) ) );
-	double df1Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 1.0f ) ) );
-	double df45Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 45.0f ) ) );
-	double df90Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 90.0f ) ) );
-	double df135Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 135.0f ) ) );
-	double df180Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 180.0f ) ) );
-	double df225Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 225.0f ) ) );
-	double df270Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 270.0f ) ) );
-	double df315Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 315.0f ) ) );
+	double df0Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 0.0f ) ) );
+	double df1Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 1.0f ) ) );
+	double df45Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 45.0f ) ) );
+	double df90Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 90.0f ) ) );
+	double df135Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 135.0f ) ) );
+	double df180Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 180.0f ) ) );
+	double df225Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 225.0f ) ) );
+	double df270Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 270.0f ) ) );
+	double df315Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 315.0f ) ) );
 
 	EXPECT_NEAR( df0Degrees, 0.0f, 0.001 );
 	EXPECT_NEAR( df1Degrees, 359.0f, 0.001 );
@@ -160,8 +200,9 @@ TEST_F( StargazerTest, TestTransforms )
 {
 	for( auto stargazerOffset : m_vecStargazerOffsets )
 	{
-		tf::Transform stargazerTransform( tf::Quaternion::getIdentity( ), tf::Vector3( stargazerOffset.x,
-			stargazerOffset.y, stargazerOffset.z) );
+		tf::Transform stargazerTransform( tf::createQuaternionFromYaw(
+			AngleMath::normalizeDeg2Rad( stargazerOffset.angle ) ),
+			tf::Vector3( stargazerOffset.x, stargazerOffset.y, stargazerOffset.z) );
 
 		m_pointTransformer.Load( "/internal/state/map/grid", stargazerTransform,
 			m_footprintTransform, m_strAnchorFile );
@@ -169,12 +210,11 @@ TEST_F( StargazerTest, TestTransforms )
 		std::map<int, tf::Transform> mapAnchorTransforms = m_pointTransformer.GetAnchorTransforms( );
 		for( auto anchorPair : mapAnchorTransforms )
 		{
-
 			uint32_t anchorId = anchorPair.first;
 
 			tf::Transform anchorTransform = mapAnchorTransforms[anchorId];
 
-			double dfAngle = tf::getYaw( anchorTransform.getRotation( ) ) * 180.0 / M_PI;
+			double dfAngle = AngleMath::normalizeRad2Deg( tf::getYaw( anchorTransform.getRotation( ) ) );
 
 			tf::Vector3 origin = anchorTransform.getOrigin( );
 
@@ -193,9 +233,11 @@ TEST_F( StargazerTest, TestTransforms )
 
 				tf::Quaternion rotation = m_pointTransformer.ConvertAngle( dfAngleLeftDegrees );
 
-				tf::Vector3 cameraOffset = m_pointTransformer.GetCameraOffset( rotation );
+				tf::Quaternion combinedRotation = tf::createQuaternionFromYaw( tf::getYaw( rotation ) + tf::getYaw( stargazerTransform.getRotation( ) ) );
 
-				tf::Vector3 footprintOffset = m_pointTransformer.GetFootprintOffset( rotation );
+				tf::Vector3 cameraOffset = m_pointTransformer.GetCameraOffset( combinedRotation );
+
+				tf::Vector3 footprintOffset = m_pointTransformer.GetFootprintOffset( combinedRotation );
 
 				tf::Vector3 stargazerOffset = m_pointTransformer.GetStargazerOffset( testPoint.x*100.0f, testPoint.y*100.0f, testPoint.z*100.0f );
 
@@ -204,13 +246,13 @@ TEST_F( StargazerTest, TestTransforms )
 				tf::Vector3 totalFootprintOffset = totalCameraOffset + footprintOffset;
 
 				ROS_DEBUG_NAMED( "transform", "\t\tstargazer (%2.5f): %2.5f, %2.5f, %2.5f",
-					tf::getYaw( rotation ) * 180.0f / M_PI, stargazerOffset.getX( ), stargazerOffset.getY( ), stargazerOffset.getZ( ) );
+					AngleMath::normalizeRad2Deg( tf::getYaw( rotation ) ), stargazerOffset.getX( ), stargazerOffset.getY( ), stargazerOffset.getZ( ) );
 
 				ROS_DEBUG_NAMED( "transform", "\t\tcamera (%2.5f): %2.5f, %2.5f, %2.5f",
-					tf::getYaw( rotation ) * 180.0f / M_PI, totalCameraOffset.getX( ), totalCameraOffset.getY( ), totalCameraOffset.getZ( ) );
+					AngleMath::normalizeRad2Deg( tf::getYaw( rotation ) ), totalCameraOffset.getX( ), totalCameraOffset.getY( ), totalCameraOffset.getZ( ) );
 
 				ROS_DEBUG_NAMED( "transform", "\t\tfootprint (%2.5f): %2.5f, %2.5f, %2.5f",
-					tf::getYaw( rotation ) * 180.0f / M_PI, totalFootprintOffset.getX( ), totalFootprintOffset.getY( ), totalFootprintOffset.getZ( ) );
+					AngleMath::normalizeRad2Deg( tf::getYaw( rotation ) ), totalFootprintOffset.getX( ), totalFootprintOffset.getY( ), totalFootprintOffset.getZ( ) );
 
 				tf::Pose pose( tf::createIdentityQuaternion( ) );
 
@@ -228,14 +270,13 @@ TEST_F( StargazerTest, TestTransforms )
 					tf::Quaternion rotation = pose.getRotation( );
 
 					ROS_DEBUG_NAMED( "transform", "\t\tmap (%2.5f): %2.5f, %2.5f, %2.5f",
-						tf::getYaw( rotation ) * 180.0f / M_PI, origin.getX( ), origin.getY( ), origin.getZ( ) );
+						AngleMath::normalizeRad2Deg( tf::getYaw( rotation ) ), origin.getX( ), origin.getY( ), origin.getZ( ) );
 
 					tf::Vector3 calculatedOrigin = calculatedPose.getOrigin( );
 					tf::Quaternion calculatedRotation = calculatedPose.getRotation( );
 
-
 					ROS_DEBUG_NAMED( "transform", "\t\tmap (correct) (%2.5f): %2.5f, %2.5f, %2.5f",
-						tf::getYaw( calculatedRotation ) * 180.0f / M_PI, calculatedOrigin.getX( ),
+						AngleMath::normalizeRad2Deg( tf::getYaw( calculatedRotation ) ), calculatedOrigin.getX( ),
 						calculatedOrigin.getY( ), calculatedOrigin.getZ( ) );
 
 					EXPECT_NEAR( origin.getX( ), calculatedOrigin.getX( ), 0.0000001 );

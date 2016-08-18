@@ -13,6 +13,7 @@ using namespace std;
 #include <opencv2/opencv.hpp>
 
 #include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/math/Base2Ocv.hpp>
 
 namespace srs {
 
@@ -62,7 +63,7 @@ struct PoseMath
         cv::Mat P0_P3 = P0 - P3;
         cv::Mat P2_P3 = P2 - P3;
 
-        cv::Mat PC = 2.0 * P - P0 - P2;
+        cv::Mat PC = TYPE(2) * P - P0 - P2;
 
         return (P2_P3.dot(PC - P2_P3) <= 0.0 && P2_P3.dot(PC + P2_P3) >= 0.0) &&
                (P0_P3.dot(PC - P0_P3) <= 0.0 && P0_P3.dot(PC + P0_P3) >= 0.0);
@@ -82,12 +83,10 @@ struct PoseMath
         return sqrt(PoseMath::dot<TYPE>(p, p));
     }
 
-    // TODO: Better implement this function. The type of R should not be fixed but
-    // depending on TYPE (ocv2base in reverse)
     template<typename TYPE = double>
     static cv::Mat pose2mat(const Pose<TYPE> pose)
     {
-        cv::Mat R = cv::Mat::zeros(3, 1, CV_64F);
+        cv::Mat R = cv::Mat::zeros(3, 1, Base2Ocv<TYPE>::OCV_TYPE);
         R.at<TYPE>(0) = pose.x;
         R.at<TYPE>(1) = pose.y;
         R.at<TYPE>(2) = pose.theta;
@@ -98,7 +97,7 @@ struct PoseMath
     template<typename TYPE = double>
     static cv::Mat poseXY2mat(const Pose<TYPE> pose)
     {
-        cv::Mat R = cv::Mat::zeros(2, 1, CV_64F);
+        cv::Mat R = cv::Mat::zeros(2, 1, Base2Ocv<TYPE>::OCV_TYPE);
         R.at<TYPE>(0) = pose.x;
         R.at<TYPE>(1) = pose.y;
 
@@ -108,16 +107,16 @@ struct PoseMath
     template<typename TYPE = double>
     static vector<Pose<>> pose2polygon(const Pose<TYPE> center, TYPE offsetX, TYPE offsetY, TYPE width, TYPE depth)
     {
-    	// Pose coordinate system is rotated by -PI relative to the map
+        // Pose coordinate system is rotated by -PI relative to the map
         Pose<> rotatedPose = PoseMath::rotate(center, -M_PI);
 
         // Translate by the offset
         rotatedPose = PoseMath::translate(rotatedPose, offsetX, offsetY);
 
-        Pose<> p0 = PoseMath::translate(rotatedPose,  depth / 2.0f, -width / 2.0f);
-        Pose<> p1 = PoseMath::translate(rotatedPose,  depth / 2.0f,  width / 2.0f);
-        Pose<> p2 = PoseMath::translate(rotatedPose, -depth / 2.0f,  width / 2.0f);
-        Pose<> p3 = PoseMath::translate(rotatedPose, -depth / 2.0f, -width / 2.0f);
+        Pose<> p0 = PoseMath::translate(rotatedPose,  depth / TYPE(2), -width / TYPE(2));
+        Pose<> p1 = PoseMath::translate(rotatedPose,  depth / TYPE(2),  width / TYPE(2));
+        Pose<> p2 = PoseMath::translate(rotatedPose, -depth / TYPE(2),  width / TYPE(2));
+        Pose<> p3 = PoseMath::translate(rotatedPose, -depth / TYPE(2), -width / TYPE(2));
 
         vector<Pose<>> polygon;
         polygon.clear();
@@ -133,6 +132,7 @@ struct PoseMath
      * @brief Perform a pose rotation around itself.
      *
      * @tparam TYPE Basic type of the operation
+     *
      * @param p pose to rotate
      * @param angle Angle of the rotation
      *

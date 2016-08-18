@@ -26,9 +26,9 @@ public:
         currentVelocity_(0.0),
         lookAheadDistance_(1.0),
         projectionIndex_(-1),
-        referencePose_(ZERO_POSE),
+        referencePose_(Pose<>::ZERO),
         velocityChange_(0.0),
-        velocityChangePose_(ZERO_POSE),
+        velocityChangePose_(Pose<>::ZERO),
         velocityCurrentMax_(0.0)
     {}
 

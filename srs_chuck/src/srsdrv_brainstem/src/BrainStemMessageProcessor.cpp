@@ -3,15 +3,17 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-
-#include <BrainStemMessageProcessor.h>
-#include <BrainStemMessages.h>
-#include <srslib_framework/io/IO.hpp>
-#include <srslib_framework/utils/Logging.hpp>
+#include <srsdrv_brainstem/BrainStemMessageProcessor.h>
 
 #include <chrono>
 #include <boost/tokenizer.hpp>
+
 #include <ros/ros.h>
+
+#include <srslib_framework/io/IO.hpp>
+#include <srslib_framework/utils/Logging.hpp>
+
+#include <srsdrv_brainstem/BrainStemMessages.h>
 
 namespace srs {
 
@@ -60,6 +62,8 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_vecBridgeCallbacks["STARTUP"] = { std::bind( &BrainStemMessageProcessor::OnStartup, this, std::placeholders::_1 ), 0 };
 	m_vecBridgeCallbacks["PAUSE"] = { std::bind( &BrainStemMessageProcessor::OnPause, this, std::placeholders::_1 ), 1 };
 	m_vecBridgeCallbacks["CLEAR_MOTION_STATUS"] = { std::bind( &BrainStemMessageProcessor::ClearMotionStatus, this ), 0 };
+
+    hwMessageHandlers_.push_back(&sensorFrameHandler_);
 }
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor( )
@@ -81,11 +85,6 @@ void BrainStemMessageProcessor::SetButtonCallback( ButtonCallbackFn buttonCallba
 	m_buttonCallback = buttonCallback;
 }
 
-void BrainStemMessageProcessor::SetOdometryCallback( OdometryCallbackFn odometryCallback )
-{
-	m_odometryCallback = odometryCallback;
-}
-
 void BrainStemMessageProcessor::SetHardwareInfoCallback( HardwareInfoCallbackFn hardwareInfoCallback )
 {
 	m_hardwareInfoCallback = hardwareInfoCallback;
@@ -105,20 +104,18 @@ void BrainStemMessageProcessor::SetVoltageCallback( VoltageCallbackFn voltageCal
 // Message Processing
 //////////////////////////////////////////////////////////////////////////
 
-void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffer )
+void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 {
-	BRAIN_STEM_MSG eCommand = BRAIN_STEM_MSG::UNKNOWN;
+    BRAIN_STEM_MSG eCommand = BRAIN_STEM_MSG::UNKNOWN;
+    char messageKey = 0x00;
 
-	const char* pszData = buffer.data( );
+    if (buffer.size() > 0)
+    {
+        messageKey = buffer[0];
+        eCommand = static_cast<BRAIN_STEM_MSG>(buffer[0]);
+    }
 
-	int size = buffer.size( );
-
-	if( buffer.size( ) > 0 )
-	{
-		eCommand = static_cast<BRAIN_STEM_MSG>( buffer[0] );
-	}
-
-	switch( eCommand )
+	switch (eCommand)
 	{
 		case BRAIN_STEM_MSG::MESSAGE:
 		{
@@ -132,8 +129,8 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 			{
 				ROS_DEBUG_STREAM_NAMED( "firmware", "Message: <" << strMessage << ">" );
 			}
+            return;
 		}
-		break;
 
 		case BRAIN_STEM_MSG::BUTTON_PRESSED:
 		{
@@ -147,8 +144,8 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 			{
 				ROS_ERROR_STREAM( "Unknown button pressed: " << (int)eButtonId );
 			}
+            return;
 		}
-		break;
 
 		case BRAIN_STEM_MSG::HARDWARE_INFO:
 		{
@@ -160,8 +157,8 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 
 			m_hardwareInfoCallback( pHardwareInfo->uniqueId, pHardwareInfo->chassisGeneration,
 				pHardwareInfo->brainstemHwVersion, strBrainStemVersion );
+            return;
 		}
-		break;
 
 		case BRAIN_STEM_MSG::OPERATIONAL_STATE:
 		{
@@ -187,32 +184,33 @@ void BrainStemMessageProcessor::ProcessBrainStemMessage( std::vector<char> buffe
 
 			m_operationalStateCallback( pOperationalState->upTime, motionStatusData,
 				failureStatusData );
+            return;
 		}
-		break;
 
 		case BRAIN_STEM_MSG::SYSTEM_VOLTAGE:
 		{
 			VOLTAGE_DATA* pVoltage = reinterpret_cast<VOLTAGE_DATA*>( buffer.data( ) );
 
 			m_voltageCallback( pVoltage->voltage );
+            return;
 		}
-		break;
-
-		case BRAIN_STEM_MSG::ODOMETRY_VELOCITY:
-		{
-			ODOMETRY_DATA* pOdometry = reinterpret_cast<ODOMETRY_DATA*>( buffer.data( ) );
-
-			m_odometryCallback( pOdometry->timestamp, pOdometry->linear_velocity, pOdometry->angular_velocity );
-		}
-		break;
-
-		case BRAIN_STEM_MSG::UNKNOWN:
-		default:
-		{
-			ROS_ERROR_STREAM( "Unknown message from brainstem: " << (int)eCommand << ", data: " << ToHex( buffer ) );
-		}
-		break;
 	}
+
+    // Go through the registered message handlers and
+    // communicate the data if the key matches
+	ros::Time currentTime = ros::Time::now();
+    for (auto handler : hwMessageHandlers_)
+    {
+        if (handler->isKeyMatching(messageKey))
+        {
+            handler->receiveData(currentTime, buffer);
+            return;
+        }
+    }
+
+    // If it arrives here, the message key is unknown
+    ROS_ERROR_STREAM( "Unknown message from brainstem: " <<
+        static_cast<int>(eCommand) << ", data: " << ToHex(buffer));
 }
 
 void BrainStemMessageProcessor::GetOperationalState( )
@@ -270,7 +268,7 @@ void BrainStemMessageProcessor::SetVelocity( double dfLinear, double dfAngular )
 //// ROS Callbacks
 ////////////////////////////////////////////////////////////////////////////
 
-void BrainStemMessageProcessor::ProcessRosMessage( const std::string& strMessage )
+void BrainStemMessageProcessor::processRosMessage(const string& strMessage)
 {
 	boost::char_separator<char> separator(";");
 
@@ -377,10 +375,9 @@ void BrainStemMessageProcessor::SetMotionStatus( const std::bitset<8>& motionSta
 
 void BrainStemMessageProcessor::OnHardStop( )
 {
-	std::bitset<8> hardStopSet;
-	hardStopSet.set( MOTION_STATUS::HARD_STOP, true );
-
-	SetMotionStatus( hardStopSet, true );
+    std::bitset<8> hardStopSet;
+    hardStopSet.set( MOTION_STATUS::HARD_STOP, true );
+    SetMotionStatus( hardStopSet, true );
 }
 
 void BrainStemMessageProcessor::OnResetBatteryHours( )

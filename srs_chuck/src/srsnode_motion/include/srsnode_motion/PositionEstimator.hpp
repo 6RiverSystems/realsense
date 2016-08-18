@@ -16,6 +16,7 @@ using namespace srsnode_motion;
 #include <srslib_framework/filter/Sensor.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
+#include <srslib_framework/robotics/Imu.hpp>
 
 #include <srsnode_motion/Configuration.hpp>
 #include <srsnode_motion/FactoryRobotNoise.hpp>
@@ -31,24 +32,27 @@ namespace srs {
 class PositionEstimator
 {
 public:
-    PositionEstimator(double dT) :
-        dT_(dT),
-        initialized_(false),
-        ukf_(robot_),
-        previousReadingTime_(-1.0)
-    {}
-
-    ~PositionEstimator()
-    {}
+    PositionEstimator(double dT);
+    ~PositionEstimator();
 
     void addSensor(Sensor<>* sensor)
     {
         ukf_.addSensor(sensor);
     }
 
+    void enableNaive(bool newState)
+    {
+        naiveSensorFusion_ = newState;
+    }
+
     Pose<> getAccumulatedOdometry()
     {
         return accumulatedOdometry_;
+    }
+
+    cv::Mat getCovariance()
+    {
+        return ukf_.getP();
     }
 
     Pose<> getPose()
@@ -79,42 +83,45 @@ public:
         return currentPose.isValid();
     }
 
-    void reset(Pose<> initialPose)
+    void reset(Pose<> initialPose);
+    void resetAccumulatedOdometry(Pose<>* initialPose);
+    void run(Odometry<>* odometry, Imu<>* imu, Pose<>* aps);
+
+    void setRobotQ(cv::Mat Q)
     {
-        if (initialPose.isValid())
-        {
-            initialized_ = true;
-
-            StatePe<> currentState = StatePe<>(initialPose);
-            cv::Mat currentCovariance = robot_.getQ();
-
-            ukf_.reset(currentState.getVectorForm(), currentCovariance);
-        }
+        robot_.setQ(Q);
     }
 
-    void resetAccumulatedOdometry()
+    void setP0Value(double p0)
     {
-        accumulatedOdometry_ = Pose<>::ZERO;
-    }
-
-    void run(Odometry<>* odometry);
-
-    void setConfiguration(MotionConfig& configuration)
-    {
-        cv::Mat newQ = FactoryRobotNoise::fromConfiguration(configuration);
-        robot_.setQ(newQ);
+        p0_ = p0;
     }
 
 private:
+    void runNaiveSensorFusion(double dT, Odometry<>* odometry, Imu<>* imu, Pose<>* aps);
+
     void updateAccumulatedOdometry(double dT, Odometry<> odometry);
 
     Pose<> accumulatedOdometry_;
 
-    double dT_;
+    double dTDefault_;
+    double dTOdometry_;
+    double dTNode_;
 
     bool initialized_;
 
-    double previousReadingTime_;
+    bool naiveSensorFusion_;
+
+    double p0_;
+    double previousNodeReadingTime_;
+    double previousOdometryTime_;
+
+    double sumDeltaTheta_;
+    Imu<> previousImu_;
+    double correctedApsTheta_;
+    unsigned int apsCounter_;
+    unsigned int apsTimeout_;
+    bool neverSeenAps_;
 
     Robot<> robot_;
 

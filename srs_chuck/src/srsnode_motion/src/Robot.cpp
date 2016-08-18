@@ -20,7 +20,15 @@ cv::Mat Robot<TYPE>::FB(
 
     if (command)
     {
-        oldState.velocity = reinterpret_cast<CmdVelocity<>*>(command)->velocity;
+        Velocity<> newVelocity = reinterpret_cast<CmdVelocity<>*>(command)->velocity;
+        Velocity<> oldVelocity = oldState.velocity;
+
+        // Calculate the average of the velocity using the
+        // velocity at the beginning and end of the time slice
+        oldState.velocity = Velocity<>(
+            (newVelocity.linear + oldVelocity.linear) / 2,
+            (newVelocity.angular + oldVelocity.angular) / 2);
+//        oldState.velocity = reinterpret_cast<CmdVelocity<>*>(command)->velocity;
     }
 
     StatePe<TYPE> newState;
@@ -50,6 +58,8 @@ void Robot<TYPE>::kinematics(StatePe<TYPE> sT0, BaseType dT, StatePe<TYPE>& sT1)
     {
         sT1.pose = PoseMath::translate<double>(sT0.pose, v * dT, 0.0);
     }
+
+    sT1.velocity = sT0.velocity;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

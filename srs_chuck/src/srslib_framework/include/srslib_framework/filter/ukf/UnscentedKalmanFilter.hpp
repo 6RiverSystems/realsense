@@ -28,7 +28,7 @@ public:
     typedef typename BaseKFType::BaseType BaseType;
 
     UnscentedKalmanFilter(Process<STATE_SIZE, COMMAND_SIZE, TYPE>& process,
-        BaseType alpha, BaseType beta);
+        BaseType alpha, BaseType kappa, BaseType beta);
 
     virtual ~UnscentedKalmanFilter()
     {}
@@ -46,9 +46,9 @@ protected:
 
     virtual cv::Mat residual(const cv::Mat A, const cv::Mat B);
 
-    void unscentedTransform(const cv::Mat X, const cv::Mat Y, const cv::Mat CHI,
-        cv::Mat& Ybar, cv::Mat& S, cv::Mat& C);
-    void update();
+//    void unscentedTransform(const cv::Mat X, const cv::Mat Y, const cv::Mat CHI,
+//        cv::Mat& Ybar, cv::Mat& S, cv::Mat& C);
+    void update(BaseType dT, Command<COMMAND_SIZE, TYPE>* const command);
 
     BaseType alpha_;
     BaseType beta_;

@@ -158,7 +158,7 @@ void Reflexes::OnObstacleDetected( )
 
 		// Send the hard stop
 		std_msgs::String msg;
-		msg.data = "STOP";
+		msg.data = "STOP;";
 
 		m_commandPublisher.publish( msg );
 	}

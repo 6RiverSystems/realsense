@@ -14,8 +14,6 @@ set(CMAKE_EXE_LINKER_FLAGS "-pie -z noexecstack -z relro -z now")
 # Flags shared libraries
 set(CMAKE_SHARED_LINKER_FLAGS "-z noexecstack -z relro -z now")
 
-find_library(REALSENSE_LIB realsense)
-
 find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   roscpp
@@ -70,7 +68,7 @@ include_directories(
 add_library(${PROJECT_NAME}_nodelet src/base_nodelet.cpp src/r200_nodelet.cpp src/f200_nodelet.cpp)
 target_link_libraries(${PROJECT_NAME}_nodelet
   ${catkin_LIBRARIES}
-  ${REALSENSE_LIB}
+  realsense
 )
 add_dependencies(${PROJECT_NAME}_nodelet ${PROJECT_NAME}_generate_messages_cpp ${PROJECT_NAME}_gencfg)
 add_dependencies(${PROJECT_NAME}_nodelet ${catkin_EXPORTED_TARGETS})

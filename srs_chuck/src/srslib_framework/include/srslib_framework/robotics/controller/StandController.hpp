@@ -33,7 +33,7 @@ protected:
         setGoalReached(false);
 
         // Send the command for execution
-        executeCommand(ZERO_VELOCITY);
+        executeCommand(Velocity<>::ZERO);
     }
 
 private:

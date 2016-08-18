@@ -1,0 +1,11 @@
+#
+# (c) Copyright 2015-2016 River Systems, all rights reserved
+#
+# This is proprietary software, unauthorized distribution is not permitted.
+#
+
+# Robot calibration parameters
+wheel_diameter: {left: 0, y: 0}
+
+# Stargazer calibration
+stargazer_offset: {x: -0.03394, y: -0.0741}

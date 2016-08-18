@@ -33,6 +33,8 @@ public:
 
 	tf::Vector3 GetCameraOffset( const tf::Quaternion& angle ) const;
 
+	tf::Quaternion GetCameraRotation( ) const;
+
 	tf::Vector3 GetFootprintOffset( const tf::Quaternion& angle ) const;
 
 	bool TransformPoint( int tagID, double fX, double fY, double fZ, double fAngle,

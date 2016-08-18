@@ -70,5 +70,8 @@
 	<xacro:property name="stargazer_x_offset" value="-0.4217162" />
 	<xacro:property name="stargazer_y_offset" value="-0.0352552" />
 	<xacro:property name="stargazer_z_offset" value="0.998982" />
+
+	<!-- SICK Lidar -->
+	<xacro:property name="lidar_x_offset" value="0.4600448" />
     
 </robot>

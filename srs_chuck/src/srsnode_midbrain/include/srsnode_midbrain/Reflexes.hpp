@@ -29,15 +29,13 @@ public:
 
 // Configuration OptionsPathChanged
 
-	void Enable( bool enableDepthDetection );
+	void Enable( bool enableDetection );
 
-	void SetObjectThreshold( uint32_t depthThreshold );
+	void SetObjectThreshold( uint32_t threshold );
 
 // Topic Callbacks
 
 	void OnOperationalStateChanged( const srslib_framework::MsgOperationalState::ConstPtr& operationalState );
-
-	void OnCommandVelocityChanged( const geometry_msgs::Twist::ConstPtr& velocity );
 
 	void OnOdomVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity );
 
@@ -63,8 +61,6 @@ private:
 
 	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
 
-	static constexpr auto CMD_VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
-
 	static constexpr auto SOLUTION_TOPIC = "/internal/state/goal/solution";
 
 	static constexpr auto POSE_TOPIC = "/internal/state/robot/pose";
@@ -83,9 +79,7 @@ private:
 
 	ros::NodeHandle&						m_nodeHandle;
 
-	bool									m_enableIrDetection;
-
-	bool									m_enableDepthDetection;
+	bool									m_enableDetection;
 
 	bool	 								m_sendHardStop;
 
@@ -95,11 +89,7 @@ private:
 
 	ros::Subscriber							m_operationalStateSubscriber;
 
-	ros::Subscriber							m_irScanSubscriber;
-
 	ros::Subscriber							m_depthScanSubscriber;
-
-	ros::Subscriber							m_commandVelocitySubscriber;
 
 	ros::Subscriber							m_odomVelocitySubscriber;
 

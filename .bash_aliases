@@ -107,6 +107,9 @@ function startChuck() {
 function restartChuck() {
   stopChuck
 
+  echo "Waiting for services to completely stop"
+  sleep 30s
+
   startChuck
 }
 

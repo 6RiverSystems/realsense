@@ -61,7 +61,7 @@ public:
 		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, 180.0f } );
 		m_vecTestPoints.push_back( { 300.0f, 700.0f, 300.0f, -90.0f } );
 
-		m_vecStargazerOffsets.push_back( { 3.0f, 5.0f, 0.0f, 0.0f });
+		m_vecStargazerOffsets.push_back( { 3.0f, 5.0f, 0.0f, 0.0f } );
 		m_vecStargazerOffsets.push_back( { -3.0f, 5.0f, 0.0f, 90.0f } );
 		m_vecStargazerOffsets.push_back( { 3.0f, -5.0f, 0.0f, 180.0f } );
 		m_vecStargazerOffsets.push_back( { -3.0f, -5.0f, 0.0f, -90.0f } );

@@ -73,18 +73,13 @@ public:
 
 	void SetDetectionCallback( ObstacleDetectedFn obstacleDetectedCallback );
 
-	void SetTestMode( bool testMode );
-	bool GetTestMode( ) const;
-
-	void SetDesiredVelocity( double linear, double angular );
-
-	void SetActualVelocity( double linear, double angular );
+	void SetVelocity( double linear, double angular );
 
 	void SetPose( const srslib_framework::MsgPose::ConstPtr& pose );
 
 	void SetSolution( const srslib_framework::MsgSolution::ConstPtr& solution );
 
-	void SetThreshold( uint32_t depthThreshold );
+	void SetThreshold( uint32_t threshold );
 
 	void ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan );
 
@@ -120,15 +115,11 @@ private:
 
 	double							m_footprintLength;
 
-	double							m_desiredLinearVelocity;
+	double							m_linearVelocity;
 
-	double							m_desiredAngularVelocity;
+	double							m_angularVelocity;
 
-	double							m_actualLinearVelocity;
-
-	double							m_actualAngularVelocity;
-
-	uint32_t						m_depthThreshold;
+	uint32_t						m_threshold;
 
 };
 

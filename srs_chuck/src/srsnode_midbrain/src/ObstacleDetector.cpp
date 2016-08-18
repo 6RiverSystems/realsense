@@ -51,19 +51,16 @@ namespace srs
 
 ObstacleDetector::ObstacleDetector( double footprintWidth, double footprintHeight ) :
 	m_obstacleDetectedCallback( ),
-	m_pose( ),
-	m_poseValid( false ),
+	m_pose( Pose<>::INVALID ),
 	m_footprintPolygon( ),
 	m_posePolygon( ),
 	m_solution( ),
 	m_dangerZone( ),
 	m_footprintWidth( footprintWidth ),
 	m_footprintLength( footprintHeight),
-	m_desiredLinearVelocity( 0.0f ),
-	m_desiredAngularVelocity( 0.0f ),
-	m_actualLinearVelocity( 0.0f ),
-	m_actualAngularVelocity( 0.0f ),
-	m_depthThreshold( 0 )
+	m_linearVelocity( 0.0f ),
+	m_angularVelocity( 0.0f ),
+	m_threshold( 0 )
 {
 
 }
@@ -78,18 +75,11 @@ void ObstacleDetector::SetDetectionCallback( ObstacleDetectedFn obstacleDetected
 	m_obstacleDetectedCallback = obstacleDetectedCallback;
 }
 
-void ObstacleDetector::SetDesiredVelocity( double linearVelocity, double angularVelocity )
+void ObstacleDetector::SetVelocity( double linearVelocity, double angularVelocity )
 {
-	m_desiredLinearVelocity = linearVelocity;
+	m_linearVelocity = linearVelocity;
 
-	m_desiredAngularVelocity = angularVelocity;
-}
-
-void ObstacleDetector::SetActualVelocity( double linearVelocity, double angularVelocity )
-{
-	m_actualLinearVelocity = linearVelocity;
-
-	m_desiredLinearVelocity = angularVelocity;
+	m_angularVelocity = angularVelocity;
 }
 
 void ObstacleDetector::SetPose( const srslib_framework::MsgPose::ConstPtr& pose )
@@ -101,8 +91,6 @@ void ObstacleDetector::SetPose( const srslib_framework::MsgPose::ConstPtr& pose 
 
 	AddPoseToPolygon( m_pose, m_footprintPolygon, m_footprintWidth, m_footprintLength );
 	AddPoseToPolygon( m_pose, m_posePolygon, m_footprintWidth, m_footprintWidth );
-
-	m_poseValid = true;
 }
 
 void ObstacleDetector::SetSolution( const srslib_framework::MsgSolution::ConstPtr& solution )
@@ -112,20 +100,20 @@ void ObstacleDetector::SetSolution( const srslib_framework::MsgSolution::ConstPt
 	UpdateDangerZone( );
 }
 
-void ObstacleDetector::SetThreshold( uint32_t depthThreshold )
+void ObstacleDetector::SetThreshold( uint32_t threshold )
 {
-	m_depthThreshold = depthThreshold;
+	m_threshold = threshold;
 }
 
 void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan )
 {
-	if( m_poseValid )
+	if( m_pose.isValid( ) )
 	{
 		uint32_t numberOfObstacles = 0;
 
 		uint32_t numberOfScans = scan->ranges.size( );
 
-		double safeDistance = GetSafeDistance( m_actualLinearVelocity, m_actualAngularVelocity );
+		double safeDistance = GetSafeDistance( m_linearVelocity, m_angularVelocity );
 
 		std::string strObstaclePoints;
 		std::string strValidPoints;
@@ -181,11 +169,11 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 		}
 
 		// Allow some number of spurious points that can make it through our filtering
-		if( numberOfObstacles > m_depthThreshold )
+		if( numberOfObstacles > m_threshold )
 		{
 			ROS_INFO_NAMED( "obstacle_detection", "Scans: %d, linear vel: %0.2f, angular vel: %0.2f, \
 				safeDistance: %.02f, Obstacles detected: %d, points: %s", numberOfScans,
-				m_actualLinearVelocity, m_actualAngularVelocity, safeDistance, numberOfObstacles, strObstaclePoints.c_str( ) );
+				m_linearVelocity, m_angularVelocity, safeDistance, numberOfObstacles, strObstaclePoints.c_str( ) );
 
 			if( m_obstacleDetectedCallback )
 			{
@@ -197,8 +185,8 @@ void ObstacleDetector::ProcessScan( const sensor_msgs::LaserScan::ConstPtr& scan
 			if( strValidPoints.size( ) )
 			{
 				ROS_DEBUG_THROTTLE_NAMED( 1.0, "obstacle_detection", "Scans: %d, linear vel: %0.2f, angular vel: %0.2f, \
-					safeDistance: %.02f, Objects detected: %d, points: %s", numberOfScans, m_actualLinearVelocity,
-					m_actualAngularVelocity, safeDistance, numberOfObstacles, strValidPoints.c_str( ) );
+					safeDistance: %.02f, Objects detected: %d, points: %s", numberOfScans, m_linearVelocity,
+					m_angularVelocity, safeDistance, numberOfObstacles, strValidPoints.c_str( ) );
 			}
 		}
 	}
@@ -217,7 +205,7 @@ double ObstacleDetector::GetSafeDistance( double linearVelocity, double angularV
 
 		safeDistance = std::max( calculatedSafeDistance, 0.75 );
 
-		ROS_DEBUG_THROTTLE_NAMED( 1.0f, "obstacle_detection", "calculatedSafeDistance: %0.2f, safeDistance: %0.2f", calculatedSafeDistance, safeDistance );
+		ROS_DEBUG_THROTTLE_NAMED( 1.0f, "obstacle_detection", "calculatedSafeDistance: %0.2f, safeDistance: %0.2f", calculatedSafeDistance, safeDistance ); 
 	}
 
 	return safeDistance;

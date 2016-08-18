@@ -30,7 +30,7 @@ find_package(catkin REQUIRED COMPONENTS
     message_filters
 )
 
-find_package(OpenCV 1.7 REQUIRED)
+find_package(OpenCV REQUIRED)
 
 include_directories(include 
     src/

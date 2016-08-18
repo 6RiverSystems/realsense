@@ -6,18 +6,16 @@
 
 #include <StarGazerPointTransformer.h>
 #include <srslib_framework/localization/Anchor.hpp>
-#include <srslib_framework/math/AngleMath.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/median.hpp>
-#include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 #include <yaml-cpp/yaml.h>
 
 using namespace boost::accumulators;
 
-typedef accumulator_set<double, stats<tag::mean, tag::median, tag::lazy_variance> > double_acc;
+typedef accumulator_set<double, stats<tag::median, tag::lazy_variance> > double_acc;
 
 namespace YAML
 {
@@ -95,7 +93,7 @@ bool StarGazerPointTransformer::Load( const std::string& strTargetFrame,
 
 tf::Quaternion StarGazerPointTransformer::ConvertAngle( double fLeftHandAngleInDegrees ) const
 {
-	double dfLeftHandAngleInRadians = AngleMath::deg2rad( fLeftHandAngleInDegrees );
+	double dfLeftHandAngleInRadians = fLeftHandAngleInDegrees * M_PI / 180.0f;
 
 	// Transform to map coordinate system (right hand rule)
 	return tf::createQuaternionFromYaw( ConvertToRightHandRule( dfLeftHandAngleInRadians ) );
@@ -115,11 +113,6 @@ tf::Vector3 StarGazerPointTransformer::GetCameraOffset( const tf::Quaternion& an
 	tf::Pose poseCamera = poseFootprintRotated * m_stargazerTransform;
 
 	return poseCamera.getOrigin( );
-}
-
-tf::Quaternion StarGazerPointTransformer::GetCameraRotation( ) const
-{
-	return m_stargazerTransform.getRotation( );
 }
 
 tf::Vector3 StarGazerPointTransformer::GetFootprintOffset( const tf::Quaternion& angle ) const
@@ -149,16 +142,11 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 			std::string strAnchorFrame = GetAnchorFrame( nTagId );
 
-			tf::Quaternion cameraRotation = GetCameraRotation( );
-
 			tf::Quaternion anchorRotation = ConvertAngle( fAngleInDegrees );
 
-			tf::Quaternion totalCameraRotation = tf::createQuaternionFromYaw( tf::getYaw( cameraRotation ) + tf::getYaw( anchorRotation ) );
+			tf::Vector3 cameraOffset = GetCameraOffset( anchorRotation );
 
-
-			tf::Vector3 cameraOffset = GetCameraOffset( totalCameraRotation );
-
-			tf::Vector3 footprintOffset = GetFootprintOffset( totalCameraRotation );
+			tf::Vector3 footprintOffset = GetFootprintOffset( anchorRotation );
 
 			tf::Vector3 stargazerOffset = GetStargazerOffset( fX, fY, fZ );
 
@@ -167,8 +155,8 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 			tf::Vector3 chuckOrigin = anchorGlobal * stargazerTranslation;
 
 			double dfAnchorGlobal = tf::getYaw(anchorGlobal.getRotation( ) );
-			double dfTotalCameraRotation = tf::getYaw( totalCameraRotation );
-			double dfMapRotation = AngleMath::normalizeAngleRad( dfAnchorGlobal + dfTotalCameraRotation );
+			double dfAnchorRotation = tf::getYaw( anchorRotation );
+			double dfMapRotation = dfAnchorGlobal + dfAnchorRotation;
 
 			tf::Quaternion chuckOrientation( tf::createQuaternionFromYaw( dfMapRotation ) );
 			pose = tf::Pose( chuckOrientation, chuckOrigin);
@@ -181,11 +169,15 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 			std::ostringstream stream;
 
-			double dfMapRotationDegrees = AngleMath::normalizeRad2Deg( dfMapRotation );
-			double dfAnchorRotationDegrees = AngleMath::normalizeRad2Deg( dfTotalCameraRotation );
+			double dfMapRotationDegrees = dfMapRotation * 180.0f / M_PI;
+
+			if( dfMapRotationDegrees < 0 )
+			{
+				dfMapRotationDegrees += 360.0f;
+			}
 
 			stream << "Stargazer: OM Data" << nTagId << std::fixed << ", " <<
-				dfAnchorRotationDegrees << ", " <<
+				tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
 				stargazerOffset.getX( ) << ", " << stargazerOffset.getY( ) << ", " << stargazerOffset.getZ( ) << ", " <<
 				totalCameraOffset.getX( ) << ", " << totalCameraOffset.getY( ) << ", " << totalCameraOffset.getZ( ) << ", " <<
 				totalFootprintOffset.getX( ) << ", " << totalFootprintOffset.getY( ) << ", " << totalFootprintOffset.getZ( ) << ", " <<
@@ -199,10 +191,12 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 			static double_acc accLocalX;
 			static double_acc accLocalY;
 			static double_acc accLocalZ;
+			static double_acc accLocalRotation;
 
 			static double_acc accCameraX;
 			static double_acc accCameraY;
 			static double_acc accCameraZ;
+			static double_acc accCameraRotation;
 
 			static double_acc accFootprintX;
 			static double_acc accFootprintY;
@@ -211,8 +205,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 			static double_acc accChuckX;
 			static double_acc accChuckY;
 			static double_acc accChuckZ;
-			static double_acc accChuckRotationX;
-			static double_acc accChuckRotationY;
+			static double_acc accChuckRotation;
 
 			accLocalX( stargazerOffset.getX( ) );
 			accLocalY( stargazerOffset.getY( ) );
@@ -229,27 +222,22 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 			accChuckX( chuckOrigin.getX( ) );
 			accChuckY( chuckOrigin.getY( ) );
 			accChuckZ( chuckOrigin.getZ( ) );
-			accChuckRotationX( sinf( dfMapRotation ) );
-			accChuckRotationY( cosf( dfMapRotation ) );
+			accChuckRotation( dfMapRotationDegrees );
 
 			static int sCount = 0;
-
-			if( ++sCount == 50 )
+			if( sCount++ == 50 )
 			{
 				std::ostringstream stream;
 
-				double averageChuckRotation = atan2( mean( accChuckRotationX ), mean( accChuckRotationY ) );
-				double averageChuckRotationDegrees = AngleMath::normalizeRad2Deg( averageChuckRotation );
-
 				stream << "Stargazer: OM Calibration Data => " << nTagId << std::fixed << ", " <<
-					dfAnchorRotationDegrees << ", " <<
+					tf::getYaw( anchorRotation ) * 180.0f / M_PI << ", " <<
 					median( accLocalX ) << ", " << median( accLocalY ) << ", " << median( accLocalZ ) << ", " <<
 					median( accCameraX ) << ", " << median( accCameraY ) << ", " << median( accCameraZ ) << ", " <<
 					median( accFootprintX ) << ", " << median( accFootprintY ) << ", " << median( accFootprintZ ) << ", " <<
 					median( accChuckX ) << ", " << median( accChuckY ) << ", " << median( accChuckZ ) << ", " <<
-					averageChuckRotationDegrees << ", " <<
+					median( accChuckRotation ) << ", " <<
 					lazy_variance( accChuckX ) << ", " << lazy_variance( accChuckY ) << ", " << lazy_variance( accChuckZ ) << ", " <<
-					( (lazy_variance( accChuckRotationX ) + lazy_variance( accChuckRotationX ) ) / 2.0) <<
+					lazy_variance( accChuckRotation ) <<
 					std::endl;
 
 				std::string strData =  stream.str( );
@@ -272,8 +260,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 				accChuckX = double_acc( );
 				accChuckY = double_acc( );
 				accChuckZ = double_acc( );
-				accChuckRotationX = double_acc( );
-				accChuckRotationY = double_acc( );
+				accChuckRotation = double_acc( );
 
 				sCount = 0;
 			}
@@ -328,12 +315,12 @@ bool StarGazerPointTransformer::LoadAnchors( const std::string& strAnchorsFile )
 					int32_t anchorId = boost::lexical_cast < int32_t > (anchor.id);
 
 					tf::Vector3 origin( anchor.x, anchor.y, -anchor.z );
-					tf::Quaternion orientation = tf::createQuaternionFromYaw( AngleMath::normalizeDeg2Rad( anchor.orientation ) );
+					tf::Quaternion orientation = tf::createQuaternionFromYaw( anchor.orientation * M_PI / 180.0f );
 
 					tf::Transform transform( orientation, origin );
 
 					ROS_INFO_STREAM( "Stargazer: anchor: x=" << origin.getX( ) << ", y=" << origin.getY( ) <<
-						", z=" << origin.getZ( )  << ", orientation=" << AngleMath::normalizeRad2Deg( tf::getYaw( orientation ) ) );
+						", z=" << origin.getZ( )  << ", orientation=" << tf::getYaw( orientation ) * 180.0f / M_PI );
 
 					m_mapTransforms[anchorId] = transform;
 				}

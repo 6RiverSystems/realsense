@@ -27,7 +27,7 @@ public:
 
 private:
 
-    void OnDepthData( const sensor_msgs::Image::ConstPtr& infraredImage );
+    void OnDepthData( const sensor_msgs::Image::ConstPtr& infraredImage1 );
 
 private:
 

@@ -11,7 +11,6 @@
 
 	<xacro:include filename="sensors/r200.urdf.xacro"/>
 	<xacro:include filename="sensors/stargazer.urdf.xacro"/>
-	<!-- <xacro:include filename="$(find sick_tim)/urdf/sick_tim.urdf.xacro" /> -->
 
     <!-- Robot footprint -->
     <link name="base_footprint">
@@ -117,14 +116,6 @@
         </material>
       </visual>
   	</link>
-  	
-    <!-- <sick_tim551 name="sick_lidar" ros_topic="scan" />
-
-  	<joint name="lidar_laser_frame_joint" type="fixed">
-      <origin xyz="${lidar_x_offset} 0 0" rpy="${M_PI} 0 0" />
-  	  <parent link="base_footprint" />
-  	  <child link="sick_lidar_mount_link" />
-  	</joint> -->
 
     <!-- Differential drive controller  -->
     <gazebo>

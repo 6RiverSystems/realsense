@@ -244,8 +244,7 @@ bool StarGazer::LoadCalibrationTransform( const std::string& strConfigurationFil
 	tf::Transform& stargazer )
 {
 	// Default values
-	tf::Vector3 translation( 0.03, -0.07, 0.0f );
-	tf::Quaternion rotation = tf::Quaternion::getIdentity( );
+	tf::Vector3 translation( 0.0308468412, -0.0687856119, 0.0f );
 
 	try
 	{
@@ -257,7 +256,6 @@ bool StarGazer::LoadCalibrationTransform( const std::string& strConfigurationFil
 		{
 			translation.setX( document["stargazer_offset"]["x"].as<double>( ) );
 			translation.setY( document["stargazer_offset"]["y"].as<double>( ) );
-			rotation = tf::createQuaternionFromYaw( AngleMath::normalizeDeg2Rad( document["stargazer_offset"]["theta"].as<double>( ) ) );
 		}
 	}
 	catch( const std::runtime_error& e )
@@ -266,11 +264,10 @@ bool StarGazer::LoadCalibrationTransform( const std::string& strConfigurationFil
 			strConfigurationFile << ", using default values" );
 	}
 
-	stargazer.setRotation( rotation );
+	stargazer.setRotation( tf::Quaternion::getIdentity( ) );
 	stargazer.setOrigin( translation );
 
-	ROS_INFO_STREAM( "Stargazer: Calibration x=" << translation.getX( ) << ", y=" << translation.getY( ) <<
-		", theta =" << tf::getYaw( rotation ) );
+	ROS_INFO_STREAM( "Stargazer: Calibration x=" << translation.getX( ) << ", y=" << translation.getY( ) );
 
 	return true;
 }

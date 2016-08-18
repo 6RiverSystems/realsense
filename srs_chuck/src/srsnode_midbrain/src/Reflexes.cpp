@@ -17,12 +17,15 @@ namespace srs
 
 Reflexes::Reflexes( ros::NodeHandle& nodeHandle ) :
 	m_nodeHandle( nodeHandle ),
-	m_enableDetection( false ),
+	m_enableIrDetection( false ),
+	m_enableDepthDetection( false ),
 	m_sendHardStop( false ),
 	m_operationalState( ),
 	m_obstacleDetector( ROBOT_WIDTH, ROBOT_LENGTH ),
 	m_operationalStateSubscriber( ),
+	m_irScanSubscriber( ),
 	m_depthScanSubscriber( ),
+	m_commandVelocitySubscriber( ),
 	m_odomVelocitySubscriber( ),
 	m_poseSubscriber( ),
 	m_solutionSubscriber( ),
@@ -48,11 +51,11 @@ Reflexes::~Reflexes( )
 // Configuration Options
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Reflexes::Enable( bool enableDetection )
+void Reflexes::Enable( bool enableDepthDetection )
 {
-	if( m_enableDetection != enableDetection )
+	if( m_enableDepthDetection != enableDepthDetection )
 	{
-		if( enableDetection )
+		if( enableDepthDetection )
 		{
 			ROS_INFO_NAMED( "obstacle_detection", "Reflexes: Enabling Depth Detection" );
 
@@ -66,13 +69,13 @@ void Reflexes::Enable( bool enableDetection )
 			m_depthScanSubscriber.shutdown( );
 		}
 
-		m_enableDetection = enableDetection;
+		m_enableDepthDetection = enableDepthDetection;
 	}
 }
 
-void Reflexes::SetObjectThreshold( uint32_t threshold )
+void Reflexes::SetObjectThreshold( uint32_t depthThreshold )
 {
-	m_obstacleDetector.SetThreshold( threshold );
+	m_obstacleDetector.SetThreshold( depthThreshold );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,9 +89,14 @@ void Reflexes::OnOperationalStateChanged( const srslib_framework::MsgOperational
 	m_operationalState = *operationalState;
 }
 
+void Reflexes::OnCommandVelocityChanged( const geometry_msgs::Twist::ConstPtr& velocity )
+{
+	m_obstacleDetector.SetDesiredVelocity( velocity->linear.x, velocity->angular.z );
+}
+
 void Reflexes::OnOdomVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity )
 {
-	m_obstacleDetector.SetVelocity( velocity->twist.linear.x, velocity->twist.angular.z );
+	m_obstacleDetector.SetActualVelocity( velocity->twist.linear.x, velocity->twist.angular.z );
 }
 
 void Reflexes::OnPoseChanged( const srslib_framework::MsgPose::ConstPtr& pose )
@@ -135,9 +143,9 @@ void Reflexes::PublishDangerZone( ) const
 void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t level)
 {
 	ROS_INFO_NAMED( "obstacle_detection", "Reflexes: Midbrain config changed: hardStop: %d, depth scan: %d, depth threshold: %d",
-		config.threshold, config.enable_hard_stop, config.threshold );
+		config.depth_threshold, config.enable_hard_stop, config.depth_threshold );
 
-	SetObjectThreshold( config.threshold );
+	SetObjectThreshold( config.depth_threshold );
 
 	Enable( config.enable_depth_scan );
 
@@ -146,7 +154,7 @@ void Reflexes::onConfigChange(srsnode_midbrain::ReflexesConfig& config, uint32_t
 
 void Reflexes::OnObstacleDetected( )
 {
-	ROS_INFO_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: paused: %d, hardStop: %d",
+    ROS_INFO_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: paused: %d, hardStop: %d",
 		m_operationalState.pause, m_sendHardStop );
 
 	// Only send a hard stop if we are paused
@@ -154,7 +162,7 @@ void Reflexes::OnObstacleDetected( )
 		!m_operationalState.hardStop &&
 		m_sendHardStop )
 	{
-		ROS_INFO_STREAM_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: Sending STOP" );
+	    ROS_INFO_STREAM_NAMED( "obstacle_detection", "Reflexes: OnObstacleDetected: Sending STOP" );
 
 		// Send the hard stop
 		std_msgs::String msg;
@@ -174,6 +182,9 @@ void Reflexes::CreateSubscribers( )
 
 	m_solutionSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgSolution>(SOLUTION_TOPIC, 10,
 		std::bind( &Reflexes::OnSolutionChanged, this, std::placeholders::_1) );
+
+	m_commandVelocitySubscriber = m_nodeHandle.subscribe<geometry_msgs::Twist>(CMD_VELOCITY_TOPIC, 1,
+	    std::bind( &Reflexes::OnCommandVelocityChanged, this, std::placeholders::_1 ) );
 
 	m_odomVelocitySubscriber = m_nodeHandle.subscribe<geometry_msgs::TwistStamped>(ODOMETRY_TOPIC, 1,
 		std::bind( &Reflexes::OnOdomVelocityChanged, this, std::placeholders::_1 ) );

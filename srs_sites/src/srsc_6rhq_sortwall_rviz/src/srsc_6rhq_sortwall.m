@@ -17,7 +17,7 @@ map = mm_addStaticObstacle(map, 6.253, 3.168, 16.692, 4.387, 0.7);
 map = mm_addStaticObstacle(map, 3.662, 6.216, 16.692, 7.435, 0.7);
 
 % Obstacle Workshop
-map = mm_addStaticObstacle(map, 9.148, 9.264, 19.521, 12.264, 0.7);
+map = mm_addStaticObstacle(map, 9.148, 9.264, 19.521, 12.264, 0.4);
 
 % Obstacle Stall 1
 %map = mm_addStaticObstacle(map, 3.662, 8.664, 3.762, 9.664, 0.2);

@@ -1,0 +1,20 @@
+<!-- 
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+<launch>
+	<!--- AMCL -->
+	<include file="$(find amcl)/examples/amcl_diff.launch" />
+
+	<!--- Move Base -->
+	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+		<rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+		<rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+		<rosparam file="$(find srsnode_navigation)/config/local_costmap_params.yaml" command="load" />
+		<rosparam file="$(find srsnode_navigation)/config/global_costmap_params.yaml" command="load" />
+		<rosparam file="$(find srsnode_navigation)/config/base_local_planner_params.yaml" command="load" />
+	</node>
+</launch>

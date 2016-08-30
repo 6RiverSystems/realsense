@@ -12,7 +12,7 @@ namespace srs {
 OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	nodeHandle_(nodeName),
 	twist_(),
-	pose_(),
+	pose_(15.71100, 5.33400, M_PI),
 	broadcaster_(),
 	rawOdometrySub_(),
 	odometryPub_()
@@ -28,8 +28,6 @@ void OdometryPositionEstimator::run()
 {
 	ros::Rate refreshRate(REFRESH_RATE_HZ);
 
-	ROS_ERROR( "OdometryPositionEstimator connected" );
-
 	connect();
 
 	while(ros::ok())
@@ -40,8 +38,6 @@ void OdometryPositionEstimator::run()
 	}
 
 	disconnect();
-
-	ROS_ERROR( "OdometryPositionEstimator disconnected" );
 }
 
 void OdometryPositionEstimator::connect()
@@ -59,9 +55,6 @@ void OdometryPositionEstimator::disconnect()
 
 void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistStamped::ConstPtr& estimatedVelocity )
 {
-	ROS_ERROR( "RawOdometryVelocity: linear=%f, angular=%f",
-		estimatedVelocity->twist.linear.x, estimatedVelocity->twist.angular.z );
-
 	static ros::Time s_lastTime = estimatedVelocity->header.stamp;
 	static geometry_msgs::TwistStamped s_lastVelocity = *estimatedVelocity;
 
@@ -73,7 +66,7 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
 	if( s_lastVelocity.twist.linear.x != estimatedVelocity->twist.linear.x ||
 		s_lastVelocity.twist.angular.z != estimatedVelocity->twist.angular.z)
 	{
-		ROS_ERROR( "Estimated Velocity Changed: linear=%f, angular=%f",
+		ROS_DEBUG( "Estimated Velocity Changed: linear=%f, angular=%f",
 			estimatedVelocity->twist.linear.x, estimatedVelocity->twist.angular.z );
 	}
 

@@ -16,7 +16,7 @@ DWAPlannerROS:
   acc_limit_trans: 0.65
 
 # Goal Tolerance Parameters
-  yaw_goal_tolerance: 0.3
+  yaw_goal_tolerance: 0.3_simple
   xy_goal_tolerance: 0.15
   latch_xy_goal_tolerance: false
 
@@ -27,8 +27,8 @@ DWAPlannerROS:
 #  vtheta_samples: 20
 
 # Trajectory Scoring Parameters
-#  path_distance_bias: 200.0     # weighting for how much it should stick to the global path plan
-#  goal_distance_bias: 0.0       # wighting for how much it should attempt to reach its goal
+  path_distance_bias: 64.0       # weighting for how much it should stick to the global path plan
+  goal_distance_bias: 24.0       # wighting for how much it should attempt to reach its goal
 #  occdist_scale: 0.05           # weighting for how much the controller should avoid obstacles
 #  forward_point_distance: 0.0   # how far along to place an additional scoring point
 #  stop_time_buffer: 0.2         # amount of time a robot must stop in before colliding for a valid traj.

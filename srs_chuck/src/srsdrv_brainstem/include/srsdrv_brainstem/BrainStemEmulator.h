@@ -37,7 +37,7 @@ private:
 
 	static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
 
-	static constexpr auto ODOMETRY_TOPIC = "/sensors/odometry/raw";
+	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
 
 	ros::NodeHandle 			m_rosNodeHandle;
 

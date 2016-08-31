@@ -83,6 +83,15 @@ void BrainStem::OnConnectionChanged( bool bIsConnected )
 
 	m_connectedPublisher.publish( msg );
 
+	if( bIsConnected )
+	{
+		m_brainstemEmulator.reset( new BrainStemEmulator( ) );
+	}
+	else
+	{
+		m_brainstemEmulator.reset( );
+	}
+
 	// Get the hardware information
 	GetHardwareInformation( );
 

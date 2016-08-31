@@ -13,7 +13,8 @@
 #include <geometry_msgs/Twist.h>
 #include <srslib_framework/io/IO.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessageProcessor.h>
+#include <BrainStemEmulator.h>
+#include <BrainStemMessageProcessor.h>
 
 namespace srs
 {
@@ -101,6 +102,8 @@ private:
 	ros::Publisher				m_connectedPublisher;
 
 	std::shared_ptr<IO>			m_pSerialIO;
+
+	std::shared_ptr<BrainStemEmulator> m_brainstemEmulator;
 
 	BrainStemMessageProcessor	m_messageProcessor;
 };

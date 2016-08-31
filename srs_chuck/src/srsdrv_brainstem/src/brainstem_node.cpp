@@ -6,7 +6,6 @@
 
 #include <ros/ros.h>
 #include <BrainStem.h>
-#include <BrainStemEmulator.h>
 
 const std::string g_SerialPort( "/dev/malg" );
 
@@ -19,8 +18,6 @@ int main( int argc, char** argv )
 
 	// Create the BrainStem node and run it
 	srs::BrainStem brainStem( g_SerialPort );
-
-	srs::BrainStemEmulator emulator;
 
 	brainStem.Run( );
 

@@ -1,9 +1,9 @@
 DWAPlannerROS:
 
-  max_vel_x: 2.0
+  max_vel_x: 1.6
   min_vel_x: 0.1
 
-  max_trans_vel: 1.0
+  max_trans_vel: 0.65
   min_trans_vel: 0.1
   trans_stopped_vel: 0.1
 
@@ -16,7 +16,7 @@ DWAPlannerROS:
   acc_limit_trans: 0.65
 
 # Goal Tolerance Parameters
-  yaw_goal_tolerance: 0.3_simple
+  yaw_goal_tolerance: 0.3
   xy_goal_tolerance: 0.15
   latch_xy_goal_tolerance: false
 

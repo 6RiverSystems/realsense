@@ -34,7 +34,13 @@ private:
 
     void RawOdometryVelocity( const geometry_msgs::TwistStamped::ConstPtr& estimatedVelocity );
 
+    void pingCallback(const ros::TimerEvent& event);
+
     static constexpr double REFRESH_RATE_HZ = 100;
+
+    static constexpr double PING_HZ = 10;
+
+    static constexpr double MAX_ALLOWED_PING_DELAY = 0.5; // 50% of the duty cycle
 
 	static constexpr auto ODOMETRY_RAW_TOPIC = "/internal/sensors/odometry/raw";
 
@@ -45,6 +51,8 @@ private:
     geometry_msgs::Twist twist_;
 
     Pose<> pose_;
+
+    ros::Timer pingTimer_;
 
 	tf::TransformBroadcaster broadcaster_;
 

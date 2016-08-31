@@ -13,6 +13,7 @@ OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	nodeHandle_(nodeName),
 	twist_(),
 	pose_(15.71100, 5.33400, M_PI),
+	pingTimer_(),
 	broadcaster_(),
 	rawOdometrySub_(),
 	odometryPub_(),
@@ -49,6 +50,10 @@ void OdometryPositionEstimator::connect()
 	odometryPub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_TOPIC, 100);
 
 	pingPub_ = nodeHandle_.advertise<std_msgs::Bool>("/internal/state/ping", 1);
+
+    // Start the ping timer
+    pingTimer_ = nodeHandle_.createTimer(ros::Duration(1.0 / PING_HZ),
+        boost::bind(&OdometryPositionEstimator::pingCallback, this, _1));
 }
 
 void OdometryPositionEstimator::disconnect()
@@ -96,7 +101,7 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
 	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( pose_.theta );
 
 	// Publish the TF
-	odom_trans.header.stamp = currentTime;
+	odom_trans.header.stamp = ros::Time::now( );
 	odom_trans.transform.translation.x = pose_.x;
 	odom_trans.transform.translation.y = pose_.y;
 	odom_trans.transform.translation.z = 0.0;
@@ -105,7 +110,7 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
 	broadcaster_.sendTransform( odom_trans );
 
 	nav_msgs::Odometry odom;
-	odom.header.stamp = currentTime;
+	odom.header.stamp = ros::Time::now( );
 	odom.header.frame_id = "odom";
 	odom.child_frame_id = "base_footprint";
 
@@ -134,5 +139,23 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
 	// Update the last time
 	s_lastTime = currentTime;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)
+{
+    std_msgs::Bool message;
+    message.data = true;
+
+    pingPub_.publish(message);
+
+    double delay = (event.current_real - event.current_expected).toSec();
+
+    // We should never be falling behind by more than 500ms
+    if ( delay > (1.0f / PING_HZ) * MAX_ALLOWED_PING_DELAY)
+    {
+        ROS_ERROR_STREAM_NAMED("motion", "Motion ping exceeded allowable delay: " << delay );
+    }
+}
+
 
 } // namespace srs

@@ -20,7 +20,7 @@ int main( int argc, char** argv )
 	// Create the BrainStem node and run it
 	srs::BrainStem brainStem( g_SerialPort );
 
-//	srs::BrainStemEmulator emulator;
+	srs::BrainStemEmulator emulator;
 
 	brainStem.Run( );
 

@@ -8,6 +8,7 @@
 #define ODOMETRY_POSITION_ESTIMATOR_HPP_
 
 #include <ros/ros.h>
+#include <std_msgs/Bool.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
@@ -50,6 +51,8 @@ private:
 	ros::Subscriber rawOdometrySub_;
 
 	ros::Publisher odometryPub_;
+
+	ros::Publisher pingPub_;
 
 };
 

@@ -15,7 +15,8 @@ OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	pose_(15.71100, 5.33400, M_PI),
 	broadcaster_(),
 	rawOdometrySub_(),
-	odometryPub_()
+	odometryPub_(),
+	pingPub_()
 {
 
 }
@@ -46,6 +47,8 @@ void OdometryPositionEstimator::connect()
 		std::bind( &OdometryPositionEstimator::RawOdometryVelocity, this, std::placeholders::_1 ));
 
 	odometryPub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_TOPIC, 100);
+
+	pingPub_ = nodeHandle_.advertise<std_msgs::Bool>("/internal/state/ping", 1);
 }
 
 void OdometryPositionEstimator::disconnect()
@@ -122,6 +125,11 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
 
 	// Publish the Odometry
 	odometryPub_.publish( odom );
+
+    std_msgs::Bool message;
+    message.data = true;
+
+	pingPub_.publish( message );
 
 	// Update the last time
 	s_lastTime = currentTime;

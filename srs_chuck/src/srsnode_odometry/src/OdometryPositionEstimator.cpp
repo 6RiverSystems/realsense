@@ -6,6 +6,7 @@
 
 #include <srsnode_odometry/OdometryPositionEstimator.hpp>
 #include <srslib_framework/math/TimeMath.hpp>
+#include <srslib_framework/math/PoseMath.hpp>
 
 namespace srs {
 
@@ -82,21 +83,29 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
 
 	ros::Time currentTime = estimatedVelocity->header.stamp;
 
+    double v = twist_.linear.x;
+    double w = twist_.angular.z;
+
+    constexpr static double ANGULAR_VELOCITY_EPSILON = 0.000001; // [rad/s] (0.0573 [deg/s])
+
 	double dfTimeDelta = (currentTime - s_lastTime).toSec( );
 
-	double dfXDelta = twist_.linear.x * cos( pose_.theta ) * dfTimeDelta;
-	double dfYDelta = twist_.linear.x * sin( pose_.theta ) * dfTimeDelta;
-	double dfThetaDelta = twist_.angular.z * dfTimeDelta;
+    // Check for the special case in which omega is 0 (the robot is moving straight)
+	if (abs(w) > ANGULAR_VELOCITY_EPSILON)
+    {
+        double r = v / w;
 
-	pose_.x += dfXDelta;
-	pose_.y += dfYDelta;
-	pose_.theta += dfThetaDelta;
+        pose_.x + r * sin(pose_.theta + w * dfTimeDelta) - r * sin(pose_.theta),
+        pose_.y + r * cos(pose_.theta) - r * cos(pose_.theta + w * dfTimeDelta),
+        AngleMath::normalizeAngleRad<>(pose_.theta + w * dfTimeDelta);
+    }
+    else
+    {
+    	pose_ = PoseMath::translate<>(pose_, v * dfTimeDelta, 0.0);
+    }
 
-	if( dfXDelta || dfYDelta || dfThetaDelta )
-	{
-		ROS_DEBUG_THROTTLE_NAMED( 1.0f, "OdomEstimator", "Pose Changed: x=%lf, y=%lf, theta=%lf",
-			pose_.x, pose_.y, pose_.theta * 180.0f / M_PI );
-	}
+	ROS_DEBUG_THROTTLE_NAMED( 1.0f, "OdomEstimator", "Pose Changed: x=%lf, y=%lf, theta=%lf",
+		pose_.x, pose_.y, pose_.theta * 180.0f / M_PI );
 
 	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( pose_.theta );
 
@@ -110,7 +119,7 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
 	broadcaster_.sendTransform( odom_trans );
 
 	nav_msgs::Odometry odom;
-	odom.header.stamp = ros::Time::now( );
+	odom.header.stamp = currentTime;
 	odom.header.frame_id = "odom";
 	odom.child_frame_id = "base_footprint";
 

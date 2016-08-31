@@ -1,0 +1,73 @@
+<!-- 
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+<launch>
+	<remap from="/scan" to="/camera/depth/scan"/>
+	<remap from="/map" to="/internal/state/map/grid"/>
+	<remap from="/initialpose" to="/request/initial_pose"/>
+
+	<!-- AMCL -->
+	<node pkg="amcl" type="amcl" name="amcl" output="screen">	
+		<param name="initial_pose_x" value="15.71100"/>
+		<param name="initial_pose_y" value="5.33400"/>
+		<param name="initial_pose_a" value="3.14159"/>
+    
+		<param name="use_map_topic " value="true"/>
+		<param name="transform_tolerance" value="0.2" />
+		<param name="gui_publish_rate" value="10.0"/>
+		<param name="laser_max_beams" value="30"/>
+		<param name="min_particles" value="500"/>
+		<param name="max_particles" value="5000"/>
+		<param name="kld_err" value="0.05"/>
+		<param name="kld_z" value="0.99"/>
+		<param name="update_min_d" value="0.2"/>
+		<param name="update_min_a" value="0.5"/>
+
+		<param name="resample_interval" value="1"/>
+		<param name="transform_tolerance" value="0.1"/>
+		<param name="recovery_alpha_slow" value="0.0"/>
+		<param name="recovery_alpha_fast" value="0.0"/>
+
+		<!-- Laser model parameters -->
+		<param name="laser_model_type" value="likelihood_field"/>
+
+		<param name="laser_z_hit" value="0.5"/>
+		<param name="laser_z_short" value="0.05"/>
+		<param name="laser_z_max" value="0.05"/>
+		<param name="laser_z_rand" value="0.5"/>
+		<param name="laser_sigma_hit" value="0.2"/>
+		<param name="laser_lambda_short" value="0.1"/>
+		<param name="laser_lambda_short" value="0.1"/>
+
+		<param name="laser_model_type" value="beam"/>
+		<param name="laser_likelihood_max_dist" value="2.0"/>
+
+		<!-- Odometry model parameters -->
+		<param name="odom_model_type" value="diff-corrected"/>
+
+		<param name="odom_alpha1" value="0.2"/>
+		<param name="odom_alpha2" value="0.2"/>
+		<param name="odom_alpha3" value="0.8"/>
+		<param name="odom_alpha4" value="0.2"/>
+		
+		<param name="odom_frame_id" value="odom"/>
+		<param name="base_frame_id" value="base_link"/>
+		<param name="global_frame_id" value="map"/>
+	</node>
+
+	<!--- Move Base -->
+	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+		<remap from="/move_base_simple/goal" to="/request/goal"/>
+		<remap from="/cmd_vel" to="/internal/drivers/brainstem/cmd_velocity"/>
+		
+		<rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+		<rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+		<rosparam file="$(find srsnode_navigation)/config/local_costmap_params.yaml" command="load" />
+		<rosparam file="$(find srsnode_navigation)/config/global_costmap_params.yaml" command="load" />
+		<rosparam file="$(find srsnode_navigation)/config/dwa_local_planner_params.yaml" command="load" />
+	</node>
+</launch>

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <launch>
   <node name="sick_tim571_2050101" pkg="sick_tim" type="sick_tim551_2050001" respawn="false" output="screen">
-    <param name="min_ang" type="double" value="-2.35619449019" />
-    <param name="max_ang" type="double" value="2.35619449019" />
+    <param name="min_ang" type="double" value="-1.8326" />
+    <param name="max_ang" type="double" value="1.8326" />
     <param name="intensity" type="bool" value="True" />
     <param name="skip" type="int" value="0" />
     <param name="frame_id" type="str" value="sick_lidar_mount_link" />

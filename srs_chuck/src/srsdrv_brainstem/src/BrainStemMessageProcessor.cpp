@@ -254,7 +254,7 @@ void BrainStemMessageProcessor::SetVelocity( double dfLinear, double dfAngular )
 	if( dfLinear != s_dfLinear ||
 		dfAngular != s_dfAngular )
 	{
-		ROS_DEBUG_NAMED( "velocity", "Brainstem: SetVelocity: %f, %f", dfLinear, dfAngular );
+		ROS_DEBUG_NAMED( "velocity", "Odometry: SetVelocity: %f, %f", dfLinear, dfAngular );
 
 		s_dfLinear = dfLinear;
 		s_dfAngular = dfAngular;

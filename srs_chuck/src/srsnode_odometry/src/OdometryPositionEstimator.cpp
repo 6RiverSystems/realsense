@@ -95,22 +95,19 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
     {
         double r = v / w;
 
-        pose_.x + r * sin(pose_.theta + w * dfTimeDelta) - r * sin(pose_.theta),
-        pose_.y + r * cos(pose_.theta) - r * cos(pose_.theta + w * dfTimeDelta),
-        AngleMath::normalizeAngleRad<>(pose_.theta + w * dfTimeDelta);
+        pose_.x = pose_.x + r * sin(pose_.theta + w * dfTimeDelta) - r * sin(pose_.theta),
+        pose_.y = pose_.y + r * cos(pose_.theta) - r * cos(pose_.theta + w * dfTimeDelta),
+		pose_.theta = AngleMath::normalizeAngleRad<>(pose_.theta + w * dfTimeDelta);
     }
     else
     {
     	pose_ = PoseMath::translate<>(pose_, v * dfTimeDelta, 0.0);
     }
 
-	ROS_DEBUG_THROTTLE_NAMED( 1.0f, "OdomEstimator", "Pose Changed: x=%lf, y=%lf, theta=%lf",
-		pose_.x, pose_.y, pose_.theta * 180.0f / M_PI );
-
 	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( pose_.theta );
 
 	// Publish the TF
-	odom_trans.header.stamp = ros::Time::now( );
+	odom_trans.header.stamp = currentTime;
 	odom_trans.transform.translation.x = pose_.x;
 	odom_trans.transform.translation.y = pose_.y;
 	odom_trans.transform.translation.z = 0.0;
@@ -162,7 +159,7 @@ void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)
     // We should never be falling behind by more than 500ms
     if ( delay > (1.0f / PING_HZ) * MAX_ALLOWED_PING_DELAY)
     {
-        ROS_ERROR_STREAM_NAMED("motion", "Motion ping exceeded allowable delay: " << delay );
+        ROS_ERROR_STREAM( "Motion ping exceeded allowable delay: " << delay );
     }
 }
 

@@ -1,8 +1,10 @@
 # Obstacle cost shapping
 footprint: [[-0.5,-0.3], [-0.5,0.3], [0.5, 0.3], [0.5,-0.3]]
 resolution: 0.10000
-inflation_radius: 3.0
+inflation_radius: 1.0
 cost_scaling_factor: 5.0
+obstacle_range: 10.0
+raytrace_range: 25.0
 
 observation_sources: realsense
 

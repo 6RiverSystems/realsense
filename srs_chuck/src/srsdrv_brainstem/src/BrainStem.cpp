@@ -83,7 +83,7 @@ void BrainStem::OnConnectionChanged( bool bIsConnected )
 
 	m_connectedPublisher.publish( msg );
 
-	if( bIsConnected )
+	if( !bIsConnected )
 	{
 		m_brainstemEmulator.reset( new BrainStemEmulator( ) );
 	}

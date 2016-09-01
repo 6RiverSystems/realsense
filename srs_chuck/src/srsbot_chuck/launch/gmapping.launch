@@ -6,106 +6,33 @@
   *
 -->
 <launch>
- <!-- 
-  *
-  * (c) Copyright 2015-2016 River Systems, all rights reserved.
-  *
-  * This is proprietary software, unauthorized distribution is not permitted.
-  *
--->
-<launch>
     <!-- Declare the parameters passed by the main launch file -->
-    <arg name="robot_configuration" />
-	<!-- <arg name="scan_topic" default="/camera/depth/scan" /> -->
-	<arg name="scan_topic" default="/lidar/scan" />
+    <arg name="robot_configuration" default="" />
+    <arg name="emulation" default="false" />
 
     <!-- Robot description -->
     <param name="robot_description" command="$(find xacro)/xacro.py $(find srsbot_chuck)/urdf/chuck.urdf.xacro" />
 
     <!-- Joint and robot state publishers -->
-    <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
+	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
     <!-- Brainstem Hardware Driver -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
 
-    <!-- Stargazer -->
-    <!-- <include file="$(find srsdrv_stargazer)/launch/driver.launch">
-        <arg name="robot_configuration" value="$(arg robot_configuration)" />
-        <arg name="target_anchors" value="$(arg target_anchors)" />
-    </include> -->
-
-    <!-- Intel Realsense R200 -->
-    <include file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" >
-        <arg name="simulation" value="$(arg emulation)" />
-    </include>
-
     <!-- Sick LIDAR -->
-	<!-- <include file="$(find sick_tim)/launch/sick_tim571_2050101.launch" /> -->
+	<include file="$(find sick_tim)/launch/sick_tim571_2050101.launch" />
 
     <!-- Joystick -->
-    <include file="$(find srsnode_joystick_adapter)/launch/node.launch" /> 
-
-    <!-- Map Server -->
-    <!-- <include file="$(find srsnode_map_server)/launch/node.launch">
-        <arg name="target_map" value="$(arg target_map)" />
-    </include> -->
-    
-    <!-- Map Server -->
-    <node name="map_server" pkg="map_server" type="map_server" args="$(arg target_map)" />
+    <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
 
     <!-- Raw Odometry -->
 	<include file="$(find srsnode_odometry)/launch/node.launch" />
 
     <!-- Navigation Stack -->
 	<include file="$(find srsnode_navigation)/launch/node.launch" />
-
-	<!-- For now remove any other controllling node until we get things working -->
-    <!-- <include file="$(find srsnode_motion)/launch/node.launch">
-        <arg name="emulation" value="$(arg emulation)" />
-    </include> -->
-
-    <!-- <include file="$(find srsnode_midbrain)/launch/node.launch" />
-    <!-- <include file="$(find srsnode_executive)/launch/node.launch" /> -->
-
+ 
     <!-- Launch the ros-bridge -->
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
-
-	<node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
-		<param name="base_frame" value="base_footprint"/>
-		<param name="odom_frame" value="odom"/>
-		<param name="map_update_interval" value="5.0"/>
-		<param name="maxUrange" value="6.0"/>
-		<param name="maxRange" value="8.0"/>
-		<param name="sigma" value="0.05"/>
-		<param name="kernelSize" value="1"/>
-		<param name="lstep" value="0.05"/>
-		<param name="astep" value="0.05"/>
-		<param name="iterations" value="5"/>
-		<param name="lsigma" value="0.075"/>
-		<param name="ogain" value="3.0"/>∂
-		<param name="lskip" value="0"/>
-		<param name="minimumScore" value="100"/>
-		<param name="srr" value="0.01"/>
-		<param name="srt" value="0.02"/>
-		<param name="str" value="0.01"/>
-		<param name="stt" value="0.02"/>
-		<param name="linearUpdate" value="0.5"/>
-		<param name="angularUpdate" value="0.436"/>
-		<param name="temporalUpdate" value="-1.0"/>
-		<param name="resampleThreshold" value="0.5"/>
-		<param name="particles" value="80"/>
-		<param name="xmin" value="-1.0"/>
-		<param name="ymin" value="-1.0"/>
-		<param name="xmax" value="1.0"/>
-		<param name="ymax" value="1.0"/>
-		<param name="delta" value="0.05"/>
-		<param name="llsamplerange" value="0.01"/>
-		<param name="llsamplestep" value="0.01"/>
-		<param name="lasamplerange" value="0.005"/>
-		<param name="lasamplestep" value="0.005"/>
-		<remap from="scan" to="$(arg scan_topic)"/>
-	</node>
 </launch>
- 

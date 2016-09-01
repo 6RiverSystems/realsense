@@ -114,6 +114,8 @@ void SensorFrameHandler::publishOdometry()
 {
     geometry_msgs::TwistStamped message = VelocityMessageFactory::velocity2TwistStamped(
         currentOdometry_.velocity);
+    message.header.stamp = lastRosSensorFrameTime_;
+
     pubOdometry_.publish(message);
 }
 

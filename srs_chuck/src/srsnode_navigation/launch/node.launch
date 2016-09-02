@@ -10,18 +10,16 @@
 	<remap from="/map" to="/internal/state/map/grid"/>
 	<remap from="/initialpose" to="/request/initial_pose"/>
 
-	<!-- Move Base -->
-    <include file="$(find srsnode_navigation)/launch/amcl.launch" />
-
 	<!--- Move Base -->
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 		<remap from="/move_base_simple/goal" to="/request/goal"/>
 		<remap from="/cmd_vel" to="/internal/drivers/brainstem/cmd_velocity"/>
-		
+
+		<rosparam file="$(find srsnode_navigation)/config/move_base_params.yaml" command="load" />
 		<rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
 		<rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
 		<rosparam file="$(find srsnode_navigation)/config/local_costmap_params.yaml" command="load" />
 		<rosparam file="$(find srsnode_navigation)/config/global_costmap_params.yaml" command="load" />
-		<rosparam file="$(find srsnode_navigation)/config/dwa_local_planner_params.yaml" command="load" />
+		<!-- <rosparam file="$(find srsnode_navigation)/config/local_planner_params.yaml" command="load" /> -->
 	</node>
 </launch>

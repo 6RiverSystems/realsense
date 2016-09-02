@@ -39,6 +39,8 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
 
 	SetupCallbacks( );
 
+	OnConnectionChanged( false );
+
 	std::shared_ptr<SerialIO> pSerialIO = std::dynamic_pointer_cast<SerialIO>( m_pSerialIO );
 
 	pSerialIO->EnableCRC( true );

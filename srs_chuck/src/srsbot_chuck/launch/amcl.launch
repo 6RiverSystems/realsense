@@ -6,37 +6,9 @@
   *
 -->
 <launch>
-    <!-- Declare the parameters passed by the main launch file -->
-    <arg name="robot_configuration" default="" />
-    <arg name="emulation" default="false" />
-
-    <!-- Robot description -->
-    <param name="robot_description" command="$(find xacro)/xacro.py $(find srsbot_chuck)/urdf/chuck.urdf.xacro" />
-
-    <!-- Joint and robot state publishers -->
-    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-
-    <!-- Brainstem Hardware Driver -->
-    <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
-
-    <!-- Sick LIDAR -->
-	<include file="$(find sick_tim)/launch/sick_tim571_2050101.launch" />
-
-    <!-- Joystick -->
-    <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
-
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_6rhq_sortwall)/map/6rhq_sortwall.yaml" >
-    	<remap from="map" to="/internal/state/map/grid"/>
-    	<remap from="map_metadata" to="/internal/state/map/info"/>
-    </node>
-
-    <!-- Raw Odometry -->
-	<include file="$(find srsnode_odometry)/launch/node.launch" />
-
-    <!-- Navigation Stack -->
-	<include file="$(find srsnode_navigation)/launch/node.launch" />
+    <!-- Chuck Stack -->
+	<include file="$(find srsbot_chuck)/launch/robot.launch" />
  
-    <!-- Launch the ros-bridge -->
-    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+    <!-- Launch AMCL Localization -->
+	<include file="$(find srsnode_navigation)/launch/amcl.launch" />
 </launch>

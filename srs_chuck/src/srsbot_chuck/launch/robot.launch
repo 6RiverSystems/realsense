@@ -14,18 +14,11 @@
     <param name="robot_description" command="$(find xacro)/xacro.py $(find srsbot_chuck)/urdf/chuck.urdf.xacro" />
 
     <!-- Joint and robot state publishers -->
-	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
     <!-- Brainstem Hardware Driver -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
-
-    <!-- Stargazer -->
-    <!-- <include file="$(find srsdrv_stargazer)/launch/driver.launch">
-        <arg name="robot_configuration" value="$(arg robot_configuration)" />
-        <arg name="target_anchors" value="$(arg target_anchors)" />
-    </include> -->
 
     <!-- Intel Realsense R200 -->
     <!-- <include file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" >
@@ -38,11 +31,6 @@
     <!-- Joystick -->
     <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
 
-    <!-- Map Server -->
-    <!-- <include file="$(find srsnode_map_server)/launch/node.launch">
-        <arg name="target_map" value="$(arg target_map)" />
-    </include>-->
-
     <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_6rhq_sortwall)/map/6rhq_sortwall.yaml" >
     	<remap from="map" to="/internal/state/map/grid"/>
     	<remap from="map_metadata" to="/internal/state/map/info"/>
@@ -53,15 +41,6 @@
 
     <!-- Navigation Stack -->
 	<include file="$(find srsnode_navigation)/launch/node.launch" />
-
-	<!-- For now remove any other controllling node until we get things working -->
-    <!-- <include file="$(find srsnode_motion)/launch/node.launch">
-        <arg name="emulation" value="$(arg emulation)" />
-    </include>
-
-    <include file="$(find srsnode_midbrain)/launch/node.launch" />
-    <include file="$(find srsnode_executive)/launch/node.launch" />
- 	-->
  
     <!-- Launch the ros-bridge -->
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />

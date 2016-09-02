@@ -1,37 +1,3 @@
-TrajectoryPlannerROS:
-  max_vel_x: 1.6
-  min_vel_x: 0.1
-  max_vel_theta: 0.7
-  min_vel_theta: -0.7
-  min_in_place_vel_theta: 0.4   
-  max_rotational_vel: 0.2
-  min_in_place_rotational_vel: 0.2
-  acc_lim_theta: 1.0
-  acc_lim_x: 1.0
-  acc_lim_y: 0.0
-  pdist_scale: 0.8
-  gdist_scale: 0.2
-  yaw_goal_tolerance: 0.3
-  xy_goal_tolerance: 0.10
-  escape_vel: -0.01
-  dwa: true
-  holonomic_robot: false
-  meter_scoring: true
-
-EBandPlannerROS:
-  differential_drive: true
-
-  # velocity limits
-  max_vel_lin: 1.0
-  min_vel_lin: 0.1
-  max_vel_th: 0.7
-  min_vel_th: 0.1
-  max_acceleration: 1.0
-
-  # goal tolerance
-  yaw_goal_tolerance: 0.3
-  xy_goal_tolerance: 0.1
-
 DWAPlannerROS:
   max_vel_x: 1.6
   min_vel_x: 0.1
@@ -51,26 +17,26 @@ DWAPlannerROS:
 # Goal Tolerance Parameters
   yaw_goal_tolerance: 0.3
   xy_goal_tolerance: 0.10
-  latch_xy_goal_tolerance: false
+#  latch_xy_goal_tolerance: false
 
 # Forward Simulation Parameters
-  sim_time: 1.7
-  sim_granularity: 0.025
-  vx_samples: 15
-  vtheta_samples: 20
-  meter_scoring: true
+#  sim_time: 1.0
+#  sim_granularity: 0.025
+#  vx_samples: 8
+#  vtheta_samples: 10
+#  meter_scoring: true
 
 # Trajectory Scoring Parameters
-  path_distance_bias: 100.0     # weighting for how much it should stick to the global path plan
-  goal_distance_bias: 24.0      # wighting for how much it should attempt to reach its goal
-  occdist_scale: 0.05           # weighting for how much the controller should avoid obstacles
-  forward_point_distance: 0.0   # how far along to place an additional scoring point
-  stop_time_buffer: 0.2         # amount of time a robot must stop in before colliding for a valid traj.
-  scaling_speed: 0.0            # absolute velocity at which to start scaling the robot's footprint
-  max_scaling_factor: 0.0       # how much to scale the robot's footprint when at speed.
+#  path_distance_bias: 100.0     # weighting for how much it should stick to the global path plan
+#  goal_distance_bias: 24.0      # wighting for how much it should attempt to reach its goal
+#  occdist_scale: 0.05           # weighting for how much the controller should avoid obstacles
+#  forward_point_distance: 0.0   # how far along to place an additional scoring point
+#  stop_time_buffer: 0.2         # amount of time a robot must stop in before colliding for a valid traj.
+#  scaling_speed: 0.0            # absolute velocity at which to start scaling the robot's footprint
+#  max_scaling_factor: 0.0       # how much to scale the robot's footprint when at speed.
 
 # Oscillation Prevention Parameters
-  oscillation_reset_dist: 0.05  # how far to travel before resetting oscillation flags
+#  oscillation_reset_dist: 0.05  # how far to travel before resetting oscillation flags
 
 # Debugging
   publish_traj_pc : true

@@ -42,7 +42,6 @@
 		<param name="laser_lambda_short" value="0.1"/>
 		<param name="laser_lambda_short" value="0.1"/>
 
-		<param name="laser_model_type" value="beam"/>
 		<param name="laser_likelihood_max_dist" value="2.0"/>
 
 		<!-- Odometry model parameters -->

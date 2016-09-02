@@ -48,9 +48,6 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="srs_chuck.null.1561350677" name="srs_chuck"/>
 	</storageModule>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Default">
@@ -84,5 +81,14 @@
 				<runAllBuilders>false</runAllBuilders>
 			</target>
 		</buildTargets>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.2034195475;cdt.managedbuild.toolchain.gnu.cross.base.2034195475.907328062;cdt.managedbuild.tool.gnu.cross.cpp.compiler.892439493;cdt.managedbuild.tool.gnu.cpp.compiler.input.886218490">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.2034195475;cdt.managedbuild.toolchain.gnu.cross.base.2034195475.907328062;cdt.managedbuild.tool.gnu.cross.c.compiler.1892950261;cdt.managedbuild.tool.gnu.c.compiler.input.769531694">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>

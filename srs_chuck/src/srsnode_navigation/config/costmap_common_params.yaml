@@ -3,8 +3,9 @@ footprint: [[-0.5,-0.3], [-0.5,0.3], [0.5, 0.3], [0.5,-0.3]]
 resolution: 0.10000
 inflation_radius: 0.55
 cost_scaling_factor: 2.0
-obstacle_range: 3.5
-raytrace_range: 4.0
+obstacle_range: 3.0
+raytrace_range: 8.0
+
 transform_tolerance: 0.25
 
 observation_sources: realsense

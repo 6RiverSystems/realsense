@@ -6,9 +6,13 @@
   *
 -->
 <launch>
+	<remap from="/map" to="/internal/state/map/grid"/>
+
 	<!-- Fixed /odom frame to /map frame TF -->
 	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
 
     <!-- Chuck Stack -->
 	<include file="$(find srsbot_chuck)/launch/robot.launch" />
+	
+	<node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" args="/lidar/scan" />
 </launch>

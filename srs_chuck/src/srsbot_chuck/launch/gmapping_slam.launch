@@ -6,15 +6,44 @@
   *
 -->
 <launch>
-	<remap from="/map" to="/internal/state/map/grid"/>
+	<remap from="map" to="/internal/state/map/grid"/>
+	<remap from="map_metadata" to="/internal/state/map/info"/>
 
     <!-- Chuck Stack -->
 	<include file="$(find srsbot_chuck)/launch/robot.launch" />
 	
-	<node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" args="/lidar/scan"/>
-		
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_6rhq_sortwall)/map/6rhq_sortwall.yaml" >
-    	<remap from="map" to="/internal/state/map/grid"/>
-    	<remap from="map_metadata" to="/internal/state/map/info"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_6rhq_sortwall)/map/6rhq_sortwall.yaml" />
+
+	<!-- Chuck Stack -->
+	<node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" args="/lidar/scan">
+      <remap from="scan" to="/lidar/scan"/>
+      <param name="map_update_interval" value="0.5"/>
+      <param name="maxUrange" value="16.0"/>
+      <param name="sigma" value="0.05"/>
+      <param name="kernelSize" value="1"/>
+      <param name="lstep" value="0.05"/>
+      <param name="astep" value="0.05"/>
+      <param name="iterations" value="5"/>
+      <param name="lsigma" value="0.075"/>
+      <param name="ogain" value="3.0"/>
+      <param name="lskip" value="0"/>
+      <param name="srr" value="0.1"/>
+      <param name="srt" value="0.2"/>
+      <param name="str" value="0.1"/>
+      <param name="stt" value="0.2"/>
+      <param name="linearUpdate" value="1.0"/>
+      <param name="angularUpdate" value="0.5"/>
+      <param name="temporalUpdate" value="3.0"/>
+      <param name="resampleThreshold" value="0.5"/>
+      <param name="particles" value="10"/>
+      <param name="xmin" value="-50.0"/>
+      <param name="ymin" value="-50.0"/>
+      <param name="xmax" value="50.0"/>
+      <param name="ymax" value="50.0"/>
+      <param name="delta" value="0.1"/>
+      <param name="llsamplerange" value="0.01"/>
+      <param name="llsamplestep" value="0.01"/>
+      <param name="lasamplerange" value="0.005"/>
+      <param name="lasamplestep" value="0.005"/>
     </node>
 </launch>

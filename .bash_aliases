@@ -11,7 +11,9 @@ function getChuckDirectory() {
   fi
 
   logFile="$baseDirectory/log/ros.log"
+}
 
+function printInfo() {
   echo -e "${BLUE}*************************************************************"
   echo -e "${BLUE}*** ${YELLOW}ENV: $ENV"
   echo -e "${BLUE}*** ${YELLOW}ROS directory: $baseDirectory"
@@ -22,6 +24,7 @@ function getChuckDirectory() {
 
 function updateChuck() {
   getChuckDirectory &&
+  printInfo &&
 
   pushd "$baseDirectory" &&
   git pull --rebase &&
@@ -32,6 +35,8 @@ function buildChuck() {
   source /opt/ros/indigo/setup.bash
 
   getChuckDirectory &&
+  printInfo &&
+
   pushd "$baseDirectory/srs_chuck" &&
   catkin_make &&
   source devel/setup.bash &&
@@ -40,7 +45,7 @@ function buildChuck() {
   catkin_make &&
   source devel/setup.bash &&
 
-  source ~/ros/srs_sites/devel/setup.bash
+  source "$baseDirectory/srs_sites/devel/setup.bash"
 
   popd
 }
@@ -64,6 +69,7 @@ function runChuck() {
 
 function cleanChuck() {
   getChuckDirectory &&
+  printInfo &&
 
   source /opt/ros/indigo/setup.bash
   pushd "$baseDirectory/srs_chuck" &&

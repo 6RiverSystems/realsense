@@ -73,5 +73,6 @@
 
 	<!-- SICK Lidar -->
 	<xacro:property name="lidar_x_offset" value="0.4600448" />
+	<xacro:property name="lidar_z_offset" value="0.3175" />
     
 </robot>

@@ -1,0 +1,20 @@
+<!-- 
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+<launch>
+	<remap from="/map" to="/internal/state/map/grid"/>
+
+    <!-- Chuck Stack -->
+	<include file="$(find srsbot_chuck)/launch/robot.launch" />
+	
+	<node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" args="/lidar/scan"/>
+		
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_6rhq_sortwall)/map/6rhq_sortwall.yaml" >
+    	<remap from="map" to="/internal/state/map/grid"/>
+    	<remap from="map_metadata" to="/internal/state/map/info"/>
+    </node>
+</launch>

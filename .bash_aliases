@@ -64,7 +64,7 @@ function runChuck() {
   echo -e "${BLUE}*************************************************************"
   echo -e "${NC}"
 
-  stdbuf -i0 -o0 -e0 roslaunch --pid=/tmp/mfp-ros.pid "srsc_$ROS_MAP" map.launch 2>&1 | tee $logFile
+  stdbuf -i0 -o0 -e0 roslaunch --pid=/tmp/mfp-ros.pid srsbot_chuck amcl.launch 2>&1 | tee $logFile
 }
 
 function cleanChuck() {

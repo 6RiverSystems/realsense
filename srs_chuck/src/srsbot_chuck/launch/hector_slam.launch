@@ -11,6 +11,7 @@
     <!-- Chuck Stack -->
 	<include file="$(find srsbot_chuck)/launch/robot.launch" />
   
+    <!-- Connect the odom to the base footprint -->
   	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /odom /base_footprint 100" />
   
     <!-- Launch AMCL Localization -->

@@ -15,5 +15,6 @@
     <!-- Chuck Stack -->
 	<include file="$(find srsbot_chuck)/launch/robot.launch" />
 	
-	<node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" args="/lidar/scan" />
+    <!-- GMapping -->
+	<include file="$(find srsnode_localization)/launch/gmapping.launch" />
 </launch>

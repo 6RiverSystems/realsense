@@ -10,7 +10,7 @@
 	<include file="$(find srsbot_chuck)/launch/robot.launch" />
  
     <!-- Launch AMCL Localization -->
-	<include file="$(find srsnode_navigation)/launch/amcl.launch" />
+	<include file="$(find srsnode_localization)/launch/amcl.launch" />
 	
     <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_6rhq_sortwall)/map/6rhq_sortwall.yaml" >
     	<remap from="map" to="/internal/state/map/grid"/>

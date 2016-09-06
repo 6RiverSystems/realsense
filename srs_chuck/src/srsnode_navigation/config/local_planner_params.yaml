@@ -1,42 +1,42 @@
 DWAPlannerROS:
   max_vel_x: 1.6
-  min_vel_x: 0.1
+  min_vel_x: 0.0
 
   max_trans_vel: 1.6
   min_trans_vel: 0.1
-  trans_stopped_vel: 0.01
+  trans_stopped_vel: 0.1
 
-  max_rot_vel: 1.0
-  min_rot_vel: 0.4
-  rot_stopped_vel: 0.65
+  max_rot_vel: 1.6
+  min_rot_vel: 0.0
+  rot_stopped_vel: 1.0
   
-  acc_lim_x: 1.00
-  acc_lim_theta: 0.700
-  acc_limit_trans: 0.65
+  acc_lim_x: 2.00
+  acc_lim_theta: 2.00
+  acc_limit_trans: 2.00
 
 # Goal Tolerance Parameters
   yaw_goal_tolerance: 0.3
   xy_goal_tolerance: 0.10
-#  latch_xy_goal_tolerance: false
 
 # Forward Simulation Parameters
-#  sim_time: 1.0
-#  sim_granularity: 0.025
-#  vx_samples: 8
-#  vtheta_samples: 10
-#  meter_scoring: true
+  sim_time: 2.0
+  sim_granularity: 0.025
+  vx_samples: 15
+  vtheta_samples: 20
+  meter_scoring: true
 
 # Trajectory Scoring Parameters
-#  path_distance_bias: 100.0     # weighting for how much it should stick to the global path plan
-#  goal_distance_bias: 24.0      # wighting for how much it should attempt to reach its goal
-#  occdist_scale: 0.05           # weighting for how much the controller should avoid obstacles
-#  forward_point_distance: 0.0   # how far along to place an additional scoring point
-#  stop_time_buffer: 0.2         # amount of time a robot must stop in before colliding for a valid traj.
-#  scaling_speed: 0.0            # absolute velocity at which to start scaling the robot's footprint
-#  max_scaling_factor: 0.0       # how much to scale the robot's footprint when at speed.
+  path_distance_bias: 32.0      # weighting for how much it should stick to the global path plan
+  goal_distance_bias: 16.0      # wighting for how much it should attempt to reach its goal
+  occdist_scale: 0.01           # weighting for how much the controller should avoid obstacles
+  forward_point_distance: 0.325 # how far along to place an additional scoring point
+  stop_time_buffer: 0.2         # amount of time a robot must stop in before colliding for a valid traj.
+  scaling_speed: 0.25           # absolute velocity at which to start scaling the robot's footprint
+  max_scaling_factor: 0.2       # how much to scale the robot's footprint when at speed.
 
 # Oscillation Prevention Parameters
-#  oscillation_reset_dist: 0.05  # how far to travel before resetting oscillation flags
+  oscillation_reset_dist: 0.05  # how far to travel before resetting oscillation flags
+  oscillation_reset_angle: 0.2  # how far to turn before resetting oscillation flags
 
 # Debugging
   publish_traj_pc : true
@@ -47,5 +47,4 @@ DWAPlannerROS:
   max_vel_y: 0.0
   min_vel_y: 0.0
   acc_lim_y: 0.0
-  vy_samples: 1
-  
+  vy_samples: 0

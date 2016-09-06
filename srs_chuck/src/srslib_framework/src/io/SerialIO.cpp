@@ -426,8 +426,8 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				{
 					if( messageData[0] == '<' )
 					{
-//						ROS_DEBUG_STREAM_NAMED( m_strDebug, "ReadData: " <<
-//							ToHex( std::vector<char>( messageData.begin( ), messageData.end( ) ) ) );
+						ROS_DEBUG_STREAM_NAMED( m_strDebug, "ReadData: " <<
+							ToHex( std::vector<char>( messageData.begin( ), messageData.end( ) ) ) );
 
 						m_cCRC = 0;
 					}

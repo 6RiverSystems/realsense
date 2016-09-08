@@ -112,17 +112,17 @@ void SensorFrameHandler::receiveData(ros::Time currentTime, vector<char>& buffer
 
     static uint32_t s_leftWheelCount = sensorData->left_wheel_count;
     static uint32_t s_rightWheelCount = sensorData->right_wheel_count;
-
-    static int64_t s_leftWheelTotalCount = 0;
-    static int64_t s_rightWheeTotallCount = 0;
+//
+//    static int64_t s_leftWheelTotalCount = 0;
+//    static int64_t s_rightWheeTotallCount = 0;
 
     int32_t s_leftWheelDiff = calculateOdometryDiff(sensorData->left_wheel_count, s_leftWheelCount);
     int32_t s_rightWheelDiff = calculateOdometryDiff(sensorData->right_wheel_count, s_rightWheelCount);
 
-    s_leftWheelTotalCount += s_leftWheelDiff;
-    s_rightWheeTotallCount += s_rightWheelDiff;
+//    s_leftWheelTotalCount += s_leftWheelDiff;
+//    s_rightWheeTotallCount += s_rightWheelDiff;
 
-    ROS_ERROR( "Left Wheel: %lld, Right Wheel: %lld", s_leftWheelTotalCount, s_rightWheeTotallCount );
+    ROS_ERROR( "%d, %d", s_leftWheelDiff, s_rightWheelDiff );
 
     // Store the time for the next sensor frame
     lastRosSensorFrameTime_ = internalTime;

@@ -122,7 +122,7 @@ void SensorFrameHandler::receiveData(ros::Time currentTime, vector<char>& buffer
 //    s_leftWheelTotalCount += s_leftWheelDiff;
 //    s_rightWheeTotallCount += s_rightWheelDiff;
 
-    ROS_ERROR( "%d, %d", s_leftWheelDiff, s_rightWheelDiff );
+//    ROS_ERROR( "%d, %d", s_leftWheelDiff, s_rightWheelDiff );
 
     // Store the time for the next sensor frame
     lastRosSensorFrameTime_ = internalTime;

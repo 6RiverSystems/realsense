@@ -41,6 +41,8 @@ private:
         uint32_t timestamp;
         float linear_velocity;
         float angular_velocity;
+        uint32_t left_wheel_count;
+        uint32_t right_wheel_count;
         float yaw;
         float pitch;
         float roll;

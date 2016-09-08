@@ -37,6 +37,38 @@ SensorFrameHandler::SensorFrameHandler() :
         TOPIC_SENSOR_FRAME, 100);
 }
 
+int32_t calculateOdometryDiff(uint32_t current, uint32_t& last)
+{
+	int32_t diff = current - last;
+	bool dir = true;
+
+	// Determine direction and delta from previous count
+	if(current >= last)
+	{
+		dir = true;
+		diff = current - last;
+	}
+	else
+	{
+		dir = false;
+		diff = last - current;
+	}
+
+	// Fix for quadrature rollover
+	if (diff > (1<<15) )
+	{
+		// Invert Direction
+		dir = dir == true ? false : true;
+
+		// adjust movement
+		diff = (1<<16)-diff;
+	}
+
+	last = current;
+
+	return dir ? diff : -diff;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SensorFrameHandler::receiveData(ros::Time currentTime, vector<char>& buffer)
 {
@@ -77,6 +109,20 @@ void SensorFrameHandler::receiveData(ros::Time currentTime, vector<char>& buffer
 
         internalTime = lastRosSensorFrameTime_+ ros::Duration(deltaTimeSlice);
     }
+
+    static uint32_t s_leftWheelCount = sensorData->left_wheel_count;
+    static uint32_t s_rightWheelCount = sensorData->right_wheel_count;
+
+    static int64_t s_leftWheelTotalCount = 0;
+    static int64_t s_rightWheeTotallCount = 0;
+
+    int32_t s_leftWheelDiff = calculateOdometryDiff(sensorData->left_wheel_count, s_leftWheelCount);
+    int32_t s_rightWheelDiff = calculateOdometryDiff(sensorData->right_wheel_count, s_rightWheelCount);
+
+    s_leftWheelTotalCount += s_leftWheelDiff;
+    s_rightWheeTotallCount += s_rightWheelDiff;
+
+    ROS_ERROR( "Left Wheel: %lld, Right Wheel: %lld", s_leftWheelTotalCount, s_rightWheeTotallCount );
 
     // Store the time for the next sensor frame
     lastRosSensorFrameTime_ = internalTime;

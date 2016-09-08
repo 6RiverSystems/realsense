@@ -19,7 +19,7 @@ DWAPlannerROS:
   xy_goal_tolerance: 0.10
 
 # Forward Simulation Parameters
-  sim_time: 2.0
+  sim_time: 1.7
   sim_granularity: 0.025
   vx_samples: 15
   vtheta_samples: 20

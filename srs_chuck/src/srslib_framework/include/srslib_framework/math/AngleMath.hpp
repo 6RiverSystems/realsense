@@ -46,6 +46,16 @@ struct AngleMath
         return deg < 0 ? 360 - (abs(deg) % 360) : deg % 360;
     }
 
+    inline static double normalizeRad2Deg(double rad)
+    {
+        return AngleMath::normalizeAngleDeg<double>(AngleMath::rad2deg<double>(rad));
+    }
+
+    inline static double normalizeDeg2Rad(double deg)
+    {
+        return AngleMath::normalizeAngleRad(AngleMath::deg2rad<double>(deg));
+    }
+
     inline static double normalizeRad2Deg90(double rad)
     {
         double angle = AngleMath::rad2deg<double>(rad);

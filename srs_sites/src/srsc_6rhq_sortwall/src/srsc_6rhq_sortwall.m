@@ -8,7 +8,9 @@ map = mm_create(20, 13, 0.1);
 
 % map = mm_addCustomBorder(map, 1.833, 1.339, 19.521, 9.264, 0.4);
 % tweaking size of white space to make room for sort-wall
-map = mm_addCustomBorder(map, 1.833, 1.339, 19.521, 12.264, 0.4);
+% map = mm_addCustomBorder(map, 1.833, 1.339, 19.521, 12.264, 0.4);
+map = mm_addCustomBorder(map, 1.600, 1.000, 19.521, 12.264, 0.4);
+
 
 % Obstacle Rack 1-2
 map = mm_addStaticObstacle(map, 6.253, 3.168, 16.692, 4.387, 0.7);

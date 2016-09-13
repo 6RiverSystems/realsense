@@ -4,5 +4,5 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 anchors:
-    - {id: "52", location: [6.08656, 5.11153, 6.2217396], orientation: 89.69 }
-    - {id: "98", location: [16.50544, 5.10973, 6.2217396], orientation: 90.52 }
+    - {id: "52", location: [6.07603, 5.09756, 6.2217396], orientation: 91.12 } 
+    - {id: "98", location: [16.49499, 5.11486, 6.2217396], orientation: 91.35 }

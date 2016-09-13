@@ -11,7 +11,7 @@ DWAPlannerROS:
   rot_stopped_vel: 1.0
   
   acc_lim_x: 4.0
-  acc_lim_theta: 4.0
+  acc_lim_theta: 5.0
   acc_limit_trans: 4.0
 
 # Goal Tolerance Parameters

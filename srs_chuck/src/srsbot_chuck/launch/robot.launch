@@ -21,9 +21,9 @@
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
 
     <!-- Intel Realsense R200 -->
-    <!-- <include file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" >
+    <include file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" >
         <arg name="simulation" value="$(arg emulation)" />
-    </include> -->
+    </include>
 
     <!-- Sick LIDAR -->
 	<include file="$(find sick_tim)/launch/sick_tim571_2050101.launch" />

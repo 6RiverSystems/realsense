@@ -15,5 +15,5 @@
   	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /odom /base_footprint 100" />
   
     <!-- Launch AMCL Localization -->
-	<include file="$(find srsnode_navigation)/launch/hector_mapping.launch" />
+	<include file="$(find srsnode_localization)/launch/hector_mapping.launch" />
 </launch>

@@ -104,7 +104,8 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
     	pose_ = PoseMath::translate<>(pose_, v * dfTimeDelta, 0.0);
     }
 
-//	ROS_ERROR_THROTTLE( 1.0, "Pose: x=%f, y=%f, angle:%f", pose_.x, pose_.y, pose_.theta );
+	ROS_ERROR_THROTTLE( 1.0, "Pose: %f, %f", pose_.x, pose_.y );
+	ROS_ERROR_THROTTLE( 1.0, "Pose: x=%f, y=%f, angle:%f", pose_.x, pose_.y, pose_.theta );
 
 	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( pose_.theta );
 

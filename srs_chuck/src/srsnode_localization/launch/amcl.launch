@@ -6,11 +6,14 @@
   *
 -->
 <launch>
-	<remap from="/scan" to="/lidar/scan"/>
+	<remap from="/scan" to="/internal/sensors/lidar/scan/filtered"/>
 	<remap from="/map" to="/internal/state/map/grid"/>
 	<remap from="/initialpose" to="/request/initial_pose"/>
 
 	<node pkg="amcl" type="amcl" name="amcl" output="screen">	
+		<param name="initial_pose_x " value="15.71100"/>
+		<param name="initial_pose_y " value="5.33400"/>
+		<param name="initial_pose_a " value="3.14159"/>
 		<param name="use_map_topic " value="true"/>
 		<param name="first_map_only " value="true"/>
 		<param name="transform_tolerance" value="0.2" />

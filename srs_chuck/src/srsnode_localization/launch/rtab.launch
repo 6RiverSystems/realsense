@@ -17,11 +17,11 @@
 			<param name="subscribe_scan" type="bool" value="true"/>
 			
 			<remap from="odom" to="/internal/sensors/odometry/velocity"/>  
-			<remap from="scan" to="/lidar/scan"/>
-			
-			<remap from="rgb/image" to="/camera/rgb/image_rect_color"/>
+			<remap from="scan" to="/internal/sensors/lidar/scan/filtered"/>
+
+			<remap from="rgb/image" to="/camera/color/image_rect_color"/>
 			<remap from="depth/image" to="/camera/depth_registered/image_raw"/>
-			<remap from="rgb/camera_info" to="/camera/rgb/camera_info"/>
+			<remap from="rgb/camera_info" to="/camera/color/camera_info"/>
 			
 			<param name="queue_size" type="int" value="10"/>
 			

@@ -33,9 +33,6 @@ public:
 
 	void OnButtonEvent( LED_ENTITIES eButtonId );
 
-	void OnHardwareInfo( uint32_t uniqueId[4], uint8_t chassisGeneration, uint8_t brainstemHwVersion,
-		const std::string& strBrainstemSwVersion );
-
 	void OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_DATA& motionStatus,
 		const FAILURE_STATUS_DATA& failureStatus );
 
@@ -63,8 +60,6 @@ private:
 
 	static constexpr auto REFRESH_RATE_HZ = 100;
 
-	static constexpr auto HARDWARE_INFO_TOPIC = "/info/hardware";
-
 	static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/operational_state";
 
 	static constexpr auto VOLTAGE_TOPIC = "/info/voltage";
@@ -91,8 +86,6 @@ private:
 	ros::Subscriber				m_velocitySubscriber;
 
 	ros::Publisher				m_llEventPublisher;
-
-	ros::Publisher				m_hardwareInfoPublisher;
 
 	ros::Publisher				m_operationalStatePublisher;
 

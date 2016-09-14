@@ -12,14 +12,16 @@ using namespace std;
 #include <srslib_framework/robotics/Odometry.hpp>
 #include <srslib_framework/robotics/Imu.hpp>
 
+#include <srsdrv_brainstem/BrainStemMessages.h>
 #include <srsdrv_brainstem/hw_message/BrainstemMessageHandler.hpp>
+#include <srsdrv_brainstem/BrainStemMessages.h>
 
 namespace srs {
 
 class SensorFrameHandler : public BrainstemMessageHandler
 {
 public:
-    static constexpr char SENSOR_FRAME_KEY = 0x4F; // 'O'
+    static constexpr char SENSOR_FRAME_KEY = static_cast<char>(BRAIN_STEM_MSG::SENSOR_FRAME);
 
     static const string TOPIC_ODOMETRY;
     static const string TOPIC_IMU;

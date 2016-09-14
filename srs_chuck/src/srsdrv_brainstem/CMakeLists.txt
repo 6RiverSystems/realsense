@@ -11,6 +11,7 @@ set(${PROJECT_NAME}_SOURCES
     src/BrainStemMessageProcessor.cpp
     src/BrainStem.cpp
     src/hw_message/SensorFrameHandler.cpp
+    src/hw_message/HardwareInfoHandler.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES

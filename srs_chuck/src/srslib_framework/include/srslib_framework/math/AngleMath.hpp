@@ -46,6 +46,12 @@ struct AngleMath
         return deg < 0 ? 360 - (abs(deg) % 360) : deg % 360;
     }
 
+    template<typename TYPE = double>
+    inline static TYPE normalizeDeg2Rad(double deg)
+    {
+        return AngleMath::normalizeRad<TYPE>(AngleMath::deg2Rad<TYPE>(deg));
+    }
+
     /**
      * @brief Normalize the specified angle to a [-pi, pi) range.
      *

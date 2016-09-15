@@ -95,7 +95,7 @@ bool StarGazerPointTransformer::Load( const std::string& strTargetFrame,
 
 tf::Quaternion StarGazerPointTransformer::ConvertAngle( double fLeftHandAngleInDegrees ) const
 {
-	double dfLeftHandAngleInRadians = AngleMath::deg2rad( fLeftHandAngleInDegrees );
+	double dfLeftHandAngleInRadians = AngleMath::deg2Rad( fLeftHandAngleInDegrees );
 
 	// Transform to map coordinate system (right hand rule)
 	return tf::createQuaternionFromYaw( ConvertToRightHandRule( dfLeftHandAngleInRadians ) );
@@ -168,7 +168,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 			double dfAnchorGlobal = tf::getYaw(anchorGlobal.getRotation( ) );
 			double dfTotalCameraRotation = tf::getYaw( totalCameraRotation );
-			double dfMapRotation = AngleMath::normalizeAngleRad( dfAnchorGlobal + dfTotalCameraRotation );
+			double dfMapRotation = AngleMath::normalizeRad<double>(dfAnchorGlobal + dfTotalCameraRotation);
 
 			tf::Quaternion chuckOrientation( tf::createQuaternionFromYaw( dfMapRotation ) );
 			pose = tf::Pose( chuckOrientation, chuckOrigin);

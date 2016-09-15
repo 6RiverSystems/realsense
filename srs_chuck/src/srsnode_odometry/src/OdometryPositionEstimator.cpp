@@ -97,7 +97,7 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
 
         pose_.x = pose_.x + r * sin(pose_.theta + w * dfTimeDelta) - r * sin(pose_.theta),
         pose_.y = pose_.y + r * cos(pose_.theta) - r * cos(pose_.theta + w * dfTimeDelta),
-		pose_.theta = AngleMath::normalizeAngleRad<>(pose_.theta + w * dfTimeDelta);
+        pose_.theta = AngleMath::normalizeRad<double>(pose_.theta + w * dfTimeDelta);
     }
     else
     {

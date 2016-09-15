@@ -181,7 +181,7 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
         message.header = msg.header;
         message.x = msg.pose.position.x;
         message.y = msg.pose.position.y;
-        message.theta = AngleMath::rad2deg<double>(tf::getYaw(msg.pose.orientation));
+        message.theta = AngleMath::rad2Deg<double>(tf::getYaw(msg.pose.orientation));
 
         m_rosApsPublisher.publish(message);
     }

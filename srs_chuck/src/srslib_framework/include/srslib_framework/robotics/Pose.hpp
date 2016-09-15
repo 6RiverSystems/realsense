@@ -60,7 +60,7 @@ struct Pose : public Object
 
     BaseType getThetaDegrees()
     {
-        return AngleMath::rad2deg<TYPE>(theta);
+        return AngleMath::rad2Deg<TYPE>(theta);
     }
 
     bool isValid()
@@ -81,7 +81,7 @@ struct Pose : public Object
 
     void setThetaDegrees(BaseType deg)
     {
-        theta = AngleMath::deg2rad<TYPE>(deg);
+        theta = AngleMath::deg2Rad<TYPE>(deg);
     }
 
     double arrivalTime;

@@ -8,7 +8,7 @@
 
 #include <srslib_framework/math/MeasurementMath.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
-#include <srslib_framework/robotics/RobotProfile.hpp>
+#include <srslib_framework/robotics/robot/RobotProfile.hpp>
 
 namespace srs {
 
@@ -30,11 +30,12 @@ struct Chuck : RobotProfile
         manualMaxAngularVelocity = 0.40; // [rad/s]
         manualMaxLinearVelocity = 0.400; // [m/s]
 
-        physicalMaxAngularAcceleration = AngleMath::deg2rad<double>(150.0); // 2.618 [rad/s^2]
-        physicalMaxAngularVelocity = AngleMath::deg2rad<double>(555.0); // 9.687 [rad/s]
+        physicalMaxAngularAcceleration = AngleMath::deg2Rad<double>(150.0); // 2.618 [rad/s^2]
+        physicalMaxAngularVelocity = AngleMath::deg2Rad<double>(555.0); // 9.687 [rad/s]
         physicalMaxLinearAcceleration = 0.700; // [m/s^2]
         physicalMaxLinearVelocity = 2.600; // [m/s]
-        physicalMinAngularVelocity = AngleMath::deg2rad<double>(0.05); // 0.0008 [rad/s]
+        physicalMinAngularVelocity = AngleMath::deg2Rad<double>(0.05); // 0.0008 [rad/s]
+        physicalMinDistanceToGoal = 0.005; // [m]
         physicalMinLinearVelocity = 0.005; // [m/s]
 
         pathFollowAdaptiveLookAhead = false;
@@ -44,7 +45,7 @@ struct Chuck : RobotProfile
         pathFollowLandingDepth = 1.0; // [m]
         pathFollowLandingWidth = 1.0; // [m]
         pathFollowLinearAcceleration =  0.250; // [m/s^2]
-        pathFollowMaxAngularVelocity = AngleMath::deg2rad<double>(40); // 0.7000 [rad/s]
+        pathFollowMaxAngularVelocity = AngleMath::deg2Rad<double>(40); // 0.7000 [rad/s]
         pathFollowMaxLinearVelocity = 1.000; // [m]
         pathFollowMaxLookAheadDistance = 1.100; // [m]
         pathFollowMinLinearVelocity = 0.010; // [m/s]
@@ -54,17 +55,18 @@ struct Chuck : RobotProfile
         pathFollowTurningZoneRadius = 0.500; // [m]
         pathFollowZeroLookAheadDistance = 0.800; // [m]
 
-        rotationGoalReachedAngle = AngleMath::deg2rad<double>(1.0); // 0.0175 [rad]
+        rotationGoalReachedAngle = AngleMath::deg2Rad<double>(1.0); // 0.0175 [rad]
         rotationKd = 0.0; // []
         rotationKi = 0.0; // []
         rotationKp = 2.25; // []
         rotationKv = 1.0; // []
         rotationKw = 1.0; // []
-        rotationMinAngularVelocity = AngleMath::deg2rad<double>(0.05); // 0.0008 [rad/s]
-        rotationRotationVelocity = AngleMath::deg2rad<double>(40.0); // 0.7 [rad/s]
+        rotationMinAngularVelocity = AngleMath::deg2Rad<double>(0.05); // 0.0008 [rad/s]
+        rotationRotationVelocity = AngleMath::deg2Rad<double>(40.0); // 0.7 [rad/s]
 
         stopMinLinearVelocity = 0.010; // [m/s]
         stopNormalDeceleration = 0.650; // [m/s^2]
+        singleCommandMode = false;
 
         wheelDiameter = MeasurementMath::inch2m<double>(8.000); // 0.203 [m]
         wheelDistance = MeasurementMath::inch2m<double>(20.915); // 0.531 [m]

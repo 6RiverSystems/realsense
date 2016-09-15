@@ -29,7 +29,7 @@ using namespace std;
 
 using namespace srs;
 
-TEST(Test_Trajectory, BarrettLongTrajectory)
+TEST(Test_Solution, Barrett_LongSolution)
 {
     Map* map = test::MapUtils::mapFactory("/tmp/srslib_framework/data/barrett.yaml");
 
@@ -40,5 +40,5 @@ TEST(Test_Trajectory, BarrettLongTrajectory)
 
     Pose<> robotPose = Pose<>(14.7855, 4.65954, 1.53943);
     Pose<> goalPose = Pose<>(33.215, 51.703, 1.5708);
-    Solution<GridSolutionItem>* solution = test::PathPlanningUtils::pose2Solution(map, robotPose, goalPose);
+    Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(map, robotPose, goalPose);
 }

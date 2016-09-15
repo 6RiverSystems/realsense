@@ -26,6 +26,7 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Executive::Executive(string nodeName) :
+    buttonX_(true),
     currentGoal_(),
     currentSolution_(nullptr),
     rosNodeHandle_(nodeName),
@@ -80,7 +81,6 @@ void Executive::connectAllTaps()
     tapCmdShutdown_.connectTap();
     tapInternal_GoalArrived_.connectTap();
     tapInternal_RobotPose_.connectTap();
-    tapJoyAdapter_.connectTap();
 
     tapMap_.connectTap();
     tapOperationalState_.connectTap();
@@ -95,7 +95,6 @@ void Executive::disconnectAllTaps()
     tapCmdShutdown_.disconnectTap();
     tapInternal_GoalArrived_.disconnectTap();
     tapInternal_RobotPose_.disconnectTap();
-    tapJoyAdapter_.disconnectTap();
 
     tapMap_.disconnectTap();
     tapOperationalState_.disconnectTap();
@@ -162,7 +161,6 @@ void Executive::executePlanToGoal()
     currentTarget_ = PoseMath::translate<double>(currentGoal_, chuck.bodyDepth / 2.0, 0.0);
 
     Map* map = tapMap_.getMap();
-    algorithm_.setGraph(map->getGrid());
 
     // Prepare the start position for the search
     Grid2d::LocationType internalStart;
@@ -180,28 +178,22 @@ void Executive::executePlanToGoal()
         currentTarget_ << " - " << currentGoal_ << " " <<
         " (" << internalGoal.x << "," << internalGoal.y << "," << goalAngle << ")");
 
-    bool foundSolution = algorithm_.search(
-        SearchPosition<Grid2d>(internalStart, startAngle),
-        SearchPosition<Grid2d>(internalGoal, goalAngle));
-
-    if (foundSolution)
+    // Deallocate the current solution if there is one
+    if (currentSolution_)
     {
-        SearchNode<Grid2d>* goalNode = algorithm_.getSolution();
+        delete currentSolution_;
+    }
 
-        // Deallocate the current solution if there is one
-        if (currentSolution_)
-        {
-            delete currentSolution_;
-        }
+    currentSolution_ = GridSolutionFactory::fromGoal(map, currentRobotPose_, currentTarget_);
 
-        currentSolution_ = GridSolutionFactory::fromSearch(goalNode, map);
-
+    if (!currentSolution_->empty())
+    {
         ROS_DEBUG_STREAM_NAMED("executive", "Found solution: " << endl << *currentSolution_);
 
         ROS_INFO_STREAM_NAMED("executive", "Found path for goal: " <<
             internalGoal.x << ", " << internalGoal.y << ", " << goalAngle << " => offset goal: " <<
             currentGoal_.x << ", " << currentGoal_.y << ", " <<
-            AngleMath::deg2rad<double>(currentGoal_.theta));
+            AngleMath::deg2Rad<double>(currentGoal_.theta));
     }
     else
     {
@@ -286,7 +278,7 @@ void Executive::findActiveNodes(vector<string>& nodes)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::publishGoalTarget(Pose<> goalTargetArea)
 {
-    vector<Pose<>> targetArea = PoseMath::pose2polygon(goalTargetArea, 0.0, 0.0, 0.2, 0.2);
+    vector<Pose<>> targetArea = PoseMath::pose2Polygon(goalTargetArea, 0.0, 0.0, 0.2, 0.2);
 
     geometry_msgs::PolygonStamped messageLanding;
 
@@ -411,9 +403,15 @@ void Executive::stepExecutiveFunctions()
     // If the joystick was touched, check if a custom action was requested
     if (tapJoyAdapter_.newDataAvailable())
     {
-        if (tapJoyAdapter_.getCustomActionState())
+        if (tapJoyAdapter_.getButtonAction())
         {
             taskCustomAction();
+        }
+
+        // Toggle the X button
+        if (tapJoyAdapter_.getButtonX())
+        {
+            buttonX_ = !buttonX_;
         }
 
         // Store the latch state for later use
@@ -424,11 +422,63 @@ void Executive::stepExecutiveFunctions()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::taskCustomAction()
 {
-    currentGoal_ = AngleMath::equalRad<double>(currentRobotPose_.theta, 0.0, 1.0) ?
-        Pose<>(15.50, 5.26, 0) :
-        Pose<>(6.38, 5.26, AngleMath::deg2rad<double>(180.0));
+//    currentGoal_ = currentRobotPose_;
+//    currentGoal_.theta += M_PI;
+//
+//    currentSolution_ = GridSolutionFactory::fromRotation(currentRobotPose_,
+//        currentRobotPose_.theta,
+//        currentRobotPose_.theta + (2 * M_PI - 0.1));
+//
+////    currentGoal_ = AngleMath::equalRad<double>(currentRobotPose_.theta, 0.0, 1.0) ?
+////        Pose<>(15.50, 5.26, 0) :
+////        Pose<>(6.38, 5.26, AngleMath::deg2rad<double>(180.0));
+//
 
-        taskPlanToGoal();
+    currentGoal_ = PoseMath::rotate(currentRobotPose_, M_PI_2);
+
+    // CCW and CW paths for UMBmark paths
+    Map* map = tapMap_.getMap();
+
+    // Deallocate the current solution if there is one
+    if (currentSolution_)
+    {
+        delete currentSolution_;
+    }
+
+    double deg90 = AngleMath::deg2Rad<double>(90);
+    double deg180 = AngleMath::deg2Rad<double>(180);
+    double delta = 3;
+
+    vector<Pose<>> goals;
+    if (buttonX_)
+    {
+        // Move the robot CCW
+        goals = {
+            PoseMath::add(currentRobotPose_, Pose<>(delta, 0, 0)),
+            PoseMath::add(currentRobotPose_, Pose<>(delta, delta, deg90)),
+            PoseMath::add(currentRobotPose_, Pose<>(0, delta, deg180)),
+            PoseMath::add(currentRobotPose_, Pose<>(0, 0, 0))
+        };
+    }
+    else
+    {
+        // Move the robot CW
+        goals = {
+            PoseMath::add(currentRobotPose_, Pose<>(0, delta, deg90)),
+            PoseMath::add(currentRobotPose_, Pose<>(delta, delta, 0)),
+            PoseMath::add(currentRobotPose_, Pose<>(delta, 0, -deg90)),
+            PoseMath::add(currentRobotPose_, Pose<>(0, 0, 0))
+        };
+    }
+    currentSolution_ = GridSolutionFactory::fromConsecutiveGoals(map, currentRobotPose_, goals);
+
+    publishGoalTarget(currentGoal_);
+    publishInternalGoalSolution(currentSolution_);
+
+    if (currentSolution_)
+    {
+        RosCallSolution::call("srsnode_motion", "/trigger/execute_solution", currentSolution_);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -32,7 +32,7 @@ struct PoseMessageFactory
         pose.arrivalTime = TimeMath::time2number(message.header.stamp);
         pose.x = message.x;
         pose.y = message.y;
-        pose.theta = AngleMath::deg2rad<double>(message.theta);
+        pose.theta = AngleMath::deg2Rad<double>(message.theta);
 
         return pose;
     }

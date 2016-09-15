@@ -76,12 +76,12 @@ struct Imu : public Object
 
     BaseType getYawDegrees()
     {
-        return AngleMath::rad2deg<TYPE>(yaw);
+        return AngleMath::rad2Deg<TYPE>(yaw);
     }
 
     BaseType getYawRotDegrees()
     {
-        return AngleMath::rad2deg<TYPE>(yawRot);
+        return AngleMath::rad2Deg<TYPE>(yawRot);
     }
 
     bool isValid()
@@ -106,12 +106,12 @@ struct Imu : public Object
 
     void setYawDegrees(BaseType deg)
     {
-        yaw = AngleMath::deg2rad<TYPE>(deg);
+        yaw = AngleMath::deg2Rad<TYPE>(deg);
     }
 
     void setYawRotDegrees(BaseType deg)
     {
-        yawRot = AngleMath::deg2rad<TYPE>(deg);
+        yawRot = AngleMath::deg2Rad<TYPE>(deg);
     }
 
     double arrivalTime;

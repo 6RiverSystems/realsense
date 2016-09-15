@@ -38,6 +38,8 @@ public:
     void processHardwareMessage(vector<char> buffer);
     void processRosMessage(const string& strMessage);
 
+    typedef map<char, BrainstemMessageHandler*> MessageHandlerMapType;
+
 	typedef std::function<void(bool)> ConnectionChangedFn;
 
 	typedef std::function<void(LED_ENTITIES)> ButtonCallbackFn;
@@ -142,7 +144,7 @@ private:
 
 	void Pause( bool bPause );
 
-    vector<BrainstemMessageHandler*> hwMessageHandlers_;
+	MessageHandlerMapType hwMessageHandlers_;
 
     SensorFrameHandler sensorFrameHandler_;
 };

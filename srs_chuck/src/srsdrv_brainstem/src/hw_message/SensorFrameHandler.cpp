@@ -132,9 +132,9 @@ void SensorFrameHandler::receiveData(ros::Time currentTime, vector<char>& buffer
     double currentTimeSec = internalTime.toSec();
     currentOdometry_ = Odometry<>(Velocity<>(currentTimeSec, odometryVelocity));
     currentImu_ = Imu<>(currentTimeSec,
-        AngleMath::deg2rad<double>(sensorData->yaw),
-        AngleMath::deg2rad<double>(sensorData->pitch),
-        AngleMath::deg2rad<double>(sensorData->roll),
+        AngleMath::deg2Rad<double>(sensorData->yaw),
+        AngleMath::deg2Rad<double>(sensorData->pitch),
+        AngleMath::deg2Rad<double>(sensorData->roll),
         sensorData->yawRot,
         sensorData->pitchRot,
         sensorData->rollRot);

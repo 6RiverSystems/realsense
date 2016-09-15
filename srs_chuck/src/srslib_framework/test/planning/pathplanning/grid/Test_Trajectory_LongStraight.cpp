@@ -22,7 +22,7 @@ using namespace srs;
 
 TEST(Test_Trajectory, LongStraight)
 {
-    constexpr double DEG90 = AngleMath::deg2rad<double>(90);
+    constexpr double DEG90 = AngleMath::deg2Rad<double>(90);
 
     GridSolutionItem SOLUTION_00 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(0, 0, DEG90), Pose<>(0, 1, DEG90));

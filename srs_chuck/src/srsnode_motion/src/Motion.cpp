@@ -131,7 +131,6 @@ void Motion::connectAllTaps()
     tapBrainStem_.connectTap();
     tapSensorFrame_.connectTap();
     tapInitialPose_.connectTap();
-    tapJoyAdapter_.connectTap();
     tapAps_.connectTap();
     tapInternalGoalSolution_.connectTap();
     tapMap_.connectTap();
@@ -148,7 +147,6 @@ void Motion::disconnectAllTaps()
     tapBrainStem_.disconnectTap();
     tapSensorFrame_.disconnectTap();
     tapInitialPose_.disconnectTap();
-    tapJoyAdapter_.disconnectTap();
     tapAps_.disconnectTap();
     tapInternalGoalSolution_.disconnectTap();
     tapMap_.disconnectTap();
@@ -223,8 +221,78 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
         config.custom_action_enabled);
 
     ROS_INFO_STREAM_NAMED("motion",
-        "Naive sensor fusion [t/f]: " <<
-        config.naive_sensor_fusion_enabled);
+        "Maximum physical angular acceleration [rad/s^2]: " <<
+        config.physical_max_angular_acceleration);
+    ROS_INFO_STREAM_NAMED("motion",
+        "Maximum physical angular velocity [rad/s]: " <<
+        config.physical_max_angular_velocity);
+    ROS_INFO_STREAM_NAMED("motion",
+        "Maximum physical linear acceleration [m/s^2]: " <<
+        config.physical_max_linear_acceleration);
+    ROS_INFO_STREAM_NAMED("motion",
+        "Maximum physical linear velocity [m/s]: " <<
+        config.physical_max_linear_velocity);
+    ROS_INFO_STREAM_NAMED("motion",
+        "Minimum physical angular velocity [rad/s]: " <<
+        config.physical_min_angular_velocity);
+    ROS_INFO_STREAM_NAMED("motion",
+        "Minimum absolute physical distance to goal [m]: " <<
+        config.physical_min_distance_to_goal);
+    ROS_INFO_STREAM_NAMED("motion",
+        "Minimum physical linear velocity [m/s]: " <<
+        config.physical_min_linear_velocity);
+
+    ROS_INFO_STREAM_NAMED("motion",
+        "APS enabled: " <<
+        config.sensor_aps_enabled);
+    ROS_INFO_STREAM_NAMED("motion",
+        "IMU enabled: " <<
+        config.sensor_imu_enabled);
+    ROS_INFO_STREAM_NAMED("motion",
+        "ODOMETRY enabled: " <<
+        config.sensor_odometry_enabled);
+
+    ROS_INFO_STREAM_NAMED("motion",
+        "Single command mode [t/f]: " <<
+        config.single_command_mode);
+
+    ROS_INFO_STREAM_NAMED("motion",
+        "Heading component of the APS noise [rad]: " <<
+        config.ukf_aps_error_heading);
+    ROS_INFO_STREAM_NAMED("motion",
+        "Location (X and Y) component of the APS noise [m]: " <<
+        config.ukf_aps_error_location);
+
+    ROS_INFO_STREAM_NAMED("motion",
+        "Angular velocity component of the odometry noise [rad/s]: " <<
+        config.ukf_odometry_error_angular);
+    ROS_INFO_STREAM_NAMED("motion",
+        "Linear velocity component of the odometry noise [m/s]: " <<
+        config.ukf_odometry_error_linear);
+
+    ROS_INFO_STREAM_NAMED("motion",
+        "Yaw component of the IMU noise [rad]: " <<
+        config.ukf_imu_error_yaw);
+
+    ROS_INFO_STREAM_NAMED("motion",
+        "Heading component of the robot noise [rad]: " <<
+        config.ukf_robot_error_heading);
+    ROS_INFO_STREAM_NAMED("motion",
+        "X component of the robot noise [m]: " <<
+        config.ukf_robot_error_location_x);
+    ROS_INFO_STREAM_NAMED("motion",
+        "Y component of the robot noise [m]: " <<
+        config.ukf_robot_error_location_y);
+    ROS_INFO_STREAM_NAMED("motion",
+        "Linear velocity component of the robot noise [m/s]: " <<
+        config.ukf_robot_error_linear);
+    ROS_INFO_STREAM_NAMED("motion",
+        "Angular velocity component of the robot noise [rad/s]: " <<
+        config.ukf_robot_error_angular);
+
+    ROS_INFO_STREAM_NAMED("motion",
+        "Common value for the initialization of P0: " <<
+        config.ukf_robot_p0);
 
     ROS_INFO_STREAM_NAMED("motion",
         "Emergency Controller: linear velocity gain []: " <<
@@ -251,25 +319,6 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
     ROS_INFO_STREAM_NAMED("motion",
         "Manual Controller: maximum linear velocity in manual mode [m/s]: " <<
         config.controller_manual_max_linear_velocity);
-
-    ROS_INFO_STREAM_NAMED("motion",
-        "Maximum physical angular acceleration [rad/s^2]: " <<
-        config.physical_max_angular_acceleration);
-    ROS_INFO_STREAM_NAMED("motion",
-        "Maximum physical angular velocity [rad/s]: " <<
-        config.physical_max_angular_velocity);
-    ROS_INFO_STREAM_NAMED("motion",
-        "Maximum physical linear acceleration [m/s^2]: " <<
-        config.physical_max_linear_acceleration);
-    ROS_INFO_STREAM_NAMED("motion",
-        "Maximum physical linear velocity [m/s]: " <<
-        config.physical_max_linear_velocity);
-    ROS_INFO_STREAM_NAMED("motion",
-        "Minimum physical angular velocity [rad/s]: " <<
-        config.physical_min_angular_velocity);
-    ROS_INFO_STREAM_NAMED("motion",
-        "Minimum physical linear velocity [m/s]: " <<
-        config.physical_min_linear_velocity);
 
     ROS_INFO_STREAM_NAMED("motion",
         "Path-follow Controller: adaptive look-ahead enabled [t/f]: " <<
@@ -346,59 +395,11 @@ void Motion::onConfigChange(MotionConfig& config, uint32_t level)
         config.controller_rotation_rotation_velocity);
 
     ROS_INFO_STREAM_NAMED("motion",
-        "APS enabled: " <<
-        config.sensor_aps_enabled);
-    ROS_INFO_STREAM_NAMED("motion",
-        "IMU enabled: " <<
-        config.sensor_imu_enabled);
-    ROS_INFO_STREAM_NAMED("motion",
-        "ODOMETRY enabled: " <<
-        config.sensor_odometry_enabled);
-
-    ROS_INFO_STREAM_NAMED("motion",
         "Stop Controller: minimum linear velocity allowed [m/s]: " <<
         config.controller_stop_min_linear_velocity);
     ROS_INFO_STREAM_NAMED("motion",
         "Stop Controller: normal deceleration [m/s^2]: " <<
         config.controller_stop_normal_linear_deceleration);
-
-    ROS_INFO_STREAM_NAMED("motion",
-        "Heading component of the APS noise [rad]: " <<
-        config.ukf_aps_error_heading);
-    ROS_INFO_STREAM_NAMED("motion",
-        "Location (X and Y) component of the APS noise [m]: " <<
-        config.ukf_aps_error_location);
-
-    ROS_INFO_STREAM_NAMED("motion",
-        "Angular velocity component of the odometry noise [rad/s]: " <<
-        config.ukf_odometry_error_angular);
-    ROS_INFO_STREAM_NAMED("motion",
-        "Linear velocity component of the odometry noise [m/s]: " <<
-        config.ukf_odometry_error_linear);
-
-    ROS_INFO_STREAM_NAMED("motion",
-        "Yaw component of the IMU noise [rad]: " <<
-        config.ukf_imu_error_yaw);
-
-    ROS_INFO_STREAM_NAMED("motion",
-        "Heading component of the robot noise [rad]: " <<
-        config.ukf_robot_error_heading);
-    ROS_INFO_STREAM_NAMED("motion",
-        "X component of the robot noise [m]: " <<
-        config.ukf_robot_error_location_x);
-    ROS_INFO_STREAM_NAMED("motion",
-        "Y component of the robot noise [m]: " <<
-        config.ukf_robot_error_location_y);
-    ROS_INFO_STREAM_NAMED("motion",
-        "Linear velocity component of the robot noise [m/s]: " <<
-        config.ukf_robot_error_linear);
-    ROS_INFO_STREAM_NAMED("motion",
-        "Angular velocity component of the robot noise [rad/s]: " <<
-        config.ukf_robot_error_angular);
-
-    ROS_INFO_STREAM_NAMED("motion",
-        "Common value for the initialization of P0: " <<
-        config.ukf_robot_p0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -610,12 +611,12 @@ void Motion::scanTapsForData()
     {
         // If the controller emergency button has been pressed, tell
         // the motion controller immediately
-        if (tapJoyAdapter_.getEmergencyState())
+        if (tapJoyAdapter_.getButtonEmergency())
         {
             motionController_.emergencyStop();
         }
 
-        if (tapJoyAdapter_.getCustomActionState())
+        if (tapJoyAdapter_.getButtonAction())
         {
             Pose<> pose = positionEstimator_.getPose();
             positionEstimator_.resetAccumulatedOdometry(&pose);

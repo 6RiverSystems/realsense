@@ -31,7 +31,7 @@ using namespace srsnode_motion;
 #include <srslib_framework/robotics/controller/StandController.hpp>
 #include <srslib_framework/robotics/controller/StopController.hpp>
 
-#include <srslib_framework/robotics/RobotProfile.hpp>
+#include <srslib_framework/robotics/robot/RobotProfile.hpp>
 
 namespace srs {
 
@@ -196,7 +196,7 @@ private:
     void publishLookAheadDistance();
     void pumpWorkFromQueue();
     void pushWorkItem(TaskEnum task, SolutionType* solution = nullptr);
-    void pushWorkSolution(SolutionType& solution);
+    Pose<> pushWorkSolution(Pose<> initialPose, SolutionType& solution);
 
     void selectController(TaskEnum task);
 

@@ -19,6 +19,7 @@ enum class BRAIN_STEM_MSG
 	BUTTON_PRESSED			= 0x42, // 'B'
 	HARDWARE_INFO			= 0x59, // 'Y'
 	OPERATIONAL_STATE		= 0x47, // 'G'
+    SENSOR_FRAME            = 0x4F, // 'O'
 	SYSTEM_VOLTAGE			= 0x56, // 'V'
 	UNKNOWN
 };

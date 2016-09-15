@@ -136,7 +136,7 @@ public:
 
     void setTrueYaw(double newValue)
     {
-        imuDeltaYaw_ = AngleMath::normalizeAngleRad<double>(newValue - currentRawImu_.yaw);
+        imuDeltaYaw_ = AngleMath::normalizeRad<double>(newValue - currentRawImu_.yaw);
     }
 
     void stopAccumulatingYaw()
@@ -171,7 +171,7 @@ private:
 
         Imu<> calibratedImu = Imu<>(
             currentRawImu_.arrivalTime,
-            AngleMath::normalizeAngleRad<double>(currentRawImu_.yaw + imuDeltaYaw_),
+            AngleMath::normalizeRad<double>(currentRawImu_.yaw + imuDeltaYaw_),
             0.0, 0.0,
             currentRawImu_.yawRot, 0.0, 0.0);
         setCalibratedImu(calibratedImu);

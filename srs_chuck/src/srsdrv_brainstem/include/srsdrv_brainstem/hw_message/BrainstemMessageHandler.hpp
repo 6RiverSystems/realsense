@@ -38,6 +38,11 @@ public:
     virtual ~BrainstemMessageHandler()
     {}
 
+    char getKey() const
+    {
+        return messageKey_;
+    }
+
     bool isKeyMatching(char key) const
     {
         return key == messageKey_;

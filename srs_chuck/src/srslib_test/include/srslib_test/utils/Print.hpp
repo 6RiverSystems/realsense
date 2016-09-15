@@ -22,7 +22,7 @@ struct Print
     template<unsigned int PRECISION = 6, typename TYPE = double>
     static void print(cv::Mat matrix, string name = "")
     {
-        cout << printToString(matrix, name) << endl;
+        cout << printToString<PRECISION, TYPE>(matrix, name) << endl;
     }
 
     template<unsigned int PRECISION = 6, typename TYPE = double>

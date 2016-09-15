@@ -76,8 +76,9 @@ private:
     void taskPauseChange();
     void taskPlanToGoal();
 
-    AStar<Grid2d> algorithm_;
 	bool arrived_;
+
+    bool buttonX_;
 
     Pose<> currentRobotPose_;
     Pose<> currentGoal_;

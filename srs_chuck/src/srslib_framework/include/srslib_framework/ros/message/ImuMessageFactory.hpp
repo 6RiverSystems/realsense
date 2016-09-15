@@ -27,12 +27,12 @@ struct ImuMessageFactory
         Imu<> imu;
 
         imu.arrivalTime = message.header.stamp.toSec();
-        imu.yaw = AngleMath::deg2rad<double>(message.yaw);
-        imu.pitch = AngleMath::deg2rad<double>(message.pitch);
-        imu.roll = AngleMath::deg2rad<double>(message.roll);
-        imu.yawRot = AngleMath::deg2rad<double>(message.yawRot);
-        imu.pitchRot = AngleMath::deg2rad<double>(message.pitchRot);
-        imu.rollRot = AngleMath::deg2rad<double>(message.rollRot);
+        imu.yaw = AngleMath::deg2Rad<double>(message.yaw);
+        imu.pitch = AngleMath::deg2Rad<double>(message.pitch);
+        imu.roll = AngleMath::deg2Rad<double>(message.roll);
+        imu.yawRot = AngleMath::deg2Rad<double>(message.yawRot);
+        imu.pitchRot = AngleMath::deg2Rad<double>(message.pitchRot);
+        imu.rollRot = AngleMath::deg2Rad<double>(message.rollRot);
 
         return imu;
     }
@@ -61,12 +61,12 @@ struct ImuMessageFactory
         srslib_framework::Imu msgImu;
 
         msgImu.header.stamp = ros::Time() + ros::Duration(imu.arrivalTime);
-        msgImu.yaw = AngleMath::rad2deg<double>(imu.yaw);
-        msgImu.pitch = AngleMath::rad2deg<double>(imu.pitch);
-        msgImu.roll = AngleMath::rad2deg<double>(imu.roll);
-        msgImu.yawRot = AngleMath::rad2deg<double>(imu.yawRot);
-        msgImu.pitchRot = AngleMath::rad2deg<double>(imu.pitchRot);
-        msgImu.rollRot = AngleMath::rad2deg<double>(imu.rollRot);
+        msgImu.yaw = AngleMath::rad2Deg<double>(imu.yaw);
+        msgImu.pitch = AngleMath::rad2Deg<double>(imu.pitch);
+        msgImu.roll = AngleMath::rad2Deg<double>(imu.roll);
+        msgImu.yawRot = AngleMath::rad2Deg<double>(imu.yawRot);
+        msgImu.pitchRot = AngleMath::rad2Deg<double>(imu.pitchRot);
+        msgImu.rollRot = AngleMath::rad2Deg<double>(imu.rollRot);
 
         return msgImu;
     }

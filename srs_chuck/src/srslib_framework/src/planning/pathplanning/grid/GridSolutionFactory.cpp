@@ -1,12 +1,61 @@
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 
+#include <srslib_framework/planning/pathplanning/grid/PoseAdapter.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Solution<GridSolutionItem>* GridSolutionFactory::fromRotation(Pose<> pose, double theta0, double thetaf)
+Solution<GridSolutionItem>* GridSolutionFactory::fromConsecutiveGoals(Map* map,
+    Pose<> start, vector<Pose<>> goals)
+{
+    Solution<GridSolutionItem>* globalSolution = new Solution<GridSolutionItem>();
+
+    Pose<> intermediateStart = start;
+    for (Pose<> goal : goals)
+    {
+        Solution<GridSolutionItem>* localSolution = GridSolutionFactory::fromGoal(map,
+            intermediateStart, goal);
+        if (localSolution->empty())
+        {
+            break;
+        }
+
+        globalSolution->append(localSolution);
+        intermediateStart = goal;
+    }
+
+    return globalSolution;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+Solution<GridSolutionItem>* GridSolutionFactory::fromGoal(Map* map,
+    Pose<> fromPose, Pose<> toPose)
+{
+    // Prepare the start position for the search
+    Grid2d::LocationType internalStart;
+    int startAngle;
+    PoseAdapter::pose2Map(fromPose, map, internalStart, startAngle);
+
+    // Prepare the goal position for the search
+    Grid2d::LocationType internalGoal;
+    int goalAngle;
+    PoseAdapter::pose2Map(toPose, map, internalGoal, goalAngle);
+
+    AStar<Grid2d> algorithm(map->getGrid());
+
+    algorithm.search(SearchPosition<Grid2d>(internalStart, startAngle),
+        SearchPosition<Grid2d>(internalGoal, goalAngle));
+
+    AStar<Grid2d>::SearchNodeType* solution = algorithm.getSolution();
+    return GridSolutionFactory::fromSearch(map, solution);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+Solution<GridSolutionItem>* GridSolutionFactory::fromRotation(
+    Pose<> pose, double theta0, double thetaf)
 {
     GridSolutionItem solutionItem;
 
@@ -15,14 +64,14 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromRotation(Pose<> pose, doubl
     solutionItem.fromPose = pose;
     solutionItem.toPose = pose;
 
-    solutionItem.fromPose.theta = AngleMath::normalizeAngleRad(theta0);
-    solutionItem.toPose.theta = AngleMath::normalizeAngleRad(thetaf);
+    solutionItem.fromPose.theta = AngleMath::normalizeRad(theta0);
+    solutionItem.toPose.theta = AngleMath::normalizeRad(thetaf);
 
     return new Solution<GridSolutionItem>(solutionItem);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(SearchNode<Grid2d>* goalNode, Map* map)
+Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(Map* map, SearchNode<Grid2d>* goalNode)
 {
     Solution<GridSolutionItem>* result = new Solution<GridSolutionItem>();
 
@@ -58,8 +107,8 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(SearchNode<Grid2d>* 
             toCursor->action->position.location.x, toCursor->action->position.location.y,
             toX, toY);
 
-        toTheta = AngleMath::deg2rad<double>(toCursor->action->position.orientation);
-        toPose = Pose<>(toX, toY, AngleMath::normalizeAngleRad<double>(toTheta));
+        toTheta = AngleMath::deg2Rad<double>(toCursor->action->position.orientation);
+        toPose = Pose<>(toX, toY, AngleMath::normalizeRad<double>(toTheta));
 
         if (fromCursor)
         {
@@ -67,8 +116,8 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(SearchNode<Grid2d>* 
                 fromCursor->action->position.location.x, fromCursor->action->position.location.y,
                 fromX, fromY);
 
-            fromTheta = AngleMath::deg2rad<double>(fromCursor->action->position.orientation);
-            fromPose = Pose<>(fromX, fromY, AngleMath::normalizeAngleRad<double>(fromTheta));
+            fromTheta = AngleMath::deg2Rad<double>(fromCursor->action->position.orientation);
+            fromPose = Pose<>(fromX, fromY, AngleMath::normalizeRad<double>(fromTheta));
         }
 
         switch (toCursor->action->actionType)
@@ -91,22 +140,22 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(SearchNode<Grid2d>* 
 
             case SearchAction<Grid2d>::ROTATE_M90:
                 solutionItem.actionType = GridSolutionItem::ROTATE;
-                fromTheta = AngleMath::normalizeAngleRad<double>(
-                    toTheta + AngleMath::deg2rad<double>(90));
+                fromTheta = AngleMath::normalizeRad<double>(
+                    toTheta + AngleMath::deg2Rad<double>(90));
                 fromPose = Pose<>(toX, toY, fromTheta);
                 break;
 
             case SearchAction<Grid2d>::ROTATE_P90:
                 solutionItem.actionType = GridSolutionItem::ROTATE;
-                fromTheta = AngleMath::normalizeAngleRad<double>(
-                    toTheta - AngleMath::deg2rad<double>(90));
+                fromTheta = AngleMath::normalizeRad<double>(
+                    toTheta - AngleMath::deg2Rad<double>(90));
                 fromPose = Pose<>(toX, toY, fromTheta);
                 break;
 
             case SearchAction<Grid2d>::ROTATE_180:
                 solutionItem.actionType = GridSolutionItem::ROTATE;
-                fromTheta = AngleMath::normalizeAngleRad<double>(
-                    toTheta - AngleMath::deg2rad<double>(180));
+                fromTheta = AngleMath::normalizeRad<double>(
+                    toTheta - AngleMath::deg2Rad<double>(180));
                 fromPose = Pose<>(toX, toY, fromTheta);
                 break;
 

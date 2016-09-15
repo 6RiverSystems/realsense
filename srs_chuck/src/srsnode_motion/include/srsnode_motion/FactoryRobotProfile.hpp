@@ -11,7 +11,7 @@
 #include <srsnode_motion/MotionConfig.h>
 using namespace srsnode_motion;
 
-#include <srslib_framework/robotics/RobotProfile.hpp>
+#include <srslib_framework/robotics/robot/RobotProfile.hpp>
 
 struct FactoryRobotProfile
 {
@@ -34,6 +34,7 @@ struct FactoryRobotProfile
         robot.physicalMaxLinearAcceleration = configuration.physical_max_linear_acceleration;
         robot.physicalMaxLinearVelocity = configuration.physical_max_linear_velocity;
         robot.physicalMinAngularVelocity = configuration.physical_min_angular_velocity;
+        robot.physicalMinDistanceToGoal = configuration.physical_min_distance_to_goal;
         robot.physicalMinLinearVelocity = configuration.physical_min_linear_velocity;
 
         robot.pathFollowAdaptiveLookAhead = configuration.controller_pathfollow_adaptive_lookahead_enabled;
@@ -62,6 +63,7 @@ struct FactoryRobotProfile
         robot.rotationMinAngularVelocity = configuration.controller_rotation_min_angular_velocity;
         robot.rotationRotationVelocity = configuration.controller_rotation_rotation_velocity;
 
+        robot.singleCommandMode = configuration.single_command_mode;
         robot.stopMinLinearVelocity = configuration.controller_stop_min_linear_velocity;
         robot.stopNormalDeceleration = configuration.controller_stop_normal_linear_deceleration;
 

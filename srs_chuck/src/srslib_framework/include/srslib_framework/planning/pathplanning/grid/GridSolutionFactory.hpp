@@ -24,14 +24,14 @@ namespace srs {
 
 struct GridSolutionFactory
 {
-    static Solution<GridSolutionItem>* fromRotation(Pose<> pose, double theta0, double thetaf);
-    static Solution<GridSolutionItem>* fromSearch(AStar<Grid2d>::SearchNodeType* goalNode, Map* map);
-
-    static double getTotalCost(Solution<GridSolutionItem>* solution)
-    {
-        GridSolutionItem lastNode = solution->getGoal();
-        return lastNode.cost;
-    }
+    static Solution<GridSolutionItem>* fromConsecutiveGoals(Map* map,
+        Pose<> start, vector<Pose<>> goals);
+    static Solution<GridSolutionItem>* fromGoal(Map* map,
+        Pose<> start, Pose<> goal);
+    static Solution<GridSolutionItem>* fromRotation(Pose<> pose,
+        double theta0, double thetaf);
+    static Solution<GridSolutionItem>* fromSearch(Map* map,
+        AStar<Grid2d>::SearchNodeType* goalNode);
 };
 
 } // namespace srs

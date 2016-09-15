@@ -101,7 +101,7 @@ private:
     static SearchAction<GRAPH>* addBackward(GRAPH* graph, SearchNode<GRAPH>* parentNode)
     {
         int currentOrientation = parentNode->action->position.orientation;
-        int direction = AngleMath::normalizeAngleDeg(currentOrientation - 180);
+        int direction = AngleMath::normalizeDeg(currentOrientation - 180);
 
         typename GRAPH::LocationType neighbor;
         if (graph->getNeighbor(parentNode->action->position.location, direction, neighbor))
@@ -161,7 +161,7 @@ private:
         SearchAction<GRAPH>* newAction = new SearchAction<GRAPH>(actionEnum);
         int currentOrientation = parentNode->action->position.orientation;
 
-        int newOrientation = AngleMath::normalizeAngleDeg(currentOrientation + angle);
+        int newOrientation = AngleMath::normalizeDeg(currentOrientation + angle);
         SearchPosition<GRAPH> newPosition(parentNode->action->position, newOrientation);
 
         const MapNote* note = reinterpret_cast<const MapNote*>(

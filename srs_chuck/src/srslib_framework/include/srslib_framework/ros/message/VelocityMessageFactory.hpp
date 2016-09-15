@@ -10,6 +10,7 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <srslib_framework/Velocity.h>
 
+#include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
 namespace srs {
@@ -29,7 +30,7 @@ struct VelocityMessageFactory
 
         velocity.arrivalTime = message.header.stamp.toSec();
         velocity.linear = message.linear;
-        velocity.angular = AngleMath::deg2rad<double>(message.angular);
+        velocity.angular = AngleMath::deg2Rad<double>(message.angular);
 
         return velocity;
     }
@@ -77,7 +78,7 @@ struct VelocityMessageFactory
 
         msgVelocity.header.stamp = ros::Time() + ros::Duration(velocity.arrivalTime);
         msgVelocity.linear = velocity.linear;
-        msgVelocity.angular = AngleMath::rad2deg<double>(velocity.angular);
+        msgVelocity.angular = AngleMath::rad2Deg<double>(velocity.angular);
 
         return msgVelocity;
     }

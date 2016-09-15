@@ -25,41 +25,38 @@ using namespace std;
 
 using namespace srs;
 
-TEST(Test_Trajectory, Map)
+static constexpr double DEG0 = 0.0;
+static constexpr double DEG90 = AngleMath::deg2Rad<double>(90);
+static constexpr double DEG180 = AngleMath::deg2Rad<double>(180);
+static constexpr double DEG270 = AngleMath::deg2Rad<double>(270);
+
+TEST(Test_Trajectory, Empty_Consecutive)
 {
-    Pose<> robotPose = Pose<>(18.1335, 5.24097, 0.0189141);
-    Pose<> goalPose = Pose<>(18.1335, 5.24097, 0);
+    Pose<> robotPose = Pose<>(3, 3, DEG0);
+    vector<Pose<>> goals = {
+        Pose<>(4, 3, DEG0),
+        Pose<>(4, 4, DEG90),
+        Pose<>(3, 4, DEG180),
+        Pose<>(3, 3, DEG270)
+    };
 
     Map* map = new Map();
-	map->load("/tmp/srslib_framework/data/6rhq.yaml");
+    map->load("/tmp/srslib_framework/data/empty.yaml");
 
-    // Prepare the start position for the search
-    Grid2d::LocationType internalStart;
-    int startAngle;
-    PoseAdapter::pose2Map(robotPose, map, internalStart, startAngle);
-
-    // Prepare the goal position for the search
-    Grid2d::LocationType internalGoal;
-    int goalAngle;
-    PoseAdapter::pose2Map(goalPose, map, internalGoal, goalAngle);
-
-    AStar<Grid2d> algorithm(map->getGrid());
-    ROS_DEBUG_STREAM("Found: " <<
-        algorithm.search(SearchPosition<Grid2d>(internalStart, startAngle),
-            SearchPosition<Grid2d>(internalGoal, goalAngle)));
-
-    AStar<Grid2d>::SearchNodeType* solution = algorithm.getSolution();
-    Solution<GridSolutionItem>* gridSolution = GridSolutionFactory::fromSearch(solution, map);
-    Solution<GridSolutionItem> gridSolution2 = *gridSolution;
-
-    cout << gridSolution2 << endl;
+    Solution<GridSolutionItem>* gridSolution = GridSolutionFactory::fromConsecutiveGoals(
+        map, robotPose, goals);
+    cout << *gridSolution << endl;
 
     Chuck chuck;
     Trajectory<> trajectory;
 
+    Solution<GridSolutionItem> gridSolution2 = *gridSolution;
     GridTrajectoryGenerator solutionConverter(chuck);
+
     solutionConverter.fromSolution(gridSolution2);
     solutionConverter.getTrajectory(trajectory);
+
+    cout << trajectory << endl;
 
     ROS_DEBUG_STREAM(trajectory);
 }

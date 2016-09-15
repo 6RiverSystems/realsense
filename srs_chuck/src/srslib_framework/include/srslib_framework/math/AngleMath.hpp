@@ -17,7 +17,7 @@ struct AngleMath
     template<typename TYPE = double>
     inline static bool equalRad(TYPE a, TYPE b, TYPE threshold = numeric_limits<TYPE>::epsilon())
     {
-        return abs(AngleMath::normalizeAngleRad<TYPE>(a - b)) < threshold;
+        return abs(AngleMath::normalizeRad<TYPE>(a - b)) < threshold;
     }
 
     /**
@@ -29,47 +29,21 @@ struct AngleMath
      * @return converted angle [radians]
      */
     template<typename TYPE = double>
-    constexpr inline static TYPE deg2rad(TYPE deg)
+    constexpr inline static TYPE deg2Rad(TYPE deg)
     {
         return deg * TYPE(M_PI) / TYPE(180);
     }
 
     template<typename TYPE = double>
-    inline static TYPE normalizeAngleDeg(TYPE deg)
+    inline static TYPE normalizeDeg(TYPE deg)
     {
         return deg < 0 ? TYPE(360) - (fmod(fabs(deg), TYPE(360))) : fmod(deg, TYPE(360));
     }
 
     template<int>
-    inline static int normalizeAngleDeg(int deg)
+    inline static int normalizeDeg(int deg)
     {
         return deg < 0 ? 360 - (abs(deg) % 360) : deg % 360;
-    }
-
-    inline static double normalizeRad2Deg(double rad)
-    {
-        return AngleMath::normalizeAngleDeg<double>(AngleMath::rad2deg<double>(rad));
-    }
-
-    inline static double normalizeDeg2Rad(double deg)
-    {
-        return AngleMath::normalizeAngleRad(AngleMath::deg2rad<double>(deg));
-    }
-
-    inline static double normalizeRad2Deg90(double rad)
-    {
-        double angle = AngleMath::rad2deg<double>(rad);
-        double ratio = angle / 90.0;
-        double upper = ceil(ratio) * 90.0;
-        double lower = floor(ratio) * 90.0;
-
-        angle = (upper - angle) > (angle - lower) ? lower : upper;
-        return AngleMath::normalizeAngleDeg<double>(angle);
-    }
-
-    inline static double normalizeRad2Rad90(double rad)
-    {
-        return AngleMath::deg2rad<double>(AngleMath::normalizeRad2Deg90(rad));
     }
 
     /**
@@ -81,9 +55,31 @@ struct AngleMath
      * @return normalized angle to a [-pi, pi) range
      */
     template<typename TYPE = double>
-    constexpr inline static TYPE normalizeAngleRad(TYPE rad)
+    constexpr inline static TYPE normalizeRad(TYPE rad)
     {
         return rad - 2 * M_PI * floor((rad + M_PI) / (2 * M_PI));
+    }
+
+    template<typename TYPE = double>
+    inline static TYPE normalizeRad2Deg(TYPE rad)
+    {
+        return AngleMath::normalizeDeg<TYPE>(AngleMath::rad2Deg<TYPE>(rad));
+    }
+
+    inline static double normalizeRad2Deg90(double rad)
+    {
+        double angle = AngleMath::rad2Deg<double>(rad);
+        double ratio = angle / 90.0;
+        double upper = ceil(ratio) * 90.0;
+        double lower = floor(ratio) * 90.0;
+
+        angle = (upper - angle) > (angle - lower) ? lower : upper;
+        return AngleMath::normalizeDeg<double>(angle);
+    }
+
+    inline static double normalizeRad2Rad90(double rad)
+    {
+        return AngleMath::deg2Rad<double>(AngleMath::normalizeRad2Deg90(rad));
     }
 
     /**
@@ -95,7 +91,7 @@ struct AngleMath
      * @return converted angle [degrees]
      */
     template<typename TYPE = double>
-    constexpr inline static TYPE rad2deg(TYPE rad)
+    constexpr inline static TYPE rad2Deg(TYPE rad)
     {
         return rad * TYPE(180) / TYPE(M_PI);
     }

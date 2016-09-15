@@ -9,6 +9,7 @@ using namespace std;
 #include <dynamic_reconfigure/server.h>
 
 #include <srslib_framework/math/BasicMath.hpp>
+#include <srslib_framework/math/VelocityMath.hpp>
 
 namespace srs {
 
@@ -17,28 +18,16 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 JoystickAdapter::JoystickAdapter(string nodeName) :
-    joystickLatched_(false),
-    rosNodeHandle_(nodeName)
+    rosNodeHandle_(nodeName),
+    publisherJoypadState_("/internal/sensors/joystick/state", 50)
 {
-    pubCommand_ = rosNodeHandle_.advertise<geometry_msgs::Twist>(
-        "/internal/sensors/joystick/velocity", 50);
-    pubJoystickLatched_ = rosNodeHandle_.advertise<std_msgs::Bool>(
-        "/internal/sensors/joystick/latched", 1);
-    pubJoystickEmergency_ = rosNodeHandle_.advertise<std_msgs::Bool>(
-        "/internal/sensors/joystick/emergency", 1);
-    pubJoystickCustomAction_ = rosNodeHandle_.advertise<std_msgs::Bool>(
-        "/internal/sensors/joystick/custom_action", 1);
-
     configServer_.setCallback(boost::bind(&JoystickAdapter::onConfigChange, this, _1, _2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void JoystickAdapter::run()
 {
-    tapJoy_.connectTap();
     triggerShutdown_.connectService();
-
-    bool requestLatch = true;
 
     ros::Rate refreshRate(REFRESH_RATE_HZ);
     while (ros::ok())
@@ -49,72 +38,86 @@ void JoystickAdapter::run()
 
         if (tapJoy_.newDataAvailable())
         {
-            requestLatch = true;
+            // Management of the B button: Emergency
+            if (tapJoy_.isButtonPressed(RosTapJoy::BUTTON_B))
+            {
+                joypadState_.buttonEmergency = true;
+                ROS_WARN("The joystick emergency button has been pressed");
+            }
+            else if (tapJoy_.isButtonReleased(RosTapJoy::BUTTON_B))
+            {
+                joypadState_.buttonEmergency = false;
+                ROS_WARN("The joystick emergency button has been released");
+            }
+
+            // Management of the X button: Generic
+            if (tapJoy_.isButtonPressed(RosTapJoy::BUTTON_X))
+            {
+                joypadState_.buttonX = true;
+                ROS_WARN("The joystick X button has been pressed");
+            }
+            else if (tapJoy_.isButtonReleased(RosTapJoy::BUTTON_X))
+            {
+                joypadState_.buttonX = false;
+                ROS_WARN("The joystick X button has been released");
+            }
+
+            // Management of the Y button: Generic
+            if (tapJoy_.isButtonPressed(RosTapJoy::BUTTON_Y))
+            {
+                joypadState_.buttonY = true;
+                ROS_WARN("The joystick Y button has been pressed");
+            }
+            else if (tapJoy_.isButtonReleased(RosTapJoy::BUTTON_Y))
+            {
+                joypadState_.buttonY = false;
+                ROS_WARN("The joystick Y button has been released");
+            }
+
+            // Management of the A button: Custom action
+            if (tapJoy_.isButtonPressed(RosTapJoy::BUTTON_A))
+            {
+                joypadState_.buttonAction = true;
+                ROS_INFO("The joystick custom action button has been pressed");
+            }
+            else if (tapJoy_.isButtonReleased(RosTapJoy::BUTTON_A))
+            {
+                joypadState_.buttonAction = false;
+                ROS_INFO("The joystick custom action button has been released");
+            }
+
+            if (tapJoy_.isButtonPressed(RosTapJoy::BUTTON_START))
+            {
+                // If the START button has been released
+                // there is no need to do anything else
+                joypadState_.latched = false;
+                ROS_INFO("The joystick latch has been removed");
+            }
 
             // Update the velocity values
-            Velocity<> currentVelocity = tapJoy_.getVelocity();
+            Velocity<> leftVelocity = tapJoy_.popJoystickLeft();
+            Velocity<> rightVelocity = tapJoy_.popJoystickRight();
 
-            double linear = configuration_.ratio_linear * currentVelocity.linear;
-            double angular = configuration_.ratio_angular * currentVelocity.angular;
+            if (!VelocityMath::equal(leftVelocity, currentLeftVelocity_) ||
+                !VelocityMath::equal(rightVelocity, currentRightVelocity_))
+            {
+                ROS_INFO_COND(!joypadState_.latched, "The joystick latch has been established");
+                joypadState_.latched = true;
+            }
+
+            currentLeftVelocity_ = leftVelocity;
+            currentRightVelocity_ = rightVelocity;
+
+            double linear = configuration_.ratio_linear * leftVelocity.linear;
+            double angular = configuration_.ratio_angular * rightVelocity.angular;
 
             linear = BasicMath::threshold<double>(linear, configuration_.threshold_linear, 0.0);
             angular = BasicMath::threshold<double>(angular, configuration_.threshold_angular, 0.0);
 
-            publishVelocity(Velocity<>(linear, angular));
+            joypadState_.velocity = Velocity<>(linear, angular);
 
-            // If the B button was pressed, publish the emergency state immediately
-            if (tapJoy_.isButtonPressed(RosTapJoy<>::BUTTON_B))
-            {
-                publishEmergency(true);
-                ROS_WARN("The joystick emergency button has been pressed");
-            }
-            else if (tapJoy_.isButtonReleased(RosTapJoy<>::BUTTON_B))
-            {
-                publishEmergency(false);
-                ROS_WARN("The joystick emergency button has been released");
-            }
-
-            // If the A button was pressed, publish the custom action state immediately
-            if (tapJoy_.isButtonChanged(RosTapJoy<>::BUTTON_A))
-            {
-                if (tapJoy_.isButtonPressed(RosTapJoy<>::BUTTON_A))
-                {
-                    publishCustomAction(true);
-                    ROS_INFO("The joystick custom action button has been pressed");
-                }
-                else if (tapJoy_.isButtonReleased(RosTapJoy<>::BUTTON_A))
-                {
-                    publishCustomAction(false);
-                    ROS_INFO("The joystick custom action button has been released");
-                }
-
-                // No need to latch the joystick
-                requestLatch = false;
-            }
-
-            if (tapJoy_.isButtonChanged(RosTapJoy<>::BUTTON_START))
-            {
-                if (tapJoy_.isButtonPressed(RosTapJoy<>::BUTTON_START))
-                {
-                    // If the START button has been released
-                    // there is no need to do anything else
-                    joystickLatched_ = false;
-                    ROS_INFO("The joystick latch has been removed");
-                }
-
-                requestLatch = false;
-            }
-
-            if (requestLatch)
-            {
-                if (!joystickLatched_)
-                {
-                    ROS_INFO("The joystick latch has been established");
-                }
-                joystickLatched_ = true;
-            }
-
-            publishLatched(joystickLatched_);
+            joypadState_.arrivalTime = ros::Time::now().toSec();
+            publisherJoypadState_.publish(joypadState_);
         }
 
         refreshRate.sleep();
@@ -134,56 +137,13 @@ void JoystickAdapter::evaluateTriggers()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void JoystickAdapter::onConfigChange(JoystickConfig& config, uint32_t level)
+void JoystickAdapter::onConfigChange(srsnode_joystick_adapter::JoystickConfig& config, uint32_t level)
 {
     configuration_ = config;
 
     ROS_INFO_STREAM("Joystick configuration changed: (" <<
         configuration_.ratio_linear << ", " << configuration_.ratio_angular <<
         configuration_.threshold_linear << ", " << configuration_.threshold_angular << ")");
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void JoystickAdapter::publishCustomAction(bool state)
-{
-    std_msgs::Bool messageCustomAction;
-
-    messageCustomAction.data = state;
-    pubJoystickCustomAction_.publish(messageCustomAction);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void JoystickAdapter::publishEmergency(bool state)
-{
-    std_msgs::Bool messageEmergency;
-
-    messageEmergency.data = state;
-    pubJoystickEmergency_.publish(messageEmergency);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void JoystickAdapter::publishLatched(bool state)
-{
-    std_msgs::Bool messageLatched;
-
-    messageLatched.data = state;
-    pubJoystickLatched_.publish(messageLatched);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void JoystickAdapter::publishVelocity(Velocity<> velocity)
-{
-    geometry_msgs::Twist messageVelocity;
-
-    messageVelocity.linear.x = velocity.linear;
-    messageVelocity.linear.y = 0.0;
-    messageVelocity.linear.z = 0.0;
-
-    messageVelocity.angular.x = 0.0;
-    messageVelocity.angular.y = 0.0;
-    messageVelocity.angular.z = velocity.angular;
-
-    pubCommand_.publish(messageVelocity);
 }
 
 } // namespace srs

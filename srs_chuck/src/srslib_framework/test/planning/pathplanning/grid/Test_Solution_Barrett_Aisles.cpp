@@ -16,6 +16,7 @@ using namespace std;
 #include <srslib_framework/localization/Map.hpp>
 
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionUtils.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
 #include <srslib_framework/planning/pathplanning/grid/PoseAdapter.hpp>
@@ -150,7 +151,7 @@ const mapNodes = {
 */
 
 static constexpr double DEG0 = 0.0;
-static constexpr double DEG270 = AngleMath::deg2rad<double>(270);
+static constexpr double DEG270 = AngleMath::deg2Rad<double>(270);
 
 static const Pose<> I01L = Pose<>(2.030, 87.835, DEG0);
 static const Pose<> I01R = Pose<>(36.360, 87.835, DEG0);
@@ -180,8 +181,7 @@ Solution<GridSolutionItem>* calculateSolution(Pose<> start, Pose<> goal)
 {
     Map* map = test::MapUtils::mapFactory("/tmp/srslib_framework/data/barrett.yaml");
 
-    Solution<GridSolutionItem>* solution = test::PathPlanningUtils::pose2Solution(
-        map, start, goal);
+    Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(map, start, goal);
 
     cout << *solution << endl;
 
@@ -189,11 +189,11 @@ Solution<GridSolutionItem>* calculateSolution(Pose<> start, Pose<> goal)
 }
 
 // Test of the aisle E01-T ---> E01-B
-TEST(Test_Trajectory, Barrett_E01T_E01B)
+TEST(Test_Solution, Barrett_Aisles_E01T_E01B)
 {
     Solution<GridSolutionItem>* solution = calculateSolution(E01T, E01B);
 
-    double totalCost = GridSolutionFactory::getTotalCost(solution);
+    double totalCost = GridSolutionUtils::getTotalCost(*solution);
     ASSERT_EQ(1078, totalCost) << "The cost is not as expected.";
 
     ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
@@ -201,11 +201,11 @@ TEST(Test_Trajectory, Barrett_E01T_E01B)
 }
 
 // Test of the aisle E02-T ---> E02-B
-TEST(Test_Trajectory, Barrett_E02T_E02B)
+TEST(Test_Solution, Barrett_Aisles_E02T_E02B)
 {
     Solution<GridSolutionItem>* solution = calculateSolution(E02T, E02B);
 
-    double totalCost = GridSolutionFactory::getTotalCost(solution);
+    double totalCost = GridSolutionUtils::getTotalCost(*solution);
     ASSERT_EQ(426, totalCost) << "The cost is not as expected.";
 
     ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
@@ -213,11 +213,11 @@ TEST(Test_Trajectory, Barrett_E02T_E02B)
 }
 
 // Test of the aisle E03-T ---> E03-B
-TEST(Test_Trajectory, Barrett_E03T_E03B)
+TEST(Test_Solution, Barrett_Aisles_E03T_E03B)
 {
     Solution<GridSolutionItem>* solution = calculateSolution(E03T, E03B);
 
-    double totalCost = GridSolutionFactory::getTotalCost(solution);
+    double totalCost = GridSolutionUtils::getTotalCost(*solution);
     ASSERT_EQ(426, totalCost) << "The cost is not as expected.";
 
     ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
@@ -225,11 +225,11 @@ TEST(Test_Trajectory, Barrett_E03T_E03B)
 }
 
 // Test of the aisle E04-T ---> E04-B
-TEST(Test_Trajectory, Barrett_E04T_E04B)
+TEST(Test_Solution, Barrett_Aisles_E04T_E04B)
 {
     Solution<GridSolutionItem>* solution = calculateSolution(E04T, E04B);
 
-    double totalCost = GridSolutionFactory::getTotalCost(solution);
+    double totalCost = GridSolutionUtils::getTotalCost(*solution);
     ASSERT_EQ(426, totalCost) << "The cost is not as expected.";
 
     ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
@@ -237,11 +237,11 @@ TEST(Test_Trajectory, Barrett_E04T_E04B)
 }
 
 // Test of the aisle CD-T ---> CD-B
-TEST(Test_Trajectory, Barrett_CDT_CDB)
+TEST(Test_Solution, Barrett_Aisles_CDT_CDB)
 {
     Solution<GridSolutionItem>* solution = calculateSolution(CDT, CDB);
 
-    double totalCost = GridSolutionFactory::getTotalCost(solution);
+    double totalCost = GridSolutionUtils::getTotalCost(*solution);
     ASSERT_EQ(652, totalCost) << "The cost is not as expected.";
 
     ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
@@ -249,11 +249,11 @@ TEST(Test_Trajectory, Barrett_CDT_CDB)
 }
 
 // Test of the aisle AB-T ---> AB-B
-TEST(Test_Trajectory, Barrett_ABT_ABB)
+TEST(Test_Solution, Barrett_Aisles_ABT_ABB)
 {
     Solution<GridSolutionItem>* solution = calculateSolution(ABT, ABB);
 
-    double totalCost = GridSolutionFactory::getTotalCost(solution);
+    double totalCost = GridSolutionUtils::getTotalCost(*solution);
     ASSERT_EQ(652, totalCost) << "The cost is not as expected.";
 
     ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
@@ -261,11 +261,11 @@ TEST(Test_Trajectory, Barrett_ABT_ABB)
 }
 
 // Test of the aisle H01-T ---> H01-B
-TEST(Test_Trajectory, Barrett_H01T_H01B)
+TEST(Test_Solution, Barrett_Aisles_H01T_H01B)
 {
     Solution<GridSolutionItem>* solution = calculateSolution(H01T, H01B);
 
-    double totalCost = GridSolutionFactory::getTotalCost(solution);
+    double totalCost = GridSolutionUtils::getTotalCost(*solution);
     ASSERT_EQ(596, totalCost) << "The cost is not as expected.";
 
     ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
@@ -273,11 +273,11 @@ TEST(Test_Trajectory, Barrett_H01T_H01B)
 }
 
 // Test of the aisle G01-T ---> G01-B
-TEST(Test_Trajectory, Barrett_G01T_G01B)
+TEST(Test_Solution, Barrett_Aisles_G01T_G01B)
 {
     Solution<GridSolutionItem>* solution = calculateSolution(G01T, G01B);
 
-    double totalCost = GridSolutionFactory::getTotalCost(solution);
+    double totalCost = GridSolutionUtils::getTotalCost(*solution);
     ASSERT_EQ(596, totalCost) << "The cost is not as expected.";
 
     ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
@@ -285,28 +285,13 @@ TEST(Test_Trajectory, Barrett_G01T_G01B)
 }
 
 // Test of the aisle F01-T ---> F01-B
-TEST(Test_Trajectory, Barrett_F01T_F01B)
+TEST(Test_Solution, Barrett_Aisles_F01T_F01B)
 {
     Solution<GridSolutionItem>* solution = calculateSolution(F01T, F01B);
 
-    double totalCost = GridSolutionFactory::getTotalCost(solution);
+    double totalCost = GridSolutionUtils::getTotalCost(*solution);
     ASSERT_EQ(596, totalCost) << "The cost is not as expected.";
 
     ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
         "Rotate commands were found in the solution";
 }
-
-// Test of the aisle I01-L ---> I01-R
-//TEST(Test_Trajectory, Barrett_I01L_I01R)
-//{
-//    Solution<GridSolutionItem>* solution = calculateSolution(I01L, I01R);
-//
-//    ASSERT_NE(solution, nullptr) << "No solution was found";
-//    ASSERT_FALSE(solution->empty()) << "No solution was found";
-//
-//    double totalCost = GridSolutionFactory::getTotalCost(solution);
-//    ASSERT_EQ(1078, totalCost) << "The cost is not as expected.";
-//
-//    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
-//        "Rotate commands were found in the solution";
-//}

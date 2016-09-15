@@ -29,6 +29,7 @@ struct RobotProfile
         physicalMaxLinearAcceleration(0.0),
         physicalMaxLinearVelocity(0.0),
         physicalMinAngularVelocity(0.0),
+        physicalMinDistanceToGoal(0.005),
         physicalMinLinearVelocity(0.0),
 
         pathFollowAdaptiveLookAhead(true),
@@ -57,6 +58,7 @@ struct RobotProfile
         rotationMinAngularVelocity(0.0),
         rotationRotationVelocity(0.0),
 
+        singleCommandMode(false),
         stopMinLinearVelocity(0.0),
         stopNormalDeceleration(0.0),
 
@@ -85,6 +87,7 @@ struct RobotProfile
     double physicalMaxLinearAcceleration; // [m/s^2]
     double physicalMaxLinearVelocity; // [m/s]
     double physicalMinAngularVelocity; // [rad/s]
+    double physicalMinDistanceToGoal; // [m]
     double physicalMinLinearVelocity; // [m/s]
 
     bool pathFollowAdaptiveLookAhead;
@@ -113,6 +116,7 @@ struct RobotProfile
     double rotationMinAngularVelocity; // [rad/s]
     double rotationRotationVelocity; // [rad/s]
 
+    bool singleCommandMode;
     double stopMinLinearVelocity; // [m/s]
     double stopNormalDeceleration; // [m/s^2]
 

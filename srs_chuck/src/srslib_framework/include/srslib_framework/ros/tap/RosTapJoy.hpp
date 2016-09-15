@@ -11,14 +11,13 @@ using namespace std;
 
 #include <sensor_msgs/Joy.h>
 
-#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/RosSubscriber.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
 namespace srs {
 
-template<typename TYPE = double>
 class RosTapJoy :
-    public RosTap
+    public RosSubscriber<sensor_msgs::Joy>
 {
 public:
     enum ButtonEnum {
@@ -38,16 +37,28 @@ public:
     };
 
     RosTapJoy() :
-        RosTap("/joy", "Joy Tap"),
-        currentVelocity_()
+        RosSubscriber("/joy", 10, "~"),
+        joystickLeft_(Velocity<>::INVALID),
+        joystickRight_(Velocity<>::INVALID)
     {
         fill(currentButtons_, currentButtons_ + MAX_NUMBER_BUTTONS, 0);
         fill(previousButtons_, previousButtons_ + MAX_NUMBER_BUTTONS, 0);
     }
 
     ~RosTapJoy()
+    {}
+
+    bool anyButtonChanged()
     {
-        disconnectTap();
+        for (unsigned int b = 0; b < MAX_NUMBER_BUTTONS; b++)
+        {
+            if (isButtonChanged(static_cast<ButtonEnum>(b)))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     bool anyButtonPressed()
@@ -76,12 +87,6 @@ public:
         return false;
     }
 
-    Velocity<TYPE> getVelocity()
-    {
-        setNewData(false);
-        return currentVelocity_;
-    }
-
     bool isButtonChanged(ButtonEnum button)
     {
         return isButtonPressed(button) || isButtonReleased(button);
@@ -89,41 +94,47 @@ public:
 
     bool isButtonPressed(ButtonEnum button)
     {
-        setNewData(false);
+        declareStale();
+
         return (button >= 0 && button < MAX_NUMBER_BUTTONS) ?
             currentButtons_[button] && !previousButtons_[button] : false;
     }
 
     bool isButtonReleased(ButtonEnum button)
     {
-        setNewData(false);
+        declareStale();
+
         return (button >= 0 && button < MAX_NUMBER_BUTTONS) ?
             !currentButtons_[button] && previousButtons_[button] : false;
     }
 
-    void reset()
+    Velocity<> peekJoystickLeft() const
     {
-        RosTap::reset();
-
-        currentVelocity_ = Velocity<>();
-        fill(currentButtons_, currentButtons_ + MAX_NUMBER_BUTTONS, 0);
-        fill(previousButtons_, previousButtons_ + MAX_NUMBER_BUTTONS, 0);
+        return joystickLeft_;
     }
 
-protected:
-    bool connect()
+    Velocity<> peekJoystickRight() const
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe(getTopic(), 10, &RosTapJoy::onJoy, this);
-        return true;
+        return joystickRight_;
     }
 
-private:
-    constexpr static unsigned int MAX_NUMBER_BUTTONS = 20;
-
-    void onJoy(const sensor_msgs::Joy::ConstPtr& message)
+    Velocity<> popJoystickLeft()
     {
-        // Extract the current velocity from the axis
-        currentVelocity_ = Velocity<TYPE>(message->axes[1], message->axes[0]);
+        declareStale();
+        return joystickLeft_;
+    }
+
+    Velocity<> popJoystickRight()
+    {
+        declareStale();
+        return joystickRight_;
+    }
+
+    void receiveData(const sensor_msgs::Joy::ConstPtr message)
+    {
+        // Extract the current velocity from the left and right axis
+        set(Velocity<>(message->axes[1], message->axes[0]),
+            Velocity<>(message->axes[3], message->axes[2]));
 
         // Copy the previous state of the buttons
         copy(currentButtons_, currentButtons_ + MAX_NUMBER_BUTTONS, previousButtons_);
@@ -133,12 +144,34 @@ private:
         {
             currentButtons_[b] = message->buttons[b] > 0;
         }
-
-        setNewData(true);
     }
 
+    void reset()
+    {
+        RosSubscriber::reset();
+
+        joystickLeft_ = Velocity<>::INVALID;
+        joystickRight_ = Velocity<>::INVALID;
+
+        fill(currentButtons_, currentButtons_ + MAX_NUMBER_BUTTONS, 0);
+        fill(previousButtons_, previousButtons_ + MAX_NUMBER_BUTTONS, 0);
+    }
+
+    virtual void set(Velocity<> joystickLeft, Velocity<> joystickRight)
+    {
+        RosSubscriber::set();
+
+        joystickLeft_ = joystickLeft;
+        joystickRight_ = joystickRight;
+    }
+
+private:
+    constexpr static unsigned int MAX_NUMBER_BUTTONS = 20;
+
     bool currentButtons_[MAX_NUMBER_BUTTONS];
-    Velocity<TYPE> currentVelocity_;
+
+    Velocity<> joystickLeft_;
+    Velocity<> joystickRight_;
 
     bool previousButtons_[MAX_NUMBER_BUTTONS];
 };

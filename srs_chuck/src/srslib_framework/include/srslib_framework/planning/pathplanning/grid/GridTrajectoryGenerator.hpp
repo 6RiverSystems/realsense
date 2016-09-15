@@ -19,7 +19,7 @@ using namespace std;
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
-#include <srslib_framework/robotics/RobotProfile.hpp>
+#include <srslib_framework/robotics/robot/RobotProfile.hpp>
 using namespace srs;
 
 namespace srs {
@@ -115,18 +115,15 @@ private:
             interpolateBetweenWaypoints(*fromWaypoint, *toWaypoint,
                 isFirstStretch, isLastStretch);
 
-            // Make sure that the destination waypoint is there
-            // with a 0 maximum velocity
-            if (isLastStretch)
-            {
-                pushWaypoint(*toWaypoint, 0.0);
-            }
-
             // Advance to the next segment
             segment++;
             fromWaypoint++;
             toWaypoint++;
         }
+
+        // Make sure that the destination waypoint is there
+        // with a 0 maximum velocity
+        pushWaypoint(*fromWaypoint, 0.0);
     }
 
     void interpolateBetweenWaypoints(WaypointType fromWaypoint, WaypointType toWaypoint,
@@ -170,7 +167,10 @@ private:
         Pose<> waypoint = fromWaypoint;
         double currentMaxVelocity = v0Max;
 
-        pushWaypoint(waypoint, currentMaxVelocity);
+        if (isFirstStretch)
+        {
+            pushWaypoint(waypoint, currentMaxVelocity);
+        }
 
         // Calculate the change in pose that depend on the
         // direction of motion and the specified spacing

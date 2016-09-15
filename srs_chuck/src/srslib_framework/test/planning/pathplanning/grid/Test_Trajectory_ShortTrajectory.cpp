@@ -21,8 +21,8 @@ using namespace srs;
 
 TEST(Test_Trajectory, ShortTrajectory)
 {
-    constexpr double DEG90 = AngleMath::deg2rad<double>(90);
-    constexpr double DEG180 = AngleMath::deg2rad<double>(180);
+    constexpr double DEG90 = AngleMath::deg2Rad<double>(90);
+    constexpr double DEG180 = AngleMath::deg2Rad<double>(180);
 
     GridSolutionItem SOLUTION_00 = GridSolutionItem(GridSolutionItem::MOVE,
         Pose<>(18, 7, DEG90), Pose<>(18, 8, DEG90));

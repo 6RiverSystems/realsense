@@ -63,7 +63,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_vecBridgeCallbacks["PAUSE"] = { std::bind( &BrainStemMessageProcessor::OnPause, this, std::placeholders::_1 ), 1 };
 	m_vecBridgeCallbacks["CLEAR_MOTION_STATUS"] = { std::bind( &BrainStemMessageProcessor::ClearMotionStatus, this ), 0 };
 
-    hwMessageHandlers_.push_back(&sensorFrameHandler_);
+    hwMessageHandlers_[sensorFrameHandler_.getKey()] = &sensorFrameHandler_;
 }
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor( )
@@ -196,16 +196,15 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 		}
 	}
 
+    ros::Time currentTime = ros::Time::now();
+
     // Go through the registered message handlers and
     // communicate the data if the key matches
-	ros::Time currentTime = ros::Time::now();
-    for (auto handler : hwMessageHandlers_)
+    MessageHandlerMapType::iterator handler = hwMessageHandlers_.find(messageKey);
+    if (handler != hwMessageHandlers_.end())
     {
-        if (handler->isKeyMatching(messageKey))
-        {
-            handler->receiveData(currentTime, buffer);
-            return;
-        }
+        handler->second->receiveData(currentTime, buffer);
+        return;
     }
 
     // If it arrives here, the message key is unknown

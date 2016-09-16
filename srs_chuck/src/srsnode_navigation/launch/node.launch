@@ -15,6 +15,8 @@
 		<remap from="/move_base_simple/goal" to="/request/goal"/>
 		<remap from="/cmd_vel" to="/internal/drivers/brainstem/cmd_velocity"/>
 
+        <param name="base_global_planner" value="srs_global_planner/SrsPlanner"/>
+
 		<rosparam file="$(find srsnode_navigation)/config/move_base_params.yaml" command="load" />
 		<rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
 		<rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />

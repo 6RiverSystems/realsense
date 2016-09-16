@@ -14,6 +14,8 @@
 #include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/MsgPose.h>
 
+#include <srslib_framework/robotics/Pose.hpp>
+
 namespace srs {
 
 struct PoseMessageFactory

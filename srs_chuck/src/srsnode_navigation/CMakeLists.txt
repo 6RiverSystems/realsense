@@ -12,19 +12,67 @@ set(PROJECT_NAME srsnode_navigation)
 
 project(${PROJECT_NAME})
 
-find_package(catkin REQUIRED COMPONENTS 
+set(PROJECT_NODE ${PROJECT_NAME})
+
+set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
+set(CMAKE_BUILD_TYPE Debug)
+
+find_package(catkin REQUIRED COMPONENTS
     roscpp
+    tf
+    nav_core
+    costmap_2d
+    base_local_planner
+    pluginlib
+    srslib_framework
+    srslib_test
 )
 
 include_directories(include
+    src/
     ${catkin_INCLUDE_DIRS}
+    ${srslib_framework_INCLUDE_DIRS}
+    ${srslib_test_INCLUDE_DIRS}
 )
+
+add_definitions(${EIGEN_DEFINITIONS})
 
 ####################################################################################################
 # Target
 
 catkin_package(
+    INCLUDE_DIRS include
+    LIBRARIES global_planner_lib
+    DEPENDS
+        roscpp
+        pluginlib
+        costmap_2d
+        base_local_planner
+        nav_core
+        srslib_framework
+)
+
+add_library(srslib_global_planner src/global_planner/SrsPlanner.cpp)
+target_link_libraries(srslib_global_planner
+    ${catkin_LIBRARIES}
+)
+
+install(TARGETS srslib_global_planner
+   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
+install(DIRECTORY 
+    include/${PROJECT_NAME}/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+    PATTERN ".svn" EXCLUDE
+)
+
+install(FILES bgp_plugin.xml
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
 ####################################################################################################
 # Tests
+
+

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- 
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+
+<library path="lib/libglobal_planner_lib">
+    <class name="srs_global_planner/SrsPlanner" type="srs::SrsPlanner" 
+        base_class_type="nav_core::BaseGlobalPlanner">
+        
+        <description>
+            This is the 6RS global planner plugin.
+        </description>
+    </class>
+ </library>

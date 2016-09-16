@@ -13,7 +13,7 @@ using namespace std;
 
 #include <srslib_framework/math/AngleMath.hpp>
 
-#include <srslib_framework/localization/Map.hpp>
+#include <srslib_framework/localization/map/Map.hpp>
 
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>

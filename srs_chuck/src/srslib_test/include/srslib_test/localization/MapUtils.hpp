@@ -9,7 +9,7 @@
 #include <string>
 using namespace std;
 
-#include <srslib_framework/localization/Map.hpp>
+#include <srslib_framework/localization/map/Map.hpp>
 
 namespace srs {
 namespace test {

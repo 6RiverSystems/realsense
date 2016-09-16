@@ -16,7 +16,7 @@ using namespace std;
 #include <srslib_framework/math/AngleMath.hpp>
 
 #include <srslib_framework/search/SearchPosition.hpp>
-#include <srslib_framework/localization/MapNote.hpp>
+#include <srslib_framework/localization/map/MapNote.hpp>
 
 namespace srs {
 

@@ -11,7 +11,7 @@ using namespace std;
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/AStar.hpp>
-#include <srslib_framework/localization/MapNote.hpp>
+#include <srslib_framework/localization/map/MapNote.hpp>
 
 #include <srslib_test/utils/Print.hpp>
 #include <srslib_test/graph/grid2d/Grid2dUtils.hpp>

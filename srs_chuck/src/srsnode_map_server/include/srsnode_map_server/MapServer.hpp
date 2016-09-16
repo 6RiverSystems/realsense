@@ -11,7 +11,7 @@ using namespace std;
 
 #include <ros/ros.h>
 
-#include <srslib_framework/localization/Map.hpp>
+#include <srslib_framework/localization/map/Map.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
 
 namespace srs {

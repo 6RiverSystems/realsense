@@ -1,4 +1,4 @@
-#include <srslib_framework/localization/Map.hpp>
+#include <srslib_framework/localization/map/Map.hpp>
 
 #include <SDL/SDL_image.h>
 #include <limits>
@@ -9,7 +9,7 @@
 #include <srslib_framework/utils/Filesystem.hpp>
 #include <srslib_framework/graph/grid2d/Grid2dLocation.hpp>
 
-#include <srslib_framework/localization/Anchor.hpp>
+#include <srslib_framework/localization/map/Anchor.hpp>
 
 namespace srs {
 

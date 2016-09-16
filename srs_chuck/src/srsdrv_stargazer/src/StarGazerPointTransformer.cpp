@@ -5,7 +5,7 @@
  */
 
 #include <StarGazerPointTransformer.h>
-#include <srslib_framework/localization/Anchor.hpp>
+#include <srslib_framework/localization/map/Anchor.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/accumulators/accumulators.hpp>

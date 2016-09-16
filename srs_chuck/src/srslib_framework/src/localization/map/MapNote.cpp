@@ -1,4 +1,4 @@
-#include <srslib_framework/localization/MapNote.hpp>
+#include <srslib_framework/localization/map/MapNote.hpp>
 
 namespace srs {
 

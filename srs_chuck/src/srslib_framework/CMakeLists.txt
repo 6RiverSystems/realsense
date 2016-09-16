@@ -20,8 +20,8 @@ set(${PROJECT_NAME}_SOURCES
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp
 
-    src/localization/Map.cpp
-    src/localization/MapNote.cpp
+    src/localization/map/Map.cpp
+    src/localization/map/MapNote.cpp
 
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp

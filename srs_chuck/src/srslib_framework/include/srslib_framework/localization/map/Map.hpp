@@ -15,7 +15,7 @@ using namespace std;
 #include <tf/LinearMath/Quaternion.h>
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
-#include <srslib_framework/localization/MapNote.hpp>
+#include <srslib_framework/localization/map/MapNote.hpp>
 
 namespace srs {
 

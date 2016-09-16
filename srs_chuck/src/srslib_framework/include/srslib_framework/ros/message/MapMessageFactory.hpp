@@ -8,7 +8,7 @@
 
 #include <srslib_framework/MsgMap.h>
 
-#include <srslib_framework/localization/Map.hpp>
+#include <srslib_framework/localization/map/Map.hpp>
 
 namespace srs {
 

@@ -109,9 +109,8 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
 
 	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( pose_.theta );
 
-	ros::Time current = ros::Time::now( );
 	// Publish the TF
-	odom_trans.header.stamp = current;
+	odom_trans.header.stamp = currentTime;
 	odom_trans.transform.translation.x = pose_.x;
 	odom_trans.transform.translation.y = pose_.y;
 	odom_trans.transform.translation.z = 0.0;
@@ -120,7 +119,7 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
 	broadcaster_.sendTransform( odom_trans );
 
 	nav_msgs::Odometry odom;
-	odom.header.stamp = current;
+	odom.header.stamp = currentTime;
 	odom.header.frame_id = "odom";
 	odom.child_frame_id = "base_footprint";
 

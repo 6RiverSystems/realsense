@@ -11,7 +11,7 @@
 #include <iostream>
 using namespace std;
 
-#include <srslib_framework/localization/map/map/Map.hpp>
+#include <srslib_framework/localization/map/Map.hpp>
 
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>

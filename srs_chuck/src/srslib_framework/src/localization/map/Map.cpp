@@ -45,6 +45,30 @@ Map::Map(double widthC, double heightC, double resolution) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+Map::Map(costmap_2d::Costmap2D* costMap)
+{
+    widthC_= costMap->getSizeInCellsX();
+    heightC_ = costMap->getSizeInCellsY();
+    resolution_ = costMap->getResolution();
+
+    widthM_ = costMap->getSizeInMetersX();
+    heightM_ = costMap->getSizeInMetersY();
+
+    grid_ = new Grid2d(widthC_, heightC_);
+
+//    for (int row = 0; row < grid_->getHeight(); row++)
+//    {
+//        for (int col = 0; col < grid_->getWidth(); col++)
+//        {
+//            unsigned char cost = costMap->getCost(col, row);
+//            Grid2dLocation location = Grid2dLocation(col, row);
+//
+//            grid_->addValue(location, static_cast<unsigned int>(cost));
+//        }
+//    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 Map::~Map()
 {
     if (grid_)

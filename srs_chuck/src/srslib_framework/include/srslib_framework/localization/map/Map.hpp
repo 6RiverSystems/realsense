@@ -11,8 +11,10 @@
 using namespace std;
 
 #include <yaml-cpp/yaml.h>
+#include <costmap_2d/costmap_2d.h>
 
 #include <tf/LinearMath/Quaternion.h>
+#include <costmap_2d/costmap_2d.h>
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/map/MapNote.hpp>
@@ -24,6 +26,7 @@ class Map
 public:
     Map();
     Map(double widthMeters, double heightMeters, double resolution);
+    Map(costmap_2d::Costmap2D* costMap);
 
     ~Map();
 

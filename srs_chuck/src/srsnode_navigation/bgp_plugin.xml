@@ -7,8 +7,8 @@
   *
 -->
 
-<library path="lib/libglobal_planner_lib">
-    <class name="srs_global_planner/SrsPlanner" type="srs::SrsPlanner" 
+<library path="lib/libsrslib_global_planner">
+    <class name="global_planner/SrsPlanner" type="srs::SrsPlanner" 
         base_class_type="nav_core::BaseGlobalPlanner">
         
         <description>

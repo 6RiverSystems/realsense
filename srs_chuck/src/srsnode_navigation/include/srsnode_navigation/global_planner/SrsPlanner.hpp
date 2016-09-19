@@ -38,7 +38,7 @@ public:
         vector<geometry_msgs::PoseStamped>& plan);
 
 private:
-    Map* map_;
+    Map* srsMap_;
 };
 
 } // namespace srs

@@ -42,7 +42,7 @@ add_definitions(${EIGEN_DEFINITIONS})
 
 catkin_package(
     INCLUDE_DIRS include
-    LIBRARIES global_planner_lib
+    LIBRARIES srslib_global_planner
     DEPENDS
         roscpp
         pluginlib
@@ -71,8 +71,3 @@ install(DIRECTORY
 install(FILES bgp_plugin.xml
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
-
-####################################################################################################
-# Tests
-
-

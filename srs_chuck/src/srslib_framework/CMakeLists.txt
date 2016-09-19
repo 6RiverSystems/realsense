@@ -106,6 +106,7 @@ find_package(catkin REQUIRED COMPONENTS
     message_generation
     std_msgs
     nav_msgs
+    costmap_2d
 )
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED)
@@ -122,6 +123,7 @@ include_directories(
     ${roscpp_INCLUDE_DIRS}
 	${OpenCV_INCLUDE_DIRS} 
     ${srslib_test_INCLUDE_DIRS}
+    ${catkin_INCLUDE_DIRS}
 )
 
 set(PROJECT_LIBRARIES
@@ -146,7 +148,9 @@ add_service_files(
 )
 
 generate_messages(
-    DEPENDENCIES std_msgs nav_msgs
+    DEPENDENCIES 
+        std_msgs 
+        nav_msgs
 )
 
 ####################################################################################################
@@ -156,7 +160,13 @@ generate_messages(
 catkin_package(
     INCLUDE_DIRS src include
     LIBRARIES ${PROJECT_LIBRARY}
-    DEPENDS opencv message_runtime std_msgs nav_msgs srslib_test
+    DEPENDS 
+        opencv 
+        message_runtime 
+        std_msgs 
+        nav_msgs 
+        srslib_test
+        costmap_2d
 )
 
 add_library(${PROJECT_LIBRARY}
@@ -164,13 +174,14 @@ add_library(${PROJECT_LIBRARY}
 )
 
 add_dependencies(${PROJECT_LIBRARY}
-    ${srslib_framework_EXPORTED_TARGETS}
+#    ${srslib_framework_EXPORTED_TARGETS}
     ${catkin_EXPORTED_TARGETS}
 )
 
 target_link_libraries(${PROJECT_LIBRARY}
     ${PROJECT_LIBRARIES}
     ${UNWIND_LIBRARIES}
+    ${catkin_LIBRARIES}
 )
 
 ####################################################################################################

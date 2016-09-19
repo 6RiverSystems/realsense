@@ -24,9 +24,7 @@ namespace srs {
 class SrsPlanner : public nav_core::BaseGlobalPlanner
 {
 public:
-    SrsPlanner()
-    {}
-
+    SrsPlanner();
     SrsPlanner(string name, costmap_2d::Costmap2DROS* costmap_ros);
     virtual ~SrsPlanner();
 
@@ -39,6 +37,7 @@ public:
 
 private:
     Map* srsMap_;
+    costmap_2d::Costmap2DROS* rosCostMap_;
 };
 
 } // namespace srs

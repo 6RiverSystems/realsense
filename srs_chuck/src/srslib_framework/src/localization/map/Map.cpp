@@ -56,16 +56,25 @@ Map::Map(costmap_2d::Costmap2D* costMap)
 
     grid_ = new Grid2d(widthC_, heightC_);
 
-//    for (int row = 0; row < grid_->getHeight(); row++)
-//    {
-//        for (int col = 0; col < grid_->getWidth(); col++)
-//        {
-//            unsigned char cost = costMap->getCost(col, row);
-//            Grid2dLocation location = Grid2dLocation(col, row);
-//
-//            grid_->addValue(location, static_cast<unsigned int>(cost));
-//        }
-//    }
+    for (int row = 0; row < grid_->getHeight(); row++)
+    {
+        for (int col = 0; col < grid_->getWidth(); col++)
+        {
+            unsigned char cost = costMap->getCost(col, row);
+            Grid2dLocation location = Grid2dLocation(col, row);
+
+            // Static obstacles is automatically added for
+            // cost values greater than 199
+            MapNote* note = nullptr;
+            if (cost >= 199)
+            {
+                note = MapNote::instanceOf();
+                note->join(MapNote::STATIC_OBSTACLE);
+            }
+
+            grid_->addValue(location, static_cast<unsigned int>(cost), note);
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -338,6 +347,8 @@ void Map::loadCosts()
 ostream& operator<<(ostream& stream, const Map& map)
 {
     int8_t maxValue = numeric_limits<int8_t>::max();
+
+    stream << "Map (" << map.grid_->getHeight() << "x" << map.grid_->getWidth() << ")" << endl;
 
     for (int row = map.grid_->getHeight() - 1; row >= 0; row--)
     {

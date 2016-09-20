@@ -21,7 +21,7 @@ namespace srs {
 SrsPlanner::SrsPlanner() :
     srsMap_(nullptr)
 {
-    ROS_WARN("SrsPlanner::SrsPlanner() called");
+    ROS_DEBUG("SrsPlanner::SrsPlanner() called");
 
     initializeParams();
 }
@@ -30,7 +30,7 @@ SrsPlanner::SrsPlanner() :
 SrsPlanner::SrsPlanner(string name, costmap_2d::Costmap2DROS* rosCostMap) :
     srsMap_(nullptr)
 {
-    ROS_WARN("SrsPlanner::SrsPlanner(...) called");
+    ROS_DEBUG("SrsPlanner::SrsPlanner(...) called");
 
     initializeParams();
     initialize(name, rosCostMap);
@@ -45,7 +45,7 @@ SrsPlanner::~SrsPlanner()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostMap)
 {
-    ROS_WARN_STREAM("SrsPlanner::initialize called" << name);
+    ROS_DEBUG_STREAM("SrsPlanner::initialize() called");
 
     delete srsMap_;
     srsMap_ = MapFactory::fromRosCostMap2D(rosCostMap, weightObstacleThreshold_);
@@ -57,7 +57,7 @@ bool SrsPlanner::makePlan(
     const geometry_msgs::PoseStamped& goal,
     vector<geometry_msgs::PoseStamped>& plan)
 {
-    ROS_WARN("SrsPlanner::makePlan called");
+    ROS_WARN("SrsPlanner::makePlan() called");
 
     // Find a suitable solution for the provided goal
     Pose<> robotPose = PoseMessageFactory::poseStamped2Pose(start);
@@ -72,8 +72,10 @@ bool SrsPlanner::makePlan(
 
         Trajectory<> trajectory;
 
-        // Calculate the trajectory from the solution
-        // found by A*
+        // Calculate the trajectory from the solution found by A*,
+        // using the default Chuck model
+
+        // TODO: Remove this assumption
         Chuck chuck;
         GridTrajectoryGenerator converter(chuck);
         converter.fromSolution(*solution);
@@ -121,7 +123,7 @@ void SrsPlanner::initializeParams()
     private_nh.param("/move_base/global_costmap/inflation_layer/enabled",
         inflationEnabled, true);
 
-    weightObstacleThreshold_ = round((100.0 * weightScaleFactor_) * 0.98);
+    weightObstacleThreshold_ = round((100.0 * (inflationEnabled ? weightScaleFactor_ : 1.0)) * 0.98);
 }
 
 } // namespace srs

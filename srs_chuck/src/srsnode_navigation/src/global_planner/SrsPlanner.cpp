@@ -22,15 +22,18 @@ SrsPlanner::SrsPlanner() :
     srsMap_(nullptr)
 {
     ROS_WARN("SrsPlanner::SrsPlanner() called");
+
+    initializeParams();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-SrsPlanner::SrsPlanner(string name, costmap_2d::Costmap2DROS* costmap_ros) :
+SrsPlanner::SrsPlanner(string name, costmap_2d::Costmap2DROS* rosCostMap) :
     srsMap_(nullptr)
 {
-    initialize(name, costmap_ros);
+    ROS_WARN("SrsPlanner::SrsPlanner(...) called");
 
-    ROS_WARN("SrsPlanner::SrsPlanner(params) called");
+    initializeParams();
+    initialize(name, rosCostMap);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,12 +43,12 @@ SrsPlanner::~SrsPlanner()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros)
+void SrsPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostMap)
 {
-    ROS_WARN("SrsPlanner::initialize called");
+    ROS_WARN_STREAM("SrsPlanner::initialize called" << name);
 
     delete srsMap_;
-    srsMap_ = MapFactory::fromRosCostMap2D(costmap_ros, 199);
+    srsMap_ = MapFactory::fromRosCostMap2D(rosCostMap, weightObstacleThreshold_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,5 +110,18 @@ bool SrsPlanner::makePlan(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
+
+void SrsPlanner::initializeParams()
+{
+    ros::NodeHandle private_nh;
+    bool inflationEnabled;
+
+    private_nh.param("/move_base/global_costmap/inflation_layer/cost_scaling_factor",
+        weightScaleFactor_, 1.0);
+    private_nh.param("/move_base/global_costmap/inflation_layer/enabled",
+        inflationEnabled, true);
+
+    weightObstacleThreshold_ = round((100.0 * weightScaleFactor_) * 0.98);
+}
 
 } // namespace srs

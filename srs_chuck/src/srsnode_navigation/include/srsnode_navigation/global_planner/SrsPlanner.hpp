@@ -25,10 +25,10 @@ class SrsPlanner : public nav_core::BaseGlobalPlanner
 {
 public:
     SrsPlanner();
-    SrsPlanner(string name, costmap_2d::Costmap2DROS* costmap_ros);
+    SrsPlanner(string name, costmap_2d::Costmap2DROS* rosCostMap);
     virtual ~SrsPlanner();
 
-    void initialize(string name, costmap_2d::Costmap2DROS* costmap_ros);
+    void initialize(string name, costmap_2d::Costmap2DROS* rosCostMap);
 
     bool makePlan(
         const geometry_msgs::PoseStamped& start,
@@ -36,8 +36,12 @@ public:
         vector<geometry_msgs::PoseStamped>& plan);
 
 private:
+    void initializeParams();
+
     Map* srsMap_;
-    costmap_2d::Costmap2DROS* rosCostMap_;
+
+    unsigned int weightObstacleThreshold_;
+    double weightScaleFactor_;
 };
 
 } // namespace srs

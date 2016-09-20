@@ -14,7 +14,7 @@ using namespace std;
 
 #include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTap.hpp>
 
 namespace srs {
 

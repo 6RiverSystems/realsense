@@ -10,7 +10,7 @@
 
 #include <srslib_framework/localization/map/Map.hpp>
 
-#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTap.hpp>
 #include <srslib_framework/ros/message/MapMessageFactory.hpp>
 
 namespace srs {

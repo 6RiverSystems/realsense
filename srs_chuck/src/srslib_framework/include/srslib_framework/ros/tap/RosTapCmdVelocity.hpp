@@ -9,7 +9,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 
-#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTap.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
 namespace srs {

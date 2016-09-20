@@ -12,7 +12,7 @@ using namespace std;
 #include <srslib_framework/MsgOperationalState.h>
 
 #include <srslib_framework/robotics/RobotState.hpp>
-#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTap.hpp>
 #include <srslib_framework/ros/message/OperationalStateMessageFactory.hpp>
 
 namespace srs {

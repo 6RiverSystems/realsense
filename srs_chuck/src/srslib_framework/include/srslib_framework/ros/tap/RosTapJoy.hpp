@@ -11,7 +11,7 @@ using namespace std;
 
 #include <sensor_msgs/Joy.h>
 
-#include <srslib_framework/ros/RosSubscriber.hpp>
+#include <srslib_framework/ros/subscriber/RosSubscriber.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
 namespace srs {

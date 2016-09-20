@@ -12,7 +12,7 @@ using namespace std;
 #include <ros/ros.h>
 
 #include <srslib_framework/math/TimeMath.hpp>
-#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTap.hpp>
 #include <srsnode_motion/tap/sensor_frame/aps/ApsSensor.hpp>
 
 #include <srslib_framework/MsgPose.h>

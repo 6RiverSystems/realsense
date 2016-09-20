@@ -10,7 +10,7 @@
 #include <std_msgs/Bool.h>
 
 #include <srslib_framework/math/TimeMath.hpp>
-#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTap.hpp>
 
 namespace srs {
 

@@ -10,7 +10,7 @@
 
 #include <srslib_framework/SensorFrame.h>
 
-#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTap.hpp>
 #include <srslib_framework/ros/message/ImuMessageFactory.hpp>
 #include <srslib_framework/ros/message/VelocityMessageFactory.hpp>
 

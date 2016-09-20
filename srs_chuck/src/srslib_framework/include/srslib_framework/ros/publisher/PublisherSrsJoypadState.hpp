@@ -10,7 +10,7 @@ using namespace std;
 
 #include <srslib_framework/JoypadState.h>
 
-#include <srslib_framework/ros/RosPublisher.hpp>
+#include <srslib_framework/ros/publisher/RosPublisher.hpp>
 #include <srslib_framework/ros/message/JoypadStateMessageFactory.hpp>
 
 namespace srs {

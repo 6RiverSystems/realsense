@@ -26,6 +26,7 @@ public:
     static const MapNote PREFERRED_270;
 
     static MapNote* instanceOf(int8_t flags = 0);
+    static MapNote* instanceOf(const MapNote& note);
 
     MapNote() :
         od_(false),

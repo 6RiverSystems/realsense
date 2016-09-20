@@ -45,39 +45,6 @@ Map::Map(double widthC, double heightC, double resolution) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Map::Map(costmap_2d::Costmap2D* costMap)
-{
-    widthC_= costMap->getSizeInCellsX();
-    heightC_ = costMap->getSizeInCellsY();
-    resolution_ = costMap->getResolution();
-
-    widthM_ = costMap->getSizeInMetersX();
-    heightM_ = costMap->getSizeInMetersY();
-
-    grid_ = new Grid2d(widthC_, heightC_);
-
-    for (int row = 0; row < grid_->getHeight(); row++)
-    {
-        for (int col = 0; col < grid_->getWidth(); col++)
-        {
-            unsigned char cost = costMap->getCost(col, row);
-            Grid2dLocation location = Grid2dLocation(col, row);
-
-            // Static obstacles is automatically added for
-            // cost values greater than 199
-            MapNote* note = nullptr;
-            if (cost >= 199)
-            {
-                note = MapNote::instanceOf();
-                note->join(MapNote::STATIC_OBSTACLE);
-            }
-
-            grid_->addValue(location, static_cast<unsigned int>(cost), note);
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 Map::~Map()
 {
     if (grid_)
@@ -193,6 +160,13 @@ void Map::load(string filename)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void Map::setCost(int c, int r, unsigned int cost)
+{
+    Grid2dLocation location = Grid2dLocation(c, r);
+    grid_->addValue(location, cost);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void Map::setGrid(const vector<int8_t>& costsGrid, const vector<int8_t>& notesGrid)
 {
     if (grid_)
@@ -226,6 +200,15 @@ void Map::setGrid(const vector<int8_t>& costsGrid, const vector<int8_t>& notesGr
             }
         }
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Map::setObstruction(int c, int r)
+{
+    Grid2dLocation location = Grid2dLocation(c, r);
+    void* note = reinterpret_cast<void*>(MapNote::instanceOf(MapNote::STATIC_OBSTACLE));
+
+    grid_->addValue(location, numeric_limits<unsigned int>::max(), note);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

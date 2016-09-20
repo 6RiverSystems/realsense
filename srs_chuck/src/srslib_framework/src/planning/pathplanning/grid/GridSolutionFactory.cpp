@@ -34,6 +34,11 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromConsecutiveGoals(Map* map,
 Solution<GridSolutionItem>* GridSolutionFactory::fromGoal(Map* map,
     Pose<> fromPose, Pose<> toPose)
 {
+    if (!map)
+    {
+        return nullptr;
+    }
+
     // Prepare the start position for the search
     Grid2d::LocationType internalStart;
     int startAngle;
@@ -73,6 +78,11 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromRotation(
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(Map* map, SearchNode<Grid2d>* goalNode)
 {
+    if (!map)
+    {
+        return nullptr;
+    }
+
     Solution<GridSolutionItem>* result = new Solution<GridSolutionItem>();
 
     // If no path was found in the previous search,

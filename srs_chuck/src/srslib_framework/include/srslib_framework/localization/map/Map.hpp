@@ -11,10 +11,7 @@
 using namespace std;
 
 #include <yaml-cpp/yaml.h>
-#include <costmap_2d/costmap_2d.h>
-
-#include <tf/LinearMath/Quaternion.h>
-#include <costmap_2d/costmap_2d.h>
+#include <tf/tf.h>
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/map/MapNote.hpp>
@@ -26,7 +23,6 @@ class Map
 public:
     Map();
     Map(double widthMeters, double heightMeters, double resolution);
-    Map(costmap_2d::Costmap2D* costMap);
 
     ~Map();
 
@@ -80,7 +76,9 @@ public:
 
     friend ostream& operator<<(ostream& stream, const Map& map);
 
+    void setCost(int c, int r, unsigned int cost);
     void setGrid(const vector<int8_t>& costsGrid, const vector<int8_t>& notesGrid);
+    void setObstruction(int c, int r);
 
 private:
     void loadConfiguration();

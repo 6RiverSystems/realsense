@@ -4,6 +4,7 @@
 
 PLUGINLIB_EXPORT_CLASS(srs::SrsPlanner, nav_core::BaseGlobalPlanner)
 
+#include <srslib_framework/localization/map/MapFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
@@ -18,16 +19,14 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlanner::SrsPlanner() :
-    srsMap_(nullptr),
-    rosCostMap_(nullptr)
+    srsMap_(nullptr)
 {
     ROS_WARN("SrsPlanner::SrsPlanner() called");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlanner::SrsPlanner(string name, costmap_2d::Costmap2DROS* costmap_ros) :
-    srsMap_(nullptr),
-    rosCostMap_(nullptr)
+    srsMap_(nullptr)
 {
     initialize(name, costmap_ros);
 
@@ -45,17 +44,8 @@ void SrsPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_
 {
     ROS_WARN("SrsPlanner::initialize called");
 
-    rosCostMap_ = costmap_ros;
-
     delete srsMap_;
-    srsMap_ = nullptr;
-
-    if (rosCostMap_)
-    {
-        srsMap_ = new Map(rosCostMap_->getCostmap());
-    }
-
-    cout << *srsMap_ << endl;
+    srsMap_ = MapFactory::fromRosCostMap2D(costmap_ros, 199);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +63,7 @@ bool SrsPlanner::makePlan(
 
     plan.clear();
 
-    if (!solution->empty())
+    if (solution && !solution->empty())
     {
         ROS_DEBUG_STREAM_NAMED("srs_planner", "Found solution: " << endl << *solution);
 

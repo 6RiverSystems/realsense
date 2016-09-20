@@ -22,6 +22,7 @@ set(${PROJECT_NAME}_SOURCES
 
     src/localization/map/Map.cpp
     src/localization/map/MapNote.cpp
+    src/localization/map/MapFactory.cpp
 
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp

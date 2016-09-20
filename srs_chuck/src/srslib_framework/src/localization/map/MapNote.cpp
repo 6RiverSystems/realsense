@@ -76,7 +76,6 @@ int8_t MapNote::getFlags()
 MapNote* MapNote::instanceOf(int8_t flags)
 {
     MapNote* note = new MapNote();
-    note->reset();
 
     if (flags & MapNote::FLAG_GO_SLOW)
     {
@@ -122,6 +121,21 @@ MapNote* MapNote::instanceOf(int8_t flags)
     }
 
     return note;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+MapNote* MapNote::instanceOf(const MapNote& originalNote)
+{
+    MapNote* newNote = new MapNote();
+
+    newNote->goSlow_ = originalNote.goSlow_;
+    newNote->noRotations_ = originalNote.noRotations_;
+    newNote->od_ = originalNote.od_;
+    newNote->staticObstacle_ = originalNote.staticObstacle_;
+    newNote->preferred_ = originalNote.preferred_;
+    newNote->preferredAngle_ = originalNote.preferredAngle_;
+
+    return newNote;
 }
 
 } // namespace srs

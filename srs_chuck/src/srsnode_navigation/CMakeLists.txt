@@ -55,6 +55,7 @@ catkin_package(
 add_library(srslib_global_planner src/global_planner/SrsPlanner.cpp)
 target_link_libraries(srslib_global_planner
     ${catkin_LIBRARIES}
+    ${srslib_framework_LIBRARIES}
 )
 
 install(TARGETS srslib_global_planner

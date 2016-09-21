@@ -13,7 +13,7 @@ namespace srs {
 OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	nodeHandle_(nodeName),
 	twist_(),
-	pose_(15.71100, 5.33400, M_PI),
+	pose_(16.427, 24.373, 0),
 	pingTimer_(),
 	broadcaster_(),
 	rawOdometrySub_(),

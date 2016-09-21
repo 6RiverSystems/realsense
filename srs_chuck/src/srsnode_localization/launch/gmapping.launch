@@ -6,6 +6,9 @@
   *
 -->
 <launch>
+	<remap from="/map" to="/internal/state/map/grid"/>
+    <remap from="/map_metadata" to="/internal/state/map/info"/>
+
 	<!-- Gmapping Stack -->
 	<node pkg="gmapping" type="slam_gmapping" name="slam_gmapping">
       <remap from="scan" to="/internal/sensors/lidar/scan/filtered"/>

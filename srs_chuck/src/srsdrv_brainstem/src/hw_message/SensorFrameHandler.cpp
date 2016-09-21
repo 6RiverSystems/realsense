@@ -95,7 +95,7 @@ void SensorFrameHandler::receiveData(ros::Time currentTime, vector<char>& buffer
     // If the last time the handler received the data is greater than the specified
     // time-out or the robot is standing still, set the arrival time of the data
     // to the current time minus the transmission delay (in this case of the serial port)
-    if (timeSliceExpired || VelocityMath::equal<double>(odometryVelocity, Velocity<>::ZERO))
+    if (true)//timeSliceExpired || VelocityMath::equal<double>(odometryVelocity, Velocity<>::ZERO))
     {
         internalTime = currentTime - ros::Duration(0, SERIAL_TRANSMIT_DELAY);
     }

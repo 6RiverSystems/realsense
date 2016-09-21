@@ -6,13 +6,13 @@
   *
 -->
 <launch>
-    <arg name="emulation" default="false" />
+    <arg name="simulation" default="false" />
    	<remap from="map" to="/internal/state/map/grid"/>
    	<remap from="map_metadata" to="/internal/state/map/info"/>
- 
+
     <!-- Chuck Stack -->
 	<include file="$(find srsbot_chuck)/launch/robot.launch" />
- 
+
     <!-- Intel Realsense R200 -->
     <include file="$(find realsense_camera)/launch/r200_nodelet_rgbd.launch" >
         <arg name="load_driver" unless="$(arg simulation)" value="true" />

@@ -19,7 +19,7 @@ using namespace std;
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
-#include <srslib_framework/robotics/robot/RobotProfile.hpp>
+#include <srslib_framework/robotics/robot_profile/RobotProfile.hpp>
 using namespace srs;
 
 namespace srs {

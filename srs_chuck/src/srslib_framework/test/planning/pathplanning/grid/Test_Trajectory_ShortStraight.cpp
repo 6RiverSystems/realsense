@@ -16,7 +16,7 @@ using namespace std;
 #include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
 
 #include <srslib_framework/robotics/Trajectory.hpp>
-#include <srslib_framework/robotics/robot/Chuck.hpp>
+#include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 using namespace srs;
 
 TEST(Test_Trajectory, ShortStraight)

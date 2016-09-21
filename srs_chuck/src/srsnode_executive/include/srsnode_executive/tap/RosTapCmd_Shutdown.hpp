@@ -3,25 +3,19 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPCMD_SHUTDOWN_HPP_
-#define ROSTAPCMD_SHUTDOWN_HPP_
+#pragma once
 
-#include <string>
-using namespace std;
-
-#include <srslib_framework/ros/tap/RosTapBool.hpp>
+#include <srslib_framework/ros/subscriber/SubscriberBoolean.hpp>
 
 namespace srs {
 
 class RosTapCmd_Shutdown :
-    public RosTapBool
+    public SubscriberBoolean
 {
 public:
     RosTapCmd_Shutdown() :
-        RosTapBool("/request/shutdown", "Command 'Shutdown' Tap")
+        SubscriberBoolean("/request/shutdown")
     {}
 };
 
 } // namespace srs
-
-#endif // ROSTAPCMD_SHUTDOWN_HPP_

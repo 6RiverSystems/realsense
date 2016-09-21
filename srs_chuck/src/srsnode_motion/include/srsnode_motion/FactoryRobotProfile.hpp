@@ -11,7 +11,7 @@
 #include <srsnode_motion/MotionConfig.h>
 using namespace srsnode_motion;
 
-#include <srslib_framework/robotics/robot/RobotProfile.hpp>
+#include <srslib_framework/robotics/robot_profile/RobotProfile.hpp>
 
 struct FactoryRobotProfile
 {

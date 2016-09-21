@@ -19,7 +19,7 @@
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
 
-#include <srslib_framework/robotics/robot/Chuck.hpp>
+#include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
 
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>

@@ -3,27 +3,19 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPCMD_GOAL_HPP_
-#define ROSTAPCMD_GOAL_HPP_
+#pragma once
 
-#include <string>
-using namespace std;
-
-#include <ros/ros.h>
-
-#include <srslib_framework/ros/tap/RosTapPoseStamped.hpp>
+#include <srslib_framework/ros/subscriber/SubscriberPoseStamped.hpp>
 
 namespace srs {
 
 class RosTapCmd_Goal :
-    public RosTapPoseStamped
+    public SubscriberPoseStamped
 {
 public:
     RosTapCmd_Goal() :
-        RosTapPoseStamped("/request/goal", "Command move")
+        SubscriberPoseStamped("/request/goal")
     {}
 };
 
 } // namespace srs
-
-#endif // ROSTAPCMD_GOAL_HPP_

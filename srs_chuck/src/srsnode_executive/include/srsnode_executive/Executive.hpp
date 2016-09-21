@@ -10,15 +10,14 @@
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
-
 #include <srslib_framework/robotics/Pose.hpp>
-
+#include <srslib_framework/ros/publisher/PublisherBoolean.hpp>
+#include <srslib_framework/ros/publisher/PublisherPoseStamped.hpp>
 #include <srslib_framework/ros/tap/RosTapMap.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_GoalArrived.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_RobotPose.hpp>
 #include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
 #include <srslib_framework/ros/tap/RosTapOperationalState.hpp>
-
 #include <srslib_framework/search/AStar.hpp>
 
 #include <srsnode_executive/tap/RosTapCmd_Goal.hpp>
@@ -65,9 +64,8 @@ private:
         return !isJoystickLatched_ && !arrived_;
     }
 
-    void publishInternalInitialPose(Pose<> initialPose);
-    void publishInternalGoalSolution(Solution<GridSolutionItem>* solution);
     void publishGoalTarget(Pose<> goalTargetArea);
+    void publishInternalInitialPose(Pose<> initialPose);
 
     void stepChecks();
     void stepExecutiveFunctions();
@@ -87,12 +85,12 @@ private:
 
     bool isJoystickLatched_;
 
-    ros::Publisher pubExternalArrived_;
+    PublisherBoolean pubExternalArrived_;
     ros::Publisher pubInternalInitialPose_;
-    ros::Publisher pubInternalGoalSolution_;
     ros::Publisher pubStatusGoalPlan_;
     ros::Publisher pubStatusGoal_;
     ros::Publisher pubStatusGoalTarget_;
+    PublisherPoseStamped pubGoalToNavigation_;
 
     Pose<> robotInitialPose_;
     ros::NodeHandle rosNodeHandle_;

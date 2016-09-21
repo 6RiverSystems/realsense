@@ -8,16 +8,14 @@
 
 #include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
-
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/PoseAdapter.hpp>
-
+#include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/ros/message/SolutionMessageFactory.hpp>
 #include <srslib_framework/ros/service/RosCallEmpty.hpp>
 #include <srslib_framework/ros/service/RosCallSetBool.hpp>
 #include <srslib_framework/ros/service/RosCallSolution.hpp>
-
-#include <srslib_framework/robotics/robot/Chuck.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
@@ -32,15 +30,12 @@ Executive::Executive(string nodeName) :
     rosNodeHandle_(nodeName),
     arrived_(true),
     robotInitialPose_(Pose<>::INVALID),
-    isJoystickLatched_(false)
-
+    isJoystickLatched_(false),
+    pubExternalArrived_(ChuckTopics::external::RESPONSE_ARRIVED),
+    pubGoalToNavigation_(ChuckTopics::internal::GOAL_TO_NAVIGATION)
 {
     pubInternalInitialPose_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
         "/internal/command/initial_pose", 1);
-    pubInternalGoalSolution_ = rosNodeHandle_.advertise<srslib_framework::MsgSolution>(
-        "/internal/state/goal/solution", 1);
-    pubExternalArrived_ = rosNodeHandle_.advertise<std_msgs::Bool>(
-        "/response/arrived", 1);
     pubStatusGoal_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
         "/internal/state/goal/goal", 1);
 
@@ -75,11 +70,6 @@ void Executive::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::connectAllTaps()
 {
-    tapCmdGoal_.connectTap();
-    tapCmdInitialPose_.connectTap();
-    tapCmdMove_.connectTap();
-    tapCmdShutdown_.connectTap();
-    tapInternal_GoalArrived_.connectTap();
     tapInternal_RobotPose_.connectTap();
 
     tapMap_.connectTap();
@@ -89,11 +79,6 @@ void Executive::connectAllTaps()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::disconnectAllTaps()
 {
-    tapCmdGoal_.disconnectTap();
-    tapCmdInitialPose_.disconnectTap();
-    tapCmdMove_.disconnectTap();
-    tapCmdShutdown_.disconnectTap();
-    tapInternal_GoalArrived_.disconnectTap();
     tapInternal_RobotPose_.disconnectTap();
 
     tapMap_.disconnectTap();
@@ -103,10 +88,7 @@ void Executive::disconnectAllTaps()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::executeArrived()
 {
-    std_msgs::Bool messageGoalArrived;
-    messageGoalArrived.data = arrived_;
-
-    pubExternalArrived_.publish(messageGoalArrived);
+    pubExternalArrived_.publish(arrived_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,20 +102,20 @@ void Executive::executePause()
 {
     if (RosCallSetBool::call("srsnode_motion", "/trigger/pause", true))
     {
-        if (currentSolution_)
-        {
-            // Reset the solution and publish it
-            // so that every display can update as well. The final
-            // goal remains, so that replan can be executed upon
-            // an resume command
-            currentSolution_->clear();
-            publishInternalGoalSolution(currentSolution_);
-
-            // Remove the current solution as it will have to be calculated
-            // again once the robot is unpaused
-            delete currentSolution_;
-            currentSolution_ = nullptr;
-        }
+//        if (currentSolution_)
+//        {
+//            // Reset the solution and publish it
+//            // so that every display can update as well. The final
+//            // goal remains, so that replan can be executed upon
+//            // an resume command
+//            currentSolution_->clear();
+//            publishInternalGoalSolution(currentSolution_);
+//
+//            // Remove the current solution as it will have to be calculated
+//            // again once the robot is unpaused
+//            delete currentSolution_;
+//            currentSolution_ = nullptr;
+//        }
     }
 }
 
@@ -160,49 +142,7 @@ void Executive::executePlanToGoal()
     // where the robot screen will be
     currentTarget_ = PoseMath::translate<double>(currentGoal_, chuck.bodyDepth / 2.0, 0.0);
 
-    Map* map = tapMap_.getMap();
 
-    // Prepare the start position for the search
-    Grid2d::LocationType internalStart;
-    int startAngle;
-    PoseAdapter::pose2Map(currentRobotPose_, map, internalStart, startAngle);
-
-    // Prepare the goal position for the search
-    Grid2d::LocationType internalGoal;
-    int goalAngle;
-    PoseAdapter::pose2Map(currentTarget_, map, internalGoal, goalAngle);
-
-    ROS_DEBUG_STREAM_NAMED("executive", "Looking for a path between " <<
-        currentRobotPose_ <<
-        " (" << internalStart.x << "," << internalStart.y << "," << startAngle << ") and " <<
-        currentTarget_ << " - " << currentGoal_ << " " <<
-        " (" << internalGoal.x << "," << internalGoal.y << "," << goalAngle << ")");
-
-    // Deallocate the current solution if there is one
-    if (currentSolution_)
-    {
-        delete currentSolution_;
-    }
-
-    currentSolution_ = GridSolutionFactory::fromGoal(map, currentRobotPose_, currentTarget_);
-
-    if (!currentSolution_->empty())
-    {
-        ROS_DEBUG_STREAM_NAMED("executive", "Found solution: " << endl << *currentSolution_);
-
-        ROS_INFO_STREAM_NAMED("executive", "Found path for goal: " <<
-            internalGoal.x << ", " << internalGoal.y << ", " << goalAngle << " => offset goal: " <<
-            currentGoal_.x << ", " << currentGoal_.y << ", " <<
-            AngleMath::deg2Rad<double>(currentGoal_.theta));
-    }
-    else
-    {
-        ROS_ERROR_STREAM_NAMED("executive", "Path not found between " <<
-            currentRobotPose_ <<
-            " (" << internalStart.x << "," << internalStart.y << "," << startAngle << ") and " <<
-            currentGoal_ <<
-            " (" << internalGoal.x << "," << internalGoal.y << "," << goalAngle << ")");
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -245,7 +185,7 @@ void Executive::executeUnpause()
     if (isExecutingSolution())
     {
         executePlanToGoal();
-        publishInternalGoalSolution(currentSolution_);
+//        publishInternalGoalSolution(currentSolution_);
 
         if (currentSolution_)
         {
@@ -301,24 +241,6 @@ void Executive::publishGoalTarget(Pose<> goalTargetArea)
     pubStatusGoalTarget_.publish(messageLanding);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Executive::publishInternalGoalSolution(Solution<GridSolutionItem>* solution)
-{
-    if (solution)
-    {
-        nav_msgs::Path messagePath = SolutionMessageFactory::gridSolution2PathMsg(*solution);
-        pubStatusGoalPlan_.publish(messagePath);
-
-        srslib_framework::MsgSolution messageSolution =
-            SolutionMessageFactory::gridSolution2Msg(*solution);
-        pubInternalGoalSolution_.publish(messageSolution);
-    }
-    else
-    {
-        ROS_ERROR_NAMED("executive", "Trying to publish a null solution");
-    }
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::publishInternalInitialPose(Pose<> initialPose)
 {
@@ -365,7 +287,7 @@ void Executive::stepExecutiveFunctions()
     // If there is a new goal to reach
     if (tapCmdMove_.newDataAvailable())
     {
-        currentGoal_ = tapCmdMove_.getPose();
+        currentGoal_ = tapCmdMove_.pop();
         executePlanToMove();
     }
 
@@ -374,7 +296,7 @@ void Executive::stepExecutiveFunctions()
     {
         // Make sure that the current goal is properly
         // initialized to the closest 90deg angle
-        currentGoal_ = tapCmdGoal_.getPose();
+        currentGoal_ = tapCmdGoal_.pop();
         currentGoal_.theta = AngleMath::normalizeRad2Rad90(currentGoal_.theta);
 
         taskPlanToGoal();
@@ -382,13 +304,13 @@ void Executive::stepExecutiveFunctions()
 
     if (tapCmdInitialPose_.newDataAvailable())
     {
-        robotInitialPose_ = tapCmdInitialPose_.getPose();
+        robotInitialPose_ = tapCmdInitialPose_.pop();
         executeInitialPose();
     }
 
     if (tapInternal_GoalArrived_.newDataAvailable())
     {
-        arrived_ = tapInternal_GoalArrived_.getBool();
+        arrived_ = tapInternal_GoalArrived_.pop();
         executeArrived();
     }
 
@@ -473,7 +395,7 @@ void Executive::taskCustomAction()
     currentSolution_ = GridSolutionFactory::fromConsecutiveGoals(map, currentRobotPose_, goals);
 
     publishGoalTarget(currentGoal_);
-    publishInternalGoalSolution(currentSolution_);
+//    publishInternalGoalSolution(currentSolution_);
 
     if (currentSolution_)
     {
@@ -499,7 +421,7 @@ void Executive::taskPlanToGoal()
 {
     executePlanToGoal();
     publishGoalTarget(currentGoal_);
-    publishInternalGoalSolution(currentSolution_);
+//    publishInternalGoalSolution(currentSolution_);
 
     if (currentSolution_)
     {

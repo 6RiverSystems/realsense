@@ -8,7 +8,7 @@
 
 #include <srslib_framework/math/MeasurementMath.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
-#include <srslib_framework/robotics/robot/RobotProfile.hpp>
+#include <srslib_framework/robotics/robot_profile/RobotProfile.hpp>
 
 namespace srs {
 

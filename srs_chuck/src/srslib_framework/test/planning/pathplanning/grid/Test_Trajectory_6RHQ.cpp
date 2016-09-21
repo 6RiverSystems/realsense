@@ -19,7 +19,7 @@ using namespace std;
 #include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
 #include <srslib_framework/planning/pathplanning/grid/PoseAdapter.hpp>
 
-#include <srslib_framework/robotics/robot/Chuck.hpp>
+#include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 
 #include <srslib_framework/search/AStar.hpp>
 

@@ -12,7 +12,7 @@
 
 	<node pkg="amcl" type="amcl" name="amcl" output="screen">	
 		<param name="use_map_topic " value="true"/>
-		<param name="first_map_only " value="false"/>
+		<param name="first_map_only " value="true"/>
 		<param name="transform_tolerance" value="0.2" />
 		<param name="gui_publish_rate" value="5.0"/>
 		<param name="min_particles" value="500"/>
@@ -24,7 +24,7 @@
 
 		<param name="resample_interval" value="2"/>
 		<param name="transform_tolerance" value="0.1"/>
-		<param name="recovery_alpha_slow" value="0.0"/>
+		<param name="recovery_alpha_slow" value="0.0001"/>
 		<param name="recovery_alpha_fast" value="0.0"/>
 
 		<!-- Laser model parameters -->

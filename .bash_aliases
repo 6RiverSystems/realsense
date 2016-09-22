@@ -1,4 +1,3 @@
-
 #!/bin/bash
 function getChuckDirectory() {
   BLUE='\033[0;34m'

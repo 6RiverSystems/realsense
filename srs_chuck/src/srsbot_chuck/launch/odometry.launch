@@ -12,6 +12,18 @@
 	<!-- Fixed /odom frame to /map frame TF -->
 	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
 
+    <!-- Navigation Stack -->
+	<include file="$(find srsnode_navigation)/launch/node.launch" />
+
+    <!-- Intel Realsense R200 -->
+    <include file="$(find realsense_camera)/launch/r200_nodelet_rgbd.launch" >
+        <arg name="load_driver" unless="$(arg simulation)" value="true" />
+    </include>
+
+    <include file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" >
+        <arg name="simulation" value="$(arg emulation)" />
+    </include>
+
 	<!-- Launch Map -->
 	<include file="$(find srsc_common)/launch/map.launch" />
 </launch>

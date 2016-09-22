@@ -19,6 +19,13 @@
         <arg name="load_driver" unless="$(arg simulation)" value="true" />
     </include>
 
+    <include file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" >
+        <arg name="simulation" value="$(arg simulation)" />
+    </include>
+
+    <!-- Navigation Stack -->
+	<include file="$(find srsnode_navigation)/launch/node.launch" />
+
 	<!-- Launch Map -->
 	<include file="$(find srsc_common)/launch/map.launch" />
 </launch>

@@ -21,6 +21,10 @@
         <arg name="load_driver" unless="$(arg simulation)" value="true" />
     </include>
 
+    <include file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" >
+        <arg name="simulation" value="$(arg simulation)" />
+    </include>
+
     <!-- GMapping -->
 	<include file="$(find srsnode_localization)/launch/gmapping.launch" />
 </launch>

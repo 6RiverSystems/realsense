@@ -7,8 +7,10 @@
   *
 -->
 <launch>
-	<remap from="/map" to="/internal/state/map/grid"/>
-    <remap from="/map_metadata" to="/internal/state/map/info"/>
+  <remap from="/map" to="/internal/state/map/grid"/>
+  <remap from="/map_metadata" to="/internal/state/map/info"/>
+  <remap from="/initialpose" to="/request/initial_pose"/>
+  
 
   <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
 
@@ -28,9 +30,9 @@
     <param name="advertise_map_service" value="true"/>
 
     <!-- Map size / start point -->
-    <param name="map_resolution" value="0.050"/>
+    <param name="map_resolution" value="0.1"/>
     <param name="map_size" value="2048"/>
-    <param name="map_start_x" value="0.5"/>
+    <param name="map_start_x" value="0.5"/>	
     <param name="map_start_y" value="0.5" />
     <param name="map_multi_res_levels" value="2" />
 

@@ -59,7 +59,7 @@ SickTimCommon::SickTimCommon(AbstractParser* parser) :
     datagram_pub_ = nh_.advertise<std_msgs::String>("datagram", 1000);
 
   // scan publisher
-  pub_ = nh_.advertise<sensor_msgs::LaserScan>("/lidar/scan", 1000);
+  pub_ = nh_.advertise<sensor_msgs::LaserScan>("/internal/sensors/lidar/scan/raw", 1000);
 
   diagnostics_.setHardwareID("none");   // set from device after connection
   diagnosticPub_ = new diagnostic_updater::DiagnosedPublisher<sensor_msgs::LaserScan>(pub_, diagnostics_,

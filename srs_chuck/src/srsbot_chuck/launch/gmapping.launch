@@ -8,13 +8,19 @@
 <launch>
 	<remap from="/map" to="/internal/state/map/grid"/>
     <remap from="/map_metadata" to="/internal/state/map/info"/>
+    <arg name="simulation" default="false" />
 
 	<!-- Fixed /odom frame to /map frame TF -->
 	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
 
     <!-- Chuck Stack -->
 	<include file="$(find srsbot_chuck)/launch/robot.launch" />
-	
+
+    <!-- Intel Realsense R200 -->
+    <include file="$(find realsense_camera)/launch/r200_nodelet_rgbd.launch" >
+        <arg name="load_driver" unless="$(arg simulation)" value="true" />
+    </include>
+
     <!-- GMapping -->
 	<include file="$(find srsnode_localization)/launch/gmapping.launch" />
 </launch>

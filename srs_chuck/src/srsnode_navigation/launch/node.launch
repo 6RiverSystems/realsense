@@ -6,7 +6,7 @@
   *
 -->
 <launch>
-	<remap from="/scan" to="/lidar/scan"/>
+	<remap from="/scan" to="/internal/sensors/lidar/scan/filtered"/>
 	<remap from="/map" to="/internal/state/map/grid"/>
 	<remap from="/initialpose" to="/request/initial_pose"/>
 
@@ -23,5 +23,6 @@
 		<rosparam file="$(find srsnode_navigation)/config/local_costmap_params.yaml" command="load" />
 		<rosparam file="$(find srsnode_navigation)/config/global_costmap_params.yaml" command="load" />
 		<rosparam file="$(find srsnode_navigation)/config/local_planner_params.yaml" command="load" />
+		<rosparam file="$(find srsnode_navigation)/config/global_planner_params.yaml" command="load" />
 	</node>
 </launch>

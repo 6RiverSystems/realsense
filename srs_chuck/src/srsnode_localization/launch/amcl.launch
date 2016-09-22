@@ -6,7 +6,7 @@
   *
 -->
 <launch>
-	<remap from="/scan" to="/lidar/scan"/>
+	<remap from="/scan" to="/internal/sensors/lidar/scan/filtered"/>
 	<remap from="/map" to="/internal/state/map/grid"/>
 	<remap from="/initialpose" to="/request/initial_pose"/>
 
@@ -43,10 +43,10 @@
 
 		<!-- Odometry model parameters -->
 		<param name="odom_model_type" value="diff-corrected"/>
-		<param name="odom_alpha1" value="0.2"/>
-		<param name="odom_alpha2" value="0.2"/>
-		<param name="odom_alpha3" value="0.2"/>
-		<param name="odom_alpha4" value="0.2"/>
+		<param name="odom_alpha1" value="0.01"/>
+		<param name="odom_alpha2" value="0.01"/>
+		<param name="odom_alpha3" value="0.01"/>
+		<param name="odom_alpha4" value="0.01"/>
 		
 		<param name="odom_frame_id" value="odom"/>
 		<param name="base_frame_id" value="base_link"/>

@@ -376,6 +376,9 @@ namespace realsense_camera
     {
       enableStream(RS_STREAM_COLOR, width_[RS_STREAM_COLOR], height_[RS_STREAM_COLOR], COLOR_FORMAT,
           fps_[RS_STREAM_COLOR]);
+
+      rs_apply_depth_control_preset(rs_device_, 5);
+
       if (camera_info_ptr_[RS_STREAM_COLOR] == NULL)
       {
         ROS_DEBUG_STREAM(nodelet_name_ << " - Allocating resources for " << STREAM_DESC[RS_STREAM_COLOR]);

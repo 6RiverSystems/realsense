@@ -9,20 +9,6 @@
 	<arg name="camera" default="camera" />
 	<arg name="simulation" default="false" />
 
-	<include unless="$(arg simulation)" file="$(find realsense_camera)/launch/r200_nodelet_modify_params.launch">
-		<arg name="enable_depth"      default="true" />
-		<arg name="enable_color"      default="true" />
-		<arg name="enable_pointcloud" default="false" />
-		<arg name="enable_tf"         default="false" />
-		<arg name="mode"              default="manual" />
-		<arg name="color_height"	value="480" />
-		<arg name="color_width"		value="640" />
-		<arg name="depth_height"	value="240" />
-		<arg name="depth_width" 	value="320" />
-		<arg name="depth_fps"       value="30" />
-		<arg name="color_fps"       value="30" />
-	</include>
-
 	<node name="srsnode_realsense_to_laserscan" pkg="srsnode_realsense_to_laserscan" type="srsnode_realsense_to_laserscan"
 		output="screen" respawn="true"/>
 

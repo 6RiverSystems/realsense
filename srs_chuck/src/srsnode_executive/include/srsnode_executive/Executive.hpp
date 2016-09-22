@@ -12,6 +12,7 @@
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/publisher/PublisherBoolean.hpp>
+#include <srslib_framework/ros/publisher/PublisherPolygonStamped.hpp>
 #include <srslib_framework/ros/publisher/PublisherPoseStamped.hpp>
 #include <srslib_framework/ros/tap/RosTapMap.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_GoalArrived.hpp>
@@ -89,7 +90,7 @@ private:
     ros::Publisher pubInternalInitialPose_;
     ros::Publisher pubStatusGoalPlan_;
     ros::Publisher pubStatusGoal_;
-    ros::Publisher pubStatusGoalTarget_;
+    PublisherPolygonStamped pubStatusGoalTarget_;
     PublisherPoseStamped pubGoalToNavigation_;
 
     Pose<> robotInitialPose_;

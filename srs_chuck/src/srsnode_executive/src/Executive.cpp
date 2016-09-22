@@ -32,7 +32,8 @@ Executive::Executive(string nodeName) :
     robotInitialPose_(Pose<>::INVALID),
     isJoystickLatched_(false),
     pubExternalArrived_(ChuckTopics::external::RESPONSE_ARRIVED),
-    pubGoalToNavigation_(ChuckTopics::internal::GOAL_TO_NAVIGATION)
+    pubGoalToNavigation_(ChuckTopics::internal::GOAL_TO_NAVIGATION),
+    pubStatusGoalTarget_(ChuckTopics::internal::TARGET_AREA)
 {
     pubInternalInitialPose_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
         "/internal/command/initial_pose", 1);
@@ -41,8 +42,6 @@ Executive::Executive(string nodeName) :
 
     pubStatusGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>(
         "/internal/state/goal/path", 1);
-    pubStatusGoalTarget_ = rosNodeHandle_.advertise<geometry_msgs::PolygonStamped>(
-        "/internal/state/goal/target_area", 1);
 
     executeInitialPose();
 }
@@ -142,7 +141,8 @@ void Executive::executePlanToGoal()
     // where the robot screen will be
     currentTarget_ = PoseMath::translate<double>(currentGoal_, chuck.bodyDepth / 2.0, 0.0);
 
-
+    // Send the new goal to the navigation system for execution
+    pubGoalToNavigation_.publish(currentTarget_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,26 +219,7 @@ void Executive::findActiveNodes(vector<string>& nodes)
 void Executive::publishGoalTarget(Pose<> goalTargetArea)
 {
     vector<Pose<>> targetArea = PoseMath::pose2Polygon(goalTargetArea, 0.0, 0.0, 0.2, 0.2);
-
-    geometry_msgs::PolygonStamped messageLanding;
-
-    messageLanding.header.frame_id = "map";
-    messageLanding.header.stamp = ros::Time::now();
-
-    vector<geometry_msgs::Point32> polygon;
-
-    for (auto pose : targetArea)
-    {
-        geometry_msgs::Point32 corner;
-        corner.x = pose.x;
-        corner.y = pose.y;
-        corner.z = 0.0;
-
-        polygon.push_back(corner);
-    }
-    messageLanding.polygon.points = polygon;
-
-    pubStatusGoalTarget_.publish(messageLanding);
+    pubStatusGoalTarget_.publish(targetArea);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

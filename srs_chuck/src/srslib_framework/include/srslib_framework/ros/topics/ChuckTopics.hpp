@@ -18,6 +18,7 @@ namespace external {
 namespace internal {
 
     static const string GOAL_TO_NAVIGATION = "/move_base_simple/goal";
+    static const string TARGET_AREA = "/internal/state/goal/target_area";
 } // namespace internal
 
 } // namespace ChuckTopics

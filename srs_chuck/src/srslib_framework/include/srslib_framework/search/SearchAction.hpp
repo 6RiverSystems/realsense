@@ -26,16 +26,24 @@ struct SearchNode;
 template<typename GRAPH>
 struct SearchAction
 {
-    constexpr static unsigned int MAX_COST = numeric_limits<unsigned int>::max();
+    constexpr static unsigned int COST_MAX = numeric_limits<unsigned int>::max();
+    constexpr static unsigned int COST_FORWARD = 1;
+    constexpr static unsigned int COST_FORWARD_NMA = 12; // Forward non-matching-angle
+    constexpr static unsigned int COST_BACKWARD = 40;
+    constexpr static unsigned int COST_ROTATE_N90 = 4;
+    constexpr static unsigned int COST_ROTATE_P90 = 4;
+    constexpr static unsigned int COST_ROTATE_180 = 3;
 
     enum ActionEnum {
         BACKWARD,
         FORWARD,
         GOAL,
         NONE,
-        ROTATE_M90, ROTATE_P90, ROTATE_180,
+        ROTATE_N90, ROTATE_P90, ROTATE_180,
         START
     };
+
+    typedef typename GRAPH::LocationType LocationType;
 
     static array<ActionEnum, 5> ALLOWED_ACTIONS;
 
@@ -46,7 +54,7 @@ struct SearchAction
         {
             case FORWARD: return addForward(graph, parentNode);
             case BACKWARD: return addBackward(graph, parentNode);
-            case ROTATE_M90: return addRotation(graph, parentNode, ROTATE_M90, -90);
+            case ROTATE_N90: return addRotation(graph, parentNode, ROTATE_N90, -90);
             case ROTATE_P90: return addRotation(graph, parentNode, ROTATE_P90, 90);
             case ROTATE_180: return addRotation(graph, parentNode, ROTATE_180, 180);
         }
@@ -61,15 +69,11 @@ struct SearchAction
         SearchPosition<GRAPH> position = SearchPosition<GRAPH>(),
         unsigned int h = 0)
     {
-        const MapNote* note = reinterpret_cast<const MapNote*>(graph->getNote(position.location));
-
-        unsigned int locationCost = graph->getCost(position.location);
-        unsigned int g = getLocationCost(locationCost, note);
-
+        unsigned int g = getTotalCost(graph, position, ActionEnum::NONE);
         return new SearchAction(action, position, g, h);
     }
 
-    SearchAction(ActionEnum action = NONE, SearchPosition<GRAPH> position = SearchPosition<GRAPH>(),
+    SearchAction(ActionEnum action, SearchPosition<GRAPH> position = SearchPosition<GRAPH>(),
             unsigned int g = 0, unsigned int h = 0) :
         actionType(action),
         position(position),
@@ -103,19 +107,13 @@ private:
         int currentOrientation = parentNode->action->position.orientation;
         int direction = AngleMath::normalizeDeg(currentOrientation - 180);
 
-        typename GRAPH::LocationType neighbor;
+        LocationType neighbor;
         if (graph->getNeighbor(parentNode->action->position.location, direction, neighbor))
         {
             SearchAction<GRAPH>* newAction = new SearchAction<GRAPH>(BACKWARD);
             SearchPosition<GRAPH> newPosition(neighbor, currentOrientation);
 
-            const MapNote* note = reinterpret_cast<const MapNote*>(graph->getNote(neighbor));
-
-            unsigned int locationCost = graph->getCost(neighbor);
-            locationCost = getLocationCost(locationCost, note);
-
-            unsigned int commandCost = getCommandCost(BACKWARD, currentOrientation, note);
-            unsigned int totalCost = BasicMath::noOverflowAdd(locationCost, commandCost);
+            unsigned int totalCost = getTotalCost(graph, newPosition, BACKWARD);
 
             newAction->position = newPosition;
             newAction->g = BasicMath::noOverflowAdd(parentNode->action->g, totalCost);
@@ -131,19 +129,13 @@ private:
     {
         int currentOrientation = parentNode->action->position.orientation;
 
-        typename GRAPH::LocationType neighbor;
+        LocationType neighbor;
         if (graph->getNeighbor(parentNode->action->position.location, currentOrientation, neighbor))
         {
             SearchAction<GRAPH>* newAction = new SearchAction<GRAPH>(FORWARD);
             SearchPosition<GRAPH> newPosition(neighbor, currentOrientation);
 
-            const MapNote* note = reinterpret_cast<const MapNote*>(graph->getNote(neighbor));
-
-            unsigned int locationCost = graph->getCost(neighbor);
-            locationCost = getLocationCost(locationCost, note);
-
-            unsigned int commandCost = getCommandCost(FORWARD, currentOrientation, note);
-            unsigned int totalCost = BasicMath::noOverflowAdd(locationCost, commandCost);
+            unsigned int totalCost = getTotalCost(graph, newPosition, FORWARD);
 
             newAction->position = newPosition;
             newAction->g = BasicMath::noOverflowAdd(parentNode->action->g, totalCost);
@@ -164,71 +156,89 @@ private:
         int newOrientation = AngleMath::normalizeDeg(currentOrientation + angle);
         SearchPosition<GRAPH> newPosition(parentNode->action->position, newOrientation);
 
-        const MapNote* note = reinterpret_cast<const MapNote*>(
-            graph->getNote(parentNode->action->position.location));
-
-        unsigned int commandCost = getCommandCost(actionEnum, newOrientation, note);
+        // WARNING: If multiple rotations are performed over the same location,
+        // the total cost will add the location cost every time. For now, this
+        // behavior is fine
+        unsigned int totalCost = getTotalCost(graph, newPosition, actionEnum);
 
         newAction->position = newPosition;
-        newAction->g = BasicMath::noOverflowAdd(parentNode->action->g, commandCost);
+        newAction->g = BasicMath::noOverflowAdd(parentNode->action->g, totalCost);
         newAction->h = parentNode->action->h;
 
         return newAction;
     }
 
-    static unsigned int getCommandCost(ActionEnum action, int orientation, const MapNote* mapNote)
+    static unsigned int getTotalCost(GRAPH* graph, SearchPosition<GRAPH> position, ActionEnum action)
     {
-        unsigned int forward = 1;
-        unsigned int backward = 40;
-        unsigned int rotateM90 = 4;
-        unsigned int rotateP90 = 4;
-        unsigned int rotate180 = 3;
+        unsigned int locationCost = graph->getCost(position.location);
 
-        if (mapNote)
+        const MapNote* note = reinterpret_cast<const MapNote*>(graph->getNote(position.location));
+        if (note && note->staticObstacle())
         {
-            if (mapNote->noRotations())
-            {
-                rotateM90 = MAX_COST;
-                rotateP90 = MAX_COST;
-                rotate180 = MAX_COST;
-            }
-
-            if (mapNote->preferred())
-            {
-                if (orientation != mapNote->preferredAngle())
-                {
-                    forward += 10;
-                }
-            }
+            locationCost = COST_MAX;
         }
 
+        unsigned int actionCost = 0;
         switch (action)
         {
-            case FORWARD: return forward;
-            case BACKWARD: return backward;
-            case ROTATE_M90: return rotateM90;
-            case ROTATE_P90: return rotateP90;
-            case ROTATE_180: return rotate180;
+            case FORWARD:
+            {
+                actionCost = COST_FORWARD;
+                if (note && note->preferred())
+                {
+                    if (position.orientation != note->preferredAngle())
+                    {
+                        actionCost = COST_FORWARD_NMA;
+                    }
+                }
+                break;
+            }
+
+            case BACKWARD:
+            {
+                actionCost = COST_BACKWARD;
+                break;
+            }
+
+            case ROTATE_N90:
+            {
+                actionCost = COST_ROTATE_N90;
+                if (note && note->noRotations())
+                {
+                    actionCost = COST_MAX;
+                }
+                break;
+            }
+
+            case ROTATE_P90:
+            {
+                actionCost = COST_ROTATE_P90;
+                if (note && note->noRotations())
+                {
+                    actionCost = COST_MAX;
+                }
+                break;
+            }
+
+            case ROTATE_180:
+            {
+                actionCost = COST_ROTATE_180;
+                if (note && note->noRotations())
+                {
+                    actionCost = COST_MAX;
+                }
+                break;
+            }
         }
-    }
 
-    static unsigned int getLocationCost(unsigned int locationCost, const MapNote* mapNote)
-    {
-        unsigned int staticObstacle = 0;
-
-        if (mapNote)
-        {
-            staticObstacle = mapNote->staticObstacle() ? MAX_COST : 0;
-        }
-
-        return BasicMath::noOverflowAdd(locationCost, staticObstacle);
+        return BasicMath::noOverflowAdd(locationCost, actionCost);
     }
 };
 
 template<typename GRAPH>
 array<typename SearchAction<GRAPH>::ActionEnum, 5> SearchAction<GRAPH>::ALLOWED_ACTIONS = {
     FORWARD,
-    ROTATE_M90,
+    ROTATE_N90,
     ROTATE_P90,
     ROTATE_180
 };
@@ -239,7 +249,7 @@ unordered_map<int, string> SearchAction<GRAPH>::ENUM_NAMES = {
     {SearchAction<GRAPH>::FORWARD, "FORWARD"},
     {SearchAction<GRAPH>::GOAL, "GOAL"},
     {SearchAction<GRAPH>::NONE, "NONE"},
-    {SearchAction<GRAPH>::ROTATE_M90, "ROTATE_M90"},
+    {SearchAction<GRAPH>::ROTATE_M90, "ROTATE_N90"},
     {SearchAction<GRAPH>::ROTATE_P90, "ROTATE_P90"},
     {SearchAction<GRAPH>::ROTATE_180, "ROTATE_180"},
     {SearchAction<GRAPH>::START, "START"}

@@ -137,7 +137,7 @@ public:
                 {
                     // Do not add any action that leads to the maximum cost
                     if (searchAction->actionType != SearchActionType::NONE &&
-                        searchAction->getTotalCost() < SearchActionType::MAX_COST)
+                        searchAction->getTotalCost() < SearchActionType::COST_MAX)
                     {
                         SearchNodeType* newNode = new SearchNodeType(searchAction, currentNode);
                         pushSearchNode(newNode);

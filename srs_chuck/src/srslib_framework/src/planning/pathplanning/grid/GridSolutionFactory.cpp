@@ -148,7 +148,7 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(Map* map, SearchNode
                 solutionItem.actionType = GridSolutionItem::MOVE;
                 break;
 
-            case SearchAction<Grid2d>::ROTATE_M90:
+            case SearchAction<Grid2d>::ROTATE_N90:
                 solutionItem.actionType = GridSolutionItem::ROTATE;
                 fromTheta = AngleMath::normalizeRad<double>(
                     toTheta + AngleMath::deg2Rad<double>(90));

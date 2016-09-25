@@ -20,9 +20,6 @@
     <!-- Brainstem Hardware Driver -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
 
-    <!-- Sick LIDAR -->
-	<include file="$(find sick_tim)/launch/sick_tim571_2050101.launch" />
-
     <!-- Joystick -->
     <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
 

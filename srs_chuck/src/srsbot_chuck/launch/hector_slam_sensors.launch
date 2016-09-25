@@ -1,0 +1,22 @@
+<!-- 
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+<launch>
+    <arg name="simulation" default="false" />
+
+    <!-- Sick LIDAR -->
+	<include file="$(find sick_tim)/launch/sick_tim571_2050101.launch" />
+
+    <!-- Intel Realsense R200 -->
+    <include file="$(find realsense_camera)/launch/r200_nodelet_rgbd.launch" >
+        <arg name="load_driver" unless="$(arg simulation)" value="true" />
+    </include>
+
+    <include file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" >
+        <arg name="simulation" value="$(arg simulation)" />
+    </include>
+</launch>

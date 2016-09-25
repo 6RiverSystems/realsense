@@ -6,8 +6,6 @@
   *
 -->
 <launch>
-    <!-- TODO: Patch Hector Slam: http://answers.ros.org/question/40541/extrapolation-error-of-local-cost-map-in-navigation/ -->
-
     <!-- Chuck Stack -->
 	<include file="$(find srsbot_chuck)/launch/robot.launch" />
 

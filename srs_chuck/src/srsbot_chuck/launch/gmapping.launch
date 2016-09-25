@@ -10,6 +10,9 @@
     <remap from="/map_metadata" to="/internal/state/map/info"/>
     <arg name="simulation" default="false" />
 
+    <!-- Sick LIDAR -->
+	<include file="$(find sick_tim)/launch/sick_tim571_2050101.launch" />
+
 	<!-- Fixed /odom frame to /map frame TF -->
 	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
 

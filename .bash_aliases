@@ -125,7 +125,8 @@ logChuck() {
 }
 
 recordChuck() {
-  rosbag record --split --buffsize=0 --duration=2m /camera/color/camera_info /camera/color/image_raw /camera/depth/camera_info /camera/depth/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
+  #rosbag record --split --buffsize=0 --duration=5m /camera/color/camera_info /camera/color/image_raw /camera/depth/camera_info /camera/depth/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
+rosbag record -O slam-lidar-rs /scan /internal/sensors/odometry/velocity /tf /camera/depth/image_raw /camera/depth/camera_info /camera/rgb/image_raw /camera/rgb/camera_info
 }
 
 alias chucklog=logChuck

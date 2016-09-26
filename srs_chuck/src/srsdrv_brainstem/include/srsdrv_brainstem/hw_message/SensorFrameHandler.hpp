@@ -24,6 +24,7 @@ public:
     static const string TOPIC_ODOMETRY;
     static const string TOPIC_IMU;
     static const string TOPIC_SENSOR_FRAME;
+    static const string TOPIC_ODOMETRY_COUNT;
 
     static constexpr int SERIAL_TRANSMIT_DELAY = 3400000;
     static constexpr double OUT_OF_SYNC_TIMEOUT = 0.15;
@@ -53,10 +54,12 @@ private:
 
     void publishImu();
     void publishOdometry();
+    void publishOdometryCount(int32_t leftWheelDiff, int32_t rightWheelDiff);
     void publishSensorFrame();
 
     ros::Publisher pubImu_;
     ros::Publisher pubOdometry_;
+    ros::Publisher pubOdometryCount_;
     ros::Publisher pubSensorFrame_;
 
     double lastHwSensorFrameTime_;

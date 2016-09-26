@@ -3,6 +3,7 @@
 #include <srslib_framework/Imu.h>
 #include <srslib_framework/SensorFrame.h>
 #include <srslib_framework/Velocity.h>
+#include <srslib_framework/Odometry.h>
 
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
@@ -17,6 +18,7 @@ namespace srs {
 // Constant definitions
 
 const string SensorFrameHandler::TOPIC_ODOMETRY = "/internal/sensors/odometry/raw";
+const string SensorFrameHandler::TOPIC_ODOMETRY_COUNT = "/internal/sensors/odometry/count";
 const string SensorFrameHandler::TOPIC_IMU = "/internal/sensors/imu/raw";
 const string SensorFrameHandler::TOPIC_SENSOR_FRAME = "/internal/sensors/sensor_frame/raw";
 
@@ -31,6 +33,8 @@ SensorFrameHandler::SensorFrameHandler() :
 {
     pubOdometry_ = rosNodeHandle_.advertise<geometry_msgs::TwistStamped>(
         TOPIC_ODOMETRY, 100);
+    pubOdometryCount_ = rosNodeHandle_.advertise<srslib_framework::Odometry>(
+    	TOPIC_ODOMETRY_COUNT, 100);
     pubImu_ = rosNodeHandle_.advertise<srslib_framework::Imu>(
         TOPIC_IMU, 100);
     pubSensorFrame_ = rosNodeHandle_.advertise<srslib_framework::SensorFrame>(
@@ -142,6 +146,7 @@ void SensorFrameHandler::receiveData(ros::Time currentTime, vector<char>& buffer
     // Publish all the data
     publishSensorFrame();
     publishOdometry();
+    publishOdometryCount(s_leftWheelDiff, s_rightWheelDiff);
     publishImu();
 }
 
@@ -163,6 +168,17 @@ void SensorFrameHandler::publishOdometry()
     message.header.stamp = lastRosSensorFrameTime_;
 
     pubOdometry_.publish(message);
+}
+
+void SensorFrameHandler::publishOdometryCount(int32_t leftWheelDiff, int32_t rightWheelDiff)
+{
+	srslib_framework::Odometry message;
+
+	message.left_wheel = leftWheelDiff;
+    message.right_wheel = rightWheelDiff;
+    message.header.stamp = lastRosSensorFrameTime_;
+
+    pubOdometryCount_.publish(message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -9,16 +9,15 @@
 	<arg name="camera" default="camera" />
 	<arg name="simulation" default="false" />
 
-	<node name="srsnode_realsense_to_laserscan" pkg="srsnode_realsense_to_laserscan" type="srsnode_realsense_to_laserscan"
-		output="screen" respawn="true"/>
+	<!-- Remap laser scan -->
+    <remap from="scan" to="/camera/depth/scan"/>
 
+	<node name="srsnode_realsense_to_laserscan" pkg="srsnode_realsense_to_laserscan" type="srsnode_realsense_to_laserscan" output="screen" respawn="true"/>
 	<node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
 
 	<!-- push depthimage_to_laserscan nodelet into sensor's nodelet manager-->
-	<node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet laserscan_nodelet_manager">
-        <remap from="image" to="/camera/depth/image_median_filter"/>
-        <remap from="scan" to="/camera/depth/scan"/>
-        
+	<node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet laserscan_nodelet_manager">        
+	    <remap from="image" to="/camera/depth/image_median_filter"/>
 		<param name="scan_height" value="20"/>
 		<param name="scan_time" value="0.033"/>
 		<param name="output_frame_id" value="/laser_frame"/>

@@ -13,10 +13,8 @@
     <!-- Chuck Stack -->
 	<include file="$(find srsbot_chuck)/launch/robot.launch" />
 
-    <!-- Intel Realsense R200 -->
-    <include file="$(find realsense_camera)/launch/r200_nodelet_rgbd.launch" >
-        <arg name="load_driver" unless="$(arg simulation)" value="true" />
-    </include>
+	<!-- Sensors -->
+	<include file="$(find srsbot_chuck)/launch/sensors.launch" />
 
     <!-- Launch RTAB SLAM -->
 	<include file="$(find srsnode_localization)/launch/rtab.launch" />

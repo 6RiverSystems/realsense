@@ -10,7 +10,7 @@
     <remap from="/map_metadata" to="/internal/state/map/info"/>
     <arg name="simulation" default="false" />
 
-    <!-- All sensors -->
+    <!-- Sensors -->
 	<include file="$(find srsbot_chuck)/launch/sensors.launch" />
 
 	<!-- Fixed /odom frame to /map frame TF -->

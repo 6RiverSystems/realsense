@@ -9,22 +9,38 @@
 	<arg name="camera" default="camera" />
 	<arg name="simulation" default="false" />
 
-	<!-- Remap laser scan -->
-    <remap from="scan" to="/camera/depth/scan"/>
+	<node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
 
-	<node name="srsnode_realsense_to_laserscan" pkg="srsnode_realsense_to_laserscan" type="srsnode_realsense_to_laserscan" output="screen" respawn="true"/>
-	<node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
+	<!-- Run a VoxelGrid filter to clean NaNs and downsample the data -->
+    <node pkg="nodelet" type="nodelet" name="VoxelGrid" args="load pcl/VoxelGrid pcl_manager" output="screen">
+        <remap from="~input" to="/camera/depth/points" />
+        <rosparam>
+            filter_field_name: z
+            filter_limit_min: -0.1
+            filter_limit_max: 1000
+            filter_limit_negative: False
+            leaf_size: 0.10
+        </rosparam>
+ 	</node>
 
-	<!-- push depthimage_to_laserscan nodelet into sensor's nodelet manager-->
-	<node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet laserscan_nodelet_manager">        
-	    <remap from="image" to="/camera/depth/image_median_filter"/>
-		<param name="scan_height" value="20"/>
-		<param name="scan_time" value="0.033"/>
-		<param name="output_frame_id" value="/laser_frame"/>
-		<param name="range_min" value="0.01"/>
-		<param name="range_max" value="8.00"/>
-		<param name="concurrency_level" value="0"/>
-    </node>
+   <node pkg="nodelet" type="nodelet" name="PassThrough" args="load pcl/PassThrough pcl_manager" output="screen">
+        <remap from="~input" to="/VoxelGrid/output"/>
+        <rosparam>
+            filter_field_name: z
+            filter_limit_min: 0.3
+            filter_limit_max: 3.5
+            filter_limit_negative: False
+        </rosparam>
+	</node>
+
+	<node pkg="nodelet" type="nodelet" name="StatisticalOutlier" args="load pcl/StatisticalOutlierRemoval pcl_manager" output="screen">
+        <remap from="~input" to="/PassThrough/output"/>
+        <remap from="~output" to="/camera/depth/points/filtered"/>
+        <rosparam>
+               mean_k: 10
+               stddev: 0.05
+        </rosparam>
+	</node>
 
 </launch>
 

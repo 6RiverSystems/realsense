@@ -377,8 +377,6 @@ namespace realsense_camera
       enableStream(RS_STREAM_COLOR, width_[RS_STREAM_COLOR], height_[RS_STREAM_COLOR], COLOR_FORMAT,
           fps_[RS_STREAM_COLOR]);
 
-      rs_apply_depth_control_preset(rs_device_, 5);
-
       if (camera_info_ptr_[RS_STREAM_COLOR] == NULL)
       {
         ROS_DEBUG_STREAM(nodelet_name_ << " - Allocating resources for " << STREAM_DESC[RS_STREAM_COLOR]);
@@ -492,6 +490,8 @@ namespace realsense_camera
 
     if (stream_index == RS_STREAM_DEPTH)
     {
+      rs_apply_depth_control_preset(rs_device_, 5);
+
       // set depth to color translation values in Projection matrix (P)
       rs_extrinsics z_extrinsic;
       rs_get_device_extrinsics(rs_device_, RS_STREAM_DEPTH, RS_STREAM_COLOR, &z_extrinsic, &rs_error_);

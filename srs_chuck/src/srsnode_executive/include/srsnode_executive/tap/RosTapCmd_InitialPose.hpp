@@ -3,27 +3,19 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPCMD_INITIALPOSE_HPP_
-#define ROSTAPCMD_INITIALPOSE_HPP_
+#pragma once
 
-#include <string>
-using namespace std;
-
-#include <ros/ros.h>
-
-#include <srslib_framework/ros/tap/RosTapPoseWithCovariance.hpp>
+#include <srslib_framework/ros/subscriber/SubscriberPoseStamped.hpp>
 
 namespace srs {
 
 class RosTapCmd_InitialPose :
-    public RosTapPoseWithCovariance
+    public SubscriberPoseStamped
 {
 public:
     RosTapCmd_InitialPose() :
-        RosTapPoseWithCovariance("/request/initial_pose", "Command 'Initial Pose' Tap")
+        SubscriberPoseStamped("/request/initial_pose")
     {}
 };
 
 } // namespace srs
-
-#endif // ROSTAPCMD_INITIALPOSE_HPP_

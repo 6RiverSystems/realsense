@@ -8,27 +8,32 @@
 #include <string>
 using namespace std;
 
-#include <srslib_framework/JoypadState.h>
+#include <std_msgs/Bool.h>
 
 #include <srslib_framework/ros/publisher/RosPublisher.hpp>
-#include <srslib_framework/ros/message/JoypadStateMessageFactory.hpp>
 
 namespace srs {
 
-class PublisherSrsJoypadState :
-    public RosPublisher<srslib_framework::JoypadState, JoypadState>
+class PublisherBoolean :
+    public RosPublisher<std_msgs::Bool, bool>
 {
 public:
-    PublisherSrsJoypadState(string topic,
+    PublisherBoolean(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
             RosPublisher(topic, buffer, latched, nameSpace)
     {}
 
-    srslib_framework::JoypadState convertData(JoypadState data)
+    ~PublisherBoolean()
+    {}
+
+    std_msgs::Bool convertData(bool data)
     {
-        return JoypadStateMessageFactory::joypadState2Msg(data);
+        std_msgs::Bool message;
+        message.data = data;
+
+        return message;
     }
 };
 

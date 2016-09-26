@@ -3,22 +3,19 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPINTERNAL_GOALARRIVED_HPP_
-#define ROSTAPINTERNAL_GOALARRIVED_HPP_
+#pragma once
 
-#include <srslib_framework/ros/tap/RosTapBool.hpp>
+#include <srslib_framework/ros/subscriber/SubscriberBoolean.hpp>
 
 namespace srs {
 
 class RosTapInternal_GoalArrived :
-    public RosTapBool
+    public SubscriberBoolean
 {
 public:
     RosTapInternal_GoalArrived() :
-        RosTapBool("/internal/state/goal/arrived", "ARRIVED to goal")
+        SubscriberBoolean("/internal/state/goal/arrived")
     {}
 };
 
 } // namespace srs
-
-#endif // ROSTAPINTERNAL_GOALARRIVED_HPP_

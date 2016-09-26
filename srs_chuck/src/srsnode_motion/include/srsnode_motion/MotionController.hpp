@@ -15,14 +15,12 @@ using namespace std;
 #include <srsnode_motion/MotionConfig.h>
 using namespace srsnode_motion;
 
+#include <srslib_framework/planning/pathplanning/Solution.hpp>
+#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
-
-#include <srslib_framework/planning/pathplanning/Solution.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
-
 #include <srslib_framework/robotics/controller/CMUPathController.hpp>
 #include <srslib_framework/robotics/controller/DummyController.hpp>
 #include <srslib_framework/robotics/controller/EmergencyController.hpp>
@@ -30,8 +28,7 @@ using namespace srsnode_motion;
 #include <srslib_framework/robotics/controller/RotationController.hpp>
 #include <srslib_framework/robotics/controller/StandController.hpp>
 #include <srslib_framework/robotics/controller/StopController.hpp>
-
-#include <srslib_framework/robotics/robot/RobotProfile.hpp>
+#include <srslib_framework/robotics/robot_profile/RobotProfile.hpp>
 
 namespace srs {
 

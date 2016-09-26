@@ -12,7 +12,7 @@ using namespace std;
 #include <ros/ros.h>
 #include <std_srvs/Empty.h>
 
-#include <srslib_framework/ros/RosService.hpp>
+#include <srslib_framework/ros/service/RosService.hpp>
 
 namespace srs {
 

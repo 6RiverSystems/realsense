@@ -3,27 +3,19 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPCMD_MOVE_HPP_
-#define ROSTAPCMD_MOVE_HPP_
+#pragma once
 
-#include <string>
-using namespace std;
-
-#include <ros/ros.h>
-
-#include <srslib_framework/ros/tap/RosTapPoseStamped.hpp>
+#include <srslib_framework/ros/subscriber/SubscriberPoseStamped.hpp>
 
 namespace srs {
 
 class RosTapCmd_Move :
-    public RosTapPoseStamped
+    public SubscriberPoseStamped
 {
 public:
     RosTapCmd_Move() :
-        RosTapPoseStamped("/request/move", "Command move")
+        SubscriberPoseStamped("/request/move")
     {}
 };
 
 } // namespace srs
-
-#endif // ROSTAPCMD_MOVE_HPP_

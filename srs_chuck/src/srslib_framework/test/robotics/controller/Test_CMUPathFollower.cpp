@@ -12,7 +12,7 @@ using namespace std;
 #include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
-#include <srslib_framework/robotics/robot/Chuck.hpp>
+#include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/controller/YoshizawaController.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>

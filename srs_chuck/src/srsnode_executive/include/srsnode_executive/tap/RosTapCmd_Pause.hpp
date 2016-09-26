@@ -3,25 +3,19 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPCMD_PAUSE_HPP_
-#define ROSTAPCMD_PAUSE_HPP_
+#pragma once
 
-#include <string>
-using namespace std;
-
-#include <srslib_framework/ros/tap/RosTapBool.hpp>
+#include <srslib_framework/ros/subscriber/SubscriberBoolean.hpp>
 
 namespace srs {
 
 class RosTapCmd_Pause :
-    public RosTapBool
+    public SubscriberBoolean
 {
 public:
     RosTapCmd_Pause() :
-        RosTapBool("/request/pause", "Command 'Pause' Tap")
+        SubscriberBoolean("/request/pause")
     {}
 };
 
 } // namespace srs
-
-#endif // ROSTAPCMD_PAUSE_HPP_

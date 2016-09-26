@@ -12,7 +12,7 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
-#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTap.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {

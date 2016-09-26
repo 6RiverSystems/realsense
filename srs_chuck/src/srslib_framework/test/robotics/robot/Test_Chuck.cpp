@@ -9,7 +9,7 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/robotics/robot/Chuck.hpp>
+#include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 using namespace srs;
 
 TEST(Test_Chuck, Usage)

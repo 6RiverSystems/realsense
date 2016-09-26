@@ -8,8 +8,8 @@
 
 namespace srs {
 
-static const CmdVelocity<> COMMAND_STEP_00 = CmdVelocity<>(1, 0);
-static const Odometry<> ODOMETRY_STEP_00 = Odometry<>(0, 0, 0);
+static const CmdVelocity<> COMMAND_STEP_00 = CmdVelocity<>(Velocity<>(1, 0));
+static const Odometry<> ODOMETRY_STEP_00 = Odometry<>::ZERO;
 static const cv::Mat STATE_STEP_00 = (cv::Mat_<double>(UKF_STATE_SIZE, 1) <<
               0,
               0,
@@ -25,7 +25,7 @@ static const cv::Mat COV_STEP_00 = (cv::Mat_<double>(UKF_STATE_SIZE, UKF_STATE_S
               0,             0,             0,             0,   +9.9900e-05
 );
 
-static const Odometry<> ODOMETRY_STEP_01 = Odometry<>(2222, 1, 0);
+static const Odometry<> ODOMETRY_STEP_01 = Odometry<>(Velocity<>(2222, 1, 0));
 static const cv::Mat STATE_STEP_01 = (cv::Mat_<double>(UKF_STATE_SIZE, 1) <<
               0,
     +9.9981e-01,

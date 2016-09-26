@@ -135,15 +135,15 @@ public:
 
 TEST_F( StargazerTest, TestRightHandRuleConverstion )
 {
-	double df0Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 0.0f ) ) );
-	double df1Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 1.0f ) ) );
-	double df45Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 45.0f ) ) );
-	double df90Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 90.0f ) ) );
-	double df135Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 135.0f ) ) );
-	double df180Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 180.0f ) ) );
-	double df225Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 225.0f ) ) );
-	double df270Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 270.0f ) ) );
-	double df315Degrees = AngleMath::normalizeRad2deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 315.0f ) ) );
+	double df0Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 0.0f ) ) );
+	double df1Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 1.0f ) ) );
+	double df45Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 45.0f ) ) );
+	double df90Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 90.0f ) ) );
+	double df135Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 135.0f ) ) );
+	double df180Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 180.0f ) ) );
+	double df225Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 225.0f ) ) );
+	double df270Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 270.0f ) ) );
+	double df315Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 315.0f ) ) );
 
 	EXPECT_NEAR( df0Degrees, 0.0f, 0.001 );
 	EXPECT_NEAR( df1Degrees, 359.0f, 0.001 );

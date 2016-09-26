@@ -244,7 +244,7 @@ bool StarGazer::LoadCalibrationTransform( const std::string& strConfigurationFil
 	tf::Transform& stargazer )
 {
 	// Default values
-	tf::Vector3 translation( 0.03, -0.07, 0.0f );
+	tf::Vector3 translation( 0.0308468412, -0.0687856119, 0.0f );
 
 	try
 	{

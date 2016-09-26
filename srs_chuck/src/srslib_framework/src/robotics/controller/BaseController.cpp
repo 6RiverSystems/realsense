@@ -5,11 +5,6 @@
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Constant initialization
-const Velocity<> BaseController::ZERO_VELOCITY = Velocity<>(0.0, 0.0);
-const Pose<> BaseController::ZERO_POSE = Pose<>(0.0, 0.0, 0.0);
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,12 +12,14 @@ void BaseController::reset()
 {
     canceled_ = false;
 
-    goal_ = ZERO_POSE;
+    firstRun_ = true;
+
+    goal_ = Pose<>::ZERO;
     goalReached_ = false;
 
     isRobotMoving_ = false;
 
-    executingCommand_ = ZERO_VELOCITY;
+    executingCommand_ = Velocity<>::ZERO;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,10 +27,12 @@ void BaseController::step(double dT, Pose<> currentPose, Odometry<> currentOdome
 {
     // Perform some basic operations before calling
     // the specific controller step
-    isRobotMoving_ = !VelocityMath::equal<double>(currentOdometry.velocity, ZERO_VELOCITY);
+    isRobotMoving_ = !VelocityMath::equal<double>(currentOdometry.velocity, Velocity<>::ZERO);
 
     // Call the controller
     stepController(dT, currentPose, currentOdometry);
+
+    firstRun_ = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

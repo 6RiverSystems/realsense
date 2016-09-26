@@ -74,6 +74,10 @@ target_link_libraries(${PROJECT_NODE}
 ####################################################################################################
 # Tests
 if (CATKIN_ENABLE_TESTING)
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -std=c++11")
+    set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
+
     catkin_add_gtest(TestSuite_Stargazer
     	test/Test_Stargazer.cpp
         ${${PROJECT_NAME}_SOURCES}

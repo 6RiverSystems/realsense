@@ -7,7 +7,6 @@
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 #include <srsnode_midbrain/ObstacleDetector.hpp>
-#include <srslib_framework/MsgOperationalState.h>
 #include <std_msgs/String.h>
 #include <boost/timer.hpp>
 #include <boost/geometry/algorithms/intersection.hpp>
@@ -24,9 +23,8 @@ class ReflexesTest : public ::testing::Test
 {
 public:
 
-	double m_robotWidth;
-
-	double m_robotDepth;
+	double m_robotHalfWidth;
+	double m_robotHalfDepth;
 
 	double m_lineWidth;
 
@@ -39,10 +37,10 @@ public:
 public:
 
 	ReflexesTest( ) :
-		m_robotWidth( 0.619125 ),
-		m_robotDepth( 0.9772396 ),
+		m_robotHalfWidth( 0.619125 / 2.0 ),
+		m_robotHalfDepth( 0.619125 ),
 		m_lineWidth( 0.3 ),
-		m_detector( m_robotWidth, m_robotDepth ),
+		m_detector( m_robotHalfWidth, m_robotHalfDepth ),
 		m_vecVelocities( ),
 		m_vecOffsets( ),
 		m_vecDistances( )
@@ -63,8 +61,8 @@ public:
 		m_vecVelocities.push_back( 2.60 );
 
 		m_vecOffsets.push_back( 0 );
-		m_vecOffsets.push_back( -(m_robotWidth/2.0 + m_lineWidth + 0.001 ) );
-		m_vecOffsets.push_back( m_robotWidth/2.0 + 0.001 );
+		m_vecOffsets.push_back( -(m_robotHalfWidth + m_lineWidth + 0.001 ) );
+		m_vecOffsets.push_back( m_robotHalfWidth + 0.001 );
 
 		m_vecDistances.push_back( 0.02 );
 		m_vecDistances.push_back( 0.07 );
@@ -155,55 +153,64 @@ public:
 		}
 	}
 
+	void SetPauseState( bool paused )
+	{
+//		srslib_framework::MsgOperationalState::Ptr operationalState( new srslib_framework::MsgOperationalState( ) );
+//
+//		operationalState->pause = paused;
+
+//		m_reflexes.OnOperationalStateChanged( operationalState );
+	}
+
 	Segment CreateSegment( double distance, double offset, double length )
 	{
 		return Segment( Point( distance, offset - ( length / 2.0f) ),
 			Point( distance, offset + (length / 2.0f) ) );
 	}
 };
-
-TEST_F( ReflexesTest, TestNoObstacleNoVelocity )
-{
-	sensor_msgs::LaserScan::Ptr laserScan = CreateLaserScan( );
-
-	bool obstacleDetected = false;
-
-	m_detector.SetDetectionCallback( [&]() {
-		obstacleDetected = true;
-	});
-
-	m_detector.ProcessScan( laserScan );
-
-	EXPECT_FALSE( obstacleDetected );
-}
-
-TEST_F( ReflexesTest, TestObstacleNoVelocity )
-{
-	for( auto distance : m_vecDistances )
-	{
-		Segment lineSegment = CreateSegment( distance, 0.0, m_lineWidth );
-
-		sensor_msgs::LaserScan::Ptr laserScan = CreateLaserScan( );
-
-		AddObject( laserScan, lineSegment );
-
-		bool obstacleDetected = false;
-
-		m_detector.SetDetectionCallback( [&]() {
-			obstacleDetected = true;
-		});
-
-		m_detector.ProcessScan( laserScan );
-
-		EXPECT_FALSE( obstacleDetected );
-	}
-}
+//
+//TEST_F( ReflexesTest, TestNoObstacleNoVelocity )
+//{
+//	sensor_msgs::LaserScan::Ptr laserScan = CreateLaserScan( );
+//
+//	bool obstacleDetected = false;
+//
+//	m_detector.SetDetectionCallback( [&]() {
+//		obstacleDetected = true;
+//	});
+//
+//	m_detector.ProcessScan( laserScan );
+//
+//	EXPECT_FALSE( obstacleDetected );
+//}
+//
+//TEST_F( ReflexesTest, TestObstacleNoVelocity )
+//{
+//	for( auto distance : m_vecDistances )
+//	{
+//		Segment lineSegment = CreateSegment( distance, 0.0, m_lineWidth );
+//
+//		sensor_msgs::LaserScan::Ptr laserScan = CreateLaserScan( );
+//
+//		AddObject( laserScan, lineSegment );
+//
+//		bool obstacleDetected = false;
+//
+//		m_detector.SetDetectionCallback( [&]() {
+//			obstacleDetected = true;
+//		});
+//
+//		m_detector.ProcessScan( laserScan );
+//
+//		EXPECT_FALSE( obstacleDetected );
+//	}
+//}
 
 TEST_F( ReflexesTest, TestMovingWithObstacle )
 {
 //	boost::geometry::strategy::transform::scale_transformer<Point, Point> scale( 10.0f, 10.0f );
 //
-//	double footprintWidth = m_detector.GetFootprintWidth( );
+//	double footprint = m_detector.GetFootprintWidth( );
 //
 //	int index = 0;
 //
@@ -211,7 +218,7 @@ TEST_F( ReflexesTest, TestMovingWithObstacle )
 //	{
 //		for( auto velocity : m_vecVelocities )
 //		{
-//			m_detector.SetVelocity( velocity, 0.0f );
+//			m_detector.SetActualVelocity( velocity, 0.0f );
 //
 //			for( auto distance : m_vecDistances )
 //			{
@@ -231,13 +238,13 @@ TEST_F( ReflexesTest, TestMovingWithObstacle )
 //
 //				using Ring = std::vector<Point>;
 //
-//				double safeDistance = m_detector.GetSafeDistance( velocity, 0.0 );
+//				double safeDistance = m_detector.GetSafeDistance( velocity );
 //
 //				Ring dangerZone({
-//					{ 0.0, -footprintWidth },
-//					{ safeDistance, -footprintWidth },
-//					{ safeDistance, footprintWidth },
-//					{ 0.0, footprintWidth }
+//					{ 0.0, -footprint },
+//					{ safeDistance, -footprint },
+//					{ safeDistance, footprint },
+//					{ 0.0, footprint }
 //				});
 //
 //				Ring lineRing( {
@@ -315,7 +322,7 @@ TEST_F( ReflexesTest, TestMovingWithObstacle )
 //				}
 //
 //				ROS_DEBUG_STREAM_NAMED( "obstacle_detection", "Object @ distance: " << lineSegment.first.x << " with footprint " <<
-//					footprintWidth << (intersects ? " is" : " is not") << " going to collide with chuck [safe distance: " <<
+//					footprint << (intersects ? " is" : " is not") << " going to collide with chuck [safe distance: " <<
 //					safeDistance << "] (" << pszFile << ")" );
 //
 //				if( intersects )

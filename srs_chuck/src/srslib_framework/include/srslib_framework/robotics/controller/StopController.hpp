@@ -17,11 +17,19 @@ class StopController: public BaseController
 {
 public:
     StopController() :
-        BaseController("STOP CONTROLLER")
+        BaseController("STOP CONTROLLER"),
+        currentLinearVelocity_()
     {}
 
     ~StopController()
     {}
+
+    void reset()
+    {
+        BaseController::reset();
+
+        currentLinearVelocity_ = 0.0;
+    }
 
     void setRobotProfile(RobotProfile robot)
     {
@@ -31,24 +39,39 @@ public:
 protected:
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
+        // If this is the first run of the controller, store the current
+        // velocity so that it can be slowly forced to 0
+        if (isFirstRun())
+        {
+            currentLinearVelocity_ = currentOdometry.velocity.linear;
+
+            ROS_DEBUG_STREAM_NAMED("controller_stop", "Set linear velocity: " <<
+                currentLinearVelocity_);
+        }
+
         // If the robot is not moving anymore, the goal was reached
         if (!isRobotMoving())
         {
             setGoalReached(true);
-            executeCommand(ZERO_VELOCITY);
+            executeCommand(Velocity<>::ZERO);
 
             return;
         }
 
         double deltaVelocity = robot_.stopNormalDeceleration * dT;
+        currentLinearVelocity_ -=  BasicMath::sgn<double>(currentLinearVelocity_) * deltaVelocity;
 
-        double linear = currentOdometry.velocity.linear;
-        linear -=  BasicMath::sgn<double>(linear) * deltaVelocity;
-        linear = BasicMath::threshold<double>(linear, robot_.stopMinLinearVelocity, 0.0);
+        // If the new linear velocity is below the specified
+        // stop minimum linear velocity, force it directly to 0
+        currentLinearVelocity_ = BasicMath::threshold<double>(currentLinearVelocity_,
+            robot_.stopMinLinearVelocity, 0.0);
 
         // Send the command for execution
-        executeCommand(linear, 0.0);
+        executeCommand(currentLinearVelocity_, 0.0);
     }
+
+private:
+    double currentLinearVelocity_;
 };
 
 } // namespace srs

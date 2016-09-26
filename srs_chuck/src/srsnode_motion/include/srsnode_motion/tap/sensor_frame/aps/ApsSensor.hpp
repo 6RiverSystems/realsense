@@ -35,6 +35,7 @@ public:
 
     Pose<BaseType> getPose()
     {
+        Sensor<STATE_SIZE, TYPE>::setNewData(false);
         return currentData_;
     }
 
@@ -44,11 +45,11 @@ public:
         Sensor<STATE_SIZE, TYPE>::setNewData(false);
     }
 
-    void set(double arrivalTime, BaseType x, BaseType y, BaseType theta)
+    void set(Pose<BaseType> newAps)
     {
         if (Sensor<STATE_SIZE, TYPE>::isEnabled())
         {
-            currentData_ = Pose<BaseType>(arrivalTime, x, y, theta);
+            currentData_ = newAps;
             Sensor<STATE_SIZE, TYPE>::setNewData(true);
         }
     }

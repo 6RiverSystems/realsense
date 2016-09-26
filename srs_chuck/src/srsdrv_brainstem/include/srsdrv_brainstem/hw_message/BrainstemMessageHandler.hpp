@@ -11,6 +11,19 @@ using namespace std;
 
 #include <ros/ros.h>
 
+// Define the macros for the beginning and end of a
+// brainstem message. The macro automatically define the
+// strict packing pragma and the struct for the
+// message data
+#define BRAINSTEM_MESSAGE_BEGIN(name) \
+    _Pragma("pack(push, 1)") \
+    struct name \
+    {
+
+#define BRAINSTEM_MESSAGE_END \
+    }; \
+    _Pragma("pack(pop)")
+
 namespace srs {
 
 class BrainstemMessageHandler
@@ -25,7 +38,12 @@ public:
     virtual ~BrainstemMessageHandler()
     {}
 
-    virtual bool isKeyMatching(char key) const
+    char getKey() const
+    {
+        return messageKey_;
+    }
+
+    bool isKeyMatching(char key) const
     {
         return key == messageKey_;
     }

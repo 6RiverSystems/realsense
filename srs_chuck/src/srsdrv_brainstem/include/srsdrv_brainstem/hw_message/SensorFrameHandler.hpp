@@ -12,14 +12,16 @@ using namespace std;
 #include <srslib_framework/robotics/Odometry.hpp>
 #include <srslib_framework/robotics/Imu.hpp>
 
+#include <srsdrv_brainstem/BrainStemMessages.h>
 #include <srsdrv_brainstem/hw_message/BrainstemMessageHandler.hpp>
+#include <srsdrv_brainstem/BrainStemMessages.h>
 
 namespace srs {
 
 class SensorFrameHandler : public BrainstemMessageHandler
 {
 public:
-    static constexpr char SENSOR_FRAME_KEY = 0x4F; // 'O'
+    static constexpr char SENSOR_FRAME_KEY = static_cast<char>(BRAIN_STEM_MSG::SENSOR_FRAME);
 
     static const string TOPIC_ODOMETRY;
     static const string TOPIC_IMU;
@@ -36,10 +38,7 @@ public:
     void receiveData(ros::Time currentTime, vector<char>& binaryData);
 
 private:
-
-#pragma pack(push, 1)
-    struct SensorFrameData
-    {
+    BRAINSTEM_MESSAGE_BEGIN(SensorFrameData)
         uint8_t cmd;
         uint32_t timestamp;
         float linear_velocity;
@@ -50,8 +49,7 @@ private:
         float yawRot;
         float pitchRot;
         float rollRot;
-    };
-#pragma pack(pop)
+    BRAINSTEM_MESSAGE_END
 
     void publishImu();
     void publishOdometry();
@@ -61,8 +59,8 @@ private:
     ros::Publisher pubOdometry_;
     ros::Publisher pubSensorFrame_;
 
-    double lastHwSensorFrameTime_; // m_dwLastOdomTime;
-    ros::Time lastRosSensorFrameTime_; // m_rosOdomTime;
+    double lastHwSensorFrameTime_;
+    ros::Time lastRosSensorFrameTime_;
 
     Odometry<> currentOdometry_;
     Imu<> currentImu_;

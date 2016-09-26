@@ -24,6 +24,7 @@ using namespace srsnode_motion;
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
 
 #include <srslib_framework/robotics/controller/CMUPathController.hpp>
+#include <srslib_framework/robotics/controller/DummyController.hpp>
 #include <srslib_framework/robotics/controller/EmergencyController.hpp>
 #include <srslib_framework/robotics/controller/ManualController.hpp>
 #include <srslib_framework/robotics/controller/RotationController.hpp>
@@ -93,13 +94,11 @@ public:
     void reset();
     void run(Pose<> currentPose, Odometry<> currentOdometry, Velocity<> currentCommand);
 
-    void setConfiguration(MotionConfig& configuration);
+    void setRobotProfile(RobotProfile robotProfile);
     void switchToManual();
     void switchToAutonomous();
 
 private:
-    const static Velocity<> ZERO_VELOCITY;
-
     enum CommandEnum {
         BRAKE,
         VELOCITY
@@ -126,6 +125,11 @@ private:
 
     void executeCommand(bool enforce, CommandEnum command, const Velocity<>* velocity = nullptr);
     void executeFinalRotation();
+
+    bool isDummyControllerActive()
+    {
+        return activeController_ == dummyController_;
+    }
 
     bool isEmergencyControllerActive()
     {
@@ -207,6 +211,7 @@ private:
 
     void taskEmergencyStop();
     void taskManualFollow();
+    void taskNone();
     void taskNormalStop();
     void taskPathFollow();
     void taskRotate();
@@ -223,6 +228,7 @@ private:
     TaskEnum currentTask_;
 
     double dT_;
+    DummyController* dummyController_;
 
     EmergencyController* emergencyController_;
 

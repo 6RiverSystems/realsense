@@ -27,13 +27,11 @@ public:
 
 private:
 
-    void OnDepthData( const sensor_msgs::Image::ConstPtr& infraredImage );
+    void OnDepthData( const sensor_msgs::Image::ConstPtr& infraredImage1 );
 
 private:
 
     cv_bridge::CvImagePtr GetCvImage( const sensor_msgs::Image::ConstPtr& image ) const;
-
-    void CombineImages( cv::Mat& image1, cv::Mat& image2, cv::Mat& result ) const;
 
     constexpr static unsigned int REFRESH_RATE_HZ = 50;
 
@@ -41,11 +39,7 @@ private:
 
     ros::Subscriber						 				depthSubscriber_;
 
-    ros::Publisher 										depthColorPublisher_;
-
     ros::Publisher 										depthMedianFilterPublisher_;
-
-    ros::Publisher 										depthHistogramPublisher_;
 
 };
 

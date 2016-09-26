@@ -23,13 +23,11 @@ namespace srs {
 class BaseController
 {
 public:
-    static const Velocity<> ZERO_VELOCITY;
-    static const Pose<> ZERO_POSE;
-
     BaseController(string name) :
         canceled_(false),
-        executingCommand_(ZERO_VELOCITY),
-        goal_(ZERO_POSE),
+        executingCommand_(Velocity<>::ZERO),
+        firstRun_(true),
+        goal_(Pose<>::ZERO),
         goalReached_(false),
         Kv_(1.0),
         Kw_(1.0),
@@ -72,6 +70,11 @@ public:
         return canceled_;
     }
 
+    bool isFirstRun() const
+    {
+        return firstRun_;
+    }
+
     bool isGoalReached() const
     {
         return goalReached_;
@@ -96,7 +99,7 @@ public:
     }
 
     void step(double dT, Pose<> currentPose, Odometry<> currentOdometry);
-    virtual void setRobotProfile(RobotProfile robot) = 0;
+    virtual void setRobotProfile(RobotProfile robotProfile) = 0;
 
 protected:
     virtual void calculateLanding(Pose<> goal)
@@ -109,9 +112,9 @@ protected:
 
     virtual void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry) = 0;
 
-    void setRobotProfile(RobotProfile robot, double Kv, double Kw)
+    void setRobotProfile(RobotProfile robotProfile, double Kv, double Kw)
     {
-        robot_ = robot;
+        robot_ = robotProfile;
 
         Kv_ = Kv;
         Kw_ = Kw;
@@ -124,6 +127,8 @@ private:
     bool canceled_;
 
     Velocity<> executingCommand_;
+
+    bool firstRun_;
 
     Pose<> goal_;
     bool goalReached_;

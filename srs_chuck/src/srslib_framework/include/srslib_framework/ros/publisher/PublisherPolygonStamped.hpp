@@ -25,10 +25,10 @@ public:
             RosPublisherStamped(topic, buffer, latched, nameSpace)
     {}
 
-    geometry_msgs::PolygonStamped convertData(vector<Pose<>> data, ros::Time stamp)
+    geometry_msgs::PolygonStamped convertData(vector<Pose<>> data, ros::Time timestamp)
     {
         geometry_msgs::PolygonStamped message;
-        message.header.stamp = stamp;
+        message.header.stamp = timestamp;
 
         vector<geometry_msgs::Point32> polygon;
         for (auto pose : data)
@@ -45,9 +45,9 @@ public:
         return message;
     }
 
-    void publish(vector<Pose<>> data, string frameId = "map", ros::Time stamp = ros::Time::now())
+    void publish(vector<Pose<>> data, string frameId = "map", ros::Time timestamp = ros::Time::now())
     {
-        geometry_msgs::PolygonStamped message = convertData(data, stamp);
+        geometry_msgs::PolygonStamped message = convertData(data, timestamp);
         message.header.frame_id = frameId;
 
         publishMessage(message);

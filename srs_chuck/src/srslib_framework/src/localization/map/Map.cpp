@@ -18,30 +18,22 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Map::Map() :
-    grid_(nullptr),
-    heightC_(0),
-    heightM_(0),
-    mapImageFilename_(""),
-    resolution_(0.0),
-    widthC_(0),
-    widthM_(0)
+    grid_(nullptr)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Map::Map(double widthC, double heightC, double resolution) :
-        grid_(nullptr),
-        heightC_(heightC),
-        heightM_(0),
-        mapImageFilename_(""),
-        resolution_(resolution),
-        widthC_(widthC),
-        widthM_(0)
+        grid_(nullptr)
 {
-    widthM_ = widthC_* resolution_;
-    heightM_ = heightC_ * resolution_;
+    metadata_.heightCells = heightC;
+    metadata_.widthCells = widthC;
+    metadata_.resolution = resolution;
 
-    grid_ = new Grid2d(widthC_, heightC_);
+    metadata_.widthM = widthC * resolution;
+    metadata_.heightM = heightC * resolution;
+
+    grid_ = new Grid2d(widthC, heightC);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,68 +65,15 @@ Map::~Map()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Map::getMapCoordinates(double x, double y, int& c, int& r)
 {
-    c = static_cast<int>(round(x / resolution_));
-    r = static_cast<int>(round(y / resolution_));
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Map::getCostsGrid(vector<int8_t>& costsGrid)
-{
-    costsGrid.clear();
-
-    if (grid_)
-    {
-        int8_t maxValue = numeric_limits<int8_t>::max();
-
-        for (int row = 0; row < grid_->getHeight(); row++)
-        {
-            for (int col = 0; col < grid_->getWidth(); col++)
-            {
-                Grid2dLocation location = Grid2dLocation(col, row);
-
-                float cost = (static_cast<float>(grid_->getCost(location)) / (2.0 * maxValue)) * 100;
-
-                // This is only for visualization purposes as
-                // a static obstacle information is carried by the map note
-                MapNote* note = reinterpret_cast<MapNote*>(grid_->getNote(location));
-                if (note && note->staticObstacle())
-                {
-                    cost = 100.0;
-                }
-
-                costsGrid.push_back(static_cast<int8_t>(ceil(cost)));
-            }
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Map::getNotesGrid(vector<int8_t>& notesGrid)
-{
-    notesGrid.clear();
-
-    if (grid_)
-    {
-        for (int row = 0; row < grid_->getHeight(); row++)
-        {
-            for (int col = 0; col < grid_->getWidth(); col++)
-            {
-                Grid2dLocation location = Grid2dLocation(col, row);
-
-                MapNote* note = reinterpret_cast<MapNote*>(grid_->getNote(location));
-                int8_t flags = note ? note->getFlags() : 0;
-
-                notesGrid.push_back(flags);
-            }
-        }
-    }
+    c = static_cast<int>(round(x / metadata_.resolution));
+    r = static_cast<int>(round(y / metadata_.resolution));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Map::getWorldCoordinates(int c, int r, double& x, double& y)
 {
-    x = static_cast<double>(c) * resolution_;
-    y = static_cast<double>(r) * resolution_;
+    x = static_cast<double>(c) * metadata_.resolution;
+    y = static_cast<double>(r) * metadata_.resolution;
 
     // The precision is down to 1mm
     x = round(x * 1000) / 1000;
@@ -144,9 +83,9 @@ void Map::getWorldCoordinates(int c, int r, double& x, double& y)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Map::load(string filename)
 {
-    mapDocumentFilename_ = filename;
+    metadata_.mapDocumentFilename = filename;
 
-    document_ = YAML::LoadFile(mapDocumentFilename_);
+    document_ = YAML::LoadFile(metadata_.mapDocumentFilename);
 
     if (!document_.IsNull())
     {
@@ -155,7 +94,7 @@ void Map::load(string filename)
     }
     else
     {
-        ROS_ERROR_STREAM("Configuration file not found: " << mapDocumentFilename_);
+        ROS_ERROR_STREAM("Configuration file not found: " << metadata_.mapDocumentFilename);
     }
 }
 
@@ -218,11 +157,11 @@ void Map::setObstruction(int c, int r)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Map::loadConfiguration()
 {
-    ROS_INFO_STREAM("Loading map configuration " << mapDocumentFilename_);
+    ROS_INFO_STREAM("Loading map configuration: " << metadata_.mapDocumentFilename);
 
     try
     {
-        resolution_ = document_["resolution"].as<double>();
+        metadata_.resolution = document_["resolution"].as<double>();
     }
     catch (YAML::InvalidScalar& e)
     {
@@ -232,18 +171,18 @@ void Map::loadConfiguration()
 
     try
     {
-        mapImageFilename_ = document_["image"].as<string>();
+        metadata_.mapImageFilename = document_["image"].as<string>();
 
-        if (mapImageFilename_.size() == 0)
+        if (metadata_.mapImageFilename.size() == 0)
         {
             ROS_ERROR("The image tag cannot be an empty string.");
             exit(-1);
         }
 
-        if (mapImageFilename_[0] != '/')
+        if (metadata_.mapImageFilename[0] != '/')
         {
-            mapImageFilename_ = Filesystem::dirname(mapDocumentFilename_) +
-                "/" + mapImageFilename_;
+            metadata_.mapImageFilename = Filesystem::dirname(metadata_.mapDocumentFilename) +
+                "/" + metadata_.mapImageFilename;
         }
 
     }
@@ -252,36 +191,33 @@ void Map::loadConfiguration()
         ROS_ERROR("The map does not contain an image tag or it is invalid.");
         exit(-1);
     }
-
-    origin_ = tf::createQuaternionFromYaw(0.0);
-    orientation_ = tf::createQuaternionFromYaw(0.0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Map::loadCosts()
 {
-    ROS_INFO_STREAM("Loading map from image " << mapImageFilename_);
+    ROS_INFO_STREAM("Loading map from image " << metadata_.mapImageFilename);
 
     SDL_Surface* image;
 
-    image = IMG_Load(mapImageFilename_.c_str());
+    image = IMG_Load(metadata_.mapImageFilename.c_str());
     if (!image)
     {
-        ROS_ERROR_STREAM("Failed to open the image file \"" << mapImageFilename_ + "\"");
+        ROS_ERROR_STREAM("Failed to open the image file \"" << metadata_.mapImageFilename + "\"");
         throw;
     }
 
     // Copy the image data into the map structure
-    widthC_ = image->w;
-    heightC_ = image->h;
-    widthM_ = widthC_ * resolution_;
-    heightM_ = heightC_ * resolution_;
+    metadata_.widthCells = image->w;
+    metadata_.heightCells = image->h;
+    metadata_.widthM = image->w * metadata_.resolution;
+    metadata_.heightM = image->h * metadata_.resolution;
 
     if (grid_)
     {
         delete grid_;
     }
-    grid_ = new Grid2d(widthC_, heightC_);
+    grid_ = new Grid2d(metadata_.widthCells, metadata_.heightCells);
 
     int pitch = image->pitch;
     int channels = image->format->BytesPerPixel;
@@ -294,9 +230,9 @@ void Map::loadCosts()
     int8_t maxValue = numeric_limits<int8_t>::max();
 
     unsigned char* imagePixels = (unsigned char*)(image->pixels);
-    for (unsigned int row = 0; row < heightC_; row++)
+    for (unsigned int row = 0; row < metadata_.heightCells; row++)
     {
-        for (unsigned int col = 0; col < widthC_; col++)
+        for (unsigned int col = 0; col < metadata_.widthCells; col++)
         {
             // Compute mean of RGB for this pixel
             unsigned char* pixel = imagePixels + row * pitch + col * channels;
@@ -306,7 +242,7 @@ void Map::loadCosts()
             unsigned char blue = *(pixel + 2);
             unsigned char alpha = *(pixel + 3);
 
-            Grid2dLocation location = Grid2dLocation(col, heightC_ - row - 1);
+            Grid2dLocation location = Grid2dLocation(col, metadata_.heightCells - row - 1);
             MapNote* note = MapNote::instanceOf(green);
 
             // Static obstacles have priority on every other note.

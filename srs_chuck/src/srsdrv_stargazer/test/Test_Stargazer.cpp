@@ -5,13 +5,16 @@
  */
 
 #include <StarGazerPointTransformer.h>
-#include <srslib_framework/math/AngleMath.hpp>
+
 #include "gtest/gtest.h"
 #include <tf/tf.h>
 #include <yaml-cpp/yaml.h>
 #include <sys/stat.h>
 #include <math.h>
 #include <boost/filesystem.hpp>
+
+#include <srslib_framework/math/AngleMath.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
@@ -141,7 +144,7 @@ TEST_F( StargazerTest, TestAverageAngle )
 {
 	tf::Transform stargazerTransform( tf::Quaternion::getIdentity( ), tf::Vector3( 0.0, 0.0, 0.0) );
 
-	m_pointTransformer.Load( "/internal/state/map/grid", stargazerTransform,
+	m_pointTransformer.Load(ChuckTopics::internal::MAP_OCCUPANCY, stargazerTransform,
 		m_footprintTransform, m_strAnchorFile );
 
 	double fourtyFive = 45.0;
@@ -166,7 +169,7 @@ TEST_F( StargazerTest, TestCameraAngleCalibration )
 {
 	tf::Transform stargazerTransform( tf::Quaternion::getIdentity( ), tf::Vector3( 0.0, 0.0, 0.0) );
 
-	m_pointTransformer.Load( "/internal/state/map/grid", stargazerTransform,
+	m_pointTransformer.Load(ChuckTopics::internal::MAP_OCCUPANCY, stargazerTransform,
 		m_footprintTransform, m_strAnchorFile );
 
 	tf::Pose pose( tf::createIdentityQuaternion( ) );
@@ -204,7 +207,7 @@ TEST_F( StargazerTest, TestTransforms )
 			AngleMath::normalizeDeg2Rad( stargazerOffset.angle ) ),
 			tf::Vector3( stargazerOffset.x, stargazerOffset.y, stargazerOffset.z) );
 
-		m_pointTransformer.Load( "/internal/state/map/grid", stargazerTransform,
+		m_pointTransformer.Load(ChuckTopics::internal::MAP_OCCUPANCY, stargazerTransform,
 			m_footprintTransform, m_strAnchorFile );
 
 		std::map<int, tf::Transform> mapAnchorTransforms = m_pointTransformer.GetAnchorTransforms( );

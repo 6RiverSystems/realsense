@@ -14,18 +14,22 @@ using namespace std;
 
 #include <tf/LinearMath/Quaternion.h>
 
+#include <srslib_framework/localization/map/MapFactory.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-MapServer::MapServer(string nodeName) :
-    costsGrid_(),
-    rosNodeHandle_(nodeName)
+MapServer::MapServer(string name, int argc, char** argv) :
+    RosUnit(name, argc, argv, REFRESH_RATE_HZ),
+    occupancy_(),
+    pubMapMetadata_(ChuckTopics::internal::MAP_METADATA, 1, true)
 {
     string mapFilename;
-    rosNodeHandle_.param("/target_map", mapFilename, string(""));
+    rosNodeHandle_.param("target_map", mapFilename, string("/home/fsantini/projects/repos/ros/srs_sites/src/srsc_empty/map/empty.yaml"));
 
     ROS_INFO_STREAM("Target map: " << mapFilename);
 
@@ -33,40 +37,47 @@ MapServer::MapServer(string nodeName) :
     rosNodeHandle_.param("/frame_id", frame_id, string("map"));
 
     map_.load(mapFilename);
-    map_.getCostsGrid(costsGrid_);
-    map_.getNotesGrid(notesGrid_);
+    MapFactory::map2Occupancy(&map_, occupancy_);
+    MapFactory::map2Notes(&map_, notes_);
 
-    pubMapMetadata_ = rosNodeHandle_.advertise<nav_msgs::MapMetaData>(
-        "/internal/state/map/metadata", 1, true);
     pubMapOccupancyGrid_ = rosNodeHandle_.advertise<nav_msgs::OccupancyGrid>(
-        "/internal/state/map/grid", 1, true);
+        ChuckTopics::internal::MAP_OCCUPANCY, 1, true);
     pubMapCompleteMap_ = rosNodeHandle_.advertise<srslib_framework::MsgMap>(
-        "/internal/state/map/complete", 1, true);
+        ChuckTopics::internal::MAP_LOGICAL, 1, true);
+
+    serviceMapRequest_ = rosNodeHandle_.advertiseService(ChuckTopics::service::MAP_OCCUPANCY,
+        &MapServer::callbackMapRequest, this);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+void MapServer::execute()
+{
+    evaluateTriggers();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MapServer::run()
+void MapServer::initialize()
 {
-    triggerShutdown_.connectService();
-
-    // TODO: For not the map is published only once and latched. There should be
-    // a more intelligent way to publish the map only when things change
-    ros::spinOnce();
     publishMap();
 
-    ros::Rate refreshRate(REFRESH_RATE_HZ);
-    while (ros::ok())
-    {
-        ros::spinOnce();
-
-        evaluateTriggers();
-
-        refreshRate.sleep();
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+bool MapServer::callbackMapRequest(nav_msgs::GetMap::Request &req, nav_msgs::GetMap::Response &res)
+{
+    ROS_INFO("Map request service: Sending map");
+
+    res.map.header.stamp = ros::Time::now();
+
+    MapMetadata mapMetadata = map_.getMetadata();
+    res.map.info = MapMessageFactory::mapMetadata2Msg(mapMetadata);
+    res.map.data = occupancy_;
+
+    return true;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MapServer::evaluateTriggers()
@@ -80,32 +91,16 @@ void MapServer::evaluateTriggers()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MapServer::publishMap()
 {
-    nav_msgs::MapMetaData metadataMessage;
+    MapMetadata mapMetadata = map_.getMetadata();
+    nav_msgs::MapMetaData metadataMessage = MapMessageFactory::mapMetadata2Msg(mapMetadata);
 
-    metadataMessage.map_load_time = ros::Time::now();
-    metadataMessage.resolution = map_.getResolution();
-    metadataMessage.width = map_.getWidthCells();
-    metadataMessage.height = map_.getHeightCells();
-
-    geometry_msgs::Pose origin;
-    tf::Quaternion orientation = map_.getOrientation();
-
-    origin.position.x = map_.getOrigin().x();
-    origin.position.y = map_.getOrigin().y();
-    origin.orientation.x = orientation.x();
-    origin.orientation.y = orientation.y();
-    origin.orientation.z = orientation.z();
-    origin.orientation.w = orientation.w();
-
-    metadataMessage.origin = origin;
-
-    pubMapMetadata_.publish(metadataMessage);
+    pubMapMetadata_.publish(mapMetadata);
 
     nav_msgs::OccupancyGrid occupancyMessage;
 
     occupancyMessage.header.stamp = ros::Time::now();
     occupancyMessage.info = metadataMessage;
-    occupancyMessage.data = costsGrid_;
+    occupancyMessage.data = occupancy_;
 
     pubMapOccupancyGrid_.publish(occupancyMessage);
 
@@ -113,8 +108,8 @@ void MapServer::publishMap()
 
     mapMessage.header.stamp = ros::Time::now();
     mapMessage.info = metadataMessage;
-    mapMessage.costs = costsGrid_;
-    mapMessage.notes = notesGrid_;
+    mapMessage.costs = occupancy_;
+    mapMessage.notes = notes_;
 
     pubMapCompleteMap_.publish(mapMessage);
 }

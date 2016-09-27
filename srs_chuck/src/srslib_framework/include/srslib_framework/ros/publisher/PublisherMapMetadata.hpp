@@ -8,27 +8,27 @@
 #include <string>
 using namespace std;
 
-#include <geometry_msgs/PoseStamped.h>
+#include <nav_msgs/MapMetaData.h>
 
+#include <srslib_framework/ros/message/MapMessageFactory.hpp>
 #include <srslib_framework/ros/publisher/RosPublisherStamped.hpp>
-#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
 namespace srs {
 
-class PublisherPoseStamped :
-    public RosPublisherStamped<geometry_msgs::PoseStamped, Pose<>>
+class PublisherMapMetadata :
+    public RosPublisherStamped<nav_msgs::MapMetaData, MapMetadata>
 {
 public:
-    PublisherPoseStamped(string topic,
+    PublisherMapMetadata(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
             RosPublisherStamped(topic, buffer, latched, nameSpace)
     {}
 
-    geometry_msgs::PoseStamped convertData(Pose<> data, ros::Time timestamp)
+    nav_msgs::MapMetaData convertData(MapMetadata data, ros::Time timestamp)
     {
-        return PoseMessageFactory::pose2PoseStamped(data, timestamp);
+        return MapMessageFactory::mapMetadata2Msg(data, timestamp);
     }
 };
 

@@ -3,48 +3,53 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef SRS_MAPSERVER_HPP_
-#define SRS_MAPSERVER_HPP_
+#pragma once
 
 #include <string>
 using namespace std;
 
 #include <ros/ros.h>
+#include <nav_msgs/GetMap.h>
 
 #include <srslib_framework/localization/map/Map.hpp>
+#include <srslib_framework/ros/publisher/PublisherMapMetadata.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
+#include <srslib_framework/ros/unit/RosUnit.hpp>
 
 namespace srs {
 
-class MapServer
+class MapServer : public RosUnit<MapServer>
 {
 public:
-    MapServer(string nodeName);
-    ~MapServer()
+    MapServer(string name, int argc, char** argv);
+    virtual ~MapServer()
     {}
 
-    void run();
+protected:
+    void execute();
+
+    void initialize();
 
 private:
     constexpr static double REFRESH_RATE_HZ = 1.0 / 10.0; // [Hz]
+
+    bool callbackMapRequest(nav_msgs::GetMap::Request &req, nav_msgs::GetMap::Response &res);
 
     void evaluateTriggers();
 
     void publishMap();
 
     Map map_;
-    vector<int8_t> costsGrid_;
-    vector<int8_t> notesGrid_;
+    vector<int8_t> occupancy_;
+    vector<int8_t> notes_;
 
-    ros::Publisher pubMapMetadata_;
+    PublisherMapMetadata pubMapMetadata_;
     ros::Publisher pubMapOccupancyGrid_;
     ros::Publisher pubMapCompleteMap_;
 
-    ros::NodeHandle rosNodeHandle_;
+    ros::ServiceServer serviceMapRequest_;
 
     RosTriggerShutdown triggerShutdown_;
 };
 
 } // namespace srs
-
-#endif  // SRS_MAPSERVER_HPP_

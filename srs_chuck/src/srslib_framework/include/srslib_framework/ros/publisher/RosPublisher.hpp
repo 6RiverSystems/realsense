@@ -17,9 +17,9 @@ class RosPublisher
 {
 public:
     RosPublisher(string topic,
-        unsigned int queueLength,
-        bool latched,
-        string nameSpace) :
+            unsigned int queueLength,
+            bool latched,
+            string nameSpace) :
         topic_(topic)
     {
         rosNodeHandle_ = ros::NodeHandle(nameSpace);
@@ -36,8 +36,7 @@ public:
 
     virtual void publish(TYPE data)
     {
-        MESSAGE message = convertData(data);
-        publishMessage(message);
+        publishMessage(convertData(data));
     }
 
     virtual MESSAGE convertData(TYPE data) = 0;
@@ -49,6 +48,8 @@ protected:
     }
 
 private:
+    MESSAGE cachedMessage_;
+
     ros::Publisher dataPublisher_;
 
     ros::NodeHandle rosNodeHandle_;

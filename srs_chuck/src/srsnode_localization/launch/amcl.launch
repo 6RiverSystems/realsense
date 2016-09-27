@@ -7,7 +7,7 @@
 -->
 <launch>
 	<remap from="/scan" to="/internal/sensors/lidar/scan/filtered"/>
-	<remap from="/map" to="/internal/state/map/grid"/>
+	<remap from="/map" to="/internal/state/map/occupancy"/>
 	<remap from="/initialpose" to="/request/initial_pose"/>
 
 	<node pkg="amcl" type="amcl" name="amcl" output="screen">	

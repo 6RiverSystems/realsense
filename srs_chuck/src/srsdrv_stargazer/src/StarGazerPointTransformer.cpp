@@ -5,8 +5,7 @@
  */
 
 #include <StarGazerPointTransformer.h>
-#include <srslib_framework/localization/map/Anchor.hpp>
-#include <srslib_framework/math/AngleMath.hpp>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
@@ -14,6 +13,10 @@
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 #include <yaml-cpp/yaml.h>
+
+#include <srslib_framework/localization/map/Anchor.hpp>
+#include <srslib_framework/math/AngleMath.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 using namespace boost::accumulators;
 
@@ -51,7 +54,7 @@ auto constexpr DEFAULT_OFFSET_Y = -0.0697303969746;
 
 StarGazerPointTransformer::StarGazerPointTransformer( ) :
 	m_filter( 2.6, 5.0, 70 ),
-	m_strAnchorFrame( "/internal/state/map/grid" ),
+	m_strAnchorFrame(ChuckTopics::internal::MAP_OCCUPANCY),
 	m_strTargetFrame(),
 	m_mapTransforms( ),
 	m_stargazerTransform( tf::Quaternion::getIdentity( ), tf::Vector3( DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y, 0.0f ) ),

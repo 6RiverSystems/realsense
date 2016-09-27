@@ -16,6 +16,9 @@ struct MapFactory
 {
     static Map* fromRosCostMap2D(costmap_2d::Costmap2DROS* rosCostMap,
         unsigned int obstacleThreshold);
+
+    static void map2Occupancy(Map* map, vector<int8_t>& costsGrid);
+    static void map2Notes(Map* map, vector<int8_t>& costsGrid);
 };
 
 } // namespace srs

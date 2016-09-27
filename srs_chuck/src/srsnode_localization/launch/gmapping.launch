@@ -6,7 +6,7 @@
   *
 -->
 <launch>
-	<remap from="/map" to="/internal/state/map/grid"/>
+	<remap from="/map" to="/internal/state/map/occupancy"/>
     <remap from="/map_metadata" to="/internal/state/map/info"/>
 
 	<!-- Gmapping Stack -->

@@ -20,7 +20,7 @@
     </include>
 
     <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_6rhq_sortwall)/map/6rhq_sortwall.yaml" >
-    	<remap from="map" to="/internal/state/map/grid"/>
+    	<remap from="map" to="/internal/state/map/occupancy"/>
     	<remap from="map_metadata" to="/internal/state/map/info"/>
     </node>
 </launch>

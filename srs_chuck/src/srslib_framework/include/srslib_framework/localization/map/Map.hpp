@@ -14,6 +14,7 @@ using namespace std;
 #include <tf/tf.h>
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/localization/map/MapMetadata.hpp>
 #include <srslib_framework/localization/map/MapNote.hpp>
 
 namespace srs {
@@ -28,12 +29,12 @@ public:
 
     int getHeightCells()
     {
-        return heightC_;
+        return metadata_.heightCells;
     }
 
     double getHeightMeters()
     {
-        return heightM_;
+        return metadata_.heightM;
     }
 
     Grid2d* getGrid()
@@ -42,32 +43,25 @@ public:
     }
 
     void getMapCoordinates(double x, double y, int& c, int& r);
-    void getCostsGrid(vector<int8_t>& costsGrid);
-    void getNotesGrid(vector<int8_t>& notesGrid);
 
-    tf::Quaternion getOrigin()
+    MapMetadata getMetadata() const
     {
-        return origin_;
-    }
-
-    tf::Quaternion getOrientation()
-    {
-        return orientation_;
+        return metadata_;
     }
 
     float getResolution()
     {
-        return resolution_;
+        return metadata_.resolution;
     }
 
     int getWidthCells()
     {
-        return widthC_;
+        return metadata_.widthCells;
     }
 
     double getWidthMeters()
     {
-        return widthM_;
+        return metadata_.widthM;
     }
 
     void getWorldCoordinates(int c, int r, double& x, double& y);
@@ -86,19 +80,7 @@ private:
 
     YAML::Node document_;
 
-    int heightC_;
-    double heightM_;
-
-    string mapDocumentFilename_;
-    string mapImageFilename_;
-
-    tf::Quaternion origin_;
-    tf::Quaternion orientation_;
-
-    double resolution_;
-
-    int widthC_;
-    double widthM_;
+    MapMetadata metadata_;
 
     Grid2d* grid_;
 };

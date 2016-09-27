@@ -33,7 +33,7 @@ Executive::Executive(string nodeName) :
     isJoystickLatched_(false),
     pubExternalArrived_(ChuckTopics::external::RESPONSE_ARRIVED),
     pubGoalToNavigation_(ChuckTopics::internal::GOAL_TO_NAVIGATION),
-    pubStatusGoalTarget_(ChuckTopics::internal::TARGET_AREA)
+    pubStatusGoalTarget_(ChuckTopics::internal::GOAL_TARGET_AREA)
 {
     pubInternalInitialPose_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
         "/internal/command/initial_pose", 1);

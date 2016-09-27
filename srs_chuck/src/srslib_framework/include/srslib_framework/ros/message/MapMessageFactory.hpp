@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef MAPMESSAGEFACTORY_HPP_
-#define MAPMESSAGEFACTORY_HPP_
+#pragma once
 
 #include <srslib_framework/MsgMap.h>
 
@@ -14,6 +13,39 @@ namespace srs {
 
 struct MapMessageFactory
 {
+    /**
+     * @brief Convert a MapMetadata into a MapMetaData message.
+     *
+     * @param metadata Map metadata to convert
+     * @param timestamp ROS time stamp for the message
+     *
+     * @return newly generated message
+     */
+    static nav_msgs::MapMetaData mapMetadata2Msg(MapMetadata metadata,
+        ros::Time timestamp = ros::Time::now())
+    {
+        nav_msgs::MapMetaData msgMapMetaData;
+
+        msgMapMetaData.map_load_time = timestamp;
+        msgMapMetaData.resolution = metadata.resolution;
+        msgMapMetaData.width = metadata.widthCells;
+        msgMapMetaData.height = metadata.heightCells;
+
+        geometry_msgs::Pose origin;
+        tf::Quaternion orientation = metadata.orientation;
+
+        origin.position.x = metadata.origin.x();
+        origin.position.y = metadata.origin.y();
+        origin.orientation.x = orientation.x();
+        origin.orientation.y = orientation.y();
+        origin.orientation.z = orientation.z();
+        origin.orientation.w = orientation.w();
+
+        msgMapMetaData.origin = origin;
+
+        return msgMapMetaData;
+    }
+
     /**
      * @brief Convert a MsgMapConstPtr type into a Map.
      *
@@ -31,5 +63,3 @@ struct MapMessageFactory
 };
 
 } // namespace srs
-
-#endif // MAPMESSAGEFACTORY_HPP_

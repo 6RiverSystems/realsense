@@ -5,9 +5,7 @@
  */
 
 #include <StarGazer.h>
-#include <srslib_framework/io/SerialIO.hpp>
-#include <srslib_framework/platform/Thread.hpp>
-#include <srslib_framework/robotics/Pose.hpp>
+
 #include <string>
 #include <iostream>
 
@@ -16,6 +14,11 @@
 #include <yaml-cpp/yaml.h>
 
 #include <srslib_framework/MsgPose.h>
+
+#include <srslib_framework/io/SerialIO.hpp>
+#include <srslib_framework/platform/Thread.hpp>
+#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs
 {
@@ -200,7 +203,7 @@ void StarGazer::LoadTransforms( )
 
 	if( !strTargetFrame.length( ) )
 	{
-		strTargetFrame = "/internal/state/map/grid";
+		strTargetFrame = ChuckTopics::internal::MAP_OCCUPANCY;
 	}
 
 	ROS_INFO_STREAM( "Stargazer: Target frame: " << strTargetFrame );

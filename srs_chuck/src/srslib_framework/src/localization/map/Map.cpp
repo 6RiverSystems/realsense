@@ -249,7 +249,7 @@ void Map::loadConfiguration()
     }
     catch (YAML::InvalidScalar& e)
     {
-        ROS_ERROR("The map does not contain a resolution tag or it is invalid.");
+        ROS_ERROR("The map does not contain a 'resolution' tag or it is invalid.");
         exit(-1);
     }
 
@@ -258,21 +258,45 @@ void Map::loadConfiguration()
         metadata_.thresholdFree = document_["free_thresh"].as<double>();
     }
     catch (YAML::InvalidScalar& e)
-    {}
+    {
+        ROS_ERROR("The map does not contain a 'free_thresh' tag or it is invalid.");
+        exit(-1);
+    }
 
     try
     {
         metadata_.thresholdOccupied = document_["occupied_thresh"].as<double>();
     }
     catch (YAML::InvalidScalar& e)
-    {}
+    {
+        ROS_ERROR("The map does not contain a 'occupied_thresh' tag or it is invalid.");
+        exit(-1);
+    }
 
     try
     {
         metadata_.negate = static_cast<bool>(document_["negate"].as<int>());
     }
     catch (YAML::InvalidScalar& e)
-    {}
+    {
+        ROS_ERROR("The map does not contain a 'negate' tag or it is invalid.");
+        exit(-1);
+    }
+
+    try {
+        metadata_.origin = tf::Quaternion(
+            document_["origin"][0].as<double>(),
+            document_["origin"][1].as<double>(),
+            0.0,
+            0.0);
+
+        metadata_.orientation = tf::createQuaternionFromYaw(document_["origin"][2].as<double>());
+    }
+    catch (YAML::InvalidScalar& e)
+    {
+        ROS_ERROR("The map does not contain a 'origin' tag or it is invalid.");
+        exit(-1);
+    }
 
     try
     {

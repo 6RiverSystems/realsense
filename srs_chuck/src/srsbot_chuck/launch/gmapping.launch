@@ -6,8 +6,10 @@
   *
 -->
 <launch>
-	<remap from="/map" to="/internal/state/map/occupancy"/>
+<!--
+    <remap from="/map" to="/internal/state/map/ros_occupancy"/>
     <remap from="/map_metadata" to="/internal/state/map/info"/>
+-->
     <arg name="simulation" default="false" />
 
 	<!-- Fixed /odom frame to /map frame TF -->

@@ -21,15 +21,16 @@ namespace internal {
 
     static const string GOAL_TARGET_AREA = "/internal/state/goal/target_area";
 
-    static const string MAP_METADATA = "/internal/state/map/metadata";
-    static const string MAP_OCCUPANCY = "/internal/state/map/occupancy";
     static const string MAP_LOGICAL = "/internal/state/map/complete";
+
+    static const string MAP_ROS_METADATA = "/internal/state/map/ros_metadata";
+    static const string MAP_ROS_OCCUPANCY = "/internal/state/map/ros_occupancy";
 
 } // namespace internal
 
 namespace service {
 
-    static const string MAP_OCCUPANCY = "static_map";
+    static const string GET_MAP_OCCUPANCY = "static_map";
 
 } // namespace service
 

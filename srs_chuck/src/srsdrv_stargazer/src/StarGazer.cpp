@@ -203,7 +203,7 @@ void StarGazer::LoadTransforms( )
 
 	if( !strTargetFrame.length( ) )
 	{
-		strTargetFrame = ChuckTopics::internal::MAP_OCCUPANCY;
+		strTargetFrame = ChuckTopics::internal::MAP_ROS_OCCUPANCY;
 	}
 
 	ROS_INFO_STREAM( "Stargazer: Target frame: " << strTargetFrame );

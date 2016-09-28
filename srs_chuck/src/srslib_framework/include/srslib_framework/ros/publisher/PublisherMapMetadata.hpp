@@ -28,7 +28,7 @@ public:
 
     nav_msgs::MapMetaData convertData(MapMetadata data, ros::Time timestamp)
     {
-        return MapMessageFactory::mapMetadata2Msg(data, timestamp);
+        return MapMessageFactory::mapMetadata2RosMsg(data, timestamp);
     }
 };
 

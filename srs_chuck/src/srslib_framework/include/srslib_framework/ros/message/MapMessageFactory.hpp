@@ -21,7 +21,7 @@ struct MapMessageFactory
      *
      * @return newly generated message
      */
-    static nav_msgs::MapMetaData mapMetadata2Msg(MapMetadata metadata,
+    static nav_msgs::MapMetaData mapMetadata2RosMsg(MapMetadata metadata,
         ros::Time timestamp = ros::Time::now())
     {
         nav_msgs::MapMetaData msgMapMetaData;

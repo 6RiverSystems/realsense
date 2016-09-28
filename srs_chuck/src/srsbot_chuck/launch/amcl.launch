@@ -19,8 +19,12 @@
         <arg name="load_driver" unless="$(arg simulation)" value="true" />
     </include>
 
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_6rhq_sortwall)/map/6rhq_sortwall.yaml" />
+
+<!--
     <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_6rhq_sortwall)/map/6rhq_sortwall.yaml" >
-    	<remap from="map" to="/internal/state/map/occupancy"/>
-    	<remap from="map_metadata" to="/internal/state/map/info"/>
+        <remap from="map" to="/internal/state/map/ros_occupancy"/>
+        <remap from="map_metadata" to="/internal/state/map/info"/>
     </node>
+-->
 </launch>

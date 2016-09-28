@@ -54,7 +54,7 @@ auto constexpr DEFAULT_OFFSET_Y = -0.0697303969746;
 
 StarGazerPointTransformer::StarGazerPointTransformer( ) :
 	m_filter( 2.6, 5.0, 70 ),
-	m_strAnchorFrame(ChuckTopics::internal::MAP_OCCUPANCY),
+	m_strAnchorFrame(ChuckTopics::internal::MAP_ROS_OCCUPANCY),
 	m_strTargetFrame(),
 	m_mapTransforms( ),
 	m_stargazerTransform( tf::Quaternion::getIdentity( ), tf::Vector3( DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y, 0.0f ) ),

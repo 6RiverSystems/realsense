@@ -217,7 +217,7 @@ Visualization Manager:
       Draw Behind: false
       Enabled: true
       Name: Map
-      Topic: /internal/state/map/occupancy
+      Topic: /internal/state/map/ros_occupancy
       Unreliable: false
       Value: true
     - Alpha: 1

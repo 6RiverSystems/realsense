@@ -10,6 +10,7 @@
 #include <sstream>
 using namespace std;
 
+#include <SDL/SDL_image.h>
 #include <yaml-cpp/yaml.h>
 #include <tf/tf.h>
 
@@ -75,6 +76,9 @@ public:
     void setObstruction(int c, int r);
 
 private:
+    void extract1Channel(SDL_Surface* image);
+    void extract3Channel(SDL_Surface* image);
+
     void loadConfiguration();
     void loadCosts();
 

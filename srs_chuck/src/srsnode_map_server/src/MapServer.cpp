@@ -26,7 +26,7 @@ namespace srs {
 MapServer::MapServer(string name, int argc, char** argv) :
     RosUnit(name, argc, argv, REFRESH_RATE_HZ),
     occupancy_(),
-    pubMapMetadata_(ChuckTopics::internal::MAP_METADATA, 1, true)
+    pubMapMetadata_(ChuckTopics::internal::MAP_ROS_METADATA, 1, true)
 {
     string mapFilename;
     rosNodeHandle_.param("target_map", mapFilename, string("/home/fsantini/projects/repos/ros/srs_sites/src/srsc_empty/map/empty.yaml"));
@@ -41,11 +41,11 @@ MapServer::MapServer(string name, int argc, char** argv) :
     MapFactory::map2Notes(&map_, notes_);
 
     pubMapOccupancyGrid_ = rosNodeHandle_.advertise<nav_msgs::OccupancyGrid>(
-        ChuckTopics::internal::MAP_OCCUPANCY, 1, true);
+        ChuckTopics::internal::MAP_ROS_OCCUPANCY, 1, true);
     pubMapCompleteMap_ = rosNodeHandle_.advertise<srslib_framework::MsgMap>(
         ChuckTopics::internal::MAP_LOGICAL, 1, true);
 
-    serviceMapRequest_ = rosNodeHandle_.advertiseService(ChuckTopics::service::MAP_OCCUPANCY,
+    serviceMapRequest_ = rosNodeHandle_.advertiseService(ChuckTopics::service::GET_MAP_OCCUPANCY,
         &MapServer::callbackMapRequest, this);
 }
 
@@ -73,7 +73,7 @@ bool MapServer::callbackMapRequest(nav_msgs::GetMap::Request &req, nav_msgs::Get
     res.map.header.stamp = ros::Time::now();
 
     MapMetadata mapMetadata = map_.getMetadata();
-    res.map.info = MapMessageFactory::mapMetadata2Msg(mapMetadata);
+    res.map.info = MapMessageFactory::mapMetadata2RosMsg(mapMetadata);
     res.map.data = occupancy_;
 
     return true;
@@ -92,7 +92,7 @@ void MapServer::evaluateTriggers()
 void MapServer::publishMap()
 {
     MapMetadata mapMetadata = map_.getMetadata();
-    nav_msgs::MapMetaData metadataMessage = MapMessageFactory::mapMetadata2Msg(mapMetadata);
+    nav_msgs::MapMetaData metadataMessage = MapMessageFactory::mapMetadata2RosMsg(mapMetadata);
 
     pubMapMetadata_.publish(mapMetadata);
 

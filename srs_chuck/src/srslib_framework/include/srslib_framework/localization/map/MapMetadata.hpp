@@ -23,7 +23,10 @@ public:
         origin(tf::createQuaternionFromYaw(0)),
         mapDocumentFilename(""),
         mapImageFilename(""),
-        resolution(0.0)
+        resolution(0.0),
+        thresholdOccupied(0.9),
+        thresholdFree(0.1),
+        negate(false)
     {}
 
     int heightCells;
@@ -32,10 +35,15 @@ public:
     string mapDocumentFilename;
     string mapImageFilename;
 
+    bool negate;
+
     tf::Quaternion origin;
     tf::Quaternion orientation;
 
     double resolution;
+
+    double thresholdFree;
+    double thresholdOccupied;
 
     int widthCells;
     double widthM;

@@ -1,6 +1,5 @@
 #include <srslib_framework/localization/map/Map.hpp>
 
-#include <SDL/SDL_image.h>
 #include <limits>
 
 #include <tf/tf.h>
@@ -155,6 +154,91 @@ void Map::setObstruction(int c, int r)
 //
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void Map::extract1Channel(SDL_Surface* image)
+{
+    unsigned char* imagePixels = (unsigned char*)(image->pixels);
+    int pitch = image->pitch;
+
+    const unsigned char maxPixelLevel = numeric_limits<unsigned char>::max();
+
+    for (unsigned int row = 0; row < metadata_.heightCells; row++)
+    {
+        for (unsigned int col = 0; col < metadata_.widthCells; col++)
+        {
+            // Find the pixel color based on the row, column, and
+            // and pitch
+            unsigned char gray = *(imagePixels + row * pitch + col);
+            Grid2dLocation location = Grid2dLocation(col, metadata_.heightCells - row - 1);
+
+            unsigned int cost = static_cast<unsigned int>(
+                metadata_.negate ? gray : maxPixelLevel - gray);
+
+            double percentage = cost / 255.0;
+
+            // If the percentage is under the specified threshold
+            // no additional cost is specified
+            cost = percentage < metadata_.thresholdFree ? 0 : cost;
+
+            // Static obstacles have priority on every other note
+            MapNote* note = nullptr;
+            if (percentage > metadata_.thresholdOccupied)
+            {
+                note = MapNote::instanceOf(MapNote::STATIC_OBSTACLE);
+                cost = numeric_limits<unsigned int>::max();
+            }
+
+            // Populate the cell only if there is something interesting
+            // to store (either there is either a cost or a note)
+            if (cost > 0 || note)
+            {
+                grid_->addValue(location, cost, note);
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Map::extract3Channel(SDL_Surface* image)
+{
+    unsigned char* imagePixels = (unsigned char*)(image->pixels);
+    int pitch = image->pitch;
+
+    for (unsigned int row = 0; row < metadata_.heightCells; row++)
+    {
+        for (unsigned int col = 0; col < metadata_.widthCells; col++)
+        {
+            // Find the pixel based on the row, column, and
+            // and pitch and number of channels (3)
+            unsigned char* pixel = imagePixels + row * pitch + col * 3;
+
+            // Extract the colors
+            unsigned char red = *pixel;
+            unsigned char green = *(pixel + 1);
+            unsigned char blue = *(pixel + 2);
+            unsigned char alpha = *(pixel + 3);
+
+            Grid2dLocation location = Grid2dLocation(col, metadata_.heightCells - row - 1);
+            MapNote* note = green > 0 ? MapNote::instanceOf(green) : nullptr;
+
+            // Static obstacles have priority on every other note
+            unsigned int cost = static_cast<unsigned int>(blue);
+            if (red > 0)
+            {
+                note->join(MapNote::STATIC_OBSTACLE);
+                cost = numeric_limits<unsigned int>::max();
+            }
+
+            // Populate the cell only if there is something interesting
+            // to store (either there is either a cost or a note)
+            if (cost > 0 || note)
+            {
+                grid_->addValue(location, cost, note);
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void Map::loadConfiguration()
 {
     ROS_INFO_STREAM("Loading map configuration: " << metadata_.mapDocumentFilename);
@@ -168,6 +252,27 @@ void Map::loadConfiguration()
         ROS_ERROR("The map does not contain a resolution tag or it is invalid.");
         exit(-1);
     }
+
+    try
+    {
+        metadata_.thresholdFree = document_["free_thresh"].as<double>();
+    }
+    catch (YAML::InvalidScalar& e)
+    {}
+
+    try
+    {
+        metadata_.thresholdOccupied = document_["occupied_thresh"].as<double>();
+    }
+    catch (YAML::InvalidScalar& e)
+    {}
+
+    try
+    {
+        metadata_.negate = static_cast<bool>(document_["negate"].as<int>());
+    }
+    catch (YAML::InvalidScalar& e)
+    {}
 
     try
     {
@@ -198,9 +303,7 @@ void Map::loadCosts()
 {
     ROS_INFO_STREAM("Loading map from image " << metadata_.mapImageFilename);
 
-    SDL_Surface* image;
-
-    image = IMG_Load(metadata_.mapImageFilename.c_str());
+    SDL_Surface* image = IMG_Load(metadata_.mapImageFilename.c_str());
     if (!image)
     {
         ROS_ERROR_STREAM("Failed to open the image file \"" << metadata_.mapImageFilename + "\"");
@@ -219,41 +322,21 @@ void Map::loadCosts()
     }
     grid_ = new Grid2d(metadata_.widthCells, metadata_.heightCells);
 
-    int pitch = image->pitch;
     int channels = image->format->BytesPerPixel;
-    if (channels < 3)
+    switch (channels)
     {
-        ROS_ERROR_STREAM("The image must have RGB channels. Current channels: " << channels);
-        exit(-1);
-    }
+        case 1:
+            extract1Channel(image);
+            break;
 
-    int8_t maxValue = numeric_limits<int8_t>::max();
+        case 3:
+            extract3Channel(image);
+            break;
 
-    unsigned char* imagePixels = (unsigned char*)(image->pixels);
-    for (unsigned int row = 0; row < metadata_.heightCells; row++)
-    {
-        for (unsigned int col = 0; col < metadata_.widthCells; col++)
-        {
-            // Compute mean of RGB for this pixel
-            unsigned char* pixel = imagePixels + row * pitch + col * channels;
-
-            unsigned char red = *pixel;
-            unsigned char green = *(pixel + 1);
-            unsigned char blue = *(pixel + 2);
-            unsigned char alpha = *(pixel + 3);
-
-            Grid2dLocation location = Grid2dLocation(col, metadata_.heightCells - row - 1);
-            MapNote* note = MapNote::instanceOf(green);
-
-            // Static obstacles have priority on every other note.
-            if (red > 0)
-            {
-                note->join(MapNote::STATIC_OBSTACLE);
-            }
-
-            unsigned int cost = static_cast<unsigned int>(blue);
-            grid_->addValue(location, cost, note);
-        }
+        default:
+            ROS_ERROR_STREAM("The image must have Single or RGB channels. Current channels: "
+                << channels);
+            exit(-1);
     }
 
     SDL_FreeSurface(image);

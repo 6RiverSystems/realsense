@@ -24,15 +24,15 @@
 
 		<param name="resample_interval" value="2"/>
 		<param name="transform_tolerance" value="0.1"/>
-		<param name="recovery_alpha_slow" value="0.001"/>
-		<param name="recovery_alpha_fast" value="0.1"/>
+		<param name="recovery_alpha_slow" value="0"/>
+		<param name="recovery_alpha_fast" value="0"/>
 
 		<!-- Laser model parameters -->
 		<param name="laser_model_type" value="likelihood_field"/>
 
 		<param name="laser_min_range" value="-1"/>
 		<param name="laser_max_range" value="-1"/>
-		<param name="laser_max_beams" value="30"/>
+		<param name="laser_max_beams" value="60"/>
 		<param name="laser_z_hit" value="0.95"/>
 		<param name="laser_z_short" value="0.1"/>
 		<param name="laser_z_max" value="0.05"/>

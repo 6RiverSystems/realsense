@@ -12,7 +12,7 @@ using namespace std;
 #include <nav_msgs/GetMap.h>
 
 #include <srslib_framework/localization/map/Map.hpp>
-#include <srslib_framework/ros/publisher/PublisherMapMetadata.hpp>
+#include <srslib_framework/ros/publisher/PublisherRosMapMetadata.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
 #include <srslib_framework/ros/unit/RosUnit.hpp>
 
@@ -43,7 +43,7 @@ private:
     vector<int8_t> occupancy_;
     vector<int8_t> notes_;
 
-    PublisherMapMetadata pubMapMetadata_;
+    PublisherRosMapMetadata pubRosMapMetadata_;
     ros::Publisher pubMapOccupancyGrid_;
     ros::Publisher pubMapCompleteMap_;
 

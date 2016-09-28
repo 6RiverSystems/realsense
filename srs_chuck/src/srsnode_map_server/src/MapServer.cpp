@@ -26,7 +26,7 @@ namespace srs {
 MapServer::MapServer(string name, int argc, char** argv) :
     RosUnit(name, argc, argv, REFRESH_RATE_HZ),
     occupancy_(),
-    pubMapMetadata_(ChuckTopics::internal::MAP_ROS_METADATA, 1, true)
+    pubRosMapMetadata_(ChuckTopics::internal::MAP_ROS_METADATA, 1, true)
 {
     string mapFilename;
     rosNodeHandle_.param("target_map", mapFilename, string("/home/fsantini/projects/repos/ros/srs_sites/src/srsc_empty/map/empty.yaml"));
@@ -94,7 +94,7 @@ void MapServer::publishMap()
     MapMetadata mapMetadata = map_.getMetadata();
     nav_msgs::MapMetaData metadataMessage = MapMessageFactory::mapMetadata2RosMsg(mapMetadata);
 
-    pubMapMetadata_.publish(mapMetadata);
+    pubRosMapMetadata_.publish(mapMetadata);
 
     nav_msgs::OccupancyGrid occupancyMessage;
 

@@ -15,11 +15,11 @@ using namespace std;
 
 namespace srs {
 
-class PublisherMapMetadata :
+class PublisherRosMapMetadata :
     public RosPublisherStamped<nav_msgs::MapMetaData, MapMetadata>
 {
 public:
-    PublisherMapMetadata(string topic,
+    PublisherRosMapMetadata(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :

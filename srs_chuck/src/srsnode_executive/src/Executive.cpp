@@ -33,15 +33,12 @@ Executive::Executive(string nodeName) :
     isJoystickLatched_(false),
     pubExternalArrived_(ChuckTopics::external::RESPONSE_ARRIVED),
     pubGoalToNavigation_(ChuckTopics::internal::GOTO_GOAL),
-    pubStatusGoalTarget_(ChuckTopics::internal::GOAL_TARGET_AREA)
+    pubStatusGoalTarget_(ChuckTopics::internal::GOAL_TARGET_AREA),
+    pubInternalInitialPose_(ChuckTopics::internal::INITIAL_POSE, 1),
+    pubStatusGoal_(ChuckTopics::internal::GOAL_GOAL, 1)
 {
-    pubInternalInitialPose_ = rosNodeHandle_.advertise<srslib_framework::Pose>(
-        "/internal/command/initial_pose", 1);
-    pubStatusGoal_ = rosNodeHandle_.advertise<srslib_framework::Pose>(
-        "/internal/state/goal/goal", 1);
-
     pubStatusGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>(
-        "/internal/state/goal/path", 1);
+        ChuckTopics::internal::GOAL_PATH, 1);
 
     executeInitialPose();
 }
@@ -223,8 +220,7 @@ void Executive::publishInternalInitialPose(Pose<> initialPose)
 {
     if (initialPose.isValid())
     {
-        srslib_framework::Pose message = PoseMessageFactory::pose2Msg(initialPose);
-        pubInternalInitialPose_.publish(message);
+        pubInternalInitialPose_.publish(initialPose);
     }
     else
     {

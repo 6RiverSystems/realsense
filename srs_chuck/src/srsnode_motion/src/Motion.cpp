@@ -13,24 +13,21 @@
 #include <std_msgs/Float64MultiArray.h>
 #include <tf/transform_broadcaster.h>
 
+#include <srsnode_motion/MotionConfig.h>
 #include <srslib_framework/Pose.h>
 
 #include <srslib_framework/math/AngleMath.hpp>
-
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
-
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
-
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 #include <srsnode_motion/tap/sensor_frame/aps/FactoryApsNoise.hpp>
 #include <srsnode_motion/tap/sensor_frame/imu/FactoryImuNoise.hpp>
 #include <srsnode_motion/tap/sensor_frame/odometry/FactoryOdometryNoise.hpp>
 #include <srsnode_motion/FactoryRobotNoise.hpp>
 #include <srsnode_motion/FactoryRobotProfile.hpp>
-
-#include <srsnode_motion/MotionConfig.h>
 
 namespace srs {
 
@@ -46,7 +43,9 @@ Motion::Motion(string nodeName) :
     pingTimer_(),
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
     motionController_(1.0 / REFRESH_RATE_HZ),
-    simulatedT_(0.0)
+    simulatedT_(0.0),
+    pubRobotPose_(ChuckTopics::internal::ROBOT_POSE),
+    pubRobotAccOdometry_(ChuckTopics::debug::ACC_ODOMETRY)
 {
     positionEstimator_.addSensor(tapAps_.getSensor());
     positionEstimator_.addSensor(tapSensorFrame_.getSensorImu());
@@ -62,10 +61,6 @@ Motion::Motion(string nodeName) :
     pubImu_ = rosNodeHandle_.advertise<srslib_framework::Imu>(
         "/internal/sensors/imu/calibrated", 100);
 
-    pubRobotAccOdometry_ = rosNodeHandle_.advertise<srslib_framework::Pose>(
-        "/internal/state/robot/acc_odometry", 100);
-    pubRobotPose_ = rosNodeHandle_.advertise<srslib_framework::Pose>(
-        "/internal/state/robot/pose", 100);
     pubRobotLocalized_ = rosNodeHandle_.advertise<std_msgs::Bool>(
         "/internal/state/robot/localized", 1, true);
 
@@ -111,10 +106,11 @@ void Motion::run()
         publishImu();
         publishOdometry();
         publishPose();
-        publishAccumulatedOdometry();
         publishGoalLanding();
         publishLocalized();
         publishCovariance();
+
+        pubRobotAccOdometry_.publish(positionEstimator_.getAccumulatedOdometry());
 
         refreshRate.sleep();
     }
@@ -418,14 +414,6 @@ void Motion::pingCallback(const ros::TimerEvent& event)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::publishAccumulatedOdometry()
-{
-    srslib_framework::Pose message = PoseMessageFactory::pose2Msg(
-        positionEstimator_.getAccumulatedOdometry());
-    pubRobotAccOdometry_.publish(message);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishArrived()
 {
     // Publish this only if the motion controller says that
@@ -567,8 +555,7 @@ void Motion::publishPose()
 
     if (robotPose.isValid())
     {
-        srslib_framework::Pose message = PoseMessageFactory::pose2Msg(robotPose);
-        pubRobotPose_.publish(message);
+        pubRobotPose_.publish(robotPose);
     }
 }
 

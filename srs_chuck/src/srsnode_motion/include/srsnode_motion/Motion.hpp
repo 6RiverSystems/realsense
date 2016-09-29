@@ -14,6 +14,7 @@
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 
+#include <srslib_framework/ros/publisher/PublisherPose.hpp>
 #include <srslib_framework/ros/tap/RosTapBrainStem.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_GoalSolution.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_InitialPose.hpp>
@@ -60,7 +61,6 @@ private:
     void onConfigChange(MotionConfig& config, uint32_t level);
 
     void pingCallback(const ros::TimerEvent& event);
-    void publishAccumulatedOdometry();
     void publishArrived();
     void publishGoalLanding();
     void publishImu();
@@ -94,8 +94,8 @@ private:
     ros::Time previousTime_;
     ros::Publisher pubOdometry_;
     ros::Publisher pubPing_;
-    ros::Publisher pubRobotAccOdometry_;
-    ros::Publisher pubRobotPose_;
+    PublisherPose pubRobotAccOdometry_;
+    PublisherPose pubRobotPose_;
     ros::Publisher pubStatusGoalArrived_;
     ros::Publisher pubStatusGoalLanding_;
     ros::Publisher pubRobotLocalized_;

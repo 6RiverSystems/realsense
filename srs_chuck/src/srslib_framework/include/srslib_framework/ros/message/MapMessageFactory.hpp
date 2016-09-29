@@ -5,9 +5,15 @@
  */
 #pragma once
 
-#include <srslib_framework/MsgMap.h>
+#include <geometry_msgs/Pose.h>
+
+#include <srslib_framework/Map.h>
+#include <srslib_framework/MapMetadata.h>
 
 #include <srslib_framework/localization/map/Map.hpp>
+#include <srslib_framework/localization/map/MapMetadata.hpp>
+#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
 namespace srs {
 
@@ -17,33 +23,47 @@ struct MapMessageFactory
      * @brief Convert a MapMetadata into a MapMetaData message.
      *
      * @param metadata Map metadata to convert
-     * @param timestamp ROS time stamp for the message
      *
      * @return newly generated message
      */
-    static nav_msgs::MapMetaData mapMetadata2RosMsg(MapMetadata metadata,
-        ros::Time timestamp = ros::Time::now())
+    static srslib_framework::MapMetadata mapMetadata2Msg(MapMetadata metadata)
     {
-        nav_msgs::MapMetaData msgMapMetaData;
+        srslib_framework::MapMetadata msgMapMetaData;
 
-        msgMapMetaData.map_load_time = timestamp;
+        msgMapMetaData.loadTime = metadata.loadTime;
+        msgMapMetaData.heightCells = metadata.heightCells;
+        msgMapMetaData.heightM = metadata.heightM;
+        msgMapMetaData.mapDocumentFilename = metadata.mapDocumentFilename;
+        msgMapMetaData.mapImageFilename = metadata.mapImageFilename;
+        msgMapMetaData.negate = metadata.negate;
+        msgMapMetaData.origin = PoseMessageFactory::pose2Msg(metadata.origin);
         msgMapMetaData.resolution = metadata.resolution;
-        msgMapMetaData.width = metadata.widthCells;
-        msgMapMetaData.height = metadata.heightCells;
-
-        geometry_msgs::Pose origin;
-        tf::Quaternion orientation = metadata.orientation;
-
-        origin.position.x = metadata.origin.x();
-        origin.position.y = metadata.origin.y();
-        origin.orientation.x = orientation.x();
-        origin.orientation.y = orientation.y();
-        origin.orientation.z = orientation.z();
-        origin.orientation.w = orientation.w();
-
-        msgMapMetaData.origin = origin;
+        msgMapMetaData.thresholdFree = metadata.thresholdFree;
+        msgMapMetaData.thresholdOccupied = metadata.thresholdOccupied;
+        msgMapMetaData.widthCells = metadata.widthCells;
+        msgMapMetaData.widthM = metadata.widthM;
 
         return msgMapMetaData;
+    }
+
+    /**
+     * @brief Convert a MapMetadata into a ROS MapMetaData message.
+     *
+     * @param metadata Map metadata to convert
+     *
+     * @return newly generated message
+     */
+    static nav_msgs::MapMetaData mapMetadata2RosMsg(MapMetadata metadata)
+    {
+        nav_msgs::MapMetaData msgRosMapMetaData;
+
+        msgRosMapMetaData.map_load_time = ros::Time(metadata.loadTime);
+        msgRosMapMetaData.resolution = metadata.resolution;
+        msgRosMapMetaData.width = metadata.widthCells;
+        msgRosMapMetaData.height = metadata.heightCells;
+        msgRosMapMetaData.origin = PoseMessageFactory::pose2RosPose(metadata.origin);
+
+        return msgRosMapMetaData;
     }
 
     /**
@@ -53,12 +73,39 @@ struct MapMessageFactory
      *
      * @return Map generated from the specified MsgMap
      */
-    static Map* msg2Map(srslib_framework::MsgMapConstPtr message)
+    static Map* msg2Map(srslib_framework::MapConstPtr message)
     {
         Map* map = new Map(message->info.width, message->info.height, message->info.resolution);
         map->setGrid(message->costs, message->notes);
 
         return map;
+    }
+
+    /**
+     * @brief Convert a MapMetadata message into a MapMetaData.
+     *
+     * @param message MapMetadata to convert
+     *
+     * @return MapMetadata generated from the specified MapMetadata message
+     */
+    static MapMetadata msg2MapMetadata(srslib_framework::MapMetadata::ConstPtr message)
+    {
+        MapMetadata metadata;
+
+        metadata.loadTime = message->loadTime;
+        metadata.heightCells = message->heightCells;
+        metadata.heightM = message->heightM;
+        metadata.mapDocumentFilename = message->mapDocumentFilename;
+        metadata.mapImageFilename = message->mapImageFilename;
+        metadata.negate = message->negate;
+        metadata.origin = PoseMessageFactory::msg2Pose(message->origin);
+        metadata.resolution = message->resolution;
+        metadata.thresholdFree = message->thresholdFree;
+        metadata.thresholdOccupied = message->thresholdOccupied;
+        metadata.widthCells = message->widthCells;
+        metadata.widthM = message->widthM;
+
+        return metadata;
     }
 };
 

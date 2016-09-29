@@ -11,24 +11,24 @@ using namespace std;
 #include <nav_msgs/MapMetaData.h>
 
 #include <srslib_framework/ros/message/MapMessageFactory.hpp>
-#include <srslib_framework/ros/publisher/RosPublisherStamped.hpp>
+#include <srslib_framework/ros/publisher/RosPublisher.hpp>
 
 namespace srs {
 
 class PublisherRosMapMetadata :
-    public RosPublisherStamped<nav_msgs::MapMetaData, MapMetadata>
+    public RosPublisher<nav_msgs::MapMetaData, MapMetadata>
 {
 public:
     PublisherRosMapMetadata(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
-            RosPublisherStamped(topic, buffer, latched, nameSpace)
+            RosPublisher(topic, buffer, latched, nameSpace)
     {}
 
-    nav_msgs::MapMetaData convertData(MapMetadata data, ros::Time timestamp)
+    nav_msgs::MapMetaData convertData(MapMetadata data)
     {
-        return MapMessageFactory::mapMetadata2RosMsg(data, timestamp);
+        return MapMessageFactory::mapMetadata2RosMsg(data);
     }
 };
 

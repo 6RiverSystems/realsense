@@ -7,6 +7,8 @@
 
 #include <tf/tf.h>
 
+#include <srslib_framework/robotics/Pose.hpp>
+
 namespace srs {
 
 using namespace std;
@@ -19,8 +21,7 @@ public:
         widthCells(0),
         heightM(0.0),
         widthM(0.0),
-        orientation(tf::createQuaternionFromYaw(0)),
-        origin(tf::createQuaternionFromYaw(0)),
+        origin(Pose<>::INVALID),
         mapDocumentFilename(""),
         mapImageFilename(""),
         resolution(0.0),
@@ -28,6 +29,8 @@ public:
         thresholdFree(0.1),
         negate(false)
     {}
+
+    double loadTime;
 
     int heightCells;
     double heightM;
@@ -37,8 +40,7 @@ public:
 
     bool negate;
 
-    tf::Quaternion origin;
-    tf::Quaternion orientation;
+    Pose<> origin;
 
     double resolution;
 

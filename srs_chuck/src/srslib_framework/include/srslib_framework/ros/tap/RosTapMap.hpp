@@ -6,7 +6,7 @@
 #ifndef ROSTAPMAP_HPP_
 #define ROSTAPMAP_HPP_
 
-#include <srslib_framework/MsgMap.h>
+#include <srslib_framework/Map.h>
 
 #include <srslib_framework/localization/map/Map.hpp>
 
@@ -43,7 +43,7 @@ protected:
     }
 
 private:
-    void onMap(const srslib_framework::MsgMapConstPtr& message)
+    void onMap(const srslib_framework::MapConstPtr& message)
     {
         if (map_)
         {

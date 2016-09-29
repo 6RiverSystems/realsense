@@ -80,9 +80,10 @@ void Map::getWorldCoordinates(int c, int r, double& x, double& y)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Map::load(string filename)
+void Map::load(string filename, double loadTime)
 {
     metadata_.mapDocumentFilename = filename;
+    metadata_.loadTime = loadTime;
 
     document_ = YAML::LoadFile(metadata_.mapDocumentFilename);
 
@@ -284,13 +285,10 @@ void Map::loadConfiguration()
     }
 
     try {
-        metadata_.origin = tf::Quaternion(
+        metadata_.origin = Pose<>(
             document_["origin"][0].as<double>(),
             document_["origin"][1].as<double>(),
-            0.0,
-            0.0);
-
-        metadata_.orientation = tf::createQuaternionFromYaw(document_["origin"][2].as<double>());
+            document_["origin"][2].as<double>());
     }
     catch (YAML::InvalidScalar& e)
     {

@@ -67,7 +67,7 @@ public:
 
     void getWorldCoordinates(int c, int r, double& x, double& y);
 
-    void load(string filename);
+    void load(string filename, double loadTime);
 
     friend ostream& operator<<(ostream& stream, const Map& map);
 

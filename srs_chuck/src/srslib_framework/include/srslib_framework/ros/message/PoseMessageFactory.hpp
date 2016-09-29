@@ -82,20 +82,45 @@ struct PoseMessageFactory
     static geometry_msgs::PoseStamped pose2PoseStamped(Pose<> pose,
         ros::Time timestamp = ros::Time::now())
     {
-        geometry_msgs::PoseStamped poseStamped;
-        poseStamped.header.stamp = timestamp;
+        geometry_msgs::PoseStamped msgPoseStamped;
+        msgPoseStamped.header.stamp = timestamp;
 
         tf::Quaternion quaternion = tf::createQuaternionFromYaw(pose.theta);
 
-        poseStamped.pose.position.x = pose.x;
-        poseStamped.pose.position.y = pose.y;
-        poseStamped.pose.position.z = 0.0;
-        poseStamped.pose.orientation.x = quaternion.x();
-        poseStamped.pose.orientation.y = quaternion.y();
-        poseStamped.pose.orientation.z = quaternion.z();
-        poseStamped.pose.orientation.w = quaternion.w();
+        msgPoseStamped.pose.position.x = pose.x;
+        msgPoseStamped.pose.position.y = pose.y;
+        msgPoseStamped.pose.position.z = 0.0;
+        msgPoseStamped.pose.orientation.x = quaternion.x();
+        msgPoseStamped.pose.orientation.y = quaternion.y();
+        msgPoseStamped.pose.orientation.z = quaternion.z();
+        msgPoseStamped.pose.orientation.w = quaternion.w();
 
-        return poseStamped;
+        return msgPoseStamped;
+    }
+
+    /**
+     * @brief Convert a Pose type into a ROS Pose.
+     *
+     * @param pose Pose to convert
+     *
+     * @return ROS Pose generated from the specified Pose
+     */
+    static geometry_msgs::Pose pose2RosPose(Pose<> pose)
+    {
+        geometry_msgs::Pose msgPose;
+
+        msgPose.position.x = pose.x;
+        msgPose.position.y = pose.y;
+        msgPose.position.z = 0.0;
+
+        tf::Quaternion quaternion = tf::createQuaternionFromYaw(pose.theta);
+
+        msgPose.orientation.x = quaternion.x();
+        msgPose.orientation.y = quaternion.y();
+        msgPose.orientation.z = quaternion.z();
+        msgPose.orientation.w = quaternion.w();
+
+        return msgPose;
     }
 
     /**

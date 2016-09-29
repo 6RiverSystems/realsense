@@ -31,8 +31,9 @@ set(${PROJECT_NAME}_SOURCES
 set(${PROJECT_NAME}_MSGS
     Imu.msg
     JoypadState.msg
+    Map.msg
+    MapMetadata.msg
     MsgHardwareInfo.msg
-    MsgMap.msg
     MsgOperationalState.msg
     MsgPose.msg
     MsgSolution.msg

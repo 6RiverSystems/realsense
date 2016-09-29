@@ -10,7 +10,7 @@ using namespace std;
 #include <nav_msgs/MapMetaData.h>
 #include <nav_msgs/OccupancyGrid.h>
 
-#include <srslib_framework/MsgMap.h>
+#include <srslib_framework/Map.h>
 
 #include <tf/LinearMath/Quaternion.h>
 
@@ -36,13 +36,13 @@ MapServer::MapServer(string name, int argc, char** argv) :
     string frame_id;
     rosNodeHandle_.param("/frame_id", frame_id, string("map"));
 
-    map_.load(mapFilename);
+    map_.load(mapFilename, ros::Time::now().toSec());
     MapFactory::map2Occupancy(&map_, occupancy_);
     MapFactory::map2Notes(&map_, notes_);
 
     pubMapOccupancyGrid_ = rosNodeHandle_.advertise<nav_msgs::OccupancyGrid>(
         ChuckTopics::internal::MAP_ROS_OCCUPANCY, 1, true);
-    pubMapCompleteMap_ = rosNodeHandle_.advertise<srslib_framework::MsgMap>(
+    pubMapCompleteMap_ = rosNodeHandle_.advertise<srslib_framework::Map>(
         ChuckTopics::internal::MAP_LOGICAL, 1, true);
 
     serviceMapRequest_ = rosNodeHandle_.advertiseService(ChuckTopics::service::GET_MAP_OCCUPANCY,
@@ -104,7 +104,7 @@ void MapServer::publishMap()
 
     pubMapOccupancyGrid_.publish(occupancyMessage);
 
-    srslib_framework::MsgMap mapMessage;
+    srslib_framework::Map mapMessage;
 
     mapMessage.header.stamp = ros::Time::now();
     mapMessage.info = metadataMessage;

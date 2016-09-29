@@ -9,19 +9,19 @@
 using namespace std;
 
 #include <ros/ros.h>
-#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/MapMetadata.h>
 
-#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/localization/map/MapMetadata.hpp>
 #include <srslib_framework/ros/subscriber/RosSubscriberSingleData.hpp>
-#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
+#include <srslib_framework/ros/message/MapMessageFactory.hpp>
 
 namespace srs {
 
-class SubscriberSrsPose :
-    public RosSubscriberSingleData<srslib_framework::MsgPose, Pose<>>
+class SubscriberMapMetadata :
+    public RosSubscriberSingleData<srslib_framework::MapMetadata, MapMetadata>
 {
 public:
-    SubscriberSrsPose(string topic,
+    SubscriberMapMetadata(string topic,
         unsigned int queueLength = 10,
         string nameSpace = "~") :
             RosSubscriberSingleData(topic, queueLength, nameSpace)
@@ -29,19 +29,20 @@ public:
         reset();
     }
 
-    ~SubscriberSrsPose()
+    ~SubscriberMapMetadata()
     {}
 
-    void receiveData(const srslib_framework::MsgPose::ConstPtr message)
+    void receiveData(const srslib_framework::MapMetadata::ConstPtr message)
     {
-        set(PoseMessageFactory::msg2Pose(message));
+        set(MapMessageFactory::msg2MapMetadata(message));
     }
 
     void reset()
     {
         RosSubscriber::reset();
 
-        set(Pose<>::INVALID);
+        MapMetadata empty;
+        set(empty);
     }
 };
 

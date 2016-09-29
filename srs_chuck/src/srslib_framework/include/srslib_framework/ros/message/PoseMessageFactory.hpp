@@ -11,9 +11,9 @@
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/PoseStamped.h>
 
-#include <srslib_framework/math/TimeMath.hpp>
-#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/Pose.h>
 
+#include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
@@ -21,13 +21,13 @@ namespace srs {
 struct PoseMessageFactory
 {
     /**
-     * @brief Convert a MsgPose type into a Pose.
+     * @brief Convert a Pose type into a Pose.
      *
-     * @param message MsgPose to convert
+     * @param message Pose to convert
      *
-     * @return Pose generated from the specified MsgPose
+     * @return Pose generated from the specified Pose
      */
-    static Pose<> msg2Pose(srslib_framework::MsgPose message)
+    static Pose<> msg2Pose(srslib_framework::Pose message)
     {
         Pose<> pose;
 
@@ -40,28 +40,28 @@ struct PoseMessageFactory
     }
 
     /**
-     * @brief Convert a MsgPoseConstPtr type into a Pose.
+     * @brief Convert a PoseConstPtr type into a Pose.
      *
-     * @param message MsgPose to convert
+     * @param message Pose to convert
      *
-     * @return Pose generated from the specified MsgPose
+     * @return Pose generated from the specified Pose
      */
-    static Pose<> msg2Pose(srslib_framework::MsgPoseConstPtr message)
+    static Pose<> msg2Pose(srslib_framework::Pose::ConstPtr message)
     {
         return PoseMessageFactory::msg2Pose(*message);
     }
 
     /**
-     * @brief Convert a Pose type into a MsgPose.
+     * @brief Convert a Pose type into a Pose.
      *
      * @param pose Pose to convert
      * @param timestamp ROS time stamp for the message
      *
-     * @return MsgPose generated from the specified Pose
+     * @return Pose generated from the specified Pose
      */
-    static srslib_framework::MsgPose pose2Msg(Pose<> pose, ros::Time timestamp = ros::Time::now())
+    static srslib_framework::Pose pose2Msg(Pose<> pose, ros::Time timestamp = ros::Time::now())
     {
-        srslib_framework::MsgPose msgPose;
+        srslib_framework::Pose msgPose;
         msgPose.header.stamp = timestamp;
 
         msgPose.x = pose.x;

@@ -13,7 +13,7 @@
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <srslib_framework/MsgOperationalState.h>
-#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/Pose.h>
 #include <srslib_framework/MsgSolution.h>
 #include <dynamic_reconfigure/server.h>
 #include <srsnode_midbrain/ReflexesConfig.h>
@@ -39,7 +39,7 @@ public:
 
 	void OnOdomVelocityChanged( const geometry_msgs::TwistStamped::ConstPtr& velocity );
 
-	void OnPoseChanged( const srslib_framework::MsgPose::ConstPtr& pose );
+	void OnPoseChanged( const srslib_framework::Pose::ConstPtr& pose );
 
 	void OnSolutionChanged( const srslib_framework::MsgSolution::ConstPtr& solution );
 

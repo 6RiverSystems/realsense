@@ -6,16 +6,16 @@
 #ifndef ROSTAPINTERNAL_ROBOTPOSE_HPP_
 #define ROSTAPINTERNAL_ROBOTPOSE_HPP_
 
-#include <srslib_framework/ros/tap/RosTapMsgPose.hpp>
+#include <srslib_framework/ros/tap/RosTapPose.hpp>
 
 namespace srs {
 
 class RosTapInternal_RobotPose :
-    public RosTapMsgPose
+    public RosTapPose
 {
 public:
     RosTapInternal_RobotPose() :
-        RosTapMsgPose("/internal/state/robot/pose", "Internal robot pose")
+        RosTapPose("/internal/state/robot/pose", "Internal robot pose")
     {}
 };
 

@@ -9,7 +9,7 @@
 #include <string>
 using namespace std;
 
-#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/Pose.h>
 
 #include <srslib_framework/math/TimeMath.hpp>
 
@@ -20,20 +20,20 @@ using namespace std;
 
 namespace srs {
 
-class RosTapMsgPose :
+class RosTapPose :
     public RosTap
 {
 public:
     typedef typename Pose<>::BaseType BaseType;
 
-    RosTapMsgPose(string topic, string description = "Pose Tap") :
+    RosTapPose(string topic, string description = "Pose Tap") :
         RosTap(topic, description),
         currentPose_(Pose<>::INVALID)
     {
         RosTap::reset();
     }
 
-    ~RosTapMsgPose()
+    ~RosTapPose()
     {
         disconnectTap();
     }
@@ -59,12 +59,12 @@ public:
 protected:
     bool connect()
     {
-        rosSubscriber_ = rosNodeHandle_.subscribe(getTopic(), 10, &RosTapMsgPose::onPose, this);
+        rosSubscriber_ = rosNodeHandle_.subscribe(getTopic(), 10, &RosTapPose::onPose, this);
         return true;
     }
 
 private:
-    void onPose(const srslib_framework::MsgPoseConstPtr message)
+    void onPose(const srslib_framework::Pose::ConstPtr message)
     {
         set(PoseMessageFactory::msg2Pose(message));
     }

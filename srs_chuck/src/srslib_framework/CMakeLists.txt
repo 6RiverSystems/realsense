@@ -35,9 +35,9 @@ set(${PROJECT_NAME}_MSGS
     MapMetadata.msg
     MsgHardwareInfo.msg
     MsgOperationalState.msg
-    MsgPose.msg
     MsgSolution.msg
     MsgSolutionItem.msg
+    Pose.msg
     SensorFrame.msg
     Velocity.msg
 )

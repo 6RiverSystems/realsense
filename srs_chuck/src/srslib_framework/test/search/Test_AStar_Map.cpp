@@ -11,6 +11,7 @@ using namespace std;
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/map/Map.hpp>
+#include <srslib_framework/localization/map/MapFactory.hpp>
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/localization/map/MapNote.hpp>
 
@@ -25,11 +26,11 @@ TEST(Test_AStar, WithMap)
     Map* map = new Map();
     map->load("/tmp/srslib_framework/data/6rhq.yaml");
 
-    vector<int8_t> costGrid;
+    vector<int8_t> occupancyMap;
     vector<int8_t> notesGrid;
 
-    map->getCostsGrid(costGrid);
-    map->getNotesGrid(notesGrid);
+    MapFactory::map2Occupancy(map, occupancyMap);
+    MapFactory::map2Notes(map, notesGrid);
 
     double widthCells = map->getWidthCells();
     double heightCells = map->getHeightCells();
@@ -38,7 +39,7 @@ TEST(Test_AStar, WithMap)
     delete map;
 
     map = new Map(widthCells, heightCells, resolution);
-    map->setGrid(costGrid, notesGrid);
+    map->setGrid(occupancyMap, notesGrid);
 
     test::MemoryWatch memoryWatch;
 

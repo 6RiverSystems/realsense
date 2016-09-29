@@ -16,7 +16,7 @@ float32 heightM
 
 bool negate
 
-MsgPose origin
+srslib_framework/Pose origin
 
 string mapDocumentFilename
 string mapImageFilename

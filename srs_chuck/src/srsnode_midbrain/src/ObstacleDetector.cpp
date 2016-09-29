@@ -82,7 +82,7 @@ void ObstacleDetector::SetVelocity( double linearVelocity, double angularVelocit
 	m_angularVelocity = angularVelocity;
 }
 
-void ObstacleDetector::SetPose( const srslib_framework::MsgPose::ConstPtr& pose )
+void ObstacleDetector::SetPose( const srslib_framework::Pose::ConstPtr& pose )
 {
 	m_pose = PoseMessageFactory::msg2Pose(*pose);
 

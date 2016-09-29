@@ -3,7 +3,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/PolygonStamped.h>
 
-#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/Pose.h>
 #include <srslib_framework/MsgSolution.h>
 
 #include <srslib_framework/math/AngleMath.hpp>
@@ -35,9 +35,9 @@ Executive::Executive(string nodeName) :
     pubGoalToNavigation_(ChuckTopics::internal::GOAL_TO_NAVIGATION),
     pubStatusGoalTarget_(ChuckTopics::internal::GOAL_TARGET_AREA)
 {
-    pubInternalInitialPose_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
+    pubInternalInitialPose_ = rosNodeHandle_.advertise<srslib_framework::Pose>(
         "/internal/command/initial_pose", 1);
-    pubStatusGoal_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
+    pubStatusGoal_ = rosNodeHandle_.advertise<srslib_framework::Pose>(
         "/internal/state/goal/goal", 1);
 
     pubStatusGoalPlan_ = rosNodeHandle_.advertise<nav_msgs::Path>(
@@ -227,7 +227,7 @@ void Executive::publishInternalInitialPose(Pose<> initialPose)
 {
     if (initialPose.isValid())
     {
-        srslib_framework::MsgPose message = PoseMessageFactory::pose2Msg(initialPose);
+        srslib_framework::Pose message = PoseMessageFactory::pose2Msg(initialPose);
         pubInternalInitialPose_.publish(message);
     }
     else

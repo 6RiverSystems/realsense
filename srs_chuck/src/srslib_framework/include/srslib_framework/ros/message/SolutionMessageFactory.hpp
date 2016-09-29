@@ -6,7 +6,7 @@
 #ifndef SOLUTIONMESSAGEFACTORY_HPP_
 #define SOLUTIONMESSAGEFACTORY_HPP_
 
-#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/Pose.h>
 #include <srslib_framework/MsgSolutionItem.h>
 
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>

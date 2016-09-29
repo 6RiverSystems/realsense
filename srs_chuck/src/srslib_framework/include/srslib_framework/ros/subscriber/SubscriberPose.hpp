@@ -9,7 +9,7 @@
 using namespace std;
 
 #include <ros/ros.h>
-#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/Pose.h>
 
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/subscriber/RosSubscriberSingleData.hpp>
@@ -17,11 +17,11 @@ using namespace std;
 
 namespace srs {
 
-class SubscriberSrsPose :
+class SubscriberPose :
     public RosSubscriberSingleData<srslib_framework::MsgPose, Pose<>>
 {
 public:
-    SubscriberSrsPose(string topic,
+    SubscriberPose(string topic,
         unsigned int queueLength = 10,
         string nameSpace = "~") :
             RosSubscriberSingleData(topic, queueLength, nameSpace)
@@ -29,10 +29,10 @@ public:
         reset();
     }
 
-    ~SubscriberSrsPose()
+    ~SubscriberPose()
     {}
 
-    void receiveData(const srslib_framework::MsgPose::ConstPtr message)
+    void receiveData(const srslib_framework::Pose::ConstPtr message)
     {
         set(PoseMessageFactory::msg2Pose(message));
     }

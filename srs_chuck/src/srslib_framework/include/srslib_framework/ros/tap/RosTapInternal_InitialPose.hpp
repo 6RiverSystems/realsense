@@ -6,16 +6,16 @@
 #ifndef ROSTAPINTERNAL_INITIALPOSE_HPP_
 #define ROSTAPINTERNAL_INITIALPOSE_HPP_
 
-#include <srslib_framework/ros/tap/RosTapMsgPose.hpp>
+#include <srslib_framework/ros/tap/RosTapPose.hpp>
 
 namespace srs {
 
 class RosTapInternal_InitialPose :
-    public RosTapMsgPose
+    public RosTapPose
 {
 public:
     RosTapInternal_InitialPose() :
-        RosTapMsgPose("/internal/command/initial_pose", "Internal initial pose")
+        RosTapPose("/internal/command/initial_pose", "Internal initial pose")
     {}
 };
 

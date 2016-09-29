@@ -13,7 +13,7 @@
 #include <std_msgs/Float64MultiArray.h>
 #include <tf/transform_broadcaster.h>
 
-#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/Pose.h>
 
 #include <srslib_framework/math/AngleMath.hpp>
 
@@ -62,9 +62,9 @@ Motion::Motion(string nodeName) :
     pubImu_ = rosNodeHandle_.advertise<srslib_framework::Imu>(
         "/internal/sensors/imu/calibrated", 100);
 
-    pubRobotAccOdometry_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
+    pubRobotAccOdometry_ = rosNodeHandle_.advertise<srslib_framework::Pose>(
         "/internal/state/robot/acc_odometry", 100);
-    pubRobotPose_ = rosNodeHandle_.advertise<srslib_framework::MsgPose>(
+    pubRobotPose_ = rosNodeHandle_.advertise<srslib_framework::Pose>(
         "/internal/state/robot/pose", 100);
     pubRobotLocalized_ = rosNodeHandle_.advertise<std_msgs::Bool>(
         "/internal/state/robot/localized", 1, true);
@@ -422,7 +422,7 @@ void Motion::pingCallback(const ros::TimerEvent& event)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishAccumulatedOdometry()
 {
-    srslib_framework::MsgPose message = PoseMessageFactory::pose2Msg(
+    srslib_framework::Pose message = PoseMessageFactory::pose2Msg(
         positionEstimator_.getAccumulatedOdometry());
     pubRobotAccOdometry_.publish(message);
 }
@@ -569,7 +569,7 @@ void Motion::publishPose()
 
     if (robotPose.isValid())
     {
-        srslib_framework::MsgPose message = PoseMessageFactory::pose2Msg(robotPose);
+        srslib_framework::Pose message = PoseMessageFactory::pose2Msg(robotPose);
         pubRobotPose_.publish(message);
     }
 }

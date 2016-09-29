@@ -15,7 +15,7 @@ using namespace std;
 #include <srslib_framework/ros/tap/RosTap.hpp>
 #include <srsnode_motion/tap/sensor_frame/aps/ApsSensor.hpp>
 
-#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/Pose.h>
 
 namespace srs {
 
@@ -87,7 +87,7 @@ protected:
     }
 
 private:
-    void onAps(const srslib_framework::MsgPoseConstPtr& message)
+    void onAps(const srslib_framework::Pose::ConstPtr& message)
     {
         // ###FS
 //        // If the tap hasn't heard from the physical sensor

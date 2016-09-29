@@ -91,7 +91,7 @@ void Reflexes::OnOdomVelocityChanged( const geometry_msgs::TwistStamped::ConstPt
 	m_obstacleDetector.SetVelocity( velocity->twist.linear.x, velocity->twist.angular.z );
 }
 
-void Reflexes::OnPoseChanged( const srslib_framework::MsgPose::ConstPtr& pose )
+void Reflexes::OnPoseChanged( const srslib_framework::Pose::ConstPtr& pose )
 {
 	m_obstacleDetector.SetPose( pose );
 }
@@ -169,7 +169,7 @@ void Reflexes::CreateSubscribers( )
 	m_operationalStateSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgOperationalState>(
 		OPERATIONAL_STATE_TOPIC, 10, std::bind( &Reflexes::OnOperationalStateChanged, this, std::placeholders::_1 ) );
 
-	m_poseSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgPose>(POSE_TOPIC, 10,
+	m_poseSubscriber = m_nodeHandle.subscribe<srslib_framework::Pose>(POSE_TOPIC, 10,
 		std::bind( &Reflexes::OnPoseChanged, this, std::placeholders::_1) );
 
 	m_solutionSubscriber = m_nodeHandle.subscribe<srslib_framework::MsgSolution>(SOLUTION_TOPIC, 10,

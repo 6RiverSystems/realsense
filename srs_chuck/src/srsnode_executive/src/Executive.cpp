@@ -32,7 +32,7 @@ Executive::Executive(string nodeName) :
     robotInitialPose_(Pose<>::INVALID),
     isJoystickLatched_(false),
     pubExternalArrived_(ChuckTopics::external::RESPONSE_ARRIVED),
-    pubGoalToNavigation_(ChuckTopics::internal::GOAL_TO_NAVIGATION),
+    pubGoalToNavigation_(ChuckTopics::internal::GOTO_GOAL),
     pubStatusGoalTarget_(ChuckTopics::internal::GOAL_TARGET_AREA)
 {
     pubInternalInitialPose_ = rosNodeHandle_.advertise<srslib_framework::Pose>(
@@ -69,8 +69,6 @@ void Executive::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::connectAllTaps()
 {
-    tapInternal_RobotPose_.connectTap();
-
     tapMap_.connectTap();
     tapOperationalState_.connectTap();
 }
@@ -78,8 +76,6 @@ void Executive::connectAllTaps()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::disconnectAllTaps()
 {
-    tapInternal_RobotPose_.disconnectTap();
-
     tapMap_.disconnectTap();
     tapOperationalState_.disconnectTap();
 }
@@ -239,7 +235,7 @@ void Executive::publishInternalInitialPose(Pose<> initialPose)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::stepChecks()
 {
-    Pose<> updatedRobotPose = tapInternal_RobotPose_.getPose();
+    Pose<> updatedRobotPose = tapInternal_RobotPose_.peek();
 
     // Run these checks only if the joystick hasn't latched
     if (isExecutingSolution())

@@ -18,7 +18,7 @@ using namespace std;
 namespace srs {
 
 class SubscriberPose :
-    public RosSubscriberSingleData<srslib_framework::MsgPose, Pose<>>
+    public RosSubscriberSingleData<srslib_framework::Pose, Pose<>>
 {
 public:
     SubscriberPose(string topic,

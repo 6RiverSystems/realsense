@@ -3,22 +3,20 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPINTERNAL_INITIALPOSE_HPP_
-#define ROSTAPINTERNAL_INITIALPOSE_HPP_
+#pragma once
 
-#include <srslib_framework/ros/tap/RosTapPose.hpp>
+#include <srslib_framework/ros/subscriber/SubscriberPose.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
 class RosTapInternal_InitialPose :
-    public RosTapPose
+    public SubscriberPose
 {
 public:
     RosTapInternal_InitialPose() :
-        RosTapPose("/internal/command/initial_pose", "Internal initial pose")
+        SubscriberPose(ChuckTopics::internal::INITIAL_POSE)
     {}
 };
 
 } // namespace srs
-
-#endif // ROSTAPINTERNAL_INITIALPOSE_HPP_

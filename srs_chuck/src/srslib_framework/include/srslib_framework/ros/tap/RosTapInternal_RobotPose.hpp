@@ -3,22 +3,20 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPINTERNAL_ROBOTPOSE_HPP_
-#define ROSTAPINTERNAL_ROBOTPOSE_HPP_
+#pragma once
 
-#include <srslib_framework/ros/tap/RosTapPose.hpp>
+#include <srslib_framework/ros/subscriber/SubscriberPose.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
 class RosTapInternal_RobotPose :
-    public RosTapPose
+    public SubscriberPose
 {
 public:
     RosTapInternal_RobotPose() :
-        RosTapPose("/internal/state/robot/pose", "Internal robot pose")
+        SubscriberPose(ChuckTopics::internal::ROBOT_POSE)
     {}
 };
 
 } // namespace srs
-
-#endif // ROSTAPINTERNAL_ROBOTPOSE_HPP_

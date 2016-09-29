@@ -17,14 +17,16 @@ namespace external {
 
 namespace internal {
 
-    static const string GOAL_TO_NAVIGATION = "/move_base_simple/goal";
-
     static const string GOAL_TARGET_AREA = "/internal/state/goal/target_area";
+    static const string GOTO_GOAL = "/move_base_simple/goal";
+
+    static const string INITIAL_POSE = "/internal/command/initial_pose";
 
     static const string MAP_LOGICAL = "/internal/state/map/complete";
-
-    static const string MAP_ROS_METADATA = "/internal/state/map/ros_metadata";
     static const string MAP_ROS_OCCUPANCY = "/internal/state/map/ros_occupancy";
+    static const string MAP_ROS_METADATA = "/internal/state/map/ros_metadata";
+
+    static const string ROBOT_POSE = "/internal/state/robot/pose";
 
 } // namespace internal
 

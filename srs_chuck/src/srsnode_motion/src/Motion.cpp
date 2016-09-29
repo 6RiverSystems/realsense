@@ -130,7 +130,6 @@ void Motion::connectAllTaps()
 {
     tapBrainStem_.connectTap();
     tapSensorFrame_.connectTap();
-    tapInitialPose_.connectTap();
     tapAps_.connectTap();
     tapInternalGoalSolution_.connectTap();
     tapMap_.connectTap();
@@ -146,7 +145,6 @@ void Motion::disconnectAllTaps()
 {
     tapBrainStem_.disconnectTap();
     tapSensorFrame_.disconnectTap();
-    tapInitialPose_.disconnectTap();
     tapAps_.disconnectTap();
     tapInternalGoalSolution_.disconnectTap();
     tapMap_.disconnectTap();
@@ -601,9 +599,9 @@ void Motion::scanTapsForData()
 
     if (tapInitialPose_.newDataAvailable())
     {
-        ROS_DEBUG_STREAM("Received initial pose: " << tapInitialPose_.getPose());
+        ROS_DEBUG_STREAM("Received initial pose: " << tapInitialPose_.peek());
 
-        reset(tapInitialPose_.getPose());
+        reset(tapInitialPose_.pop());
     }
 
     // If the joystick was touched, read the state of the latch
@@ -659,7 +657,7 @@ void Motion::stepEmulation()
             // Establish an "acceptable" initial position, at least until the
             // Position Estimator can get its bearings
             tapInitialPose_.set(Pose<>(TimeMath::time2number(currentTime_), 3.0, 3.0, 0));
-            reset(tapInitialPose_.getPose());
+            reset(tapInitialPose_.pop());
         }
     }
     else

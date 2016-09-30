@@ -12,7 +12,8 @@ using namespace std;
 
 #include <srslib_framework/math/AngleMath.hpp>
 
-#include <srslib_framework/localization/map/Map.hpp>
+#include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/localization/map/MapStackFactory.hpp>
 
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
@@ -30,6 +31,10 @@ static constexpr double DEG90 = AngleMath::deg2Rad<double>(90);
 static constexpr double DEG180 = AngleMath::deg2Rad<double>(180);
 static constexpr double DEG270 = AngleMath::deg2Rad<double>(270);
 
+#include <string>
+#include <limits.h>
+#include <unistd.h>
+
 TEST(Test_Trajectory, Empty_Consecutive)
 {
     Pose<> robotPose = Pose<>(3, 3, DEG0);
@@ -40,11 +45,10 @@ TEST(Test_Trajectory, Empty_Consecutive)
         Pose<>(3, 3, DEG270)
     };
 
-    Map* map = new Map();
-    map->load("/tmp/srslib_framework/data/empty.yaml");
+    MapStack* mapStack = MapStackFactory::fromJsonFile("pathplanning/grid/data/empty/empty.yaml");
 
     Solution<GridSolutionItem>* gridSolution = GridSolutionFactory::fromConsecutiveGoals(
-        map, robotPose, goals);
+        mapStack->getOccupancyMap(), robotPose, goals);
     cout << *gridSolution << endl;
 
     Chuck chuck;

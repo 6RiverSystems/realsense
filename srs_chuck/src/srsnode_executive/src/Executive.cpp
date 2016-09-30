@@ -66,14 +66,14 @@ void Executive::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::connectAllTaps()
 {
-    tapMap_.connectTap();
+    // ###FS tapMap_.connectTap();
     tapOperationalState_.connectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::disconnectAllTaps()
 {
-    tapMap_.disconnectTap();
+    // ###FS tapMap_.disconnectTap();
     tapOperationalState_.disconnectTap();
 }
 
@@ -331,49 +331,50 @@ void Executive::taskCustomAction()
 
     currentGoal_ = PoseMath::rotate(currentRobotPose_, M_PI_2);
 
-    // CCW and CW paths for UMBmark paths
-    Map* map = tapMap_.getMap();
-
-    // Deallocate the current solution if there is one
-    if (currentSolution_)
-    {
-        delete currentSolution_;
-    }
-
-    double deg90 = AngleMath::deg2Rad<double>(90);
-    double deg180 = AngleMath::deg2Rad<double>(180);
-    double delta = 3;
-
-    vector<Pose<>> goals;
-    if (buttonX_)
-    {
-        // Move the robot CCW
-        goals = {
-            PoseMath::add(currentRobotPose_, Pose<>(delta, 0, 0)),
-            PoseMath::add(currentRobotPose_, Pose<>(delta, delta, deg90)),
-            PoseMath::add(currentRobotPose_, Pose<>(0, delta, deg180)),
-            PoseMath::add(currentRobotPose_, Pose<>(0, 0, 0))
-        };
-    }
-    else
-    {
-        // Move the robot CW
-        goals = {
-            PoseMath::add(currentRobotPose_, Pose<>(0, delta, deg90)),
-            PoseMath::add(currentRobotPose_, Pose<>(delta, delta, 0)),
-            PoseMath::add(currentRobotPose_, Pose<>(delta, 0, -deg90)),
-            PoseMath::add(currentRobotPose_, Pose<>(0, 0, 0))
-        };
-    }
-    currentSolution_ = GridSolutionFactory::fromConsecutiveGoals(map, currentRobotPose_, goals);
-
-    publishGoalTarget(currentGoal_);
-//    publishInternalGoalSolution(currentSolution_);
-
-    if (currentSolution_)
-    {
-        RosCallSolution::call("srsnode_motion", "/trigger/execute_solution", currentSolution_);
-    }
+    // ###FS
+//    // CCW and CW paths for UMBmark paths
+//    Map* map = tapMap_.getMap();
+//
+//    // Deallocate the current solution if there is one
+//    if (currentSolution_)
+//    {
+//        delete currentSolution_;
+//    }
+//
+//    double deg90 = AngleMath::deg2Rad<double>(90);
+//    double deg180 = AngleMath::deg2Rad<double>(180);
+//    double delta = 3;
+//
+//    vector<Pose<>> goals;
+//    if (buttonX_)
+//    {
+//        // Move the robot CCW
+//        goals = {
+//            PoseMath::add(currentRobotPose_, Pose<>(delta, 0, 0)),
+//            PoseMath::add(currentRobotPose_, Pose<>(delta, delta, deg90)),
+//            PoseMath::add(currentRobotPose_, Pose<>(0, delta, deg180)),
+//            PoseMath::add(currentRobotPose_, Pose<>(0, 0, 0))
+//        };
+//    }
+//    else
+//    {
+//        // Move the robot CW
+//        goals = {
+//            PoseMath::add(currentRobotPose_, Pose<>(0, delta, deg90)),
+//            PoseMath::add(currentRobotPose_, Pose<>(delta, delta, 0)),
+//            PoseMath::add(currentRobotPose_, Pose<>(delta, 0, -deg90)),
+//            PoseMath::add(currentRobotPose_, Pose<>(0, 0, 0))
+//        };
+//    }
+//    currentSolution_ = GridSolutionFactory::fromConsecutiveGoals(map, currentRobotPose_, goals);
+//
+//    publishGoalTarget(currentGoal_);
+////    publishInternalGoalSolution(currentSolution_);
+//
+//    if (currentSolution_)
+//    {
+//        RosCallSolution::call("srsnode_motion", "/trigger/execute_solution", currentSolution_);
+//    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

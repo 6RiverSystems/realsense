@@ -53,8 +53,7 @@ public:
         }
     }
 
-    void addValue(const Grid2dLocation location,
-        unsigned int cost = 0,
+    void addValue(const Grid2dLocation location, unsigned int cost,
         void* notes = nullptr)
     {
         auto found = grid_.find(location);
@@ -62,7 +61,7 @@ public:
         if (found != grid_.end())
         {
             Grid2dNode* node = found->second;
-            node->cost = cost;
+            node->setCost(cost);
             node->notes = notes;
         }
         else
@@ -78,6 +77,27 @@ public:
             delete gridCell.second;
         }
         grid_.clear();
+//        if (grid_)
+//        {
+//            // Find the map notes and remove them first, because Grid will not
+//            // do it for us
+//            for (int row = 0; row < grid_->getHeight(); row++)
+//            {
+//                for (int col = 0; col < grid_->getWidth(); col++)
+//                {
+//                    Grid2dLocation location = Grid2dLocation(col, row);
+//                    MapNote* note = reinterpret_cast<MapNote*>(grid_->getNote(location));
+//
+//                    if (note)
+//                    {
+//                        delete note;
+//                    }
+//                }
+//            }
+//
+//            // Now deallocate the grid
+//            delete grid_;
+//        }
     }
 
     bool exists(const Grid2dLocation location) const
@@ -101,7 +121,7 @@ public:
 
         if (found != grid_.end())
         {
-            return found->second->cost;
+            return found->second->getCost();
         }
 
         return 0;
@@ -180,7 +200,7 @@ public:
                 if (grid.exists(nodeLocation))
                 {
                     Grid2dNode* node = grid.grid_.at(nodeLocation);
-                    stream << right << setw(WIDTH - 1) << node->cost;
+                    stream << right << setw(WIDTH - 1) << node->getCost();
                     stream << (node->notes ? '*' : ' ');
                 }
                 else

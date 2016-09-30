@@ -17,7 +17,7 @@ using namespace std;
 #include <base_local_planner/world_model.h>
 #include <base_local_planner/costmap_model.h>
 
-#include <srslib_framework/localization/map/Map.hpp>
+#include <srslib_framework/localization/map/MapStack.hpp>
 
 namespace srs {
 
@@ -38,7 +38,7 @@ public:
 private:
     void initializeParams();
 
-    Map* srsMap_;
+    MapStack* srsMapStack_;
 
     unsigned int weightObstacleThreshold_;
     double weightScaleFactor_;

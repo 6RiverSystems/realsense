@@ -6,12 +6,12 @@
   *
 -->
 <launch>
-    <arg name="target_map" />
+    <arg name="map_stack" />
 
     <node name="srsnode_map_server"
         pkg="srsnode_map_server" 
         type="srsnode_map_server"
         output="screen">
-        <param name="target_map" type="str" value="$(arg target_map)" />
+        <param name="map_stack" type="str" value="$(arg map_stack)" />
     </node>
 </launch>

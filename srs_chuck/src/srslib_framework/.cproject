@@ -175,13 +175,13 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
-		<configuration configurationName="Release">
+		<configuration configurationName="Debug Tests">
 			<resource resourceType="PROJECT" workspacePath="/srslib_framework"/>
 		</configuration>
 		<configuration configurationName="Debug">
 			<resource resourceType="PROJECT" workspacePath="/srslib_framework"/>
 		</configuration>
-		<configuration configurationName="Debug Tests">
+		<configuration configurationName="Release">
 			<resource resourceType="PROJECT" workspacePath="/srslib_framework"/>
 		</configuration>
 	</storageModule>

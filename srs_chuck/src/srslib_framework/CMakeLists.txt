@@ -20,9 +20,13 @@ set(${PROJECT_NAME}_SOURCES
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp
 
-    src/localization/map/Map.cpp
+    src/localization/map/BaseMap.cpp
     src/localization/map/MapNote.cpp
-    src/localization/map/MapFactory.cpp
+    src/localization/map/MapStackFactory.cpp
+    src/localization/map/logical/LogicalMap.cpp
+    src/localization/map/logical/LogicalMapFactory.cpp
+    src/localization/map/occupancy/OccupancyMap.cpp
+    src/localization/map/occupancy/OccupancyMapFactory.cpp
 
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp
@@ -67,17 +71,19 @@ set(TEST_SOURCES_MATH
     test/math/Test_PoseMath.cpp
 )
 
+###FS
+
 set(TEST_SOURCES_PLANNING
     test/planning/pathplanning/grid/Test_Solution_Barrett_Aisles.cpp
-    test/planning/pathplanning/grid/Test_Solution_Barrett_LongSolution.cpp
+#    test/planning/pathplanning/grid/Test_Solution_Barrett_LongSolution.cpp
     test/planning/pathplanning/grid/Test_Solution_Empty_Consecutive.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_180ShortTrajectory.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_6RHQ.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_LongStraight.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_LongTrajectory.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_ShortStraight.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_ShortTrajectory.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_SingleRotation.cpp
+#    test/planning/pathplanning/grid/Test_Trajectory_180ShortTrajectory.cpp
+#    test/planning/pathplanning/grid/Test_Trajectory_6RHQ.cpp
+#    test/planning/pathplanning/grid/Test_Trajectory_LongStraight.cpp
+#    test/planning/pathplanning/grid/Test_Trajectory_LongTrajectory.cpp
+#    test/planning/pathplanning/grid/Test_Trajectory_ShortStraight.cpp
+#    test/planning/pathplanning/grid/Test_Trajectory_ShortTrajectory.cpp
+#    test/planning/pathplanning/grid/Test_Trajectory_SingleRotation.cpp
 )
 
 set(TEST_SOURCES_ROBOTICS
@@ -176,7 +182,6 @@ add_library(${PROJECT_LIBRARY}
 )
 
 add_dependencies(${PROJECT_LIBRARY}
-#    ${srslib_framework_EXPORTED_TARGETS}
     ${catkin_EXPORTED_TARGETS}
 )
 
@@ -191,7 +196,7 @@ target_link_libraries(${PROJECT_LIBRARY}
 
 if (CATKIN_ENABLE_TESTING)
 
-    file(COPY data DESTINATION "/tmp/${PROJECT_NAME}")
+#    file(COPY data DESTINATION "/tmp/${PROJECT_NAME}")
 
     catkin_add_gtest(TestSuite_Datastructure
         test/TestSuite.cpp
@@ -242,6 +247,7 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_PLANNING}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/planning
     )
     target_link_libraries(TestSuite_Planning
         ${PROJECT_LIBRARY}

@@ -4,6 +4,8 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 
+###FS
+
 float32 loadTime
 
 float32 resolution
@@ -18,8 +20,9 @@ bool negate
 
 srslib_framework/Pose origin
 
-string mapDocumentFilename
-string mapImageFilename
+string documentFilename
+string occupancyFilename
+string logicalFilename
 
 float32 thresholdFree
 float32 thresholdOccupied

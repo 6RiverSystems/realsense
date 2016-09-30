@@ -11,7 +11,7 @@ using namespace std;
 #include <ros/ros.h>
 #include <nav_msgs/GetMap.h>
 
-#include <srslib_framework/localization/map/Map.hpp>
+#include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/ros/publisher/PublisherRosMapMetadata.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
 #include <srslib_framework/ros/unit/RosUnit.hpp>
@@ -39,7 +39,7 @@ private:
 
     void publishMap();
 
-    Map map_;
+    MapStack* mapStack_;
     vector<int8_t> occupancy_;
     vector<int8_t> notes_;
 

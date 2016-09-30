@@ -8,7 +8,7 @@
 
 #include <srslib_framework/Map.h>
 
-#include <srslib_framework/localization/map/Map.hpp>
+// ###FS #include <srslib_framework/localization/map/logical/Map.hpp>
 
 #include <srslib_framework/ros/tap/RosTap.hpp>
 #include <srslib_framework/ros/message/MapMessageFactory.hpp>
@@ -20,8 +20,8 @@ class RosTapMap :
 {
 public:
     RosTapMap():
-        RosTap("/internal/state/map/complete", "Global Map Tap"),
-        map_(nullptr)
+        RosTap("/internal/state/map/complete", "Global Map Tap")/*,
+        map_(nullptr)*/
     {}
 
     ~RosTapMap()
@@ -29,10 +29,10 @@ public:
         disconnectTap();
     }
 
-    Map* getMap() const
-    {
-        return map_;
-    }
+//    Map* getMap() const
+//    {
+//        return map_;
+//    }
 
 protected:
     bool connect()
@@ -45,15 +45,15 @@ protected:
 private:
     void onMap(const srslib_framework::MapConstPtr& message)
     {
-        if (map_)
-        {
-            delete map_;
-        }
-
-        map_ = MapMessageFactory::msg2Map(message);
+//        if (map_)
+//        {
+//            delete map_;
+//        }
+//
+//        map_ = MapMessageFactory::msg2Map(message);
     }
 
-    Map* map_;
+//    Map* map_;
 };
 
 } // namespace srs

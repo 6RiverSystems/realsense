@@ -10,8 +10,9 @@
 
 namespace srs {
 
-struct Grid2dNode
+class Grid2dNode
 {
+public:
     Grid2dNode(Grid2dLocation location, unsigned int cost, void* notes) :
         location(location),
         cost(cost),
@@ -26,9 +27,21 @@ struct Grid2dNode
         return stream;
     }
 
+    unsigned int getCost() const
+    {
+        return cost;
+    }
+
+    void setCost(unsigned int newCost)
+    {
+        cost = newCost;
+    }
+
     const Grid2dLocation location;
-    unsigned int cost;
     void* notes;
+
+private:
+    unsigned int cost;
 };
 
 } // namespace srs

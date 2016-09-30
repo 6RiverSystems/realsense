@@ -11,7 +11,7 @@ using namespace std;
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 
-#include <srslib_framework/localization/map/Map.hpp>
+#include <srslib_framework/localization/map/BaseMap.hpp>
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
@@ -24,13 +24,13 @@ namespace srs {
 
 struct GridSolutionFactory
 {
-    static Solution<GridSolutionItem>* fromConsecutiveGoals(Map* map,
+    static Solution<GridSolutionItem>* fromConsecutiveGoals(BaseMap* map,
         Pose<> start, vector<Pose<>> goals);
-    static Solution<GridSolutionItem>* fromGoal(Map* map,
+    static Solution<GridSolutionItem>* fromGoal(BaseMap* map,
         Pose<> start, Pose<> goal);
     static Solution<GridSolutionItem>* fromRotation(Pose<> pose,
         double theta0, double thetaf);
-    static Solution<GridSolutionItem>* fromSearch(Map* map,
+    static Solution<GridSolutionItem>* fromSearch(BaseMap* map,
         AStar<Grid2d>::SearchNodeType* goalNode);
 };
 

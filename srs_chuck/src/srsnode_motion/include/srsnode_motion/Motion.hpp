@@ -115,7 +115,7 @@ private:
     RosTapInternal_GoalSolution tapInternalGoalSolution_;
     RosTapInternal_InitialPose tapInitialPose_;
     RosTapJoyAdapter tapJoyAdapter_;
-    RosTapMap tapMap_;
+    // ###FS RosTapMap tapMap_;
 
     RosServiceExecuteSolution triggerExecuteSolution_;
     RosTriggerPause triggerPause_;

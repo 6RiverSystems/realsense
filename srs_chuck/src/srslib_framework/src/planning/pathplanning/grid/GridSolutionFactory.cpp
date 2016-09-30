@@ -8,7 +8,7 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Solution<GridSolutionItem>* GridSolutionFactory::fromConsecutiveGoals(Map* map,
+Solution<GridSolutionItem>* GridSolutionFactory::fromConsecutiveGoals(BaseMap* map,
     Pose<> start, vector<Pose<>> goals)
 {
     Solution<GridSolutionItem>* globalSolution = new Solution<GridSolutionItem>();
@@ -31,7 +31,7 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromConsecutiveGoals(Map* map,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Solution<GridSolutionItem>* GridSolutionFactory::fromGoal(Map* map,
+Solution<GridSolutionItem>* GridSolutionFactory::fromGoal(BaseMap* map,
     Pose<> fromPose, Pose<> toPose)
 {
     if (!map)
@@ -76,7 +76,8 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromRotation(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(Map* map, SearchNode<Grid2d>* goalNode)
+Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(BaseMap* map,
+    SearchNode<Grid2d>* goalNode)
 {
     if (!map)
     {

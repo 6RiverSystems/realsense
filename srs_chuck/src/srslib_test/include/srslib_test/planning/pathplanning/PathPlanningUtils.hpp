@@ -3,15 +3,12 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef PATHPLANNINGUTILS_HPP_
-#define PATHPLANNINGUTILS_HPP_
+#pragma once
 
 #include <gtest/gtest.h>
 
 #include <iostream>
 using namespace std;
-
-#include <srslib_framework/localization/map/Map.hpp>
 
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
@@ -39,5 +36,3 @@ struct PathPlanningUtils
 
 } // namespace test
 } // namespace srs
-
-#endif // PATHPLANNINGUTILS_HPP_

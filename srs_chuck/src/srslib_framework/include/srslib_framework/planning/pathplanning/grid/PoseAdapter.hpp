@@ -11,7 +11,7 @@ using namespace std;
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 
-#include <srslib_framework/localization/map/Map.hpp>
+#include <srslib_framework/localization/map/BaseMap.hpp>
 
 #include <srslib_framework/robotics/Pose.hpp>
 
@@ -19,7 +19,7 @@ namespace srs {
 
 struct PoseAdapter
 {
-    static void pose2Map(Pose<> pose, Map* map, Grid2d::LocationType& location, int& orientation)
+    static void pose2Map(Pose<> pose, BaseMap* map, Grid2d::LocationType& location, int& orientation)
     {
         int r = 0;
         int c = 0;

@@ -4,7 +4,7 @@
 
 PLUGINLIB_EXPORT_CLASS(srs::SrsPlanner, nav_core::BaseGlobalPlanner)
 
-#include <srslib_framework/localization/map/MapFactory.hpp>
+// ###FS #include <srslib_framework/localization/map/MapFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
@@ -19,7 +19,7 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlanner::SrsPlanner() :
-    srsMap_(nullptr)
+    srsMapStack_(nullptr)
 {
     ROS_DEBUG("SrsPlanner::SrsPlanner() called");
 
@@ -28,7 +28,7 @@ SrsPlanner::SrsPlanner() :
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlanner::SrsPlanner(string name, costmap_2d::Costmap2DROS* rosCostMap) :
-    srsMap_(nullptr)
+    srsMapStack_(nullptr)
 {
     ROS_DEBUG("SrsPlanner::SrsPlanner(...) called");
 
@@ -39,7 +39,7 @@ SrsPlanner::SrsPlanner(string name, costmap_2d::Costmap2DROS* rosCostMap) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlanner::~SrsPlanner()
 {
-    delete srsMap_;
+    delete srsMapStack_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,8 +47,8 @@ void SrsPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostM
 {
     ROS_DEBUG_STREAM("SrsPlanner::initialize() called");
 
-    delete srsMap_;
-    srsMap_ = MapFactory::fromRosCostMap2D(rosCostMap, weightObstacleThreshold_);
+    delete srsMapStack_;
+    // ###FS srsMapStack_ = MapFactory::fromRosCostMap2D(rosCostMap, weightObstacleThreshold_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +62,9 @@ bool SrsPlanner::makePlan(
     // Find a suitable solution for the provided goal
     Pose<> robotPose = PoseMessageFactory::poseStamped2Pose(start);
     Pose<> target = PoseMessageFactory::poseStamped2Pose(goal);
-    Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(srsMap_, robotPose, target);
+
+    /// ###FS Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(srsMap_, robotPose, target);
+    Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(nullptr, robotPose, target);
 
     plan.clear();
 

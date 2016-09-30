@@ -13,7 +13,8 @@ using namespace std;
 
 #include <srslib_framework/math/AngleMath.hpp>
 
-#include <srslib_framework/localization/map/Map.hpp>
+#include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/localization/map/MapStackFactory.hpp>
 
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionUtils.hpp>
@@ -25,7 +26,6 @@ using namespace std;
 
 #include <srslib_framework/search/AStar.hpp>
 
-#include <srslib_test/localization/MapUtils.hpp>
 #include <srslib_test/planning/pathplanning/PathPlanningUtils.hpp>
 
 using namespace srs;
@@ -179,9 +179,9 @@ static const Pose<> E04B = Pose<>(27.990, 4.125, DEG270);
 
 Solution<GridSolutionItem>* calculateSolution(Pose<> start, Pose<> goal)
 {
-    Map* map = test::MapUtils::mapFactory("/tmp/srslib_framework/data/barrett.yaml");
-
-    Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(map, start, goal);
+    MapStack* mapStack = MapStackFactory::fromJsonFile("pathplanning/grid/data/barrett/barrett.yaml");
+    Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(
+        mapStack->getOccupancyMap(), start, goal);
 
     cout << *solution << endl;
 

@@ -14,7 +14,7 @@
 #include <boost/accumulators/statistics/variance.hpp>
 #include <yaml-cpp/yaml.h>
 
-#include <srslib_framework/localization/map/Anchor.hpp>
+#include <srsdrv_stargazer/Anchor.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 

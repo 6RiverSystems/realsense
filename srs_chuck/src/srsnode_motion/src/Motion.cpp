@@ -128,7 +128,7 @@ void Motion::connectAllTaps()
     tapSensorFrame_.connectTap();
     tapAps_.connectTap();
     tapInternalGoalSolution_.connectTap();
-    tapMap_.connectTap();
+    // ###FS tapMap_.connectTap();
 
     triggerStop_.connectService();
     triggerShutdown_.connectService();
@@ -143,7 +143,7 @@ void Motion::disconnectAllTaps()
     tapSensorFrame_.disconnectTap();
     tapAps_.disconnectTap();
     tapInternalGoalSolution_.disconnectTap();
-    tapMap_.disconnectTap();
+    // ###FS tapMap_.disconnectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -104,9 +104,10 @@ private:
     RosTapInternal_GoalArrived tapInternal_GoalArrived_;
     RosTapInternal_RobotPose tapInternal_RobotPose_;
     RosTapOperationalState tapOperationalState_;
-	RosTapJoyAdapter tapJoyAdapter_;
+    RosTapJoyAdapter tapJoyAdapter_;
 
-    RosTapMap tapMap_;
+    // ###FS
+    // RosTapMap tapMap_;
 };
 
 } // namespace srs

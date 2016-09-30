@@ -1,8 +1,0 @@
-#
-# (c) Copyright 2015-2016 River Systems, all rights reserved
-#
-# This is proprietary software, unauthorized distribution is not permitted.
-#
-anchors:
-    - {id: "52", location: [6.142, 5.107, 5.093], orientation: 91.08 }
-    - {id: "98", location: [16.508, 5.103, 5.123], orientation: 92.01 }

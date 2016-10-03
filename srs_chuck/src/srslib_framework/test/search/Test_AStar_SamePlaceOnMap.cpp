@@ -63,26 +63,4 @@ TEST(Test_AStar, SamePlaceOnMap)
 
     ROS_DEBUG_STREAM("Memory usage: " << memoryWatch.getMemoryUsage());
     ROS_DEBUG_STREAM("Memory leaks: " << !memoryWatch.isZero());
-
-// ###FS
-//    Pose<> robotPose = Pose<>(18.1335, 5.24097, 0.0189141);
-//    Pose<> goalPose = Pose<>(18.1335, 5.24097, 0);
-//
-//    Map* map = new Map();
-//    map->load("/tmp/srslib_framework/data/6rhq.yaml");
-//
-//    // Prepare the start position for the search
-//    Grid2d::LocationType internalStart;
-//    int startAngle;
-//    PoseAdapter::pose2Map(robotPose, map, internalStart, startAngle);
-//
-//    // Prepare the goal position for the search
-//    Grid2d::LocationType internalGoal;
-//    int goalAngle;
-//    PoseAdapter::pose2Map(goalPose, map, internalGoal, goalAngle);
-//
-//    AStar<Grid2d>* algorithm = new AStar<Grid2d>(map->getGrid());
-//    ROS_DEBUG_STREAM("Found: " <<
-//        algorithm->search(SearchPosition<Grid2d>(internalStart, startAngle),
-//            SearchPosition<Grid2d>(internalGoal, goalAngle)));
 }

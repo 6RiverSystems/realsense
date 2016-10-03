@@ -28,7 +28,7 @@ public:
         height_(size)
     {}
 
-    Grid2d(int width, int height) :
+    Grid2d(unsigned int width, unsigned int height) :
         width_(width),
         height_(height)
     {}
@@ -110,7 +110,7 @@ public:
         return grid_.count(location);
     }
 
-    int getHeight() const
+    unsigned int getHeight() const
     {
         return height_;
     }
@@ -163,7 +163,7 @@ public:
         return isWithinBounds(result);
     }
 
-    int getWidth() const
+    unsigned int getWidth() const
     {
         return width_;
     }
@@ -225,8 +225,8 @@ protected:
 private:
     unordered_map<Grid2dLocation, Grid2dNode*> grid_;
 
-    int width_;
-    int height_;
+    unsigned int width_;
+    unsigned int height_;
 };
 
 } // namespace srs

@@ -4,8 +4,6 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 
-###FS
-
 float32 loadTime
 
 float32 resolution
@@ -16,13 +14,6 @@ uint32 heightCells
 float32 widthM
 float32 heightM
 
-bool negate
-
 srslib_framework/Pose origin
 
-string documentFilename
-string occupancyFilename
 string logicalFilename
-
-float32 thresholdFree
-float32 thresholdOccupied

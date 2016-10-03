@@ -6,18 +6,20 @@
 #pragma once
 
 #include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/localization/map/BaseMetadata.hpp>
 
 namespace srs {
 
 using namespace std;
 
-struct LogicalMetadata : public BaseMetadata
+struct LogicalMetadata
 {
 public:
     LogicalMetadata() :
+        loadTime(0),
         logicalFilename("")
     {}
+
+    double loadTime;
 
     string logicalFilename;
 };

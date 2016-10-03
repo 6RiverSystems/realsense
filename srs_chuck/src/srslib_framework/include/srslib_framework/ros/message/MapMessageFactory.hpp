@@ -7,11 +7,14 @@
 
 #include <geometry_msgs/Pose.h>
 
-#include <srslib_framework/Map.h>
-#include <srslib_framework/MapMetadata.h>
+#include <srslib_framework/MapStack.h>
+#include <srslib_framework/MapStackMetadata.h>
+#include <srslib_framework/LogicalMetadata.h>
+#include <srslib_framework/OccupancyMetadata.h>
 
-//#include <srslib_framework/localization/map/Map.hpp>
-//#include <srslib_framework/localization/map/MapMetadata.hpp>
+#include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/localization/map/logical/LogicalMetadata.hpp>
+#include <srslib_framework/localization/map/occupancy/OccupancyMetadata.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
@@ -19,56 +22,129 @@ namespace srs {
 
 struct MapMessageFactory
 {
-// ###FS
+    /**
+     * @brief Convert a LogicalMetadata into a LogicalMetaData message.
+     *
+     * @param metadata Logical metadata to convert
+     *
+     * @return newly generated message
+     */
+    static srslib_framework::LogicalMetadata metadata2Msg(LogicalMetadata metadata)
+    {
+        srslib_framework::LogicalMetadata msgLogicalMetaData;
 
-//    /**
-//     * @brief Convert a MapMetadata into a MapMetaData message.
-//     *
-//     * @param metadata Map metadata to convert
-//     *
-//     * @return newly generated message
-//     */
-//    static srslib_framework::MapMetadata mapMetadata2Msg(MapMetadata metadata)
-//    {
-//        srslib_framework::MapMetadata msgMapMetaData;
-//
-//        msgMapMetaData.loadTime = metadata.loadTime;
-//        msgMapMetaData.heightCells = metadata.heightCells;
-//        msgMapMetaData.heightM = metadata.heightM;
-//        msgMapMetaData.documentFilename = metadata.documentFilename;
-//        msgMapMetaData.occupancyFilename = metadata.occupancyFilename;
-//        msgMapMetaData.logicalFilename = metadata.logicalFilename;
-//        msgMapMetaData.negate = metadata.negate;
-//        msgMapMetaData.origin = PoseMessageFactory::pose2Msg(metadata.origin);
-//        msgMapMetaData.resolution = metadata.resolution;
-//        msgMapMetaData.thresholdFree = metadata.thresholdFree;
-//        msgMapMetaData.thresholdOccupied = metadata.thresholdOccupied;
-//        msgMapMetaData.widthCells = metadata.widthCells;
-//        msgMapMetaData.widthM = metadata.widthM;
-//
-//        return msgMapMetaData;
-//    }
-//
-//    /**
-//     * @brief Convert a MapMetadata into a ROS MapMetaData message.
-//     *
-//     * @param metadata Map metadata to convert
-//     *
-//     * @return newly generated message
-//     */
-//    static nav_msgs::MapMetaData mapMetadata2RosMsg(MapMetadata metadata)
-//    {
-//        nav_msgs::MapMetaData msgRosMapMetaData;
-//
-//        msgRosMapMetaData.map_load_time = ros::Time(metadata.loadTime);
-//        msgRosMapMetaData.resolution = metadata.resolution;
-//        msgRosMapMetaData.width = metadata.widthCells;
-//        msgRosMapMetaData.height = metadata.heightCells;
-//        msgRosMapMetaData.origin = PoseMessageFactory::pose2RosPose(metadata.origin);
-//
-//        return msgRosMapMetaData;
-//    }
-//
+        msgLogicalMetaData.loadTime = metadata.loadTime;
+        msgLogicalMetaData.logicalFilename = metadata.logicalFilename;
+
+        return msgLogicalMetaData;
+    }
+
+    /**
+     * @brief Convert a OccupancyMetadata into a OccupancyMetadata message.
+     *
+     * @param metadata Occupancy metadata to convert
+     *
+     * @return newly generated message
+     */
+    static srslib_framework::OccupancyMetadata metadata2Msg(OccupancyMetadata metadata)
+    {
+        srslib_framework::OccupancyMetadata msgOccupancyMetaData;
+
+        msgOccupancyMetaData.loadTime = metadata.loadTime;
+        msgOccupancyMetaData.heightCells = metadata.heightCells;
+        msgOccupancyMetaData.heightM = metadata.heightM;
+        msgOccupancyMetaData.occupancyFilename = metadata.occupancyFilename;
+        msgOccupancyMetaData.negate = metadata.negate;
+        msgOccupancyMetaData.origin = PoseMessageFactory::pose2Msg(metadata.origin);
+        msgOccupancyMetaData.resolution = metadata.resolution;
+        msgOccupancyMetaData.thresholdFree = metadata.thresholdFree;
+        msgOccupancyMetaData.thresholdOccupied = metadata.thresholdOccupied;
+        msgOccupancyMetaData.widthCells = metadata.widthCells;
+        msgOccupancyMetaData.widthM = metadata.widthM;
+
+        return msgOccupancyMetaData;
+    }
+
+    /**
+     * @brief Convert a OccupancyMetadata into a ROS Map Metadata message.
+     *
+     * @param metadata Occupancy metadata to convert
+     *
+     * @return newly generated message
+     */
+    static nav_msgs::MapMetaData metadata2RosMsg(OccupancyMetadata metadata)
+    {
+        nav_msgs::MapMetaData msgRosMapMetaData;
+
+        msgRosMapMetaData.map_load_time = ros::Time(metadata.loadTime);
+        msgRosMapMetaData.resolution = metadata.resolution;
+        msgRosMapMetaData.width = metadata.widthCells;
+        msgRosMapMetaData.height = metadata.heightCells;
+        msgRosMapMetaData.origin = PoseMessageFactory::pose2RosPose(metadata.origin);
+
+        return msgRosMapMetaData;
+    }
+
+    /**
+     * @brief Convert a MapMetadata message into a LogicalMetaData.
+     *
+     * @param message MapMetadata to convert
+     *
+     * @return LogicalMetaData generated from the specified MapMetadata message
+     */
+    static LogicalMetadata msg2LogicalMetadata(srslib_framework::MapStackMetadata::ConstPtr message)
+    {
+        LogicalMetadata metadata;
+
+        metadata.loadTime = message->logical.loadTime;
+        metadata.logicalFilename = message->logical.logicalFilename;
+
+        return metadata;
+    }
+
+    /**
+     * @brief Convert a MapMetadata message into a OccupancyMetaData.
+     *
+     * @param message MapMetadata to convert
+     *
+     * @return OccupancyMetaData generated from the specified MapMetadata message
+     */
+    static OccupancyMetadata msg2OccupancyMetadata(srslib_framework::MapStackMetadata::ConstPtr message)
+    {
+        OccupancyMetadata metadata;
+
+        metadata.loadTime = message->occupancy.loadTime;
+        metadata.heightCells = message->occupancy.heightCells;
+        metadata.heightM = message->occupancy.heightM;
+        metadata.occupancyFilename = message->occupancy.occupancyFilename;
+        metadata.negate = message->occupancy.negate;
+        metadata.origin = PoseMessageFactory::msg2Pose(message->occupancy.origin);
+        metadata.resolution = message->occupancy.resolution;
+        metadata.thresholdFree = message->occupancy.thresholdFree;
+        metadata.thresholdOccupied = message->occupancy.thresholdOccupied;
+        metadata.widthCells = message->occupancy.widthCells;
+        metadata.widthM = message->occupancy.widthM;
+
+        return metadata;
+    }
+
+    /**
+     * @brief Convert the metadata of a Map Stack into a MapMetaData message.
+     *
+     * @param mapStack Map stack to use for metadata generation
+     *
+     * @return newly generated message
+     */
+    static srslib_framework::MapStackMetadata metadata2Msg(MapStack* mapStack)
+    {
+        srslib_framework::MapStackMetadata msgMapMetaData;
+
+        msgMapMetaData.logical = metadata2Msg(mapStack->getLogicalMap()->getMetadata());
+        msgMapMetaData.occupancy = metadata2Msg(mapStack->getOccupancyMap()->getMetadata());
+
+        return msgMapMetaData;
+    }
+
 //    /**
 //     * @brief Convert a MsgMapConstPtr type into a Map.
 //     *
@@ -82,34 +158,6 @@ struct MapMessageFactory
 //        map->setGrid(message->costs, message->notes);
 //
 //        return map;
-//    }
-//
-//    /**
-//     * @brief Convert a MapMetadata message into a MapMetaData.
-//     *
-//     * @param message MapMetadata to convert
-//     *
-//     * @return MapMetadata generated from the specified MapMetadata message
-//     */
-//    static MapMetadata msg2MapMetadata(srslib_framework::MapMetadata::ConstPtr message)
-//    {
-//        MapMetadata metadata;
-//
-//        metadata.loadTime = message->loadTime;
-//        metadata.heightCells = message->heightCells;
-//        metadata.heightM = message->heightM;
-//        metadata.documentFilename = message->documentFilename;
-//        metadata.occupancyFilename = message->occupancyFilename;
-//        metadata.logicalFilename = message->logicalFilename;
-//        metadata.negate = message->negate;
-//        metadata.origin = PoseMessageFactory::msg2Pose(message->origin);
-//        metadata.resolution = message->resolution;
-//        metadata.thresholdFree = message->thresholdFree;
-//        metadata.thresholdOccupied = message->thresholdOccupied;
-//        metadata.widthCells = message->widthCells;
-//        metadata.widthM = message->widthM;
-//
-//        return metadata;
 //    }
 };
 

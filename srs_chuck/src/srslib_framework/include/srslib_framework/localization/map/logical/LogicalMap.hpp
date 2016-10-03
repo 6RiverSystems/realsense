@@ -17,10 +17,7 @@ namespace srs {
 class LogicalMap : public BaseMap
 {
 public:
-    LogicalMap();
-    LogicalMap(double widthMeters, double heightMeters, double resolution);
-    LogicalMap(LogicalMetadata metadata);
-
+    LogicalMap(unsigned int widthCells, unsigned int heightCells, double resolution);
     ~LogicalMap()
     {}
 

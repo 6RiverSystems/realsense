@@ -11,20 +11,8 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap::LogicalMap() :
-    BaseMap()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap::LogicalMap(double widthC, double heightC, double resolution) :
-        BaseMap(widthC, heightC, resolution)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap::LogicalMap(LogicalMetadata metadata) :
-    BaseMap(metadata)
+LogicalMap::LogicalMap(unsigned int widthCells, unsigned int heightCells, double resolution) :
+        BaseMap(widthCells, heightCells, resolution)
 {
 }
 

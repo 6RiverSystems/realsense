@@ -3,7 +3,6 @@
 #
 # This is proprietary software, unauthorized distribution is not permitted.
 #
-Header header 
-nav_msgs/MapMetaData info
-int8[] costs
-int8[] notes
+
+srslib_framework/LogicalMap logical
+srslib_framework/OccupancyMap occupancy

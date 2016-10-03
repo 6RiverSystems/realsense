@@ -6,20 +6,8 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-OccupancyMap::OccupancyMap() :
-        BaseMap()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-OccupancyMap::OccupancyMap(double widthC, double heightC, double resolution) :
-        BaseMap(widthC, heightC, resolution)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-OccupancyMap::OccupancyMap(OccupancyMetadata metadata) :
-        BaseMap(metadata)
+OccupancyMap::OccupancyMap(unsigned int widthCells, unsigned int heightCells, double resolution) :
+        BaseMap(widthCells, heightCells, resolution)
 {
 }
 

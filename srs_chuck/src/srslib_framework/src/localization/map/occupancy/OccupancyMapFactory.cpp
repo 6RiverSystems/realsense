@@ -6,6 +6,7 @@
 
 #include <srslib_framework/exception/io/FailedToOpenFileException.hpp>
 #include <srslib_framework/localization/map/occupancy/InvalidChannelNumberException.hpp>
+#include <srslib_framework/localization/map/MapNote.hpp>
 
 namespace srs {
 
@@ -25,7 +26,7 @@ OccupancyMap* OccupancyMapFactory::fromMetadata(OccupancyMetadata metadata)
     metadata.widthCells = image->w;
     metadata.heightCells = image->h;
 
-    OccupancyMap* map = new OccupancyMap(metadata);
+    OccupancyMap* map = new OccupancyMap(metadata.widthCells, metadata.heightCells, metadata.resolution);
 
     int channels = image->format->BytesPerPixel;
     switch (channels)

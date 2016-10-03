@@ -17,10 +17,7 @@ namespace srs {
 class OccupancyMap : public BaseMap
 {
 public:
-    OccupancyMap();
-    OccupancyMap(double widthMeters, double heightMeters, double resolution);
-    OccupancyMap(OccupancyMetadata metadata);
-
+    OccupancyMap(unsigned int widthCells, unsigned int heightCells, double resolution);
     ~OccupancyMap();
 
     OccupancyMetadata getMetadata() const

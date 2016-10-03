@@ -71,19 +71,17 @@ set(TEST_SOURCES_MATH
     test/math/Test_PoseMath.cpp
 )
 
-###FS
-
 set(TEST_SOURCES_PLANNING
     test/planning/pathplanning/grid/Test_Solution_Barrett_Aisles.cpp
-#    test/planning/pathplanning/grid/Test_Solution_Barrett_LongSolution.cpp
+    test/planning/pathplanning/grid/Test_Solution_Barrett_LongSolution.cpp
     test/planning/pathplanning/grid/Test_Solution_Empty_Consecutive.cpp
-#    test/planning/pathplanning/grid/Test_Trajectory_180ShortTrajectory.cpp
-#    test/planning/pathplanning/grid/Test_Trajectory_6RHQ.cpp
-#    test/planning/pathplanning/grid/Test_Trajectory_LongStraight.cpp
-#    test/planning/pathplanning/grid/Test_Trajectory_LongTrajectory.cpp
-#    test/planning/pathplanning/grid/Test_Trajectory_ShortStraight.cpp
-#    test/planning/pathplanning/grid/Test_Trajectory_ShortTrajectory.cpp
-#    test/planning/pathplanning/grid/Test_Trajectory_SingleRotation.cpp
+    test/planning/pathplanning/grid/Test_Trajectory_180ShortTrajectory.cpp
+    test/planning/pathplanning/grid/Test_Trajectory_6RHQ.cpp
+    test/planning/pathplanning/grid/Test_Trajectory_LongStraight.cpp
+    test/planning/pathplanning/grid/Test_Trajectory_LongTrajectory.cpp
+    test/planning/pathplanning/grid/Test_Trajectory_ShortStraight.cpp
+    test/planning/pathplanning/grid/Test_Trajectory_ShortTrajectory.cpp
+    test/planning/pathplanning/grid/Test_Trajectory_SingleRotation.cpp
 )
 
 set(TEST_SOURCES_ROBOTICS

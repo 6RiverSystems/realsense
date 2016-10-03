@@ -5,5 +5,5 @@
 #
 cmake_minimum_required(VERSION 2.8.3)
 
-project(srsc_6rhq_sortwall_rviz)
+project(srsc_6rshq_sortwall)
 

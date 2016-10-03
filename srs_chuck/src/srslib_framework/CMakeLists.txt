@@ -91,7 +91,7 @@ set(TEST_SOURCES_ROBOTICS
 set(TEST_SOURCES_SEARCH
     test/search/Test_AStar_Basic.cpp
     test/search/Test_AStar_Map.cpp
-#    test/search/Test_AStar_SamePlaceOnMap.cpp
+    test/search/Test_AStar_SamePlaceOnMap.cpp
 )
 
 set(TEST_SOURCES_IO
@@ -200,6 +200,7 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_DATASTRUCTURE}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/datastructure
     )
     target_link_libraries(TestSuite_Datastructure
         ${PROJECT_LIBRARY}
@@ -209,6 +210,7 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_FILTER}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/filter
     )
     target_link_libraries(TestSuite_Filter
         ${PROJECT_LIBRARY}
@@ -218,6 +220,7 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_GRAPH}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/graph
     )
     target_link_libraries(TestSuite_Graph
         ${PROJECT_LIBRARY}
@@ -227,6 +230,7 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_MATH}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/math
     )
     target_link_libraries(TestSuite_Math
         ${PROJECT_LIBRARY}
@@ -236,6 +240,7 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_LOCALIZATION}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/localization
     )
     target_link_libraries(TestSuite_Localization
         ${PROJECT_LIBRARY}
@@ -255,6 +260,7 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_ROBOTICS}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/robotics
     )
     target_link_libraries(TestSuite_Robotics
         ${PROJECT_LIBRARY}
@@ -264,6 +270,7 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_SEARCH}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/search
     )
     target_link_libraries(TestSuite_Search
         ${PROJECT_LIBRARY}
@@ -272,6 +279,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(TestSuite_Io
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_IO}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/io
     )
     target_compile_definitions(TestSuite_Io 
         PRIVATE ENABLE_TEST_FIXTURE

@@ -12,8 +12,9 @@ using namespace std;
 #include <nav_msgs/GetMap.h>
 
 #include <srslib_framework/localization/map/MapStack.hpp>
-#include <srslib_framework/ros/publisher/PublisherRosMapMetadata.hpp>
 #include <srslib_framework/ros/publisher/PublisherMapStack.hpp>
+#include <srslib_framework/ros/publisher/PublisherRosMapMetadata.hpp>
+#include <srslib_framework/ros/publisher/PublisherRosOccupancyGrid.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
 #include <srslib_framework/ros/unit/RosUnit.hpp>
 
@@ -41,13 +42,10 @@ private:
     void publishMap();
 
     MapStack* mapStack_;
-    vector<int8_t> occupancy_;
-    vector<int8_t> notes_;
 
     PublisherMapStack pubMapStack_;
     PublisherRosMapMetadata pubRosMapMetadata_;
-    ros::Publisher pubMapOccupancyGrid_;
-    ros::Publisher pubMapCompleteMap_;
+    PublisherRosOccupancyGrid pubOccupancyGrid_;
 
     ros::ServiceServer serviceMapRequest_;
 

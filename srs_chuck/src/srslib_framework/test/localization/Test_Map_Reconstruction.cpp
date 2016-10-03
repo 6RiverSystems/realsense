@@ -10,8 +10,9 @@
 using namespace std;
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
-//#include <srslib_framework/localization/map/Map.hpp>
-//#include <srslib_framework/localization/map/MapFactory.hpp>
+#include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/localization/map/MapNote.hpp>
+#include <srslib_framework/localization/map/MapStackFactory.hpp>
 using namespace srs;
 
 #include <srslib_test/utils/MemoryWatch.hpp>
@@ -19,16 +20,17 @@ using namespace srs;
 TEST(Test_Map, Reconstruction)
 {
 // ###FS
+
 //    test::MemoryWatch memoryWatch;
 //
-//    Map* map = new Map();
-//    map->load("/tmp/srslib_framework/data/empty.yaml");
+//    MapStack* mapStack = MapStackFactory::fromJsonFile("data/empty/empty.yaml");
+//    OccupancyMap* map = mapStack->getOccupancyMap();
 //
 //    ROS_DEBUG_STREAM(*map);
 //
 //    ROS_DEBUG_STREAM(map->getGrid()->getCost(Grid2dLocation(1, 0)));
 //    ROS_DEBUG_STREAM(*(reinterpret_cast<MapNote*>(map->getGrid()->getNote(Grid2dLocation(1, 0)))));
-//
+
 //    vector<int8_t> occupancyMap;
 //    vector<int8_t> notesGrid;
 //

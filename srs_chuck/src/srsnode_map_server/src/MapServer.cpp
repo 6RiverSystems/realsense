@@ -14,7 +14,7 @@ using namespace std;
 
 #include <tf/LinearMath/Quaternion.h>
 
-// #include <srslib_framework/localization/map/MapFactory.hpp>
+#include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
@@ -26,8 +26,9 @@ namespace srs {
 MapServer::MapServer(string name, int argc, char** argv) :
     RosUnit(name, argc, argv, REFRESH_RATE_HZ),
     mapStack_(nullptr),
-    occupancy_(),
-    pubRosMapMetadata_(ChuckTopics::internal::MAP_ROS_METADATA, 1, true)
+    pubRosMapMetadata_(ChuckTopics::internal::MAP_ROS_METADATA, 1, true),
+    pubMapStack_(ChuckTopics::internal::MAP_STACK, 1, true),
+    pubOccupancyGrid_(ChuckTopics::internal::MAP_ROS_OCCUPANCY, 1, true)
 {
     string mapFilename;
     rosNodeHandle_.param("map_stack", mapFilename, string("/home/fsantini/projects/repos/ros/srs_sites/src/srsc_empty/map/empty.yaml"));
@@ -37,20 +38,10 @@ MapServer::MapServer(string name, int argc, char** argv) :
     string frame_id;
     rosNodeHandle_.param("/frame_id", frame_id, string("map"));
 
-    // ###FS
+    mapStack_ = MapStackFactory::fromJsonFile(mapFilename);
 
-
-//    map_.load(mapFilename, ros::Time::now().toSec());
-//    MapFactory::map2Occupancy(&map_, occupancy_);
-//    MapFactory::map2Notes(&map_, notes_);
-//
-//    pubMapOccupancyGrid_ = rosNodeHandle_.advertise<nav_msgs::OccupancyGrid>(
-//        ChuckTopics::internal::MAP_ROS_OCCUPANCY, 1, true);
-//    pubMapCompleteMap_ = rosNodeHandle_.advertise<srslib_framework::Map>(
-//        ChuckTopics::internal::MAP_LOGICAL, 1, true);
-//
-//    serviceMapRequest_ = rosNodeHandle_.advertiseService(ChuckTopics::service::GET_MAP_OCCUPANCY,
-//        &MapServer::callbackMapRequest, this);
+    serviceMapRequest_ = rosNodeHandle_.advertiseService(ChuckTopics::service::GET_MAP_OCCUPANCY,
+        &MapServer::callbackMapRequest, this);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +54,6 @@ void MapServer::execute()
 void MapServer::initialize()
 {
     publishMap();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,17 +62,16 @@ void MapServer::initialize()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 bool MapServer::callbackMapRequest(nav_msgs::GetMap::Request &req, nav_msgs::GetMap::Response &res)
 {
-    return false;
-    // ###FS
-//    ROS_INFO("Map request service: Sending map");
-//
-//    res.map.header.stamp = ros::Time::now();
-//
-//    MapMetadata mapMetadata = map_.getMetadata();
-//    res.map.info = MapMessageFactory::mapMetadata2RosMsg(mapMetadata);
-//    res.map.data = occupancy_;
-//
-//    return true;
+    ROS_INFO("Map request service: Sending map");
+
+    vector<int8_t> occupancy;
+    OccupancyMapUtils::map2Occupancy(mapStack_->getOccupancyMap(), occupancy);
+
+    res.map.header.stamp = ros::Time::now();
+    res.map.info = MapMessageFactory::metadata2RosMsg(mapStack_->getOccupancyMap()->getMetadata());
+    res.map.data = occupancy;
+
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,29 +86,8 @@ void MapServer::evaluateTriggers()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MapServer::publishMap()
 {
-    // ###FS
-
-//    MapMetadata mapMetadata = map_.getMetadata();
-//    nav_msgs::MapMetaData metadataMessage = MapMessageFactory::mapMetadata2RosMsg(mapMetadata);
-//
-//    pubRosMapMetadata_.publish(mapMetadata);
-//
-//    nav_msgs::OccupancyGrid occupancyMessage;
-//
-//    occupancyMessage.header.stamp = ros::Time::now();
-//    occupancyMessage.info = metadataMessage;
-//    occupancyMessage.data = occupancy_;
-//
-//    pubMapOccupancyGrid_.publish(occupancyMessage);
-//
-//    srslib_framework::Map mapMessage;
-//
-//    mapMessage.header.stamp = ros::Time::now();
-//    mapMessage.info = metadataMessage;
-//    mapMessage.costs = occupancy_;
-//    mapMessage.notes = notes_;
-//
-//    pubMapCompleteMap_.publish(mapMessage);
+    pubMapStack_.publish(mapStack_);
+    pubOccupancyGrid_.publish(mapStack_->getOccupancyMap());
 }
 
 } // namespace srs

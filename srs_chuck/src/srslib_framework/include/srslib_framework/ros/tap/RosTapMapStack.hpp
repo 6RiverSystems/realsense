@@ -14,6 +14,7 @@ using namespace std;
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/ros/subscriber/RosSubscriberSingleData.hpp>
 #include <srslib_framework/ros/message/MapMessageFactory.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
@@ -21,10 +22,8 @@ class RosTapMapStack :
     public RosSubscriberSingleData<srslib_framework::MapStack, MapStack*>
 {
 public:
-    RosTapMapStack(string topic,
-        unsigned int queueLength = 10,
-        string nameSpace = "~") :
-            RosSubscriberSingleData(topic, queueLength, nameSpace)
+    RosTapMapStack() :
+            RosSubscriberSingleData(ChuckTopics::internal::MAP_STACK, 1, "~")
     {
         reset();
     }

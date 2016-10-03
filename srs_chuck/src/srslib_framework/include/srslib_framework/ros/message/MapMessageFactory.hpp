@@ -243,6 +243,28 @@ struct MapMessageFactory
 
         return new MapStack(logical, occupancy);
     }
+
+    /**
+     * @brief Convert a Occupancy Map type into a ROS OccupancyGrid message.
+     *
+     * @param map Occupancy map to convert
+     *
+     * @return Ros OccupancyGrid message generated from the specified occupancy map
+     */
+    static nav_msgs::OccupancyGrid occupancyMap2Msg(const OccupancyMap* map)
+    {
+        vector<int8_t> occupancy;
+        OccupancyMapUtils::map2Occupancy(map, occupancy);
+
+        nav_msgs::OccupancyGrid msgOccupancyMap;
+
+        msgOccupancyMap.info = MapMessageFactory::metadata2RosMsg(map->getMetadata());
+        msgOccupancyMap.data = occupancy;
+        msgOccupancyMap.header.frame_id = "map";
+
+        return msgOccupancyMap;
+    }
+
 };
 
 } // namespace srs

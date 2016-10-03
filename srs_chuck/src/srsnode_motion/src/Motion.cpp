@@ -45,8 +45,7 @@ Motion::Motion(string nodeName) :
     motionController_(1.0 / REFRESH_RATE_HZ),
     simulatedT_(0.0),
     pubRobotPose_(ChuckTopics::internal::ROBOT_POSE),
-    pubRobotAccOdometry_(ChuckTopics::debug::ACC_ODOMETRY),
-    tapMapStack_(ChuckTopics::internal::MAP_STACK)
+    pubRobotAccOdometry_(ChuckTopics::debug::ACC_ODOMETRY)
 {
     positionEstimator_.addSensor(tapAps_.getSensor());
     positionEstimator_.addSensor(tapSensorFrame_.getSensorImu());

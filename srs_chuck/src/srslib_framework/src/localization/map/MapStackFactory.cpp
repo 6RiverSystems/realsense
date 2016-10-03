@@ -34,9 +34,9 @@ MapStack* MapStackFactory::fromJsonFile(string jsonFilename)
     string localDirectory = Filesystem::dirname(jsonFilename) + "/";
 
     LogicalMap* logical = MapStackFactory::analizeLogicalNode(
-        localDirectory, jsonFilename, mapStackDocument);
+        localDirectory, jsonFilename, ros::Time::now().toSec(), mapStackDocument);
     OccupancyMap* occupancy = MapStackFactory::analizeOccupancyNode(
-        localDirectory, jsonFilename, mapStackDocument);
+        localDirectory, jsonFilename, ros::Time::now().toSec(), mapStackDocument);
 
     return new MapStack(logical, occupancy);
 }
@@ -46,7 +46,7 @@ MapStack* MapStackFactory::fromJsonFile(string jsonFilename)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 LogicalMap* MapStackFactory::analizeLogicalNode(string localDirectory, string jsonFilename,
-    YAML::Node& mapStackDocument)
+    double loadTime, YAML::Node& mapStackDocument)
 {
     YAML::Node logicalDocument;
     try
@@ -59,6 +59,7 @@ LogicalMap* MapStackFactory::analizeLogicalNode(string localDirectory, string js
     }
 
     LogicalMetadata metadata;
+    metadata.loadTime = loadTime;
 
     try
     {
@@ -85,7 +86,7 @@ LogicalMap* MapStackFactory::analizeLogicalNode(string localDirectory, string js
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 OccupancyMap* MapStackFactory::analizeOccupancyNode(string localDirectory, string jsonFilename,
-    YAML::Node& mapStackDocument)
+    double loadTime, YAML::Node& mapStackDocument)
 {
     YAML::Node occupancyDocument;
     try
@@ -98,6 +99,7 @@ OccupancyMap* MapStackFactory::analizeOccupancyNode(string localDirectory, strin
     }
 
     OccupancyMetadata metadata;
+    metadata.loadTime = loadTime;
 
     try
     {

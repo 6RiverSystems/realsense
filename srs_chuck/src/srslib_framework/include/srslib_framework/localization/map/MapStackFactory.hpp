@@ -33,9 +33,9 @@ private:
     static const string TAG_OCCUPANCY_IMAGE;
 
     static LogicalMap* analizeLogicalNode(string localDirectory, string jsonFilename,
-        YAML::Node& mapStackDocument);
+        double loadTime, YAML::Node& mapStackDocument);
     static OccupancyMap* analizeOccupancyNode(string localDirectory, string jsonFilename,
-        YAML::Node& mapStackDocument);
+        double loadTime, YAML::Node& mapStackDocument);
 };
 
 } // namespace srs

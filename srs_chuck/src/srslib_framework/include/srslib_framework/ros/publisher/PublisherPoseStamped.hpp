@@ -16,7 +16,7 @@ using namespace std;
 namespace srs {
 
 class PublisherPoseStamped :
-    public RosPublisherStamped<geometry_msgs::PoseStamped, Pose<>>
+    public RosPublisherStamped<geometry_msgs::PoseStamped, const Pose<>&>
 {
 public:
     PublisherPoseStamped(string topic,
@@ -26,7 +26,7 @@ public:
             RosPublisherStamped(topic, buffer, latched, nameSpace)
     {}
 
-    geometry_msgs::PoseStamped convertData(Pose<> data, ros::Time timestamp)
+    geometry_msgs::PoseStamped convertData(const Pose<>& data, const ros::Time timestamp)
     {
         return PoseMessageFactory::pose2PoseStamped(data, timestamp);
     }

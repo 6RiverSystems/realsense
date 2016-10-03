@@ -17,7 +17,7 @@ using namespace std;
 namespace srs {
 
 class PublisherRosMapMetadata :
-    public RosPublisher<nav_msgs::MapMetaData, OccupancyMetadata>
+    public RosPublisher<nav_msgs::MapMetaData, const OccupancyMetadata&>
 {
 public:
     PublisherRosMapMetadata(string topic,
@@ -27,9 +27,9 @@ public:
             RosPublisher(topic, buffer, latched, nameSpace)
     {}
 
-    nav_msgs::MapMetaData convertData(OccupancyMetadata data)
+    nav_msgs::MapMetaData convertData(const OccupancyMetadata& data)
     {
-        // ###FS return MapMessageFactory::mapMetadata2RosMsg(data);
+        return MapMessageFactory::metadata2RosMsg(data);
     }
 };
 

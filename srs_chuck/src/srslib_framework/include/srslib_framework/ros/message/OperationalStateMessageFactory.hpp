@@ -21,7 +21,7 @@ struct OperationalStateMessageFactory
      *
      * @return newly generated message
      */
-    static srslib_framework::MsgOperationalState robotState2Msg(RobotState robotState)
+    static srslib_framework::MsgOperationalState robotState2Msg(const RobotState& robotState)
     {
         srslib_framework::MsgOperationalState msgOperationState;
 
@@ -47,7 +47,7 @@ struct OperationalStateMessageFactory
      *
      * @return newly generated RobotState
      */
-    static RobotState msg2RobotState(srslib_framework::MsgOperationalState message)
+    static RobotState msg2RobotState(const srslib_framework::MsgOperationalState& message)
     {
         RobotState robotState;
 
@@ -73,7 +73,7 @@ struct OperationalStateMessageFactory
      *
      * @return newly generated RobotState
      */
-    static RobotState msg2RobotState(srslib_framework::MsgOperationalStateConstPtr message)
+    static RobotState msg2RobotState(srslib_framework::MsgOperationalState::ConstPtr message)
     {
         return OperationalStateMessageFactory::msg2RobotState(*message);
     }

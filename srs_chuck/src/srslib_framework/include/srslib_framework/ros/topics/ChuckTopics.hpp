@@ -34,6 +34,7 @@ namespace internal {
     static const string MAP_LOGICAL = "/internal/state/map/complete";
     static const string MAP_ROS_OCCUPANCY = "/internal/state/map/ros_occupancy";
     static const string MAP_ROS_METADATA = "/internal/state/map/ros_metadata";
+    static const string MAP_STACK = "/internal/state/map/stack";
 
     static const string ROBOT_POSE = "/internal/state/robot/pose";
 

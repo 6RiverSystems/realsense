@@ -27,6 +27,7 @@ set(${PROJECT_NAME}_SOURCES
     src/localization/map/logical/LogicalMapFactory.cpp
     src/localization/map/occupancy/OccupancyMap.cpp
     src/localization/map/occupancy/OccupancyMapFactory.cpp
+    src/localization/map/occupancy/OccupancyMapUtils.cpp
 
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp

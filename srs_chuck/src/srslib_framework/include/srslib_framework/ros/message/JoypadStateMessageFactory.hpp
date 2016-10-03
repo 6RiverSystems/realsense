@@ -21,7 +21,7 @@ struct JoypadStateMessageFactory
      *
      * @return newly generated message
      */
-    static srslib_framework::JoypadState joypadState2Msg(JoypadState joypadState)
+    static srslib_framework::JoypadState joypadState2Msg(const JoypadState& joypadState)
     {
         srslib_framework::JoypadState msgJoypadState;
 
@@ -44,7 +44,7 @@ struct JoypadStateMessageFactory
      *
      * @return newly generated JoypadState
      */
-    static JoypadState msg2JoypadState(srslib_framework::JoypadState message)
+    static JoypadState msg2JoypadState(const srslib_framework::JoypadState& message)
     {
         JoypadState joypadState;
 
@@ -67,7 +67,7 @@ struct JoypadStateMessageFactory
      *
      * @return newly generated RobotState
      */
-    static JoypadState msg2JoypadState(srslib_framework::JoypadStateConstPtr message)
+    static JoypadState msg2JoypadState(srslib_framework::JoypadState::ConstPtr message)
     {
         return JoypadStateMessageFactory::msg2JoypadState(*message);
     }

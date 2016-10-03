@@ -27,7 +27,7 @@ struct PoseMessageFactory
      *
      * @return Pose generated from the specified Pose
      */
-    static Pose<> msg2Pose(srslib_framework::Pose message)
+    static Pose<> msg2Pose(const srslib_framework::Pose& message)
     {
         Pose<> pose;
 
@@ -59,7 +59,7 @@ struct PoseMessageFactory
      *
      * @return Pose generated from the specified Pose
      */
-    static srslib_framework::Pose pose2Msg(Pose<> pose, ros::Time timestamp = ros::Time::now())
+    static srslib_framework::Pose pose2Msg(const Pose<> pose, ros::Time timestamp = ros::Time::now())
     {
         srslib_framework::Pose msgPose;
         msgPose.header.stamp = timestamp;
@@ -79,7 +79,7 @@ struct PoseMessageFactory
      *
      * @return PoseStamped generated from the specified Pose
      */
-    static geometry_msgs::PoseStamped pose2PoseStamped(Pose<> pose,
+    static geometry_msgs::PoseStamped pose2PoseStamped(const Pose<> pose,
         ros::Time timestamp = ros::Time::now())
     {
         geometry_msgs::PoseStamped msgPoseStamped;
@@ -105,7 +105,7 @@ struct PoseMessageFactory
      *
      * @return ROS Pose generated from the specified Pose
      */
-    static geometry_msgs::Pose pose2RosPose(Pose<> pose)
+    static geometry_msgs::Pose pose2RosPose(const Pose<> pose)
     {
         geometry_msgs::Pose msgPose;
 
@@ -130,7 +130,7 @@ struct PoseMessageFactory
      *
      * @return Pose generated from the specified PoseStamped
      */
-    static Pose<> poseStamped2Pose(geometry_msgs::PoseStamped message)
+    static Pose<> poseStamped2Pose(const geometry_msgs::PoseStamped& message)
     {
         Pose<> pose;
 
@@ -149,7 +149,7 @@ struct PoseMessageFactory
      *
      * @return Pose generated from the specified PoseStampedConstPtr
      */
-    static Pose<> poseStamped2Pose(geometry_msgs::PoseStampedConstPtr message)
+    static Pose<> poseStamped2Pose(geometry_msgs::PoseStamped::ConstPtr message)
     {
         return PoseMessageFactory::poseStamped2Pose(*message);
     }

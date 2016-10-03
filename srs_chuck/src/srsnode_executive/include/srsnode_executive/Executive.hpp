@@ -15,7 +15,7 @@
 #include <srslib_framework/ros/publisher/PublisherPolygonStamped.hpp>
 #include <srslib_framework/ros/publisher/PublisherPose.hpp>
 #include <srslib_framework/ros/publisher/PublisherPoseStamped.hpp>
-#include <srslib_framework/ros/tap/RosTapMap.hpp>
+#include <srslib_framework/ros/tap/RosTapMapStack.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_GoalArrived.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_RobotPose.hpp>
 #include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
@@ -106,8 +106,7 @@ private:
     RosTapOperationalState tapOperationalState_;
     RosTapJoyAdapter tapJoyAdapter_;
 
-    // ###FS
-    // RosTapMap tapMap_;
+    RosTapMapStack tapMapStack_;
 };
 
 } // namespace srs

@@ -16,7 +16,7 @@ using namespace std;
 namespace srs {
 
 class PublisherPose :
-    public RosPublisher<srslib_framework::Pose, Pose<>>
+    public RosPublisher<srslib_framework::Pose, const Pose<>&>
 {
 public:
     PublisherPose(string topic,
@@ -26,7 +26,7 @@ public:
             RosPublisher(topic, buffer, latched, nameSpace)
     {}
 
-    srslib_framework::Pose convertData(Pose<> data)
+    srslib_framework::Pose convertData(const Pose<>& data)
     {
         return PoseMessageFactory::pose2Msg(data);
     }

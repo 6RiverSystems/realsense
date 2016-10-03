@@ -23,7 +23,7 @@ struct SolutionMessageFactory
      *
      * @return MsgSolutionItem generated from the specified GridSolutionItem
      */
-    static srslib_framework::MsgSolutionItem gridSolutionItem2Msg(GridSolutionItem gridSolutionItem)
+    static srslib_framework::MsgSolutionItem gridSolutionItem2Msg(const GridSolutionItem& gridSolutionItem)
     {
         srslib_framework::MsgSolutionItem msgSolutionItem;
 
@@ -42,7 +42,7 @@ struct SolutionMessageFactory
      *
      * @return GridSolutionItem generated from the specified MsgSolutionItem
      */
-    static GridSolutionItem msg2GridSolutionItem(srslib_framework::MsgSolutionItem message)
+    static GridSolutionItem msg2GridSolutionItem(const srslib_framework::MsgSolutionItem& message)
     {
         GridSolutionItem gridSolutionItem;
 
@@ -61,7 +61,7 @@ struct SolutionMessageFactory
      *
      * @return GridSolutionItem generated from the specified MsgSolutionItem
      */
-    static GridSolutionItem msg2GridSolutionItem(srslib_framework::MsgSolutionItemConstPtr message)
+    static GridSolutionItem msg2GridSolutionItem(srslib_framework::MsgSolutionItem::ConstPtr message)
     {
         return SolutionMessageFactory::msg2GridSolutionItem(*message);
     }
@@ -73,7 +73,7 @@ struct SolutionMessageFactory
      *
      * @return Solution of GridSolutionItem generated from the specified MsgSolution
      */
-    static Solution<GridSolutionItem> msg2Solution(srslib_framework::MsgSolution message)
+    static Solution<GridSolutionItem> msg2Solution(const srslib_framework::MsgSolution& message)
     {
         Solution<GridSolutionItem> solution;
 
@@ -95,7 +95,7 @@ struct SolutionMessageFactory
      *
      * @return Solution of GridSolutionItem generated from the specified MsgSolutionConstPtr
      */
-    static Solution<GridSolutionItem> msg2Solution(srslib_framework::MsgSolutionConstPtr message)
+    static Solution<GridSolutionItem> msg2Solution(srslib_framework::MsgSolution::ConstPtr message)
     {
         return SolutionMessageFactory::msg2Solution(*message);
     }
@@ -108,8 +108,8 @@ struct SolutionMessageFactory
      *
      * @return MsgSolution generated from the specified Solution of GridSolutionItem
      */
-    static srslib_framework::MsgSolution gridSolution2Msg(Solution<GridSolutionItem>& solution,
-        ros::Time timestamp = ros::Time::now())
+    static srslib_framework::MsgSolution gridSolution2Msg(const Solution<GridSolutionItem>& solution,
+        const ros::Time timestamp = ros::Time::now())
     {
         srslib_framework::MsgSolution msgSolution;
         msgSolution.header.stamp = timestamp;
@@ -133,8 +133,8 @@ struct SolutionMessageFactory
      *
      * @return nav_msgs::Path generated from the specified Solution of GridSolutionItem
      */
-    static nav_msgs::Path gridSolution2PathMsg(Solution<GridSolutionItem>& solution,
-        ros::Time timestamp = ros::Time::now())
+    static nav_msgs::Path gridSolution2PathMsg(const Solution<GridSolutionItem>& solution,
+        const ros::Time timestamp = ros::Time::now())
     {
         nav_msgs::Path messagePath;
         messagePath.header.frame_id = "map";

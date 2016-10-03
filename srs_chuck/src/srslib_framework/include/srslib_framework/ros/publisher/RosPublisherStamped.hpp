@@ -29,7 +29,7 @@ public:
     virtual ~RosPublisherStamped()
     {}
 
-    virtual void publish(TYPE data, ros::Time timestamp = ros::Time::now())
+    virtual void publish(TYPE data, const ros::Time timestamp = ros::Time::now())
     {
         MESSAGE message = convertData(data, timestamp);
         RosPublisher<MESSAGE, TYPE>::publishMessage(message);
@@ -40,7 +40,7 @@ public:
         return convertData(data, ros::Time::now());
     }
 
-    virtual MESSAGE convertData(TYPE data, ros::Time timestamp) = 0;
+    virtual MESSAGE convertData(TYPE data, const ros::Time timestamp) = 0;
 };
 
 } // namespace srs

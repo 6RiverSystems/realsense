@@ -18,15 +18,12 @@ using namespace std;
 
 namespace srs {
 
-struct OccupancyMapFactory
+struct OccupancyMapUtils
 {
-    static OccupancyMap* fromMetadata(OccupancyMetadata metadata);
-    static OccupancyMap* fromRosCostMap2D(costmap_2d::Costmap2DROS* rosCostMap,
-        double freeThreshold, double occupiedThreshold);
+    static void map2Occupancy(const OccupancyMap* map, vector<int8_t>& occupancy);
 
-private:
-    static void extract1Channel(SDL_Surface* image, OccupancyMap* map);
-    static void extract3Channel(SDL_Surface* image, OccupancyMap* map);
+    static OccupancyMap* occupancy2Map(const OccupancyMetadata& metadata,
+        const vector<int8_t>& occupancy);
 };
 
 } // namespace srs

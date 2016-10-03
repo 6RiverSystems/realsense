@@ -11,17 +11,17 @@ using namespace std;
 #include <ros/ros.h>
 #include <srslib_framework/MapMetadata.h>
 
-#include <srslib_framework/localization/map/MapMetadata.hpp>
+#include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/ros/subscriber/RosSubscriberSingleData.hpp>
 #include <srslib_framework/ros/message/MapMessageFactory.hpp>
 
 namespace srs {
 
-class SubscriberMapMetadata :
-    public RosSubscriberSingleData<srslib_framework::MapMetadata, MapMetadata>
+class RosTapMapStack :
+    public RosSubscriberSingleData<srslib_framework::MapStack, MapStack*>
 {
 public:
-    SubscriberMapMetadata(string topic,
+    RosTapMapStack(string topic,
         unsigned int queueLength = 10,
         string nameSpace = "~") :
             RosSubscriberSingleData(topic, queueLength, nameSpace)
@@ -29,20 +29,23 @@ public:
         reset();
     }
 
-    ~SubscriberMapMetadata()
+    ~RosTapMapStack()
     {}
 
-    void receiveData(const srslib_framework::MapMetadata::ConstPtr message)
+    void receiveData(const srslib_framework::MapStack::ConstPtr message)
     {
-        set(MapMessageFactory::msg2MapMetadata(message));
+        // Deallocate the current Map Stack
+        delete pop();
+
+        // Create a new Map stack from the message
+        set(MapMessageFactory::msg2MapStack(message));
     }
 
     void reset()
     {
         RosSubscriber::reset();
 
-        MapMetadata empty;
-        set(empty);
+        set(nullptr);
     }
 };
 

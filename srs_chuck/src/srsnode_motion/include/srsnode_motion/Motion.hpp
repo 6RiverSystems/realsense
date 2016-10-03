@@ -19,7 +19,7 @@
 #include <srslib_framework/ros/tap/RosTapInternal_GoalSolution.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_InitialPose.hpp>
 #include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
-#include <srslib_framework/ros/tap/RosTapMap.hpp>
+#include <srslib_framework/ros/tap/RosTapMapStack.hpp>
 #include <srslib_framework/ros/service/RosServiceExecuteSolution.hpp>
 #include <srslib_framework/ros/service/RosTriggerPause.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
@@ -115,7 +115,7 @@ private:
     RosTapInternal_GoalSolution tapInternalGoalSolution_;
     RosTapInternal_InitialPose tapInitialPose_;
     RosTapJoyAdapter tapJoyAdapter_;
-    // ###FS RosTapMap tapMap_;
+    RosTapMapStack tapMapStack_;
 
     RosServiceExecuteSolution triggerExecuteSolution_;
     RosTriggerPause triggerPause_;

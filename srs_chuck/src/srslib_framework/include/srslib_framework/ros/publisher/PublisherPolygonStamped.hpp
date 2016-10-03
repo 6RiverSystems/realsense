@@ -15,7 +15,7 @@ using namespace std;
 namespace srs {
 
 class PublisherPolygonStamped :
-    public RosPublisherStamped<geometry_msgs::PolygonStamped, vector<Pose<>>>
+    public RosPublisherStamped<geometry_msgs::PolygonStamped, const vector<Pose<>>&>
 {
 public:
     PublisherPolygonStamped(string topic,
@@ -25,7 +25,7 @@ public:
             RosPublisherStamped(topic, buffer, latched, nameSpace)
     {}
 
-    geometry_msgs::PolygonStamped convertData(vector<Pose<>> data, ros::Time timestamp)
+    geometry_msgs::PolygonStamped convertData(const vector<Pose<>>& data, const ros::Time timestamp)
     {
         geometry_msgs::PolygonStamped message;
         message.header.stamp = timestamp;
@@ -45,7 +45,8 @@ public:
         return message;
     }
 
-    void publish(vector<Pose<>> data, string frameId = "map", ros::Time timestamp = ros::Time::now())
+    void publish(const vector<Pose<>>& data, const string frameId = "map",
+        const ros::Time timestamp = ros::Time::now())
     {
         geometry_msgs::PolygonStamped message = convertData(data, timestamp);
         message.header.frame_id = frameId;

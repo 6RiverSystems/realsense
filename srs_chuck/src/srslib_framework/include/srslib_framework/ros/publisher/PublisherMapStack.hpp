@@ -8,27 +8,28 @@
 #include <string>
 using namespace std;
 
-#include <srslib_framework/JoypadState.h>
+#include <srslib_framework/MapStack.h>
 
+#include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/ros/message/MapMessageFactory.hpp>
 #include <srslib_framework/ros/publisher/RosPublisher.hpp>
-#include <srslib_framework/ros/message/JoypadStateMessageFactory.hpp>
 
 namespace srs {
 
-class PublisherSrsJoypadState :
-    public RosPublisher<srslib_framework::JoypadState, const JoypadState&>
+class PublisherMapStack :
+    public RosPublisher<srslib_framework::MapStack, const MapStack*>
 {
 public:
-    PublisherSrsJoypadState(string topic,
+    PublisherMapStack(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
             RosPublisher(topic, buffer, latched, nameSpace)
     {}
 
-    srslib_framework::JoypadState convertData(const JoypadState& data)
+    srslib_framework::MapStack convertData(const MapStack* data)
     {
-        return JoypadStateMessageFactory::joypadState2Msg(data);
+        return MapMessageFactory::mapStack2Msg(data);
     }
 };
 

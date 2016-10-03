@@ -5,3 +5,5 @@
 #
 
 srslib_framework/OccupancyMetadata metadata
+
+int8[] data

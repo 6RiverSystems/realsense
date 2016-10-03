@@ -5,4 +5,3 @@
 #
 
 srslib_framework/LogicalMetadata metadata
-string json

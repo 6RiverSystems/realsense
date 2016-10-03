@@ -15,6 +15,7 @@
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMetadata.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMetadata.hpp>
+#include <srslib_framework/localization/map/occupancy/OccupancyMapUtils.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
@@ -23,13 +24,66 @@ namespace srs {
 struct MapMessageFactory
 {
     /**
+     * @brief Convert a Logical Map type into a LogicalMap message.
+     *
+     * @param map Logical map to convert
+     *
+     * @return LogicalMap message generated from the specified logical map
+     */
+    static srslib_framework::LogicalMap map2Msg(const LogicalMap* map)
+    {
+        srslib_framework::LogicalMap msgLogicalMap;
+
+        msgLogicalMap.metadata = MapMessageFactory::metadata2Msg(map->getMetadata());
+
+        return msgLogicalMap;
+    }
+
+    /**
+     * @brief Convert a Logical Map type into a LogicalMap message.
+     *
+     * @param map Logical map to convert
+     *
+     * @return LogicalMap message generated from the specified logical map
+     */
+    static srslib_framework::OccupancyMap map2Msg(const OccupancyMap* map)
+    {
+        vector<int8_t> occupancy;
+        OccupancyMapUtils::map2Occupancy(map, occupancy);
+
+        srslib_framework::OccupancyMap msgOccupancyMap;
+
+        msgOccupancyMap.metadata = MapMessageFactory::metadata2Msg(map->getMetadata());
+        msgOccupancyMap.data = occupancy;
+
+        return msgOccupancyMap;
+    }
+
+    /**
+     * @brief Convert a MapStack type into a MapStack message.
+     *
+     * @param mapStack MapStack to convert
+     *
+     * @return MapStack message generated from the specified MapStack
+     */
+    static srslib_framework::MapStack mapStack2Msg(const MapStack* mapStack)
+    {
+        srslib_framework::MapStack msgMapStack;
+
+        msgMapStack.logical = MapMessageFactory::map2Msg(mapStack->getLogicalMap());
+        msgMapStack.occupancy = MapMessageFactory::map2Msg(mapStack->getOccupancyMap());
+
+        return msgMapStack;
+    }
+
+    /**
      * @brief Convert a LogicalMetadata into a LogicalMetaData message.
      *
      * @param metadata Logical metadata to convert
      *
      * @return newly generated message
      */
-    static srslib_framework::LogicalMetadata metadata2Msg(LogicalMetadata metadata)
+    static srslib_framework::LogicalMetadata metadata2Msg(const LogicalMetadata& metadata)
     {
         srslib_framework::LogicalMetadata msgLogicalMetaData;
 
@@ -46,7 +100,7 @@ struct MapMessageFactory
      *
      * @return newly generated message
      */
-    static srslib_framework::OccupancyMetadata metadata2Msg(OccupancyMetadata metadata)
+    static srslib_framework::OccupancyMetadata metadata2Msg(const OccupancyMetadata& metadata)
     {
         srslib_framework::OccupancyMetadata msgOccupancyMetaData;
 
@@ -72,7 +126,7 @@ struct MapMessageFactory
      *
      * @return newly generated message
      */
-    static nav_msgs::MapMetaData metadata2RosMsg(OccupancyMetadata metadata)
+    static nav_msgs::MapMetaData metadata2RosMsg(const OccupancyMetadata& metadata)
     {
         nav_msgs::MapMetaData msgRosMapMetaData;
 
@@ -86,18 +140,48 @@ struct MapMessageFactory
     }
 
     /**
+     * @brief Convert a LogicalMap message into a LogicalMap.
+     *
+     * @param message LogicalMap to convert
+     *
+     * @return LogicalMap generated from the specified LogicalMap message
+     */
+    static LogicalMap* msg2LogicalMap(const srslib_framework::LogicalMap& message)
+    {
+        LogicalMap* logical = new LogicalMap(message.metadata.widthCells,
+            message.metadata.heightCells, message.metadata.resolution);
+
+        return logical;
+    }
+
+    /**
+     * @brief Convert a OccupancyMap message into a OccupancyMap.
+     *
+     * @param message OccupancyMap to convert
+     *
+     * @return OccupancyMap generated from the specified OccupancyMap message
+     */
+    static OccupancyMap* msg2OccupancyMap(const srslib_framework::OccupancyMap& message)
+    {
+        OccupancyMetadata metadata = MapMessageFactory::msg2OccupancyMetadata(message.metadata);
+        OccupancyMap* occupancyMap = OccupancyMapUtils::occupancy2Map(metadata, message.data);
+
+        return occupancyMap;
+    }
+
+    /**
      * @brief Convert a MapMetadata message into a LogicalMetaData.
      *
-     * @param message MapMetadata to convert
+     * @param message LogicalMetadata to convert
      *
      * @return LogicalMetaData generated from the specified MapMetadata message
      */
-    static LogicalMetadata msg2LogicalMetadata(srslib_framework::MapStackMetadata::ConstPtr message)
+    static LogicalMetadata msg2LogicalMetadata(const srslib_framework::LogicalMetadata& message)
     {
         LogicalMetadata metadata;
 
-        metadata.loadTime = message->logical.loadTime;
-        metadata.logicalFilename = message->logical.logicalFilename;
+        metadata.loadTime = message.loadTime;
+        metadata.logicalFilename = message.logicalFilename;
 
         return metadata;
     }
@@ -105,25 +189,25 @@ struct MapMessageFactory
     /**
      * @brief Convert a MapMetadata message into a OccupancyMetaData.
      *
-     * @param message MapMetadata to convert
+     * @param message OccupancyMetadata to convert
      *
      * @return OccupancyMetaData generated from the specified MapMetadata message
      */
-    static OccupancyMetadata msg2OccupancyMetadata(srslib_framework::MapStackMetadata::ConstPtr message)
+    static OccupancyMetadata msg2OccupancyMetadata(const srslib_framework::OccupancyMetadata& message)
     {
         OccupancyMetadata metadata;
 
-        metadata.loadTime = message->occupancy.loadTime;
-        metadata.heightCells = message->occupancy.heightCells;
-        metadata.heightM = message->occupancy.heightM;
-        metadata.occupancyFilename = message->occupancy.occupancyFilename;
-        metadata.negate = message->occupancy.negate;
-        metadata.origin = PoseMessageFactory::msg2Pose(message->occupancy.origin);
-        metadata.resolution = message->occupancy.resolution;
-        metadata.thresholdFree = message->occupancy.thresholdFree;
-        metadata.thresholdOccupied = message->occupancy.thresholdOccupied;
-        metadata.widthCells = message->occupancy.widthCells;
-        metadata.widthM = message->occupancy.widthM;
+        metadata.loadTime = message.loadTime;
+        metadata.heightCells = message.heightCells;
+        metadata.heightM = message.heightM;
+        metadata.occupancyFilename = message.occupancyFilename;
+        metadata.negate = message.negate;
+        metadata.origin = PoseMessageFactory::msg2Pose(message.origin);
+        metadata.resolution = message.resolution;
+        metadata.thresholdFree = message.thresholdFree;
+        metadata.thresholdOccupied = message.thresholdOccupied;
+        metadata.widthCells = message.widthCells;
+        metadata.widthM = message.widthM;
 
         return metadata;
     }
@@ -135,7 +219,7 @@ struct MapMessageFactory
      *
      * @return newly generated message
      */
-    static srslib_framework::MapStackMetadata metadata2Msg(MapStack* mapStack)
+    static srslib_framework::MapStackMetadata metadata2Msg(const MapStack* mapStack)
     {
         srslib_framework::MapStackMetadata msgMapMetaData;
 
@@ -145,20 +229,20 @@ struct MapMessageFactory
         return msgMapMetaData;
     }
 
-//    /**
-//     * @brief Convert a MsgMapConstPtr type into a Map.
-//     *
-//     * @param message MsgMap to convert
-//     *
-//     * @return Map generated from the specified MsgMap
-//     */
-//    static Map* msg2Map(srslib_framework::MapConstPtr message)
-//    {
-//        Map* map = new Map(message->info.width, message->info.height, message->info.resolution);
-//        map->setGrid(message->costs, message->notes);
-//
-//        return map;
-//    }
+    /**
+     * @brief Convert a MapStack message ConstPtr type into a MapStack.
+     *
+     * @param message MapStack to convert
+     *
+     * @return MapStack generated from the specified MapStack message
+     */
+    static MapStack* msg2MapStack(srslib_framework::MapStack::ConstPtr message)
+    {
+        LogicalMap* logical = MapMessageFactory::msg2LogicalMap(message->logical);
+        OccupancyMap* occupancy = MapMessageFactory::msg2OccupancyMap(message->occupancy);
+
+        return new MapStack(logical, occupancy);
+    }
 };
 
 } // namespace srs

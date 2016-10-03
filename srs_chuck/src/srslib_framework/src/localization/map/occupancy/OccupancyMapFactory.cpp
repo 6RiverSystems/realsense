@@ -76,57 +76,6 @@ OccupancyMap* OccupancyMapFactory::fromRosCostMap2D(costmap_2d::Costmap2DROS* ro
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void OccupancyMapFactory::map2Occupancy(OccupancyMap* map, vector<int8_t>& occupancy)
-{
-    occupancy.clear();
-
-    Grid2d* grid = map->getGrid();
-    if (grid)
-    {
-        for (int row = 0; row < grid->getHeight(); row++)
-        {
-            for (int col = 0; col < grid->getWidth(); col++)
-            {
-                Grid2dLocation location = Grid2dLocation(col, row);
-                occupancy.push_back(static_cast<int8_t>(grid->getCost(location)));
-            }
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-OccupancyMap* OccupancyMapFactory::occupancy2Map(vector<int8_t>& occupancy)
-{
-//    auto costsIterator = costsGrid.begin();
-//
-//    for (int row = 0; row < grid_->getHeight(); row++)
-//    {
-//        for (int col = 0; col < grid_->getWidth(); col++)
-//        {
-//            Grid2dLocation location = Grid2dLocation(col, row);
-//
-//            char flags = *notesIterator;
-//            float cost = (static_cast<float>(*costsIterator) / 100) * 255;
-//
-//            MapNote* note = reinterpret_cast<MapNote*>(grid_->getNote(location));
-//            if (note)
-//            {
-//                note->add(flags);
-//            }
-//            else
-//            {
-//                note = MapNote::instanceOf(flags);
-//            }
-//
-//            grid_->addValue(location, static_cast<unsigned int>(cost), note);
-//
-//            costsIterator++;
-//        }
-//    }
-    return nullptr;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

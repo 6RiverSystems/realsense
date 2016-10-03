@@ -42,14 +42,12 @@ public:
     virtual MESSAGE convertData(TYPE data) = 0;
 
 protected:
-    void publishMessage(MESSAGE message)
+    void publishMessage(const MESSAGE& message)
     {
         dataPublisher_.publish(message);
     }
 
 private:
-    MESSAGE cachedMessage_;
-
     ros::Publisher dataPublisher_;
 
     ros::NodeHandle rosNodeHandle_;

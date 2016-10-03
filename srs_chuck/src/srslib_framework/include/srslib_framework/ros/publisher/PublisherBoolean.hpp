@@ -15,7 +15,7 @@ using namespace std;
 namespace srs {
 
 class PublisherBoolean :
-    public RosPublisher<std_msgs::Bool, bool>
+    public RosPublisher<std_msgs::Bool, const bool>
 {
 public:
     PublisherBoolean(string topic,
@@ -28,7 +28,7 @@ public:
     ~PublisherBoolean()
     {}
 
-    std_msgs::Bool convertData(bool data)
+    std_msgs::Bool convertData(const bool data)
     {
         std_msgs::Bool message;
         message.data = data;

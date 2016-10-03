@@ -58,12 +58,12 @@ struct Pose : public Object
     virtual ~Pose()
     {}
 
-    BaseType getThetaDegrees()
+    BaseType getThetaDegrees() const
     {
         return AngleMath::rad2Deg<TYPE>(theta);
     }
 
-    bool isValid()
+    bool isValid() const
     {
         return !BasicMath::isNan<TYPE>(x) && !BasicMath::isNan<TYPE>(y) &&
             !BasicMath::isNan<TYPE>(theta);

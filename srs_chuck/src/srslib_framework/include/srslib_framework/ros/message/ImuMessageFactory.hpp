@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef IMUMESSAGEFACTORY_HPP_
-#define IMUMESSAGEFACTORY_HPP_
+#pragma once
 
 #include <ros/ros.h>
 #include <srslib_framework/Imu.h>
@@ -22,7 +21,7 @@ struct ImuMessageFactory
      *
      * @return Imu generated from the specified Imu message
      */
-    static Imu<> msg2Imu(srslib_framework::Imu message)
+    static Imu<> msg2Imu(const srslib_framework::Imu& message)
     {
         Imu<> imu;
 
@@ -44,7 +43,7 @@ struct ImuMessageFactory
      *
      * @return Imu generated from the specified ImuConstPtr message
      */
-    static Imu<> msg2Imu(srslib_framework::ImuConstPtr message)
+    static Imu<> msg2Imu(srslib_framework::Imu::ConstPtr message)
     {
         return ImuMessageFactory::msg2Imu(*message);
     }
@@ -56,7 +55,7 @@ struct ImuMessageFactory
      *
      * @return Imu message generated from the specified Imu
      */
-    static srslib_framework::Imu imu2Msg(Imu<> imu)
+    static srslib_framework::Imu imu2Msg(const Imu<>& imu)
     {
         srslib_framework::Imu msgImu;
 
@@ -73,5 +72,3 @@ struct ImuMessageFactory
 };
 
 } // namespace srs
-
-#endif // IMUMESSAGEFACTORY_HPP_

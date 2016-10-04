@@ -21,8 +21,6 @@ void OccupancyMapUtils::map2Occupancy(const OccupancyMap* map, vector<int8_t>& o
     Grid2d* grid = map->getGrid();
     if (grid)
     {
-        cout << *grid << endl;
-
         for (int row = 0; row < grid->getHeight(); row++)
         {
             for (int col = 0; col < grid->getWidth(); col++)

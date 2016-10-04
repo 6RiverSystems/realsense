@@ -39,6 +39,14 @@ public:
         return logical_;
     }
 
+    OccupancyMap* getObstructionMap() const
+    {
+        // TODO: The obstruction map is in general of type OccupancyMap. However,
+        // for now, we simply return the occupancy map instead. There will be a
+        // method to merge in new information to generate a new obstruction map
+        return occupancy_;
+    }
+
     OccupancyMap* getOccupancyMap() const
     {
         return occupancy_;

@@ -18,6 +18,7 @@ using namespace std;
 #include <base_local_planner/costmap_model.h>
 
 #include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/ros/tap/TapMapStack.hpp>
 
 namespace srs {
 
@@ -38,9 +39,13 @@ public:
 private:
     void initializeParams();
 
+    void updateMapStack(costmap_2d::Costmap2DROS* rosCostMap);
+
     MapStack* srsMapStack_;
 
-    unsigned int weightObstacleThreshold_;
+    TapMapStack tapMapStack_;
+//
+//    unsigned int weightObstacleThreshold_;
     double weightScaleFactor_;
 };
 

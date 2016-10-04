@@ -4,7 +4,6 @@
 
 PLUGINLIB_EXPORT_CLASS(srs::SrsPlanner, nav_core::BaseGlobalPlanner)
 
-// ###FS #include <srslib_framework/localization/map/MapFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
@@ -21,18 +20,18 @@ namespace srs {
 SrsPlanner::SrsPlanner() :
     srsMapStack_(nullptr)
 {
-    ROS_DEBUG("SrsPlanner::SrsPlanner() called");
+    ROS_WARN("SrsPlanner::SrsPlanner() called");
 
     initializeParams();
+    updateMapStack(nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlanner::SrsPlanner(string name, costmap_2d::Costmap2DROS* rosCostMap) :
     srsMapStack_(nullptr)
 {
-    ROS_DEBUG("SrsPlanner::SrsPlanner(...) called");
+    ROS_WARN("SrsPlanner::SrsPlanner(...) called");
 
-    initializeParams();
     initialize(name, rosCostMap);
 }
 
@@ -45,10 +44,10 @@ SrsPlanner::~SrsPlanner()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostMap)
 {
-    ROS_DEBUG_STREAM("SrsPlanner::initialize() called");
+    ROS_WARN("SrsPlanner::initialize() called");
 
-    delete srsMapStack_;
-    // ###FS srsMapStack_ = MapFactory::fromRosCostMap2D(rosCostMap, weightObstacleThreshold_);
+    initializeParams();
+    updateMapStack(rosCostMap);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,12 +58,15 @@ bool SrsPlanner::makePlan(
 {
     ROS_WARN("SrsPlanner::makePlan() called");
 
+    // Make sure that we get the latest Map Stack
+    updateMapStack(nullptr);
+
     // Find a suitable solution for the provided goal
     Pose<> robotPose = PoseMessageFactory::poseStamped2Pose(start);
     Pose<> target = PoseMessageFactory::poseStamped2Pose(goal);
 
-    /// ###FS Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(srsMap_, robotPose, target);
-    Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(nullptr, robotPose, target);
+    Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(
+        srsMapStack_->getObstructionMap(), robotPose, target);
 
     plan.clear();
 
@@ -115,6 +117,7 @@ bool SrsPlanner::makePlan(
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlanner::initializeParams()
 {
     ros::NodeHandle private_nh;
@@ -125,7 +128,19 @@ void SrsPlanner::initializeParams()
     private_nh.param("/move_base/global_costmap/inflation_layer/enabled",
         inflationEnabled, true);
 
-    weightObstacleThreshold_ = round((100.0 * (inflationEnabled ? weightScaleFactor_ : 1.0)) * 0.98);
+//    weightObstacleThreshold_ = round((100.0 * (inflationEnabled ? weightScaleFactor_ : 1.0)) * 0.98);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void SrsPlanner::updateMapStack(costmap_2d::Costmap2DROS* rosCostMap)
+{
+    if (tapMapStack_.newDataAvailable())
+    {
+        delete srsMapStack_;
+        srsMapStack_ = tapMapStack_.pop();
+    }
+
+    // TODO: Update the occupancy map in the map stack with the new rosCostMap
 }
 
 } // namespace srs

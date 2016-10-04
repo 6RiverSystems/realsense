@@ -13,6 +13,6 @@
         free_thresh: 0.196,
     },
     logical: {
-        map: empty-logical.json
+        map: empty-logical.geojson
     }
 }

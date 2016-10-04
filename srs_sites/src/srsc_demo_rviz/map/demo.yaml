@@ -14,6 +14,6 @@
         free_thresh: 0.196,
     },
     logical: {
-        map: demo-logical.json
+        map: demo-logical.geojson
     }
 }

@@ -23,9 +23,10 @@ namespace debug {
 
 namespace internal {
 
-    static const string GOAL_TARGET_AREA = "/internal/state/goal/target_area";
+    static const string GOAL_ARRIVED = "/internal/state/goal/arrived";
     static const string GOAL_GOAL = "/internal/state/goal/goal";
     static const string GOAL_PATH = "/internal/state/goal/path";
+    static const string GOAL_TARGET_AREA = "/internal/state/goal/target_area";
 
     static const string GOTO_GOAL = "/move_base_simple/goal";
 
@@ -39,6 +40,13 @@ namespace internal {
     static const string ROBOT_POSE = "/internal/state/robot/pose";
 
 } // namespace internal
+
+namespace sensor {
+
+    static const string JOYPAD_STATE = "/internal/sensors/joypad/state";
+
+    static const string JOYSTICK_RAW = "/joy";
+}
 
 namespace service {
 

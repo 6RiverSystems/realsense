@@ -14,9 +14,9 @@ using namespace std;
 #include <dynamic_reconfigure/server.h>
 
 #include <srslib_framework/robotics/device/JoypadState.hpp>
-#include <srslib_framework/ros/publisher/PublisherSrsJoypadState.hpp>
+#include <srslib_framework/ros/channel/ChannelJoypad.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
-#include <srslib_framework/ros/tap/RosTapJoy.hpp>
+#include <srslib_framework/ros/tap/TapJoy.hpp>
 
 namespace srs {
 
@@ -45,11 +45,11 @@ private:
     Velocity<> currentLeftVelocity_;
     Velocity<> currentRightVelocity_;
 
-    PublisherSrsJoypadState publisherJoypadState_;
+    ChannelJoypad channelJoypad_;
 
     ros::NodeHandle rosNodeHandle_;
 
-    RosTapJoy tapJoy_;
+    TapJoy tapJoy_;
     RosTriggerShutdown triggerShutdown_;
 };
 

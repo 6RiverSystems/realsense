@@ -5,16 +5,17 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/subscriber/SubscriberBoolean.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberBoolean.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
-class RosTapInternal_GoalArrived :
+class TapGoalArrived :
     public SubscriberBoolean
 {
 public:
-    RosTapInternal_GoalArrived() :
-        SubscriberBoolean("/internal/state/goal/arrived")
+    TapGoalArrived() :
+        SubscriberBoolean(ChuckTopics::internal::GOAL_ARRIVED)
     {}
 };
 

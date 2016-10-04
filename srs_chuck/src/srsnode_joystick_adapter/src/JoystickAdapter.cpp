@@ -18,8 +18,7 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 JoystickAdapter::JoystickAdapter(string nodeName) :
-    rosNodeHandle_(nodeName),
-    publisherJoypadState_("/internal/sensors/joystick/state", 50)
+    rosNodeHandle_(nodeName)
 {
     configServer_.setCallback(boost::bind(&JoystickAdapter::onConfigChange, this, _1, _2));
 }
@@ -39,54 +38,54 @@ void JoystickAdapter::run()
         if (tapJoy_.newDataAvailable())
         {
             // Management of the B button: Emergency
-            if (tapJoy_.isButtonPressed(RosTapJoy::BUTTON_B))
+            if (tapJoy_.isButtonPressed(TapJoy::BUTTON_B))
             {
                 joypadState_.buttonEmergency = true;
                 ROS_WARN("The joystick emergency button has been pressed");
             }
-            else if (tapJoy_.isButtonReleased(RosTapJoy::BUTTON_B))
+            else if (tapJoy_.isButtonReleased(TapJoy::BUTTON_B))
             {
                 joypadState_.buttonEmergency = false;
                 ROS_WARN("The joystick emergency button has been released");
             }
 
             // Management of the X button: Generic
-            if (tapJoy_.isButtonPressed(RosTapJoy::BUTTON_X))
+            if (tapJoy_.isButtonPressed(TapJoy::BUTTON_X))
             {
                 joypadState_.buttonX = true;
                 ROS_WARN("The joystick X button has been pressed");
             }
-            else if (tapJoy_.isButtonReleased(RosTapJoy::BUTTON_X))
+            else if (tapJoy_.isButtonReleased(TapJoy::BUTTON_X))
             {
                 joypadState_.buttonX = false;
                 ROS_WARN("The joystick X button has been released");
             }
 
             // Management of the Y button: Generic
-            if (tapJoy_.isButtonPressed(RosTapJoy::BUTTON_Y))
+            if (tapJoy_.isButtonPressed(TapJoy::BUTTON_Y))
             {
                 joypadState_.buttonY = true;
                 ROS_WARN("The joystick Y button has been pressed");
             }
-            else if (tapJoy_.isButtonReleased(RosTapJoy::BUTTON_Y))
+            else if (tapJoy_.isButtonReleased(TapJoy::BUTTON_Y))
             {
                 joypadState_.buttonY = false;
                 ROS_WARN("The joystick Y button has been released");
             }
 
             // Management of the A button: Custom action
-            if (tapJoy_.isButtonPressed(RosTapJoy::BUTTON_A))
+            if (tapJoy_.isButtonPressed(TapJoy::BUTTON_A))
             {
                 joypadState_.buttonAction = true;
                 ROS_INFO("The joystick custom action button has been pressed");
             }
-            else if (tapJoy_.isButtonReleased(RosTapJoy::BUTTON_A))
+            else if (tapJoy_.isButtonReleased(TapJoy::BUTTON_A))
             {
                 joypadState_.buttonAction = false;
                 ROS_INFO("The joystick custom action button has been released");
             }
 
-            if (tapJoy_.isButtonPressed(RosTapJoy::BUTTON_START))
+            if (tapJoy_.isButtonPressed(TapJoy::BUTTON_START))
             {
                 // If the START button has been released
                 // there is no need to do anything else
@@ -117,7 +116,7 @@ void JoystickAdapter::run()
             joypadState_.velocity = Velocity<>(linear, angular);
 
             joypadState_.arrivalTime = ros::Time::now().toSec();
-            publisherJoypadState_.publish(joypadState_);
+            channelJoypad_.publish(joypadState_);
         }
 
         refreshRate.sleep();

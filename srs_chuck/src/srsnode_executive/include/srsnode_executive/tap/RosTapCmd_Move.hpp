@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/subscriber/SubscriberPoseStamped.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberPoseStamped.hpp>
 
 namespace srs {
 

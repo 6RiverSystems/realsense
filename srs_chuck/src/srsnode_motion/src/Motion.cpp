@@ -43,9 +43,8 @@ Motion::Motion(string nodeName) :
     pingTimer_(),
     positionEstimator_(1.0 / REFRESH_RATE_HZ),
     motionController_(1.0 / REFRESH_RATE_HZ),
-    simulatedT_(0.0),
-    pubRobotPose_(ChuckTopics::internal::ROBOT_POSE),
-    pubRobotAccOdometry_(ChuckTopics::debug::ACC_ODOMETRY)
+    simulatedT_(0.0)
+    // ###FS pubRobotAccOdometry_(ChuckTopics::debug::ACC_ODOMETRY)
 {
     positionEstimator_.addSensor(tapAps_.getSensor());
     positionEstimator_.addSensor(tapSensorFrame_.getSensorImu());
@@ -110,7 +109,7 @@ void Motion::run()
         publishLocalized();
         publishCovariance();
 
-        pubRobotAccOdometry_.publish(positionEstimator_.getAccumulatedOdometry());
+        // ###FS pubRobotAccOdometry_.publish(positionEstimator_.getAccumulatedOdometry());
 
         refreshRate.sleep();
     }
@@ -592,23 +591,23 @@ void Motion::scanTapsForData()
     }
 
     // If the joystick was touched, read the state of the latch
-    if (tapJoyAdapter_.newDataAvailable())
+    if (tapJoypad_.newDataAvailable())
     {
         // If the controller emergency button has been pressed, tell
         // the motion controller immediately
-        if (tapJoyAdapter_.getButtonEmergency())
+        if (tapJoypad_.getButtonEmergency())
         {
             motionController_.emergencyStop();
         }
 
-        if (tapJoyAdapter_.getButtonAction())
+        if (tapJoypad_.getButtonAction())
         {
             Pose<> pose = positionEstimator_.getPose();
             positionEstimator_.resetAccumulatedOdometry(&pose);
         }
 
         // Store the latch state for later use
-        isJoystickLatched_ = tapJoyAdapter_.getLatchState();
+        isJoystickLatched_ = tapJoypad_.getLatchState();
     }
 
     // Check if odometry or APS data is available
@@ -656,7 +655,7 @@ void Motion::stepEmulation()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::stepNode()
 {
-    Velocity<> currentJoystickCommand = tapJoyAdapter_.getVelocity();
+    Velocity<> currentJoystickCommand = tapJoypad_.getVelocity();
 
     if (motionController_.isEmergencyDeclared())
     {

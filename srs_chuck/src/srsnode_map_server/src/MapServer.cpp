@@ -25,20 +25,16 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 MapServer::MapServer(string name, int argc, char** argv) :
     RosUnit(name, argc, argv, REFRESH_RATE_HZ),
-    mapStack_(nullptr),
-    pubRosMapMetadata_(ChuckTopics::internal::MAP_ROS_METADATA, 1, true),
-    pubMapStack_(ChuckTopics::internal::MAP_STACK, 1, true),
-    pubOccupancyGrid_(ChuckTopics::internal::MAP_ROS_OCCUPANCY, 1, true)
+    mapStack_(nullptr)
 {
-    string mapFilename;
-    rosNodeHandle_.param("map_stack", mapFilename, string("/home/fsantini/projects/repos/ros/srs_sites/src/srsc_empty/map/empty.yaml"));
+    rosNodeHandle_.param("map_stack", mapStackFilename_,
+        string("/home/fsantini/projects/repos/ros/srs_sites/src/srsc_empty/map/empty.yaml"));
 
-    ROS_INFO_STREAM("Target map: " << mapFilename);
+    ROS_INFO_STREAM("Target map stack: " << mapStackFilename_);
 
-    string frame_id;
-    rosNodeHandle_.param("/frame_id", frame_id, string("map"));
+    rosNodeHandle_.param("/frame_id", frameId_, string("map"));
 
-    mapStack_ = MapStackFactory::fromJsonFile(mapFilename);
+    mapStack_ = MapStackFactory::fromJsonFile(mapStackFilename_);
 
     serviceMapRequest_ = rosNodeHandle_.advertiseService(ChuckTopics::service::GET_MAP_OCCUPANCY,
         &MapServer::callbackMapRequest, this);
@@ -86,8 +82,9 @@ void MapServer::evaluateTriggers()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MapServer::publishMap()
 {
-    pubMapStack_.publish(mapStack_);
-    pubOccupancyGrid_.publish(mapStack_->getOccupancyMap());
+    channelMapStack_.publish(mapStack_);
+    channelRosMapMetadata_.publish(mapStack_->getOccupancyMap()->getMetadata());
+    channelRosOccupancyGrid_.publish(mapStack_->getOccupancyMap());
 }
 
 } // namespace srs

@@ -28,6 +28,12 @@ OccupancyMap* OccupancyMapFactory::fromMetadata(OccupancyMetadata metadata)
 
     OccupancyMap* map = new OccupancyMap(metadata.widthCells, metadata.heightCells, metadata.resolution);
 
+    map->setLoadTime(metadata.loadTime);
+    map->setNegate(metadata.negate);
+    map->setOccupancyFilename(metadata.occupancyFilename);
+    map->setOrigin(metadata.origin);
+    map->setThresholds(metadata.thresholdFree, metadata.thresholdOccupied);
+
     int channels = image->format->BytesPerPixel;
     switch (channels)
     {

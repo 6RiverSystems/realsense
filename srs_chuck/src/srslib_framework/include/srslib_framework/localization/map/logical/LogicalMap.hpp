@@ -21,6 +21,11 @@ public:
     ~LogicalMap()
     {}
 
+    unsigned int getCost(unsigned int c, unsigned int r) const
+    {
+        return 0;
+    }
+
     LogicalMetadata getMetadata() const
     {
         return logicalMetadata_;

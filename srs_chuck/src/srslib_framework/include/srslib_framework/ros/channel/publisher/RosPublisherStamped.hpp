@@ -10,7 +10,7 @@ using namespace std;
 
 #include <ros/ros.h>
 
-#include <srslib_framework/ros/publisher/RosPublisher.hpp>
+#include <srslib_framework/ros/channel/publisher/RosPublisher.hpp>
 
 namespace srs {
 

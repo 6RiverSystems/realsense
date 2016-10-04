@@ -9,19 +9,20 @@
 using namespace std;
 
 #include <srslib_framework/robotics/Velocity.hpp>
-#include <srslib_framework/ros/subscriber/SubscriberSrsJoypadState.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberJoypadState.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
-class RosTapJoyAdapter :
-    public SubscriberSrsJoypadState
+class TapJoypad :
+    public SubscriberJoypadState
 {
 public:
-    RosTapJoyAdapter() :
-        SubscriberSrsJoypadState("/internal/sensors/joystick/state", 1000)
+    TapJoypad() :
+        SubscriberJoypadState(ChuckTopics::sensor::JOYPAD_STATE, 1000)
     {}
 
-    ~RosTapJoyAdapter()
+    ~TapJoypad()
     {}
 
     bool getButtonAction()

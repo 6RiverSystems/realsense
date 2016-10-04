@@ -11,7 +11,7 @@ using namespace std;
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 
-#include <srslib_framework/ros/subscriber/RosSubscriberSingleData.hpp>
+#include <srslib_framework/ros/tap/subscriber/RosSubscriberSingleData.hpp>
 
 namespace srs {
 

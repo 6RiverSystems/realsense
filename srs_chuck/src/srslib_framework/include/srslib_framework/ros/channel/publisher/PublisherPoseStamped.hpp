@@ -10,7 +10,7 @@ using namespace std;
 
 #include <geometry_msgs/PoseStamped.h>
 
-#include <srslib_framework/ros/publisher/RosPublisherStamped.hpp>
+#include <srslib_framework/ros/channel/publisher/RosPublisherStamped.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
 namespace srs {

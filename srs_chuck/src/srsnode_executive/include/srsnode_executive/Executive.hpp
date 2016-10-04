@@ -11,14 +11,14 @@
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/ros/publisher/PublisherBoolean.hpp>
-#include <srslib_framework/ros/publisher/PublisherPolygonStamped.hpp>
-#include <srslib_framework/ros/publisher/PublisherPose.hpp>
-#include <srslib_framework/ros/publisher/PublisherPoseStamped.hpp>
-#include <srslib_framework/ros/tap/RosTapMapStack.hpp>
-#include <srslib_framework/ros/tap/RosTapInternal_GoalArrived.hpp>
-#include <srslib_framework/ros/tap/RosTapInternal_RobotPose.hpp>
-#include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
+#include <srslib_framework/ros/channel/publisher/PublisherBoolean.hpp>
+#include <srslib_framework/ros/channel/publisher/PublisherPolygonStamped.hpp>
+#include <srslib_framework/ros/channel/publisher/PublisherPose.hpp>
+#include <srslib_framework/ros/channel/publisher/PublisherPoseStamped.hpp>
+#include <srslib_framework/ros/tap/TapGoalArrived.hpp>
+#include <srslib_framework/ros/tap/TapMapStack.hpp>
+#include <srslib_framework/ros/tap/TapRobotPose.hpp>
+#include <srslib_framework/ros/tap/TapJoypad.hpp>
 #include <srslib_framework/ros/tap/RosTapOperationalState.hpp>
 #include <srslib_framework/search/AStar.hpp>
 
@@ -101,12 +101,11 @@ private:
     RosTapCmd_InitialPose tapCmdInitialPose_;
     RosTapCmd_Move tapCmdMove_;
     RosTapCmd_Shutdown tapCmdShutdown_;
-    RosTapInternal_GoalArrived tapInternal_GoalArrived_;
-    RosTapInternal_RobotPose tapInternal_RobotPose_;
+    TapGoalArrived tapGoalArrived_;
+    TapRobotPose tapRobotPose_;
     RosTapOperationalState tapOperationalState_;
-    RosTapJoyAdapter tapJoyAdapter_;
-
-    RosTapMapStack tapMapStack_;
+    TapJoypad tapJoyAdapter_;
+    TapMapStack tapMapStack_;
 };
 
 } // namespace srs

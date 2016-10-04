@@ -229,7 +229,7 @@ void Executive::publishInternalInitialPose(Pose<> initialPose)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::stepChecks()
 {
-    Pose<> updatedRobotPose = tapInternal_RobotPose_.peek();
+    Pose<> updatedRobotPose = tapRobotPose_.peek();
 
     // Run these checks only if the joystick hasn't latched
     if (isExecutingSolution())
@@ -279,9 +279,9 @@ void Executive::stepExecutiveFunctions()
         executeInitialPose();
     }
 
-    if (tapInternal_GoalArrived_.newDataAvailable())
+    if (tapGoalArrived_.newDataAvailable())
     {
-        arrived_ = tapInternal_GoalArrived_.pop();
+        arrived_ = tapGoalArrived_.pop();
         executeArrived();
     }
 

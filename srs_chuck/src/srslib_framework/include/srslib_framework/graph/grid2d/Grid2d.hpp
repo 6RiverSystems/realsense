@@ -115,6 +115,20 @@ public:
         return height_;
     }
 
+    unsigned int getCost(unsigned int c, unsigned int r) const
+    {
+        Grid2dLocation location = Grid2dLocation(c, r);
+
+        auto found = grid_.find(location);
+        if (found != grid_.end())
+        {
+            return found->second->getCost();
+        }
+
+        return 0;
+    }
+
+    // TODO: remove this when optimizing A*
     unsigned int getCost(Grid2dLocation location) const
     {
         auto found = grid_.find(location);

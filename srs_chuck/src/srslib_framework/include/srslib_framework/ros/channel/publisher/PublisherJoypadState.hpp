@@ -10,16 +10,16 @@ using namespace std;
 
 #include <srslib_framework/JoypadState.h>
 
-#include <srslib_framework/ros/publisher/RosPublisher.hpp>
+#include <srslib_framework/ros/channel/publisher/RosPublisher.hpp>
 #include <srslib_framework/ros/message/JoypadStateMessageFactory.hpp>
 
 namespace srs {
 
-class PublisherSrsJoypadState :
+class PublisherJoypadState :
     public RosPublisher<srslib_framework::JoypadState, const JoypadState&>
 {
 public:
-    PublisherSrsJoypadState(string topic,
+    PublisherJoypadState(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :

@@ -12,7 +12,7 @@ using namespace std;
 
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/ros/message/MapMessageFactory.hpp>
-#include <srslib_framework/ros/publisher/RosPublisher.hpp>
+#include <srslib_framework/ros/channel/publisher/RosPublisher.hpp>
 
 namespace srs {
 

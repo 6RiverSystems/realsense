@@ -20,6 +20,11 @@ public:
     OccupancyMap(unsigned int widthCells, unsigned int heightCells, double resolution);
     ~OccupancyMap();
 
+    unsigned int getCost(unsigned int c, unsigned int r) const
+    {
+        return getGrid()->getCost(c, r);
+    }
+
     OccupancyMetadata getMetadata() const
     {
         return occupancyMetadata_;
@@ -28,6 +33,33 @@ public:
     friend ostream& operator<<(ostream& stream, const OccupancyMap& map);
 
     void setCost(int c, int r, unsigned int cost);
+
+    void setLoadTime(double loadTime)
+    {
+        occupancyMetadata_.loadTime = loadTime;
+    }
+
+    void setOrigin(Pose<> origin)
+    {
+        occupancyMetadata_.origin = origin;
+    }
+
+    void setOccupancyFilename(string filename)
+    {
+        occupancyMetadata_.occupancyFilename = filename;
+    }
+
+    void setNegate(bool negate)
+    {
+        occupancyMetadata_.negate = negate;
+    }
+
+    void setThresholds(double free, double occupied)
+    {
+        occupancyMetadata_.thresholdFree = free;
+        occupancyMetadata_.thresholdOccupied = occupied;
+    }
+
     void setObstruction(int c, int r);
 
 protected:

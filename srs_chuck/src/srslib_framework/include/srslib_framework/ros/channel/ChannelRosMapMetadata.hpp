@@ -5,17 +5,17 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/subscriber/SubscriberPose.hpp>
+#include <srslib_framework/ros/channel/publisher/PublisherRosMapMetadata.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
-class RosTapInternal_InitialPose :
-    public SubscriberPose
+class ChannelRosMapMetadata :
+    public PublisherRosMapMetadata
 {
 public:
-    RosTapInternal_InitialPose() :
-        SubscriberPose(ChuckTopics::internal::INITIAL_POSE)
+    ChannelRosMapMetadata() :
+        PublisherRosMapMetadata(ChuckTopics::internal::MAP_ROS_METADATA, 1, true)
     {}
 };
 

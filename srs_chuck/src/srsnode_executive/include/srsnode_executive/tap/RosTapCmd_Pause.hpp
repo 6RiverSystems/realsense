@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/subscriber/SubscriberBoolean.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberBoolean.hpp>
 
 namespace srs {
 

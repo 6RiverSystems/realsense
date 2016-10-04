@@ -3,20 +3,20 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSTAPJOY_HPP_
-#define ROSTAPJOY_HPP_
+#pragma once
 
 #include <algorithm>
 using namespace std;
 
 #include <sensor_msgs/Joy.h>
 
-#include <srslib_framework/ros/subscriber/RosSubscriber.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
+#include <srslib_framework/ros/tap/subscriber/RosSubscriber.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
-class RosTapJoy :
+class TapJoy :
     public RosSubscriber<sensor_msgs::Joy>
 {
 public:
@@ -36,8 +36,8 @@ public:
         BUTTON_MODE = 12
     };
 
-    RosTapJoy() :
-        RosSubscriber("/joy", 10, "~"),
+    TapJoy() :
+        RosSubscriber(ChuckTopics::sensor::JOYSTICK_RAW, 10, "~"),
         joystickLeft_(Velocity<>::INVALID),
         joystickRight_(Velocity<>::INVALID)
     {
@@ -45,7 +45,7 @@ public:
         fill(previousButtons_, previousButtons_ + MAX_NUMBER_BUTTONS, 0);
     }
 
-    ~RosTapJoy()
+    ~TapJoy()
     {}
 
     bool anyButtonChanged()
@@ -177,5 +177,3 @@ private:
 };
 
 } // namespace srs
-
-#endif // ROSTAPJOY_HPP_

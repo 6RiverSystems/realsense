@@ -10,7 +10,7 @@ using namespace std;
 
 #include <geometry_msgs/PolygonStamped.h>
 
-#include <srslib_framework/ros/publisher/RosPublisherStamped.hpp>
+#include <srslib_framework/ros/channel/publisher/RosPublisherStamped.hpp>
 
 namespace srs {
 

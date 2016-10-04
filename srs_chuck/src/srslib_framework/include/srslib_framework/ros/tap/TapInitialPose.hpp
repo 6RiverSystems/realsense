@@ -5,17 +5,17 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/subscriber/SubscriberPose.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberPose.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
-class RosTapInternal_RobotPose :
+class TapInitialPose :
     public SubscriberPose
 {
 public:
-    RosTapInternal_RobotPose() :
-        SubscriberPose(ChuckTopics::internal::ROBOT_POSE)
+    TapInitialPose() :
+        SubscriberPose(ChuckTopics::internal::INITIAL_POSE)
     {}
 };
 

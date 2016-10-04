@@ -12,7 +12,7 @@ using namespace std;
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 #include <srslib_framework/robotics/Velocity.hpp>
-#include <srslib_framework/ros/subscriber/RosSubscriberSingleData.hpp>
+#include <srslib_framework/ros/tap/subscriber/RosSubscriberSingleData.hpp>
 #include <srslib_framework/ros/message/VelocityMessageFactory.hpp>
 
 namespace srs {

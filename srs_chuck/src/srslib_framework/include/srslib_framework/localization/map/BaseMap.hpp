@@ -22,6 +22,8 @@ public:
     BaseMap(unsigned int widthCells, unsigned int heightCells, double resolution);
     virtual ~BaseMap();
 
+    virtual unsigned int getCost(unsigned int c, unsigned int r) const = 0;
+
     int getHeightCells() const
     {
         return grid_->getHeight();
@@ -71,7 +73,7 @@ public:
     virtual void setCost(int c, int r, unsigned int cost) = 0;
     virtual void setObstruction(int c, int r) = 0;
 
-protected:
+private:
 
     double heightM_;
 

@@ -12,24 +12,24 @@ using namespace std;
 
 #include <srslib_framework/localization/map/occupancy/OccupancyMetadata.hpp>
 #include <srslib_framework/ros/message/MapMessageFactory.hpp>
-#include <srslib_framework/ros/publisher/RosPublisher.hpp>
+#include <srslib_framework/ros/channel/publisher/RosPublisher.hpp>
 
 namespace srs {
 
-class PublisherRosMapMetadata :
-    public RosPublisher<nav_msgs::MapMetaData, const OccupancyMetadata&>
+class PublisherRosOccupancyGrid :
+    public RosPublisher<nav_msgs::OccupancyGrid, const OccupancyMap*>
 {
 public:
-    PublisherRosMapMetadata(string topic,
+    PublisherRosOccupancyGrid(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
             RosPublisher(topic, buffer, latched, nameSpace)
     {}
 
-    nav_msgs::MapMetaData convertData(const OccupancyMetadata& data)
+    nav_msgs::OccupancyGrid convertData(const OccupancyMap* data)
     {
-        return MapMessageFactory::metadata2RosMsg(data);
+        return MapMessageFactory::occupancyMap2Msg(data);
     }
 };
 

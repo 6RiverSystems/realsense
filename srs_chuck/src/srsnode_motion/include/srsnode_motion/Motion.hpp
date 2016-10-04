@@ -14,12 +14,12 @@
 
 #include <srslib_framework/graph/grid2d/Grid2d.hpp>
 
-#include <srslib_framework/ros/publisher/PublisherPose.hpp>
+#include <srslib_framework/ros/channel/ChannelRobotPose.hpp>
 #include <srslib_framework/ros/tap/RosTapBrainStem.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_GoalSolution.hpp>
-#include <srslib_framework/ros/tap/RosTapInternal_InitialPose.hpp>
-#include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
-#include <srslib_framework/ros/tap/RosTapMapStack.hpp>
+#include <srslib_framework/ros/tap/TapInitialPose.hpp>
+#include <srslib_framework/ros/tap/TapJoypad.hpp>
+#include <srslib_framework/ros/tap/TapMapStack.hpp>
 #include <srslib_framework/ros/service/RosServiceExecuteSolution.hpp>
 #include <srslib_framework/ros/service/RosTriggerPause.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
@@ -94,8 +94,8 @@ private:
     ros::Time previousTime_;
     ros::Publisher pubOdometry_;
     ros::Publisher pubPing_;
-    PublisherPose pubRobotAccOdometry_;
-    PublisherPose pubRobotPose_;
+    // ###FS PublisherPose pubRobotAccOdometry_;
+    ChannelRobotPose pubRobotPose_;
     ros::Publisher pubStatusGoalArrived_;
     ros::Publisher pubStatusGoalLanding_;
     ros::Publisher pubRobotLocalized_;
@@ -113,9 +113,9 @@ private:
     RosTapBrainStem tapBrainStem_;
     RosTapSensorFrame tapSensorFrame_;
     RosTapInternal_GoalSolution tapInternalGoalSolution_;
-    RosTapInternal_InitialPose tapInitialPose_;
-    RosTapJoyAdapter tapJoyAdapter_;
-    RosTapMapStack tapMapStack_;
+    TapInitialPose tapInitialPose_;
+    TapJoypad tapJoypad_;
+    TapMapStack tapMapStack_;
 
     RosServiceExecuteSolution triggerExecuteSolution_;
     RosTriggerPause triggerPause_;

@@ -15,7 +15,7 @@ class ChannelRosOccupancyGrid :
 {
 public:
     ChannelRosOccupancyGrid() :
-        PublisherRosOccupancyGrid(ChuckTopics::internal::MAP_ROS_OCCUPANCY, 1, true)
+        PublisherRosOccupancyGrid(ChuckTopics::internal::MAP_ROS_OCCUPANCY, "map", 1, true)
     {}
 };
 

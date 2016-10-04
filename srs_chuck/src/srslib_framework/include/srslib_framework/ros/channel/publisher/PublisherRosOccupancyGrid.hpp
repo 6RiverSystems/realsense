@@ -20,17 +20,21 @@ class PublisherRosOccupancyGrid :
     public RosPublisher<nav_msgs::OccupancyGrid, const OccupancyMap*>
 {
 public:
-    PublisherRosOccupancyGrid(string topic,
+    PublisherRosOccupancyGrid(string topic, string frameId,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
-            RosPublisher(topic, buffer, latched, nameSpace)
+            RosPublisher(topic, buffer, latched, nameSpace),
+            frameId_(frameId)
     {}
 
     nav_msgs::OccupancyGrid convertData(const OccupancyMap* data)
     {
-        return MapMessageFactory::occupancyMap2Msg(data);
+        return MapMessageFactory::occupancyMap2Msg(data, frameId_);
     }
+
+private:
+    string frameId_;
 };
 
 } // namespace srs

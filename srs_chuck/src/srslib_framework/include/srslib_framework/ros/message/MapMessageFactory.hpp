@@ -248,10 +248,11 @@ struct MapMessageFactory
      * @brief Convert a Occupancy Map type into a ROS OccupancyGrid message.
      *
      * @param map Occupancy map to convert
+     * @param frameId Frame id of the occupancy map
      *
      * @return Ros OccupancyGrid message generated from the specified occupancy map
      */
-    static nav_msgs::OccupancyGrid occupancyMap2Msg(const OccupancyMap* map)
+    static nav_msgs::OccupancyGrid occupancyMap2Msg(const OccupancyMap* map, string frameId)
     {
         vector<int8_t> occupancy;
         OccupancyMapUtils::map2Occupancy(map, occupancy);
@@ -260,7 +261,7 @@ struct MapMessageFactory
 
         msgOccupancyMap.info = MapMessageFactory::metadata2RosMsg(map->getMetadata());
         msgOccupancyMap.data = occupancy;
-        msgOccupancyMap.header.frame_id = "map";
+        msgOccupancyMap.header.frame_id = frameId;
 
         return msgOccupancyMap;
     }

@@ -68,7 +68,8 @@ set(TEST_SOURCES_GRAPH
 )
 
 set(TEST_SOURCES_LOCALIZATION
-    test/localization/Test_Map_Reconstruction.cpp
+#    test/localization/Test_Map_Reconstruction.cpp
+    test/localization/map/logical/Test_Empty_BasicRead.cpp
 )
 
 set(TEST_SOURCES_MATH

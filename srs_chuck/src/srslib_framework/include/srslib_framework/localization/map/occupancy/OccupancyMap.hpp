@@ -32,7 +32,7 @@ public:
 
     friend ostream& operator<<(ostream& stream, const OccupancyMap& map);
 
-    void setCost(int c, int r, unsigned int cost);
+    void setCost(unsigned int c, unsigned int r, unsigned int cost);
 
     void setLoadTime(double loadTime)
     {
@@ -60,7 +60,7 @@ public:
         occupancyMetadata_.thresholdOccupied = occupied;
     }
 
-    void setObstruction(int c, int r);
+    void setObstruction(unsigned int c, unsigned int r);
 
 protected:
     OccupancyMetadata occupancyMetadata_;

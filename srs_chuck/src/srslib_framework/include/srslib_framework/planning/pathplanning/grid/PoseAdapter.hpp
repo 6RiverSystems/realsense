@@ -21,8 +21,8 @@ struct PoseAdapter
 {
     static void pose2Map(Pose<> pose, BaseMap* map, Grid2d::LocationType& location, int& orientation)
     {
-        int r = 0;
-        int c = 0;
+        unsigned int r = 0;
+        unsigned int c = 0;
         map->getMapCoordinates(pose.x, pose.y, c, r);
 
         location = Grid2d::LocationType(c, r);

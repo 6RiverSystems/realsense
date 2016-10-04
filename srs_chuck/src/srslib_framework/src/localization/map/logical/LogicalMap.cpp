@@ -11,20 +11,25 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap::LogicalMap(unsigned int widthCells, unsigned int heightCells, double resolution) :
-        BaseMap(widthCells, heightCells, resolution)
+LogicalMap::LogicalMap(double widthM, double heightM, double resolution) :
+        BaseMap(widthM, heightM, resolution)
 {
+    logicalMetadata_.heightCells = getHeightCells();
+    logicalMetadata_.heightM = heightM;
+    logicalMetadata_.resolution = resolution;
+    logicalMetadata_.widthCells = getWidthCells();
+    logicalMetadata_.widthM = widthM;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::setCost(int c, int r, unsigned int cost)
+void LogicalMap::setCost(unsigned int c, unsigned int r, unsigned int cost)
 {
 //    Grid2dLocation location = Grid2dLocation(c, r);
 //    grid_->addValue(location, cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::setObstruction(int c, int r)
+void LogicalMap::setObstruction(unsigned int c, unsigned int r)
 {
 //    Grid2dLocation location = Grid2dLocation(c, r);
 //    void* note = reinterpret_cast<void*>(MapNote::instanceOf(MapNote::STATIC_OBSTACLE));

@@ -27,10 +27,6 @@ static constexpr double DEG90 = AngleMath::deg2Rad<double>(90);
 static constexpr double DEG180 = AngleMath::deg2Rad<double>(180);
 static constexpr double DEG270 = AngleMath::deg2Rad<double>(270);
 
-#include <string>
-#include <limits.h>
-#include <unistd.h>
-
 TEST(Test_Trajectory, Empty_Consecutive)
 {
     Pose<> robotPose = Pose<>(3, 3, DEG0);

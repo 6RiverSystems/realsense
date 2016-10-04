@@ -16,6 +16,19 @@ BaseMap::BaseMap(unsigned int widthCells, unsigned int heightCells, double resol
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+BaseMap::BaseMap(double widthM, double heightM, double resolution) :
+        grid_(nullptr),
+        resolution_(resolution),
+        widthM_(widthM),
+        heightM_(heightM)
+{
+    unsigned int widthCells = static_cast<unsigned int>(round(widthM / resolution_));
+    unsigned int heightCells = static_cast<unsigned int>(round(heightM / resolution_));
+
+    grid_ = new Grid2d(widthCells, heightCells);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 BaseMap::~BaseMap()
 {
     delete grid_;

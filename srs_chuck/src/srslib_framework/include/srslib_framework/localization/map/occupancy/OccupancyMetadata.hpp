@@ -28,24 +28,23 @@ public:
         negate(false)
     {}
 
-    double loadTime;
-
     int heightCells;
     double heightM;
 
+    double loadTime;
+
+    bool negate;
+
+    string occupancyFilename;
     Pose<> origin;
 
     double resolution;
 
-    int widthCells;
-    double widthM;
-
-    string occupancyFilename;
-
-    bool negate;
-
     double thresholdFree;
     double thresholdOccupied;
+
+    int widthCells;
+    double widthM;
 };
 
 } // namespace srs

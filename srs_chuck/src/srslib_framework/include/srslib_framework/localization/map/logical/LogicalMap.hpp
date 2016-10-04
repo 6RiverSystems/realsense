@@ -17,7 +17,7 @@ namespace srs {
 class LogicalMap : public BaseMap
 {
 public:
-    LogicalMap(unsigned int widthCells, unsigned int heightCells, double resolution);
+    LogicalMap(double widthM, double heightM, double resolution);
     ~LogicalMap()
     {}
 
@@ -33,8 +33,23 @@ public:
 
     friend ostream& operator<<(ostream& stream, const LogicalMap& map);
 
-    void setCost(int c, int r, unsigned int cost);
-    void setObstruction(int c, int r);
+    void setObstruction(unsigned int c, unsigned int r);
+    void setCost(unsigned int c, unsigned int r, unsigned int cost);
+
+    void setLoadTime(double loadTime)
+    {
+        logicalMetadata_.loadTime = loadTime;
+    }
+
+    void setOrigin(Pose<> origin)
+    {
+        logicalMetadata_.origin = origin;
+    }
+
+    void setLogicalFilename(string filename)
+    {
+        logicalMetadata_.logicalFilename = filename;
+    }
 
 private:
     LogicalMetadata logicalMetadata_;

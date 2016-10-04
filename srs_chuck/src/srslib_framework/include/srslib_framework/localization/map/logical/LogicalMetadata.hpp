@@ -16,12 +16,27 @@ struct LogicalMetadata
 public:
     LogicalMetadata() :
         loadTime(0),
+        heightCells(0),
+        widthCells(0),
+        heightM(0.0),
+        widthM(0.0),
+        origin(Pose<>::INVALID),
+        resolution(0.0),
         logicalFilename("")
     {}
 
-    double loadTime;
+    int heightCells;
+    double heightM;
 
+    double loadTime;
     string logicalFilename;
+
+    Pose<> origin;
+
+    double resolution;
+
+    int widthCells;
+    double widthM;
 };
 
 } // namespace srs

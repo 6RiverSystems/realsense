@@ -9,10 +9,10 @@ namespace srs {
 OccupancyMap::OccupancyMap(unsigned int widthCells, unsigned int heightCells, double resolution) :
         BaseMap(widthCells, heightCells, resolution)
 {
-    occupancyMetadata_.heightCells = getHeightCells();
+    occupancyMetadata_.heightCells = heightCells;
     occupancyMetadata_.heightM = getHeightMeters();
     occupancyMetadata_.resolution = resolution;
-    occupancyMetadata_.widthCells = getWidthCells();
+    occupancyMetadata_.widthCells = widthCells;
     occupancyMetadata_.widthM = getWidthMeters();
 }
 
@@ -22,14 +22,14 @@ OccupancyMap::~OccupancyMap()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void OccupancyMap::setCost(int c, int r, unsigned int cost)
+void OccupancyMap::setCost(unsigned int c, unsigned int r, unsigned int cost)
 {
     Grid2dLocation location = Grid2dLocation(c, r);
     getGrid()->addValue(location, cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void OccupancyMap::setObstruction(int c, int r)
+void OccupancyMap::setObstruction(unsigned int c, unsigned int r)
 {
     Grid2dLocation location = Grid2dLocation(c, r);
     getGrid()->addValue(location, numeric_limits<unsigned int>::max(), nullptr);

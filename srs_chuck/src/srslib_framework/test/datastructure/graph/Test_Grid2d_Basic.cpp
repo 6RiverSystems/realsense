@@ -9,11 +9,11 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/AStar.hpp>
 using namespace srs;
 
-#include <srslib_test/graph/grid2d/Grid2dUtils.hpp>
+#include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
 
 TEST(Test_Graph, Grid2dCreation)
 {

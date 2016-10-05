@@ -10,8 +10,8 @@
 #include <unordered_map>
 using namespace std;
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
-#include <srslib_framework/datastructure/MappedPriorityQueue.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/queue/MappedPriorityQueue.hpp>
 #include <srslib_framework/search/SearchNode.hpp>
 #include <srslib_framework/search/SearchAction.hpp>
 #include <srslib_framework/search/SearchPosition.hpp>

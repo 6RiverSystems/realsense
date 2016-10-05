@@ -6,7 +6,7 @@
 #ifndef EXECUTIVE_HPP_
 #define EXECUTIVE_HPP_
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>

@@ -12,7 +12,7 @@
 
 #include <dynamic_reconfigure/server.h>
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 
 #include <srslib_framework/ros/channel/ChannelRobotPose.hpp>
 #include <srslib_framework/ros/tap/RosTapBrainStem.hpp>

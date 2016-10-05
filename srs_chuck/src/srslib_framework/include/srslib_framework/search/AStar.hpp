@@ -14,7 +14,7 @@ using namespace std;
 
 #include <srslib_framework/math/AngleMath.hpp>
 
-#include <srslib_framework/datastructure/MappedPriorityQueue.hpp>
+#include <srslib_framework/datastructure/queue/MappedPriorityQueue.hpp>
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
 #include <srslib_framework/search/SearchNode.hpp>

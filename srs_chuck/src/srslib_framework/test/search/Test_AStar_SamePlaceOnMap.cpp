@@ -10,9 +10,7 @@ using namespace std;
 
 #include <ros/ros.h>
 
-// #include <srslib_framework/localization/Map.hpp>
-
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>

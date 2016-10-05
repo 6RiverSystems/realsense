@@ -55,16 +55,13 @@ set(${PROJECT_NAME}_SRVS
 )
 
 set(TEST_SOURCES_DATASTRUCTURE
-    test/datastructure/Test_MappedPriorityQueue_Basic.cpp
-    test/datastructure/Test_MappedPriorityQueue_UserDefinedKey.cpp
+    test/datastructure/graph/Test_Grid2d_Basic.cpp
+    test/datastructure/queue/Test_MappedPriorityQueue_Basic.cpp
+    test/datastructure/queue/Test_MappedPriorityQueue_UserDefinedKey.cpp
 )
 
 set(TEST_SOURCES_FILTER
     test/filter/ukf/Test_Ukf_Basic.cpp
-)
-
-set(TEST_SOURCES_GRAPH
-    test/graph/Test_Grid2d_Basic.cpp
 )
 
 set(TEST_SOURCES_LOCALIZATION
@@ -199,8 +196,6 @@ target_link_libraries(${PROJECT_LIBRARY}
 
 if (CATKIN_ENABLE_TESTING)
 
-#    file(COPY data DESTINATION "/tmp/${PROJECT_NAME}")
-
     catkin_add_gtest(TestSuite_Datastructure
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
@@ -218,16 +213,6 @@ if (CATKIN_ENABLE_TESTING)
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/filter
     )
     target_link_libraries(TestSuite_Filter
-        ${PROJECT_LIBRARY}
-    )
-
-    catkin_add_gtest(TestSuite_Graph
-        test/TestSuite.cpp
-        ${${PROJECT_NAME}_SOURCES}
-        ${TEST_SOURCES_GRAPH}
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/graph
-    )
-    target_link_libraries(TestSuite_Graph
         ${PROJECT_LIBRARY}
     )
 

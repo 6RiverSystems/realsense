@@ -12,16 +12,37 @@
 #include <unordered_map>
 using namespace std;
 
+#include <srslib_framework/datastructure/graph/grid2d/Grid2dLocation.hpp>
 #include <srslib_framework/math/BasicMath.hpp>
-#include <srslib_framework/graph/grid2d/Grid2dLocation.hpp>
-#include <srslib_framework/graph/grid2d/Grid2dNode.hpp>
 
 namespace srs {
 
 class Grid2d
 {
 private:
-    typedef unordered_map<Grid2dLocation, Grid2dNode*> BaseGridType;
+    class InternalNode
+    {
+    public:
+        InternalNode(Grid2dLocation location, unsigned int cost, void* notes) :
+            location(location),
+            cost(cost),
+            notes(notes)
+        {}
+
+        friend ostream& operator<<(ostream& stream, const InternalNode* node)
+        {
+            stream << "InternalNode "<< hex << reinterpret_cast<long>(node) << dec << " {" << '\n';
+            stream << "  l: " << node->location << " c: " << node->cost <<
+                " n: " << node->notes << "\n}";
+            return stream;
+        }
+
+        unsigned int cost;
+        const Grid2dLocation location;
+        void* notes;
+    };
+
+    typedef unordered_map<Grid2dLocation, InternalNode*> BaseGridType;
 
 public:
     typedef Grid2dLocation LocationType;
@@ -46,13 +67,13 @@ public:
         auto found = findLocation(c, r);
         if (found != grid_.end())
         {
-            Grid2dNode* node = found->second;
+            InternalNode* node = found->second;
             node->cost = BasicMath::noOverflowAdd(node->cost, cost);
         }
         else
         {
             Grid2dLocation location = Grid2dLocation(c, r);
-            grid_[location] = new Grid2dNode(location, cost, nullptr);
+            grid_[location] = new InternalNode(location, cost, nullptr);
         }
     }
 
@@ -61,12 +82,12 @@ public:
         auto found = grid_.find(location);
         if (found != grid_.end())
         {
-            Grid2dNode* node = found->second;
+            InternalNode* node = found->second;
             node->notes = notes;
         }
         else
         {
-            grid_[location] = new Grid2dNode(location, 0, notes);
+            grid_[location] = new InternalNode(location, 0, notes);
         }
     }
 
@@ -76,13 +97,13 @@ public:
         auto found = grid_.find(location);
         if (found != grid_.end())
         {
-            Grid2dNode* node = found->second;
+            InternalNode* node = found->second;
             node->cost = cost;
             node->notes = notes;
         }
         else
         {
-            grid_[location] = new Grid2dNode(location, cost, notes);
+            grid_[location] = new InternalNode(location, cost, notes);
         }
     }
 
@@ -225,7 +246,7 @@ public:
 
                 if (grid.exists(nodeLocation))
                 {
-                    Grid2dNode* node = grid.grid_.at(nodeLocation);
+                    InternalNode* node = grid.grid_.at(nodeLocation);
                     stream << right << setw(WIDTH - 1) << node->cost;
                     stream << (node->notes ? '*' : ' ');
                 }
@@ -247,13 +268,13 @@ public:
         auto found = findLocation(c, r);
         if (found != grid_.end())
         {
-            Grid2dNode* node = found->second;
+            InternalNode* node = found->second;
             node->cost = cost;
         }
         else
         {
             Grid2dLocation location = Grid2dLocation(c, r);
-            grid_[location] = new Grid2dNode(location, cost, nullptr);
+            grid_[location] = new InternalNode(location, cost, nullptr);
         }
     }
 

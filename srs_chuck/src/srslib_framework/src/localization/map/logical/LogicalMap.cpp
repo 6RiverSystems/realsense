@@ -3,7 +3,7 @@
 #include <limits>
 
 #include <srslib_framework/utils/Filesystem.hpp>
-#include <srslib_framework/graph/grid2d/Grid2dLocation.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/Grid2dLocation.hpp>
 
 namespace srs {
 

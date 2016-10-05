@@ -9,7 +9,7 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/datastructure/MappedPriorityQueue.hpp>
+#include <srslib_framework/datastructure/queue/MappedPriorityQueue.hpp>
 #include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 

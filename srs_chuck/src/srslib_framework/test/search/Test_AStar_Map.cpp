@@ -9,7 +9,7 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_framework/search/AStar.hpp>

@@ -11,7 +11,7 @@ using namespace std;
 
 #include <tf/tf.h>
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {

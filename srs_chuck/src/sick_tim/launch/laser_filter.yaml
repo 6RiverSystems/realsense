@@ -1,8 +1,8 @@
-#scan_filter_chain:
-#- name: footprint_filter
-#  type: laser_filters/LaserScanFootprintFilter
-#  params:
-#    inscribed_radius: 0.65
+scan_filter_chain:
+- name: footprint_filter
+  type: laser_filters/LaserScanFootprintFilter
+  params:
+    inscribed_radius: 0.65
 #- name: shadows
 #  type: laser_filters/ScanShadowsFilter
 #  params:

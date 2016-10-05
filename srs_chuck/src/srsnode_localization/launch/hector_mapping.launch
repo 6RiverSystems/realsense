@@ -14,7 +14,7 @@
   <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
 
     <!-- Topic names -->
-    <param name="scan_topic" value="/internal/sensors/lidar/scan/raw" />
+    <param name="scan_topic" value="/internal/sensors/lidar/scan/filtered" />
 
     <!-- Frame names -->
     <param name="map_frame" value="map" />

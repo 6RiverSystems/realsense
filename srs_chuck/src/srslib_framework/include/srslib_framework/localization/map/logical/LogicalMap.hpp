@@ -23,7 +23,7 @@ public:
 
     unsigned int getCost(unsigned int c, unsigned int r) const
     {
-        return 0;
+        return getGrid()->getCost(c, r);
     }
 
     LogicalMetadata getMetadata() const
@@ -33,8 +33,8 @@ public:
 
     friend ostream& operator<<(ostream& stream, const LogicalMap& map);
 
-    void setObstruction(unsigned int c, unsigned int r);
     void setCost(unsigned int c, unsigned int r, unsigned int cost);
+    void setObstruction(unsigned int c, unsigned int r);
 
     void setLoadTime(double loadTime)
     {

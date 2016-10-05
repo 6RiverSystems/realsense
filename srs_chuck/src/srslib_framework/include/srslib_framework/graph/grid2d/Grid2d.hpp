@@ -230,6 +230,22 @@ public:
         return stream;
     }
 
+    void setCost(unsigned int c, unsigned int r, unsigned int cost)
+    {
+        Grid2dLocation location = Grid2dLocation(c, r);
+        auto found = grid_.find(location);
+
+        if (found != grid_.end())
+        {
+            Grid2dNode* node = found->second;
+            node->setCost(cost);
+        }
+        else
+        {
+            grid_[location] = new Grid2dNode(location, cost, nullptr);
+        }
+    }
+
 protected:
     Grid2d() :
         width_(0),

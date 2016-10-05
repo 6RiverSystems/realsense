@@ -58,21 +58,19 @@ LogicalMap* MapStackFactory::analizeLogicalNode(string localDirectory, string js
         throw YamlTagException(jsonFilename, TAG_LOGICAL);
     }
 
-    LogicalMetadata metadata;
-    metadata.loadTime = loadTime;
-
+    string logicalMapFilename;
     try
     {
-        metadata.logicalFilename = logicalDocument[TAG_LOGICAL_MAP].as<string>();
+        logicalMapFilename = logicalDocument[TAG_LOGICAL_MAP].as<string>();
 
-        if (metadata.logicalFilename.size() == 0)
+        if (logicalMapFilename.size() == 0)
         {
             throw YamlTagException(jsonFilename, TAG_LOGICAL_MAP);
         }
 
-        if (metadata.logicalFilename[0] != '/')
+        if (logicalMapFilename[0] != '/')
         {
-            metadata.logicalFilename = localDirectory + metadata.logicalFilename;
+            logicalMapFilename = localDirectory + logicalMapFilename;
         }
 
     }
@@ -81,7 +79,10 @@ LogicalMap* MapStackFactory::analizeLogicalNode(string localDirectory, string js
         throw YamlTagException(jsonFilename, TAG_LOGICAL_MAP);
     }
 
-    return LogicalMapFactory::fromMetadata(metadata);
+    LogicalMap* logicalMap = LogicalMapFactory::fromJsonFile(logicalMapFilename);
+    logicalMap->setLoadTime(loadTime);
+
+    return logicalMap;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

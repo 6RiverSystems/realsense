@@ -17,5 +17,7 @@ using namespace srs;
 
 TEST(Test_Trajectory, Empty_BasicRead)
 {
-    LogicalMap* logical = LogicalMapFactory::fromJsonFile("data/empty/empty-logical.geojson");
+    LogicalMap* logical = LogicalMapFactory::fromJsonFile("data/small-map/small-map-logical.geojson");
+
+    cout << *logical << endl;
 }

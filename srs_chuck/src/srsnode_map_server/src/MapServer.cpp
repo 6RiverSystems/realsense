@@ -10,8 +10,6 @@ using namespace std;
 #include <nav_msgs/MapMetaData.h>
 #include <nav_msgs/OccupancyGrid.h>
 
-#include <srslib_framework/Map.h>
-
 #include <tf/LinearMath/Quaternion.h>
 
 #include <srslib_framework/localization/map/MapStackFactory.hpp>

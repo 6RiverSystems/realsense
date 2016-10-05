@@ -9,7 +9,7 @@
 using namespace std;
 
 #include <ros/ros.h>
-#include <srslib_framework/MapMetadata.h>
+#include <srslib_framework/MapStack.h>
 
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/ros/tap/subscriber/RosSubscriberSingleData.hpp>

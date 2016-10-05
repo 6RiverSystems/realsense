@@ -40,13 +40,7 @@ public:
         return grid_;
     }
 
-    void getMapCoordinates(double x, double y, unsigned int& c, unsigned int& r)
-    {
-        c = static_cast<unsigned int>(round(x / resolution_));
-        r = static_cast<unsigned int>(round(y / resolution_));
-    }
-
-    float getResolution() const
+    double getResolution() const
     {
         return resolution_;
     }
@@ -61,18 +55,44 @@ public:
         return widthM_;
     }
 
-    void getWorldCoordinates(unsigned int c, unsigned int r, double& x, double& y)
-    {
-        x = static_cast<double>(c) * resolution_;
-        y = static_cast<double>(r) * resolution_;
-
-        // The precision is down to 1mm
-        x = round(x * 1000) / 1000;
-        y = round(y * 1000) / 1000;
-    }
-
     virtual void setCost(unsigned int c, unsigned int r, unsigned int cost) = 0;
     virtual void setObstruction(unsigned int c, unsigned int r) = 0;
+
+    void transformCells2M(unsigned int cells, double& measurement)
+    {
+        // The precision is down to 1mm
+        double r = static_cast<double>(cells) * resolution_;
+        measurement = round(r * 1000) / 1000;
+    }
+
+    void transformCells2M(unsigned int c, unsigned int r, double& x, double& y)
+    {
+        transformCells2M(c, x);
+        transformCells2M(r, y);
+    }
+
+    void transformCells2M(unsigned int c, unsigned int r, Pose<>& p)
+    {
+        transformCells2M(c, p.x);
+        transformCells2M(r, p.y);
+    }
+
+    void transformM2Cells(double mesurement, unsigned int& cells)
+    {
+        cells = static_cast<unsigned int>(round(mesurement / resolution_));
+    }
+
+    void transformM2Cells(double x, double y, unsigned int& c, unsigned int& r)
+    {
+        transformM2Cells(x, c);
+        transformM2Cells(y, r);
+    }
+
+    void transformM2Cells(Pose<> p, unsigned int& c, unsigned int& r)
+    {
+        transformM2Cells(p.x, c);
+        transformM2Cells(p.y, r);
+    }
 
 private:
 

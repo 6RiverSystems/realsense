@@ -45,23 +45,18 @@ void OccupancyMap::setObstruction(unsigned int c, unsigned int r)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ostream& operator<<(ostream& stream, const OccupancyMap& map)
 {
-    int8_t maxValue = numeric_limits<unsigned int>::max();
-
     unsigned int rows = map.getHeightCells();
     unsigned int columns = map.getWidthCells();
     stream << "OccupancyMap (" << rows << "x" << columns << ")" << endl;
 
-    for (unsigned int row = rows - 1; row >= 0; row--)
+    for (int row = rows - 1; row >= 0; row--)
     {
         for (unsigned int col = 0; col < columns; col++)
         {
-            unsigned int rawCost = map.getCost(col, row);
+            unsigned int rawCost = map.getCost(col, static_cast<unsigned int>(row));
 
-            char cost = rawCost > 0.0 ? '+' : '.';
-            if (rawCost == maxValue)
-            {
-                cost = '#';
-            }
+            char cost = rawCost > 0 ? '+' : '.';
+            cost = rawCost == numeric_limits<unsigned int>::max() ? '#' : cost;
 
             stream << cost;
         }

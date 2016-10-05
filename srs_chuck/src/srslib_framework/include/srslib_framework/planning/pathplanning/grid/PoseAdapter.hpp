@@ -23,7 +23,7 @@ struct PoseAdapter
     {
         unsigned int r = 0;
         unsigned int c = 0;
-        map->getMapCoordinates(pose.x, pose.y, c, r);
+        map->transformM2Cells(pose, c, r);
 
         location = Grid2d::LocationType(c, r);
         orientation = static_cast<int>(AngleMath::normalizeRad2Deg90(pose.theta));

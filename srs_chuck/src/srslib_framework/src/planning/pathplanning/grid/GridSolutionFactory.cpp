@@ -114,7 +114,7 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(BaseMap* map,
     {
         insertNode = true;
 
-        map->getWorldCoordinates(
+        map->transformCells2M(
             toCursor->action->position.location.x, toCursor->action->position.location.y,
             toX, toY);
 
@@ -123,7 +123,7 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(BaseMap* map,
 
         if (fromCursor)
         {
-            map->getWorldCoordinates(
+            map->transformCells2M(
                 fromCursor->action->position.location.x, fromCursor->action->position.location.y,
                 fromX, fromY);
 

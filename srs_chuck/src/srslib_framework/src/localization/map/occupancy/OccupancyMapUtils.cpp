@@ -5,7 +5,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include <srslib_framework/exception/io/FailedToOpenFileException.hpp>
-#include <srslib_framework/localization/map/occupancy/InvalidChannelNumberException.hpp>
+#include <srslib_framework/localization/map/occupancy/exception/InvalidChannelNumberException.hpp>
 #include <srslib_framework/localization/map/MapNote.hpp>
 
 namespace srs {

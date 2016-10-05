@@ -17,14 +17,22 @@ namespace srs {
 struct LogicalMapFactory
 {
     static LogicalMap* fromJsonFile(string jsonFilename);
-    static LogicalMap* fromMetadata(LogicalMetadata metadata);
+    static LogicalMap* fromString(string jsonFilename);
 
 private:
+    static void addRectangleCost(LogicalMap* logicalMap,
+        Pose<> origin, double width, double height,
+        unsigned int cost);
+    static void addStaticObstacle(LogicalMap* logicalMap,
+        Pose<> origin, double widthM, double heightM,
+        double sizeEnvelope = 0.0, unsigned int costEnvelope = 0);
+
     static bool findId(YAML::Node node, string id, YAML::Node& result);
 
-    static LogicalMap* nonTerminalMap(YAML::Node mapNode);
+    static void nonTerminalBoundary(YAML::Node node, LogicalMap* logicalMap);
+    static LogicalMap* nonTerminalMap(YAML::Node node);
 
-    static LogicalMap* synthesizeMap(YAML::Node documentNode);
+    static LogicalMap* synthesizeMap(LogicalMetadata& metadata, YAML::Node documentNode);
 };
 
 } // namespace srs

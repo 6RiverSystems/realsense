@@ -8,7 +8,6 @@
 #include <geometry_msgs/Pose.h>
 
 #include <srslib_framework/MapStack.h>
-#include <srslib_framework/MapStackMetadata.h>
 #include <srslib_framework/LogicalMetadata.h>
 #include <srslib_framework/OccupancyMetadata.h>
 
@@ -213,23 +212,6 @@ struct MapMessageFactory
     }
 
     /**
-     * @brief Convert the metadata of a Map Stack into a MapMetaData message.
-     *
-     * @param mapStack Map stack to use for metadata generation
-     *
-     * @return newly generated message
-     */
-    static srslib_framework::MapStackMetadata metadata2Msg(const MapStack* mapStack)
-    {
-        srslib_framework::MapStackMetadata msgMapMetaData;
-
-        msgMapMetaData.logical = metadata2Msg(mapStack->getLogicalMap()->getMetadata());
-        msgMapMetaData.occupancy = metadata2Msg(mapStack->getOccupancyMap()->getMetadata());
-
-        return msgMapMetaData;
-    }
-
-    /**
      * @brief Convert a MapStack message ConstPtr type into a MapStack.
      *
      * @param message MapStack to convert
@@ -265,7 +247,6 @@ struct MapMessageFactory
 
         return msgOccupancyMap;
     }
-
 };
 
 } // namespace srs

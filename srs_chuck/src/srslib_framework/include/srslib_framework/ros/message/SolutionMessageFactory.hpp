@@ -63,7 +63,7 @@ struct SolutionMessageFactory
      */
     static GridSolutionItem msg2GridSolutionItem(srslib_framework::MsgSolutionItem::ConstPtr message)
     {
-        return SolutionMessageFactory::msg2GridSolutionItem(*message);
+        return msg2GridSolutionItem(*message);
     }
 
     /**
@@ -79,8 +79,7 @@ struct SolutionMessageFactory
 
         for (auto solutionItem : message.items)
         {
-            GridSolutionItem gridSolutionItem = SolutionMessageFactory::msg2GridSolutionItem(
-                solutionItem);
+            GridSolutionItem gridSolutionItem = msg2GridSolutionItem(solutionItem);
 
             solution.push_back(gridSolutionItem);
         }
@@ -97,7 +96,7 @@ struct SolutionMessageFactory
      */
     static Solution<GridSolutionItem> msg2Solution(srslib_framework::MsgSolution::ConstPtr message)
     {
-        return SolutionMessageFactory::msg2Solution(*message);
+        return msg2Solution(*message);
     }
 
     /**
@@ -118,7 +117,7 @@ struct SolutionMessageFactory
 
         for (auto solutionItem : solution)
         {
-            items.push_back(SolutionMessageFactory::gridSolutionItem2Msg(solutionItem));
+            items.push_back(gridSolutionItem2Msg(solutionItem));
         }
         msgSolution.items = items;
 

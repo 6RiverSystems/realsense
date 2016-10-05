@@ -18,7 +18,10 @@ class OccupancyMap : public BaseMap
 {
 public:
     OccupancyMap(unsigned int widthCells, unsigned int heightCells, double resolution);
-    ~OccupancyMap();
+    ~OccupancyMap()
+    {}
+
+    void addCost(unsigned int c, unsigned int r, unsigned int cost);
 
     unsigned int getCost(unsigned int c, unsigned int r) const
     {

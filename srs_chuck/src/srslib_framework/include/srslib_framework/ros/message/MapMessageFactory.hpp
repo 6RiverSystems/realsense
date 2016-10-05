@@ -33,7 +33,7 @@ struct MapMessageFactory
     {
         srslib_framework::LogicalMap msgLogicalMap;
 
-        msgLogicalMap.metadata = MapMessageFactory::metadata2Msg(map->getMetadata());
+        msgLogicalMap.metadata = metadata2Msg(map->getMetadata());
 
         return msgLogicalMap;
     }
@@ -52,7 +52,7 @@ struct MapMessageFactory
 
         srslib_framework::OccupancyMap msgOccupancyMap;
 
-        msgOccupancyMap.metadata = MapMessageFactory::metadata2Msg(map->getMetadata());
+        msgOccupancyMap.metadata = metadata2Msg(map->getMetadata());
         msgOccupancyMap.data = occupancy;
 
         return msgOccupancyMap;
@@ -69,8 +69,8 @@ struct MapMessageFactory
     {
         srslib_framework::MapStack msgMapStack;
 
-        msgMapStack.logical = MapMessageFactory::map2Msg(mapStack->getLogicalMap());
-        msgMapStack.occupancy = MapMessageFactory::map2Msg(mapStack->getOccupancyMap());
+        msgMapStack.logical = map2Msg(mapStack->getLogicalMap());
+        msgMapStack.occupancy = map2Msg(mapStack->getOccupancyMap());
 
         return msgMapStack;
     }
@@ -105,7 +105,7 @@ struct MapMessageFactory
 
         msgOccupancyMetaData.loadTime = metadata.loadTime;
         msgOccupancyMetaData.heightCells = metadata.heightCells;
-        msgOccupancyMetaData.heightM = metadata.heightM;
+        msgOccupancyMetaData.heightMm = metadata.heightMm;
         msgOccupancyMetaData.occupancyFilename = metadata.occupancyFilename;
         msgOccupancyMetaData.negate = metadata.negate;
         msgOccupancyMetaData.origin = PoseMessageFactory::pose2Msg(metadata.origin);
@@ -113,7 +113,7 @@ struct MapMessageFactory
         msgOccupancyMetaData.thresholdFree = metadata.thresholdFree;
         msgOccupancyMetaData.thresholdOccupied = metadata.thresholdOccupied;
         msgOccupancyMetaData.widthCells = metadata.widthCells;
-        msgOccupancyMetaData.widthM = metadata.widthM;
+        msgOccupancyMetaData.widthMm = metadata.widthMm;
 
         return msgOccupancyMetaData;
     }
@@ -162,7 +162,7 @@ struct MapMessageFactory
      */
     static OccupancyMap* msg2OccupancyMap(const srslib_framework::OccupancyMap& message)
     {
-        OccupancyMetadata metadata = MapMessageFactory::msg2OccupancyMetadata(message.metadata);
+        OccupancyMetadata metadata = msg2OccupancyMetadata(message.metadata);
         OccupancyMap* occupancyMap = OccupancyMapUtils::occupancy2Map(metadata, message.data);
 
         return occupancyMap;
@@ -198,7 +198,7 @@ struct MapMessageFactory
 
         metadata.loadTime = message.loadTime;
         metadata.heightCells = message.heightCells;
-        metadata.heightM = message.heightM;
+        metadata.heightMm = message.heightMm;
         metadata.occupancyFilename = message.occupancyFilename;
         metadata.negate = message.negate;
         metadata.origin = PoseMessageFactory::msg2Pose(message.origin);
@@ -206,7 +206,7 @@ struct MapMessageFactory
         metadata.thresholdFree = message.thresholdFree;
         metadata.thresholdOccupied = message.thresholdOccupied;
         metadata.widthCells = message.widthCells;
-        metadata.widthM = message.widthM;
+        metadata.widthMm = message.widthMm;
 
         return metadata;
     }
@@ -220,8 +220,8 @@ struct MapMessageFactory
      */
     static MapStack* msg2MapStack(srslib_framework::MapStack::ConstPtr message)
     {
-        LogicalMap* logical = MapMessageFactory::msg2LogicalMap(message->logical);
-        OccupancyMap* occupancy = MapMessageFactory::msg2OccupancyMap(message->occupancy);
+        LogicalMap* logical = msg2LogicalMap(message->logical);
+        OccupancyMap* occupancy = msg2OccupancyMap(message->occupancy);
 
         return new MapStack(logical, occupancy);
     }
@@ -241,7 +241,7 @@ struct MapMessageFactory
 
         nav_msgs::OccupancyGrid msgOccupancyMap;
 
-        msgOccupancyMap.info = MapMessageFactory::metadata2RosMsg(map->getMetadata());
+        msgOccupancyMap.info = metadata2RosMsg(map->getMetadata());
         msgOccupancyMap.data = occupancy;
         msgOccupancyMap.header.frame_id = frameId;
 

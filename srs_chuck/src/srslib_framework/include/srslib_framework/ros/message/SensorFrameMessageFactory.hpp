@@ -49,7 +49,7 @@ struct SensorFrameMessageFactory
      */
     static SensorFrame<> msg2SensorFrame(srslib_framework::SensorFrame::ConstPtr message)
     {
-        return SensorFrameMessageFactory::msg2SensorFrame(*message);
+        return msg2SensorFrame(*message);
     }
 
     /**

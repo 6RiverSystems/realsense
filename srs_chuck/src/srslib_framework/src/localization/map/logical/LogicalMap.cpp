@@ -15,10 +15,16 @@ LogicalMap::LogicalMap(double widthM, double heightM, double resolution) :
         BaseMap(widthM, heightM, resolution)
 {
     logicalMetadata_.heightCells = getHeightCells();
-    logicalMetadata_.heightM = heightM;
+    logicalMetadata_.heightMm = heightM;
     logicalMetadata_.resolution = resolution;
     logicalMetadata_.widthCells = getWidthCells();
-    logicalMetadata_.widthM = widthM;
+    logicalMetadata_.widthMm = widthM;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMap::addCost(unsigned int c, unsigned int r, unsigned int cost)
+{
+    getGrid()->addCost(c, r, cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

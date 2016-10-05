@@ -48,7 +48,7 @@ struct PoseMessageFactory
      */
     static Pose<> msg2Pose(srslib_framework::Pose::ConstPtr message)
     {
-        return PoseMessageFactory::msg2Pose(*message);
+        return msg2Pose(*message);
     }
 
     /**
@@ -151,7 +151,7 @@ struct PoseMessageFactory
      */
     static Pose<> poseStamped2Pose(geometry_msgs::PoseStamped::ConstPtr message)
     {
-        return PoseMessageFactory::poseStamped2Pose(*message);
+        return poseStamped2Pose(*message);
     }
 };
 

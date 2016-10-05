@@ -16,8 +16,7 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromConsecutiveGoals(BaseMap* m
     Pose<> intermediateStart = start;
     for (Pose<> goal : goals)
     {
-        Solution<GridSolutionItem>* localSolution = GridSolutionFactory::fromGoal(map,
-            intermediateStart, goal);
+        Solution<GridSolutionItem>* localSolution = fromGoal(map, intermediateStart, goal);
         if (localSolution->empty())
         {
             break;
@@ -55,7 +54,7 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromGoal(BaseMap* map,
         SearchPosition<Grid2d>(internalGoal, goalAngle));
 
     AStar<Grid2d>::SearchNodeType* solution = algorithm.getSolution();
-    return GridSolutionFactory::fromSearch(map, solution);
+    return fromSearch(map, solution);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +113,7 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(BaseMap* map,
     {
         insertNode = true;
 
-        map->transformCells2M(
+        map->transformCells2Mm(
             toCursor->action->position.location.x, toCursor->action->position.location.y,
             toX, toY);
 
@@ -123,7 +122,7 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromSearch(BaseMap* map,
 
         if (fromCursor)
         {
-            map->transformCells2M(
+            map->transformCells2Mm(
                 fromCursor->action->position.location.x, fromCursor->action->position.location.y,
                 fromX, fromY);
 

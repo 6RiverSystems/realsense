@@ -18,8 +18,8 @@ public:
         loadTime(0),
         heightCells(0),
         widthCells(0),
-        heightM(0.0),
-        widthM(0.0),
+        heightMm(0.0),
+        widthMm(0.0),
         origin(Pose<>::INVALID),
         resolution(0.0),
         occupancyFilename(""),
@@ -29,7 +29,7 @@ public:
     {}
 
     int heightCells;
-    double heightM;
+    double heightMm;
 
     double loadTime;
 
@@ -44,7 +44,7 @@ public:
     double thresholdOccupied;
 
     int widthCells;
-    double widthM;
+    double widthMm;
 };
 
 } // namespace srs

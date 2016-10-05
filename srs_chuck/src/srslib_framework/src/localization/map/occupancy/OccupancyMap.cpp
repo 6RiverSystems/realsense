@@ -10,15 +10,16 @@ OccupancyMap::OccupancyMap(unsigned int widthCells, unsigned int heightCells, do
         BaseMap(widthCells, heightCells, resolution)
 {
     occupancyMetadata_.heightCells = heightCells;
-    occupancyMetadata_.heightM = getHeightMeters();
+    occupancyMetadata_.heightMm = getHeightMm();
     occupancyMetadata_.resolution = resolution;
     occupancyMetadata_.widthCells = widthCells;
-    occupancyMetadata_.widthM = getWidthMeters();
+    occupancyMetadata_.widthMm = getWidthMm();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-OccupancyMap::~OccupancyMap()
+void OccupancyMap::addCost(unsigned int c, unsigned int r, unsigned int cost)
 {
+    getGrid()->addCost(c, r, cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

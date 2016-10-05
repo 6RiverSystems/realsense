@@ -33,9 +33,9 @@ MapStack* MapStackFactory::fromJsonFile(string jsonFilename)
 
     string localDirectory = Filesystem::dirname(jsonFilename) + "/";
 
-    LogicalMap* logical = MapStackFactory::analizeLogicalNode(
+    LogicalMap* logical = analizeLogicalNode(
         localDirectory, jsonFilename, ros::Time::now().toSec(), mapStackDocument);
-    OccupancyMap* occupancy = MapStackFactory::analizeOccupancyNode(
+    OccupancyMap* occupancy = analizeOccupancyNode(
         localDirectory, jsonFilename, ros::Time::now().toSec(), mapStackDocument);
 
     return new MapStack(logical, occupancy);

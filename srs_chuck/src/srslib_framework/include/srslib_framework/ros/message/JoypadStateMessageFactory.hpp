@@ -69,7 +69,7 @@ struct JoypadStateMessageFactory
      */
     static JoypadState msg2JoypadState(srslib_framework::JoypadState::ConstPtr message)
     {
-        return JoypadStateMessageFactory::msg2JoypadState(*message);
+        return msg2JoypadState(*message);
     }
 };
 

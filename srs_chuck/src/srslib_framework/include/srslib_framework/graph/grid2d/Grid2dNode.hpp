@@ -27,21 +27,9 @@ public:
         return stream;
     }
 
-    unsigned int getCost() const
-    {
-        return cost;
-    }
-
-    void setCost(unsigned int newCost)
-    {
-        cost = newCost;
-    }
-
+    unsigned int cost;
     const Grid2dLocation location;
     void* notes;
-
-private:
-    unsigned int cost;
 };
 
 } // namespace srs

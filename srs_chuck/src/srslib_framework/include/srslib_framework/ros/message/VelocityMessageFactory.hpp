@@ -62,7 +62,7 @@ struct VelocityMessageFactory
      */
     static Velocity<> msg2Velocity(geometry_msgs::TwistStampedConstPtr message)
     {
-        return VelocityMessageFactory::msg2Velocity(*message);
+        return msg2Velocity(*message);
     }
 
     /**

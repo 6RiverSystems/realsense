@@ -38,11 +38,11 @@ OccupancyMap* OccupancyMapFactory::fromMetadata(OccupancyMetadata metadata)
     switch (channels)
     {
         case 1:
-            OccupancyMapFactory::extract1Channel(image, map);
+            extract1Channel(image, map);
             break;
 
         case 3:
-            OccupancyMapFactory::extract3Channel(image, map);
+            extract3Channel(image, map);
             break;
 
         default:

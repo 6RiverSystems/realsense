@@ -21,18 +21,20 @@ struct LogicalMapFactory
 
 private:
     static void addRectangleCost(LogicalMap* logicalMap,
-        Pose<> origin, double width, double height,
+        Pose<> origin, double widthMm, double heightMm,
         unsigned int cost);
     static void addStaticObstacle(LogicalMap* logicalMap,
-        Pose<> origin, double widthM, double heightM,
+        Pose<> origin, double widthMm, double heightMm,
         double sizeEnvelope = 0.0, unsigned int costEnvelope = 0);
 
-    static bool findId(YAML::Node node, string id, YAML::Node& result);
+    static bool findIdInCollection(YAML::Node node, string id, YAML::Node& result);
+    static bool findCollection(YAML::Node node, YAML::Node& result);
 
-    static void nonTerminalBoundary(YAML::Node node, LogicalMap* logicalMap);
+    static void nonTerminalBoundary(YAML::Node node, LogicalMap* map);
+    static LogicalMap* nonTerminalEntry(LogicalMetadata& metadata, YAML::Node node);
     static LogicalMap* nonTerminalMap(YAML::Node node);
-
-    static LogicalMap* synthesizeMap(LogicalMetadata& metadata, YAML::Node documentNode);
+    static void nonTerminalObstacle(YAML::Node node, LogicalMap* map);
+    static void nonTerminalObstacles(YAML::Node node, LogicalMap* map);
 };
 
 } // namespace srs

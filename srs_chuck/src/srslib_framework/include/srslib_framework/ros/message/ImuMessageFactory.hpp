@@ -45,7 +45,7 @@ struct ImuMessageFactory
      */
     static Imu<> msg2Imu(srslib_framework::Imu::ConstPtr message)
     {
-        return ImuMessageFactory::msg2Imu(*message);
+        return msg2Imu(*message);
     }
 
     /**

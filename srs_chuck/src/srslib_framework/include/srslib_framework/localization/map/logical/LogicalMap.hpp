@@ -21,6 +21,8 @@ public:
     ~LogicalMap()
     {}
 
+    void addCost(unsigned int c, unsigned int r, unsigned int cost);
+
     unsigned int getCost(unsigned int c, unsigned int r) const
     {
         return getGrid()->getCost(c, r);

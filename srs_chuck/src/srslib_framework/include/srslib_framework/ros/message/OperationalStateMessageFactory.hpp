@@ -75,7 +75,7 @@ struct OperationalStateMessageFactory
      */
     static RobotState msg2RobotState(srslib_framework::MsgOperationalState::ConstPtr message)
     {
-        return OperationalStateMessageFactory::msg2RobotState(*message);
+        return msg2RobotState(*message);
     }
 };
 

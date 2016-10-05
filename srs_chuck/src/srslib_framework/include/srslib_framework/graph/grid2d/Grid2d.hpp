@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef GRID2D_HPP_
-#define GRID2D_HPP_
+#pragma once
 
 #include <sstream>
 #include <iostream>
@@ -13,6 +12,7 @@
 #include <unordered_map>
 using namespace std;
 
+#include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/graph/grid2d/Grid2dLocation.hpp>
 #include <srslib_framework/graph/grid2d/Grid2dNode.hpp>
 
@@ -20,10 +20,13 @@ namespace srs {
 
 class Grid2d
 {
+private:
+    typedef unordered_map<Grid2dLocation, Grid2dNode*> BaseGridType;
+
 public:
     typedef Grid2dLocation LocationType;
 
-    Grid2d(int size) :
+    Grid2d(unsigned int size) :
         width_(size),
         height_(size)
     {}
@@ -38,10 +41,24 @@ public:
         clear();
     }
 
+    void addCost(unsigned int c, unsigned int r, unsigned int cost)
+    {
+        auto found = findLocation(c, r);
+        if (found != grid_.end())
+        {
+            Grid2dNode* node = found->second;
+            node->cost = BasicMath::noOverflowAdd(node->cost, cost);
+        }
+        else
+        {
+            Grid2dLocation location = Grid2dLocation(c, r);
+            grid_[location] = new Grid2dNode(location, cost, nullptr);
+        }
+    }
+
     void addNote(const Grid2dLocation location, void* notes = nullptr)
     {
         auto found = grid_.find(location);
-
         if (found != grid_.end())
         {
             Grid2dNode* node = found->second;
@@ -57,11 +74,10 @@ public:
         void* notes = nullptr)
     {
         auto found = grid_.find(location);
-
         if (found != grid_.end())
         {
             Grid2dNode* node = found->second;
-            node->setCost(cost);
+            node->cost = cost;
             node->notes = notes;
         }
         else
@@ -117,12 +133,10 @@ public:
 
     unsigned int getCost(unsigned int c, unsigned int r) const
     {
-        Grid2dLocation location = Grid2dLocation(c, r);
-
-        auto found = grid_.find(location);
+        auto found = findLocation(c, r);
         if (found != grid_.end())
         {
-            return found->second->getCost();
+            return found->second->cost;
         }
 
         return 0;
@@ -132,10 +146,9 @@ public:
     unsigned int getCost(Grid2dLocation location) const
     {
         auto found = grid_.find(location);
-
         if (found != grid_.end())
         {
-            return found->second->getCost();
+            return found->second->cost;
         }
 
         return 0;
@@ -144,7 +157,6 @@ public:
     void* getNote(Grid2dLocation location) const
     {
         auto found = grid_.find(location);
-
         if (found != grid_.end())
         {
             return found->second->notes;
@@ -214,7 +226,7 @@ public:
                 if (grid.exists(nodeLocation))
                 {
                     Grid2dNode* node = grid.grid_.at(nodeLocation);
-                    stream << right << setw(WIDTH - 1) << node->getCost();
+                    stream << right << setw(WIDTH - 1) << node->cost;
                     stream << (node->notes ? '*' : ' ');
                 }
                 else
@@ -232,16 +244,15 @@ public:
 
     void setCost(unsigned int c, unsigned int r, unsigned int cost)
     {
-        Grid2dLocation location = Grid2dLocation(c, r);
-        auto found = grid_.find(location);
-
+        auto found = findLocation(c, r);
         if (found != grid_.end())
         {
             Grid2dNode* node = found->second;
-            node->setCost(cost);
+            node->cost = cost;
         }
         else
         {
+            Grid2dLocation location = Grid2dLocation(c, r);
             grid_[location] = new Grid2dNode(location, cost, nullptr);
         }
     }
@@ -252,13 +263,17 @@ protected:
         height_(0)
     {}
 
+    BaseGridType::const_iterator findLocation(unsigned int c, unsigned int r) const
+    {
+        Grid2dLocation location = Grid2dLocation(c, r);
+        return grid_.find(location);
+    }
+
 private:
-    unordered_map<Grid2dLocation, Grid2dNode*> grid_;
+    BaseGridType grid_;
 
     unsigned int width_;
     unsigned int height_;
 };
 
 } // namespace srs
-
-#endif // GRID2D_HPP_

@@ -8,8 +8,7 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srslib_framework)
 
 set(${PROJECT_NAME}_SOURCES
-    src/utils/Logging.cpp
-    src/utils/CrashHandler.cpp
+    src/datastructure/graph/grid2d/Grid2d.cpp
 
     src/io/SerialIO.cpp
 
@@ -31,6 +30,9 @@ set(${PROJECT_NAME}_SOURCES
 
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp
+
+    src/utils/Logging.cpp
+    src/utils/CrashHandler.cpp
 )
 
 set(${PROJECT_NAME}_MSGS

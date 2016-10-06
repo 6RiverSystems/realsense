@@ -10,25 +10,29 @@
 using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
-#include <srslib_framework/search/AStar.hpp>
 using namespace srs;
 
 #include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
 
 TEST(Test_Graph, Grid2dCreation)
 {
-    Grid2d grid(6, 8);
+    Grid2d grid(10);
 
-    test::Grid2dUtils::addRectangleCost(grid, 1, 1, 3, 2, 900);
-    test::Grid2dUtils::addRectangleCost(grid, 4, 1, 4, 1, 900);
-    test::Grid2dUtils::addRectangleCost(grid, 3, 4, 3, 7, 900);
+    grid.setCost(Grid2d::Location(1, 1), 10);
+    grid.setCost(Grid2d::Location(3, 3), 30);
 
-    ROS_DEBUG_STREAM(grid);
-    ROS_DEBUG_STREAM(grid.getCost(Grid2d::LocationType(1, 1)));
+    cout << grid << endl;
 
-    grid.clear();
+    grid.setAggregateSize(1, 1);
 
-    ROS_DEBUG_STREAM(grid);
-    ROS_DEBUG_STREAM(grid.getCost(Grid2d::LocationType(1, 1)));
+    cout << grid << endl;
 
+    grid.setCost(Grid2d::Location(3, 3), 22);
+    cout << grid << endl;
+
+    grid.setCost(Grid2d::Location(2, 2), 10);
+    cout << grid << endl;
+
+    grid.addCost(Grid2d::Location(1, 1), 10);
+    cout << grid << endl;
 }

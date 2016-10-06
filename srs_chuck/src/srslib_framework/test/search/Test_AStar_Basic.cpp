@@ -30,8 +30,8 @@ TEST(Test_AStar, SearchCreation)
 
     AStar<Grid2d> algorithm(&grid);
 
-    Grid2d::LocationType start(0, 0);
-    Grid2d::LocationType goal(GRID_SIZE - 1, GRID_SIZE - 1);
+    Grid2d::Location start(0, 0);
+    Grid2d::Location goal(GRID_SIZE - 1, GRID_SIZE - 1);
 
     algorithm.search(SearchPosition<Grid2d>(start, 0), SearchPosition<Grid2d>(goal, 0));
 }

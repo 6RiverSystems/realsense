@@ -25,7 +25,7 @@ public:
 
     unsigned int getCost(unsigned int c, unsigned int r) const
     {
-        return getGrid()->getCost(c, r);
+        return getGrid()->getCost(Grid2d::Location(c, r));
     }
 
     LogicalMetadata getMetadata() const

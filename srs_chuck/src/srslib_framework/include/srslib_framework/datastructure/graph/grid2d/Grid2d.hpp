@@ -12,49 +12,88 @@
 #include <unordered_map>
 using namespace std;
 
-#include <srslib_framework/datastructure/graph/grid2d/Grid2dLocation.hpp>
 #include <srslib_framework/math/BasicMath.hpp>
 
 namespace srs {
 
 class Grid2d
 {
-private:
-    class InternalNode
+public:
+    struct Location
     {
-    public:
-        InternalNode(Grid2dLocation location, unsigned int cost, void* notes) :
-            location(location),
-            cost(cost),
-            notes(notes)
+        Location(unsigned int x = 0, unsigned int y = 0) :
+            x(x),
+            y(y)
         {}
 
-        friend ostream& operator<<(ostream& stream, const InternalNode* node)
+        friend bool operator==(const Location& lhs, const Location& rhs)
         {
-            stream << "InternalNode "<< hex << reinterpret_cast<long>(node) << dec << " {" << '\n';
-            stream << "  l: " << node->location << " c: " << node->cost <<
-                " n: " << node->notes << "\n}";
+            return (lhs.x == rhs.x) && (lhs.y == rhs.y);
+        }
+
+        friend ostream& operator<<(ostream& stream, const Location& location)
+        {
+            return stream << location.x << ", " << location.y;
+        }
+
+        unsigned int x;
+        unsigned int y;
+    };
+
+private:
+    struct LocationHash
+    {
+        std::size_t operator()(const Location& location) const
+        {
+            return location.x + 1812433253 * location.y;
+        }
+    };
+
+    struct LocationEqual
+    {
+        bool operator()(const Location& lhs, const Location& rhs) const
+        {
+            return (lhs.x == rhs.x) && (lhs.y == rhs.y);
+        }
+    };
+
+    struct Node
+    {
+        Node(Location location, unsigned int cost, unsigned int aggregateCost) :
+            location(location),
+            cost(cost),
+            aggregateCost(aggregateCost)
+        {}
+
+        friend ostream& operator<<(ostream& stream, const Node* node)
+        {
+            stream << "Node "<< hex << reinterpret_cast<long>(node) << dec << " {" << '\n';
+            stream << "l: " << node->location <<
+                ", c: " << node->cost <<
+                ", ac: " << node->aggregateCost << "\n}";
             return stream;
         }
 
+        unsigned int aggregateCost;
         unsigned int cost;
-        const Grid2dLocation location;
-        void* notes;
+        const Location location;
     };
 
-    typedef unordered_map<Grid2dLocation, InternalNode*> BaseGridType;
-
 public:
-    typedef Grid2dLocation LocationType;
-
     Grid2d(unsigned int size) :
         width_(size),
-        height_(size)
+        height_(size),
+        aggregate_(false),
+        aggregateHeight_(0),
+        aggregateWidth_(0)
     {}
 
     Grid2d(unsigned int width, unsigned int height) :
         width_(width),
-        height_(height)
+        height_(height),
+        aggregate_(false),
+        aggregateHeight_(0),
+        aggregateWidth_(0)
     {}
 
     ~Grid2d()
@@ -62,82 +101,11 @@ public:
         clear();
     }
 
-    void addCost(unsigned int c, unsigned int r, unsigned int cost)
-    {
-        auto found = findLocation(c, r);
-        if (found != grid_.end())
-        {
-            InternalNode* node = found->second;
-            node->cost = BasicMath::noOverflowAdd(node->cost, cost);
-        }
-        else
-        {
-            Grid2dLocation location = Grid2dLocation(c, r);
-            grid_[location] = new InternalNode(location, cost, nullptr);
-        }
-    }
+    void addCost(const Location& location, unsigned int cost);
 
-    void addNote(const Grid2dLocation location, void* notes = nullptr)
-    {
-        auto found = grid_.find(location);
-        if (found != grid_.end())
-        {
-            InternalNode* node = found->second;
-            node->notes = notes;
-        }
-        else
-        {
-            grid_[location] = new InternalNode(location, 0, notes);
-        }
-    }
+    void clear();
 
-    void addValue(const Grid2dLocation location, unsigned int cost,
-        void* notes = nullptr)
-    {
-        auto found = grid_.find(location);
-        if (found != grid_.end())
-        {
-            InternalNode* node = found->second;
-            node->cost = cost;
-            node->notes = notes;
-        }
-        else
-        {
-            grid_[location] = new InternalNode(location, cost, notes);
-        }
-    }
-
-    void clear()
-    {
-        for (auto gridCell : grid_)
-        {
-            delete gridCell.second;
-        }
-        grid_.clear();
-//        if (grid_)
-//        {
-//            // Find the map notes and remove them first, because Grid will not
-//            // do it for us
-//            for (int row = 0; row < grid_->getHeight(); row++)
-//            {
-//                for (int col = 0; col < grid_->getWidth(); col++)
-//                {
-//                    Grid2dLocation location = Grid2dLocation(col, row);
-//                    MapNote* note = reinterpret_cast<MapNote*>(grid_->getNote(location));
-//
-//                    if (note)
-//                    {
-//                        delete note;
-//                    }
-//                }
-//            }
-//
-//            // Now deallocate the grid
-//            delete grid_;
-//        }
-    }
-
-    bool exists(const Grid2dLocation location) const
+    bool exists(const Location& location) const
     {
         if (!isWithinBounds(location))
         {
@@ -147,154 +115,48 @@ public:
         return grid_.count(location);
     }
 
+    bool isWithinBounds(const Location& location) const
+    {
+        return (0 <= location.x && location.x < width_) &&
+            (0 <= location.y && location.y < height_);
+    }
+
+    unsigned int getCost(const Location& location) const;
+
     unsigned int getHeight() const
     {
         return height_;
     }
 
-    unsigned int getCost(unsigned int c, unsigned int r) const
-    {
-        auto found = findLocation(c, r);
-        if (found != grid_.end())
-        {
-            return found->second->cost;
-        }
-
-        return 0;
-    }
-
-    // TODO: remove this when optimizing A*
-    unsigned int getCost(Grid2dLocation location) const
-    {
-        auto found = grid_.find(location);
-        if (found != grid_.end())
-        {
-            return found->second->cost;
-        }
-
-        return 0;
-    }
-
-    void* getNote(Grid2dLocation location) const
-    {
-        auto found = grid_.find(location);
-        if (found != grid_.end())
-        {
-            return found->second->notes;
-        }
-
-        return nullptr;
-    }
-
-    bool getNeighbor(Grid2dLocation location, int orientation, Grid2dLocation& result) const
-    {
-        switch (orientation)
-        {
-            case 0:
-                result = Grid2dLocation(location.x + 1, location.y);
-                break;
-
-            case 90:
-                result = Grid2dLocation(location.x, location.y + 1);
-                break;
-
-            case 180:
-                result = Grid2dLocation(location.x - 1, location.y);
-                break;
-
-            case 270:
-                result = Grid2dLocation(location.x, location.y - 1);
-                break;
-        }
-
-        return isWithinBounds(result);
-    }
+    bool getNeighbor(const Location& location, int orientation, Location& result) const;
 
     unsigned int getWidth() const
     {
         return width_;
     }
 
-    bool isWithinBounds(const Grid2dLocation location) const
-    {
-        return (0 <= location.x && location.x < width_) &&
-            (0 <= location.y && location.y < height_);
-    }
+    friend ostream& operator<<(ostream& stream, const Grid2d& grid);
 
-    friend ostream& operator<<(ostream& stream, const Grid2d& grid)
-    {
-        constexpr int WIDTH = 6;
-        stream << "Grid2d {" << endl;
-
-        stream << "(" << grid.height_ << "x" << grid.width_ << ")" << endl;
-
-        stream << right << setw(WIDTH) << ' ';
-        for (int x = 0; x < grid.width_; ++x)
-        {
-            stream << right << setw(WIDTH - 1) << x << ' ';
-        }
-        stream << endl;
-
-        for (int y = 0; y < grid.height_; ++y)
-        {
-            stream << right << setw(WIDTH) << y;
-            for (int x = 0; x < grid.width_; ++x)
-            {
-                Grid2dLocation nodeLocation;
-                nodeLocation.x = x;
-                nodeLocation.y = y;
-
-                if (grid.exists(nodeLocation))
-                {
-                    InternalNode* node = grid.grid_.at(nodeLocation);
-                    stream << right << setw(WIDTH - 1) << node->cost;
-                    stream << (node->notes ? '*' : ' ');
-                }
-                else
-                {
-                    stream << right << setw(WIDTH) << ". ";
-                }
-            }
-            stream << endl;
-        }
-
-        stream << "}";
-
-        return stream;
-    }
-
-    void setCost(unsigned int c, unsigned int r, unsigned int cost)
-    {
-        auto found = findLocation(c, r);
-        if (found != grid_.end())
-        {
-            InternalNode* node = found->second;
-            node->cost = cost;
-        }
-        else
-        {
-            Grid2dLocation location = Grid2dLocation(c, r);
-            grid_[location] = new InternalNode(location, cost, nullptr);
-        }
-    }
-
-protected:
-    Grid2d() :
-        width_(0),
-        height_(0)
-    {}
-
-    BaseGridType::const_iterator findLocation(unsigned int c, unsigned int r) const
-    {
-        Grid2dLocation location = Grid2dLocation(c, r);
-        return grid_.find(location);
-    }
+    void setAggregateSize(unsigned int width, unsigned int height);
+    void setCost(const Location& location, unsigned int cost);
 
 private:
-    BaseGridType grid_;
+    void calculateAggregateArea(unsigned int x0, unsigned int y0,
+        unsigned int& xi, unsigned int& xf,
+        unsigned int& yi, unsigned int& yf);
+
+    void updateAllAggregate(Node* node);
+    void updateNodeAggregate(Node* node);
+
+    bool aggregate_;
+    unsigned int aggregateWidth_;
+    unsigned int aggregateHeight_;
+
+    unordered_map<Location, Node*, LocationHash, LocationEqual> grid_;
+
+    unsigned int height_;
 
     unsigned int width_;
-    unsigned int height_;
 };
 
 } // namespace srs

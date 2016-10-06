@@ -19,8 +19,8 @@ using namespace srs;
 
 TEST(Test_AStar, WithMap)
 {
-    Grid2d::LocationType start(86, 48);
-    Grid2d::LocationType goal(87, 48);
+    Grid2d::Location start(86, 48);
+    Grid2d::Location goal(87, 48);
 
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 

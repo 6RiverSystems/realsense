@@ -3,7 +3,6 @@
 #include <limits>
 
 #include <srslib_framework/utils/Filesystem.hpp>
-#include <srslib_framework/datastructure/graph/grid2d/Grid2dLocation.hpp>
 
 namespace srs {
 
@@ -24,19 +23,19 @@ LogicalMap::LogicalMap(double widthM, double heightM, double resolution) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::addCost(unsigned int c, unsigned int r, unsigned int cost)
 {
-    getGrid()->addCost(c, r, cost);
+    getGrid()->addCost(Grid2d::Location(c, r), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::setCost(unsigned int c, unsigned int r, unsigned int cost)
 {
-    getGrid()->setCost(c, r, cost);
+    getGrid()->setCost(Grid2d::Location(c, r), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::setObstruction(unsigned int c, unsigned int r)
 {
-    getGrid()->setCost(c, r, numeric_limits<unsigned int>::max());
+    getGrid()->setCost(Grid2d::Location(c, r), numeric_limits<unsigned int>::max());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

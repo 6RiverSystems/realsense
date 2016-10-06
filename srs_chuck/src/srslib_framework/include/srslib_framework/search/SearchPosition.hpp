@@ -14,7 +14,7 @@ namespace srs {
 template<typename GRAPH>
 struct SearchPosition
 {
-    typedef typename GRAPH::LocationType LocationType;
+    typedef typename GRAPH::Location LocationType;
 
     static int heuristic(SearchPosition<GRAPH> from, SearchPosition<GRAPH> to)
     {
@@ -49,27 +49,28 @@ struct SearchPosition
 
 } // namespace srs
 
-namespace std {
-
-// Hash definition for the SearchNode class
-template<typename GRAPH>
-struct hash<srs::SearchPosition<GRAPH>>
-{
-    unsigned long operator()(const srs::SearchPosition<GRAPH>& node) const
-    {
-        return hash<typename GRAPH::LocationType>()(node.location) + 1001 * node.orientation;
-    }
-};
-
-template<typename GRAPH>
-struct equal_to<srs::SearchPosition<GRAPH>>
-{
-    bool operator()(const srs::SearchPosition<GRAPH>& lhs, const srs::SearchPosition<GRAPH>& rhs) const
-    {
-        return (lhs.location == rhs.location) && (lhs.orientation == rhs.orientation);
-    }
-};
-
-} // namespace std
+// ###FS
+//namespace std {
+//
+//// Hash definition for the SearchNode class
+//template<typename GRAPH>
+//struct hash<srs::SearchPosition<GRAPH>>
+//{
+//    unsigned long operator()(const srs::SearchPosition<GRAPH>& node) const
+//    {
+//        return hash<typename GRAPH::Location>()(node.location) + 1001 * node.orientation;
+//    }
+//};
+//
+//template<typename GRAPH>
+//struct equal_to<srs::SearchPosition<GRAPH>>
+//{
+//    bool operator()(const srs::SearchPosition<GRAPH>& lhs, const srs::SearchPosition<GRAPH>& rhs) const
+//    {
+//        return (lhs.location == rhs.location) && (lhs.orientation == rhs.orientation);
+//    }
+//};
+//
+//} // namespace std
 
 #endif // SEARCHPOSITION_HPP_

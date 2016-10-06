@@ -43,7 +43,7 @@ struct SearchAction
         START
     };
 
-    typedef typename GRAPH::LocationType LocationType;
+    typedef typename GRAPH::Location LocationType;
 
     static array<ActionEnum, 5> ALLOWED_ACTIONS;
 
@@ -172,11 +172,8 @@ private:
     {
         unsigned int locationCost = graph->getCost(position.location);
 
-        const MapNote* note = reinterpret_cast<const MapNote*>(graph->getNote(position.location));
-        if (note && note->staticObstacle())
-        {
-            locationCost = COST_MAX;
-        }
+        // ###FS Fix the MapNote issue
+        // const MapNote* note = reinterpret_cast<const MapNote*>(graph->getNote(position.location));
 
         unsigned int actionCost = 0;
         switch (action)
@@ -184,13 +181,14 @@ private:
             case FORWARD:
             {
                 actionCost = COST_FORWARD;
-                if (note && note->preferred())
-                {
-                    if (position.orientation != note->preferredAngle())
-                    {
-                        actionCost = COST_FORWARD_NMA;
-                    }
-                }
+// ###FS
+//                if (note && note->preferred())
+//                {
+//                    if (position.orientation != note->preferredAngle())
+//                    {
+//                        actionCost = COST_FORWARD_NMA;
+//                    }
+//                }
                 break;
             }
 
@@ -203,30 +201,33 @@ private:
             case ROTATE_N90:
             {
                 actionCost = COST_ROTATE_N90;
-                if (note && note->noRotations())
-                {
-                    actionCost = COST_MAX;
-                }
+// ###FS
+//                if (note && note->noRotations())
+//                {
+//                    actionCost = COST_MAX;
+//                }
                 break;
             }
 
             case ROTATE_P90:
             {
                 actionCost = COST_ROTATE_P90;
-                if (note && note->noRotations())
-                {
-                    actionCost = COST_MAX;
-                }
+// ###FS
+//                if (note && note->noRotations())
+//                {
+//                    actionCost = COST_MAX;
+//                }
                 break;
             }
 
             case ROTATE_180:
             {
                 actionCost = COST_ROTATE_180;
-                if (note && note->noRotations())
-                {
-                    actionCost = COST_MAX;
-                }
+// ###FS
+//                if (note && note->noRotations())
+//                {
+//                    actionCost = COST_MAX;
+//                }
                 break;
             }
         }

@@ -52,27 +52,28 @@ struct SearchNode
 
 } // namespace srs
 
-namespace std {
-
-// Hash definition for the SearchNode class
-template<typename GRAPH>
-struct hash<srs::SearchNode<GRAPH>*>
-{
-    unsigned long operator()(const srs::SearchNode<GRAPH>* node) const
-    {
-        return hash<typename srs::SearchPosition<GRAPH>>()(node->action->position);
-    }
-};
-
-template<typename GRAPH>
-struct equal_to<srs::SearchNode<GRAPH>*>
-{
-    bool operator()(const srs::SearchNode<GRAPH>* lhs, const srs::SearchNode<GRAPH>* rhs) const
-    {
-        return (lhs == rhs) || (lhs->action->position == rhs->action->position);
-    }
-};
-
-} // namespace std
+// ###FS
+//namespace std {
+//
+//// Hash definition for the SearchNode class
+//template<typename GRAPH>
+//struct hash<srs::SearchNode<GRAPH>*>
+//{
+//    unsigned long operator()(const srs::SearchNode<GRAPH>* node) const
+//    {
+//        return hash<typename srs::SearchPosition<GRAPH>>()(node->action->position);
+//    }
+//};
+//
+//template<typename GRAPH>
+//struct equal_to<srs::SearchNode<GRAPH>*>
+//{
+//    bool operator()(const srs::SearchNode<GRAPH>* lhs, const srs::SearchNode<GRAPH>* rhs) const
+//    {
+//        return (lhs == rhs) || (lhs->action->position == rhs->action->position);
+//    }
+//};
+//
+//} // namespace std
 
 #endif // SEARCHNODE_HPP_

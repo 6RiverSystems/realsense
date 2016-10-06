@@ -28,8 +28,8 @@ TEST(Test_Map, Reconstruction)
 //
 //    ROS_DEBUG_STREAM(*map);
 //
-//    ROS_DEBUG_STREAM(map->getGrid()->getCost(Grid2dLocation(1, 0)));
-//    ROS_DEBUG_STREAM(*(reinterpret_cast<MapNote*>(map->getGrid()->getNote(Grid2dLocation(1, 0)))));
+//    ROS_DEBUG_STREAM(map->getGrid()->getCost(Grid2d::Location(1, 0)));
+//    ROS_DEBUG_STREAM(*(reinterpret_cast<MapNote*>(map->getGrid()->getNote(Grid2d::Location(1, 0)))));
 
 //    vector<int8_t> occupancyMap;
 //    vector<int8_t> notesGrid;
@@ -49,8 +49,8 @@ TEST(Test_Map, Reconstruction)
 //
 //    ROS_DEBUG_STREAM(*map);
 //
-//    ROS_DEBUG_STREAM(map->getGrid()->getCost(Grid2dLocation(1, 0)));
-//    ROS_DEBUG_STREAM(*(reinterpret_cast<MapNote*>(map->getGrid()->getNote(Grid2dLocation(1, 0)))));
+//    ROS_DEBUG_STREAM(map->getGrid()->getCost(Grid2d::Location(1, 0)));
+//    ROS_DEBUG_STREAM(*(reinterpret_cast<MapNote*>(map->getGrid()->getNote(Grid2d::Location(1, 0)))));
 //
 //    // TODO: Research the memory leaks in the YAML library
 //    ROS_DEBUG_STREAM("End memory usage: " << memoryWatch.getMemoryUsage());

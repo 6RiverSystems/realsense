@@ -30,7 +30,7 @@ template<typename GRAPH>
 class AStar
 {
 public:
-    typedef typename GRAPH::LocationType LocationType;
+    typedef typename GRAPH::Location LocationType;
     typedef SearchNode<GRAPH> SearchNodeType;
     typedef SearchAction<GRAPH> SearchActionType;
 

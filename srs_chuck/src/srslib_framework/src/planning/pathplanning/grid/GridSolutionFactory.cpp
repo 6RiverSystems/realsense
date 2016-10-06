@@ -39,12 +39,12 @@ Solution<GridSolutionItem>* GridSolutionFactory::fromGoal(BaseMap* map,
     }
 
     // Prepare the start position for the search
-    Grid2d::LocationType internalStart;
+    Grid2d::Location internalStart;
     int startAngle;
     PoseAdapter::pose2Map(fromPose, map, internalStart, startAngle);
 
     // Prepare the goal position for the search
-    Grid2d::LocationType internalGoal;
+    Grid2d::Location internalGoal;
     int goalAngle;
     PoseAdapter::pose2Map(toPose, map, internalGoal, goalAngle);
 

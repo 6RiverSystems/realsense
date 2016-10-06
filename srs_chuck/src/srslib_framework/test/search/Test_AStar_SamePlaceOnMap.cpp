@@ -36,13 +36,13 @@ TEST(Test_AStar, SamePlaceOnMap)
 
     // Prepare the start position for the search
     Pose<> robotPose = Pose<>(18.1335, 5.24097, 0.0189141);
-    Grid2d::LocationType internalStart;
+    Grid2d::Location internalStart;
     int startAngle;
     PoseAdapter::pose2Map(robotPose, map, internalStart, startAngle);
 
     // Prepare the goal position for the search
     Pose<> goalPose = Pose<>(18.1335, 5.24097, 0);
-    Grid2d::LocationType internalGoal;
+    Grid2d::Location internalGoal;
     int goalAngle;
     PoseAdapter::pose2Map(goalPose, map, internalGoal, goalAngle);
 

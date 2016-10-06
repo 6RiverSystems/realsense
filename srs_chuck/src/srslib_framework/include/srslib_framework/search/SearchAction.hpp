@@ -83,7 +83,7 @@ struct SearchAction
 
     unsigned int getTotalCost()
     {
-        return BasicMath::noOverflowAdd(g, h);
+        return BasicMath::noOverflowAdd<int>(g, h);
     }
 
     friend ostream& operator<<(ostream& stream, const SearchAction* searchAction)
@@ -116,7 +116,7 @@ private:
             unsigned int totalCost = getTotalCost(graph, newPosition, BACKWARD);
 
             newAction->position = newPosition;
-            newAction->g = BasicMath::noOverflowAdd(parentNode->action->g, totalCost);
+            newAction->g = BasicMath::noOverflowAdd<int>(parentNode->action->g, totalCost);
             newAction->h = parentNode->action->h;
 
             return newAction;
@@ -138,7 +138,7 @@ private:
             unsigned int totalCost = getTotalCost(graph, newPosition, FORWARD);
 
             newAction->position = newPosition;
-            newAction->g = BasicMath::noOverflowAdd(parentNode->action->g, totalCost);
+            newAction->g = BasicMath::noOverflowAdd<int>(parentNode->action->g, totalCost);
             newAction->h = parentNode->action->h;
 
             return newAction;
@@ -162,7 +162,7 @@ private:
         unsigned int totalCost = getTotalCost(graph, newPosition, actionEnum);
 
         newAction->position = newPosition;
-        newAction->g = BasicMath::noOverflowAdd(parentNode->action->g, totalCost);
+        newAction->g = BasicMath::noOverflowAdd<int>(parentNode->action->g, totalCost);
         newAction->h = parentNode->action->h;
 
         return newAction;
@@ -232,7 +232,7 @@ private:
             }
         }
 
-        return BasicMath::noOverflowAdd(locationCost, actionCost);
+        return BasicMath::noOverflowAdd<int>(locationCost, actionCost);
     }
 };
 

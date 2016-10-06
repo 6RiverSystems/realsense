@@ -14,25 +14,207 @@ using namespace srs;
 
 #include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
 
-TEST(Test_Graph, Grid2dCreation)
+const Grid2d::Location P_1_1 = Grid2d::Location(1, 1);
+const Grid2d::Location P_2_2 = Grid2d::Location(2, 2);
+const Grid2d::Location P_3_3 = Grid2d::Location(3, 3);
+
+TEST(Test_Graph2d, BasicSet)
 {
     Grid2d grid(10);
 
-    grid.setCost(Grid2d::Location(1, 1), 10);
-    grid.setCost(Grid2d::Location(3, 3), 30);
+    grid.setCost(P_1_1, 10);
+    grid.setCost(P_3_3, 30);
+
+    ASSERT_EQ(10, grid.getCost(P_1_1)) <<
+        "Location cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(30, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
+
+    grid.setCost(P_3_3, 15);
+
+    ASSERT_EQ(10, grid.getCost(P_1_1)) <<
+        "Location cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(15, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
 
     cout << grid << endl;
+}
+
+TEST(Test_Graph2d, GetCost)
+{
+    Grid2d grid(10);
+
+    grid.setCost(P_1_1, 10);
+    grid.setCost(P_3_3, 30);
+
+    ASSERT_EQ(10, grid.getCost(P_1_1)) <<
+        "Location cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(30, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
+    ASSERT_EQ(srs::Grid2d::MIN_COST, grid.getCost(P_2_2)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
+
+    cout << grid << endl;
+}
+
+TEST(Test_Graph2d, BasicAdd)
+{
+    Grid2d grid(10);
+
+    grid.setCost(P_1_1, 10);
+    grid.setCost(P_3_3, 30);
+
+    ASSERT_EQ(10, grid.getCost(P_1_1)) <<
+        "Location cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(30, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
+
+    grid.addCost(P_1_1, 5);
+    grid.addCost(P_3_3, 5);
+    grid.addCost(P_2_2, 5);
+
+    ASSERT_EQ(15, grid.getCost(P_1_1)) <<
+        "Location cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(35, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
+    ASSERT_EQ(5, grid.getCost(P_2_2)) <<
+        "Location cost in " << P_2_2 << " is not as expected";
+
+    cout << grid << endl;
+}
+
+TEST(Test_Graph2d, SetWithMax)
+{
+    Grid2d grid(10);
+
+    grid.setCost(P_1_1, 10);
+    grid.setCost(P_3_3, 30);
+
+    ASSERT_EQ(10, grid.getCost(P_1_1)) <<
+        "Location cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(30, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
+
+    grid.setCost(P_3_3, srs::Grid2d::MAX_COST);
+
+    ASSERT_EQ(10, grid.getCost(P_1_1)) <<
+        "Location cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(srs::Grid2d::MAX_COST, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
+
+    cout << grid << endl;
+}
+
+TEST(Test_Graph2d, AddWithMax)
+{
+    Grid2d grid(10);
+
+    grid.setCost(P_1_1, 10);
+    grid.setCost(P_3_3, 30);
+
+    ASSERT_EQ(10, grid.getCost(P_1_1)) <<
+        "Location cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(30, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
+
+    grid.addCost(P_3_3, srs::Grid2d::MAX_COST);
+
+    ASSERT_EQ(10, grid.getCost(P_1_1)) <<
+        "Location cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(srs::Grid2d::MAX_COST, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
+
+    cout << grid << endl;
+}
+
+TEST(Test_Graph2d, BasicAggregate)
+{
+    Grid2d grid(10);
 
     grid.setAggregateSize(1, 1);
 
-    cout << grid << endl;
+    grid.addCost(P_1_1, 10);
+    grid.addCost(P_3_3, 30);
 
-    grid.setCost(Grid2d::Location(3, 3), 22);
-    cout << grid << endl;
+    ASSERT_EQ(10, grid.getCost(P_1_1)) <<
+        "Location cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(30, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
 
-    grid.setCost(Grid2d::Location(2, 2), 10);
-    cout << grid << endl;
+    ASSERT_EQ(10, grid.getAggregateCost(P_1_1)) <<
+        "Location aggregate cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(30, grid.getAggregateCost(P_3_3)) <<
+        "Location aggregate cost in " << P_3_3 << " is not as expected";
 
-    grid.addCost(Grid2d::Location(1, 1), 10);
     cout << grid << endl;
 }
+
+TEST(Test_Graph2d, AggregateChange)
+{
+    Grid2d grid(10);
+
+    grid.setAggregateSize(1, 1);
+
+    grid.addCost(P_1_1, 10);
+    grid.addCost(P_3_3, 30);
+
+    ASSERT_EQ(10, grid.getCost(P_1_1)) <<
+        "Location cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(30, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
+
+    ASSERT_EQ(10, grid.getAggregateCost(P_1_1)) <<
+        "Location aggregate cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(30, grid.getAggregateCost(P_3_3)) <<
+        "Location aggregate cost in " << P_3_3 << " is not as expected";
+
+    grid.setAggregateSize(2, 2);
+
+    ASSERT_EQ(10, grid.getCost(P_1_1)) <<
+        "Location cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(30, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
+
+    ASSERT_EQ(40, grid.getAggregateCost(P_1_1)) <<
+        "Location aggregate cost in " << P_1_1 << " is not as expected";
+    ASSERT_EQ(40, grid.getAggregateCost(P_3_3)) <<
+        "Location aggregate cost in " << P_3_3 << " is not as expected";
+
+    cout << grid << endl;
+}
+
+//TEST(Test_Graph, Grid2dCreation)
+//{
+//    Grid2d grid(10);
+//
+//    grid.setCost(P_1_1, 10);
+//    grid.setCost(Grid2d::Location(3, 3), 30);
+//    cout << grid << endl;
+//
+//    grid.setAggregateSize(1, 1);
+//    cout << grid << endl;
+//
+//    grid.setCost(Grid2d::Location(3, 3), 22);
+//    cout << grid << endl;
+//
+//    grid.setCost(Grid2d::Location(2, 2), 10);
+//    cout << grid << endl;
+//
+//    grid.addCost(Grid2d::Location(1, 1), 10);
+//    cout << grid << endl;
+//
+//    grid.addCost(Grid2d::Location(1, 1), numeric_limits<int>::max());
+//    cout << grid << endl;
+//
+//    grid.setAggregateSize(2, 2);
+//    cout << grid << endl;
+//
+//    grid.setAggregateSize(0, 0);
+//    cout << grid << endl;
+//
+//    grid.setAggregateSize(1, 2);
+//    cout << grid << endl;
+//
+//    grid.addCost(Grid2d::Location(1, 1), numeric_limits<int>::max());
+//    cout << grid << endl;
+//}

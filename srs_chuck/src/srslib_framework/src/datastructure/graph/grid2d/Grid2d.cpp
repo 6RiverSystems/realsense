@@ -5,26 +5,37 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
+const int Grid2d::MIN_COST = 0;
+const int Grid2d::MAX_COST = numeric_limits<int>::max();
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::addCost(const Location& location, unsigned int cost)
+void Grid2d::addCost(const Location& location, int cost)
 {
     auto found = grid_.find(location);
 
     Node* node;
+    int oldCost = MIN_COST;
+
     if (found != grid_.end())
     {
         node = found->second;
-        node->cost = BasicMath::noOverflowAdd(node->cost, cost);
+        oldCost = node->cost;
+        node->cost = BasicMath::noOverflowAdd<int>(node->cost, cost);
     }
     else
     {
-        node = new Node(location, cost, 0);
+        node = new Node(location, cost, MIN_COST);
         grid_[location] = node;
+
+        if (aggregate_)
+        {
+            node->aggregateCost = BasicMath::noOverflowAdd(calculateAggregateCost(node), -cost);
+        }
     }
 
     if (aggregate_)
     {
-        updateAllAggregate(node);
+        updateNodeAggregate(node, oldCost);
     }
 }
 
@@ -40,7 +51,19 @@ void Grid2d::clear()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-unsigned int Grid2d::getCost(const Location& location) const
+int Grid2d::getAggregateCost(const Location& location) const
+{
+    auto found = grid_.find(location);
+    if (found != grid_.end())
+    {
+        return found->second->aggregateCost;
+    }
+
+    return MIN_COST;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+int Grid2d::getCost(const Location& location) const
 {
     auto found = grid_.find(location);
     if (found != grid_.end())
@@ -48,7 +71,7 @@ unsigned int Grid2d::getCost(const Location& location) const
         return found->second->cost;
     }
 
-    return 0;
+    return MIN_COST;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,22 +108,34 @@ ostream& operator<<(ostream& stream, const Grid2d& grid)
     stream << "(" << grid.height_ << "x" << grid.width_ << ")" << endl;
 
     stream << right << setw(WIDTH) << ' ';
-    for (unsigned int x = 0; x < grid.width_; ++x)
+    for (int x = 0; x < grid.width_; ++x)
     {
         stream << right << setw(WIDTH) << x;
     }
     stream << endl;
 
-    for (unsigned int y = 0; y < grid.height_; ++y)
+    for (int y = 0; y < grid.height_; ++y)
     {
         stream << right << setw(WIDTH) << y;
-        for (unsigned int x = 0; x < grid.width_; ++x)
+        for (int x = 0; x < grid.width_; ++x)
         {
             Grid2d::Location nodeLocation(x, y);
             if (grid.exists(nodeLocation))
             {
                 Grid2d::Node* node = grid.grid_.at(nodeLocation);
-                stream << right << setw(WIDTH) << node->cost;
+
+                if (node->cost == Grid2d::MAX_COST)
+                {
+                    stream << right << setw(WIDTH) << "#";
+                }
+                else if (node->cost == Grid2d::MIN_COST)
+                {
+                    stream << right << setw(WIDTH) << ".";
+                }
+                else
+                {
+                    stream << right << setw(WIDTH) << node->cost;
+                }
             }
             else
             {
@@ -110,32 +145,47 @@ ostream& operator<<(ostream& stream, const Grid2d& grid)
         stream << endl;
     }
 
-    stream << endl;
-
-    stream << right << setw(WIDTH) << ' ';
-    for (unsigned int x = 0; x < grid.width_; ++x)
+    if (grid.aggregate_)
     {
-        stream << right << setw(WIDTH) << x;
-    }
-    stream << endl;
+        stream << endl;
 
-    for (unsigned int y = 0; y < grid.height_; ++y)
-    {
-        stream << right << setw(WIDTH) << y;
-        for (unsigned int x = 0; x < grid.width_; ++x)
+        stream << right << setw(WIDTH) << ' ';
+        for (int x = 0; x < grid.width_; ++x)
         {
-            Grid2d::Location nodeLocation(x, y);
-            if (grid.exists(nodeLocation))
-            {
-                Grid2d::Node* node = grid.grid_.at(nodeLocation);
-                stream << right << setw(WIDTH) << node->aggregateCost;
-            }
-            else
-            {
-                stream << right << setw(WIDTH) << ".";
-            }
+            stream << right << setw(WIDTH) << x;
         }
         stream << endl;
+
+        for (int y = 0; y < grid.height_; ++y)
+        {
+            stream << right << setw(WIDTH) << y;
+            for (int x = 0; x < grid.width_; ++x)
+            {
+                Grid2d::Location nodeLocation(x, y);
+                if (grid.exists(nodeLocation))
+                {
+                    Grid2d::Node* node = grid.grid_.at(nodeLocation);
+
+                    if (node->aggregateCost == Grid2d::MAX_COST)
+                    {
+                        stream << right << setw(WIDTH) << "#";
+                    }
+                    else if (node->aggregateCost == Grid2d::MIN_COST)
+                    {
+                        stream << right << setw(WIDTH) << ".";
+                    }
+                    else
+                    {
+                        stream << right << setw(WIDTH) << node->aggregateCost;
+                    }
+                }
+                else
+                {
+                    stream << right << setw(WIDTH) << ".";
+                }
+            }
+            stream << endl;
+        }
     }
 
     stream << "}";
@@ -146,33 +196,48 @@ ostream& operator<<(ostream& stream, const Grid2d& grid)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2d::setAggregateSize(unsigned int width, unsigned int height)
 {
-    aggregate_ = true;
-    aggregateWidth_ = width;
-    aggregateHeight_ = height;
+    if (width > 0 && height > 0)
+    {
+        aggregate_ = true;
+        aggregateWidth_ = width;
+        aggregateHeight_ = height;
 
-    updateAllAggregate(nullptr);
+        updateAllAggregate();
+    }
+    else
+    {
+        aggregate_ = false;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::setCost(const Location& location, unsigned int cost)
+void Grid2d::setCost(const Location& location, int newCost)
 {
     auto found = grid_.find(location);
 
     Node* node;
+    int oldCost = MIN_COST;
+
     if (found != grid_.end())
     {
         node = found->second;
-        node->cost = cost;
+        oldCost = node->cost;
+        node->cost = newCost;
     }
     else
     {
-        node = new Node(location, cost, 0);
+        node = new Node(location, newCost, MIN_COST);
         grid_[location] = node;
+
+        if (aggregate_)
+        {
+            node->aggregateCost = BasicMath::noOverflowAdd(calculateAggregateCost(node), -newCost);
+        }
     }
 
     if (aggregate_)
     {
-        updateAllAggregate(node);
+        updateNodeAggregate(node, oldCost);
     }
 }
 
@@ -180,17 +245,40 @@ void Grid2d::setCost(const Location& location, unsigned int cost)
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::calculateAggregateArea(unsigned int x0, unsigned int y0,
-    unsigned int& xi, unsigned int& xf,
-    unsigned int& yi, unsigned int& yf)
+int Grid2d::calculateAggregateCost(Node* node)
 {
-    xi = x0 - round(static_cast<double>(aggregateWidth_) / 2);
+    int xi;
+    int xf;
+    int yi;
+    int yf;
+    calculateAggregateArea(node->location.x, node->location.y, xi, xf, yi, yf);
+
+    int aggregateCost = MIN_COST;
+    for (int y = yi; y <= yf; ++y)
+    {
+        for (int x = xi; x <= xf; ++x)
+        {
+            auto found = grid_.find(Location(x, y));
+            if (found != grid_.end())
+            {
+                aggregateCost += found->second->cost;
+            }
+        }
+    }
+
+    return aggregateCost;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Grid2d::calculateAggregateArea(int x0, int y0, int& xi, int& xf, int& yi, int& yf)
+{
+    xi = x0 - aggregateWidth_;
     xi = xi < 0 ? 0 : xi;
 
     xf = xi + aggregateWidth_ * 2;
     xf = xf >= width_ ? width_ - 1 : xf;
 
-    yi = y0 - round(static_cast<double>(aggregateHeight_) / 2);
+    yi = y0 - aggregateHeight_;
     yi = yi < 0 ? 0 : yi;
 
     yf = yi + aggregateHeight_ * 2;
@@ -198,64 +286,38 @@ void Grid2d::calculateAggregateArea(unsigned int x0, unsigned int y0,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::updateAllAggregate(Node* node)
+void Grid2d::updateAllAggregate()
 {
-    unsigned int xi;
-    unsigned int xf;
-    unsigned int yi;
-    unsigned int yf;
-
-    if (node)
+    for (auto node : grid_)
     {
-        calculateAggregateArea(node->location.x, node->location.y, xi, xf, yi, yf);
-    }
-    else
-    {
-        xi = 0;
-        xf = width_ - 1;
-
-        yi = 0;
-        yf = height_ - 1;
-    }
-
-    unsigned int aggregateCost = 0;
-    for (unsigned int y = yi; y <= yf; ++y)
-    {
-        for (unsigned int x = xi; x <= xf; ++x)
-        {
-            auto found = grid_.find(Location(x, y));
-            if (found != grid_.end())
-            {
-                updateNodeAggregate(found->second);
-            }
-        }
+        node.second->aggregateCost = calculateAggregateCost(node.second);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::updateNodeAggregate(Node* node)
+void Grid2d::updateNodeAggregate(Node* node, int oldCost)
 {
-    unsigned int xi;
-    unsigned int xf;
-    unsigned int yi;
-    unsigned int yf;
-
+    int xi;
+    int xf;
+    int yi;
+    int yf;
     calculateAggregateArea(node->location.x, node->location.y, xi, xf, yi, yf);
 
-    unsigned int aggregateCost = 0;
-    for (unsigned int y = yi; y <= yf; ++y)
+    int deltaCost = BasicMath::noOverflowAdd<int>(node->cost, -oldCost);
+
+    for (int y = yi; y <= yf; ++y)
     {
-        for (unsigned int x = xi; x <= xf; ++x)
+        for (int x = xi; x <= xf; ++x)
         {
             auto found = grid_.find(Location(x, y));
             if (found != grid_.end())
             {
-                aggregateCost = BasicMath::noOverflowAdd(aggregateCost, found->second->cost);
+                Node* neighbor = found->second;
+                neighbor->aggregateCost = BasicMath::noOverflowAdd<int>(
+                    neighbor->aggregateCost, deltaCost);
             }
         }
     }
-
-    node->aggregateCost = aggregateCost;
 }
 
 } // namespace srs

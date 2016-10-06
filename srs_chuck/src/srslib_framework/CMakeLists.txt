@@ -72,6 +72,7 @@ set(TEST_SOURCES_LOCALIZATION
 )
 
 set(TEST_SOURCES_MATH
+    test/math/Test_BasicMath.cpp
     test/math/Test_PoseMath.cpp
 )
 

@@ -4,7 +4,6 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
-#include <ros/ros.h>
 
 #include <vector>
 using namespace std;

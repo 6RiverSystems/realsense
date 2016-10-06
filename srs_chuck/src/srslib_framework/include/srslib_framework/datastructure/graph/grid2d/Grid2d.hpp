@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <vector>
 #include <unordered_map>
+#include <limits>
 using namespace std;
 
 #include <srslib_framework/math/BasicMath.hpp>
@@ -19,9 +20,12 @@ namespace srs {
 class Grid2d
 {
 public:
+    static const int MIN_COST;
+    static const int MAX_COST;
+
     struct Location
     {
-        Location(unsigned int x = 0, unsigned int y = 0) :
+        Location(int x = 0, int y = 0) :
             x(x),
             y(y)
         {}
@@ -33,53 +37,13 @@ public:
 
         friend ostream& operator<<(ostream& stream, const Location& location)
         {
-            return stream << location.x << ", " << location.y;
+            return stream << "<" << location.x << ", " << location.y << ">";
         }
 
-        unsigned int x;
-        unsigned int y;
+        int x;
+        int y;
     };
 
-private:
-    struct LocationHash
-    {
-        std::size_t operator()(const Location& location) const
-        {
-            return location.x + 1812433253 * location.y;
-        }
-    };
-
-    struct LocationEqual
-    {
-        bool operator()(const Location& lhs, const Location& rhs) const
-        {
-            return (lhs.x == rhs.x) && (lhs.y == rhs.y);
-        }
-    };
-
-    struct Node
-    {
-        Node(Location location, unsigned int cost, unsigned int aggregateCost) :
-            location(location),
-            cost(cost),
-            aggregateCost(aggregateCost)
-        {}
-
-        friend ostream& operator<<(ostream& stream, const Node* node)
-        {
-            stream << "Node "<< hex << reinterpret_cast<long>(node) << dec << " {" << '\n';
-            stream << "l: " << node->location <<
-                ", c: " << node->cost <<
-                ", ac: " << node->aggregateCost << "\n}";
-            return stream;
-        }
-
-        unsigned int aggregateCost;
-        unsigned int cost;
-        const Location location;
-    };
-
-public:
     Grid2d(unsigned int size) :
         width_(size),
         height_(size),
@@ -101,7 +65,7 @@ public:
         clear();
     }
 
-    void addCost(const Location& location, unsigned int cost);
+    void addCost(const Location& location, int cost);
 
     void clear();
 
@@ -121,7 +85,8 @@ public:
             (0 <= location.y && location.y < height_);
     }
 
-    unsigned int getCost(const Location& location) const;
+    int getAggregateCost(const Location& location) const;
+    int getCost(const Location& location) const;
 
     unsigned int getHeight() const
     {
@@ -138,15 +103,52 @@ public:
     friend ostream& operator<<(ostream& stream, const Grid2d& grid);
 
     void setAggregateSize(unsigned int width, unsigned int height);
-    void setCost(const Location& location, unsigned int cost);
+    void setCost(const Location& location, int newCost);
 
 private:
-    void calculateAggregateArea(unsigned int x0, unsigned int y0,
-        unsigned int& xi, unsigned int& xf,
-        unsigned int& yi, unsigned int& yf);
+    struct LocationHash
+    {
+        std::size_t operator()(const Location& location) const
+        {
+            return location.x + 1812433253 * location.y;
+        }
+    };
 
-    void updateAllAggregate(Node* node);
-    void updateNodeAggregate(Node* node);
+    struct LocationEqual
+    {
+        bool operator()(const Location& lhs, const Location& rhs) const
+        {
+            return (lhs.x == rhs.x) && (lhs.y == rhs.y);
+        }
+    };
+
+    struct Node
+    {
+        Node(Location location, int cost, int aggregateCost) :
+            location(location),
+            cost(cost),
+            aggregateCost(aggregateCost)
+        {}
+
+        friend ostream& operator<<(ostream& stream, const Node* node)
+        {
+            stream << "Node "<< hex << reinterpret_cast<long>(node) << dec << " {" << '\n';
+            stream << "l: " << node->location <<
+                ", c: " << node->cost <<
+                ", ac: " << node->aggregateCost << "\n}";
+            return stream;
+        }
+
+        int aggregateCost;
+        int cost;
+        const Location location;
+    };
+
+    int calculateAggregateCost(Node* node);
+    void calculateAggregateArea(int x0, int y0, int& xi, int& xf, int& yi, int& yf);
+
+    void updateAllAggregate();
+    void updateNodeAggregate(Node* node, int oldCost);
 
     bool aggregate_;
     unsigned int aggregateWidth_;

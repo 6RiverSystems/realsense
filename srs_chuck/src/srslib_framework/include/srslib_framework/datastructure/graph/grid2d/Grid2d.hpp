@@ -11,6 +11,7 @@
 #include <vector>
 #include <unordered_map>
 #include <limits>
+#include <functional>
 using namespace std;
 
 #include <srslib_framework/math/BasicMath.hpp>
@@ -20,8 +21,13 @@ namespace srs {
 class Grid2d
 {
 public:
-    static const int MIN_COST;
-    static const int MAX_COST;
+    static const int COST_MIN;
+    static const int COST_MAX;
+
+    static const int ORIENTATION_NORTH;
+    static const int ORIENTATION_EAST;
+    static const int ORIENTATION_SOUTH;
+    static const int ORIENTATION_WEST;
 
     struct Location
     {
@@ -68,6 +74,7 @@ public:
     void addCost(const Location& location, int cost);
 
     void clear();
+    void clear(const Location& location);
 
     bool exists(const Location& location) const
     {
@@ -94,6 +101,7 @@ public:
     }
 
     bool getNeighbor(const Location& location, int orientation, Location& result) const;
+    int getWeight(const Location& location, int orientation) const;
 
     unsigned int getWidth() const
     {
@@ -104,8 +112,12 @@ public:
 
     void setAggregateSize(unsigned int width, unsigned int height);
     void setCost(const Location& location, int newCost);
+    void setWeights(const Location& location, int north, int east, int south, int west);
 
 private:
+    static constexpr int WIDTH = 6;
+    static constexpr int MAX_WEIGHTS = 4;
+
     struct LocationHash
     {
         std::size_t operator()(const Location& location) const
@@ -122,13 +134,34 @@ private:
         }
     };
 
+    struct Weights
+    {
+        Weights(
+            int north = COST_MIN, int east = COST_MIN,
+            int south = COST_MIN, int west = COST_MIN)
+        {
+            cost[ORIENTATION_NORTH] = north;
+            cost[ORIENTATION_EAST] = east;
+            cost[ORIENTATION_SOUTH] = south;
+            cost[ORIENTATION_WEST] = west;
+        }
+
+        int cost[MAX_WEIGHTS];
+    };
+
     struct Node
     {
         Node(Location location, int cost, int aggregateCost) :
             location(location),
             cost(cost),
-            aggregateCost(aggregateCost)
+            aggregateCost(aggregateCost),
+            weights(nullptr)
         {}
+
+        ~Node()
+        {
+            delete weights;
+        }
 
         friend ostream& operator<<(ostream& stream, const Node* node)
         {
@@ -140,12 +173,37 @@ private:
         }
 
         int aggregateCost;
+
         int cost;
+
         const Location location;
+
+        Weights* weights;
     };
+
+    Node* addNode(const Location& location, int cost, int aggregateCost)
+    {
+        Node* node = new Node(location, cost, aggregateCost);
+        grid_[location] = node;
+
+        return node;
+    }
 
     int calculateAggregateCost(Node* node);
     void calculateAggregateArea(int x0, int y0, int& xi, int& xf, int& yi, int& yf);
+
+    Node* findNode(const Location& location) const
+    {
+        auto found = grid_.find(location);
+        if (found != grid_.end())
+        {
+            return found->second;
+        }
+
+        return nullptr;
+    }
+
+    void printGrid(string title, ostream& stream, std::function<int (Node*)> fieldSelection) const;
 
     void updateAllAggregate();
     void updateNodeAggregate(Node* node, int oldCost);

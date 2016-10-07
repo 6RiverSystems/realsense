@@ -36,8 +36,6 @@ TEST(Test_Graph2d, BasicSet)
         "Location cost in " << P_1_1 << " is not as expected";
     ASSERT_EQ(15, grid.getCost(P_3_3)) <<
         "Location cost in " << P_3_3 << " is not as expected";
-
-    cout << grid << endl;
 }
 
 TEST(Test_Graph2d, GetCost)
@@ -51,10 +49,8 @@ TEST(Test_Graph2d, GetCost)
         "Location cost in " << P_1_1 << " is not as expected";
     ASSERT_EQ(30, grid.getCost(P_3_3)) <<
         "Location cost in " << P_3_3 << " is not as expected";
-    ASSERT_EQ(srs::Grid2d::MIN_COST, grid.getCost(P_2_2)) <<
+    ASSERT_EQ(srs::Grid2d::COST_MIN, grid.getCost(P_2_2)) <<
         "Location cost in " << P_3_3 << " is not as expected";
-
-    cout << grid << endl;
 }
 
 TEST(Test_Graph2d, BasicAdd)
@@ -79,8 +75,6 @@ TEST(Test_Graph2d, BasicAdd)
         "Location cost in " << P_3_3 << " is not as expected";
     ASSERT_EQ(5, grid.getCost(P_2_2)) <<
         "Location cost in " << P_2_2 << " is not as expected";
-
-    cout << grid << endl;
 }
 
 TEST(Test_Graph2d, SetWithMax)
@@ -95,14 +89,12 @@ TEST(Test_Graph2d, SetWithMax)
     ASSERT_EQ(30, grid.getCost(P_3_3)) <<
         "Location cost in " << P_3_3 << " is not as expected";
 
-    grid.setCost(P_3_3, srs::Grid2d::MAX_COST);
+    grid.setCost(P_3_3, srs::Grid2d::COST_MAX);
 
     ASSERT_EQ(10, grid.getCost(P_1_1)) <<
         "Location cost in " << P_1_1 << " is not as expected";
-    ASSERT_EQ(srs::Grid2d::MAX_COST, grid.getCost(P_3_3)) <<
+    ASSERT_EQ(srs::Grid2d::COST_MAX, grid.getCost(P_3_3)) <<
         "Location cost in " << P_3_3 << " is not as expected";
-
-    cout << grid << endl;
 }
 
 TEST(Test_Graph2d, AddWithMax)
@@ -117,14 +109,12 @@ TEST(Test_Graph2d, AddWithMax)
     ASSERT_EQ(30, grid.getCost(P_3_3)) <<
         "Location cost in " << P_3_3 << " is not as expected";
 
-    grid.addCost(P_3_3, srs::Grid2d::MAX_COST);
+    grid.addCost(P_3_3, srs::Grid2d::COST_MAX);
 
     ASSERT_EQ(10, grid.getCost(P_1_1)) <<
         "Location cost in " << P_1_1 << " is not as expected";
-    ASSERT_EQ(srs::Grid2d::MAX_COST, grid.getCost(P_3_3)) <<
+    ASSERT_EQ(srs::Grid2d::COST_MAX, grid.getCost(P_3_3)) <<
         "Location cost in " << P_3_3 << " is not as expected";
-
-    cout << grid << endl;
 }
 
 TEST(Test_Graph2d, BasicAggregate)
@@ -145,8 +135,6 @@ TEST(Test_Graph2d, BasicAggregate)
         "Location aggregate cost in " << P_1_1 << " is not as expected";
     ASSERT_EQ(30, grid.getAggregateCost(P_3_3)) <<
         "Location aggregate cost in " << P_3_3 << " is not as expected";
-
-    cout << grid << endl;
 }
 
 TEST(Test_Graph2d, AggregateChange)
@@ -179,42 +167,67 @@ TEST(Test_Graph2d, AggregateChange)
         "Location aggregate cost in " << P_1_1 << " is not as expected";
     ASSERT_EQ(40, grid.getAggregateCost(P_3_3)) <<
         "Location aggregate cost in " << P_3_3 << " is not as expected";
-
-    cout << grid << endl;
 }
 
-//TEST(Test_Graph, Grid2dCreation)
-//{
-//    Grid2d grid(10);
-//
-//    grid.setCost(P_1_1, 10);
-//    grid.setCost(Grid2d::Location(3, 3), 30);
-//    cout << grid << endl;
-//
-//    grid.setAggregateSize(1, 1);
-//    cout << grid << endl;
-//
-//    grid.setCost(Grid2d::Location(3, 3), 22);
-//    cout << grid << endl;
-//
-//    grid.setCost(Grid2d::Location(2, 2), 10);
-//    cout << grid << endl;
-//
-//    grid.addCost(Grid2d::Location(1, 1), 10);
-//    cout << grid << endl;
-//
-//    grid.addCost(Grid2d::Location(1, 1), numeric_limits<int>::max());
-//    cout << grid << endl;
-//
-//    grid.setAggregateSize(2, 2);
-//    cout << grid << endl;
-//
-//    grid.setAggregateSize(0, 0);
-//    cout << grid << endl;
-//
-//    grid.setAggregateSize(1, 2);
-//    cout << grid << endl;
-//
-//    grid.addCost(Grid2d::Location(1, 1), numeric_limits<int>::max());
-//    cout << grid << endl;
-//}
+TEST(Test_Graph2d, BasicWeigths)
+{
+    Grid2d grid(10);
+
+    grid.setCost(P_1_1, 10);
+    grid.setCost(P_3_3, 30);
+    grid.setWeights(P_3_3, 100, 200, 300, 400);
+
+    ASSERT_EQ(Grid2d::COST_MIN, grid.getWeight(P_1_1, Grid2d::ORIENTATION_NORTH)) <<
+        "North weight in location " << P_1_1 << " is not as expected";
+
+    ASSERT_EQ(100, grid.getWeight(P_3_3, Grid2d::ORIENTATION_NORTH)) <<
+        "North weight in location " << P_3_3 << " is not as expected";
+}
+
+TEST(Test_Graph2d, BasicClear)
+{
+    Grid2d grid(10);
+
+    grid.setCost(P_3_3, 30);
+    grid.setWeights(P_3_3, 100, 200, 300, 400);
+
+    ASSERT_EQ(30, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
+
+    ASSERT_EQ(100, grid.getWeight(P_3_3, Grid2d::ORIENTATION_NORTH)) <<
+        "North weight in location " << P_3_3 << " is not as expected";
+    ASSERT_EQ(200, grid.getWeight(P_3_3, Grid2d::ORIENTATION_EAST)) <<
+        "East weight in location " << P_3_3 << " is not as expected";
+    ASSERT_EQ(300, grid.getWeight(P_3_3, Grid2d::ORIENTATION_SOUTH)) <<
+        "South weight in location " << P_3_3 << " is not as expected";
+    ASSERT_EQ(400, grid.getWeight(P_3_3, Grid2d::ORIENTATION_WEST)) <<
+        "West weight in location " << P_3_3 << " is not as expected";
+
+    grid.clear(P_3_3);
+
+    ASSERT_EQ(Grid2d::COST_MIN, grid.getCost(P_3_3)) <<
+        "Location cost in " << P_3_3 << " is not as expected";
+
+    ASSERT_EQ(Grid2d::COST_MIN, grid.getWeight(P_3_3, Grid2d::ORIENTATION_NORTH)) <<
+        "North weight in location " << P_3_3 << " is not as expected";
+    ASSERT_EQ(Grid2d::COST_MIN, grid.getWeight(P_3_3, Grid2d::ORIENTATION_EAST)) <<
+        "East weight in location " << P_3_3 << " is not as expected";
+    ASSERT_EQ(Grid2d::COST_MIN, grid.getWeight(P_3_3, Grid2d::ORIENTATION_SOUTH)) <<
+        "South weight in location " << P_3_3 << " is not as expected";
+    ASSERT_EQ(Grid2d::COST_MIN, grid.getWeight(P_3_3, Grid2d::ORIENTATION_WEST)) <<
+        "West weight in location " << P_3_3 << " is not as expected";
+
+    ASSERT_EQ(Grid2d::COST_MIN, grid.getCost(P_2_2)) <<
+        "Location cost in " << P_2_2 << " is not as expected";
+
+    ASSERT_EQ(Grid2d::COST_MIN, grid.getWeight(P_2_2, Grid2d::ORIENTATION_NORTH)) <<
+        "North weight in location " << P_2_2 << " is not as expected";
+    ASSERT_EQ(Grid2d::COST_MIN, grid.getWeight(P_2_2, Grid2d::ORIENTATION_EAST)) <<
+        "East weight in location " << P_2_2 << " is not as expected";
+    ASSERT_EQ(Grid2d::COST_MIN, grid.getWeight(P_3_3, Grid2d::ORIENTATION_SOUTH)) <<
+        "South weight in location " << P_2_2 << " is not as expected";
+    ASSERT_EQ(Grid2d::COST_MIN, grid.getWeight(P_3_3, Grid2d::ORIENTATION_WEST)) <<
+        "West weight in location " << P_2_2 << " is not as expected";
+
+    grid.clear(P_2_2);
+}

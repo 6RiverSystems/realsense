@@ -5,28 +5,28 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-const int Grid2d::MIN_COST = 0;
-const int Grid2d::MAX_COST = numeric_limits<int>::max();
+const int Grid2d::COST_MIN = 0;
+const int Grid2d::COST_MAX = numeric_limits<int>::max();
+
+const int Grid2d::ORIENTATION_NORTH = 0;
+const int Grid2d::ORIENTATION_EAST = 1;
+const int Grid2d::ORIENTATION_SOUTH = 2;
+const int Grid2d::ORIENTATION_WEST = 3;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2d::addCost(const Location& location, int cost)
 {
-    auto found = grid_.find(location);
+    int oldCost = COST_MIN;
 
-    Node* node;
-    int oldCost = MIN_COST;
-
-    if (found != grid_.end())
+    Node* node = findNode(location);
+    if (node)
     {
-        node = found->second;
         oldCost = node->cost;
         node->cost = BasicMath::noOverflowAdd<int>(node->cost, cost);
     }
     else
     {
-        node = new Node(location, cost, MIN_COST);
-        grid_[location] = node;
-
+        node = addNode(location, cost, COST_MIN);
         if (aggregate_)
         {
             node->aggregateCost = BasicMath::noOverflowAdd(calculateAggregateCost(node), -cost);
@@ -51,27 +51,38 @@ void Grid2d::clear()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-int Grid2d::getAggregateCost(const Location& location) const
+void Grid2d::clear(const Location& location)
 {
     auto found = grid_.find(location);
     if (found != grid_.end())
     {
-        return found->second->aggregateCost;
+        delete found->second;
+        grid_.erase(found);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+int Grid2d::getAggregateCost(const Location& location) const
+{
+    Node* node = findNode(location);
+    if (node)
+    {
+        return node->aggregateCost;
     }
 
-    return MIN_COST;
+    return COST_MIN;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 int Grid2d::getCost(const Location& location) const
 {
-    auto found = grid_.find(location);
-    if (found != grid_.end())
+    Node* node = findNode(location);
+    if (node)
     {
-        return found->second->cost;
+        return node->cost;
     }
 
-    return MIN_COST;
+    return COST_MIN;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,19 +90,19 @@ bool Grid2d::getNeighbor(const Location& location, int orientation, Location& re
 {
     switch (orientation)
     {
-        case 0:
+        case ORIENTATION_EAST:
             result = Location(location.x + 1, location.y);
             break;
 
-        case 90:
+        case ORIENTATION_NORTH:
             result = Location(location.x, location.y + 1);
             break;
 
-        case 180:
+        case ORIENTATION_WEST:
             result = Location(location.x - 1, location.y);
             break;
 
-        case 270:
+        case ORIENTATION_SOUTH:
             result = Location(location.x, location.y - 1);
             break;
     }
@@ -100,93 +111,86 @@ bool Grid2d::getNeighbor(const Location& location, int orientation, Location& re
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+int Grid2d::getWeight(const Location& location, int orientation) const
+{
+    Node* node = findNode(location);
+    if (node && node->weights)
+    {
+        switch (orientation)
+        {
+            case ORIENTATION_EAST:
+            case ORIENTATION_NORTH:
+            case ORIENTATION_WEST:
+            case ORIENTATION_SOUTH:
+                return node->weights->cost[orientation];
+
+            default:
+                return COST_MAX;
+        }
+    }
+
+    return COST_MIN;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 ostream& operator<<(ostream& stream, const Grid2d& grid)
 {
-    constexpr int WIDTH = 6;
     stream << "Grid2d {" << endl;
 
     stream << "(" << grid.height_ << "x" << grid.width_ << ")" << endl;
 
-    stream << right << setw(WIDTH) << ' ';
-    for (int x = 0; x < grid.width_; ++x)
-    {
-        stream << right << setw(WIDTH) << x;
-    }
-    stream << endl;
-
-    for (int y = 0; y < grid.height_; ++y)
-    {
-        stream << right << setw(WIDTH) << y;
-        for (int x = 0; x < grid.width_; ++x)
+    grid.printGrid("", stream,
+        [] (Grid2d::Node* node) -> int
         {
-            Grid2d::Location nodeLocation(x, y);
-            if (grid.exists(nodeLocation))
-            {
-                Grid2d::Node* node = grid.grid_.at(nodeLocation);
-
-                if (node->cost == Grid2d::MAX_COST)
-                {
-                    stream << right << setw(WIDTH) << "#";
-                }
-                else if (node->cost == Grid2d::MIN_COST)
-                {
-                    stream << right << setw(WIDTH) << ".";
-                }
-                else
-                {
-                    stream << right << setw(WIDTH) << node->cost;
-                }
-            }
-            else
-            {
-                stream << right << setw(WIDTH) << ".";
-            }
+            return node->cost;
         }
-        stream << endl;
-    }
+    );
 
     if (grid.aggregate_)
     {
-        stream << endl;
-
-        stream << right << setw(WIDTH) << ' ';
-        for (int x = 0; x < grid.width_; ++x)
-        {
-            stream << right << setw(WIDTH) << x;
-        }
-        stream << endl;
-
-        for (int y = 0; y < grid.height_; ++y)
-        {
-            stream << right << setw(WIDTH) << y;
-            for (int x = 0; x < grid.width_; ++x)
+        grid.printGrid("Aggregate", stream,
+            [] (Grid2d::Node* node) -> int
             {
-                Grid2d::Location nodeLocation(x, y);
-                if (grid.exists(nodeLocation))
-                {
-                    Grid2d::Node* node = grid.grid_.at(nodeLocation);
-
-                    if (node->aggregateCost == Grid2d::MAX_COST)
-                    {
-                        stream << right << setw(WIDTH) << "#";
-                    }
-                    else if (node->aggregateCost == Grid2d::MIN_COST)
-                    {
-                        stream << right << setw(WIDTH) << ".";
-                    }
-                    else
-                    {
-                        stream << right << setw(WIDTH) << node->aggregateCost;
-                    }
-                }
-                else
-                {
-                    stream << right << setw(WIDTH) << ".";
-                }
+                return node->aggregateCost;
             }
-            stream << endl;
-        }
+        );
     }
+
+    grid.printGrid("North Weights", stream,
+        [] (Grid2d::Node* node) -> int
+        {
+            return node->weights ?
+                node->weights->cost[Grid2d::ORIENTATION_NORTH] :
+                Grid2d::COST_MIN;
+        }
+    );
+
+    grid.printGrid("East Weights", stream,
+        [] (Grid2d::Node* node) -> int
+        {
+            return node->weights ?
+                node->weights->cost[Grid2d::ORIENTATION_EAST] :
+                Grid2d::COST_MIN;
+        }
+    );
+
+    grid.printGrid("South Weights", stream,
+        [] (Grid2d::Node* node) -> int
+        {
+            return node->weights ?
+                node->weights->cost[Grid2d::ORIENTATION_SOUTH] :
+                Grid2d::COST_MIN;
+        }
+    );
+
+    grid.printGrid("West Weights", stream,
+        [] (Grid2d::Node* node) -> int
+        {
+            return node->weights ?
+                node->weights->cost[Grid2d::ORIENTATION_WEST] :
+                Grid2d::COST_MIN;
+        }
+    );
 
     stream << "}";
 
@@ -213,22 +217,17 @@ void Grid2d::setAggregateSize(unsigned int width, unsigned int height)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2d::setCost(const Location& location, int newCost)
 {
-    auto found = grid_.find(location);
+    int oldCost = COST_MIN;
 
-    Node* node;
-    int oldCost = MIN_COST;
-
-    if (found != grid_.end())
+    Node* node = findNode(location);
+    if (node)
     {
-        node = found->second;
         oldCost = node->cost;
         node->cost = newCost;
     }
     else
     {
-        node = new Node(location, newCost, MIN_COST);
-        grid_[location] = node;
-
+        node = addNode(location, newCost, COST_MIN);
         if (aggregate_)
         {
             node->aggregateCost = BasicMath::noOverflowAdd(calculateAggregateCost(node), -newCost);
@@ -239,6 +238,18 @@ void Grid2d::setCost(const Location& location, int newCost)
     {
         updateNodeAggregate(node, oldCost);
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Grid2d::setWeights(const Location& location, int north, int east, int south, int west)
+{
+    Node* node;
+    if (!node)
+    {
+        node = addNode(location, COST_MIN, COST_MIN);
+    }
+
+    node->weights = new Weights(north, east, south, west);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -253,7 +264,7 @@ int Grid2d::calculateAggregateCost(Node* node)
     int yf;
     calculateAggregateArea(node->location.x, node->location.y, xi, xf, yi, yf);
 
-    int aggregateCost = MIN_COST;
+    int aggregateCost = COST_MIN;
     for (int y = yi; y <= yf; ++y)
     {
         for (int x = xi; x <= xf; ++x)
@@ -283,6 +294,53 @@ void Grid2d::calculateAggregateArea(int x0, int y0, int& xi, int& xf, int& yi, i
 
     yf = yi + aggregateHeight_ * 2;
     yf = yf >= height_ ? height_ - 1 : yf;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Grid2d::printGrid(string title, ostream& stream, std::function<int (Node*)> fieldSelection) const
+{
+    if (!title.empty())
+    {
+        stream << endl << title << endl;
+    }
+
+    stream << right << setw(Grid2d::WIDTH) << ' ';
+    for (int x = 0; x < width_; ++x)
+    {
+        stream << right << setw(Grid2d::WIDTH) << x;
+    }
+    stream << endl;
+
+    for (int y = 0; y < height_; ++y)
+    {
+        stream << right << setw(Grid2d::WIDTH) << y;
+        for (int x = 0; x < width_; ++x)
+        {
+            Grid2d::Node* node = findNode(Grid2d::Location(x, y));
+            if (node)
+            {
+                int cost = fieldSelection(node);
+
+                if (cost == Grid2d::COST_MAX)
+                {
+                    stream << right << setw(WIDTH) << "#";
+                }
+                else if (cost == Grid2d::COST_MIN)
+                {
+                    stream << right << setw(WIDTH) << ".";
+                }
+                else
+                {
+                    stream << right << setw(WIDTH) << cost;
+                }
+            }
+            else
+            {
+                stream << right << setw(WIDTH) << ".";
+            }
+        }
+        stream << endl;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

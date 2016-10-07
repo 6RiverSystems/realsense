@@ -9,12 +9,12 @@
 
 namespace srs {
 
-class FeaturesNotFoundException: public LogicalMapException
+class GeoJsonTypeUnsupportedException: public LogicalMapException
 {
 public:
-    FeaturesNotFoundException(const LogicalMetadata& metadata) :
+    GeoJsonTypeUnsupportedException(const LogicalMetadata& metadata, const string& type) :
         LogicalMapException(metadata,
-            "The file file does not contain a features section.")
+            "GeoJson type not supported [" + type + "]")
     {}
 };
 

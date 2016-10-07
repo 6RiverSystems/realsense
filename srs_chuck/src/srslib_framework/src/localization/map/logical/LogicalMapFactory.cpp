@@ -7,7 +7,9 @@ using namespace std;
 #include <srslib_framework/exception/io/FailedToOpenFileException.hpp>
 #include <srslib_framework/localization/map/logical/exception/FeatureNotFoundException.hpp>
 #include <srslib_framework/localization/map/logical/exception/FeaturesNotFoundException.hpp>
+#include <srslib_framework/localization/map/logical/exception/GeoJsonTypeUnsupportedException.hpp>
 #include <srslib_framework/localization/map/logical/exception/UnexpectedFeatureException.hpp>
+#include <srslib_framework/localization/map/logical/exception/UnexpectedNumberOfPointsException.hpp>
 
 namespace srs {
 
@@ -101,8 +103,37 @@ void LogicalMapFactory::addStaticObstacle(LogicalMap* logicalMap,
     }
 
     // Add the static obstacle
-    addRectangleCost(logicalMap, origin,
-        widthMm, heightMm, numeric_limits<unsigned int>::max());
+    addRectangleCost(logicalMap, origin, widthMm, heightMm, Grid2d::COST_MAX);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::addWeight(LogicalMap* logicalMap,
+    Pose<> from, Pose<> to,
+    int north, int east, int south, int west)
+{
+    unsigned int xi;
+    unsigned int yi;
+    logicalMap->transformMm2Cells(from, xi, yi);
+
+    unsigned int xf;
+    unsigned int yf;
+    logicalMap->transformMm2Cells(to, xf, yf);
+
+    int deltaX = BasicMath::sgn<int>(xf - xi);
+    int deltaY = BasicMath::sgn<int>(yf - yi);
+
+    unsigned int x = xi;
+    unsigned int y = yi;
+    do
+    {
+        do
+        {
+            logicalMap->setWeights(x, y, north, east, south, west);
+            x += deltaX;
+        } while (x != xf);
+
+        y += deltaY;
+    } while (y != yf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,45 +193,44 @@ bool LogicalMapFactory::findIdInCollection(YAML::Node node, string id, YAML::Nod
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::nonTerminalBoundary(YAML::Node node, LogicalMap* map)
+int LogicalMapFactory::nonTerminalCostValue(YAML::Node node, LogicalMap* map)
 {
-    YAML::Node properties = node["properties"];
-
-    double envelopeSize = 0.0;
-    if (properties["envelope_size"])
+    if (node)
     {
-        envelopeSize = properties["envelope_size"].as<double>();
+        int cost = Grid2d::COST_MAX;
+
+        string costString = node.as<string>();
+        if (costString != "max")
+        {
+            cost = node.as<int>();
+        }
+
+        return cost;
     }
 
-    unsigned int envelopeCost = 0;
-    if (properties["envelope_cost"])
+    return Grid2d::COST_MIN;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::nonTerminalEntities(YAML::Node node, LogicalMap* map)
+{
+    // Go through all the obstacles in the collection
+    for (auto entity : node)
     {
-        envelopeCost = properties["envelope_cost"].as<unsigned int>();
+        string entityId = entity["id"].as<string>();
+        if (entityId == "obstacle")
+        {
+            nonTerminalStatementObstacle(entity, map);
+        }
+        else if (entityId == "weight")
+        {
+            nonTerminalStatementWeight(entity, map);
+        }
+        else
+        {
+            throw UnexpectedFeatureException(map->getMetadata(), entityId);
+        }
     }
-
-    double widthM = map->getWidthMm();
-    double heightM = map->getHeightMm();
-    double resolution = map->getResolution();
-
-    YAML::Node coordinates = node["geometry"]["coordinates"];
-    Pose<> c0 = coordinates[0].as<Pose<double>>();
-    Pose<> c2 = coordinates[2].as<Pose<double>>();
-
-    // Add the bottom border
-    addStaticObstacle(map, Pose<>::ZERO, widthM, c0.y,
-        envelopeSize, envelopeCost);
-
-    // Add the left border
-    addStaticObstacle(map, Pose<>(0, c0.y), c0.x, heightM - c0.y,
-        envelopeSize, envelopeCost);
-
-    // Add the top border
-    addStaticObstacle(map, Pose<>(c0.x, c2.y), widthM - c0.x, heightM - c2.y,
-        envelopeSize, envelopeCost);
-
-    // Add the right border
-    addStaticObstacle(map, Pose<>(c2.x, c0.y), widthM - c2.x, c2.y - c0.y,
-        envelopeSize, envelopeCost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -218,27 +248,58 @@ LogicalMap* LogicalMapFactory::nonTerminalEntry(LogicalMetadata& metadata, YAML:
         }
         else
         {
-            throw FeatureNotFoundException(metadata.logicalFilename, "map");
+            throw FeatureNotFoundException(metadata, "map");
         }
 
         YAML::Node boundaryNode;
         if (findIdInCollection(features, "boundary", boundaryNode))
         {
-            nonTerminalBoundary(boundaryNode, logicalMap);
+            nonTerminalStatementBoundary(boundaryNode, logicalMap);
         }
 
-        YAML::Node obstaclesNode;
-        if (findCollection(features, obstaclesNode))
+        YAML::Node entitiesNode;
+        if (findCollection(features, entitiesNode))
         {
-            nonTerminalObstacles(obstaclesNode, logicalMap);
+            nonTerminalEntities(entitiesNode, logicalMap);
         }
     }
     else
     {
-        throw FeaturesNotFoundException(metadata.logicalFilename);
+        throw FeaturesNotFoundException(metadata);
     }
 
     return logicalMap;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+vector<Pose<>> LogicalMapFactory::nonTerminalGeometry(YAML::Node node, LogicalMap* map)
+{
+    vector<Pose<>> coordinates;
+
+    YAML::Node typeNode = node["type"];
+    if (typeNode)
+    {
+        YAML::Node coordinatesNode = node["coordinates"];
+
+        string typeString = typeNode.as<string>();
+        if (typeString == "Point")
+        {
+            coordinates.push_back(coordinatesNode.as<Pose<>>());
+        }
+        else if (typeString == "MultiPoint")
+        {
+            for (auto coordinate : coordinatesNode)
+            {
+                coordinates.push_back(coordinate.as<Pose<>>());
+            }
+        }
+        else
+        {
+            throw GeoJsonTypeUnsupportedException(map->getMetadata(), typeString);
+        }
+    }
+
+    return coordinates;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -258,7 +319,7 @@ LogicalMap* LogicalMapFactory::nonTerminalMap(YAML::Node node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::nonTerminalObstacle(YAML::Node node, LogicalMap* map)
+void LogicalMapFactory::nonTerminalStatementBoundary(YAML::Node node, LogicalMap* map)
 {
     YAML::Node properties = node["properties"];
 
@@ -274,31 +335,96 @@ void LogicalMapFactory::nonTerminalObstacle(YAML::Node node, LogicalMap* map)
         envelopeCost = properties["envelope_cost"].as<unsigned int>();
     }
 
-    YAML::Node coordinates = node["geometry"]["coordinates"];
+    double widthM = map->getWidthMm();
+    double heightM = map->getHeightMm();
+    double resolution = map->getResolution();
 
-    Pose<> c0 = coordinates[0].as<Pose<double>>();
-    Pose<> c2 = coordinates[2].as<Pose<double>>();
+    vector<Pose<>> coordinates = nonTerminalGeometry(node["geometry"], map);
+    if (coordinates.size() == 2)
+    {
+        Pose<> bl = coordinates[0];
+        Pose<> tr = coordinates[1];
 
-    // Add the static obstacle
-    addStaticObstacle(map, c0, abs(c2.x - c0.x), abs(c2.y - c0.y),
-        envelopeSize, envelopeCost);
+        // Add the bottom border
+        addStaticObstacle(map, Pose<>::ZERO, widthM, bl.y,
+            envelopeSize, envelopeCost);
+
+        // Add the left border
+        addStaticObstacle(map, Pose<>(0, bl.y), bl.x, heightM - bl.y,
+            envelopeSize, envelopeCost);
+
+        // Add the top border
+        addStaticObstacle(map, Pose<>(bl.x, tr.y), widthM - bl.x, heightM - tr.y,
+            envelopeSize, envelopeCost);
+
+        // Add the right border
+        addStaticObstacle(map, Pose<>(tr.x, bl.y), widthM - tr.x, tr.y - bl.y,
+            envelopeSize, envelopeCost);
+    }
+    else
+    {
+        throw UnexpectedNumberOfPointsException(map->getMetadata(), 2, coordinates.size());
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::nonTerminalObstacles(YAML::Node node, LogicalMap* map)
+void LogicalMapFactory::nonTerminalStatementObstacle(YAML::Node node, LogicalMap* map)
 {
-    // Go through all the obstacles in the collection
-    for (auto obstacle : node)
+    YAML::Node properties = node["properties"];
+
+    double envelopeSize = 0.0;
+    if (properties["envelope_size"])
     {
-        if (obstacle["id"].as<string>() == "obstacle")
-        {
-            nonTerminalObstacle(obstacle, map);
-        }
-        else
-        {
-            throw UnexpectedFeatureException(map->getMetadata().logicalFilename,
-                obstacle["id"].as<string>());
-        }
+        envelopeSize = properties["envelope_size"].as<double>();
+    }
+
+    unsigned int envelopeCost = 0;
+    if (properties["envelope_cost"])
+    {
+        envelopeCost = properties["envelope_cost"].as<unsigned int>();
+    }
+
+    vector<Pose<>> coordinates = nonTerminalGeometry(node["geometry"], map);
+    if (coordinates.size() == 2)
+    {
+        Pose<> bl = coordinates[0];
+        Pose<> tr = coordinates[1];
+
+        // Add the static obstacle
+        addStaticObstacle(map, bl, abs(tr.x - bl.x), abs(tr.y - bl.y),
+            envelopeSize, envelopeCost);
+    }
+    else
+    {
+        throw UnexpectedNumberOfPointsException(map->getMetadata(), 2, coordinates.size());
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::nonTerminalStatementWeight(YAML::Node node, LogicalMap* map)
+{
+    YAML::Node properties = node["properties"];
+
+    int northCost = nonTerminalCostValue(properties["north"], map);
+    int eastCost = nonTerminalCostValue(properties["east"], map);
+    int southCost = nonTerminalCostValue(properties["south"], map);
+    int westCost = nonTerminalCostValue(properties["west"], map);
+
+    vector<Pose<>> coordinates = nonTerminalGeometry(node["geometry"], map);
+    if (coordinates.size() == 2)
+    {
+        Pose<> from = coordinates[0];
+        Pose<> to = coordinates[1];
+        addWeight(map, from, to, northCost, eastCost, southCost, westCost);
+    }
+    else if (coordinates.size() == 1)
+    {
+        Pose<> from = coordinates[0];
+        addWeight(map, from, from, northCost, eastCost, southCost, westCost);
+    }
+    else
+    {
+        throw UnexpectedNumberOfPointsException(map->getMetadata(), 1, 2, coordinates.size());
     }
 }
 

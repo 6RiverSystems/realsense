@@ -55,7 +55,8 @@ public:
         height_(size),
         aggregate_(false),
         aggregateHeight_(0),
-        aggregateWidth_(0)
+        aggregateWidth_(0),
+        hasWeights_(false)
     {}
 
     Grid2d(unsigned int width, unsigned int height) :
@@ -63,7 +64,8 @@ public:
         height_(height),
         aggregate_(false),
         aggregateHeight_(0),
-        aggregateWidth_(0)
+        aggregateWidth_(0),
+        hasWeights_(false)
     {}
 
     ~Grid2d()
@@ -115,8 +117,8 @@ public:
     void setWeights(const Location& location, int north, int east, int south, int west);
 
 private:
-    static constexpr int WIDTH = 6;
-    static constexpr int MAX_WEIGHTS = 4;
+    static constexpr int WIDTH = 4;
+    static constexpr int MAX_WEIGHT_DIRECTIONS = 4;
 
     struct LocationHash
     {
@@ -146,7 +148,7 @@ private:
             cost[ORIENTATION_WEST] = west;
         }
 
-        int cost[MAX_WEIGHTS];
+        int cost[MAX_WEIGHT_DIRECTIONS];
     };
 
     struct Node
@@ -203,7 +205,8 @@ private:
         return nullptr;
     }
 
-    void printGrid(string title, ostream& stream, std::function<int (Node*)> fieldSelection) const;
+    void printGrid(string title, bool simple, ostream& stream,
+        std::function<int (Node*)> fieldSelection) const;
 
     void updateAllAggregate();
     void updateNodeAggregate(Node* node, int oldCost);
@@ -214,6 +217,7 @@ private:
 
     unordered_map<Location, Node*, LocationHash, LocationEqual> grid_;
 
+    bool hasWeights_;
     unsigned int height_;
 
     unsigned int width_;

@@ -21,13 +21,13 @@ LogicalMap::LogicalMap(double widthM, double heightM, double resolution) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::addCost(unsigned int c, unsigned int r, unsigned int cost)
+void LogicalMap::addCost(unsigned int c, unsigned int r, int cost)
 {
     getGrid()->addCost(Grid2d::Location(c, r), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::setCost(unsigned int c, unsigned int r, unsigned int cost)
+void LogicalMap::setCost(unsigned int c, unsigned int r, int cost)
 {
     getGrid()->setCost(Grid2d::Location(c, r), cost);
 }
@@ -35,7 +35,14 @@ void LogicalMap::setCost(unsigned int c, unsigned int r, unsigned int cost)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::setObstruction(unsigned int c, unsigned int r)
 {
-    getGrid()->setCost(Grid2d::Location(c, r), numeric_limits<unsigned int>::max());
+    getGrid()->setCost(Grid2d::Location(c, r), Grid2d::COST_MAX);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMap::setWeights(unsigned int c, unsigned int r,
+    int north, int east, int south, int west)
+{
+    getGrid()->setWeights(Grid2d::Location(c, r), north, east, south, west);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,24 +55,8 @@ void LogicalMap::setObstruction(unsigned int c, unsigned int r)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ostream& operator<<(ostream& stream, const LogicalMap& map)
 {
-    unsigned int rows = map.getHeightCells();
-    unsigned int columns = map.getWidthCells();
-    stream << "LogicalMap (" << rows << "x" << columns << ")" << endl;
-
-    for (int row = rows - 1; row >= 0; row--)
-    {
-        for (unsigned int col = 0; col < columns; col++)
-        {
-            unsigned int rawCost = map.getCost(col, static_cast<unsigned int>(row));
-
-            char cost = rawCost > 0 ? '+' : '.';
-            cost = rawCost == numeric_limits<unsigned int>::max() ? '#' : cost;
-
-            stream << cost;
-        }
-
-        stream << endl;
-    }
+    stream << "LogicalMap" << endl;
+    stream << *map.getGrid() << endl;
 
     return stream;
 }

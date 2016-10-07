@@ -5,16 +5,16 @@
  */
 #pragma once
 
-#include <srslib_framework/exception/SrsRuntimeErrorException.hpp>
+#include <srslib_framework/localization/map/logical/exception/LogicalMapException.hpp>
 
 namespace srs {
 
-class FeatureNotFoundException: public SrsRuntimeErrorException
+class FeatureNotFoundException: public LogicalMapException
 {
 public:
-    FeatureNotFoundException(const string& filename, const string& feature) :
-        SrsRuntimeErrorException("The geojson file does not contain the required feature [" +
-            filename + ", " + feature + "]")
+    FeatureNotFoundException(const LogicalMetadata& metadata, const string& feature) :
+        LogicalMapException(metadata,
+            "The file does not contain the required feature [" + feature + "]")
     {}
 };
 

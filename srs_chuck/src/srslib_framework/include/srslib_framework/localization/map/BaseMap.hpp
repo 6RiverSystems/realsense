@@ -23,9 +23,9 @@ public:
     BaseMap(double widthM, double heightM, double resolution);
     virtual ~BaseMap();
 
-    virtual void addCost(unsigned int c, unsigned int r, unsigned int cost) = 0;
+    virtual void addCost(unsigned int c, unsigned int r, int cost) = 0;
 
-    virtual unsigned int getCost(unsigned int c, unsigned int r) const = 0;
+    virtual int getCost(unsigned int c, unsigned int r) const = 0;
 
     int getHeightCells() const
     {
@@ -57,7 +57,7 @@ public:
         return widthM_;
     }
 
-    virtual void setCost(unsigned int c, unsigned int r, unsigned int cost) = 0;
+    virtual void setCost(unsigned int c, unsigned int r, int cost) = 0;
     virtual void setObstruction(unsigned int c, unsigned int r) = 0;
 
     void transformCells2Mm(unsigned int cells, double& measurement)

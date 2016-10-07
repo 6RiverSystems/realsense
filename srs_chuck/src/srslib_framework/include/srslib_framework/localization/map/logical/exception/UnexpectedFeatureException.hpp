@@ -5,16 +5,16 @@
  */
 #pragma once
 
-#include <srslib_framework/exception/SrsRuntimeErrorException.hpp>
+#include <srslib_framework/localization/map/logical/exception/LogicalMapException.hpp>
 
 namespace srs {
 
-class UnexpectedFeatureException: public SrsRuntimeErrorException
+class UnexpectedFeatureException: public LogicalMapException
 {
 public:
-    UnexpectedFeatureException(const string& filename, const string& feature) :
-        SrsRuntimeErrorException("The feature was not expected [" +
-            filename + ", " + feature + "]")
+    UnexpectedFeatureException(const LogicalMetadata& metadata, const string& feature) :
+        LogicalMapException(metadata,
+            "The feature was not expected [" + feature + "]")
     {}
 };
 

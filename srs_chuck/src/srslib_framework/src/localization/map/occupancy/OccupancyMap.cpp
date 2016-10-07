@@ -17,13 +17,13 @@ OccupancyMap::OccupancyMap(unsigned int widthCells, unsigned int heightCells, do
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void OccupancyMap::addCost(unsigned int c, unsigned int r, unsigned int cost)
+void OccupancyMap::addCost(unsigned int c, unsigned int r, int cost)
 {
     getGrid()->addCost(Grid2d::Location(c, r), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void OccupancyMap::setCost(unsigned int c, unsigned int r, unsigned int cost)
+void OccupancyMap::setCost(unsigned int c, unsigned int r, int cost)
 {
     getGrid()->addCost(Grid2d::Location(c, r), cost);
 }
@@ -31,7 +31,7 @@ void OccupancyMap::setCost(unsigned int c, unsigned int r, unsigned int cost)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OccupancyMap::setObstruction(unsigned int c, unsigned int r)
 {
-    getGrid()->addCost(Grid2d::Location(c, r), numeric_limits<unsigned int>::max());
+    getGrid()->addCost(Grid2d::Location(c, r), Grid2d::COST_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,24 +44,8 @@ void OccupancyMap::setObstruction(unsigned int c, unsigned int r)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ostream& operator<<(ostream& stream, const OccupancyMap& map)
 {
-    unsigned int rows = map.getHeightCells();
-    unsigned int columns = map.getWidthCells();
-    stream << "OccupancyMap (" << rows << "x" << columns << ")" << endl;
-
-    for (int row = rows - 1; row >= 0; row--)
-    {
-        for (unsigned int col = 0; col < columns; col++)
-        {
-            unsigned int rawCost = map.getCost(col, static_cast<unsigned int>(row));
-
-            char cost = rawCost > 0 ? '+' : '.';
-            cost = rawCost == numeric_limits<unsigned int>::max() ? '#' : cost;
-
-            stream << cost;
-        }
-
-        stream << endl;
-    }
+    stream << "OccupancyMap" << endl;
+    stream << *map.getGrid() << endl;
 
     return stream;
 }

@@ -113,19 +113,22 @@ bool Grid2d::getNeighbor(const Location& location, int orientation, Location& re
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 int Grid2d::getWeight(const Location& location, int orientation) const
 {
-    Node* node = findNode(location);
-    if (node && node->weights)
+    if (hasWeights_)
     {
-        switch (orientation)
+        Node* node = findNode(location);
+        if (node && node->weights)
         {
-            case ORIENTATION_EAST:
-            case ORIENTATION_NORTH:
-            case ORIENTATION_WEST:
-            case ORIENTATION_SOUTH:
-                return node->weights->cost[orientation];
+            switch (orientation)
+            {
+                case ORIENTATION_EAST:
+                case ORIENTATION_NORTH:
+                case ORIENTATION_WEST:
+                case ORIENTATION_SOUTH:
+                    return node->weights->cost[orientation];
 
-            default:
-                return COST_MAX;
+                default:
+                    return COST_MAX;
+            }
         }
     }
 
@@ -139,7 +142,14 @@ ostream& operator<<(ostream& stream, const Grid2d& grid)
 
     stream << "(" << grid.height_ << "x" << grid.width_ << ")" << endl;
 
-    grid.printGrid("", stream,
+    grid.printGrid("Simplified", true, stream,
+        [] (Grid2d::Node* node) -> int
+        {
+            return node->cost;
+        }
+    );
+
+    grid.printGrid("Cost", false, stream,
         [] (Grid2d::Node* node) -> int
         {
             return node->cost;
@@ -148,7 +158,7 @@ ostream& operator<<(ostream& stream, const Grid2d& grid)
 
     if (grid.aggregate_)
     {
-        grid.printGrid("Aggregate", stream,
+        grid.printGrid("Aggregate", false, stream,
             [] (Grid2d::Node* node) -> int
             {
                 return node->aggregateCost;
@@ -156,41 +166,44 @@ ostream& operator<<(ostream& stream, const Grid2d& grid)
         );
     }
 
-    grid.printGrid("North Weights", stream,
-        [] (Grid2d::Node* node) -> int
-        {
-            return node->weights ?
-                node->weights->cost[Grid2d::ORIENTATION_NORTH] :
-                Grid2d::COST_MIN;
-        }
-    );
+    if (grid.hasWeights_)
+    {
+        grid.printGrid("North Weights", false, stream,
+            [] (Grid2d::Node* node) -> int
+            {
+                return node->weights ?
+                    node->weights->cost[Grid2d::ORIENTATION_NORTH] :
+                    Grid2d::COST_MIN;
+            }
+        );
 
-    grid.printGrid("East Weights", stream,
-        [] (Grid2d::Node* node) -> int
-        {
-            return node->weights ?
-                node->weights->cost[Grid2d::ORIENTATION_EAST] :
-                Grid2d::COST_MIN;
-        }
-    );
+        grid.printGrid("East Weights", false, stream,
+            [] (Grid2d::Node* node) -> int
+            {
+                return node->weights ?
+                    node->weights->cost[Grid2d::ORIENTATION_EAST] :
+                    Grid2d::COST_MIN;
+            }
+        );
 
-    grid.printGrid("South Weights", stream,
-        [] (Grid2d::Node* node) -> int
-        {
-            return node->weights ?
-                node->weights->cost[Grid2d::ORIENTATION_SOUTH] :
-                Grid2d::COST_MIN;
-        }
-    );
+        grid.printGrid("South Weights", false, stream,
+            [] (Grid2d::Node* node) -> int
+            {
+                return node->weights ?
+                    node->weights->cost[Grid2d::ORIENTATION_SOUTH] :
+                    Grid2d::COST_MIN;
+            }
+        );
 
-    grid.printGrid("West Weights", stream,
-        [] (Grid2d::Node* node) -> int
-        {
-            return node->weights ?
-                node->weights->cost[Grid2d::ORIENTATION_WEST] :
-                Grid2d::COST_MIN;
-        }
-    );
+        grid.printGrid("West Weights", false, stream,
+            [] (Grid2d::Node* node) -> int
+            {
+                return node->weights ?
+                    node->weights->cost[Grid2d::ORIENTATION_WEST] :
+                    Grid2d::COST_MIN;
+            }
+        );
+    }
 
     stream << "}";
 
@@ -243,7 +256,14 @@ void Grid2d::setCost(const Location& location, int newCost)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2d::setWeights(const Location& location, int north, int east, int south, int west)
 {
-    Node* node;
+    if (north == COST_MIN && east == COST_MIN && south == COST_MIN && west == COST_MIN)
+    {
+        return;
+    }
+
+    hasWeights_ = true;
+
+    Node* node = findNode(location);
     if (!node)
     {
         node = addNode(location, COST_MIN, COST_MIN);
@@ -297,23 +317,24 @@ void Grid2d::calculateAggregateArea(int x0, int y0, int& xi, int& xf, int& yi, i
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::printGrid(string title, ostream& stream, std::function<int (Node*)> fieldSelection) const
+void Grid2d::printGrid(string title, bool simple, ostream& stream,
+    std::function<int (Node*)> fieldSelection) const
 {
     if (!title.empty())
     {
         stream << endl << title << endl;
     }
 
-    stream << right << setw(Grid2d::WIDTH) << ' ';
+    stream << right << setw(WIDTH) << ' ';
     for (int x = 0; x < width_; ++x)
     {
-        stream << right << setw(Grid2d::WIDTH) << x;
+        stream << right << setw(WIDTH) << x;
     }
     stream << endl;
 
     for (int y = 0; y < height_; ++y)
     {
-        stream << right << setw(Grid2d::WIDTH) << y;
+        stream << right << setw(WIDTH) << y;
         for (int x = 0; x < width_; ++x)
         {
             Grid2d::Node* node = findNode(Grid2d::Location(x, y));
@@ -331,7 +352,14 @@ void Grid2d::printGrid(string title, ostream& stream, std::function<int (Node*)>
                 }
                 else
                 {
-                    stream << right << setw(WIDTH) << cost;
+                    if (simple)
+                    {
+                        stream << right << setw(WIDTH) << "+";
+                    }
+                    else
+                    {
+                        stream << right << setw(WIDTH) << cost;
+                    }
                 }
             }
             else

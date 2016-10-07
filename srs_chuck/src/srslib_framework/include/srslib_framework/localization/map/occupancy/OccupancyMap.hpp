@@ -21,9 +21,9 @@ public:
     ~OccupancyMap()
     {}
 
-    void addCost(unsigned int c, unsigned int r, unsigned int cost);
+    void addCost(unsigned int c, unsigned int r, int cost);
 
-    unsigned int getCost(unsigned int c, unsigned int r) const
+    int getCost(unsigned int c, unsigned int r) const
     {
         return getGrid()->getCost(Grid2d::Location(c, r));
     }
@@ -35,21 +35,11 @@ public:
 
     friend ostream& operator<<(ostream& stream, const OccupancyMap& map);
 
-    void setCost(unsigned int c, unsigned int r, unsigned int cost);
+    void setCost(unsigned int c, unsigned int r, int cost);
 
     void setLoadTime(double loadTime)
     {
         occupancyMetadata_.loadTime = loadTime;
-    }
-
-    void setOrigin(Pose<> origin)
-    {
-        occupancyMetadata_.origin = origin;
-    }
-
-    void setOccupancyFilename(string filename)
-    {
-        occupancyMetadata_.occupancyFilename = filename;
     }
 
     void setNegate(bool negate)
@@ -57,13 +47,23 @@ public:
         occupancyMetadata_.negate = negate;
     }
 
+    void setObstruction(unsigned int c, unsigned int r);
+
+    void setOccupancyFilename(string filename)
+    {
+        occupancyMetadata_.occupancyFilename = filename;
+    }
+
+    void setOrigin(Pose<> origin)
+    {
+        occupancyMetadata_.origin = origin;
+    }
+
     void setThresholds(double free, double occupied)
     {
         occupancyMetadata_.thresholdFree = free;
         occupancyMetadata_.thresholdOccupied = occupied;
     }
-
-    void setObstruction(unsigned int c, unsigned int r);
 
 protected:
     OccupancyMetadata occupancyMetadata_;

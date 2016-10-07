@@ -21,9 +21,9 @@ public:
     ~LogicalMap()
     {}
 
-    void addCost(unsigned int c, unsigned int r, unsigned int cost);
+    void addCost(unsigned int c, unsigned int r, int cost);
 
-    unsigned int getCost(unsigned int c, unsigned int r) const
+    int getCost(unsigned int c, unsigned int r) const
     {
         return getGrid()->getCost(Grid2d::Location(c, r));
     }
@@ -35,7 +35,7 @@ public:
 
     friend ostream& operator<<(ostream& stream, const LogicalMap& map);
 
-    void setCost(unsigned int c, unsigned int r, unsigned int cost);
+    void setCost(unsigned int c, unsigned int r, int cost);
     void setObstruction(unsigned int c, unsigned int r);
 
     void setLoadTime(double loadTime)
@@ -43,15 +43,17 @@ public:
         logicalMetadata_.loadTime = loadTime;
     }
 
+    void setLogicalFilename(string filename)
+    {
+        logicalMetadata_.logicalFilename = filename;
+    }
+
     void setOrigin(Pose<> origin)
     {
         logicalMetadata_.origin = origin;
     }
 
-    void setLogicalFilename(string filename)
-    {
-        logicalMetadata_.logicalFilename = filename;
-    }
+    void setWeights(unsigned int c, unsigned int r, int north, int east, int south, int west);
 
 private:
     LogicalMetadata logicalMetadata_;

@@ -5,6 +5,9 @@
  */
 #pragma once
 
+#include <string>
+using namespace std;
+
 #include <srslib_framework/exception/SrsRuntimeErrorException.hpp>
 
 namespace srs {

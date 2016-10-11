@@ -1,5 +1,5 @@
-image: hbc.pgm
-resolution: 0.10000
+image: map-hector-v4.pgm
+resolution: 0.1S0000
 origin: [-0.025000, -0.025000, 0.000000]
 negate: 0
 occupied_thresh: 0.65

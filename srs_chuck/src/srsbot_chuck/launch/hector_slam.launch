@@ -6,9 +6,15 @@
   *
 -->
 <launch>
-    <!-- Chuck Stack -->
-	<include file="$(find srsbot_chuck)/launch/robot.launch" />
+    <arg name="simulation" default="true" />
 
-    <!-- Launch AMCL Localization -->
+	<include file="$(find srsbot_chuck)/launch/sensors.launch" />
+
+    <!-- Chuck Stack -->
+	<include file="$(find srsbot_chuck)/launch/robot.launch" >
+        <arg name="simulation" value="$(arg simulation)" />
+	</include>
+
+    <!-- Launch Hector SLAM mapping -->
 	<include file="$(find srsnode_localization)/launch/hector_mapping.launch" />
 </launch>

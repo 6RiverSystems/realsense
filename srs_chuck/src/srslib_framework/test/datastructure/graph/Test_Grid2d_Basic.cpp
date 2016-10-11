@@ -65,9 +65,9 @@ TEST(Test_Graph2d, BasicAdd)
     ASSERT_EQ(30, grid.getCost(P_3_3)) <<
         "Location cost in " << P_3_3 << " is not as expected";
 
-    grid.addCost(P_1_1, 5);
-    grid.addCost(P_3_3, 5);
-    grid.addCost(P_2_2, 5);
+    grid.maxCost(P_1_1, 5);
+    grid.maxCost(P_3_3, 5);
+    grid.maxCost(P_2_2, 5);
 
     ASSERT_EQ(15, grid.getCost(P_1_1)) <<
         "Location cost in " << P_1_1 << " is not as expected";
@@ -109,7 +109,7 @@ TEST(Test_Graph2d, AddWithMax)
     ASSERT_EQ(30, grid.getCost(P_3_3)) <<
         "Location cost in " << P_3_3 << " is not as expected";
 
-    grid.addCost(P_3_3, srs::Grid2d::COST_MAX);
+    grid.maxCost(P_3_3, srs::Grid2d::COST_MAX);
 
     ASSERT_EQ(10, grid.getCost(P_1_1)) <<
         "Location cost in " << P_1_1 << " is not as expected";
@@ -123,8 +123,8 @@ TEST(Test_Graph2d, BasicAggregate)
 
     grid.setAggregateSize(1, 1);
 
-    grid.addCost(P_1_1, 10);
-    grid.addCost(P_3_3, 30);
+    grid.maxCost(P_1_1, 10);
+    grid.maxCost(P_3_3, 30);
 
     ASSERT_EQ(10, grid.getCost(P_1_1)) <<
         "Location cost in " << P_1_1 << " is not as expected";
@@ -143,8 +143,8 @@ TEST(Test_Graph2d, AggregateChange)
 
     grid.setAggregateSize(1, 1);
 
-    grid.addCost(P_1_1, 10);
-    grid.addCost(P_3_3, 30);
+    grid.maxCost(P_1_1, 10);
+    grid.maxCost(P_3_3, 30);
 
     ASSERT_EQ(10, grid.getCost(P_1_1)) <<
         "Location cost in " << P_1_1 << " is not as expected";

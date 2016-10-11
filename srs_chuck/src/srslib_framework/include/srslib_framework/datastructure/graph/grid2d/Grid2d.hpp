@@ -73,8 +73,6 @@ public:
         clear();
     }
 
-    void addCost(const Location& location, int cost);
-
     void clear();
     void clear(const Location& location);
 
@@ -109,6 +107,8 @@ public:
     {
         return width_;
     }
+
+    void maxCost(const Location& location, int cost);
 
     friend ostream& operator<<(ostream& stream, const Grid2d& grid);
 
@@ -205,8 +205,8 @@ private:
         return nullptr;
     }
 
-    void printGrid(string title, bool simple, ostream& stream,
-        std::function<int (Node*)> fieldSelection) const;
+    void printGrid(ostream& stream, string title, std::function<int (Node*)> fieldSelection) const;
+    void printCosts(ostream& stream, string title, std::function<int (Node*)> fieldSelection) const;
 
     void updateAllAggregate();
     void updateNodeAggregate(Node* node, int oldCost);

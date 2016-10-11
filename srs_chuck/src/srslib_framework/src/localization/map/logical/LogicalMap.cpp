@@ -21,9 +21,9 @@ LogicalMap::LogicalMap(double widthM, double heightM, double resolution) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::addCost(unsigned int c, unsigned int r, int cost)
+void LogicalMap::maxCost(unsigned int c, unsigned int r, int cost)
 {
-    getGrid()->addCost(Grid2d::Location(c, r), cost);
+    getGrid()->maxCost(Grid2d::Location(c, r), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -83,7 +83,7 @@ void LogicalMapFactory::addRectangleCost(LogicalMap* logicalMap,
     {
         for (unsigned int c = x0; c < x0 + widthCells; ++c)
         {
-            logicalMap->addCost(c, r, cost);
+            logicalMap->maxCost(c, r, cost);
         }
     }
 }

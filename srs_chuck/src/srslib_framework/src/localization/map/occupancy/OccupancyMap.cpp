@@ -17,21 +17,21 @@ OccupancyMap::OccupancyMap(unsigned int widthCells, unsigned int heightCells, do
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void OccupancyMap::addCost(unsigned int c, unsigned int r, int cost)
+void OccupancyMap::maxCost(unsigned int c, unsigned int r, int cost)
 {
-    getGrid()->addCost(Grid2d::Location(c, r), cost);
+    getGrid()->maxCost(Grid2d::Location(c, r), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OccupancyMap::setCost(unsigned int c, unsigned int r, int cost)
 {
-    getGrid()->addCost(Grid2d::Location(c, r), cost);
+    getGrid()->setCost(Grid2d::Location(c, r), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OccupancyMap::setObstruction(unsigned int c, unsigned int r)
 {
-    getGrid()->addCost(Grid2d::Location(c, r), Grid2d::COST_MAX);
+    getGrid()->setCost(Grid2d::Location(c, r), Grid2d::COST_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

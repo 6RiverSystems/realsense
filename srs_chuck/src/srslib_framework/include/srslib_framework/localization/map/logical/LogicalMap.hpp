@@ -21,8 +21,6 @@ public:
     ~LogicalMap()
     {}
 
-    void addCost(unsigned int c, unsigned int r, int cost);
-
     int getCost(unsigned int c, unsigned int r) const
     {
         return getGrid()->getCost(Grid2d::Location(c, r));
@@ -32,6 +30,8 @@ public:
     {
         return logicalMetadata_;
     }
+
+    void maxCost(unsigned int c, unsigned int r, int cost);
 
     friend ostream& operator<<(ostream& stream, const LogicalMap& map);
 

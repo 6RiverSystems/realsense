@@ -3,12 +3,12 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef MAPPEDPRIORITYQUEUE_HPP_
-#define MAPPEDPRIORITYQUEUE_HPP_
+#pragma once
 
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
+#include <forward_list>
 using namespace std;
 
 namespace srs {
@@ -16,158 +16,127 @@ namespace srs {
 template<typename TYPE,
     typename PRIORITY = int,
     typename HASH = std::hash<TYPE>,
-    typename EQUAL_TO = std::equal_to<TYPE>>
+    typename EQUAL_TO = std::equal_to<TYPE>,
+    int BUCKETS_INITIAL = 100,
+    int BUCKETS_MAX = 10000>
 class MappedPriorityQueue
 {
 public:
-    // TODO: Implement begin() and end() for foreach operations
-    // TODO: Recycle the empty buckets to improve performance and memory management
+    MappedPriorityQueue();
+    ~MappedPriorityQueue();
+
+    void clear();
 
     bool empty() const
     {
-        return indexMap_.empty() && priorityQueue_.empty();
+        return index_.empty();
     }
 
-    void erase(TYPE item)
+    void erase(TYPE item);
+
+    bool exists(TYPE item) const
     {
-        auto result = indexMap_.find(item);
-        if (result == indexMap_.end())
-        {
-            return;
-        }
-
-        PRIORITY priority = result->second;
-        indexMap_.erase(item);
-
-        BucketType* bucket = priorityQueue_[priority];
-        bucket->erase(item);
-
-        if (bucket->empty())
-        {
-            priorityQueue_.erase(priority);
-            delete bucket;
-        }
+        auto result = index_.find(item);
+        return result != index_.end();
     }
 
-    bool exists(TYPE item)
-    {
-        auto result = indexMap_.find(item);
-        return result != indexMap_.end();
-    }
+    TYPE find(TYPE& item) const;
 
-    TYPE find(TYPE item)
+    friend ostream& operator<<(ostream& stream,
+        const MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO>& queue)
     {
-        auto result = indexMap_.find(item);
-        if (result == indexMap_.end())
-        {
-            return TYPE();
-        }
+        stream << "MappedPriorityQueue {" << endl;
 
-        return result->first;
-    }
-
-    friend ostream& operator<<(ostream& stream, const MappedPriorityQueue& queue)
-    {
         if (queue.empty())
         {
-            stream << "(empty)";
+            stream << "  (empty)";
         }
         else
         {
-            int counter = 0;
-            for (auto bucketIterator : queue.priorityQueue_)
-            {
-                for (auto item : *bucketIterator.second)
-                {
-                    stream << setw(4) << counter++ << ": [" <<
-                        setw(10) << bucketIterator.first << "] " << item << '\n';
-                }
-            }
-
-    //        stream << "MappedPriorityQueue {" << '\n';
-    //        stream << "Buckets" << endl;
-    //        for (auto bucketIterator : queue.priorityQueue_)
-    //        {
-    //            stream << bucketIterator.first << ": {" << endl;
-    //            for (auto item : *bucketIterator.second)
-    //            {
-    //                stream << item << '\n';
-    //            }
-    //            stream << "}" << '\n';
-    //        }
-    //
-    //        stream << "Index map" << endl;
-    //        for (auto item : queue.indexMap_)
-    //        {
-    //            stream << "(" << item.first << "  priority: " << item.second << ")\n";
-    //        }
-    //
-    //        stream << "}";
+            queue.printBuckets(stream);
+            queue.printIndex(stream);
         }
+
+        cout << endl << "Empty buckets: " << queue.sizeEmptyBuckets() << endl;
+        cout << "Occupied buckets: " << queue.sizeOccuppiedBuckets() << endl;
 
         return stream;
     }
 
-    bool pop(TYPE& item)
+    bool pop(TYPE& item);
+    void push(PRIORITY priority, TYPE item);
+
+    size_t size() const
     {
-        if (indexMap_.empty())
-        {
-            return false;
-        }
-
-        auto lowestBucketIterator = priorityQueue_.begin();
-        BucketType* bucket = lowestBucketIterator->second;
-        PRIORITY key = lowestBucketIterator->first;
-
-        auto itemIterator = bucket->begin();
-
-        item = *itemIterator;
-        bucket->erase(itemIterator);
-
-        if (bucket->empty())
-        {
-            priorityQueue_.erase(key);
-            delete bucket;
-        }
-
-        indexMap_.erase(item);
-
-        return true;
+        return index_.size();
     }
 
-    void push(PRIORITY priority, TYPE item)
+    size_t sizeEmptyBuckets() const
     {
-        auto bucketIterator = priorityQueue_.find(priority);
+        return distance(emptyBuckets_.begin(), emptyBuckets_.end());
+    }
 
-        BucketType* bucket;
-        if (bucketIterator != priorityQueue_.end())
+    size_t sizeInitialBuckets() const
+    {
+        return BUCKETS_INITIAL;
+    }
+
+    size_t sizeMaxBuckets() const
+    {
+        return BUCKETS_MAX;
+    }
+
+    size_t sizeOccuppiedBuckets() const
+    {
+        return queue_.size();
+    }
+
+private:
+    typedef unordered_set<TYPE, HASH, EQUAL_TO> BucketType;
+    typedef forward_list<BucketType*> BucketPoolType;
+
+    BucketType* getNewBucket()
+    {
+        BucketType* bucket = nullptr;
+        if (!emptyBuckets_.empty())
         {
-            bucket = bucketIterator->second;
+            bucket = emptyBuckets_.front();
+            emptyBuckets_.pop_front();
         }
         else
         {
             bucket = new BucketType();
         }
 
-        bucket->insert(item);
-
-        priorityQueue_[priority] = bucket;
-        indexMap_[item] = priority;
+        return bucket;
     }
 
-    size_t size()
+    void printBuckets(ostream& stream) const;
+    void printIndex(ostream& stream) const;
+
+    void recycleBucket(BucketType* bucket)
     {
-        return indexMap_.size();
+        // Recycle the bucket only if the number of empty
+        // buckets in the queue is less than the
+        // specified threshold
+        if (emptyBucketsCounter_ < BUCKETS_MAX)
+        {
+            emptyBucketsCounter_++;
+            emptyBuckets_.push_front(bucket);
+        }
+        else
+        {
+            delete bucket;
+        }
     }
 
-private:
-    typedef unordered_set<TYPE> BucketType;
-    typedef map<PRIORITY, BucketType*, less<PRIORITY>> MapType;
+    map<PRIORITY, BucketType*, less<PRIORITY>> queue_;
+    unordered_map<TYPE, PRIORITY, HASH, EQUAL_TO> index_;
 
-    MapType priorityQueue_;
-    unordered_map<TYPE, PRIORITY, HASH> indexMap_;
+    BucketPoolType emptyBuckets_;
+    int emptyBucketsCounter_;
 };
 
 } // namespace srs
 
-#endif // MAPPEDPRIORITYQUEUE_HPP_
+#include <datastructure/queue/MappedPriorityQueue.cpp>

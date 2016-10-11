@@ -59,7 +59,8 @@ set(${PROJECT_NAME}_SRVS
 set(TEST_SOURCES_DATASTRUCTURE
     test/datastructure/graph/Test_Grid2d_Basic.cpp
     test/datastructure/queue/Test_MappedPriorityQueue_Basic.cpp
-    test/datastructure/queue/Test_MappedPriorityQueue_UserDefinedKey.cpp
+    test/datastructure/queue/Test_MappedPriorityQueue_InnerHashEqual.cpp
+    test/datastructure/queue/Test_MappedPriorityQueue_UserDefinedClass.cpp
 )
 
 set(TEST_SOURCES_FILTER

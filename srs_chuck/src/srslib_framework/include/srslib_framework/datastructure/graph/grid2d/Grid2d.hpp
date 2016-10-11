@@ -167,7 +167,7 @@ private:
 
         friend ostream& operator<<(ostream& stream, const Node* node)
         {
-            stream << "Node "<< hex << reinterpret_cast<long>(node) << dec << " {" << '\n';
+            stream << "Node "<< hex << reinterpret_cast<long>(node) << dec << " {" << endl;
             stream << "l: " << node->location <<
                 ", c: " << node->cost <<
                 ", ac: " << node->aggregateCost << "\n}";

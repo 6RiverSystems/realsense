@@ -13,14 +13,60 @@ using namespace std;
 #include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 
-TEST(Test_MappedPriorityQueue, MappedPriorityQueueCreation)
+TEST(Test_MappedPriorityQueue, Creation)
 {
     test::MemoryWatch memoryWatch;
 
     MappedPriorityQueue<int>* queue = new MappedPriorityQueue<int>();
-    int item;
 
-    ROS_DEBUG_STREAM("Memory usage: " << memoryWatch.getMemoryUsage());
+    queue->push(500, 50);
+    queue->push(100, 0);
+    queue->push(400, 40);
+    queue->push(500, 51);
+    queue->push(500, 52);
+    queue->push(300, 30);
+    queue->push(100, 1);
+    queue->push(400, 40);
+    queue->push(500, 50);
+    queue->push(500, 51);
+    queue->push(500, 52);
+    queue->push(200, 20);
+
+    int item;
+    queue->pop(item);
+    ASSERT_EQ(1, item) << "Unexpected item in the queue";
+
+    queue->pop(item);
+    ASSERT_EQ(0, item) << "Unexpected item in the queue";
+
+    queue->pop(item);
+    ASSERT_EQ(20, item) << "Unexpected item in the queue";
+
+    queue->pop(item);
+    ASSERT_EQ(30, item) << "Unexpected item in the queue";
+
+    queue->pop(item);
+    ASSERT_EQ(40, item) << "Unexpected item in the queue";
+
+    queue->push(500, 53);
+
+    queue->pop(item);
+    ASSERT_EQ(53, item) << "Unexpected item in the queue";
+
+    ASSERT_EQ(1, queue->sizeOccuppiedBuckets()) << "Unexpected number of occupied buckets";
+    ASSERT_EQ(queue->sizeInitialBuckets() - 1, queue->sizeEmptyBuckets()) <<
+        "Unexpected number of empty buckets";
+
+    delete queue;
+
+    ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
+}
+
+TEST(Test_MappedPriorityQueue, Exist)
+{
+    test::MemoryWatch memoryWatch;
+
+    MappedPriorityQueue<int>* queue = new MappedPriorityQueue<int>();
 
     queue->push(500, 50);
     queue->push(100, 0);
@@ -35,54 +81,87 @@ TEST(Test_MappedPriorityQueue, MappedPriorityQueueCreation)
     queue->push(500, 51);
     queue->push(500, 52);
 
-    ROS_DEBUG_STREAM("POP ---------------------");
-    ROS_DEBUG_STREAM(*queue);
+    ASSERT_TRUE(queue->exists(50)) << "Item not found in the queue";
+    ASSERT_TRUE(queue->exists(1)) << "Item not found in the queue";
+    ASSERT_FALSE(queue->exists(999)) << "Item found in the queue";
 
-    queue->pop(item);
-    ROS_DEBUG_STREAM(item);
-
-    queue->pop(item);
-    ROS_DEBUG_STREAM(item);
-
-    queue->pop(item);
-    ROS_DEBUG_STREAM(item);
-
-    queue->pop(item);
-    ROS_DEBUG_STREAM(item);
-
-    queue->pop(item);
-    ROS_DEBUG_STREAM(item);
-
-    ROS_DEBUG_STREAM("PUSH ---------------------");
-    queue->push(500, 53);
-
-    ROS_DEBUG_STREAM(*queue);
-
-    ROS_DEBUG_STREAM("POP ---------------------");
-    queue->pop(item);
-    ROS_DEBUG_STREAM(item);
-
-    ROS_DEBUG_STREAM("EXIST -------------------");
-    ROS_DEBUG_STREAM(*queue);
-
-    ROS_DEBUG_STREAM(queue->exists(50));
-    ROS_DEBUG_STREAM(queue->exists(53));
-
-    ROS_DEBUG_STREAM("ERASE -------------------");
-    queue->erase(0);
-
-    ROS_DEBUG_STREAM("CLEAR------------------");
-    ROS_DEBUG_STREAM(*queue);
-
-    while (!queue->empty())
-    {
-        queue->pop(item);
-    }
-
-    ROS_DEBUG_STREAM(*queue);
+    ASSERT_EQ(5, queue->sizeOccuppiedBuckets()) << "Unexpected number of occupied buckets";
+    ASSERT_EQ(queue->sizeInitialBuckets() - 5, queue->sizeEmptyBuckets()) <<
+        "Unexpected number of empty buckets";
 
     delete queue;
 
-    ROS_DEBUG_STREAM("Memory usage: " << memoryWatch.getMemoryUsage());
-    ROS_DEBUG_STREAM("Memory leaks: " << !memoryWatch.isZero());
+    ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
+}
+
+TEST(Test_MappedPriorityQueue, Erase)
+{
+    test::MemoryWatch memoryWatch;
+
+    MappedPriorityQueue<int>* queue = new MappedPriorityQueue<int>();
+
+    queue->push(500, 50);
+    queue->push(100, 0);
+    queue->push(100, 1);
+    queue->push(400, 40);
+    queue->push(200, 20);
+    queue->push(500, 51);
+    queue->push(500, 52);
+    queue->push(300, 30);
+    queue->push(400, 40);
+    queue->push(500, 50);
+    queue->push(500, 51);
+    queue->push(500, 52);
+
+    ASSERT_TRUE(queue->exists(0)) << "Item not found in the queue";
+    queue->erase(0);
+    ASSERT_FALSE(queue->exists(0)) << "Item found in the queue";
+
+    int item;
+    queue->pop(item);
+    ASSERT_EQ(1, item) << "Unexpected item in the queue";
+
+    ASSERT_EQ(4, queue->sizeOccuppiedBuckets()) << "Unexpected number of occupied buckets";
+    ASSERT_EQ(queue->sizeInitialBuckets() - 4, queue->sizeEmptyBuckets()) <<
+        "Unexpected number of empty buckets";
+
+    delete queue;
+
+    ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
+}
+
+TEST(Test_MappedPriorityQueue, Clear)
+{
+    test::MemoryWatch memoryWatch;
+
+    MappedPriorityQueue<int>* queue = new MappedPriorityQueue<int>();
+
+    queue->push(500, 50);
+    queue->push(100, 0);
+    queue->push(100, 1);
+    queue->push(400, 40);
+    queue->push(200, 20);
+    queue->push(500, 51);
+    queue->push(500, 52);
+    queue->push(300, 30);
+    queue->push(400, 40);
+    queue->push(500, 50);
+    queue->push(500, 51);
+    queue->push(500, 52);
+
+    ASSERT_EQ(5, queue->sizeOccuppiedBuckets()) << "Unexpected number of occupied buckets";
+    ASSERT_EQ(queue->sizeInitialBuckets() - 5, queue->sizeEmptyBuckets()) <<
+        "Unexpected number of empty buckets";
+    ASSERT_FALSE(queue->empty()) << "The queue is empty";
+
+    queue->clear();
+
+    ASSERT_EQ(0, queue->sizeOccuppiedBuckets()) << "Unexpected number of occupied buckets";
+    ASSERT_EQ(queue->sizeInitialBuckets(), queue->sizeEmptyBuckets()) <<
+        "Unexpected number of empty buckets";
+    ASSERT_TRUE(queue->empty()) << "The queue is not empty";
+
+    delete queue;
+
+    ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
 }

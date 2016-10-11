@@ -53,7 +53,7 @@ TEST(Test_Graph2d, GetCost)
         "Location cost in " << P_3_3 << " is not as expected";
 }
 
-TEST(Test_Graph2d, BasicAdd)
+TEST(Test_Graph2d, BasicMax)
 {
     Grid2d grid(10);
 
@@ -66,14 +66,19 @@ TEST(Test_Graph2d, BasicAdd)
         "Location cost in " << P_3_3 << " is not as expected";
 
     grid.maxCost(P_1_1, 5);
-    grid.maxCost(P_3_3, 5);
-    grid.maxCost(P_2_2, 5);
+    grid.maxCost(P_3_3, 50);
+    grid.maxCost(P_2_2, 50);
 
-    ASSERT_EQ(15, grid.getCost(P_1_1)) <<
+    ASSERT_EQ(10, grid.getCost(P_1_1)) <<
         "Location cost in " << P_1_1 << " is not as expected";
-    ASSERT_EQ(35, grid.getCost(P_3_3)) <<
+    ASSERT_EQ(50, grid.getCost(P_3_3)) <<
         "Location cost in " << P_3_3 << " is not as expected";
-    ASSERT_EQ(5, grid.getCost(P_2_2)) <<
+    ASSERT_EQ(50, grid.getCost(P_2_2)) <<
+        "Location cost in " << P_2_2 << " is not as expected";
+
+    grid.maxCost(P_2_2, srs::Grid2d::COST_MAX);
+
+    ASSERT_EQ(srs::Grid2d::COST_MAX, grid.getCost(P_2_2)) <<
         "Location cost in " << P_2_2 << " is not as expected";
 }
 

@@ -6,9 +6,6 @@
   *
 -->
 <launch>
-
-	<include file="$(find srsbot_chuck)/launch/sensors.launch" />
-
     <!-- Chuck Stack -->
 	<include file="$(find srsbot_chuck)/launch/robot.launch" />
 

@@ -8,15 +8,12 @@
 <launch>
 	<remap from="/map" to="/internal/state/map/grid"/>
     <remap from="/map_metadata" to="/internal/state/map/info"/>
-    <arg name="simulation" default="true" />
 
     <!-- Sensors -->
 	<include file="$(find srsbot_chuck)/launch/sensors.launch" />
 
     <!-- Chuck Stack -->
-	<include file="$(find srsbot_chuck)/launch/robot.launch" >
-        <arg name="simulation" value="$(arg simulation)" />
-	</include>
+	<include file="$(find srsbot_chuck)/launch/robot.launch" />
 
     <!-- GMapping -->
 	<include file="$(find srsnode_localization)/launch/gmapping.launch" />

@@ -8,7 +8,6 @@
 <launch>
     <!-- Declare the parameters passed by the main launch file -->
     <arg name="robot_configuration" default="" />
-    <arg name="simulation" />
 
     <!-- Robot description -->
     <param name="robot_description" command="$(find xacro)/xacro.py $(find srsbot_chuck)/urdf/chuck.urdf.xacro" />
@@ -18,13 +17,13 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
     <!-- Brainstem Hardware Driver -->
-    <include unless="$(arg simulation)" file="$(find srsdrv_brainstem)/launch/driver.launch" />
+    <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
 
     <!-- Joystick -->
-    <include unless="$(arg simulation)" file="$(find srsnode_joystick_adapter)/launch/node.launch" />
+    <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
 
     <!-- Raw Odometry -->
-	<include unless="$(arg simulation)" file="$(find srsnode_odometry)/launch/node.launch" />
+	<include file="$(find srsnode_odometry)/launch/node.launch" />
 
     <!-- Launch the ros-bridge -->
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />

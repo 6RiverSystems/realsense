@@ -6,12 +6,8 @@
   *
 -->
 <launch>
-    <arg name="simulation" default="false" />
-
     <!-- Chuck Stack -->
-	<include file="$(find srsbot_chuck)/launch/robot.launch" >
-        <arg name="simulation" value="$(arg simulation)" />
-	</include>
+	<include file="$(find srsbot_chuck)/launch/robot.launch" />
 
     <!-- Launch AMCL Localization -->
 	<include file="$(find srsnode_localization)/launch/amcl.launch" />

@@ -31,6 +31,9 @@ set(${PROJECT_NAME}_SOURCES
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp
 
+    src/search/graph/grid2d/Grid2dAction.cpp
+    src/search/graph/grid2d/Grid2dNode.cpp
+
     src/utils/Logging.cpp
     src/utils/CrashHandler.cpp
 )
@@ -96,8 +99,8 @@ set(TEST_SOURCES_ROBOTICS
 
 set(TEST_SOURCES_SEARCH
     test/search/Test_AStar_Basic.cpp
-    test/search/Test_AStar_Map.cpp
-    test/search/Test_AStar_SamePlaceOnMap.cpp
+#    test/search/Test_AStar_Map.cpp
+#    test/search/Test_AStar_SamePlaceOnMap.cpp
 )
 
 set(TEST_SOURCES_IO

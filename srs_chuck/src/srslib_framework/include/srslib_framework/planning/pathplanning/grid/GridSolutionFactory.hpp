@@ -26,12 +26,14 @@ struct GridSolutionFactory
 {
     static Solution<GridSolutionItem>* fromConsecutiveGoals(BaseMap* map,
         Pose<> start, vector<Pose<>> goals);
-    static Solution<GridSolutionItem>* fromGoal(BaseMap* map,
-        Pose<> start, Pose<> goal);
+
+// ###FS
+//    static Solution<GridSolutionItem>* fromGoal(BaseMap* map,
+//        Pose<> start, Pose<> goal);
     static Solution<GridSolutionItem>* fromRotation(Pose<> pose,
         double theta0, double thetaf);
-    static Solution<GridSolutionItem>* fromSearch(BaseMap* map,
-        AStar<Grid2d>::SearchNodeType* goalNode);
+//    static Solution<GridSolutionItem>* fromSearch(BaseMap* map,
+//        AStar<Grid2d>::SearchNodeType* goalNode);
 };
 
 } // namespace srs

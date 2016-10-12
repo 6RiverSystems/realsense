@@ -75,7 +75,7 @@ private:
     void stepNode();
     void stepEmulation();
 
-    AStar<Grid2d> algorithm_;
+    // ###FS AStar<Grid2d> algorithm_;
 
     dynamic_reconfigure::Server<MotionConfig> configServer_;
     ros::Time currentTime_;

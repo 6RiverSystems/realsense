@@ -26,20 +26,21 @@ TEST(Test_Trajectory, 6RHQ)
     Pose<> robotPose = Pose<>(18.1335, 5.24097, 0.0189141);
     Pose<> goalPose = Pose<>(18.1335, 5.24097, 0);
 
-    MapStack* mapStack = MapStackFactory::fromJsonFile("pathplanning/grid/data/6rshq/6rshq.yaml");
-
-    Solution<GridSolutionItem>* gridSolution = GridSolutionFactory::fromGoal(
-        mapStack->getOccupancyMap(), robotPose, goalPose);
-    Solution<GridSolutionItem> gridSolution2 = *gridSolution;
-
-    cout << gridSolution2 << endl;
-
-    Chuck chuck;
-    Trajectory<> trajectory;
-
-    GridTrajectoryGenerator solutionConverter(chuck);
-    solutionConverter.fromSolution(gridSolution2);
-    solutionConverter.getTrajectory(trajectory);
-
-    ROS_DEBUG_STREAM(trajectory);
+    // ###FS
+//    MapStack* mapStack = MapStackFactory::fromJsonFile("pathplanning/grid/data/6rshq/6rshq.yaml");
+//
+//    Solution<GridSolutionItem>* gridSolution = GridSolutionFactory::fromGoal(
+//        mapStack->getOccupancyMap(), robotPose, goalPose);
+//    Solution<GridSolutionItem> gridSolution2 = *gridSolution;
+//
+//    cout << gridSolution2 << endl;
+//
+//    Chuck chuck;
+//    Trajectory<> trajectory;
+//
+//    GridTrajectoryGenerator solutionConverter(chuck);
+//    solutionConverter.fromSolution(gridSolution2);
+//    solutionConverter.getTrajectory(trajectory);
+//
+//    ROS_DEBUG_STREAM(trajectory);
 }

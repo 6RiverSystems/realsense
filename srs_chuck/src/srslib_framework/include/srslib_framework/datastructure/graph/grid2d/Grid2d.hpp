@@ -24,10 +24,12 @@ public:
     static const int COST_MIN;
     static const int COST_MAX;
 
-    static const int ORIENTATION_NORTH;
-    static const int ORIENTATION_EAST;
-    static const int ORIENTATION_SOUTH;
-    static const int ORIENTATION_WEST;
+    enum {
+        ORIENTATION_NORTH = 90,
+        ORIENTATION_EAST = 0,
+        ORIENTATION_SOUTH = 270,
+        ORIENTATION_WEST = 180
+    };
 
     struct Location
     {
@@ -48,6 +50,22 @@ public:
 
         int x;
         int y;
+    };
+
+    struct LocationHash
+    {
+        std::size_t operator()(const Location& location) const
+        {
+            return location.x + 1812433253 * location.y;
+        }
+    };
+
+    struct LocationEqual
+    {
+        bool operator()(const Location& lhs, const Location& rhs) const
+        {
+            return (lhs.x == rhs.x) && (lhs.y == rhs.y);
+        }
     };
 
     Grid2d(unsigned int size) :
@@ -118,23 +136,6 @@ public:
 
 private:
     static constexpr int WIDTH = 4;
-    static constexpr int MAX_WEIGHT_DIRECTIONS = 4;
-
-    struct LocationHash
-    {
-        std::size_t operator()(const Location& location) const
-        {
-            return location.x + 1812433253 * location.y;
-        }
-    };
-
-    struct LocationEqual
-    {
-        bool operator()(const Location& lhs, const Location& rhs) const
-        {
-            return (lhs.x == rhs.x) && (lhs.y == rhs.y);
-        }
-    };
 
     struct Weights
     {
@@ -142,13 +143,16 @@ private:
             int north = COST_MIN, int east = COST_MIN,
             int south = COST_MIN, int west = COST_MIN)
         {
-            cost[ORIENTATION_NORTH] = north;
-            cost[ORIENTATION_EAST] = east;
-            cost[ORIENTATION_SOUTH] = south;
-            cost[ORIENTATION_WEST] = west;
+            north = north;
+            east = east;
+            south = south;
+            west = west;
         }
 
-        int cost[MAX_WEIGHT_DIRECTIONS];
+        int north;
+        int east;
+        int south;
+        int west;
     };
 
     struct Node

@@ -179,13 +179,15 @@ static const Pose<> E04B = Pose<>(27.990, 4.125, DEG270);
 
 Solution<GridSolutionItem>* calculateSolution(Pose<> start, Pose<> goal)
 {
-    MapStack* mapStack = MapStackFactory::fromJsonFile("pathplanning/grid/data/barrett/barrett.yaml");
-    Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(
-        mapStack->getOccupancyMap(), start, goal);
-
-    cout << *solution << endl;
-
-    return solution;
+// ###FS
+//    MapStack* mapStack = MapStackFactory::fromJsonFile("pathplanning/grid/data/barrett/barrett.yaml");
+//    Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(
+//        mapStack->getOccupancyMap(), start, goal);
+//
+//    cout << *solution << endl;
+//
+//    return solution;
+    return nullptr;
 }
 
 // Test of the aisle E01-T ---> E01-B

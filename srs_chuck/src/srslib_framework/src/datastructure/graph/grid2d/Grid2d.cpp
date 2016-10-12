@@ -8,11 +8,6 @@ namespace srs {
 const int Grid2d::COST_MIN = 0;
 const int Grid2d::COST_MAX = numeric_limits<int>::max();
 
-const int Grid2d::ORIENTATION_NORTH = 0;
-const int Grid2d::ORIENTATION_EAST = 1;
-const int Grid2d::ORIENTATION_SOUTH = 2;
-const int Grid2d::ORIENTATION_WEST = 3;
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2d::clear()
 {
@@ -95,10 +90,16 @@ int Grid2d::getWeight(const Location& location, int orientation) const
             switch (orientation)
             {
                 case ORIENTATION_EAST:
+                    return node->weights->east;
+
                 case ORIENTATION_NORTH:
+                    return node->weights->north;
+
                 case ORIENTATION_WEST:
+                    return node->weights->west;
+
                 case ORIENTATION_SOUTH:
-                    return node->weights->cost[orientation];
+                    return node->weights->south;
 
                 default:
                     return COST_MAX;
@@ -171,36 +172,28 @@ ostream& operator<<(ostream& stream, const Grid2d& grid)
         grid.printCosts(stream, "North Weights",
             [] (Grid2d::Node* node) -> int
             {
-                return node->weights ?
-                    node->weights->cost[Grid2d::ORIENTATION_NORTH] :
-                    Grid2d::COST_MIN;
+                return node->weights ? node->weights->north : Grid2d::COST_MIN;
             }
         );
 
         grid.printCosts(stream, "East Weights",
             [] (Grid2d::Node* node) -> int
             {
-                return node->weights ?
-                    node->weights->cost[Grid2d::ORIENTATION_EAST] :
-                    Grid2d::COST_MIN;
+                return node->weights ? node->weights->east : Grid2d::COST_MIN;
             }
         );
 
         grid.printCosts(stream, "South Weights",
             [] (Grid2d::Node* node) -> int
             {
-                return node->weights ?
-                    node->weights->cost[Grid2d::ORIENTATION_SOUTH] :
-                    Grid2d::COST_MIN;
+                return node->weights ? node->weights->south : Grid2d::COST_MIN;
             }
         );
 
         grid.printCosts(stream, "West Weights",
             [] (Grid2d::Node* node) -> int
             {
-                return node->weights ?
-                    node->weights->cost[Grid2d::ORIENTATION_WEST] :
-                    Grid2d::COST_MIN;
+                return node->weights ? node->weights->west : Grid2d::COST_MIN;
             }
         );
     }

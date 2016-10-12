@@ -40,7 +40,7 @@ public:
         return result != index_.end();
     }
 
-    TYPE find(TYPE& item) const;
+    TYPE find(TYPE item) const;
 
     friend ostream& operator<<(ostream& stream,
         const MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO>& queue)
@@ -73,7 +73,7 @@ public:
 
     size_t sizeEmptyBuckets() const
     {
-        return distance(emptyBuckets_.begin(), emptyBuckets_.end());
+        return emptyBucketsCounter_;
     }
 
     size_t sizeInitialBuckets() const
@@ -94,12 +94,16 @@ public:
 private:
     typedef unordered_set<TYPE, HASH, EQUAL_TO> BucketType;
     typedef forward_list<BucketType*> BucketPoolType;
+    typedef unordered_map<TYPE, PRIORITY, HASH, EQUAL_TO> IndexType;
+    typedef map<PRIORITY, BucketType*, less<PRIORITY>> QueueType;
 
-    BucketType* getNewBucket()
+    inline BucketType* getAvailableBucket()
     {
         BucketType* bucket = nullptr;
         if (!emptyBuckets_.empty())
         {
+            emptyBucketsCounter_--;
+
             bucket = emptyBuckets_.front();
             emptyBuckets_.pop_front();
         }
@@ -114,7 +118,7 @@ private:
     void printBuckets(ostream& stream) const;
     void printIndex(ostream& stream) const;
 
-    void recycleBucket(BucketType* bucket)
+    inline void recycleBucket(BucketType* bucket)
     {
         // Recycle the bucket only if the number of empty
         // buckets in the queue is less than the
@@ -122,6 +126,7 @@ private:
         if (emptyBucketsCounter_ < BUCKETS_MAX)
         {
             emptyBucketsCounter_++;
+
             emptyBuckets_.push_front(bucket);
         }
         else
@@ -130,11 +135,12 @@ private:
         }
     }
 
-    map<PRIORITY, BucketType*, less<PRIORITY>> queue_;
-    unordered_map<TYPE, PRIORITY, HASH, EQUAL_TO> index_;
-
     BucketPoolType emptyBuckets_;
     int emptyBucketsCounter_;
+
+    IndexType index_;
+
+    QueueType queue_;
 };
 
 } // namespace srs

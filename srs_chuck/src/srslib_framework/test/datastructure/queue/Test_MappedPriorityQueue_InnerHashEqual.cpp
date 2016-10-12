@@ -27,16 +27,19 @@ struct Node
         return stream << node.a << "-" << node.b;
     }
 
+    // Object's equal operation
     bool operator==(const Node<T> &other) const
     {
         return a == other.a && b == other.b;
     }
 
+    // Objects's hash function (needed for maps and sets)
     size_t operator()(const Node<T>& node) const
     {
         return hash<T>()(node.a + 101 * node.b);
     }
 
+    // Object's comparison operation (needed for maps and sets)
     bool operator()(const Node<T>& lhs, const Node<T>& rhs) const
     {
         return lhs == rhs;

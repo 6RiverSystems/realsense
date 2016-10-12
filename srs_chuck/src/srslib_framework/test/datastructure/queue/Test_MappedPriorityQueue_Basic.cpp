@@ -121,8 +121,15 @@ TEST(Test_MappedPriorityQueue, Erase)
     queue->pop(item);
     ASSERT_EQ(1, item) << "Unexpected item in the queue";
 
-    ASSERT_EQ(4, queue->sizeOccuppiedBuckets()) << "Unexpected number of occupied buckets";
-    ASSERT_EQ(queue->sizeInitialBuckets() - 4, queue->sizeEmptyBuckets()) <<
+    ASSERT_TRUE(queue->exists(40)) << "Item not found in the queue";
+    queue->erase(40);
+    ASSERT_FALSE(queue->exists(40)) << "Item found in the queue";
+
+    queue->pop(item);
+    ASSERT_EQ(20, item) << "Unexpected item in the queue";
+
+    ASSERT_EQ(2, queue->sizeOccuppiedBuckets()) << "Unexpected number of occupied buckets";
+    ASSERT_EQ(queue->sizeInitialBuckets() - 2, queue->sizeEmptyBuckets()) <<
         "Unexpected number of empty buckets";
 
     delete queue;

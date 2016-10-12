@@ -75,21 +75,22 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
         return;
     }
 
-    // Remove the item from the map index
-    PRIORITY priority = itemIterator->second;
+    // Find the bucket which contains the item
+    auto bucketIterator = queue_.find(itemIterator->second);
 
-    index_.erase(item);
+    // Remove the item from the bucket
+    bucketIterator->second->erase(itemIterator->first);
 
-    // Remove the item from its own bucket
-    BucketType* bucket = queue_[priority];
-    bucket->erase(item);
-
-    // Recycle the bucket if empty
-    if (bucket->empty())
+    // Recycle the bucket if it becomes empty
+    if (bucketIterator->second->empty())
     {
-        queue_.erase(priority);
-        recycleBucket(bucket);
+        queue_.erase(bucketIterator);
+        recycleBucket(bucketIterator->second);
     }
+
+    // Remove the item from the general index
+    index_.erase(itemIterator->first);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +98,7 @@ template<typename TYPE, typename PRIORITY,
     typename HASH, typename EQUAL_TO,
     int BUCKETS_INITIAL, int BUCKETS_MAX>
 TYPE MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKETS_MAX>::
-    find(TYPE& item) const
+    find(TYPE item) const
 {
     auto result = index_.find(item);
     if (result == index_.end())
@@ -164,7 +165,7 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
         // If no bucket was found, get one
         // from the original pool and link it
         // to the queue of priorities
-        bucket = getNewBucket();
+        bucket = getAvailableBucket();
         queue_[priority] = bucket;
     }
 

@@ -22,18 +22,20 @@ struct Grid2dUtils
         int deltaX = BasicMath::sgn<int>(xf - xi);
         int deltaY = BasicMath::sgn<int>(yf - yi);
 
-        unsigned int c = xi;
+        unsigned int c;
         unsigned int r = yi;
         do
         {
+            c = xi;
+
             do
             {
                 grid.maxCost(Grid2d::Location(c, r), cost);
                 c += deltaX;
-            } while (c != xf);
+            } while (c != (xf + deltaX));
 
             r += deltaY;
-        } while (r != yf);
+        } while (r != (yf + deltaY));
     }
 
     static void addStaticObstacle(Grid2d& grid,
@@ -60,18 +62,20 @@ struct Grid2dUtils
         int deltaX = BasicMath::sgn<int>(xf - xi);
         int deltaY = BasicMath::sgn<int>(yf - yi);
 
-        unsigned int c = xi;
+        unsigned int c;
         unsigned int r = yi;
         do
         {
+            c = xi;
+
             do
             {
                 grid.setWeights(Grid2d::Location(c, r), north, east, south, west);
                 c += deltaX;
-            } while (c != xf);
+            } while (c != (xf + deltaX));
 
             r += deltaY;
-        } while (r != yf);
+        } while (r != (yf + deltaY));
     }
 };
 

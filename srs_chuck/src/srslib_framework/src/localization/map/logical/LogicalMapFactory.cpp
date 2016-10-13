@@ -122,18 +122,19 @@ void LogicalMapFactory::addWeight(LogicalMap* logicalMap,
     int deltaX = BasicMath::sgn<int>(xf - xi);
     int deltaY = BasicMath::sgn<int>(yf - yi);
 
-    unsigned int c = xi;
+    unsigned int c;
     unsigned int r = yi;
     do
     {
+        c = xi;
         do
         {
             logicalMap->setWeights(c, r, north, east, south, west);
             c += deltaX;
-        } while (c != xf);
+        } while (c != (xf + deltaX));
 
         r += deltaY;
-    } while (r != yf);
+    } while (r != (yf + deltaY));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

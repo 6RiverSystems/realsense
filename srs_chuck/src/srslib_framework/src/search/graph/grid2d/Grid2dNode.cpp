@@ -24,8 +24,6 @@ Grid2dNode* Grid2dNode::instanceOfStart(Grid2d* graph, Grid2dPosition position, 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2dNode::getNeighbors(vector<ISearchNode*>& neighbors)
 {
-    neighbors.clear();
-
     for (Grid2dAction::ActionEnum action : Grid2dAction::ALLOWED_ACTIONS)
     {
         // Find if the next action is allowed

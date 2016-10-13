@@ -45,7 +45,7 @@ public:
 
         friend ostream& operator<<(ostream& stream, const Location& location)
         {
-            return stream << "<" << location.x << ", " << location.y << ">";
+            return stream << "{" << location.x << ", " << location.y << "}";
         }
 
         int x;
@@ -64,7 +64,7 @@ public:
     {
         bool operator()(const Location& lhs, const Location& rhs) const
         {
-            return (lhs.x == rhs.x) && (lhs.y == rhs.y);
+            return lhs == rhs;
         }
     };
 

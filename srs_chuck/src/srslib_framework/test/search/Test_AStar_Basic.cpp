@@ -23,7 +23,7 @@ TEST(Test_AStar, SearchOnEmpty)
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar<Grid2d::LocationHash, Grid2d::LocationEqual> algorithm;
 
-    Grid2dPosition goalPosition(Grid2d::Location(0, 0), 0);
+    Grid2dPosition goalPosition(Grid2d::Location(1, 0), 0);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);

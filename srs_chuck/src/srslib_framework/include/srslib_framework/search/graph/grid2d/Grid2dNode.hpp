@@ -5,6 +5,9 @@
  */
 #pragma once
 
+#include <sstream>
+using namespace std;
+
 #include <srslib_framework/search/ISearchGoal.hpp>
 #include <srslib_framework/search/ISearchNode.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dPosition.hpp>
@@ -46,6 +49,17 @@ struct Grid2dNode : public ISearchNode
     bool reachedGoal() const
     {
         return goal_->reached(reinterpret_cast<const Grid2dNode*>(this));
+    }
+
+    ostream& toString(ostream& stream) const
+    {
+        return stream << hex << reinterpret_cast<const void*>(this) << dec << " {" <<
+            "p: " << hex << reinterpret_cast<const void*>(parentNode_) << dec <<
+            ", a: " << parentAction_ <<
+            ", g: " << g_ <<
+            ", h: " << h_ <<
+            ", goal: " << *goal_ <<
+            "}";
     }
 
 private:

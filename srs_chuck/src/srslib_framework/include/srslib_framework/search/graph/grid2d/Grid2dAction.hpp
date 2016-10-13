@@ -36,6 +36,11 @@ public:
 
     static ActionResultType execute(Grid2d* graph, Grid2dNode* fromNode, ActionEnum action);
 
+    friend ostream& operator<<(ostream& stream, const ActionEnum& action)
+    {
+        return stream << ENUM_NAMES[action];
+    }
+
 private:
     static constexpr int COMMAND_COSTS_LENGTH = 8;
 

@@ -27,6 +27,11 @@ struct Grid2dPosition
         return (lhs.location == rhs.location) && (lhs.orientation == rhs.orientation);
     }
 
+    friend ostream& operator<<(ostream& stream, const Grid2dPosition& position)
+    {
+        return stream << "{" << position.location << ", " << position.orientation << "}";
+    }
+
     Grid2d::Location location;
     int orientation;
 };

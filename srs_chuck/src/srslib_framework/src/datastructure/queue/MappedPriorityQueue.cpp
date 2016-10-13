@@ -186,7 +186,7 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
 {
     int counter = 0;
 
-    stream << "Buckets" << endl;
+    stream << "Buckets " << "{" << endl;
     for (auto bucketIterator : queue_)
     {
         stream << bucketIterator.first << ": {" << endl;
@@ -196,6 +196,7 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
         }
         stream << "}" << endl;
     }
+    stream << "}";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,13 +208,14 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
 {
     int counter = 0;
 
-    stream << "Index map" << endl;
+    stream << "Index map {" << endl;
     for (auto itemIterator : index_)
     {
         stream << setw(4) << counter++ << ": [" <<
             setw(10) << itemIterator.second << "] " <<
             itemIterator.first << endl;
     }
+    stream << "}";
 }
 
 } // namespace srs

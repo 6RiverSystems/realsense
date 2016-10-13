@@ -28,6 +28,13 @@ struct Grid2dSingleGoal : public ISearchGoal
         return goalPosition_ == reinterpret_cast<const Grid2dNode*>(node)->getPosition();
     }
 
+    ostream& toString(ostream& stream) const
+    {
+        return stream << hex << reinterpret_cast<const void*>(this) << dec << " {"
+            "p: " << goalPosition_ <<
+            "}";
+    }
+
 private:
     Grid2dSingleGoal(Grid2dPosition position) :
         goalPosition_(position)

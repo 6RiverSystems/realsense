@@ -15,7 +15,14 @@ struct ISearchGoal
 
     virtual int heuristic(const ISearchNode* node) const = 0;
 
+    friend ostream& operator<<(ostream& stream, const ISearchGoal& goal)
+    {
+        return goal.toString(stream);
+    }
+
     virtual bool reached(const ISearchNode* node) const = 0;
+
+    virtual ostream& toString(ostream& stream) const = 0;
 };
 
 } // namespace srs

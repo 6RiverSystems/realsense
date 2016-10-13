@@ -45,7 +45,7 @@ public:
     friend ostream& operator<<(ostream& stream,
         const MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO>& queue)
     {
-        stream << "MappedPriorityQueue {" << endl;
+        stream << "{" << endl;
 
         if (queue.empty())
         {
@@ -54,11 +54,12 @@ public:
         else
         {
             queue.printBuckets(stream);
+            stream << endl;
             queue.printIndex(stream);
         }
 
         cout << endl << "Empty buckets: " << queue.sizeEmptyBuckets() << endl;
-        cout << "Occupied buckets: " << queue.sizeOccuppiedBuckets() << endl;
+        cout << "Occupied buckets: " << queue.sizeOccuppiedBuckets() << endl << "}";
 
         return stream;
     }

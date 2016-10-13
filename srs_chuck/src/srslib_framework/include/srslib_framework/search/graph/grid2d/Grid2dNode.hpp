@@ -56,6 +56,7 @@ struct Grid2dNode : public ISearchNode
         return stream << hex << reinterpret_cast<const void*>(this) << dec << " {" <<
             "p: " << hex << reinterpret_cast<const void*>(parentNode_) << dec <<
             ", a: " << parentAction_ <<
+            ", pos: " << position_ <<
             ", g: " << g_ <<
             ", h: " << h_ <<
             ", goal: " << *goal_ <<

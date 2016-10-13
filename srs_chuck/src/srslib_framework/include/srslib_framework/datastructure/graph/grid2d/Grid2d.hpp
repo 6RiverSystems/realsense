@@ -139,15 +139,13 @@ private:
 
     struct Weights
     {
-        Weights(
-            int north = COST_MIN, int east = COST_MIN,
-            int south = COST_MIN, int west = COST_MIN)
-        {
-            north = north;
-            east = east;
-            south = south;
-            west = west;
-        }
+        Weights(int north = COST_MIN, int east = COST_MIN,
+            int south = COST_MIN, int west = COST_MIN) :
+                north(north),
+                east(east),
+                south(south),
+                west(west)
+        {}
 
         int north;
         int east;

@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef SOLUTION_HPP_
-#define SOLUTION_HPP_
+#pragma once
 
 #include <iomanip>
 
@@ -41,7 +40,7 @@ public:
     {
         int counter = 0;
 
-        stream << "Solution {" << endl;
+        stream << "{" << endl;
         for (auto node : solution)
         {
             stream << setw(4) << counter++ << ": " << node << endl;
@@ -52,5 +51,3 @@ public:
 };
 
 } // namespace srs
-
-#endif // SOLUTION_HPP_

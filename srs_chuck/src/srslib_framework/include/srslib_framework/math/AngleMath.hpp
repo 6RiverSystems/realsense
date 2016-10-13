@@ -14,17 +14,27 @@ namespace srs {
 
 struct AngleMath
 {
+    /**
+     * @brief Compare two angles.
+     *
+     * @tparam TYPE Basic type of the operation
+     * @param lhs Left-hand side angle [radians]
+     * @param rhs Right-hand side angle [radians]
+     * @param threshold Threshold of the comparison [radians]
+     *
+     * @return true if the difference between the two angles is less than the specified threshold
+     */
     template<typename TYPE = double>
-    inline static bool equalRad(TYPE a, TYPE b, TYPE threshold = numeric_limits<TYPE>::epsilon())
+    inline static bool equalRad(TYPE lhs, TYPE rhs, TYPE threshold = numeric_limits<TYPE>::epsilon())
     {
-        return abs(AngleMath::normalizeRad<TYPE>(a - b)) < threshold;
+        return abs(AngleMath::normalizeRad<TYPE>(lhs - rhs)) < threshold;
     }
 
     /**
      * @brief Convert degrees to radians.
      *
      * @tparam TYPE Basic type of the operation
-     * @param rad Angle to convert [degrees]
+     * @param deg Angle to convert [degrees]
      *
      * @return converted angle [radians]
      */
@@ -34,20 +44,40 @@ struct AngleMath
         return deg * TYPE(M_PI) / TYPE(180);
     }
 
+    /**
+     * @brief Normalize the specified angle to a [0, 360) range.
+     *
+     * @tparam TYPE Basic type of the operation
+     * @param deg Angle to convert [degrees]
+     *
+     * @return converted angle [degrees]
+     */
     template<typename TYPE = double>
     inline static TYPE normalizeDeg(TYPE deg)
     {
-        return deg < 0 ? TYPE(360) - (fmod(fabs(deg), TYPE(360))) : fmod(deg, TYPE(360));
+        return deg < TYPE(0) ?
+            TYPE(360) - fmod(std::abs(deg), TYPE(360)) :
+            fmod(deg, TYPE(360));
     }
 
     template<int>
     inline static int normalizeDeg(int deg)
     {
-        return deg < 0 ? 360 - (abs(deg) % 360) : deg % 360;
+        return deg < 0 ?
+            360 - (static_cast<int>(std::abs<int>(deg)) % 360) :
+            deg % 360;
     }
 
+    /**
+     * @brief Normalize the specified angle to a [-pi, pi) range.
+     *
+     * @tparam TYPE Basic type of the operation
+     * @param deg Angle to normalize [degrees]
+     *
+     * @return normalized angle to a [-pi, pi) range [radians]
+     */
     template<typename TYPE = double>
-    inline static TYPE normalizeDeg2Rad(double deg)
+    inline static TYPE normalizeDeg2Rad(TYPE deg)
     {
         return AngleMath::normalizeRad<TYPE>(AngleMath::deg2Rad<TYPE>(deg));
     }
@@ -66,12 +96,28 @@ struct AngleMath
         return rad - 2 * M_PI * floor((rad + M_PI) / (2 * M_PI));
     }
 
+    /**
+     * @brief Normalize the specified angle to a [0, 360) range.
+     *
+     * @tparam TYPE Basic type of the operation
+     * @param rad Angle to normalize [radians]
+     *
+     * @return normalized angle to a [0, 360) range [degrees]
+     */
     template<typename TYPE = double>
     inline static TYPE normalizeRad2Deg(TYPE rad)
     {
         return AngleMath::normalizeDeg<TYPE>(AngleMath::rad2Deg<TYPE>(rad));
     }
 
+    /**
+     * @brief Normalize the specified angle to a multiple of 90 deg.
+     *
+     * @tparam TYPE Basic type of the operation
+     * @param rad Angle to normalize [radians]
+     *
+     * @return angle normalized to multiples of 90 deg [degrees]
+     */
     inline static double normalizeRad2Deg90(double rad)
     {
         double angle = AngleMath::rad2Deg<double>(rad);

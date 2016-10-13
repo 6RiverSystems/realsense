@@ -49,7 +49,7 @@ LogicalMap* LogicalMapFactory::fromString(string geoJson)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::addRectangleCost(LogicalMap* logicalMap,
     Pose<> origin, double widthMm, double heightMm,
-    unsigned int cost)
+    int cost)
 {
     double newWidthMm = widthMm;
     double c = origin.x;
@@ -91,14 +91,14 @@ void LogicalMapFactory::addRectangleCost(LogicalMap* logicalMap,
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::addStaticObstacle(LogicalMap* logicalMap,
     Pose<> origin, double widthMm, double heightMm,
-    double sizeEnvelope, unsigned int costEnvelope)
+    double sizeEnvelopeMm, int costEnvelope)
 {
     // First add the envelope, if specified
-    if (sizeEnvelope > 0.0 && costEnvelope > 0)
+    if (sizeEnvelopeMm > 0.0 && costEnvelope > 0)
     {
         addRectangleCost(logicalMap,
-            PoseMath::add(origin, Pose<>(-sizeEnvelope, -sizeEnvelope)),
-            widthMm + 2 * sizeEnvelope, heightMm + 2 * sizeEnvelope,
+            PoseMath::add(origin, Pose<>(-sizeEnvelopeMm, -sizeEnvelopeMm)),
+            widthMm + 2 * sizeEnvelopeMm, heightMm + 2 * sizeEnvelopeMm,
             costEnvelope);
     }
 
@@ -122,18 +122,18 @@ void LogicalMapFactory::addWeight(LogicalMap* logicalMap,
     int deltaX = BasicMath::sgn<int>(xf - xi);
     int deltaY = BasicMath::sgn<int>(yf - yi);
 
-    unsigned int x = xi;
-    unsigned int y = yi;
+    unsigned int c = xi;
+    unsigned int r = yi;
     do
     {
         do
         {
-            logicalMap->setWeights(x, y, north, east, south, west);
-            x += deltaX;
-        } while (x != xf);
+            logicalMap->setWeights(c, r, north, east, south, west);
+            c += deltaX;
+        } while (c != xf);
 
-        y += deltaY;
-    } while (y != yf);
+        r += deltaY;
+    } while (r != yf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

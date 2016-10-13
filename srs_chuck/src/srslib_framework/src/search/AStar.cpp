@@ -23,18 +23,13 @@ bool AStar<HASH, EQUAL_TO>::search(ISearchNode* startNode)
     ISearchNode* currentNode = nullptr;
     while (!open_.empty())
     {
-        cout << open_ << endl;
-
         // The current node is popped from the priority queue and
         // immediately declared closed
         open_.pop(currentNode);
         closed_.insert(currentNode);
 
-        cout << "Evaluating: " << *currentNode << endl << endl;
-
-        // If the goal node and the current node are the same, then
-        // exit and return the solution. The "==" operator depends on the
-        // nature of the ISearchNode class
+        // If the current node satisfies its goal, then
+        // exit and return the solution
         if (currentNode->reachedGoal())
         {
             lastNode_ = currentNode;
@@ -42,7 +37,12 @@ bool AStar<HASH, EQUAL_TO>::search(ISearchNode* startNode)
         }
 
         neighbors.clear();
+
+        // Collect all the valid next states from
+        // from the current node
         currentNode->getNeighbors(neighbors);
+
+        // Try to push the neighbors in the open queue
         pushNodes(neighbors);
     }
 

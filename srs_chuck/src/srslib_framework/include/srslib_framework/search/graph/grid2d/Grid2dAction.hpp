@@ -49,9 +49,9 @@ private:
 
     static ActionResultType addBackward(Grid2d* graph, Grid2dNode* fromNode);
     static ActionResultType addForward(Grid2d* graph, Grid2dNode* fromNode);
-    static ActionResultType addRotationN90(Grid2d* graph, Grid2dNode* fromNode);
-    static ActionResultType addRotationP90(Grid2d* graph, Grid2dNode* fromNode);
-    static ActionResultType addRotation180(Grid2d* graph, Grid2dNode* fromNode);
+    static ActionResultType addRotation(Grid2d* graph, Grid2dNode* fromNode,
+        ActionEnum action, int angle);
+
 };
 
 } // namespace srs

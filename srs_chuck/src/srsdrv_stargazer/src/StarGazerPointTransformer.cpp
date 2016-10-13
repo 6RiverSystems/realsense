@@ -331,7 +331,8 @@ bool StarGazerPointTransformer::LoadAnchors( const std::string& strAnchorsFile )
 					int32_t anchorId = boost::lexical_cast < int32_t > (anchor.id);
 
 					tf::Vector3 origin( anchor.x, anchor.y, -anchor.z );
-					tf::Quaternion orientation = tf::createQuaternionFromYaw( AngleMath::normalizeDeg2Rad( anchor.orientation ) );
+					tf::Quaternion orientation = tf::createQuaternionFromYaw(
+					    AngleMath::normalizeDeg2Rad<double>(anchor.orientation));
 
 					tf::Transform transform( orientation, origin );
 

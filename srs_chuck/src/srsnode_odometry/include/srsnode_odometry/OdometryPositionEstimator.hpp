@@ -65,6 +65,8 @@ private:
 
 	tf::TransformBroadcaster broadcaster_;
 
+	dynamic_reconfigure::Server<srsnode_odometry::RobotSetupConfig> configServer_;
+
 	ros::Subscriber rawOdometrySub_;
 
 	ros::Publisher odometryPub_;

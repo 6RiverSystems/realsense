@@ -8,7 +8,6 @@
 #include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 
-
 namespace srs {
 
 OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
@@ -24,7 +23,7 @@ OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	leftWheelRadius_(0.10243),
 	rightWheelRadius_(0.10243)
 {
-
+	configServer_.setCallback(boost::bind(&OdometryPositionEstimator::cfgCallback, this, _1, _2));
 }
 
 OdometryPositionEstimator::~OdometryPositionEstimator()

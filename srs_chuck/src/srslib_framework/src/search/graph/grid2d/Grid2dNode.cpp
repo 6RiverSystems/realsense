@@ -6,7 +6,7 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2dNode::getNeighbors(vector<ISearchNode*>& neighbors)
+void Grid2dNode::getNeighbors(vector<SearchNode*>& neighbors)
 {
     for (Grid2dAction::ActionEnum action : Grid2dAction::ALLOWED_ACTIONS)
     {

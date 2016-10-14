@@ -5,22 +5,23 @@
  */
 #pragma once
 
-#include <srslib_framework/search/ISearchNode.hpp>
+#include <srslib_framework/search/SearchNode.hpp>
 
 namespace srs {
 
-struct ISearchGoal
+struct SearchGoal
 {
-    virtual ~ISearchGoal() {};
+    virtual ~SearchGoal()
+    {};
 
-    virtual int heuristic(const ISearchNode* node) const = 0;
+    virtual int heuristic(const SearchNode* node) const = 0;
 
-    friend ostream& operator<<(ostream& stream, const ISearchGoal& goal)
+    friend ostream& operator<<(ostream& stream, const SearchGoal& goal)
     {
         return goal.toString(stream);
     }
 
-    virtual bool reached(const ISearchNode* node) const = 0;
+    virtual bool reached(const SearchNode* node) const = 0;
 
     virtual void release() = 0;
 

@@ -8,14 +8,14 @@
 #include <sstream>
 using namespace std;
 
-#include <srslib_framework/search/ISearchGoal.hpp>
-#include <srslib_framework/search/ISearchNode.hpp>
+#include <srslib_framework/search/SearchGoal.hpp>
+#include <srslib_framework/search/SearchNode.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dPosition.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dAction.hpp>
 
 namespace srs {
 
-struct Grid2dNode : public ISearchNode
+struct Grid2dNode : public SearchNode
 {
     static Grid2dNode* instanceOfStart(Grid2d* graph, Grid2dPosition position)
     {
@@ -25,7 +25,7 @@ struct Grid2dNode : public ISearchNode
             0, 0, nullptr);
     }
 
-    bool equals(ISearchNode* const& rhs) const
+    bool equals(SearchNode* const& rhs) const
     {
         return this == rhs || position_ == reinterpret_cast<const Grid2dNode*>(rhs)->getPosition();
     }
@@ -40,7 +40,7 @@ struct Grid2dNode : public ISearchNode
         return h_;
     }
 
-    void getNeighbors(vector<ISearchNode*>& neighbors);
+    void getNeighbors(vector<SearchNode*>& neighbors);
 
     Grid2dPosition getPosition() const
     {
@@ -67,7 +67,7 @@ struct Grid2dNode : public ISearchNode
         delete this;
     }
 
-    void setGoal(ISearchGoal* goal)
+    void setGoal(SearchGoal* goal)
     {
         if (goal)
         {
@@ -96,7 +96,7 @@ private:
     Grid2dNode(Grid2d* graph,
             Grid2dNode* parentNode, Grid2dAction::ActionEnum parentAction,
             Grid2dPosition position, int g, int h,
-            ISearchGoal* goal) :
+            SearchGoal* goal) :
         graph_(graph),
         parentAction_(parentAction),
         parentNode_(parentNode),
@@ -109,7 +109,7 @@ private:
     ~Grid2dNode()
     {}
 
-    ISearchGoal* goal_;
+    SearchGoal* goal_;
     Grid2d* graph_;
     int g_;
 

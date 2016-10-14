@@ -11,39 +11,40 @@ using namespace std;
 
 namespace srs {
 
-struct ISearchGoal;
+struct SearchGoal;
 
-struct ISearchNode
+struct SearchNode
 {
-    virtual ~ISearchNode() {};
+    virtual ~SearchNode()
+    {};
 
-    virtual bool equals(ISearchNode* const& rhs) const = 0;
+    virtual bool equals(SearchNode* const& rhs) const = 0;
 
-    virtual void getNeighbors(vector<ISearchNode*>& neighbors) = 0;
+    virtual void getNeighbors(vector<SearchNode*>& neighbors) = 0;
     virtual int getTotalCost() const = 0;
     virtual bool goalReached() const = 0;
 
     virtual std::size_t hash() const = 0;
 
-    friend ostream& operator<<(ostream& stream, const ISearchNode& node)
+    friend ostream& operator<<(ostream& stream, const SearchNode& node)
     {
         return node.toString(stream);
     }
 
-    friend ostream& operator<<(ostream& stream, ISearchNode*& node)
+    friend ostream& operator<<(ostream& stream, SearchNode*& node)
     {
         return node->toString(stream);
     }
 
     virtual void release() = 0;
 
-    virtual void setGoal(ISearchGoal* goal) = 0;
+    virtual void setGoal(SearchGoal* goal) = 0;
 
     virtual ostream& toString(ostream& stream) const = 0;
 
     struct EqualTo
     {
-        bool operator()(ISearchNode* const& lhs, ISearchNode* const& rhs) const
+        bool operator()(SearchNode* const& lhs, SearchNode* const& rhs) const
         {
             return lhs->equals(rhs);
         }
@@ -51,7 +52,7 @@ struct ISearchNode
 
     struct Hash
     {
-        std::size_t operator()(ISearchNode* const& node) const
+        std::size_t operator()(SearchNode* const& node) const
         {
             return node->hash();
         }

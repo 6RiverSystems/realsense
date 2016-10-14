@@ -12,7 +12,7 @@
 using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
-#include <srslib_framework/search/ISearchGoal.hpp>
+#include <srslib_framework/search/SearchGoal.hpp>
 
 namespace srs {
 

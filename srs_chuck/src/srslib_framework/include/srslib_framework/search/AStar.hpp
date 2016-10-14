@@ -12,7 +12,7 @@
 using namespace std;
 
 #include <srslib_framework/datastructure/queue/MappedPriorityQueue.hpp>
-#include <srslib_framework/search/ISearchNode.hpp>
+#include <srslib_framework/search/SearchNode.hpp>
 
 namespace srs {
 
@@ -39,7 +39,7 @@ public:
         return open_.size();
     }
 
-    ISearchNode* getSolution() const
+    SearchNode* getSolution() const
     {
         return lastNode_;
     }
@@ -49,20 +49,20 @@ public:
         return lastNode_;
     }
 
-    bool search(ISearchNode* start, ISearchGoal* goal);
+    bool search(SearchNode* start, SearchGoal* goal);
 
 private:
-    typedef unordered_set<ISearchNode*,
-        ISearchNode::Hash, ISearchNode::EqualTo> ClosedSetType;
-    typedef MappedPriorityQueue<ISearchNode*, unsigned int,
-        ISearchNode::Hash, ISearchNode::EqualTo> OpenSetType;
+    typedef unordered_set<SearchNode*,
+        SearchNode::Hash, SearchNode::EqualTo> ClosedSetType;
+    typedef MappedPriorityQueue<SearchNode*, unsigned int,
+        SearchNode::Hash, SearchNode::EqualTo> OpenSetType;
 
-    void pushNodes(vector<ISearchNode*>& nodes);
+    void pushNodes(vector<SearchNode*>& nodes);
 
     ClosedSetType closed_;
 
-    ISearchNode* startNode_;
-    ISearchNode* lastNode_;
+    SearchNode* startNode_;
+    SearchNode* lastNode_;
 
     OpenSetType open_;
 };

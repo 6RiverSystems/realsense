@@ -13,7 +13,7 @@ void AStar::clear()
 {
     // Pop all the nodes out of the priority queue and
     // release them
-    ISearchNode* node = nullptr;
+    SearchNode* node = nullptr;
     while (!open_.empty())
     {
         open_.pop(node);
@@ -37,7 +37,7 @@ void AStar::clear()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool AStar::search(ISearchNode* start, ISearchGoal* goal)
+bool AStar::search(SearchNode* start, SearchGoal* goal)
 {
     // Do not execute any search without complete information
     if (!start || !goal)
@@ -67,9 +67,9 @@ bool AStar::search(ISearchNode* start, ISearchGoal* goal)
     // Add the starting node to the open queue
     open_.push(startNode_->getTotalCost(), startNode_);
 
-    vector<ISearchNode*> nextSearchNodes;
+    vector<SearchNode*> nextSearchNodes;
 
-    ISearchNode* currentNode = nullptr;
+    SearchNode* currentNode = nullptr;
     while (!open_.empty())
     {
 //        cout << "OPEN ------------------------------------------------------------------------------------------" << endl;
@@ -115,7 +115,7 @@ bool AStar::search(ISearchNode* start, ISearchGoal* goal)
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void AStar::pushNodes(vector<ISearchNode*>& nodes)
+void AStar::pushNodes(vector<SearchNode*>& nodes)
 {
 //    cout << "NEXT ------------------------------------------------------------------------------------------" << endl;
 //    for (auto node : nodes)
@@ -141,7 +141,7 @@ void AStar::pushNodes(vector<ISearchNode*>& nodes)
 
         if (!closed_.count(node))
         {
-            ISearchNode* inOpenQueue = open_.find(node);
+            SearchNode* inOpenQueue = open_.find(node);
             if (inOpenQueue)
             {
                 // If the total cost of the node is greater than the

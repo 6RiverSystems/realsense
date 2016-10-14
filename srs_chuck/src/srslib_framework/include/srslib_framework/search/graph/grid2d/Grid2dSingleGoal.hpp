@@ -5,25 +5,25 @@
  */
 #pragma once
 
-#include <srslib_framework/search/ISearchGoal.hpp>
+#include <srslib_framework/search/SearchGoal.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dPosition.hpp>
 
 namespace srs {
 
-struct Grid2dSingleGoal : public ISearchGoal
+struct Grid2dSingleGoal : public SearchGoal
 {
     static Grid2dSingleGoal* instanceOf(Grid2dPosition position)
     {
         return new Grid2dSingleGoal(position);
     }
 
-    int heuristic(const ISearchNode* node) const
+    int heuristic(const SearchNode* node) const
     {
         return heuristic((reinterpret_cast<const Grid2dNode*>(node))->getPosition().location);
     }
 
-    bool reached(const ISearchNode* node) const
+    bool reached(const SearchNode* node) const
     {
         return goalPosition_ == reinterpret_cast<const Grid2dNode*>(node)->getPosition();
     }

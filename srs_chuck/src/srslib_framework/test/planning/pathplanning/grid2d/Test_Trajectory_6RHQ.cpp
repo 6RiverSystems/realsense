@@ -12,10 +12,10 @@ using namespace std;
 
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
-#include <srslib_framework/planning/pathplanning/grid/PoseAdapter.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/PoseAdapter.hpp>
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/search/AStar.hpp>
 
@@ -27,18 +27,18 @@ TEST(Test_Trajectory, 6RHQ)
     Pose<> goalPose = Pose<>(18.1335, 5.24097, 0);
 
     // ###FS
-//    MapStack* mapStack = MapStackFactory::fromJsonFile("pathplanning/grid/data/6rshq/6rshq.yaml");
+//    MapStack* mapStack = MapStackFactory::fromJsonFile("pathplanning/grid2d/data/6rshq/6rshq.yaml");
 //
-//    Solution<GridSolutionItem>* gridSolution = GridSolutionFactory::fromGoal(
+//    Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromGoal(
 //        mapStack->getOccupancyMap(), robotPose, goalPose);
-//    Solution<GridSolutionItem> gridSolution2 = *gridSolution;
+//    Solution<Grid2dSolutionItem> gridSolution2 = *gridSolution;
 //
 //    cout << gridSolution2 << endl;
 //
 //    Chuck chuck;
 //    Trajectory<> trajectory;
 //
-//    GridTrajectoryGenerator solutionConverter(chuck);
+//    Grid2dTrajectoryGenerator solutionConverter(chuck);
 //    solutionConverter.fromSolution(gridSolution2);
 //    solutionConverter.getTrajectory(trajectory);
 //

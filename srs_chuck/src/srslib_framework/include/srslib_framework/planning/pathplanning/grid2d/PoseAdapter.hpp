@@ -3,11 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef POSEADAPTER_HPP_
-#define POSEADAPTER_HPP_
-
-#include <vector>
-using namespace std;
+#pragma once
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 
@@ -31,5 +27,3 @@ struct PoseAdapter
 };
 
 } // namespace srs
-
-#endif // POSEADAPTER_HPP_

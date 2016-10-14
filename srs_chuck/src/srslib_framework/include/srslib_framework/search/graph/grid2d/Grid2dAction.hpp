@@ -24,7 +24,6 @@ public:
     enum ActionEnum {
         BACKWARD = 0,
         FORWARD,
-        GOAL,
         NONE,
         ROTATE_N90, ROTATE_P90, ROTATE_180,
         START

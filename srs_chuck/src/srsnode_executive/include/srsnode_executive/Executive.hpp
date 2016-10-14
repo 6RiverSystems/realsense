@@ -9,7 +9,7 @@
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/channel/publisher/PublisherBoolean.hpp>
 #include <srslib_framework/ros/channel/publisher/PublisherPolygonStamped.hpp>
@@ -82,7 +82,7 @@ private:
 
     Pose<> currentRobotPose_;
     Pose<> currentGoal_;
-    Solution<GridSolutionItem>* currentSolution_;
+    Solution<Grid2dSolutionItem>* currentSolution_;
     Pose<> currentTarget_;
 
     bool isJoystickLatched_;

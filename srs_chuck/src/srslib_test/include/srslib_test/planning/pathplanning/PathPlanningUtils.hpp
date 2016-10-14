@@ -10,21 +10,21 @@
 #include <iostream>
 using namespace std;
 
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
-#include <srslib_framework/planning/pathplanning/grid/PoseAdapter.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/PoseAdapter.hpp>
 
 namespace srs {
 namespace test {
 
 struct PathPlanningUtils
 {
-    static bool checkForNoRotate(Solution<GridSolutionItem>* solution)
+    static bool checkForNoRotate(Solution<Grid2dSolutionItem>* solution)
     {
         for (auto solutionItem : *solution)
         {
-            if (solutionItem.actionType == GridSolutionItem::ROTATE)
+            if (solutionItem.actionType == Grid2dSolutionItem::ROTATE)
             {
                 return true;
             }

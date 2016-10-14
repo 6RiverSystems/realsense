@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef GRIDSOLUTIONFACTORY_HPP_
-#define GRIDSOLUTIONFACTORY_HPP_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -14,7 +13,7 @@ using namespace std;
 #include <srslib_framework/localization/map/BaseMap.hpp>
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
 
 #include <srslib_framework/robotics/Pose.hpp>
 
@@ -22,20 +21,18 @@ using namespace std;
 
 namespace srs {
 
-struct GridSolutionFactory
+struct Grid2dSolutionFactory
 {
-    static Solution<GridSolutionItem>* fromConsecutiveGoals(BaseMap* map,
+    static Solution<Grid2dSolutionItem>* fromConsecutiveGoals(BaseMap* map,
         Pose<> start, vector<Pose<>> goals);
-
-// ###FS
-//    static Solution<GridSolutionItem>* fromGoal(BaseMap* map,
-//        Pose<> start, Pose<> goal);
-    static Solution<GridSolutionItem>* fromRotation(Pose<> pose,
+    static Solution<Grid2dSolutionItem>* fromSingleGoal(BaseMap* map,
+        Pose<> start, Pose<> goal);
+    static Solution<Grid2dSolutionItem>* fromRotation(Pose<> pose,
         double theta0, double thetaf);
-//    static Solution<GridSolutionItem>* fromSearch(BaseMap* map,
-//        AStar<Grid2d>::SearchNodeType* goalNode);
+
+private:
+    static Solution<Grid2dSolutionItem>* fromSearch(BaseMap* map,
+        AStar::SolutionType& intermediateSolution);
 };
 
 } // namespace srs
-
-#endif // GRIDSOLUTIONFACTORY_HPP_

@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef GRIDSOLUTIONITEM_HPP_
-#define GRIDSOLUTIONITEM_HPP_
+#pragma once
 
 #include <iomanip>
 #include <unordered_map>
@@ -14,32 +13,35 @@ using namespace std;
 
 namespace srs {
 
-struct GridSolutionItem
+struct Grid2dSolutionItem
 {
     enum ActionEnum {
         NONE,
         MOVE,
         ROTATE};
 
-    GridSolutionItem() :
+    Grid2dSolutionItem() :
         actionType(NONE),
         fromPose(Pose<>::ZERO),
         toPose(Pose<>::ZERO),
         cost(0.0)
     {}
 
-    GridSolutionItem(ActionEnum actionType, Pose<> fromPose, Pose<> toPose, double cost = 0.0) :
+    Grid2dSolutionItem(ActionEnum actionType, Pose<> fromPose, Pose<> toPose, double cost = 0.0) :
         actionType(actionType),
         fromPose(fromPose),
         toPose(toPose),
         cost(cost)
     {}
 
-    friend ostream& operator<<(ostream& stream, const GridSolutionItem& solutionItem)
+    friend ostream& operator<<(ostream& stream, const Grid2dSolutionItem& solutionItem)
     {
-        return stream << " (" << ENUM_NAMES[solutionItem.actionType] <<
-            ", " << solutionItem.fromPose << " -> " <<
-            solutionItem.toPose << ", " << solutionItem.cost << ")";
+        return stream << " (" <<
+            ENUM_NAMES[solutionItem.actionType] <<
+            ", " << solutionItem.fromPose <<
+            " -> " << solutionItem.toPose <<
+            ", " << solutionItem.cost <<
+            ")";
     }
 
     ActionEnum actionType;
@@ -55,5 +57,3 @@ private:
 };
 
 } // namespace srs
-
-#endif // GRIDSOLUTIONITEM_HPP_

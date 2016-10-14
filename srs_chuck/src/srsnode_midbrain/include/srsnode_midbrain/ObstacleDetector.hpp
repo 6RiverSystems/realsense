@@ -22,7 +22,7 @@
 #include <srslib_framework/Pose.h>
 #include <srslib_framework/MsgSolution.h>
 #include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
 
 namespace bg = boost::geometry;
 
@@ -107,7 +107,7 @@ private:
 
 	Polygon							m_posePolygon;
 
-	Solution<GridSolutionItem>		m_solution;
+	Solution<Grid2dSolutionItem>		m_solution;
 
 	Polygon							m_dangerZone;
 

@@ -16,7 +16,7 @@ using namespace std;
 using namespace srsnode_motion;
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
@@ -35,7 +35,7 @@ namespace srs {
 class MotionController
 {
 public:
-    typedef Solution<GridSolutionItem> SolutionType;
+    typedef Solution<Grid2dSolutionItem> SolutionType;
 
     MotionController(double dT);
 

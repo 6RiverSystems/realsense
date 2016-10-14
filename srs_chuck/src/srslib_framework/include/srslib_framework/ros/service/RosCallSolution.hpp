@@ -19,7 +19,7 @@ namespace srs {
 struct RosCallSolution
 {
 public:
-    static bool call(string node, string trigger, Solution<GridSolutionItem>* value)
+    static bool call(string node, string trigger, Solution<Grid2dSolutionItem>* value)
     {
         ros::NodeHandle rosNodeHandle;
 

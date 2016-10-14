@@ -12,8 +12,8 @@ using namespace std;
 #include <srslib_framework/math/AngleMath.hpp>
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
 
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
@@ -24,22 +24,22 @@ TEST(Test_Trajectory, ShortTrajectory)
     constexpr double DEG90 = AngleMath::deg2Rad<double>(90);
     constexpr double DEG180 = AngleMath::deg2Rad<double>(180);
 
-    GridSolutionItem SOLUTION_00 = GridSolutionItem(GridSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_00 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(18, 7, DEG90), Pose<>(18, 8, DEG90));
 
-    GridSolutionItem SOLUTION_01 = GridSolutionItem(GridSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_01 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(18, 8, DEG90), Pose<>(18, 9, DEG90));
 
-    GridSolutionItem SOLUTION_02 = GridSolutionItem(GridSolutionItem::ROTATE,
+    Grid2dSolutionItem SOLUTION_02 = Grid2dSolutionItem(Grid2dSolutionItem::ROTATE,
         Pose<>(18, 9, DEG90), Pose<>(18, 9, DEG180));
 
-    GridSolutionItem SOLUTION_03 = GridSolutionItem(GridSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_03 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(18, 9, DEG180), Pose<>(17, 9, DEG180));
 
-    GridSolutionItem SOLUTION_04 = GridSolutionItem(GridSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_04 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(17, 9, DEG180), Pose<>(16, 9, DEG180));
 
-    Solution<GridSolutionItem> solution;
+    Solution<Grid2dSolutionItem> solution;
     solution.push_back(SOLUTION_00);
     solution.push_back(SOLUTION_01);
     solution.push_back(SOLUTION_02);
@@ -51,7 +51,7 @@ TEST(Test_Trajectory, ShortTrajectory)
     Chuck chuck;
     Trajectory<> trajectory;
 
-    GridTrajectoryGenerator solutionConverter(chuck);
+    Grid2dTrajectoryGenerator solutionConverter(chuck);
     solutionConverter.fromSolution(solution);
     solutionConverter.getTrajectory(trajectory);
 

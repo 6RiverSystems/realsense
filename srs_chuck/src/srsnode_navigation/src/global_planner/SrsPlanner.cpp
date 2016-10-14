@@ -4,8 +4,8 @@
 
 PLUGINLIB_EXPORT_CLASS(srs::SrsPlanner, nav_core::BaseGlobalPlanner)
 
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
@@ -65,7 +65,7 @@ bool SrsPlanner::makePlan(
     Pose<> robotPose = PoseMessageFactory::poseStamped2Pose(start);
     Pose<> target = PoseMessageFactory::poseStamped2Pose(goal);
 
-    Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(
+    Solution<Grid2dSolutionItem>* solution = Grid2dSolutionFactory::fromSingleGoal(
         srsMapStack_->getObstructionMap(), robotPose, target);
 
     plan.clear();
@@ -81,7 +81,7 @@ bool SrsPlanner::makePlan(
 
         // TODO: Remove this assumption
         Chuck chuck;
-        GridTrajectoryGenerator converter(chuck);
+        Grid2dTrajectoryGenerator converter(chuck);
         converter.fromSolution(*solution);
         converter.getTrajectory(trajectory);
 

@@ -56,7 +56,7 @@ private:
     void disconnectAllTaps();
 
     void evaluateTriggers();
-    void executeSolution(Solution<GridSolutionItem> solution);
+    void executeSolution(Solution<Grid2dSolutionItem> solution);
 
     void onConfigChange(MotionConfig& config, uint32_t level);
 

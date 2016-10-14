@@ -1,4 +1,4 @@
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionUtils.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionUtils.hpp>
 
 namespace srs {
 
@@ -6,31 +6,31 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-double GridSolutionUtils::getTotalCost(Solution<GridSolutionItem>& solution)
+double Grid2dSolutionUtils::getTotalCost(Solution<Grid2dSolutionItem>& solution)
 {
     return solution.getGoal().cost;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-vector<Solution<GridSolutionItem>*> GridSolutionUtils::splitSolution(
-    Solution<GridSolutionItem>& solution)
+vector<Solution<Grid2dSolutionItem>*> Grid2dSolutionUtils::splitSolution(
+    Solution<Grid2dSolutionItem>& solution)
 {
-    vector<Solution<GridSolutionItem>*> result;
+    vector<Solution<Grid2dSolutionItem>*> result;
     if (solution.empty())
     {
         return result;
     }
 
-    Solution<GridSolutionItem>* currentSolution = new Solution<GridSolutionItem>();
+    Solution<Grid2dSolutionItem>* currentSolution = new Solution<Grid2dSolutionItem>();
     result.push_back(currentSolution);
 
-    GridSolutionItem::ActionEnum currentAction = solution.getStart().actionType;
+    Grid2dSolutionItem::ActionEnum currentAction = solution.getStart().actionType;
 
     for (auto solutionItem : solution)
     {
         if (solutionItem.actionType != currentAction)
         {
-            currentSolution = new Solution<GridSolutionItem>();
+            currentSolution = new Solution<Grid2dSolutionItem>();
             result.push_back(currentSolution);
         }
 

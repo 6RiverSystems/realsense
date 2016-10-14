@@ -6,7 +6,7 @@
 #pragma once
 
 #include <array>
-#include <vector>
+#include <list>
 #include <limits>
 #include <unordered_set>
 using namespace std;
@@ -19,13 +19,17 @@ namespace srs {
 class AStar
 {
 public:
+    typedef list<SearchNode*> SolutionType;
+
     AStar() :
         lastNode_(nullptr),
         startNode_(nullptr)
     {}
 
     ~AStar()
-    {}
+    {
+        clear();
+    }
 
     void clear();
 
@@ -39,10 +43,7 @@ public:
         return open_.size();
     }
 
-    SearchNode* getSolution() const
-    {
-        return lastNode_;
-    }
+    void getSolution(SolutionType& solution);
 
     bool hasSolution() const
     {

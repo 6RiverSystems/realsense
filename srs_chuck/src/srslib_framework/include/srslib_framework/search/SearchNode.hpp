@@ -21,6 +21,7 @@ struct SearchNode
     virtual bool equals(SearchNode* const& rhs) const = 0;
 
     virtual void getNeighbors(vector<SearchNode*>& neighbors) = 0;
+    virtual SearchNode* getParent() = 0;
     virtual int getTotalCost() const = 0;
     virtual bool goalReached() const = 0;
 

@@ -37,6 +37,21 @@ void AStar::clear()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void AStar::getSolution(list<SearchNode*>& solution)
+{
+    solution.clear();
+
+    // Explore the tree backward to
+    // reconstruct the solution
+    SearchNode* node = lastNode_;
+    while (node)
+    {
+        solution.push_front(node);
+        node = node->getParent();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 bool AStar::search(SearchNode* start, SearchGoal* goal)
 {
     // Do not execute any search without complete information

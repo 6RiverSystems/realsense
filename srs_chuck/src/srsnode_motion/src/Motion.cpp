@@ -178,7 +178,7 @@ void Motion::evaluateTriggers()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Motion::executeSolution(Solution<GridSolutionItem> solution)
+void Motion::executeSolution(Solution<Grid2dSolutionItem> solution)
 {
     ROS_DEBUG_STREAM_NAMED("motion", "Communicated solution: " << endl << solution);
 

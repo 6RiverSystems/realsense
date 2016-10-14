@@ -26,11 +26,11 @@ TEST(Test_AStar, SmallSearchOnEmptyGrid)
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
 
-    Grid2dPosition goalPosition(Grid2d::Location(1, 1), 0);
-    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
-
     Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
+
+    Grid2dPosition goalPosition(Grid2d::Location(1, 1), 0);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A solution was not found";
@@ -47,11 +47,11 @@ TEST(Test_AStar, Corner2CornerSearchOnEmptyGrid)
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
 
-    Grid2dPosition goalPosition(Grid2d::Location(GRID_SIZE - 1, GRID_SIZE - 1), 0);
-    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
-
     Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
+
+    Grid2dPosition goalPosition(Grid2d::Location(GRID_SIZE - 1, GRID_SIZE - 1), 0);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A solution was not found";
@@ -72,11 +72,11 @@ TEST(Test_AStar, SearchAroundObstacle)
 
     cout << grid << endl;
 
-    Grid2dPosition goalPosition(Grid2d::Location(GRID_SIZE - 1, GRID_SIZE - 1), 0);
-    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
-
     Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
+
+    Grid2dPosition goalPosition(Grid2d::Location(GRID_SIZE - 1, GRID_SIZE - 1), 0);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A solution was not found";
@@ -97,11 +97,11 @@ TEST(Test_AStar, UnreachableGoal)
 
     cout << grid << endl;
 
-    Grid2dPosition goalPosition(Grid2d::Location(4, 0), 0);
-    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
-
     Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
+
+    Grid2dPosition goalPosition(Grid2d::Location(4, 0), 0);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_FALSE(algorithm.search(start, goal)) <<
         "A solution was found";
@@ -118,11 +118,11 @@ TEST(Test_AStar, Clear)
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
 
-    Grid2dPosition goalPosition(Grid2d::Location(1, 1), 0);
-    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
-
     Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
+
+    Grid2dPosition goalPosition(Grid2d::Location(1, 1), 0);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A solution was not found";
@@ -158,14 +158,14 @@ TEST(Test_AStar, MemoryLeaks)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
 
-    Grid2dPosition goalPosition(Grid2d::Location(1, 1), 0);
     Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
+    Grid2dPosition goalPosition(Grid2d::Location(1, 1), 0);
 
     test::MemoryWatch memoryWatch;
 
     AStar* algorithm = new AStar();
-    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm->search(start, goal)) <<
         "A solution was not found";

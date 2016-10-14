@@ -12,15 +12,15 @@ using namespace std;
 
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
 
 using namespace srs;
 
 TEST(Test_Solution, Barrett_LongSolution)
 {
     // ###FS
-//    MapStack* mapStack = MapStackFactory::fromJsonFile("pathplanning/grid/data/barrett/barrett.yaml");
+//    MapStack* mapStack = MapStackFactory::fromJsonFile("pathplanning/grid2d/data/barrett/barrett.yaml");
 //
 //    // Looking for a path between
 //    // Pose {@: 1.4686e+09, x: 14.7855, y: 4.65954, t: 1.53943} (148,47,90)
@@ -29,6 +29,6 @@ TEST(Test_Solution, Barrett_LongSolution)
 //
 //    Pose<> robotPose = Pose<>(14.7855, 4.65954, 1.53943);
 //    Pose<> goalPose = Pose<>(33.215, 51.703, 1.5708);
-//    Solution<GridSolutionItem>* solution = GridSolutionFactory::fromGoal(
+//    Solution<Grid2dSolutionItem>* solution = Grid2dSolutionFactory::fromGoal(
 //        mapStack->getOccupancyMap(), robotPose, goalPose);
 }

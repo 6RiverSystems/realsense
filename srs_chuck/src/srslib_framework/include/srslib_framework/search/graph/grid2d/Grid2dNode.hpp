@@ -42,6 +42,16 @@ struct Grid2dNode : public SearchNode
 
     void getNeighbors(vector<SearchNode*>& neighbors);
 
+    SearchNode* getParent()
+    {
+        return parentNode_;
+    }
+
+    Grid2dAction::ActionEnum getParentAction()
+    {
+        return parentAction_;
+    }
+
     Grid2dPosition getPosition() const
     {
         return position_;

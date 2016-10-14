@@ -11,14 +11,14 @@ using namespace std;
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
 
 namespace srs {
 
-struct GridSolutionUtils
+struct Grid2dSolutionUtils
 {
-    static double getTotalCost(Solution<GridSolutionItem>& solution);
-    static vector<Solution<GridSolutionItem>*> splitSolution(Solution<GridSolutionItem>& solution);
+    static double getTotalCost(Solution<Grid2dSolutionItem>& solution);
+    static vector<Solution<Grid2dSolutionItem>*> splitSolution(Solution<Grid2dSolutionItem>& solution);
 };
 
 } // namespace srs

@@ -8,8 +8,8 @@
 
 #include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid/PoseAdapter.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/PoseAdapter.hpp>
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/ros/message/SolutionMessageFactory.hpp>
 #include <srslib_framework/ros/service/RosCallEmpty.hpp>
@@ -318,7 +318,7 @@ void Executive::taskCustomAction()
 //    currentGoal_ = currentRobotPose_;
 //    currentGoal_.theta += M_PI;
 //
-//    currentSolution_ = GridSolutionFactory::fromRotation(currentRobotPose_,
+//    currentSolution_ = Grid2dSolutionFactory::fromRotation(currentRobotPose_,
 //        currentRobotPose_.theta,
 //        currentRobotPose_.theta + (2 * M_PI - 0.1));
 //
@@ -364,7 +364,7 @@ void Executive::taskCustomAction()
 //            PoseMath::add(currentRobotPose_, Pose<>(0, 0, 0))
 //        };
 //    }
-//    currentSolution_ = GridSolutionFactory::fromConsecutiveGoals(map, currentRobotPose_, goals);
+//    currentSolution_ = Grid2dSolutionFactory::fromConsecutiveGoals(map, currentRobotPose_, goals);
 //
 //    publishGoalTarget(currentGoal_);
 ////    publishInternalGoalSolution(currentSolution_);

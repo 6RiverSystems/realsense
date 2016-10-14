@@ -12,8 +12,8 @@ using namespace std;
 #include <srslib_framework/math/AngleMath.hpp>
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
 
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
@@ -25,10 +25,10 @@ TEST(Test_Trajectory, SingleRotation)
     constexpr double DEG90 = AngleMath::deg2Rad<double>(90);
     constexpr double DEG180 = AngleMath::deg2Rad<double>(180);
 
-    GridSolutionItem SOLUTION_00 = GridSolutionItem(GridSolutionItem::ROTATE,
+    Grid2dSolutionItem SOLUTION_00 = Grid2dSolutionItem(Grid2dSolutionItem::ROTATE,
         Pose<>(18, 9, DEG90), Pose<>(18, 9, DEG180));
 
-    Solution<GridSolutionItem> gridSolution;
+    Solution<Grid2dSolutionItem> gridSolution;
     gridSolution.push_back(SOLUTION_00);
 
     ROS_DEBUG_STREAM(gridSolution);
@@ -36,7 +36,7 @@ TEST(Test_Trajectory, SingleRotation)
     Chuck chuck;
     Trajectory<> trajectory;
 
-    GridTrajectoryGenerator solutionConverter(chuck);
+    Grid2dTrajectoryGenerator solutionConverter(chuck);
     solutionConverter.fromSolution(gridSolution);
     solutionConverter.getTrajectory(trajectory);
 

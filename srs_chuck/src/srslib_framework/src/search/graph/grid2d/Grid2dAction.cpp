@@ -16,7 +16,6 @@ array<Grid2dAction::ActionEnum, 3> Grid2dAction::ALLOWED_ACTIONS = {
 const int Grid2dAction::COMMAND_COSTS[] = {
     40, // BACKWARD
     1, // FORWARD
-    0, // GOAL
     0, // NONE
     2, // ROTATE_N90
     2, // ROTATE_P90
@@ -47,7 +46,6 @@ Grid2dAction::ActionResultType Grid2dAction::execute(Grid2d* graph,
 unordered_map<int, string> Grid2dAction::ENUM_NAMES = {
     {Grid2dAction::BACKWARD, "BACKWARD"},
     {Grid2dAction::FORWARD, "FORWARD"},
-    {Grid2dAction::GOAL, "GOAL"},
     {Grid2dAction::NONE, "NONE"},
     {Grid2dAction::ROTATE_N90, "ROTATE_N90"},
     {Grid2dAction::ROTATE_P90, "ROTATE_P90"},

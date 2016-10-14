@@ -12,8 +12,8 @@ using namespace std;
 #include <srslib_framework/math/AngleMath.hpp>
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
 
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
@@ -24,34 +24,34 @@ TEST(Test_Trajectory, LongStraight)
 {
     constexpr double DEG90 = AngleMath::deg2Rad<double>(90);
 
-    GridSolutionItem SOLUTION_00 = GridSolutionItem(GridSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_00 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(0, 0, DEG90), Pose<>(0, 1, DEG90));
 
-    GridSolutionItem SOLUTION_01 = GridSolutionItem(GridSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_01 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(0, 1, DEG90), Pose<>(0, 2, DEG90));
 
-    GridSolutionItem SOLUTION_02 = GridSolutionItem(GridSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_02 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(0, 2, DEG90), Pose<>(0, 3, DEG90));
 
-    GridSolutionItem SOLUTION_03 = GridSolutionItem(GridSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_03 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(0, 3, DEG90), Pose<>(0, 4, DEG90));
 
-    GridSolutionItem SOLUTION_04 = GridSolutionItem(GridSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_04 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(0, 4, DEG90), Pose<>(0, 5, DEG90));
 
-    GridSolutionItem SOLUTION_05 = GridSolutionItem(GridSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_05 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(0, 5, DEG90), Pose<>(0, 6, DEG90));
 
-    GridSolutionItem SOLUTION_06 = GridSolutionItem(GridSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_06 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(0, 6, DEG90), Pose<>(0, 7, DEG90));
 
-    GridSolutionItem SOLUTION_07 = GridSolutionItem(GridSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_07 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(0, 7, DEG90), Pose<>(0, 8, DEG90));
 
-    GridSolutionItem SOLUTION_08 = GridSolutionItem(GridSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_08 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(0, 8, DEG90), Pose<>(0, 9, DEG90));
 
-    Solution<GridSolutionItem> gridSolution;
+    Solution<Grid2dSolutionItem> gridSolution;
     gridSolution.push_back(SOLUTION_00);
     gridSolution.push_back(SOLUTION_01);
     gridSolution.push_back(SOLUTION_02);
@@ -67,7 +67,7 @@ TEST(Test_Trajectory, LongStraight)
     Chuck chuck;
     Trajectory<> trajectory;
 
-    GridTrajectoryGenerator solutionConverter(chuck);
+    Grid2dTrajectoryGenerator solutionConverter(chuck);
     solutionConverter.fromSolution(gridSolution);
     solutionConverter.getTrajectory(trajectory);
 

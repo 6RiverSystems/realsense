@@ -12,9 +12,9 @@ set(${PROJECT_NAME}_SOURCES
 
     src/io/SerialIO.cpp
 
-    src/planning/pathplanning/grid/GridSolutionItem.cpp
-    src/planning/pathplanning/grid/GridSolutionFactory.cpp
-    src/planning/pathplanning/grid/GridSolutionUtils.cpp
+    src/planning/pathplanning/grid2d/Grid2dSolutionItem.cpp
+    src/planning/pathplanning/grid2d/Grid2dSolutionFactory.cpp
+    src/planning/pathplanning/grid2d/Grid2dSolutionUtils.cpp
 
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp
@@ -83,16 +83,16 @@ set(TEST_SOURCES_MATH
 )
 
 set(TEST_SOURCES_PLANNING
-    test/planning/pathplanning/grid/Test_Solution_Barrett_Aisles.cpp
-    test/planning/pathplanning/grid/Test_Solution_Barrett_LongSolution.cpp
-    test/planning/pathplanning/grid/Test_Solution_Empty_Consecutive.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_180ShortTrajectory.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_6RHQ.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_LongStraight.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_LongTrajectory.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_ShortStraight.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_ShortTrajectory.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_SingleRotation.cpp
+    test/planning/pathplanning/grid2d/Test_Solution_Barrett_Aisles.cpp
+    test/planning/pathplanning/grid2d/Test_Solution_Barrett_LongSolution.cpp
+    test/planning/pathplanning/grid2d/Test_Solution_Empty_Consecutive.cpp
+    test/planning/pathplanning/grid2d/Test_Trajectory_180ShortTrajectory.cpp
+    test/planning/pathplanning/grid2d/Test_Trajectory_6RHQ.cpp
+    test/planning/pathplanning/grid2d/Test_Trajectory_LongStraight.cpp
+    test/planning/pathplanning/grid2d/Test_Trajectory_LongTrajectory.cpp
+    test/planning/pathplanning/grid2d/Test_Trajectory_ShortStraight.cpp
+    test/planning/pathplanning/grid2d/Test_Trajectory_ShortTrajectory.cpp
+    test/planning/pathplanning/grid2d/Test_Trajectory_SingleRotation.cpp
 )
 
 set(TEST_SOURCES_ROBOTICS

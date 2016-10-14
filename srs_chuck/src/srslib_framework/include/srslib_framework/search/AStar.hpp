@@ -16,12 +16,12 @@ using namespace std;
 
 namespace srs {
 
-template<typename HASH, typename EQUAL_TO>
 class AStar
 {
 public:
     AStar() :
-        lastNode_(nullptr)
+        lastNode_(nullptr),
+        startNode_(nullptr)
     {}
 
     ~AStar()
@@ -29,28 +29,42 @@ public:
 
     void clear();
 
-    unsigned int getClosedNodeCount()
+    unsigned int getClosedNodeCount() const
     {
         return closed_.size();
     }
 
-    unsigned int getOpenNodeCount()
+    unsigned int getOpenNodeCount() const
     {
         return open_.size();
     }
 
-    bool search(ISearchNode* startNode);
+    ISearchNode* getSolution() const
+    {
+        return lastNode_;
+    }
+
+    bool hasSolution() const
+    {
+        return lastNode_;
+    }
+
+    bool search(ISearchNode* start, ISearchGoal* goal);
 
 private:
+    typedef unordered_set<ISearchNode*,
+        ISearchNode::Hash, ISearchNode::EqualTo> ClosedSetType;
+    typedef MappedPriorityQueue<ISearchNode*, unsigned int,
+        ISearchNode::Hash, ISearchNode::EqualTo> OpenSetType;
+
     void pushNodes(vector<ISearchNode*>& nodes);
 
-    unordered_set<ISearchNode*> closed_;
+    ClosedSetType closed_;
 
+    ISearchNode* startNode_;
     ISearchNode* lastNode_;
 
-    MappedPriorityQueue<ISearchNode*, unsigned int> open_;
+    OpenSetType open_;
 };
 
 } // namespace srs
-
-#include <search/AStar.cpp>

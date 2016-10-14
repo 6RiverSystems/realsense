@@ -5,6 +5,9 @@
  */
 #pragma once
 
+#include <string>
+#include <sstream>
+#include <iomanip>
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
@@ -58,8 +61,8 @@ public:
             queue.printIndex(stream);
         }
 
-        cout << endl << "Empty buckets: " << queue.sizeEmptyBuckets() << endl;
-        cout << "Occupied buckets: " << queue.sizeOccuppiedBuckets() << endl << "}";
+        stream << endl << "Empty buckets: " << queue.sizeEmptyBuckets() << endl;
+        stream << "Occupied buckets: " << queue.sizeOccuppiedBuckets() << endl << "}";
 
         return stream;
     }

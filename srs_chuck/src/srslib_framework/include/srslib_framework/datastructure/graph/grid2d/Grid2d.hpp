@@ -38,6 +38,11 @@ public:
             y(y)
         {}
 
+        std::size_t hash() const
+        {
+            return x + 1812433253 * y;
+        }
+
         friend bool operator==(const Location& lhs, const Location& rhs)
         {
             return (lhs.x == rhs.x) && (lhs.y == rhs.y);
@@ -50,22 +55,6 @@ public:
 
         int x;
         int y;
-    };
-
-    struct LocationHash
-    {
-        std::size_t operator()(const Location& location) const
-        {
-            return location.x + 1812433253 * location.y;
-        }
-    };
-
-    struct LocationEqual
-    {
-        bool operator()(const Location& lhs, const Location& rhs) const
-        {
-            return lhs == rhs;
-        }
     };
 
     Grid2d(unsigned int size) :
@@ -136,6 +125,22 @@ public:
 
 private:
     static constexpr int WIDTH = 4;
+
+    struct EqualTo
+    {
+        bool operator()(const Location& lhs, const Location& rhs) const
+        {
+            return lhs == rhs;
+        }
+    };
+
+    struct Hash
+    {
+        std::size_t operator()(const Location& location) const
+        {
+            return location.hash();
+        }
+    };
 
     struct Weights
     {
@@ -217,7 +222,7 @@ private:
     unsigned int aggregateWidth_;
     unsigned int aggregateHeight_;
 
-    unordered_map<Location, Node*, LocationHash, LocationEqual> grid_;
+    unordered_map<Location, Node*, Hash, EqualTo> grid_;
 
     bool hasWeights_;
     unsigned int height_;

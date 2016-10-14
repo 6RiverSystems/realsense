@@ -16,6 +16,7 @@ using namespace std;
 #include <srslib_framework/search/graph/grid2d/Grid2dPosition.hpp>
 
 #include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
+#include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 
 constexpr int GRID_SIZE = 5;
@@ -23,37 +24,49 @@ constexpr int GRID_SIZE = 5;
 TEST(Test_AStar, SmallSearchOnEmptyGrid)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
-    AStar<Grid2d::LocationHash, Grid2d::LocationEqual> algorithm;
+    AStar algorithm;
 
     Grid2dPosition goalPosition(Grid2d::Location(1, 1), 0);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
-    Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition, goal);
+    Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
 
-    ASSERT_TRUE(algorithm.search(start)) <<
-        "A solution for an empty grid was not found";
+    ASSERT_TRUE(algorithm.search(start, goal)) <<
+        "A solution was not found";
+
+    ASSERT_EQ(12, algorithm.getOpenNodeCount()) <<
+        "Unexpected number of open nodes";
+
+    ASSERT_EQ(12, algorithm.getClosedNodeCount()) <<
+        "Unexpected number of closed nodes";
 }
 
 TEST(Test_AStar, Corner2CornerSearchOnEmptyGrid)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
-    AStar<Grid2d::LocationHash, Grid2d::LocationEqual> algorithm;
+    AStar algorithm;
 
     Grid2dPosition goalPosition(Grid2d::Location(GRID_SIZE - 1, GRID_SIZE - 1), 0);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
-    Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition, goal);
+    Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
 
-    ASSERT_TRUE(algorithm.search(start)) <<
-        "A solution for an empty grid was not found";
+    ASSERT_TRUE(algorithm.search(start, goal)) <<
+        "A solution was not found";
+
+    ASSERT_EQ(23, algorithm.getOpenNodeCount()) <<
+        "Unexpected number of open nodes";
+
+    ASSERT_EQ(19, algorithm.getClosedNodeCount()) <<
+        "Unexpected number of closed nodes";
 }
 
 TEST(Test_AStar, SearchAroundObstacle)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
-    AStar<Grid2d::LocationHash, Grid2d::LocationEqual> algorithm;
+    AStar algorithm;
 
     test::Grid2dUtils::addStaticObstacle(grid, 2, 0, 2, 3);
 
@@ -63,8 +76,111 @@ TEST(Test_AStar, SearchAroundObstacle)
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
-    Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition, goal);
+    Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
 
-    ASSERT_TRUE(algorithm.search(start)) <<
-        "A solution for an empty grid was not found";
+    ASSERT_TRUE(algorithm.search(start, goal)) <<
+        "A solution was not found";
+
+    ASSERT_EQ(21, algorithm.getOpenNodeCount()) <<
+        "Unexpected number of open nodes";
+
+    ASSERT_EQ(19, algorithm.getClosedNodeCount()) <<
+        "Unexpected number of closed nodes";
+}
+
+TEST(Test_AStar, UnreachableGoal)
+{
+    Grid2d grid(GRID_SIZE, GRID_SIZE);
+    AStar algorithm;
+
+    test::Grid2dUtils::addStaticObstacle(grid, 1, 0, 4, 4);
+
+    cout << grid << endl;
+
+    Grid2dPosition goalPosition(Grid2d::Location(4, 0), 0);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
+
+    Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
+    Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
+
+    ASSERT_FALSE(algorithm.search(start, goal)) <<
+        "A solution was found";
+
+    ASSERT_EQ(0, algorithm.getOpenNodeCount()) <<
+        "Unexpected number of open nodes";
+
+    ASSERT_EQ(20, algorithm.getClosedNodeCount()) <<
+        "Unexpected number of closed nodes";
+}
+
+TEST(Test_AStar, Clear)
+{
+    Grid2d grid(GRID_SIZE, GRID_SIZE);
+    AStar algorithm;
+
+    Grid2dPosition goalPosition(Grid2d::Location(1, 1), 0);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
+
+    Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
+    Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
+
+    ASSERT_TRUE(algorithm.search(start, goal)) <<
+        "A solution was not found";
+
+    ASSERT_EQ(12, algorithm.getOpenNodeCount()) <<
+        "Unexpected number of open nodes";
+
+    ASSERT_EQ(12, algorithm.getClosedNodeCount()) <<
+        "Unexpected number of closed nodes";
+
+    algorithm.clear();
+
+    ASSERT_EQ(0, algorithm.getOpenNodeCount()) <<
+        "Unexpected number of open nodes";
+
+    ASSERT_EQ(0, algorithm.getClosedNodeCount()) <<
+        "Unexpected number of closed nodes";
+
+    ASSERT_TRUE(algorithm.search(start, goal)) <<
+        "A solution was not found";
+
+    ASSERT_EQ(12, algorithm.getOpenNodeCount()) <<
+        "Unexpected number of open nodes";
+
+    ASSERT_EQ(12, algorithm.getClosedNodeCount()) <<
+        "Unexpected number of closed nodes";
+
+    start->release();
+    goal->release();
+}
+
+TEST(Test_AStar, MemoryLeaks)
+{
+    Grid2d grid(GRID_SIZE, GRID_SIZE);
+
+    Grid2dPosition goalPosition(Grid2d::Location(1, 1), 0);
+    Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
+
+    test::MemoryWatch memoryWatch;
+
+    AStar* algorithm = new AStar();
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
+    Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
+
+    ASSERT_TRUE(algorithm->search(start, goal)) <<
+        "A solution was not found";
+
+    ASSERT_EQ(12, algorithm->getOpenNodeCount()) <<
+        "Unexpected number of open nodes";
+
+    ASSERT_EQ(12, algorithm->getClosedNodeCount()) <<
+        "Unexpected number of closed nodes";
+
+    algorithm->clear();
+
+    start->release();
+    goal->release();
+    delete algorithm;
+
+    ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
 }

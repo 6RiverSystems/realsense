@@ -17,11 +17,17 @@ namespace srs {
 
 struct Grid2dNode : public ISearchNode
 {
-    static Grid2dNode* instanceOfStart(Grid2d* graph, Grid2dPosition position, ISearchGoal* goal);
-
-    void freeNode()
+    static Grid2dNode* instanceOfStart(Grid2d* graph, Grid2dPosition position)
     {
-        delete this;
+        return new Grid2dNode(graph,
+            nullptr, Grid2dAction::START,
+            position,
+            0, 0, nullptr);
+    }
+
+    bool equals(ISearchNode* const& rhs) const
+    {
+        return this == rhs || position_ == reinterpret_cast<const Grid2dNode*>(rhs)->getPosition();
     }
 
     int getG() const
@@ -46,9 +52,32 @@ struct Grid2dNode : public ISearchNode
         return BasicMath::noOverflowAdd(g_, h_);
     }
 
-    bool reachedGoal() const
+    bool goalReached() const
     {
         return goal_->reached(reinterpret_cast<const Grid2dNode*>(this));
+    }
+
+    std::size_t hash() const
+    {
+        return position_.hash();
+    }
+
+    void release()
+    {
+        delete this;
+    }
+
+    void setGoal(ISearchGoal* goal)
+    {
+        if (goal)
+        {
+            goal_ = goal;
+
+            // Calculate the total cost of the node, which,
+            // for the start node, is the value of the
+            // heuristic function to the goal
+            h_ = goal_->heuristic(this);
+        }
     }
 
     ostream& toString(ostream& stream) const

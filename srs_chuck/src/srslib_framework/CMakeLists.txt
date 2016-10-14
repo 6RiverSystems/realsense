@@ -31,6 +31,7 @@ set(${PROJECT_NAME}_SOURCES
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp
 
+    src/search/AStar.cpp
     src/search/graph/grid2d/Grid2dAction.cpp
     src/search/graph/grid2d/Grid2dNode.cpp
 

@@ -22,6 +22,8 @@ struct ISearchGoal
 
     virtual bool reached(const ISearchNode* node) const = 0;
 
+    virtual void release() = 0;
+
     virtual ostream& toString(ostream& stream) const = 0;
 };
 

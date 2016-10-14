@@ -6,22 +6,6 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2dNode* Grid2dNode::instanceOfStart(Grid2d* graph, Grid2dPosition position, ISearchGoal* goal)
-{
-    Grid2dNode* node = new Grid2dNode(graph,
-        nullptr, Grid2dAction::START,
-        position, 0, 0,
-        goal);
-
-    // Calculate the total cost of the node, which,
-    // for the start node, is the value of the
-    // heuristic function to the goal
-    node->h_ = goal->heuristic(node);
-
-    return node;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2dNode::getNeighbors(vector<ISearchNode*>& neighbors)
 {
     for (Grid2dAction::ActionEnum action : Grid2dAction::ALLOWED_ACTIONS)

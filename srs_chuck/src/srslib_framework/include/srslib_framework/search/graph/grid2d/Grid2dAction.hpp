@@ -32,7 +32,7 @@ public:
 
     typedef pair<Grid2dPosition, int> ActionResultType;
 
-    static array<ActionEnum, 5> ALLOWED_ACTIONS;
+    static array<ActionEnum, 3> ALLOWED_ACTIONS;
 
     static ActionResultType execute(Grid2d* graph, Grid2dNode* fromNode, ActionEnum action);
 

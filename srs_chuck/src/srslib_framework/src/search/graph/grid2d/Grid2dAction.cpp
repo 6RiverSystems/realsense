@@ -7,7 +7,7 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-array<Grid2dAction::ActionEnum, 5> Grid2dAction::ALLOWED_ACTIONS = {
+array<Grid2dAction::ActionEnum, 3> Grid2dAction::ALLOWED_ACTIONS = {
     FORWARD,
     ROTATE_N90,
     ROTATE_P90

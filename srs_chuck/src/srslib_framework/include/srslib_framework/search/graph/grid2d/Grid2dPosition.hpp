@@ -22,6 +22,11 @@ struct Grid2dPosition
     ~Grid2dPosition()
     {}
 
+    std::size_t hash() const
+    {
+        return location.hash() + orientation;
+    }
+
     friend bool operator==(const Grid2dPosition& lhs, const Grid2dPosition& rhs)
     {
         return (lhs.location == rhs.location) && (lhs.orientation == rhs.orientation);

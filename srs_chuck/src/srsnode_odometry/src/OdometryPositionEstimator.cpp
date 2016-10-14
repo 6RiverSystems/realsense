@@ -8,17 +8,21 @@
 #include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 
+
 namespace srs {
 
 OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	nodeHandle_(nodeName),
-	twist_(),
+	//twist_(),
 	pose_(15.711, 5.34, 3.14159),
 	pingTimer_(),
 	broadcaster_(),
 	rawOdometrySub_(),
 	odometryPub_(),
-	pingPub_()
+	pingPub_(),
+	wheelbaseLength_(0.5235),
+	leftWheelRadius_(0.10243),
+	rightWheelRadius_(0.10243)
 {
 
 }
@@ -45,8 +49,8 @@ void OdometryPositionEstimator::run()
 
 void OdometryPositionEstimator::connect()
 {
-	rawOdometrySub_ = nodeHandle_.subscribe<geometry_msgs::TwistStamped>(ODOMETRY_RAW_TOPIC, 10,
-		std::bind( &OdometryPositionEstimator::RawOdometryVelocity, this, std::placeholders::_1 ));
+	rawOdometrySub_ = nodeHandle_.subscribe<srslib_framework::Odometry>(ODOMETRY_RAW_TOPIC, 10,
+		std::bind( &OdometryPositionEstimator::CalculateRobotPose, this, std::placeholders::_1 ));
 
 	odometryPub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_TOPIC, 100);
 
@@ -62,33 +66,37 @@ void OdometryPositionEstimator::disconnect()
 	odometryPub_.shutdown();
 }
 
-void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistStamped::ConstPtr& estimatedVelocity )
+void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odometry::ConstPtr& encoderCount )
 {
-	static ros::Time s_lastTime = estimatedVelocity->header.stamp;
-	static geometry_msgs::TwistStamped s_lastVelocity = *estimatedVelocity;
+	static ros::Time s_lastTime = encoderCount->header.stamp;
+
+	// Update current time and calculate time interval between two consecutive messages
+	ros::Time currentTime = encoderCount->header.stamp;
+	double dfTimeDelta = (currentTime - s_lastTime).toSec();
+
+	// Calculate linear and angular velocity
+	double v, w;
+	GetRawOdometryVelocity(encoderCount->left_wheel, encoderCount->right_wheel, dfTimeDelta, v, w);
+
+	//static geometry_msgs::Twist s_lastVelocity = twist_;
 
 	// Message declarations
 	geometry_msgs::TransformStamped odom_trans;
 	odom_trans.header.frame_id = "odom";
 	odom_trans.child_frame_id = "base_footprint";
 
+	/*
 	if( s_lastVelocity.twist.linear.x != estimatedVelocity->twist.linear.x ||
 		s_lastVelocity.twist.angular.z != estimatedVelocity->twist.angular.z)
 	{
 		ROS_DEBUG( "Estimated Velocity Changed: linear=%f, angular=%f",
 			estimatedVelocity->twist.linear.x, estimatedVelocity->twist.angular.z );
-	}
+	} */
 
-	twist_ = estimatedVelocity->twist;
-
-	ros::Time currentTime = estimatedVelocity->header.stamp;
-
-    double v = twist_.linear.x;
-    double w = twist_.angular.z;
+    //double v = twist_.linear.x;
+    //double w = twist_.angular.z;
 
     constexpr static double ANGULAR_VELOCITY_EPSILON = 0.000001; // [rad/s] (0.0573 [deg/s])
-
-	double dfTimeDelta = (currentTime - s_lastTime).toSec( );
 
     // Check for the special case in which omega is 0 (the robot is moving straight)
 	if (abs(w) > ANGULAR_VELOCITY_EPSILON)
@@ -130,12 +138,12 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
 	odom.pose.pose.orientation = odom_quat;
 
 	// Velocity
-	odom.twist.twist.linear.x = twist_.linear.x;
+	odom.twist.twist.linear.x = v;
 	odom.twist.twist.linear.y = 0.0;
 	odom.twist.twist.linear.z = 0.0;
 	odom.twist.twist.angular.x = 0.0;
 	odom.twist.twist.angular.y = 0.0;
-	odom.twist.twist.angular.z = twist_.angular.z;
+	odom.twist.twist.angular.z = w;
 
 	// Publish the Odometry
 	odometryPub_.publish( odom );
@@ -149,6 +157,17 @@ void OdometryPositionEstimator::RawOdometryVelocity( const geometry_msgs::TwistS
 	s_lastTime = currentTime;
 }
 
+void OdometryPositionEstimator::GetRawOdometryVelocity( const int32_t leftWheelCount, const int32_t rightWheelCount, double timeInterval, double& v, double& w)
+{
+	constexpr static int MOTOR_COUNT_PER_REVOLUTION = 4096;
+	constexpr static int GEAR_BOX_REDUCTION_RATE = 10;
+
+	double leftWheelVelocity = (double)leftWheelCount/ timeInterval / (double)MOTOR_COUNT_PER_REVOLUTION / (double) GEAR_BOX_REDUCTION_RATE * leftWheelRadius_ * 2 * M_PI;
+	double rightWheelVelocity = (double)rightWheelCount/ timeInterval / (double)MOTOR_COUNT_PER_REVOLUTION / (double) GEAR_BOX_REDUCTION_RATE * rightWheelRadius_ * 2 * M_PI;
+
+	v = ( rightWheelVelocity + leftWheelVelocity )/2;
+	w = ( rightWheelVelocity - leftWheelVelocity )/wheelbaseLength_ ;
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)
 {
@@ -166,5 +185,11 @@ void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)
     }
 }
 
+void OdometryPositionEstimator::cfgCallback(srsnode_odometry::RobotSetupConfig &config, uint32_t level)
+{
+	wheelbaseLength_ = config.robot_wheelbase_length;
+	leftWheelRadius_ = config.robot_leftwheel_radius;
+	rightWheelRadius_ = config.robot_rightwheel_radius;
+}
 
 } // namespace srs

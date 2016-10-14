@@ -18,7 +18,7 @@ namespace srs {
 // Constant definitions
 
 const string SensorFrameHandler::TOPIC_ODOMETRY = "/internal/sensors/odometry/raw";
-const string SensorFrameHandler::TOPIC_ODOMETRY_COUNT = "/internal/sensors/odometry/count";
+const string SensorFrameHandler::TOPIC_ODOMETRY_COUNT = "/internal/sensors/odometry/firmware/raw";
 const string SensorFrameHandler::TOPIC_IMU = "/internal/sensors/imu/raw";
 const string SensorFrameHandler::TOPIC_SENSOR_FRAME = "/internal/sensors/sensor_frame/raw";
 

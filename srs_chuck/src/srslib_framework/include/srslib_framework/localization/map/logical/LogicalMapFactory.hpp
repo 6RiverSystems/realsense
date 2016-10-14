@@ -16,6 +16,7 @@ namespace srs {
 
 struct LogicalMapFactory
 {
+    static LogicalMap* fromGrid2d(Grid2d* grid, double resolution);
     static LogicalMap* fromJsonFile(string jsonFilename);
     static LogicalMap* fromString(string jsonFilename);
 

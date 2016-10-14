@@ -3,22 +3,18 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef SENSORFRAME_HPP_
-#define SENSORFRAME_HPP_
+#pragma once
 
 #include <string>
 #include <sstream>
 using namespace std;
 
-#include <opencv2/opencv.hpp>
-
-#include <srslib_framework/platform/Object.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
 namespace srs {
 
 template<typename TYPE = double>
-struct SensorFrame : public Object
+struct SensorFrame
 {
     typedef TYPE BaseType;
 
@@ -62,5 +58,3 @@ const SensorFrame<TYPE> SensorFrame<TYPE>::ZERO = SensorFrame<TYPE>(
 );
 
 } // namespace srs
-
-#endif // SENSORFRAME_HPP_

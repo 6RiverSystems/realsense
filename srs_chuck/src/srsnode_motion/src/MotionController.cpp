@@ -332,7 +332,7 @@ void MotionController::aggregateFinalRotations(SolutionType*& solution, Solution
     while (node.actionType == Grid2dSolutionItem::ROTATE)
     {
         // Remove the rotation from the original solution
-        solution->erase(solution->end() - 1);
+        solution->pop_back();
 
         // Try the next solution node
         node = solution->getGoal();

@@ -53,6 +53,4 @@ TEST(Test_Trajectory, Empty_Consecutive)
     solutionConverter.getTrajectory(trajectory);
 
     cout << trajectory << endl;
-
-    ROS_DEBUG_STREAM(trajectory);
 }

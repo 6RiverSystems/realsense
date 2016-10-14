@@ -1,5 +1,6 @@
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
 
+#include <srslib_framework/planning/pathplanning/grid2d/exception/UnexpectedSearchActionException.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/PoseAdapter.hpp>
 #include <srslib_framework/search/SearchNode.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
@@ -121,20 +122,16 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map,
     double toTheta = 0;
 
     AStar::SolutionType::const_iterator fromCursor = intermediateSolution.begin();
-    AStar::SolutionType::const_iterator toCursor = ++fromCursor;
-
-    bool insertNode;
+    AStar::SolutionType::const_iterator toCursor = next(fromCursor, 1);
 
     while (toCursor != intermediateSolution.end())
     {
-        insertNode = true;
-
         Grid2dNode* fromNode = reinterpret_cast<Grid2dNode*>(*fromCursor);
         Grid2dNode* toNode = reinterpret_cast<Grid2dNode*>(*toCursor);
 
         map->transformCells2Mm(
             fromNode->getPosition().location.x, fromNode->getPosition().location.y,
-            toX, toY);
+            fromX, fromY);
 
         fromTheta = AngleMath::deg2Rad<double>(fromNode->getPosition().orientation);
         fromPose = Pose<>(fromX, fromY, AngleMath::normalizeRad<double>(fromTheta));
@@ -148,67 +145,33 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map,
 
         switch (toNode->getParentAction())
         {
-            case Grid2dAction::START:
-                insertNode = false;
-                break;
-
             case Grid2dAction::FORWARD:
-                solutionItem.actionType = Grid2dSolutionItem::MOVE;
-                break;
-
             case Grid2dAction::BACKWARD:
                 solutionItem.actionType = Grid2dSolutionItem::MOVE;
                 break;
 
             case Grid2dAction::ROTATE_N90:
-                solutionItem.actionType = Grid2dSolutionItem::ROTATE;
-                fromTheta = AngleMath::normalizeRad<double>(
-                    toTheta + AngleMath::deg2Rad<double>(90));
-                fromPose = Pose<>(toX, toY, fromTheta);
-                break;
-
             case Grid2dAction::ROTATE_P90:
-                solutionItem.actionType = Grid2dSolutionItem::ROTATE;
-                fromTheta = AngleMath::normalizeRad<double>(
-                    toTheta - AngleMath::deg2Rad<double>(90));
-                fromPose = Pose<>(toX, toY, fromTheta);
-                break;
-
             case Grid2dAction::ROTATE_180:
                 solutionItem.actionType = Grid2dSolutionItem::ROTATE;
-                fromTheta = AngleMath::normalizeRad<double>(
-                    toTheta - AngleMath::deg2Rad<double>(180));
-                fromPose = Pose<>(toX, toY, fromTheta);
                 break;
 
             default:
-                // TODO: Add exception
-                // It should never see a NONE
-                throw;
+                // It should never see a NONE or START
+                throw UnexpectedSearchActionException(intermediateSolution);
         }
 
-        //
-        //        solutionItem.fromPose = fromPose;
-        //        solutionItem.toPose = toPose;
-        //        solutionItem.cost = toCursor->action->getTotalCost();
-        //
-        //        if (insertNode)
-        //        {
-        //            result->insert(result->begin(), solutionItem);
-        //        }
-        //
-        //        toCursor = toCursor->parent;
-        //        if (fromCursor)
-        //        {
-        //            fromCursor = fromCursor->parent;
-        //        }
-        //    }
-        //
-        //    return result;
-        //}
+        solutionItem.fromPose = fromPose;
+        solutionItem.toPose = toPose;
+        solutionItem.cost = toNode->getG();
+
+        result->push_back(solutionItem);
+
+        fromCursor++;
+        toCursor++;
     }
 
-    return nullptr;
+    return result;
 }
 
 } // namespace srs

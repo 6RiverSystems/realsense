@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include <vector>
+#include <list>
 #include <sstream>
 #include <iomanip>
 using namespace std;
@@ -13,7 +13,7 @@ using namespace std;
 namespace srs {
 
 template<typename SOLUTION_ITEM>
-class Solution : public vector<SOLUTION_ITEM>
+class Solution : public list<SOLUTION_ITEM>
 {
 public:
     Solution()
@@ -21,35 +21,44 @@ public:
 
     Solution(SOLUTION_ITEM firstNode)
     {
-        vector<SOLUTION_ITEM>::push_back(firstNode);
+        list<SOLUTION_ITEM>::push_back(firstNode);
     }
 
     void append(Solution<SOLUTION_ITEM>* other)
     {
-        vector<SOLUTION_ITEM>::insert(vector<SOLUTION_ITEM>::end(), other->begin(), other->end());
+        list<SOLUTION_ITEM>::insert(list<SOLUTION_ITEM>::end(), other->begin(), other->end());
     }
 
     SOLUTION_ITEM getGoal() const
     {
-        return *(vector<SOLUTION_ITEM>::end() - 1);
+        return list<SOLUTION_ITEM>::back();
     }
 
     SOLUTION_ITEM getStart() const
     {
-        return *vector<SOLUTION_ITEM>::begin();
+        return list<SOLUTION_ITEM>::front();
     }
 
     friend ostream& operator<<(ostream& stream, const Solution& solution)
     {
+        return stream << solution.toString();
+    }
+
+    string toString() const
+    {
+        stringstream stream;
+
         int counter = 0;
 
         stream << "{" << endl;
-        for (auto node : solution)
+        for (auto node : *this)
         {
             stream << setw(4) << counter++ << ": " << node << endl;
         }
 
-        return stream << "}";
+        stream << "}";
+
+        return stream.str();
     }
 };
 

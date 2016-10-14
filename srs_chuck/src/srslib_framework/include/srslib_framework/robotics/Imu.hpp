@@ -3,24 +3,19 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef IMU_HPP_
-#define IMU_HPP_
+#pragma once
 
 #include <string>
 #include <sstream>
 using namespace std;
 
-#include <opencv2/opencv.hpp>
-
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
-
-#include <srslib_framework/platform/Object.hpp>
 
 namespace srs {
 
 template<typename TYPE = double>
-struct Imu : public Object
+struct Imu
 {
     typedef TYPE BaseType;
 
@@ -137,5 +132,3 @@ template<typename TYPE>
 const Imu<TYPE> Imu<TYPE>::ZERO = Imu<TYPE>(TYPE(), TYPE(), TYPE(), TYPE(), TYPE(), TYPE());
 
 } // namespace srs
-
-#endif // IMU_HPP_

@@ -3,23 +3,19 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef VELOCITY_HPP_
-#define VELOCITY_HPP_
+#pragma once
 
 #include <string>
 #include <sstream>
 using namespace std;
 
-#include <opencv2/opencv.hpp>
-
 #include <srslib_framework/math/BasicMath.hpp>
-
-#include <srslib_framework/platform/Object.hpp>
+#include <srslib_framework/math/AngleMath.hpp>
 
 namespace srs {
 
 template<typename TYPE = double>
-struct Velocity : public Object
+struct Velocity
 {
     typedef TYPE BaseType;
 
@@ -82,5 +78,3 @@ template<typename TYPE>
 const Velocity<TYPE> Velocity<TYPE>::ZERO = Velocity<TYPE>(TYPE(), TYPE());
 
 } // namespace srs
-
-#endif // VELOCITY_HPP_

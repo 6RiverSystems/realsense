@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef TRAJECTORY_HPP_
-#define TRAJECTORY_HPP_
+#pragma once
 
 #include <vector>
 #include <limits>
@@ -164,5 +163,3 @@ private:
 };
 
 } // namespace srs
-
-#endif // TRAJECTORY_HPP_

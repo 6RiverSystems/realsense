@@ -17,6 +17,12 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+LogicalMap* LogicalMapFactory::fromGrid2d(Grid2d* grid, double resolution)
+{
+    return new LogicalMap(grid->getWidth(), grid->getHeight(), resolution);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename)
 {
     YAML::Node jsonDocument = YAML::LoadFile(jsonFilename);

@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef POSEMATH_HPP_
-#define POSEMATH_HPP_
+#pragma once
 
 #include <cmath>
 #include <limits>
@@ -32,6 +31,26 @@ struct PoseMath
     inline static TYPE dot(Pose<TYPE> p1, Pose<TYPE> p2)
     {
         return p1.x * p2.x + p1.y * p2.y;
+    }
+
+    /**
+     * @brief Return TRUE if the poses are similar. In order to consider them
+     * similar:
+     *
+     * - The difference between x must be less than 0.001 m
+     * - The difference between angles must be less than 0.005 deg
+     *
+     * @param lhv Left hand pose
+     * @param rhv Right-hand pose
+     *
+     * @return TRUE if the two poses are similar
+     */
+    template<typename TYPE = double>
+    inline static bool equal(const Pose<TYPE>& lhv, const Pose<TYPE>& rhv)
+    {
+        return BasicMath::equal(lhv.x, rhv.x, 0.001) &&
+            BasicMath::equal(lhv.y, rhv.y, 0.001) &&
+            AngleMath::equalRad(lhv.theta, rhv.theta, 0.001);
     }
 
     template<typename TYPE = double>
@@ -156,5 +175,3 @@ struct PoseMath
 };
 
 } // namespace srs
-
-#endif // POSEMATH_HPP_

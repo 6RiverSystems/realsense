@@ -9,6 +9,7 @@
 #include <unordered_map>
 using namespace std;
 
+#include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
@@ -24,10 +25,10 @@ struct Grid2dSolutionItem
         actionType(NONE),
         fromPose(Pose<>::ZERO),
         toPose(Pose<>::ZERO),
-        cost(0.0)
+        cost(0)
     {}
 
-    Grid2dSolutionItem(ActionEnum actionType, Pose<> fromPose, Pose<> toPose, double cost = 0.0) :
+    Grid2dSolutionItem(ActionEnum actionType, Pose<> fromPose, Pose<> toPose, int cost = 0) :
         actionType(actionType),
         fromPose(fromPose),
         toPose(toPose),
@@ -44,9 +45,17 @@ struct Grid2dSolutionItem
             ")";
     }
 
+    friend bool operator==(const Grid2dSolutionItem& lhs, const Grid2dSolutionItem& rhs)
+    {
+        return lhs.actionType == rhs.actionType &&
+            PoseMath::equal(lhs.fromPose, rhs.fromPose) &&
+            PoseMath::equal(lhs.toPose, rhs.toPose) &&
+            lhs.cost == rhs.cost;
+    }
+
     ActionEnum actionType;
 
-    double cost;
+    int cost;
 
     Pose<> fromPose;
 

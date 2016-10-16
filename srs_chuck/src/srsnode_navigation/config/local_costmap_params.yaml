@@ -1,12 +1,10 @@
 local_costmap:
   global_frame: /odom
   robot_base_frame: /base_link
-  inflation_radius: 0.50
-  update_frequency: 5.0
+  update_frequency: 7.0
   publish_frequency: 0.5
   static_map: true
   rolling_window: true
   width: 6.0
   height: 6.0
-  resolution: 0.1
-  transform_tolerance: 0.25
+  transform_tolerance: 0.5

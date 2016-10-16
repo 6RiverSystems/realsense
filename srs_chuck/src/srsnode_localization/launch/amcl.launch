@@ -6,7 +6,7 @@
   *
 -->
 <launch>
-	<remap from="/scan" to="/internal/sensors/lidar/scan/filtered"/>
+	<remap from="/scan" to="/internal/sensors/lidar/scan/raw"/>
 	<remap from="/map" to="/internal/state/map/grid"/>
 	<remap from="/initialpose" to="/request/initial_pose"/>
 

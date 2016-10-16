@@ -6,14 +6,20 @@
   *
 -->
 <launch>
+    <arg name="use_sim_time" default="false"/>
+
 	<remap from="/map" to="/internal/state/map/grid"/>
     <remap from="/map_metadata" to="/internal/state/map/info"/>
 
-    <!-- Sensors -->
-	<include file="$(find srsbot_chuck)/launch/sensors.launch" />
-
     <!-- Chuck Stack -->
-	<include file="$(find srsbot_chuck)/launch/robot.launch" />
+	<include file="$(find srsbot_chuck)/launch/robot.launch" >
+    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+	</include>
+
+    <!-- Sensors -->
+	<include file="$(find srsbot_chuck)/launch/sensors.launch"
+    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+	</include>
 
     <!-- GMapping -->
 	<include file="$(find srsnode_localization)/launch/gmapping.launch" />

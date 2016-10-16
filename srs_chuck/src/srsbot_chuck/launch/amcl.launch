@@ -6,17 +6,25 @@
   *
 -->
 <launch>
+    <arg name="use_sim_time" default="false"/>
+
     <!-- Chuck Stack -->
-	<include file="$(find srsbot_chuck)/launch/robot.launch" />
+	<include file="$(find srsbot_chuck)/launch/robot.launch" >
+    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+	</include>
+
+    <!-- Sensors -->
+	<include file="$(find srsbot_chuck)/launch/sensors.launch" >
+    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+	</include>
+
+    <!-- Navigation Stack -->
+	<include file="$(find srsnode_navigation)/launch/node.launch" >
+    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+	</include>
 
     <!-- Launch AMCL Localization -->
 	<include file="$(find srsnode_localization)/launch/amcl.launch" />
-
-    <!-- Sensors -->
-	<include file="$(find srsbot_chuck)/launch/sensors.launch" />
-
-    <!-- Navigation Stack -->
-	<include file="$(find srsnode_navigation)/launch/node.launch" />
 
 	<!-- Launch Map -->
 	<include file="$(find srsc_common)/launch/map.launch" />

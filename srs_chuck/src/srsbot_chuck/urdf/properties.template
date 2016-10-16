@@ -2,7 +2,6 @@
 <robot name="chuck" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
     <!-- All units in m-kg-s-radians unit system -->
-
     <xacro:property name="M_PI" value="3.1415926535897931" />
     <xacro:property name="M_PI_2" value="1.570796327" />
     <xacro:property name="DEG_TO_RAD" value="0.017453293" />
@@ -61,18 +60,19 @@
     <xacro:property name="r200_z_offset" value="${r200_cam_z_size + realsense_z_offset}" />
     
     <!-- Sensors -->
-    
+
     <!-- Realsense -->
-	<xacro:property name="realsense_z_offset" value="0.0641858" />
-    
+    <xacro:property name="realsense_z_offset" value="0.0641858" />
+
     <!-- Stargazer -->
     <!-- All measurements made from base_link -> bottom left corner of stargazer -->
-	<xacro:property name="stargazer_x_offset" value="-0.4217162" />
-	<xacro:property name="stargazer_y_offset" value="-0.0352552" />
-	<xacro:property name="stargazer_z_offset" value="0.998982" />
+    <xacro:property name="stargazer_x_offset" value="-0.4217162" />
+    <xacro:property name="stargazer_y_offset" value="-0.0352552" />
+    <xacro:property name="stargazer_z_offset" value="0.998982" />
 
-	<!-- SICK Lidar -->
-	<xacro:property name="lidar_x_offset" value="0.4600448" />
-	<xacro:property name="lidar_z_offset" value="0.3175" />
-    
+    <!-- SICK Lidar -->
+    <xacro:property name="lidar_x_offset" value="0.4600448" />
+    <xacro:property name="lidar_z_offset" value="0.3175" />
+    <xacro:property name="lidar_rotation" value="${M_PI}" />
+
 </robot>

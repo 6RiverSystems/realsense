@@ -51,6 +51,9 @@ void OdometryPositionEstimator::connect()
 	rawOdometrySub_ = nodeHandle_.subscribe<srslib_framework::Odometry>(ODOMETRY_RAW_TOPIC, 10,
 		std::bind( &OdometryPositionEstimator::CalculateRobotPose, this, std::placeholders::_1 ));
 
+	initialPoseSub_ = nodeHandle_.subscribe<geometry_msgs::Pose>(RESET_ODOMETRY_TOPIC, 1,
+			std::bind( &OdometryPositionEstimator::ResetOdomPose, this, std::placeholders::_1 ));
+
 	odometryPub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_TOPIC, 100);
 
 	pingPub_ = nodeHandle_.advertise<std_msgs::Bool>("/internal/state/ping", 1);
@@ -72,7 +75,7 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 	// Update current time and calculate time interval between two consecutive messages
 	ros::Time currentTime = encoderCount->header.stamp;
 
-	// Skip first round calculation (dfTimeDelta=0 -> v,w=NaN)
+	// Skip first round calculation (if dfTimeDelta = 0 -> v,w = NaN)
 	if(s_lastTime == currentTime)
 		return;
 
@@ -161,14 +164,30 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 	s_lastTime = currentTime;
 }
 
+void OdometryPositionEstimator::ResetOdomPose( const geometry_msgs::Pose::ConstPtr& assignedPose )
+{
+	// Reset pose position
+	pose_.x = assignedPose->position.x;
+	pose_.y = assignedPose->position.y;
+
+	// Reset pose orientation
+	double roll =0.0, pitch =0.0, yaw =0.0;
+	tf::Quaternion qua(assignedPose->orientation.x, assignedPose->orientation.y,
+			assignedPose->orientation.z, assignedPose->orientation.w);
+	tf::Matrix3x3(qua).getRPY(roll, pitch, yaw);
+	pose_.theta = yaw;
+}
+
 void OdometryPositionEstimator::GetRawOdometryVelocity( const int32_t leftWheelCount, const int32_t rightWheelCount, double timeInterval, double& v, double& w)
 {
 	constexpr static int MOTOR_COUNT_PER_REVOLUTION = 4096;
 	constexpr static int GEAR_BOX_REDUCTION_RATE = 10;
 
+	// Calculate left and right wheel velocity
 	double leftWheelVelocity = (double)leftWheelCount/ timeInterval / (double)MOTOR_COUNT_PER_REVOLUTION / (double) GEAR_BOX_REDUCTION_RATE * leftWheelRadius_ * 2 * M_PI;
 	double rightWheelVelocity = (double)rightWheelCount/ timeInterval / (double)MOTOR_COUNT_PER_REVOLUTION / (double) GEAR_BOX_REDUCTION_RATE * rightWheelRadius_ * 2 * M_PI;
 
+	// Calculate v and w
 	v = ( rightWheelVelocity + leftWheelVelocity )/2;
 	w = ( rightWheelVelocity - leftWheelVelocity )/wheelbaseLength_ ;
 }

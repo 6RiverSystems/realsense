@@ -10,13 +10,16 @@
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/TwistStamped.h>
-#include <tf/transform_broadcaster.h>
+#include <geometry_msgs/Pose.h>
 #include <nav_msgs/Odometry.h>
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_datatypes.h>
+#include <dynamic_reconfigure/server.h>
+#include <srsnode_odometry/RobotSetupConfig.h>
 #include <srslib_framework/Odometry.h>
 #include <srslib_framework/ros/RosTap.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
-#include <dynamic_reconfigure/server.h>
-#include <srsnode_odometry/RobotSetupConfig.h>
+
 
 namespace srs {
 
@@ -40,6 +43,8 @@ private:
 
     void GetRawOdometryVelocity(const int32_t leftWheelCount, const int32_t rightWheelCount, double timeInterval, double& v, double& w);
 
+    void ResetOdomPose( const geometry_msgs::Pose::ConstPtr& resetMsg );
+
     void pingCallback(const ros::TimerEvent& event);
 
     void cfgCallback(srsnode_odometry::RobotSetupConfig &config, uint32_t level);
@@ -55,6 +60,8 @@ private:
 
 	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/velocity";
 
+	static constexpr auto RESET_ODOMETRY_TOPIC = "/odom_init_pose";
+
     ros::NodeHandle nodeHandle_;
 
     //geometry_msgs::Twist twist_;
@@ -68,6 +75,8 @@ private:
 	dynamic_reconfigure::Server<srsnode_odometry::RobotSetupConfig> configServer_;
 
 	ros::Subscriber rawOdometrySub_;
+
+	ros::Subscriber initialPoseSub_;
 
 	ros::Publisher odometryPub_;
 

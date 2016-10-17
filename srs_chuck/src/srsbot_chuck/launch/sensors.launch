@@ -6,7 +6,7 @@
   *
 -->
 <launch>
-    <arg name="use_sim_time" />
+    <arg name="use_sim_time" default="false" />
 
 	<remap from="scan" to="/internal/sensors/lidar/scan/raw" />
 

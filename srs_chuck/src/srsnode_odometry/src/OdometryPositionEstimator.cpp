@@ -71,6 +71,11 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 
 	// Update current time and calculate time interval between two consecutive messages
 	ros::Time currentTime = encoderCount->header.stamp;
+
+	// Skip first round calculation (dfTimeDelta=0 -> v,w=NaN)
+	if(s_lastTime == currentTime)
+		return;
+
 	double dfTimeDelta = (currentTime - s_lastTime).toSec();
 
 	// Calculate linear and angular velocity

@@ -20,7 +20,6 @@
 #include <srslib_framework/ros/RosTap.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
-
 namespace srs {
 
 class OdometryPositionEstimator

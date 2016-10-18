@@ -13,13 +13,13 @@ namespace srs {
 
 OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	nodeHandle_(nodeName),
-	pose_(15.711, 5.34, 3.14159),
+	pose_(-1.0, -1.0, -1.0),
 	pingTimer_(),
 	broadcaster_(),
 	rawOdometryCountSub_(),
 	odometryPosePub_(),
 	pingPub_(),
-	motorCountPerRev_(4960),
+	motorCountPerRev_(4096),
 	gearboxRatio_(10.0),
 	wheelbaseLength_(0.5235),
 	leftWheelRadius_(0.10243),
@@ -60,7 +60,7 @@ void OdometryPositionEstimator::connect()
 
 	pingPub_ = nodeHandle_.advertise<std_msgs::Bool>("/internal/state/ping", 1);
 
-	// Setup dynamic configuration callback
+	// Register dynamic configuration callback
 	configServer_.setCallback(boost::bind(&OdometryPositionEstimator::cfgCallback, this, _1, _2));
 
     // Start the ping timer
@@ -73,9 +73,19 @@ void OdometryPositionEstimator::disconnect()
 	odometryPosePub_.shutdown();
 }
 
+
 void OdometryPositionEstimator::RawOdomCountToVelocity( const srslib_framework::Odometry::ConstPtr& encoderCount )
 {
+	// If no initial pose is provided, return immediately without any calculation
+	if(pose_.x == (-1.0) && pose_.y == (-1.0)
+			&& pose_.theta == (-1.0))
+	{
+		ROS_ERROR("No initial pose provided");
+		return;
+	}
+
 	static ros::Time s_lastTime = encoderCount->header.stamp;
+	static Pose<> s_lastPose = pose_;
 
 	// Update current time and calculate time interval between two consecutive messages
 	ros::Time currentTime = encoderCount->header.stamp;
@@ -83,7 +93,6 @@ void OdometryPositionEstimator::RawOdomCountToVelocity( const srslib_framework::
 	// Skip first round calculation (if dfTimeDelta = 0 -> v,w = NaN)
 	if(!TimeMath::isTimeElapsed(0.00001, s_lastTime, currentTime))
 	{
-		ROS_INFO("here");
 		return;
 	}
 
@@ -94,23 +103,10 @@ void OdometryPositionEstimator::RawOdomCountToVelocity( const srslib_framework::
 	double angularVelocity = 0.0;
 	GetRawOdometryVelocity(encoderCount->left_wheel, encoderCount->right_wheel, dfTimeDelta, linearVelocity, angularVelocity);
 
-	//static geometry_msgs::Twist s_lastVelocity = twist_;
-
 	// Message declarations
 	geometry_msgs::TransformStamped odom_trans;
 	odom_trans.header.frame_id = "odom";
 	odom_trans.child_frame_id = "base_footprint";
-
-	/*
-	if( s_lastVelocity.twist.linear.x != estimatedVelocity->twist.linear.x ||
-		s_lastVelocity.twist.angular.z != estimatedVelocity->twist.angular.z)
-	{
-		ROS_DEBUG( "Estimated Velocity Changed: linear=%f, angular=%f",
-			estimatedVelocity->twist.linear.x, estimatedVelocity->twist.angular.z );
-	}*/
-
-    //double v = twist_.linear.x;
-    //double w = twist_.angular.z;
 
     constexpr static double ANGULAR_VELOCITY_EPSILON = 0.000001; // [rad/s] (0.0573 [deg/s])
 
@@ -127,6 +123,13 @@ void OdometryPositionEstimator::RawOdomCountToVelocity( const srslib_framework::
     {
     	pose_ = PoseMath::translate<>(pose_, linearVelocity * dfTimeDelta, 0.0);
     }
+
+	// Display status in DEBUG MODE
+	if(pose_.x != s_lastPose.x || pose_.y != s_lastPose.y || pose_.theta != s_lastPose.theta)
+	{
+		ROS_DEBUG( "Estimated Pose Changed: x=%f, y=%f, theta=%f",
+					pose_.x, pose_.y, pose_.theta );
+	}
 
 //	ROS_ERROR_THROTTLE( 1.0, "Pose: %f, %f", pose_.x, pose_.y );
 //	ROS_ERROR_THROTTLE( 1.0, "Pose: x=%f, y=%f, angle:%f", pose_.x, pose_.y, pose_.theta );
@@ -171,6 +174,7 @@ void OdometryPositionEstimator::RawOdomCountToVelocity( const srslib_framework::
 
 	// Update the last time
 	s_lastTime = currentTime;
+	s_lastPose = pose_;
 }
 
 void OdometryPositionEstimator::ResetOdomPose( const geometry_msgs::PoseStamped::ConstPtr& assignedPose )

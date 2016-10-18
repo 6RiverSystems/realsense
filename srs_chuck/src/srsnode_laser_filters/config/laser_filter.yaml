@@ -1,8 +1,14 @@
 scan_filter_chain:
-- name: footprint_filter
-  type: laser_filters/LaserScanFootprintFilter
+- name: box_filter
+  type: laser_filters/LaserScanBoxFilter
   params:
-    inscribed_radius: 0.65
+    box_frame: base_link
+    max_x: 0.49
+    max_y: -0.31
+    max_z: 3.0
+    min_x: -0.49
+    min_y: -0.31
+    min_z: 0.0
 #- name: shadows
 #  type: laser_filters/ScanShadowsFilter
 #  params:

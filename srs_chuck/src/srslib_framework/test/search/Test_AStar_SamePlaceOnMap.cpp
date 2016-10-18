@@ -13,12 +13,10 @@ using namespace std;
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/PoseAdapter.hpp>
-#include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/search/AStar.hpp>
+#include <srslib_framework/search/graph/grid2d/Grid2dPosition.hpp>
+#include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
+#include <srslib_framework/search/graph/grid2d/Grid2dSingleGoal.hpp>
 
 #include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
@@ -26,40 +24,66 @@ using namespace srs;
 
 using namespace srs;
 
-// Path not found between Pose {@: 0, x: 18.1335, y: 5.24097, t: 0.0189141} (181,52,0) and
-// Pose {@: 1.46645e+09, x: 18.1335, y: 5.24097, t: 0} (181,52,0)
-
-TEST(Test_AStar, SamePlaceOnMap)
+TEST(Test_AStar, SamePositionOnMap)
 {
-// ###FS
-//    MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
-//    OccupancyMap* map = mapStack->getOccupancyMap();
-//
-//    // Prepare the start position for the search
-//    Pose<> robotPose = Pose<>(18.1335, 5.24097, 0.0189141);
-//    Grid2d::Location internalStart;
-//    int startAngle;
-//    PoseAdapter::pose2Map(robotPose, map, internalStart, startAngle);
-//
-//    // Prepare the goal position for the search
-//    Pose<> goalPose = Pose<>(18.1335, 5.24097, 0);
-//    Grid2d::Location internalGoal;
-//    int goalAngle;
-//    PoseAdapter::pose2Map(goalPose, map, internalGoal, goalAngle);
-//
-//    test::MemoryWatch memoryWatch;
-//
-//    AStar<Grid2d>* algorithm = new AStar<Grid2d>(map->getGrid());
-//
-//    ROS_DEBUG_STREAM("Found: " <<
-//        algorithm->search(
-//            SearchPosition<Grid2d>(internalStart, startAngle),
-//            SearchPosition<Grid2d>(internalGoal, goalAngle)));
-//
-//    algorithm->clear();
-//
-//    delete algorithm;
-//
-//    ROS_DEBUG_STREAM("Memory usage: " << memoryWatch.getMemoryUsage());
-//    ROS_DEBUG_STREAM("Memory leaks: " << !memoryWatch.isZero());
+    MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
+
+    Grid2dPosition startPosition(Grid2d::Location(181, 52), 0);
+    Grid2dPosition goalPosition(Grid2d::Location(181, 52), 0);
+
+    test::MemoryWatch memoryWatch;
+
+    AStar* algorithm = new AStar();
+    Grid2dNode* start = Grid2dNode::instanceOfStart(mapStack->getLogicalMap()->getGrid(),
+        startPosition);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
+
+    ASSERT_TRUE(algorithm->search(start, goal)) <<
+        "A solution was not found";
+
+    ASSERT_EQ(0, algorithm->getOpenNodeCount()) <<
+        "Unexpected number of open nodes";
+
+    ASSERT_EQ(1, algorithm->getClosedNodeCount()) <<
+        "Unexpected number of closed nodes";
+
+    algorithm->clear();
+
+    start->release();
+    goal->release();
+    delete algorithm;
+
+    ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
+}
+
+TEST(Test_AStar, SameLocationOnMap)
+{
+    MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
+
+    Grid2dPosition startPosition(Grid2d::Location(181, 52), 0);
+    Grid2dPosition goalPosition(Grid2d::Location(181, 52), 90);
+
+    test::MemoryWatch memoryWatch;
+
+    AStar* algorithm = new AStar();
+    Grid2dNode* start = Grid2dNode::instanceOfStart(mapStack->getLogicalMap()->getGrid(),
+        startPosition);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
+
+    ASSERT_TRUE(algorithm->search(start, goal)) <<
+        "A solution was not found";
+
+    ASSERT_EQ(2, algorithm->getOpenNodeCount()) <<
+        "Unexpected number of open nodes";
+
+    ASSERT_EQ(2, algorithm->getClosedNodeCount()) <<
+        "Unexpected number of closed nodes";
+
+    algorithm->clear();
+
+    start->release();
+    goal->release();
+    delete algorithm;
+
+    ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
 }

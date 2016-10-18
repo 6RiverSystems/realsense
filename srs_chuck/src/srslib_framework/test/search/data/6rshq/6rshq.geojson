@@ -19,12 +19,16 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [50,50,1950,10050]
+						"coordinates": [
+							[0,0],
+							[2000,10000]
+						]
 					},
 					"properties": {
 						"name": "1",
 						"envelope_size": 300,
-						"envelope_cost": 200
+						"envelope_cost": 200,
+						"is_border": 1
 					}
 				},
 				{
@@ -32,12 +36,16 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [2050,50,19450,850]
+						"coordinates": [
+							[1900,0],
+							[19500,900]
+						]
 					},
 					"properties": {
 						"name": "2",
 						"envelope_size": 300,
-						"envelope_cost": 200
+						"envelope_cost": 200,
+						"is_border": 1
 					}
 				},
 				{
@@ -45,12 +53,16 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [2050,8650,19450,10050]
+						"coordinates": [
+							[1900,8500],
+							[19500,10000]
+						]
 					},
 					"properties": {
 						"name": "3",
 						"envelope_size": 300,
-						"envelope_cost": 200
+						"envelope_cost": 200,
+						"is_border": 1
 					}
 				},
 				{
@@ -58,12 +70,16 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [3650,2550,16750,3850]
+						"coordinates": [
+							[3600,2500],
+							[16700,3800]
+						]
 					},
 					"properties": {
 						"name": "4",
 						"envelope_size": 300,
-						"envelope_cost": 200
+						"envelope_cost": 200,
+						"is_border": 0
 					}
 				},
 				{
@@ -71,12 +87,16 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [6250,5650,16750,6950]
+						"coordinates": [
+							[6200,5600],
+							[16700,6900]
+						]
 					},
 					"properties": {
 						"name": "5",
 						"envelope_size": 300,
-						"envelope_cost": 200
+						"envelope_cost": 200,
+						"is_border": 0
 					}
 				},
 				{
@@ -84,12 +104,16 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [19550,50,20050,10050]
+						"coordinates": [
+							[19400,0],
+							[20000,10000]
+						]
 					},
 					"properties": {
 						"name": "6",
 						"envelope_size": 300,
-						"envelope_cost": 200
+						"envelope_cost": 200,
+						"is_border": 1
 					}
 				}
 			]

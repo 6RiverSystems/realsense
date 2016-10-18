@@ -19,7 +19,10 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [0,0,5300,23300]
+						"coordinates": [
+							[0,0],
+							[5300,23300]
+						]
 					},
 					"properties": {
 						"name": "1",
@@ -33,7 +36,10 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [5200,0,7100,3400]
+						"coordinates": [
+							[5200,0],
+							[7100,3400]
+						]
 					},
 					"properties": {
 						"name": "2",
@@ -47,7 +53,10 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [5200,15400,27200,23300]
+						"coordinates": [
+							[5200,15400],
+							[27200,23300]
+						]
 					},
 					"properties": {
 						"name": "3",
@@ -61,7 +70,10 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [7000,0,10100,5200]
+						"coordinates": [
+							[7000,0],
+							[10100,5200]
+						]
 					},
 					"properties": {
 						"name": "4",
@@ -75,7 +87,10 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [8800,8300,21900,9700]
+						"coordinates": [
+							[8800,8300],
+							[21900,9700]
+						]
 					},
 					"properties": {
 						"name": "5",
@@ -89,7 +104,10 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [10000,0,27200,2900]
+						"coordinates": [
+							[10000,0],
+							[27200,2900]
+						]
 					},
 					"properties": {
 						"name": "6",
@@ -103,7 +121,10 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [11400,11400,21900,12800]
+						"coordinates": [
+							[11400,11400],
+							[21900,12800]
+						]
 					},
 					"properties": {
 						"name": "7",
@@ -117,7 +138,10 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [14300,2800,27200,6000]
+						"coordinates": [
+							[14300,2800],
+							[27200,6000]
+						]
 					},
 					"properties": {
 						"name": "8",
@@ -131,7 +155,10 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [17700,5900,27200,6700]
+						"coordinates": [
+							[17700,5900],
+							[27200,6700]
+						]
 					},
 					"properties": {
 						"name": "9",
@@ -145,7 +172,10 @@
 					"id": "obstacle",
 					"geometry": {
 						"type": "MultiPoint",
-						"coordinates": [25400,6600,27200,15500]
+						"coordinates": [
+							[25400,6600],
+							[27200,15500]
+						]
 					},
 					"properties": {
 						"name": "10",

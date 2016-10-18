@@ -9,7 +9,7 @@
     <!-- Declare the parameters passed by the main launch file -->
     <arg name="robot_configuration" default="" />
     <arg name="use_sim_time" />
-    <arg name="start_bridge" default="true" />
+    <arg name="start_bridge" />
 
     <!-- Robot description -->
     <param name="robot_description" command="$(find xacro)/xacro.py $(find srsbot_chuck)/urdf/chuck.urdf.xacro" />

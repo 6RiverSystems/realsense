@@ -8,7 +8,7 @@ scan_filter_chain:
     max_z: 3.0
     min_x: -0.49
     min_y: -0.31
-    min_z: 0.0 
+    min_z: -3.0
 - type: laser_filters/LaserArrayFilter
   name: laser_median_filter
   params: 

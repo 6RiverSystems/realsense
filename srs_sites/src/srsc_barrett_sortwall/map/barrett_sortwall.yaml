@@ -6,7 +6,7 @@
 
 {
     occupancy: {
-        image: barrett_sortwall-occupancy.pgm,
+        image: barrett_sortwall.pgm,
         resolution: 100,
         origin: [0, 0, 0],
         negate: 0,
@@ -14,6 +14,6 @@
         free_thresh: 0.196,
     },
     logical: {
-        map: 6rhq_sortwall-logical.geojson
+        map: 6rhq_sortwall.geojson
     }
 }

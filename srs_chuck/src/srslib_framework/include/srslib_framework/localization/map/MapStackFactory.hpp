@@ -18,7 +18,7 @@ namespace srs {
 
 struct MapStackFactory
 {
-    static MapStack* fromJsonFile(string jsonFilename);
+    static MapStack* fromJsonFile(string jsonFilename, double loadingTime = 0);
 
 private:
     static const string TAG_LOGICAL;

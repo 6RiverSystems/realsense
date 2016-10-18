@@ -1,0 +1,356 @@
+{
+	"type": "FeatureCollection",
+	"features": [
+		{
+			"type": "Feature",
+			"id": "map",
+			"properties": {
+				"origin": [0,0,0],
+				"resolution": 100,
+				"width": 36500,
+				"height": 91100
+			}
+		},
+		{
+			"type": "FeatureCollection",
+			"features": [
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [0,0,36500,2800]
+					},
+					"properties": {
+						"name": "1",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [0,2700,2700,4500]
+					},
+					"properties": {
+						"name": "2",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [0,4400,6600,34800]
+					},
+					"properties": {
+						"name": "3",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [0,34700,13800,91100]
+					},
+					"properties": {
+						"name": "4",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [9200,4500,14300,32700]
+					},
+					"properties": {
+						"name": "5",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [13500,88700,33900,91100]
+					},
+					"properties": {
+						"name": "6",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [15500,34800,22800,45000]
+					},
+					"properties": {
+						"name": "7",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [15600,47600,22900,64100]
+					},
+					"properties": {
+						"name": "8",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [15900,66300,19000,86100]
+					},
+					"properties": {
+						"name": "9",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [17300,4500,20600,32700]
+					},
+					"properties": {
+						"name": "10",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [20500,66300,23100,86100]
+					},
+					"properties": {
+						"name": "11",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [23400,4500,28100,32700]
+					},
+					"properties": {
+						"name": "12",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [24500,66300,27400,86100]
+					},
+					"properties": {
+						"name": "13",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [25000,34800,27800,47900]
+					},
+					"properties": {
+						"name": "14",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [25100,49500,27700,64100]
+					},
+					"properties": {
+						"name": "15",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [25700,87200,26600,87900]
+					},
+					"properties": {
+						"name": "16",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [28700,66300,31400,86100]
+					},
+					"properties": {
+						"name": "17",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [29100,34800,32100,64100]
+					},
+					"properties": {
+						"name": "18",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [31100,4400,36500,32800]
+					},
+					"properties": {
+						"name": "19",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [32500,66200,36500,86200]
+					},
+					"properties": {
+						"name": "20",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [33800,2700,36500,4500]
+					},
+					"properties": {
+						"name": "21",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [33800,32700,36500,34800]
+					},
+					"properties": {
+						"name": "22",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [33800,34700,36500,66300]
+					},
+					"properties": {
+						"name": "23",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "obstacle",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [33800,86100,36500,91100]
+					},
+					"properties": {
+						"name": "24",
+						"envelope_size": 300,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				}
+			]
+		}
+	]
+}

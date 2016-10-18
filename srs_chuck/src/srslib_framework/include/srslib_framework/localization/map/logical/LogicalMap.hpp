@@ -31,6 +31,11 @@ public:
         return logicalMetadata_;
     }
 
+    int getWeights(unsigned int c, unsigned int r, int orientation) const
+    {
+        return getGrid()->getWeight(Grid2d::Location(c, r), orientation);
+    }
+
     void maxCost(unsigned int c, unsigned int r, int cost);
 
     friend ostream& operator<<(ostream& stream, const LogicalMap& map);

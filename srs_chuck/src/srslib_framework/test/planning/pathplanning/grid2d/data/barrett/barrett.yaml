@@ -3,16 +3,17 @@
 #
 # This is proprietary software, unauthorized distribution is not permitted.
 #
+
 {
     occupancy: {
-        image: barrett-occupancy.pgm,
-        resolution: 0.100,
-        origin: [0.000000, 0.000000, 0.000000],
+        image: barrett.pgm,
+        resolution: 100,
+        origin: [0, 0, 0],
         negate: 0,
         occupied_thresh: 0.65,
         free_thresh: 0.196,
     },
     logical: {
-        map: barrett-logical.geojson
+        map: barrett.geojson
     }
 }

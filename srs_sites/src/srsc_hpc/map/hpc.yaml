@@ -3,17 +3,16 @@
 #
 # This is proprietary software, unauthorized distribution is not permitted.
 #
-
 {
     occupancy: {
-        image: 6rshq.png,
-        resolution: 100,
-        origin: [0, 0, 0],
+        image: hpc.pgm,
+        resolution: 50,
+        origin: [-25, -25, 0],
         negate: 0,
         occupied_thresh: 0.65,
         free_thresh: 0.196,
     },
     logical: {
-        map: 6rshq.geojson
+        map: hpc.geojson
     }
 }

@@ -23,7 +23,7 @@ const string MapStackFactory::TAG_OCCUPANCY_IMAGE = "image";
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-MapStack* MapStackFactory::fromJsonFile(string jsonFilename)
+MapStack* MapStackFactory::fromJsonFile(string jsonFilename, double loadingTime)
 {
     YAML::Node mapStackDocument = YAML::LoadFile(jsonFilename);
     if (mapStackDocument.IsNull())
@@ -34,9 +34,9 @@ MapStack* MapStackFactory::fromJsonFile(string jsonFilename)
     string localDirectory = Filesystem::dirname(jsonFilename) + "/";
 
     LogicalMap* logical = analizeLogicalNode(
-        localDirectory, jsonFilename, ros::Time::now().toSec(), mapStackDocument);
+        localDirectory, jsonFilename, loadingTime, mapStackDocument);
     OccupancyMap* occupancy = analizeOccupancyNode(
-        localDirectory, jsonFilename, ros::Time::now().toSec(), mapStackDocument);
+        localDirectory, jsonFilename, loadingTime, mapStackDocument);
 
     return new MapStack(logical, occupancy);
 }

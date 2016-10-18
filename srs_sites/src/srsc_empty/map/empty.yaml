@@ -5,7 +5,7 @@
 #
 {
     occupancy: {
-        image: empty-occupancy.png,
+        image: empty.png,
         resolution: 100,
         origin: [0, 0, 0],
         negate: 0,
@@ -13,6 +13,6 @@
         free_thresh: 0.196,
     },
     logical: {
-        map: empty-logical.geojson
+        map: empty.geojson
     }
 }

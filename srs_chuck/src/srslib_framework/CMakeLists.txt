@@ -72,8 +72,9 @@ set(TEST_SOURCES_FILTER
 )
 
 set(TEST_SOURCES_LOCALIZATION
+    test/localization/map/Test_Empty_BasicRead.cpp
 #    test/localization/Test_Map_Reconstruction.cpp
-    test/localization/map/logical/Test_Empty_BasicRead.cpp
+    test/localization/map/logical/Test_SmallMap_BasicRead.cpp
 )
 
 set(TEST_SOURCES_MATH
@@ -83,8 +84,8 @@ set(TEST_SOURCES_MATH
 )
 
 set(TEST_SOURCES_PLANNING
+    test/planning/pathplanning/grid2d/Test_Solution_Basic.cpp
     test/planning/pathplanning/grid2d/Test_Solution_Barrett_Aisles.cpp
-    test/planning/pathplanning/grid2d/Test_Solution_Barrett_LongSolution.cpp
     test/planning/pathplanning/grid2d/Test_Solution_Empty_Consecutive.cpp
     test/planning/pathplanning/grid2d/Test_Trajectory_180ShortTrajectory.cpp
     test/planning/pathplanning/grid2d/Test_Trajectory_6RHQ.cpp
@@ -100,9 +101,10 @@ set(TEST_SOURCES_ROBOTICS
 )
 
 set(TEST_SOURCES_SEARCH
+    test/search/Test_AStar_6rshq_SmallSearch.cpp
+    test/search/Test_AStar_Barrett_BigSearch.cpp
     test/search/Test_AStar_Basic.cpp
-#    test/search/Test_AStar_Map.cpp
-#    test/search/Test_AStar_SamePlaceOnMap.cpp
+    test/search/Test_AStar_SamePlaceOnMap.cpp
 )
 
 set(TEST_SOURCES_IO

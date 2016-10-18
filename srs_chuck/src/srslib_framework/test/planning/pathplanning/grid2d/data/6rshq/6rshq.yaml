@@ -6,14 +6,14 @@
 
 {
     occupancy: {
-        image: 6rshq-occupancy.png,
-        resolution: 0.100,
-        origin: [0.000000, 0.000000, 0.000000],
+        image: 6rshq.png,
+        resolution: 100,
+        origin: [0, 0, 0],
         negate: 0,
         occupied_thresh: 0.65,
         free_thresh: 0.196,
     },
     logical: {
-        map: 6rshq-logical.geojson
+        map: 6rshq.geojson
     }
 }

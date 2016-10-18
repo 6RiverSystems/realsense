@@ -53,7 +53,7 @@ private:
 
     static constexpr double MAX_ALLOWED_PING_DELAY = 0.5; // 50% of the duty cycle
 
-	static constexpr auto ODOMETRY_RAW_COUNT_TOPIC = "/internal/sensors/odometry/firmware/raw";
+	static constexpr auto ODOMETRY_RAW_COUNT_TOPIC = "/internal/sensors/odometry/count";
 
 	static constexpr auto ODOMETRY_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity";
 

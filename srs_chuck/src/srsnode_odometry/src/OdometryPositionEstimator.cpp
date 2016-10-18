@@ -186,12 +186,12 @@ void OdometryPositionEstimator::ResetOdomPose( const geometry_msgs::PoseStamped:
 void OdometryPositionEstimator::GetRawOdometryVelocity( const int32_t leftWheelCount, const int32_t rightWheelCount, double timeInterval, double& linearV, double& angularV)
 {
 	// Calculate left and right wheel velocity
-	double leftWheelVelocity = (double)leftWheelCount/ timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * leftWheelRadius_ * 2 * M_PI;
-	double rightWheelVelocity = (double)rightWheelCount/ timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * rightWheelRadius_ * 2 * M_PI;
+	double leftWheelVelocity = (double)leftWheelCount / timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * leftWheelRadius_ * 2 * M_PI;
+	double rightWheelVelocity = (double)rightWheelCount / timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * rightWheelRadius_ * 2 * M_PI;
 
 	// Calculate v and w
-	linearV = ( rightWheelVelocity + leftWheelVelocity )/2;
-	angularV = ( rightWheelVelocity - leftWheelVelocity )/wheelbaseLength_ ;
+	linearV = ( rightWheelVelocity + leftWheelVelocity ) / 2;
+	angularV = ( rightWheelVelocity - leftWheelVelocity ) / wheelbaseLength_ ;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)

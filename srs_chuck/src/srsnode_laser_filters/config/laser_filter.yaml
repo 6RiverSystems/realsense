@@ -8,7 +8,22 @@ scan_filter_chain:
     max_z: 3.0
     min_x: -0.49
     min_y: -0.31
-    min_z: 0.0
+    min_z: 0.0 
+- type: laser_filters/LaserArrayFilter
+  name: laser_median_filter
+  params: 
+    range_filter_chain:
+      - name: median_3
+        type: filters/MultiChannelMedianFilterFloat 
+        params:
+          number_of_observations: 3
+          unused: 0
+    intensity_filter_chain:
+      - name: median_3
+        type: filters/MultiChannelMedianFilterFloat 
+        params:
+          number_of_observations: 3
+          unused: 0
 #- name: shadows
 #  type: laser_filters/ScanShadowsFilter
 #  params:
@@ -21,19 +36,4 @@ scan_filter_chain:
 #  params: 
 #    lower_threshold: 100
 #    upper_threshold: 10000
-#    disp_histogram: 0    
-#- type: laser_filters/LaserArrayFilter
-#  name: laser_median_filter
-#  params: 
-#    range_filter_chain:
-#      - name: median_5
-#        type: filters/MultiChannelMedianFilterFloat 
-#        params:
-#          number_of_observations: 5
-#          unused: 0
-#    intensity_filter_chain:
-#      - name: median_5
-#        type: filters/MultiChannelMedianFilterFloat 
-#        params:
-#          number_of_observations: 5
-#          unused: 0
+#    disp_histogram: 0   

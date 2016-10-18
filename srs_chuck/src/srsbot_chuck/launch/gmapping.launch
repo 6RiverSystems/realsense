@@ -7,6 +7,7 @@
 -->
 <launch>
     <arg name="use_sim_time" default="false"/>
+    <arg name="start_bridge" default="true" />
 
 	<remap from="/map" to="/internal/state/map/grid"/>
     <remap from="/map_metadata" to="/internal/state/map/info"/>
@@ -14,6 +15,7 @@
     <!-- Chuck Stack -->
 	<include file="$(find srsbot_chuck)/launch/robot.launch" >
     	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+        <arg name="start_bridge" value="$(arg start_bridge)" />
 	</include>
 
     <!-- Sensors -->

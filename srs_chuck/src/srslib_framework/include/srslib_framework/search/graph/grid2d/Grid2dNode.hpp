@@ -19,11 +19,16 @@ struct Grid2dNode : public SearchNode
 {
     static Grid2dNode* instanceOfStart(Grid2d* graph, Grid2dPosition position)
     {
-        return new Grid2dNode(graph,
+        return instanceOf(graph,
             nullptr, Grid2dAction::START,
             position,
             0, 0, nullptr);
     }
+
+    static Grid2dNode* instanceOf(Grid2d* graph,
+        Grid2dNode* parentNode, Grid2dAction::ActionEnum parentAction,
+        Grid2dPosition position, int g, int h,
+        SearchGoal* goal);
 
     bool equals(SearchNode* const& rhs) const
     {
@@ -72,10 +77,7 @@ struct Grid2dNode : public SearchNode
         return position_.hash();
     }
 
-    void release()
-    {
-        delete this;
-    }
+    void release();
 
     void setGoal(SearchGoal* goal)
     {
@@ -102,7 +104,7 @@ struct Grid2dNode : public SearchNode
             "}";
     }
 
-private:
+protected:
     Grid2dNode(Grid2d* graph,
             Grid2dNode* parentNode, Grid2dAction::ActionEnum parentAction,
             Grid2dPosition position, int g, int h,
@@ -119,6 +121,7 @@ private:
     ~Grid2dNode()
     {}
 
+private:
     SearchGoal* goal_;
     Grid2d* graph_;
     int g_;

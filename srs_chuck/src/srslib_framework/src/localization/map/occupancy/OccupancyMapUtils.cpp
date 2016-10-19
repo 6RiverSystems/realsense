@@ -25,7 +25,7 @@ void OccupancyMapUtils::map2Occupancy(const OccupancyMap* map, vector<int8_t>& o
         {
             for (int col = 0; col < grid->getWidth(); col++)
             {
-                occupancy.push_back(static_cast<int8_t>(grid->getCost(Grid2d::Location(col, row))));
+                occupancy.push_back(static_cast<int8_t>(grid->getPayload(Grid2d::Location(col, row))));
             }
         }
     }

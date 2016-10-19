@@ -15,7 +15,7 @@ namespace test {
 
 struct Grid2dUtils
 {
-    static void addRectangleCost(Grid2d& grid,
+    static void addRectanglePayload(Grid2d& grid,
         unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
         unsigned int cost)
     {
@@ -30,7 +30,7 @@ struct Grid2dUtils
 
             do
             {
-                grid.maxCost(Grid2d::Location(c, r), cost);
+                grid.maxOnPayload(Grid2d::Location(c, r), cost);
                 c += deltaX;
             } while (c != (xf + deltaX));
 
@@ -45,14 +45,14 @@ struct Grid2dUtils
         // First add the envelope, if specified
         if (sizeEnvelopeCells > 0 && costEnvelope > 0)
         {
-            addRectangleCost(grid,
+            addRectanglePayload(grid,
                 xi - sizeEnvelopeCells, yi - sizeEnvelopeCells,
                 xf + sizeEnvelopeCells, yf + sizeEnvelopeCells,
                 costEnvelope);
         }
 
         // Add the static obstacle
-        addRectangleCost(grid, xi, yi, xf, yf, Grid2d::COST_MAX);
+        addRectanglePayload(grid, xi, yi, xf, yf, Grid2d::PAYLOAD_MAX);
     }
 
     static void addWeight(Grid2d& grid,

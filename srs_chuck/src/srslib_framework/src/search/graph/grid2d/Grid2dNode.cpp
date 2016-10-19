@@ -27,7 +27,7 @@ void Grid2dNode::getNeighbors(vector<SearchNode*>& neighbors)
             graph_, this, action);
 
         // If the action is allowed
-        if (actionResult.second < Grid2d::COST_MAX)
+        if (actionResult.second < Grid2d::PAYLOAD_MAX)
         {
             // Create a neighbor node with all the relative data
             Grid2dNode* neighborNode = Grid2dNode::instanceOf(

@@ -36,7 +36,7 @@ Grid2dAction::ActionResultType Grid2dAction::execute(Grid2d* graph,
         case ROTATE_180: return addRotation(graph, fromNode, ROTATE_180, +180);
     }
 
-    return ActionResultType(Grid2dPosition(0, 0), Grid2d::COST_MAX);
+    return ActionResultType(Grid2dPosition(0, 0), Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,12 +75,12 @@ Grid2dAction::ActionResultType Grid2dAction::addBackward(Grid2d* graph, Grid2dNo
         cost = BasicMath::noOverflowAdd(cost, graph->getWeight(currentLocation, directionMovement));
 
         // Add the cost of the new location
-        cost = BasicMath::noOverflowAdd(cost, graph->getCost(neighbor));
+        cost = BasicMath::noOverflowAdd(cost, graph->getAggregate(neighbor));
 
         return ActionResultType(Grid2dPosition(neighbor, currentOrientation), cost);
     }
 
-    return ActionResultType(Grid2dPosition(0, 0), Grid2d::COST_MAX);
+    return ActionResultType(Grid2dPosition(0, 0), Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,12 +104,12 @@ Grid2dAction::ActionResultType Grid2dAction::addForward(Grid2d* graph, Grid2dNod
         cost = BasicMath::noOverflowAdd(cost, graph->getWeight(currentLocation, currentOrientation));
 
         // Add the cost of the new location
-        cost = BasicMath::noOverflowAdd(cost, graph->getCost(neighbor));
+        cost = BasicMath::noOverflowAdd(cost, graph->getAggregate(neighbor));
 
         return ActionResultType(Grid2dPosition(neighbor, currentOrientation), cost);
     }
 
-    return ActionResultType(Grid2dPosition(0, 0), Grid2d::COST_MAX);
+    return ActionResultType(Grid2dPosition(0, 0), Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -109,7 +109,7 @@ void LogicalMapFactory::addStaticObstacle(LogicalMap* logicalMap,
     }
 
     // Add the static obstacle
-    addRectangleCost(logicalMap, origin, widthMm, heightMm, Grid2d::COST_MAX);
+    addRectangleCost(logicalMap, origin, widthMm, heightMm, Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -204,7 +204,7 @@ int LogicalMapFactory::nonTerminalCostValue(YAML::Node node, LogicalMap* map)
 {
     if (node)
     {
-        int cost = Grid2d::COST_MAX;
+        int cost = Grid2d::PAYLOAD_MAX;
 
         string costString = node.as<string>();
         if (costString != "max")
@@ -215,7 +215,7 @@ int LogicalMapFactory::nonTerminalCostValue(YAML::Node node, LogicalMap* map)
         return cost;
     }
 
-    return Grid2d::COST_MIN;
+    return Grid2d::PAYLOAD_MIN;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -17,15 +17,15 @@ namespace srs {
 
 struct Grid2dNode : public SearchNode
 {
-    static Grid2dNode* instanceOfStart(Grid2d* graph, Grid2dPosition position)
+    static Grid2dNode* instanceOfStart(Grid2d* grid, Grid2dPosition position)
     {
-        return instanceOf(graph,
+        return instanceOf(grid,
             nullptr, Grid2dAction::START,
             position,
-            0, 0, nullptr);
+            grid->getAggregate(position.location), 0, nullptr);
     }
 
-    static Grid2dNode* instanceOf(Grid2d* graph,
+    static Grid2dNode* instanceOf(Grid2d* grid,
         Grid2dNode* parentNode, Grid2dAction::ActionEnum parentAction,
         Grid2dPosition position, int g, int h,
         SearchGoal* goal);

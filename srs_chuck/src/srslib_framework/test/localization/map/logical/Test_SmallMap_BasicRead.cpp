@@ -21,24 +21,24 @@ TEST(Test_SmallMap, BasicRead)
 
     cout << *logical << endl;
 
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(0, 0)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(0, 0)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(9, 9)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(9, 9)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(9, 30)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(9, 30)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(30, 9)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(30, 9)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(30, 30)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(30, 30)) <<
         "The cost is not as expected";
 
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(15, 15)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(15, 15)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(19, 15)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(19, 15)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(15, 19)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(15, 19)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(19, 19)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(19, 19)) <<
         "The cost is not as expected";
 
     ASSERT_EQ(200, logical->getCost(10, 10)) <<
@@ -55,7 +55,7 @@ TEST(Test_SmallMap, BasicRead)
     ASSERT_EQ(0, logical->getCost(23, 23)) <<
         "The cost is not as expected";
 
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getWeights(25, 25, Grid2d::ORIENTATION_NORTH)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getWeights(25, 25, Grid2d::ORIENTATION_NORTH)) <<
         "The cost of the weight is not as expected";
     ASSERT_EQ(333, logical->getWeights(25, 25, Grid2d::ORIENTATION_EAST)) <<
         "The cost of the weight is not as expected";
@@ -97,14 +97,14 @@ TEST(Test_SmallMap, BasicRead)
     ASSERT_EQ(33, logical->getWeights(19, 15, Grid2d::ORIENTATION_SOUTH)) <<
         "The cost of the weight is not as expected";
 
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getWeights(15, 15, Grid2d::ORIENTATION_WEST)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getWeights(15, 15, Grid2d::ORIENTATION_WEST)) <<
         "The cost of the weight is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getWeights(16, 15, Grid2d::ORIENTATION_WEST)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getWeights(16, 15, Grid2d::ORIENTATION_WEST)) <<
         "The cost of the weight is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getWeights(17, 15, Grid2d::ORIENTATION_WEST)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getWeights(17, 15, Grid2d::ORIENTATION_WEST)) <<
         "The cost of the weight is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getWeights(18, 15, Grid2d::ORIENTATION_WEST)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getWeights(18, 15, Grid2d::ORIENTATION_WEST)) <<
         "The cost of the weight is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getWeights(19, 15, Grid2d::ORIENTATION_WEST)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getWeights(19, 15, Grid2d::ORIENTATION_WEST)) <<
         "The cost of the weight is not as expected";
 }

@@ -23,7 +23,7 @@ public:
 
     int getCost(unsigned int c, unsigned int r) const
     {
-        return getGrid()->getCost(Grid2d::Location(c, r));
+        return getGrid()->getPayload(Grid2d::Location(c, r));
     }
 
     OccupancyMetadata getMetadata() const

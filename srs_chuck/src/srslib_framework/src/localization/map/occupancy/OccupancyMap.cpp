@@ -19,19 +19,19 @@ OccupancyMap::OccupancyMap(unsigned int widthCells, unsigned int heightCells, do
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OccupancyMap::maxCost(unsigned int c, unsigned int r, int cost)
 {
-    getGrid()->maxCost(Grid2d::Location(c, r), cost);
+    getGrid()->maxOnPayload(Grid2d::Location(c, r), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OccupancyMap::setCost(unsigned int c, unsigned int r, int cost)
 {
-    getGrid()->setCost(Grid2d::Location(c, r), cost);
+    getGrid()->setPayload(Grid2d::Location(c, r), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OccupancyMap::setObstruction(unsigned int c, unsigned int r)
 {
-    getGrid()->setCost(Grid2d::Location(c, r), Grid2d::COST_MAX);
+    getGrid()->setPayload(Grid2d::Location(c, r), Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

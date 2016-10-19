@@ -25,14 +25,14 @@ TEST(Test_Empty, BasicRead)
 
     cout << *logical << endl;
 
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(0, 0)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(0, 0)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(17, 12)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(17, 12)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(17, 93)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(17, 93)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(195, 92)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(195, 92)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::COST_MAX, logical->getCost(195, 93)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(195, 93)) <<
         "The cost is not as expected";
 }

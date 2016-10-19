@@ -23,19 +23,19 @@ LogicalMap::LogicalMap(double widthM, double heightM, double resolution) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::maxCost(unsigned int c, unsigned int r, int cost)
 {
-    getGrid()->maxCost(Grid2d::Location(c, r), cost);
+    getGrid()->maxOnPayload(Grid2d::Location(c, r), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::setCost(unsigned int c, unsigned int r, int cost)
 {
-    getGrid()->setCost(Grid2d::Location(c, r), cost);
+    getGrid()->setPayload(Grid2d::Location(c, r), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::setObstruction(unsigned int c, unsigned int r)
 {
-    getGrid()->setCost(Grid2d::Location(c, r), Grid2d::COST_MAX);
+    getGrid()->setPayload(Grid2d::Location(c, r), Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

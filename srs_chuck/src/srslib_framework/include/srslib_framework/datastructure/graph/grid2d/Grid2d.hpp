@@ -21,8 +21,8 @@ namespace srs {
 class Grid2d
 {
 public:
-    static const int COST_MIN;
-    static const int COST_MAX;
+    static const int PAYLOAD_MIN;
+    static const int PAYLOAD_MAX;
 
     enum {
         ORIENTATION_NORTH = 90,
@@ -99,8 +99,8 @@ public:
             (0 <= location.y && location.y < height_);
     }
 
-    int getAggregateCost(const Location& location) const;
-    int getCost(const Location& location) const;
+    int getAggregate(const Location& location) const;
+    int getPayload(const Location& location) const;
 
     unsigned int getHeight() const
     {
@@ -115,12 +115,12 @@ public:
         return width_;
     }
 
-    void maxCost(const Location& location, int cost);
+    void maxOnPayload(const Location& location, int payload);
 
     friend ostream& operator<<(ostream& stream, const Grid2d& grid);
 
     void setAggregateSize(unsigned int width, unsigned int height);
-    void setCost(const Location& location, int newCost);
+    void setPayload(const Location& location, int newPayload);
     void setWeights(const Location& location, int north, int east, int south, int west);
 
 private:
@@ -144,8 +144,8 @@ private:
 
     struct Weights
     {
-        Weights(int north = COST_MIN, int east = COST_MIN,
-            int south = COST_MIN, int west = COST_MIN) :
+        Weights(int north = PAYLOAD_MIN, int east = PAYLOAD_MIN,
+            int south = PAYLOAD_MIN, int west = PAYLOAD_MIN) :
                 north(north),
                 east(east),
                 south(south),
@@ -160,10 +160,10 @@ private:
 
     struct Node
     {
-        Node(Location location, int cost, int aggregateCost) :
+        Node(Location location, int payload, int aggregate) :
             location(location),
-            cost(cost),
-            aggregateCost(aggregateCost),
+            payload(payload),
+            aggregate(aggregate),
             weights(nullptr)
         {}
 
@@ -176,29 +176,29 @@ private:
         {
             stream << "Node "<< hex << reinterpret_cast<long>(node) << dec << " {" << endl;
             stream << "l: " << node->location <<
-                ", c: " << node->cost <<
-                ", ac: " << node->aggregateCost << "\n}";
+                ", p: " << node->payload <<
+                ", a: " << node->aggregate << "\n}";
             return stream;
         }
 
-        int aggregateCost;
-
-        int cost;
+        int aggregate;
 
         const Location location;
+
+        int payload;
 
         Weights* weights;
     };
 
-    Node* addNode(const Location& location, int cost, int aggregateCost)
+    Node* addNode(const Location& location, int payload, int aggregate)
     {
-        Node* node = new Node(location, cost, aggregateCost);
+        Node* node = new Node(location, payload, aggregate);
         grid_[location] = node;
 
         return node;
     }
 
-    int calculateAggregateCost(Node* node);
+    int calculateAggregate(Node* node);
     void calculateAggregateArea(int x0, int y0, int& xi, int& xf, int& yi, int& yf);
 
     Node* findNode(const Location& location) const
@@ -213,7 +213,7 @@ private:
     }
 
     void printGrid(ostream& stream, string title, std::function<int (Node*)> fieldSelection) const;
-    void printCosts(ostream& stream, string title, std::function<int (Node*)> fieldSelection) const;
+    void print(ostream& stream, string title, std::function<int (Node*)> fieldSelection) const;
 
     void updateAllAggregate();
     void updateNodeAggregate(Node* node, int oldCost);

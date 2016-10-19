@@ -88,31 +88,6 @@ TEST(Test_AStar, SearchAroundObstacle)
         "Unexpected number of closed nodes";
 }
 
-TEST(Test_AStar, UnreachableGoal)
-{
-    Grid2d grid(GRID_SIZE, GRID_SIZE);
-    AStar algorithm;
-
-    test::Grid2dUtils::addStaticObstacle(grid, 1, 0, 4, 4);
-
-    cout << grid << endl;
-
-    Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
-    Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
-
-    Grid2dPosition goalPosition(Grid2d::Location(4, 0), 0);
-    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
-
-    ASSERT_FALSE(algorithm.search(start, goal)) <<
-        "A solution was found";
-
-    ASSERT_EQ(0, algorithm.getOpenNodeCount()) <<
-        "Unexpected number of open nodes";
-
-    ASSERT_EQ(20, algorithm.getClosedNodeCount()) <<
-        "Unexpected number of closed nodes";
-}
-
 TEST(Test_AStar, Clear)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
@@ -184,3 +159,4 @@ TEST(Test_AStar, MemoryLeaks)
 
     ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
 }
+

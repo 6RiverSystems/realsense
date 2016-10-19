@@ -88,7 +88,6 @@ set(TEST_SOURCES_PLANNING
     test/planning/pathplanning/grid2d/Test_Solution_Barrett_Aisles.cpp
     test/planning/pathplanning/grid2d/Test_Solution_Empty_Consecutive.cpp
     test/planning/pathplanning/grid2d/Test_Trajectory_180ShortTrajectory.cpp
-    test/planning/pathplanning/grid2d/Test_Trajectory_6RHQ.cpp
     test/planning/pathplanning/grid2d/Test_Trajectory_LongStraight.cpp
     test/planning/pathplanning/grid2d/Test_Trajectory_LongTrajectory.cpp
     test/planning/pathplanning/grid2d/Test_Trajectory_ShortStraight.cpp
@@ -101,9 +100,11 @@ set(TEST_SOURCES_ROBOTICS
 )
 
 set(TEST_SOURCES_SEARCH
+    test/search/Test_AStar_6RHQ.cpp
     test/search/Test_AStar_6rshq_SmallSearch.cpp
     test/search/Test_AStar_Barrett_BigSearch.cpp
     test/search/Test_AStar_Basic.cpp
+    test/search/Test_AStar_NoSolution.cpp
     test/search/Test_AStar_SamePlaceOnMap.cpp
 )
 

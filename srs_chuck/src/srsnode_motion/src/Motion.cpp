@@ -93,7 +93,15 @@ void Motion::run()
         previousTime_ = currentTime_;
         currentTime_ = ros::Time::now();
 
-        stepEmulation();
+        if (isEmulationEnabled_)
+        {
+            ROS_WARN_STREAM_ONCE_NAMED("motion", "Emulation enabled");
+            stepEmulation();
+        }
+        else
+        {
+            ROS_WARN_STREAM_ONCE_NAMED("motion", "Emulation disabled");
+        }
 
         evaluateTriggers();
 
@@ -621,34 +629,25 @@ void Motion::stepEmulation()
 {
     // If emulation is enabled, feed velocity commands back to the
     // odometry sensor, and initialize the first pose
-    if (isEmulationEnabled_)
+    Velocity<> currentCommand = motionController_.getExecutingCommand();
+    Pose<> currentPose = positionEstimator_.getPose();
+
+    simulatedT_ += 1.0 / REFRESH_RATE_HZ;
+    tapSensorFrame_.setOdometry(Odometry<>(Velocity<>(
+        simulatedT_,
+        currentCommand.linear,
+        currentCommand.angular)));
+    tapSensorFrame_.setRawImu(Imu<>(
+        simulatedT_,
+        currentPose.theta, 0.0, 0.0,
+        currentCommand.angular, 0.0, 0.0));
+
+    if (!positionEstimator_.isPoseValid())
     {
-        ROS_WARN_STREAM_ONCE_NAMED("motion", "Emulation enabled");
-
-        Velocity<> currentCommand = motionController_.getExecutingCommand();
-        Pose<> currentPose = positionEstimator_.getPose();
-
-        simulatedT_ += 1.0 / REFRESH_RATE_HZ;
-        tapSensorFrame_.setOdometry(Odometry<>(Velocity<>(
-            simulatedT_,
-            currentCommand.linear,
-            currentCommand.angular)));
-        tapSensorFrame_.setRawImu(Imu<>(
-            simulatedT_,
-            currentPose.theta, 0.0, 0.0,
-            currentCommand.angular, 0.0, 0.0));
-
-        if (!positionEstimator_.isPoseValid())
-        {
-            // Establish an "acceptable" initial position, at least until the
-            // Position Estimator can get its bearings
-            tapInitialPose_.set(Pose<>(TimeMath::time2number(currentTime_), 3.0, 3.0, 0));
-            reset(tapInitialPose_.pop());
-        }
-    }
-    else
-    {
-        ROS_WARN_STREAM_ONCE_NAMED("motion", "Emulation disabled");
+        // Establish an "acceptable" initial position, at least until the
+        // Position Estimator can get its bearings
+        tapInitialPose_.set(Pose<>(TimeMath::time2number(currentTime_), 3.0, 3.0, 0));
+        reset(tapInitialPose_.pop());
     }
 }
 

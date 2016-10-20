@@ -64,6 +64,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_vecBridgeCallbacks["CLEAR_MOTION_STATUS"] = { std::bind( &BrainStemMessageProcessor::ClearMotionStatus, this ), 0 };
 
     hwMessageHandlers_.push_back(&sensorFrameHandler_);
+    hwMessageHandlers_.push_back(&rawOdometryHandler_);
 }
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor( )

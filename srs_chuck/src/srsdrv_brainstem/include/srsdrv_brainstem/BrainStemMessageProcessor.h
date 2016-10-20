@@ -19,6 +19,7 @@ using namespace std;
 #include <srsdrv_brainstem/BrainStemMessages.h>
 #include <srsdrv_brainstem/hw_message/BrainstemMessageHandler.hpp>
 #include <srsdrv_brainstem/hw_message/SensorFrameHandler.hpp>
+#include <srsdrv_brainstem/hw_message/RawOdometryHandler.hpp>
 
 namespace srs {
 
@@ -145,6 +146,7 @@ private:
     vector<BrainstemMessageHandler*> hwMessageHandlers_;
 
     SensorFrameHandler sensorFrameHandler_;
+    RawOdometryHandler rawOdometryHandler_;
 };
 
 } /* namespace srs */

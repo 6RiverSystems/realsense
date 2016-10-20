@@ -9,6 +9,7 @@
 using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/search/graph/grid2d/Grid2dPosition.hpp>
 
 #include <srslib_framework/localization/map/BaseMap.hpp>
 
@@ -25,6 +26,8 @@ struct Grid2dSolutionFactory
 {
     static Solution<Grid2dSolutionItem>* fromConsecutiveGoals(BaseMap* map,
         Pose<> start, vector<Pose<>> goals);
+    static Solution<Grid2dSolutionItem>* fromSingleGoal(BaseMap* map,
+        Grid2dPosition& start, Grid2dPosition& goal);
     static Solution<Grid2dSolutionItem>* fromSingleGoal(BaseMap* map,
         Pose<> start, Pose<> goal);
     static Solution<Grid2dSolutionItem>* fromRotation(Pose<> pose,

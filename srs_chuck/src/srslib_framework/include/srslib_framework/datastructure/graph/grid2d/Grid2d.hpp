@@ -23,6 +23,8 @@ class Grid2d
 public:
     static const int PAYLOAD_MIN;
     static const int PAYLOAD_MAX;
+    static const int WEIGHT_MIN;
+    static const int WEIGHT_MAX;
 
     enum {
         ORIENTATION_NORTH = 90,
@@ -63,7 +65,7 @@ public:
         aggregate_(false),
         aggregateHeight_(0),
         aggregateWidth_(0),
-        hasWeights_(false)
+        weightCount_(0)
     {}
 
     Grid2d(unsigned int width, unsigned int height) :
@@ -72,7 +74,7 @@ public:
         aggregate_(false),
         aggregateHeight_(0),
         aggregateWidth_(0),
-        hasWeights_(false)
+        weightCount_(0)
     {}
 
     ~Grid2d()
@@ -108,14 +110,25 @@ public:
     }
 
     bool getNeighbor(const Location& location, int orientation, Location& result) const;
+
+    unsigned int getOccupiedCount() const
+    {
+        return grid_.size();
+    }
+
     int getWeight(const Location& location, int orientation) const;
+
+    unsigned int getWeightCount() const
+    {
+        return weightCount_;
+    }
 
     unsigned int getWidth() const
     {
         return width_;
     }
 
-    void maxOnPayload(const Location& location, int payload);
+    void maxOnPayload(const Location& location, int otherPayload);
 
     friend ostream& operator<<(ostream& stream, const Grid2d& grid);
 
@@ -144,8 +157,8 @@ private:
 
     struct Weights
     {
-        Weights(int north = PAYLOAD_MIN, int east = PAYLOAD_MIN,
-            int south = PAYLOAD_MIN, int west = PAYLOAD_MIN) :
+        Weights(int north = WEIGHT_MIN, int east = WEIGHT_MIN,
+            int south = WEIGHT_MIN, int west = WEIGHT_MIN) :
                 north(north),
                 east(east),
                 south(south),
@@ -190,6 +203,8 @@ private:
         Weights* weights;
     };
 
+    using MapType = unordered_map<Location, Node*, Hash, EqualTo>;
+
     Node* addNode(const Location& location, int payload, int aggregate)
     {
         Node* node = new Node(location, payload, aggregate);
@@ -217,17 +232,71 @@ private:
 
     void updateAllAggregate();
     void updateNodeAggregate(Node* node, int oldCost);
+    void updatePayload(const Location& location, int newPayload,
+        std::function<int (int, int)> payloadSelection);
 
     bool aggregate_;
     unsigned int aggregateWidth_;
     unsigned int aggregateHeight_;
 
-    unordered_map<Location, Node*, Hash, EqualTo> grid_;
+    MapType grid_;
 
-    bool hasWeights_;
     unsigned int height_;
 
+    unsigned int weightCount_;
     unsigned int width_;
+
+public:
+    struct const_iterator
+    {
+        const_iterator(Grid2d* grid, MapType::const_iterator mapIterator) :
+            grid_(grid),
+            mapIterator_(mapIterator)
+        {}
+
+        Location operator*()
+        {
+            return mapIterator_->first;
+        }
+
+        const_iterator& operator++()
+        {
+           mapIterator_++;
+           return *this;
+        }
+
+        const_iterator& operator=(const const_iterator& other)
+        {
+            grid_ = other.grid_;
+            mapIterator_ = other.mapIterator_;
+
+            return *this;
+        }
+
+        bool operator==(const const_iterator& other) const
+        {
+            return mapIterator_ == other.mapIterator_;
+        }
+
+        bool operator!=(const const_iterator& other) const
+        {
+            return mapIterator_ != other.mapIterator_;
+        }
+
+    private:
+        Grid2d* grid_;
+        MapType::const_iterator mapIterator_;
+    };
+
+    const_iterator begin() const
+    {
+        return const_iterator(const_cast<Grid2d*>(this), grid_.begin());
+    }
+
+    const_iterator end() const
+    {
+        return const_iterator(const_cast<Grid2d*>(this), grid_.end());
+    }
 };
 
 } // namespace srs

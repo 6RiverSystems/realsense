@@ -66,7 +66,7 @@ bool SrsPlanner::makePlan(
     Pose<> target = PoseMessageFactory::poseStamped2Pose(goal);
 
     Solution<Grid2dSolutionItem>* solution = Grid2dSolutionFactory::fromSingleGoal(
-        srsMapStack_->getObstructionMap(), robotPose, target);
+        srsMapStack_->getLogicalMap(), robotPose, target);
 
     plan.clear();
 
@@ -120,27 +120,21 @@ bool SrsPlanner::makePlan(
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlanner::initializeParams()
 {
-    ros::NodeHandle private_nh;
-    bool inflationEnabled;
-
-    private_nh.param("/move_base/global_costmap/inflation_layer/cost_scaling_factor",
-        weightScaleFactor_, 1.0);
-    private_nh.param("/move_base/global_costmap/inflation_layer/enabled",
-        inflationEnabled, true);
-
-//    weightObstacleThreshold_ = round((100.0 * (inflationEnabled ? weightScaleFactor_ : 1.0)) * 0.98);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlanner::updateMapStack(costmap_2d::Costmap2DROS* rosCostMap)
 {
+    // Make sure that the neither the logical not the occupancy maps
+    // have been re-published. In case, destroy what we have and
+    // ask for a new stack
     if (tapMapStack_.newDataAvailable())
     {
         delete srsMapStack_;
         srsMapStack_ = tapMapStack_.pop();
     }
 
-    // TODO: Update the occupancy map in the map stack with the new rosCostMap
+    // TODO: Sync the obstruction map in the stack with the new rosCostMap
 }
 
 } // namespace srs

@@ -25,7 +25,6 @@ TEST(Test_AStar, NoSolution)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     test::Grid2dUtils::addStaticObstacle(grid, 0, 0, GRID_SIZE - 1, GRID_SIZE - 1);
-    cout << grid << endl;
 
     AStar algorithm;
 
@@ -52,8 +51,6 @@ TEST(Test_AStar, ForbiddenGoal)
 
     test::Grid2dUtils::addStaticObstacle(grid, 1, 0, GRID_SIZE - 1, GRID_SIZE - 1);
 
-    cout << grid << endl;
-
     Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
 
@@ -76,8 +73,6 @@ TEST(Test_AStar, UnreachableGoal)
     AStar algorithm;
 
     test::Grid2dUtils::addStaticObstacle(grid, 2, 0, 2, GRID_SIZE - 1);
-
-    cout << grid << endl;
 
     Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);

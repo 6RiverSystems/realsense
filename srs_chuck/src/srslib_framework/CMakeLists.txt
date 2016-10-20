@@ -106,6 +106,7 @@ set(TEST_SOURCES_SEARCH
     test/search/Test_AStar_Basic.cpp
     test/search/Test_AStar_NoSolution.cpp
     test/search/Test_AStar_SamePlaceOnMap.cpp
+    test/search/Test_AStar_Weights.cpp
 )
 
 set(TEST_SOURCES_IO

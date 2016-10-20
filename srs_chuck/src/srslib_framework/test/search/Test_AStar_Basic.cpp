@@ -70,8 +70,6 @@ TEST(Test_AStar, SearchAroundObstacle)
 
     test::Grid2dUtils::addStaticObstacle(grid, 2, 0, 2, 3);
 
-    cout << grid << endl;
-
     Grid2dPosition startPosition(Grid2d::Location(0, 0), 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
 
@@ -159,4 +157,3 @@ TEST(Test_AStar, MemoryLeaks)
 
     ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
 }
-

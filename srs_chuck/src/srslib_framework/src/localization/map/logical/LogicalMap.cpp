@@ -10,14 +10,25 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap::LogicalMap(double widthM, double heightM, double resolution) :
-        BaseMap(widthM, heightM, resolution)
+LogicalMap::LogicalMap(double widthMm, double heightMm, double resolution) :
+        BaseMap(widthMm, heightMm, resolution)
 {
     logicalMetadata_.heightCells = getHeightCells();
-    logicalMetadata_.heightMm = heightM;
-    logicalMetadata_.resolution = resolution;
+    logicalMetadata_.heightMm = getHeightMm();
+    logicalMetadata_.resolution = getResolution();
     logicalMetadata_.widthCells = getWidthCells();
-    logicalMetadata_.widthMm = widthM;
+    logicalMetadata_.widthMm = getWidthMm();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+LogicalMap::LogicalMap(Grid2d* grid, double resolution) :
+    BaseMap(grid, resolution)
+{
+    logicalMetadata_.heightCells = getHeightCells();
+    logicalMetadata_.heightMm = getHeightMm();
+    logicalMetadata_.resolution = getResolution();
+    logicalMetadata_.widthCells = getWidthCells();
+    logicalMetadata_.widthMm = getWidthMm();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

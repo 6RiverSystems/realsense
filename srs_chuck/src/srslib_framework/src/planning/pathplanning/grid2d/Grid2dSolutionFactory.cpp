@@ -36,6 +36,30 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(BaseMa
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(BaseMap* map,
+    Grid2dPosition& start, Grid2dPosition& goal)
+{
+    if (!map)
+    {
+        return nullptr;
+    }
+
+    Grid2d* grid = map->getGrid();
+
+    Grid2dNode* startNode = Grid2dNode::instanceOfStart(grid, start);
+    Grid2dSingleGoal* goalNode = Grid2dSingleGoal::instanceOf(goal);
+
+    AStar algorithm;
+
+    algorithm.search(startNode, goalNode);
+
+    AStar::SolutionType solution;
+    algorithm.getSolution(solution);
+
+    return fromSearch(map, solution);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(BaseMap* map,
     Pose<> fromPose, Pose<> toPose)
 {
     if (!map)
@@ -53,22 +77,10 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(BaseMap* map
     int goalAngle;
     PoseAdapter::pose2Map(toPose, map, internalGoal, goalAngle);
 
-    Grid2d* grid = map->getGrid();
+    Grid2dPosition start(internalStart, startAngle);
+    Grid2dPosition goal(internalGoal, goalAngle);
 
-    Grid2dPosition startPosition(internalStart, startAngle);
-    Grid2dNode* start = Grid2dNode::instanceOfStart(grid, Grid2dPosition(internalStart, startAngle));
-
-    Grid2dPosition goalPosition(internalGoal, goalAngle);
-    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(Grid2dPosition(internalGoal, goalAngle));
-
-    AStar algorithm;
-
-    algorithm.search(start, goal);
-
-    AStar::SolutionType solution;
-    algorithm.getSolution(solution);
-
-    return fromSearch(map, solution);
+    return fromSingleGoal(map, start, goal);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

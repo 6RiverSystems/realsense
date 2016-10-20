@@ -9,6 +9,7 @@
 #include <sstream>
 using namespace std;
 
+#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/map/BaseMap.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMetadata.hpp>
 
@@ -17,7 +18,8 @@ namespace srs {
 class LogicalMap : public BaseMap
 {
 public:
-    LogicalMap(double widthM, double heightM, double resolution);
+    LogicalMap(double widthMm, double heightMm, double resolution);
+    LogicalMap(Grid2d* grid, double resolution);
     ~LogicalMap()
     {}
 

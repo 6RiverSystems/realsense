@@ -21,6 +21,7 @@ class BaseMap
 public:
     BaseMap(unsigned int widthCells, unsigned int heightCells, double resolution);
     BaseMap(double widthM, double heightM, double resolution);
+    BaseMap(Grid2d* grid, double resolution);
     virtual ~BaseMap();
 
     virtual int getCost(unsigned int c, unsigned int r) const = 0;
@@ -105,6 +106,8 @@ private:
     Pose<> origin_;
 
     double resolution_;
+
+    bool userSpecifiedGrid_;
 
     double widthM_;
 };

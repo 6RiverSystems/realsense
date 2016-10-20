@@ -44,9 +44,6 @@ private:
     MapStack* srsMapStack_;
 
     TapMapStack tapMapStack_;
-//
-//    unsigned int weightObstacleThreshold_;
-    double weightScaleFactor_;
 };
 
 } // namespace srs

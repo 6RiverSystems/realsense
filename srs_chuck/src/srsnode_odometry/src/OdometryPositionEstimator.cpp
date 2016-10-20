@@ -76,10 +76,9 @@ void OdometryPositionEstimator::disconnect()
 void OdometryPositionEstimator::RawOdomCountToVelocity( const srslib_framework::Odometry::ConstPtr& encoderCount )
 {
 	// If no initial pose is provided, return immediately without any calculation
-	if(pose_.x == (-1.0) && pose_.y == (-1.0)
-			&& pose_.theta == (-1.0))
+	if(pose_.x == (-1.0) && pose_.y == (-1.0) && pose_.theta == (-1.0))
 	{
-		ROS_ERROR("No initial pose provided");
+		ROS_ERROR_ONCE("No initial pose provided");
 		return;
 	}
 

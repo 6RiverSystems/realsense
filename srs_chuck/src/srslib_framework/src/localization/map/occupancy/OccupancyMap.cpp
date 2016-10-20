@@ -10,10 +10,10 @@ OccupancyMap::OccupancyMap(unsigned int widthCells, unsigned int heightCells, do
         BaseMap(widthCells, heightCells, resolution)
 {
     occupancyMetadata_.heightCells = heightCells;
-    occupancyMetadata_.heightMm = getHeightMm();
+    occupancyMetadata_.heightM = getHeightM();
     occupancyMetadata_.resolution = resolution;
     occupancyMetadata_.widthCells = widthCells;
-    occupancyMetadata_.widthMm = getWidthMm();
+    occupancyMetadata_.widthM = getWidthM();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

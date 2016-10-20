@@ -18,7 +18,7 @@ namespace srs {
 class LogicalMap : public BaseMap
 {
 public:
-    LogicalMap(double widthMm, double heightMm, double resolution);
+    LogicalMap(double widthM, double heightM, double resolution);
     LogicalMap(Grid2d* grid, double resolution);
     ~LogicalMap()
     {}

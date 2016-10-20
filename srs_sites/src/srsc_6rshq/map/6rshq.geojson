@@ -6,9 +6,9 @@
 			"id": "map",
 			"properties": {
 				"origin": [0,0,0],
-				"resolution": 100,
-				"width": 20000,
-				"height": 10000
+				"resolution": 0.1,
+				"width": 20,
+				"height": 10
 			}
 		},
 		{
@@ -21,12 +21,12 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[0,0],
-							[2000,10000]
+							[2,10]
 						]
 					},
 					"properties": {
 						"name": "1",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}
@@ -37,13 +37,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[1900,0],
-							[19500,900]
+							[1.9,0],
+							[19.5,0.9]
 						]
 					},
 					"properties": {
 						"name": "2",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}
@@ -54,13 +54,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[1900,8500],
-							[19500,10000]
+							[1.9,8.5],
+							[19.5,10]
 						]
 					},
 					"properties": {
 						"name": "3",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}
@@ -71,13 +71,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[3600,2500],
-							[16700,3800]
+							[3.6,2.5],
+							[16.7,3.8]
 						]
 					},
 					"properties": {
 						"name": "4",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 0
 					}
@@ -88,13 +88,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[6200,5600],
-							[16700,6900]
+							[6.2,5.6],
+							[16.7,6.9]
 						]
 					},
 					"properties": {
 						"name": "5",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 0
 					}
@@ -105,13 +105,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[19400,0],
-							[20000,10000]
+							[19.4,0],
+							[20,10]
 						]
 					},
 					"properties": {
 						"name": "6",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}

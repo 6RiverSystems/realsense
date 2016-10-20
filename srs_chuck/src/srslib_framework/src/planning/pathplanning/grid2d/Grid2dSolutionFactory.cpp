@@ -141,14 +141,14 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map,
         Grid2dNode* fromNode = reinterpret_cast<Grid2dNode*>(*fromCursor);
         Grid2dNode* toNode = reinterpret_cast<Grid2dNode*>(*toCursor);
 
-        map->transformCells2Mm(
+        map->transformCells2M(
             fromNode->getPosition().location.x, fromNode->getPosition().location.y,
             fromX, fromY);
 
         fromTheta = AngleMath::deg2Rad<double>(fromNode->getPosition().orientation);
         fromPose = Pose<>(fromX, fromY, AngleMath::normalizeRad<double>(fromTheta));
 
-        map->transformCells2Mm(
+        map->transformCells2M(
             toNode->getPosition().location.x, toNode->getPosition().location.y,
             toX, toY);
 

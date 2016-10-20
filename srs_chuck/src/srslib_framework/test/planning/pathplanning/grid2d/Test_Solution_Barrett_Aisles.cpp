@@ -153,29 +153,29 @@ const mapNodes = {
 static constexpr double DEG0 = 0.0;
 static constexpr double DEG270 = AngleMath::deg2Rad<double>(270);
 
-static const Pose<> I01L = Pose<>(2030, 87835, DEG0);
-static const Pose<> I01R = Pose<>(36360, 87835, DEG0);
+static const Pose<> I01L = Pose<>(2.030, 87.835, DEG0);
+static const Pose<> I01R = Pose<>(36.360, 87.835, DEG0);
 
-static const Pose<> F01T = Pose<>(29905, 87835, DEG270);
-static const Pose<> F01B = Pose<>(29905, 58020, DEG270);
-static const Pose<> G01T = Pose<>(21910, 87835, DEG270);
-static const Pose<> G01B = Pose<>(21910, 58020, DEG270);
-static const Pose<> H01T = Pose<>(15290, 87835, DEG270);
-static const Pose<> H01B = Pose<>(15290, 58020, DEG270);
+static const Pose<> F01T = Pose<>(29.905, 87.835, DEG270);
+static const Pose<> F01B = Pose<>(29.905, 58.020, DEG270);
+static const Pose<> G01T = Pose<>(21.910, 87.835, DEG270);
+static const Pose<> G01B = Pose<>(21.910, 58.020, DEG270);
+static const Pose<> H01T = Pose<>(15.290, 87.835, DEG270);
+static const Pose<> H01B = Pose<>(15.290, 58.020, DEG270);
 
-static const Pose<> CDT = Pose<>(28890, 58020, DEG270);
-static const Pose<> CDB = Pose<>(28890, 25450, DEG270);
-static const Pose<> ABT = Pose<>(33215, 58020, DEG270);
-static const Pose<> ABB = Pose<>(33215, 25450, DEG270);
+static const Pose<> CDT = Pose<>(28.890, 58.020, DEG270);
+static const Pose<> CDB = Pose<>(28.890, 25.450, DEG270);
+static const Pose<> ABT = Pose<>(33.215, 58.020, DEG270);
+static const Pose<> ABB = Pose<>(33.215, 25450, DEG270);
 
-static const Pose<> E01T = Pose<>(14690, 58020, DEG270);
-static const Pose<> E01B = Pose<>(14690, 4125, DEG270);
-static const Pose<> E02T = Pose<>(19430, 25450, DEG270);
-static const Pose<> E02B = Pose<>(19430, 4125, DEG270);
-static const Pose<> E03T = Pose<>(23615, 25450, DEG270);
-static const Pose<> E03B = Pose<>(23615, 4125, DEG270);
-static const Pose<> E04T = Pose<>(27990, 25450, DEG270);
-static const Pose<> E04B = Pose<>(27990, 4125, DEG270);
+static const Pose<> E01T = Pose<>(14.690, 58.020, DEG270);
+static const Pose<> E01B = Pose<>(14.690, 4.125, DEG270);
+static const Pose<> E02T = Pose<>(19.430, 25.450, DEG270);
+static const Pose<> E02B = Pose<>(19.430, 4.125, DEG270);
+static const Pose<> E03T = Pose<>(23.615, 25.450, DEG270);
+static const Pose<> E03B = Pose<>(23.615, 4.125, DEG270);
+static const Pose<> E04T = Pose<>(27.990, 25.450, DEG270);
+static const Pose<> E04B = Pose<>(27.990, 4.125, DEG270);
 
 Solution<Grid2dSolutionItem>* calculateSolution(Pose<> start, Pose<> goal)
 {

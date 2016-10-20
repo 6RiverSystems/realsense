@@ -6,9 +6,9 @@
 			"id": "map",
 			"properties": {
 				"origin": [0,0,0],
-				"resolution": 100,
-				"width": 27200,
-				"height": 23300
+				"resolution": 0.1,
+				"width": 27.2,
+				"height": 23.3
 			}
 		},
 		{
@@ -21,12 +21,12 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[0,0],
-							[5300,23300]
+							[5.3,23.3]
 						]
 					},
 					"properties": {
 						"name": "1",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}
@@ -37,13 +37,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[5200,0],
-							[7100,3400]
+							[5.2,0],
+							[7.1,3.4]
 						]
 					},
 					"properties": {
 						"name": "2",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}
@@ -54,13 +54,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[5200,15400],
-							[27200,23300]
+							[5.2,15.4],
+							[27.2,23.3]
 						]
 					},
 					"properties": {
 						"name": "3",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}
@@ -71,13 +71,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[7000,0],
-							[10100,5200]
+							[7,0],
+							[10.1,5.2]
 						]
 					},
 					"properties": {
 						"name": "4",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}
@@ -88,13 +88,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[8800,8300],
-							[21900,9700]
+							[8.8,8.3],
+							[21.9,9.7]
 						]
 					},
 					"properties": {
 						"name": "5",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 0
 					}
@@ -105,13 +105,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[10000,0],
-							[27200,2900]
+							[10,0],
+							[27.2,2.9]
 						]
 					},
 					"properties": {
 						"name": "6",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}
@@ -122,13 +122,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11400,11400],
-							[21900,12800]
+							[11.4,11.4],
+							[21.9,12.8]
 						]
 					},
 					"properties": {
 						"name": "7",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 0
 					}
@@ -139,13 +139,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[14300,2800],
-							[27200,6000]
+							[14.3,2.8],
+							[27.2,6]
 						]
 					},
 					"properties": {
 						"name": "8",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}
@@ -156,13 +156,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[17700,5900],
-							[27200,6700]
+							[17.7,5.9],
+							[27.2,6.7]
 						]
 					},
 					"properties": {
 						"name": "9",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}
@@ -173,13 +173,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[25400,6600],
-							[27200,15500]
+							[25.4,6.6],
+							[27.2,15.5]
 						]
 					},
 					"properties": {
 						"name": "10",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}

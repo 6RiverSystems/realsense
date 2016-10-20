@@ -31,7 +31,7 @@ public:
         return grid_->getHeight();
     }
 
-    double getHeightMm() const
+    double getHeightM() const
     {
         return heightM_;
     }
@@ -51,7 +51,7 @@ public:
         return grid_->getWidth();
     }
 
-    double getWidthMm() const
+    double getWidthM() const
     {
         return widthM_;
     }
@@ -61,40 +61,39 @@ public:
     virtual void setCost(unsigned int c, unsigned int r, int cost) = 0;
     virtual void setObstruction(unsigned int c, unsigned int r) = 0;
 
-    void transformCells2Mm(unsigned int cells, double& measurement)
+    void transformCells2M(unsigned int cells, double& measurement)
     {
         // The precision is down to 1mm
-        double r = static_cast<double>(cells) * resolution_;
-        measurement = round(r);
+        measurement = round(static_cast<double>(cells) * resolution_ * 1e3) / 1e3;
     }
 
-    void transformCells2Mm(unsigned int c, unsigned int r, double& x, double& y)
+    void transformCells2M(unsigned int c, unsigned int r, double& x, double& y)
     {
-        transformCells2Mm(c, x);
-        transformCells2Mm(r, y);
+        transformCells2M(c, x);
+        transformCells2M(r, y);
     }
 
-    void transformCells2Mm(unsigned int c, unsigned int r, Pose<>& p)
+    void transformCells2M(unsigned int c, unsigned int r, Pose<>& p)
     {
-        transformCells2Mm(c, p.x);
-        transformCells2Mm(r, p.y);
+        transformCells2M(c, p.x);
+        transformCells2M(r, p.y);
     }
 
-    void transformMm2Cells(double mesurement, unsigned int& cells)
+    void transformM2Cells(double mesurement, unsigned int& cells)
     {
         cells = static_cast<unsigned int>(round(mesurement / resolution_));
     }
 
-    void transformMm2Cells(double x, double y, unsigned int& c, unsigned int& r)
+    void transformM2Cells(double x, double y, unsigned int& c, unsigned int& r)
     {
-        transformMm2Cells(x, c);
-        transformMm2Cells(y, r);
+        transformM2Cells(x, c);
+        transformM2Cells(y, r);
     }
 
-    void transformMm2Cells(Pose<> p, unsigned int& c, unsigned int& r)
+    void transformM2Cells(Pose<> p, unsigned int& c, unsigned int& r)
     {
-        transformMm2Cells(p.x, c);
-        transformMm2Cells(p.y, r);
+        transformM2Cells(p.x, c);
+        transformM2Cells(p.y, r);
     }
 
 private:

@@ -6,9 +6,9 @@
 			"id": "map",
 			"properties": {
 				"origin": [0,0,0],
-				"resolution": 100,
-				"width": 20000,
-				"height": 10000
+				"resolution": 0.1,
+				"width": 20,
+				"height": 10
 			}
 		},
 		{
@@ -21,12 +21,12 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[0,0],
-							[20000,900]
+							[20,0.9]
 						]
 					},
 					"properties": {
 						"name": "1",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}
@@ -37,13 +37,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[0,800],
-							[2000,10000]
+							[0,0.8],
+							[2,10]
 						]
 					},
 					"properties": {
 						"name": "2",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}
@@ -54,13 +54,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[1900,8500],
-							[20000,10000]
+							[1.9,8.5],
+							[20,10]
 						]
 					},
 					"properties": {
 						"name": "3",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}
@@ -71,13 +71,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[19400,800],
-							[20000,8600]
+							[19.4,0.8],
+							[20,8.6]
 						]
 					},
 					"properties": {
 						"name": "4",
-						"envelope_size": 300,
+						"envelope_size": 0.3,
 						"envelope_cost": 200,
 						"is_border": 1
 					}

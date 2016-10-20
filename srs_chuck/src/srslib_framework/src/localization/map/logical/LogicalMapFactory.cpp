@@ -54,36 +54,36 @@ LogicalMap* LogicalMapFactory::fromString(string geoJson)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::addRectangleCost(LogicalMap* logicalMap,
-    Pose<> origin, double widthMm, double heightMm,
+    Pose<> origin, double widthM, double heightM,
     int cost)
 {
-    double newWidthMm = widthMm;
+    double newWidthM = widthM;
     double c = origin.x;
     if (c < 0)
     {
-        newWidthMm += c;
-        newWidthMm = newWidthMm > 0 ? newWidthMm : 0;
+        newWidthM += c;
+        newWidthM = newWidthM > 0 ? newWidthM : 0;
         c = 0;
     }
 
-    double newHeightMm = heightMm;
+    double newHeightM = heightM;
     double r = origin.y;
     if (r < 0)
     {
-        newHeightMm += r;
-        newHeightMm = newHeightMm > 0 ? newHeightMm : 0;
+        newHeightM += r;
+        newHeightM = newHeightM > 0 ? newHeightM : 0;
         r = 0;
     }
 
     unsigned int x0;
     unsigned int y0;
-    logicalMap->transformMm2Cells(c, r, x0, y0);
+    logicalMap->transformM2Cells(c, r, x0, y0);
 
     unsigned int widthCells;
-    logicalMap->transformMm2Cells(newWidthMm, widthCells);
+    logicalMap->transformM2Cells(newWidthM, widthCells);
 
     unsigned int heightCells;
-    logicalMap->transformMm2Cells(newHeightMm, heightCells);
+    logicalMap->transformM2Cells(newHeightM, heightCells);
 
     for (unsigned int r = y0; r < y0 + heightCells; ++r)
     {
@@ -96,20 +96,20 @@ void LogicalMapFactory::addRectangleCost(LogicalMap* logicalMap,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::addStaticObstacle(LogicalMap* logicalMap,
-    Pose<> origin, double widthMm, double heightMm,
-    double sizeEnvelopeMm, int costEnvelope)
+    Pose<> origin, double widthM, double heightM,
+    double sizeEnvelopeM, int costEnvelope)
 {
     // First add the envelope, if specified
-    if (sizeEnvelopeMm > 0.0 && costEnvelope > 0)
+    if (sizeEnvelopeM > 0.0 && costEnvelope > 0)
     {
         addRectangleCost(logicalMap,
-            PoseMath::add(origin, Pose<>(-sizeEnvelopeMm, -sizeEnvelopeMm)),
-            widthMm + 2 * sizeEnvelopeMm, heightMm + 2 * sizeEnvelopeMm,
+            PoseMath::add(origin, Pose<>(-sizeEnvelopeM, -sizeEnvelopeM)),
+            widthM + 2 * sizeEnvelopeM, heightM + 2 * sizeEnvelopeM,
             costEnvelope);
     }
 
     // Add the static obstacle
-    addRectangleCost(logicalMap, origin, widthMm, heightMm, Grid2d::PAYLOAD_MAX);
+    addRectangleCost(logicalMap, origin, widthM, heightM, Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,11 +119,11 @@ void LogicalMapFactory::addWeight(LogicalMap* logicalMap,
 {
     unsigned int xi;
     unsigned int yi;
-    logicalMap->transformMm2Cells(from, xi, yi);
+    logicalMap->transformM2Cells(from, xi, yi);
 
     unsigned int xf;
     unsigned int yf;
-    logicalMap->transformMm2Cells(to, xf, yf);
+    logicalMap->transformM2Cells(to, xf, yf);
 
     int deltaX = BasicMath::sgn<int>(xf - xi);
     int deltaY = BasicMath::sgn<int>(yf - yi);
@@ -342,8 +342,8 @@ void LogicalMapFactory::nonTerminalStatementBoundary(YAML::Node node, LogicalMap
         envelopeCost = properties["envelope_cost"].as<unsigned int>();
     }
 
-    double widthM = map->getWidthMm();
-    double heightM = map->getHeightMm();
+    double widthM = map->getWidthM();
+    double heightM = map->getHeightM();
     double resolution = map->getResolution();
 
     vector<Pose<>> coordinates = nonTerminalGeometry(node["geometry"], map);

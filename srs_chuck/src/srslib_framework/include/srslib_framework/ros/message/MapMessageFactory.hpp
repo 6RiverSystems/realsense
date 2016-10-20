@@ -105,7 +105,7 @@ struct MapMessageFactory
 
         msgOccupancyMetaData.loadTime = metadata.loadTime;
         msgOccupancyMetaData.heightCells = metadata.heightCells;
-        msgOccupancyMetaData.heightMm = metadata.heightMm;
+        msgOccupancyMetaData.heightM = metadata.heightM;
         msgOccupancyMetaData.occupancyFilename = metadata.occupancyFilename;
         msgOccupancyMetaData.negate = metadata.negate;
         msgOccupancyMetaData.origin = PoseMessageFactory::pose2Msg(metadata.origin);
@@ -113,13 +113,14 @@ struct MapMessageFactory
         msgOccupancyMetaData.thresholdFree = metadata.thresholdFree;
         msgOccupancyMetaData.thresholdOccupied = metadata.thresholdOccupied;
         msgOccupancyMetaData.widthCells = metadata.widthCells;
-        msgOccupancyMetaData.widthMm = metadata.widthMm;
+        msgOccupancyMetaData.widthM = metadata.widthM;
 
         return msgOccupancyMetaData;
     }
 
     /**
-     * @brief Convert a OccupancyMetadata into a ROS Map Metadata message.
+     * @brief Convert a OccupancyMetadata into a ROS Map Metadata message. It adapts the
+     * scale the resolution from millimeters to meters.
      *
      * @param metadata Occupancy metadata to convert
      *
@@ -198,7 +199,7 @@ struct MapMessageFactory
 
         metadata.loadTime = message.loadTime;
         metadata.heightCells = message.heightCells;
-        metadata.heightMm = message.heightMm;
+        metadata.heightM = message.heightM;
         metadata.occupancyFilename = message.occupancyFilename;
         metadata.negate = message.negate;
         metadata.origin = PoseMessageFactory::msg2Pose(message.origin);
@@ -206,7 +207,7 @@ struct MapMessageFactory
         metadata.thresholdFree = message.thresholdFree;
         metadata.thresholdOccupied = message.thresholdOccupied;
         metadata.widthCells = message.widthCells;
-        metadata.widthMm = message.widthMm;
+        metadata.widthM = message.widthM;
 
         return metadata;
     }

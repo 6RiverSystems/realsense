@@ -11,8 +11,8 @@ float32 resolution
 uint32 widthCells
 uint32 heightCells
 
-float32 widthMm
-float32 heightMm
+float32 widthM
+float32 heightM
 
 srslib_framework/Pose origin
 

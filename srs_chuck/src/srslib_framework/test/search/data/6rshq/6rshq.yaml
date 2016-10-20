@@ -7,7 +7,7 @@
 {
     occupancy: {
         image: 6rshq.png,
-        resolution: 100,
+        resolution: 0.100,
         origin: [0, 0, 0],
         negate: 0,
         occupied_thresh: 0.65,

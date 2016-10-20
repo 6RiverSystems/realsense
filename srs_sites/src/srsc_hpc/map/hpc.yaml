@@ -6,7 +6,7 @@
 {
     occupancy: {
         image: hpc.pgm,
-        resolution: 50,
+        resolution: 0.050,
         origin: [-25, -25, 0],
         negate: 0,
         occupied_thresh: 0.65,

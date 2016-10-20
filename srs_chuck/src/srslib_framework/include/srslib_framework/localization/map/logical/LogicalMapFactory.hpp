@@ -22,11 +22,11 @@ struct LogicalMapFactory
 
 private:
     static void addRectangleCost(LogicalMap* logicalMap,
-        Pose<> origin, double widthMm, double heightMm,
+        Pose<> origin, double widthM, double heightM,
         int cost);
     static void addStaticObstacle(LogicalMap* logicalMap,
-        Pose<> origin, double widthMm, double heightMm,
-        double sizeEnvelopeMm = 0.0, int costEnvelope = 0);
+        Pose<> origin, double widthM, double heightM,
+        double sizeEnvelopeM = 0.0, int costEnvelope = 0);
     static void addWeight(LogicalMap* logicalMap,
         Pose<> from, Pose<> to,
         int north, int east, int south, int west);

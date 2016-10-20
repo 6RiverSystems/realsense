@@ -53,7 +53,7 @@ void OdometryPositionEstimator::connect()
 	rawOdometryCountSub_ = nodeHandle_.subscribe<srslib_framework::Odometry>(ODOMETRY_RAW_COUNT_TOPIC, 10,
 		std::bind( &OdometryPositionEstimator::RawOdomCountToVelocity, this, std::placeholders::_1 ));
 
-	resetPoseSub_ = nodeHandle_.subscribe<geometry_msgs::PoseStamped>(RESET_ODOMETRY_POSE_TOPIC, 1,
+	resetPoseSub_ = nodeHandle_.subscribe<geometry_msgs::PoseWithCovarianceStamped>(INITIAL_POSE_TOPIC, 1,
 			std::bind( &OdometryPositionEstimator::ResetOdomPose, this, std::placeholders::_1 ));
 
 	odometryPosePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_OUTPUT_TOPIC, 100);
@@ -73,14 +73,12 @@ void OdometryPositionEstimator::disconnect()
 	odometryPosePub_.shutdown();
 }
 
-
 void OdometryPositionEstimator::RawOdomCountToVelocity( const srslib_framework::Odometry::ConstPtr& encoderCount )
 {
 	// If no initial pose is provided, return immediately without any calculation
-	if(pose_.x == (-1.0) && pose_.y == (-1.0)
-			&& pose_.theta == (-1.0))
+	if(pose_.x == (-1.0) && pose_.y == (-1.0) && pose_.theta == (-1.0))
 	{
-		ROS_ERROR("No initial pose provided");
+		ROS_ERROR_ONCE("No initial pose provided");
 		return;
 	}
 
@@ -177,10 +175,11 @@ void OdometryPositionEstimator::RawOdomCountToVelocity( const srslib_framework::
 	s_lastPose = pose_;
 }
 
-void OdometryPositionEstimator::ResetOdomPose( const geometry_msgs::PoseStamped::ConstPtr& assignedPose )
+void OdometryPositionEstimator::ResetOdomPose( const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& assignedPose )
 {
-	pose_ = PoseMessageFactory::poseStamped2Pose(assignedPose);
-	ROS_INFO("Robot pose has been set to x= %f, y= %f, theta= %f", pose_.x, pose_.y, pose_.theta);
+	pose_ = PoseMessageFactory::poseStampedWithCovariance2Pose(assignedPose);
+
+	ROS_DEBUG("Robot pose has been set to x= %f, y= %f, theta= %f", pose_.x, pose_.y, pose_.theta);
 }
 
 void OdometryPositionEstimator::GetRawOdometryVelocity( const int32_t leftWheelCount, const int32_t rightWheelCount, double timeInterval, double& linearV, double& angularV)

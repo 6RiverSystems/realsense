@@ -10,7 +10,7 @@
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/TwistStamped.h>
-#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
@@ -41,7 +41,7 @@ private:
 
     void GetRawOdometryVelocity(const int32_t leftWheelCount, const int32_t rightWheelCount, double timeInterval, double& v, double& w);
 
-    void ResetOdomPose( const geometry_msgs::PoseStamped::ConstPtr& resetMsg );
+    void ResetOdomPose( const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& resetMsg );
 
     void pingCallback(const ros::TimerEvent& event);
 
@@ -57,7 +57,7 @@ private:
 
 	static constexpr auto ODOMETRY_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity";
 
-	static constexpr auto RESET_ODOMETRY_POSE_TOPIC = "/odom_init_pose";
+	static constexpr auto INITIAL_POSE_TOPIC = "/request/initial_pose";
 
     ros::NodeHandle nodeHandle_;
 

@@ -88,12 +88,6 @@ void OdometryPositionEstimator::RawRPMToVelocity( const srslib_framework::Odomet
 	// Update current time and calculate time interval between two consecutive messages
 	ros::Time currentTime = wheelRPM->header.stamp;
 
-	// Skip first round calculation (if dfTimeDelta = 0 -> v,w = NaN)
-	//if(!TimeMath::isTimeElapsed(0.00001, s_lastTime, currentTime))
-	//{
-	//	return;
-	//}
-
 	double dfTimeDelta = (currentTime - s_lastTime).toSec();
 
 	// Calculate linear and angular velocity

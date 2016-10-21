@@ -37,7 +37,7 @@ public:
 
 private:
 
-    void RawRPMToVelocity( const srslib_framework::OdometryRPM::ConstPtr& whelRPM );
+    void RawRPMToVelocity( const srslib_framework::OdometryRPM::ConstPtr& wheelRPM );
 
     void GetRawOdometryVelocity(const float leftWheelCount, const float rightWheelCount, double& v, double& w);
 
@@ -77,10 +77,6 @@ private:
 	ros::Publisher odometryPosePub_;
 
 	ros::Publisher pingPub_;
-
-	//int motorCountPerRev_;
-
-	//double gearboxRatio_;
 
 	double wheelbaseLength_;
 

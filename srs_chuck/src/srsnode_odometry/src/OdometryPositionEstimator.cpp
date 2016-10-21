@@ -19,8 +19,6 @@ OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	rawOdometryCountSub_(),
 	odometryPosePub_(),
 	pingPub_(),
-	//motorCountPerRev_(4096),
-	//gearboxRatio_(10.0),
 	wheelbaseLength_(0.5235),
 	leftWheelRadius_(0.10243),
 	rightWheelRadius_(0.10243)
@@ -116,7 +114,7 @@ void OdometryPositionEstimator::RawRPMToVelocity( const srslib_framework::Odomet
     	pose_ = PoseMath::translate<>(pose_, linearVelocity * dfTimeDelta, 0.0);
     }
 
-	// Display status in DEBUG MODE
+	// Display status in DEBUG MODE whenever pose has been changed
 	if(pose_.x != s_lastPose.x || pose_.y != s_lastPose.y || pose_.theta != s_lastPose.theta)
 	{
 		ROS_DEBUG( "Estimated Pose Changed: x=%f, y=%f, theta=%f",
@@ -178,10 +176,10 @@ void OdometryPositionEstimator::ResetOdomPose( const geometry_msgs::PoseWithCova
 
 void OdometryPositionEstimator::GetRawOdometryVelocity( const float leftWheelRPM, const float rightWheelRPM, double& linearV, double& angularV)
 {
-	// Calculate left and right wheel velocity
 	//double leftWheelVelocity = (double)leftWheelRPM / timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * leftWheelRadius_ * 2 * M_PI;
 	//double rightWheelVelocity = (double)rightWheelRPM / timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * rightWheelRadius_ * 2 * M_PI;
 
+	// Calculate left and right wheel velocity
 	double leftWheelVelocity = (double)leftWheelRPM * 2.0 * M_PI * leftWheelRadius_ / 60.0;
 	double rightWheelVelocity = (double)rightWheelRPM * 2.0 * M_PI * rightWheelRadius_ / 60.0;
 
@@ -208,8 +206,6 @@ void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)
 
 void OdometryPositionEstimator::cfgCallback(srsnode_odometry::RobotSetupConfig &config, uint32_t level)
 {
-	//motorCountPerRev_ = config.motor_count_per_rev;
-	//gearboxRatio_ = config.gearbox_ratio;
 	wheelbaseLength_ = config.robot_wheelbase_length;
 	leftWheelRadius_ = config.robot_leftwheel_radius;
 	rightWheelRadius_ = config.robot_rightwheel_radius;

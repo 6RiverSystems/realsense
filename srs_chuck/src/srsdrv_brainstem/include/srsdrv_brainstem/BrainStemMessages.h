@@ -39,6 +39,7 @@ enum class BRAIN_STEM_CMD
 	SET_MOTION_STATUS		= 0x32, // '2'
 	SET_TOTE_LIGHTS			= 0x39, // '9'
 	SET_VELOCITY			= 0x76, // 'v'
+	SET_VELOCITY_RPM        = 0x72, // 'r'
 	STARTUP					= 0x38, // '8'
 	SHUTDOWN				= 0x78, // 'x'
 	UNKNOWN
@@ -171,6 +172,14 @@ struct ODOMETRY_DATA
 	uint32_t	timestamp;
 	float		linear_velocity;
 	float		angular_velocity;
+};
+
+struct ODOMETRY_RPM_DATA
+{
+	uint8_t		cmd;
+	uint32_t	timestamp;
+	float		left_wheel_rpm;
+	float		right_wheel_rpm;
 };
 
 // Back to normal packing

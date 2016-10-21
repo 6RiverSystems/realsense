@@ -223,6 +223,31 @@ void BrainStemMessageProcessor::SendPing( )
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
 }
 
+void BrainStemMessageProcessor::SetRPM( double leftWheelRPM, double rightWheelRPM )
+{
+	ODOMETRY_RPM_DATA msg = {
+	    static_cast<uint8_t>( BRAIN_STEM_CMD::SET_VELOCITY_RPM ),
+	    static_cast<float>( leftWheelRPM ),
+	    static_cast<float>( rightWheelRPM )
+	};
+
+	static double s_leftWheelRPM = leftWheelRPM;
+	static double s_rightWheelRPM = rightWheelRPM;
+
+	if( leftWheelRPM != s_leftWheelRPM ||
+		rightWheelRPM != s_rightWheelRPM )
+	{
+		ROS_DEBUG_NAMED( "velocity_rpm", "Odometry: SetRPM: %f, %f", leftWheelRPM, rightWheelRPM );
+
+		s_leftWheelRPM = leftWheelRPM;
+		s_rightWheelRPM = rightWheelRPM;
+	}
+
+	// Send the velocity down to the motors
+	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+}
+
+
 void BrainStemMessageProcessor::SetVelocity( double dfLinear, double dfAngular )
 {
 	VELOCITY_DATA msg = {

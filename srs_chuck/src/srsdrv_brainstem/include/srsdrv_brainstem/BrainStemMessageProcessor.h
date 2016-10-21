@@ -20,6 +20,7 @@ using namespace std;
 #include <srsdrv_brainstem/hw_message/BrainstemMessageHandler.hpp>
 #include <srsdrv_brainstem/hw_message/SensorFrameHandler.hpp>
 #include <srsdrv_brainstem/hw_message/RawOdometryHandler.hpp>
+#include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
 
 namespace srs {
 
@@ -38,6 +39,8 @@ class BrainStemMessageProcessor
 public:
     void processHardwareMessage(vector<char> buffer);
     void processRosMessage(const string& strMessage);
+
+    typedef map<char, BrainstemMessageHandler*> MessageHandlerMapType;
 
 	typedef std::function<void(bool)> ConnectionChangedFn;
 
@@ -71,8 +74,6 @@ private:
 
 	ButtonCallbackFn						m_buttonCallback;
 
-	HardwareInfoCallbackFn					m_hardwareInfoCallback;
-
 	OperationalStateCallbackFn				m_operationalStateCallback;
 
 	VoltageCallbackFn						m_voltageCallback;
@@ -88,8 +89,6 @@ public:
 	void SetConnectionChangedCallback( ConnectionChangedFn connectionChangedCallback );
 
 	void SetButtonCallback( ButtonCallbackFn buttonCallback );
-
-	void SetHardwareInfoCallback( HardwareInfoCallbackFn hardwareInfoCallback );
 
 	void SetOperationalStateCallback( OperationalStateCallbackFn operationalStateCallback );
 
@@ -143,10 +142,13 @@ private:
 
 	void Pause( bool bPause );
 
-    vector<BrainstemMessageHandler*> hwMessageHandlers_;
+    MessageHandlerMapType hwMessageHandlers_;
 
     SensorFrameHandler sensorFrameHandler_;
+
     RawOdometryHandler rawOdometryHandler_;
+
+    HardwareInfoHandler hardwareInfoHandler_;
 };
 
 } /* namespace srs */

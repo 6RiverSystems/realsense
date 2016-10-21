@@ -27,7 +27,6 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
     m_connectedPublisher( ),
 	m_llcmdSubscriber( ),
 	m_llEventPublisher( ),
-	m_hardwareInfoPublisher( ),
 	m_operationalStatePublisher( ),
 	m_voltagePublisher( ),
 	m_pSerialIO( new SerialIO( "brainstem" ) ),
@@ -122,29 +121,6 @@ void BrainStem::OnButtonEvent( LED_ENTITIES eButtonId )
 		ROS_ERROR( "Unknown button entity %d", eButtonId );
 	}
 }
-
-void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t chassisGeneration, uint8_t brainstemHwVersion,
-	const std::string& strBrainstemSwVersion )
-{
-	char pszUid[255] = { '\0' };
-	sprintf( pszUid, "%08X-%08X-%08X-%08X", uniqueId[0], uniqueId[1], uniqueId[2], uniqueId[3] );
-
-	std::string strName( getenv( "ROBOT_NAME" ) );
-
-	ROS_INFO_STREAM( "Hardware Info => name: " << strName << ", id: " << pszUid <<
-		", chassisGeneration: " << unsigned( chassisGeneration ) << ", brainstemHwVersion: " << unsigned( brainstemHwVersion ) <<
-		", brainstemSwVersion: " << strBrainstemSwVersion );
-
-	srslib_framework::MsgHardwareInfo msg;
-	msg.name = strName;
-	msg.uid = pszUid;
-	msg.chassisGeneration = chassisGeneration;
-	msg.brainstemHwVersion = brainstemHwVersion;
-	msg.brainstemSwVersion = strBrainstemSwVersion;
-
-	m_hardwareInfoPublisher.publish( msg );
-}
-
 void BrainStem::OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_DATA& motionStatus,
 	const FAILURE_STATUS_DATA& failureStatus )
 {
@@ -210,9 +186,6 @@ void BrainStem::CreatePublishers( )
 {
 	m_connectedPublisher = m_rosNodeHandle.advertise<std_msgs::Bool>( CONNECTED_TOPIC, 1, true );
 
-	m_hardwareInfoPublisher = m_rosNodeHandle.advertise<srslib_framework::MsgHardwareInfo>(
-	    HARDWARE_INFO_TOPIC, 1, true );
-
 	m_operationalStatePublisher = m_rosNodeHandle.advertise<srslib_framework::MsgOperationalState>(
 	    OPERATIONAL_STATE_TOPIC, 1, true );
 
@@ -227,9 +200,6 @@ void BrainStem::SetupCallbacks( )
 		this, std::placeholders::_1 ) );
 
 	m_messageProcessor.SetButtonCallback( std::bind( &BrainStem::OnButtonEvent, this, std::placeholders::_1 ) );
-
-	m_messageProcessor.SetHardwareInfoCallback( std::bind( &BrainStem::OnHardwareInfo, this,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
 
 	m_messageProcessor.SetOperationalStateCallback( std::bind( &BrainStem::OnOperationalStateChanged, this,
 		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );

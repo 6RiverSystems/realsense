@@ -16,7 +16,7 @@ namespace srs {
 class RawOdometryHandler : public BrainstemMessageHandler
 {
 public:
-    static constexpr char RAW_ODOMETRY_KEY = 0x52; // 'R'
+    static constexpr char RAW_ODOMETRY_KEY = static_cast<char>(BRAIN_STEM_MSG::RAW_ODOMETRY);
 
     static const string TOPIC_RAW_ODOMETRY;
 

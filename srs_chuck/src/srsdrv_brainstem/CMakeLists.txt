@@ -13,6 +13,7 @@ set(${PROJECT_NAME}_SOURCES
 	src/BrainStemEmulator.cpp
     src/hw_message/SensorFrameHandler.cpp
     src/hw_message/RawOdometryHandler.cpp
+    src/hw_message/HardwareInfoHandler.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES

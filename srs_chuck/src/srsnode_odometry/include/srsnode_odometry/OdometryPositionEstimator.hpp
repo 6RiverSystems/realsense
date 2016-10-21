@@ -16,7 +16,7 @@
 #include <tf/transform_datatypes.h>
 #include <dynamic_reconfigure/server.h>
 #include <srsnode_odometry/RobotSetupConfig.h>
-#include <srslib_framework/Odometry.h>
+#include <srslib_framework/OdometryRPM.h>
 #include <srslib_framework/ros/RosTap.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
@@ -37,9 +37,9 @@ public:
 
 private:
 
-    void RawOdomCountToVelocity( const srslib_framework::Odometry::ConstPtr& encoderCount );
+    void RawRPMToVelocity( const srslib_framework::OdometryRPM::ConstPtr& whelRPM );
 
-    void GetRawOdometryVelocity(const int32_t leftWheelCount, const int32_t rightWheelCount, double timeInterval, double& v, double& w);
+    void GetRawOdometryVelocity(const float leftWheelCount, const float rightWheelCount, double& v, double& w);
 
     void ResetOdomPose( const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& resetMsg );
 
@@ -53,7 +53,8 @@ private:
 
     static constexpr double MAX_ALLOWED_PING_DELAY = 0.5; // 50% of the duty cycle
 
-	static constexpr auto ODOMETRY_RAW_COUNT_TOPIC = "/internal/sensors/odometry/count";
+	static constexpr auto ODOMETRY_RAW_RPM_TOPIC = "/internal/sensors/odometry/rpm";
+	//static constexpr auto ODOMETRY_RAW_COUNT_TOPIC = "/internal/sensors/odometry/count";
 
 	static constexpr auto ODOMETRY_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity";
 
@@ -77,9 +78,9 @@ private:
 
 	ros::Publisher pingPub_;
 
-	int motorCountPerRev_;
+	//int motorCountPerRev_;
 
-	double gearboxRatio_;
+	//double gearboxRatio_;
 
 	double wheelbaseLength_;
 

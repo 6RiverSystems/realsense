@@ -19,8 +19,8 @@ OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	rawOdometryCountSub_(),
 	odometryPosePub_(),
 	pingPub_(),
-	motorCountPerRev_(4096),
-	gearboxRatio_(10.0),
+	//motorCountPerRev_(4096),
+	//gearboxRatio_(10.0),
 	wheelbaseLength_(0.5235),
 	leftWheelRadius_(0.10243),
 	rightWheelRadius_(0.10243)
@@ -50,8 +50,8 @@ void OdometryPositionEstimator::run()
 
 void OdometryPositionEstimator::connect()
 {
-	rawOdometryCountSub_ = nodeHandle_.subscribe<srslib_framework::Odometry>(ODOMETRY_RAW_COUNT_TOPIC, 10,
-		std::bind( &OdometryPositionEstimator::RawOdomCountToVelocity, this, std::placeholders::_1 ));
+	rawOdometryCountSub_ = nodeHandle_.subscribe<srslib_framework::OdometryRPM>(ODOMETRY_RAW_RPM_TOPIC, 10,
+		std::bind( &OdometryPositionEstimator::RawRPMToVelocity, this, std::placeholders::_1 ));
 
 	resetPoseSub_ = nodeHandle_.subscribe<geometry_msgs::PoseWithCovarianceStamped>(INITIAL_POSE_TOPIC, 1,
 			std::bind( &OdometryPositionEstimator::ResetOdomPose, this, std::placeholders::_1 ));
@@ -73,7 +73,7 @@ void OdometryPositionEstimator::disconnect()
 	odometryPosePub_.shutdown();
 }
 
-void OdometryPositionEstimator::RawOdomCountToVelocity( const srslib_framework::Odometry::ConstPtr& encoderCount )
+void OdometryPositionEstimator::RawRPMToVelocity( const srslib_framework::OdometryRPM::ConstPtr& wheelRPM )
 {
 	// If no initial pose is provided, return immediately without any calculation
 	if(pose_.x == (-1.0) && pose_.y == (-1.0) && pose_.theta == (-1.0))
@@ -82,24 +82,24 @@ void OdometryPositionEstimator::RawOdomCountToVelocity( const srslib_framework::
 		return;
 	}
 
-	static ros::Time s_lastTime = encoderCount->header.stamp;
+	static ros::Time s_lastTime = wheelRPM->header.stamp;
 	static Pose<> s_lastPose = pose_;
 
 	// Update current time and calculate time interval between two consecutive messages
-	ros::Time currentTime = encoderCount->header.stamp;
+	ros::Time currentTime = wheelRPM->header.stamp;
 
 	// Skip first round calculation (if dfTimeDelta = 0 -> v,w = NaN)
-	if(!TimeMath::isTimeElapsed(0.00001, s_lastTime, currentTime))
-	{
-		return;
-	}
+	//if(!TimeMath::isTimeElapsed(0.00001, s_lastTime, currentTime))
+	//{
+	//	return;
+	//}
 
 	double dfTimeDelta = (currentTime - s_lastTime).toSec();
 
 	// Calculate linear and angular velocity
 	double linearVelocity = 0.0;
 	double angularVelocity = 0.0;
-	GetRawOdometryVelocity(encoderCount->left_wheel, encoderCount->right_wheel, dfTimeDelta, linearVelocity, angularVelocity);
+	GetRawOdometryVelocity(wheelRPM->left_wheel_rpm, wheelRPM->right_wheel_rpm, linearVelocity, angularVelocity);
 
 	// Message declarations
 	geometry_msgs::TransformStamped odom_trans;
@@ -182,14 +182,17 @@ void OdometryPositionEstimator::ResetOdomPose( const geometry_msgs::PoseWithCova
 	ROS_DEBUG("Robot pose has been set to x= %f, y= %f, theta= %f", pose_.x, pose_.y, pose_.theta);
 }
 
-void OdometryPositionEstimator::GetRawOdometryVelocity( const int32_t leftWheelCount, const int32_t rightWheelCount, double timeInterval, double& linearV, double& angularV)
+void OdometryPositionEstimator::GetRawOdometryVelocity( const float leftWheelRPM, const float rightWheelRPM, double& linearV, double& angularV)
 {
 	// Calculate left and right wheel velocity
-	double leftWheelVelocity = (double)leftWheelCount / timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * leftWheelRadius_ * 2 * M_PI;
-	double rightWheelVelocity = (double)rightWheelCount / timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * rightWheelRadius_ * 2 * M_PI;
+	//double leftWheelVelocity = (double)leftWheelRPM / timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * leftWheelRadius_ * 2 * M_PI;
+	//double rightWheelVelocity = (double)rightWheelRPM / timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * rightWheelRadius_ * 2 * M_PI;
+
+	double leftWheelVelocity = (double)leftWheelRPM * 2.0 * M_PI * leftWheelRadius_ / 60.0;
+	double rightWheelVelocity = (double)rightWheelRPM * 2.0 * M_PI * rightWheelRadius_ / 60.0;
 
 	// Calculate v and w
-	linearV = ( rightWheelVelocity + leftWheelVelocity ) / 2;
+	linearV = ( rightWheelVelocity + leftWheelVelocity ) / 2.0;
 	angularV = ( rightWheelVelocity - leftWheelVelocity ) / wheelbaseLength_ ;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -211,8 +214,8 @@ void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)
 
 void OdometryPositionEstimator::cfgCallback(srsnode_odometry::RobotSetupConfig &config, uint32_t level)
 {
-	motorCountPerRev_ = config.motor_count_per_rev;
-	gearboxRatio_ = config.gearbox_ratio;
+	//motorCountPerRev_ = config.motor_count_per_rev;
+	//gearboxRatio_ = config.gearbox_ratio;
 	wheelbaseLength_ = config.robot_wheelbase_length;
 	leftWheelRadius_ = config.robot_leftwheel_radius;
 	rightWheelRadius_ = config.robot_rightwheel_radius;

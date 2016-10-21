@@ -37,6 +37,7 @@ set(${PROJECT_NAME}_MSGS
     SensorFrame.msg
     Velocity.msg
     Odometry.msg
+    OdometryRPM.msg
 )
 
 set(${PROJECT_NAME}_SRVS

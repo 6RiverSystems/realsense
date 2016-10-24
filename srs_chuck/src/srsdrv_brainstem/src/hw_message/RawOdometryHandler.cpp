@@ -5,9 +5,7 @@
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/math/TimeMath.hpp>
-#include <srslib_framework/math/VelocityMath.hpp>
 #include <srslib_framework/ros/message/VelocityMessageFactory.hpp>
-#include <srslib_framework/ros/message/ImuMessageFactory.hpp>
 
 namespace srs {
 
@@ -18,8 +16,8 @@ const string RawOdometryHandler::TOPIC_RAW_ODOMETRY = "/internal/sensors/odometr
 
 RawOdometryHandler::RawOdometryHandler() :
     BrainstemMessageHandler(RAW_ODOMETRY_KEY),
-    lastHwSensorFrameTime_(0),
-    lastRosSensorFrameTime_(ros::Time::now())
+    lastHwOdometryTime_(0),
+    lastRosOdometryTime_(ros::Time::now())
 {
 	pubOdometry_ = rosNodeHandle_.advertise<srslib_framework::OdometryRPM>(
 		TOPIC_RAW_ODOMETRY , 100);
@@ -32,14 +30,14 @@ void RawOdometryHandler::receiveData(ros::Time currentTime, vector<char>& buffer
 
 	ros::Time internalTime = currentTime;
 	bool timeSliceExpired = TimeMath::isTimeElapsed(OUT_OF_SYNC_TIMEOUT,
-	        lastRosSensorFrameTime_, internalTime);
+			lastRosOdometryTime_, internalTime);
 
 	if (timeSliceExpired)
 	{
 	    ROS_ERROR_STREAM_NAMED("odometry_frame",
 	        "Time-stamp out of range: " <<
-	        "diff: " << (internalTime.toSec() - lastRosSensorFrameTime_.toSec()) <<
-	        " last: " << lastRosSensorFrameTime_.toSec() <<
+	        " diff: " << (internalTime.toSec() - lastRosOdometryTime_.toSec()) <<
+	        " last: " << lastRosOdometryTime_.toSec() <<
 	        " current: " << internalTime.toSec());
 	}
 
@@ -62,13 +60,13 @@ void RawOdometryHandler::receiveData(ros::Time currentTime, vector<char>& buffer
 	    // ROS time of the last sensor frame plus the difference between
 	    // the two hardware time-stamps
 	    double deltaTimeSlice = (static_cast<double>(odometryRPMData->timestamp) -
-	        lastHwSensorFrameTime_) / 1000.0;
+	        lastHwOdometryTime_) / 1000.0;
 
-	    internalTime = lastRosSensorFrameTime_+ ros::Duration(deltaTimeSlice);
+	    internalTime = lastRosOdometryTime_+ ros::Duration(deltaTimeSlice);
 	}
 
-	lastRosSensorFrameTime_ = internalTime;
-	lastHwSensorFrameTime_ = static_cast<double>(odometryRPMData->timestamp);
+	lastRosOdometryTime_ = internalTime;
+	lastHwOdometryTime_ = static_cast<double>(odometryRPMData->timestamp);
 
 	publishOdometry(odometryRPMData->rpm_left_wheel, odometryRPMData->rpm_right_wheel);
 }
@@ -79,7 +77,7 @@ void RawOdometryHandler::receiveData(ros::Time currentTime, vector<char>& buffer
 void RawOdometryHandler::publishOdometry(float leftWheelRPM, float rightWheelRPM)
 {
 	srslib_framework::OdometryRPM message;
-	message.header.stamp = lastRosSensorFrameTime_;
+	message.header.stamp = lastRosOdometryTime_;
 
 	message.left_wheel_rpm = leftWheelRPM;
 	message.right_wheel_rpm = rightWheelRPM;

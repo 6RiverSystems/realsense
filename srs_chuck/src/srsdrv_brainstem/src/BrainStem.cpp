@@ -225,7 +225,20 @@ void BrainStem::OnPing( )
 
 void BrainStem::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity )
 {
-	m_messageProcessor.SetVelocity( velocity->linear.x, velocity->angular.z );
+	double rightWheelRadius = 0.0;
+	double leftWheelRadius = 0.0;
+	double wheelbaseLength = 0.0;
+	m_rosNodeHandle.getParam("/srsnode_odometry/robot_leftwheel_radius", leftWheelRadius);
+	m_rosNodeHandle.getParam("/srsnode_odometry/robot_rightwheel_radius", rightWheelRadius);
+	m_rosNodeHandle.getParam("/srsnode_odometry/robot_wheelbase_length", wheelbaseLength);
+
+	double leftMotorSpeed = velocity->linear.x - ((wheelbaseLength / 2) * velocity->angular.z);
+	double rightMotorSpeed = velocity->linear.x + ((wheelbaseLength / 2) * velocity->angular.z);
+
+	double leftMotorSpeedRPM = leftMotorSpeed * 60.0 / 2.0 / M_PI / leftWheelRadius;
+	double rightMotorSpeedRPM = rightMotorSpeed * 60.0 / 2.0 / M_PI / rightWheelRadius;
+
+	m_messageProcessor.SetRPM( leftMotorSpeedRPM, rightMotorSpeedRPM );
 }
 
 void BrainStem::OnRosCallback(const std_msgs::String::ConstPtr& msg)

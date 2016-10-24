@@ -177,7 +177,6 @@ struct ODOMETRY_DATA
 struct ODOMETRY_RPM_DATA
 {
 	uint8_t		cmd;
-	uint32_t	timestamp;
 	float		left_wheel_rpm;
 	float		right_wheel_rpm;
 };

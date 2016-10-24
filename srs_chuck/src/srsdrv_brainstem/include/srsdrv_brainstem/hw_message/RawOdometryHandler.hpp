@@ -42,8 +42,9 @@ private:
 
     ros::Publisher pubOdometry_;
 
-    double lastHwSensorFrameTime_;
-    ros::Time lastRosSensorFrameTime_;
+    double lastHwOdometryTime_;
+
+    ros::Time lastRosOdometryTime_;
 };
 
 } // namespace srs

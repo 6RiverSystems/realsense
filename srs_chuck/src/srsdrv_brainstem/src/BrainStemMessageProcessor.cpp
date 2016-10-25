@@ -243,7 +243,7 @@ void BrainStemMessageProcessor::SetRPM( double leftWheelRPM, double rightWheelRP
 		s_rightWheelRPM = rightWheelRPM;
 	}
 
-	// Send the velocity down to the motors
+	// Send the RPM down to the motors
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 

@@ -16,7 +16,7 @@ OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	pose_(-1.0, -1.0, -1.0),
 	pingTimer_(),
 	broadcaster_(),
-	rawOdometryCountSub_(),
+	rawOdometryRPMSub_(),
 	odometryPosePub_(),
 	pingPub_(),
 	wheelbaseLength_(0.5235),
@@ -48,7 +48,7 @@ void OdometryPositionEstimator::run()
 
 void OdometryPositionEstimator::connect()
 {
-	rawOdometryCountSub_ = nodeHandle_.subscribe<srslib_framework::OdometryRPM>(ODOMETRY_RAW_RPM_TOPIC, 10,
+	rawOdometryRPMSub_ = nodeHandle_.subscribe<srslib_framework::OdometryRPM>(ODOMETRY_RAW_RPM_TOPIC, 10,
 		std::bind( &OdometryPositionEstimator::RawRPMToVelocity, this, std::placeholders::_1 ));
 
 	resetPoseSub_ = nodeHandle_.subscribe<geometry_msgs::PoseWithCovarianceStamped>(INITIAL_POSE_TOPIC, 1,

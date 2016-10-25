@@ -53,7 +53,8 @@ private:
 
     static constexpr double MAX_ALLOWED_PING_DELAY = 0.5; // 50% of the duty cycle
 
-	static constexpr auto ODOMETRY_RAW_RPM_TOPIC = "/internal/sensors/odometry/rpm";
+	static constexpr auto ODOMETRY_RAW_RPM_TOPIC = "/internal/sensors/odometry/raw";
+
 	//static constexpr auto ODOMETRY_RAW_COUNT_TOPIC = "/internal/sensors/odometry/count";
 
 	static constexpr auto ODOMETRY_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity";
@@ -70,7 +71,7 @@ private:
 
 	dynamic_reconfigure::Server<srsnode_odometry::RobotSetupConfig> configServer_;
 
-	ros::Subscriber rawOdometryCountSub_;
+	ros::Subscriber rawOdometryRPMSub_;
 
 	ros::Subscriber resetPoseSub_;
 

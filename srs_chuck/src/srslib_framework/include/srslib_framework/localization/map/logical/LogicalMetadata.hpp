@@ -5,6 +5,8 @@
  */
 #pragma once
 
+#include <srslib_framework/math/BasicMath.hpp>
+#include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
@@ -24,6 +26,18 @@ public:
         resolution(0.0),
         logicalFilename("")
     {}
+
+    friend bool operator==(const LogicalMetadata& lhs, const LogicalMetadata& rhs)
+    {
+        return lhs.heightCells == rhs.heightCells &&
+            BasicMath::equal(lhs.heightM, rhs.heightM, 0.001) &&
+            BasicMath::equal(lhs.loadTime, rhs.loadTime, 1e-10) &&
+            lhs.logicalFilename == rhs.logicalFilename &&
+            PoseMath::equal(lhs.origin, rhs.origin) &&
+            BasicMath::equal(lhs.resolution, rhs.resolution, 0.001) &&
+            lhs.widthCells == rhs.widthCells &&
+            BasicMath::equal(lhs.widthM, rhs.widthM, 0.001);
+    }
 
     int heightCells;
     double heightM;

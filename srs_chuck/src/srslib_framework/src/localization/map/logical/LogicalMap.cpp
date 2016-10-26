@@ -32,13 +32,44 @@ LogicalMap::LogicalMap(Grid2d* grid, double resolution) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::maxCost(unsigned int c, unsigned int r, int cost)
+LogicalMap::LogicalMap(LogicalMetadata metadata) :
+    BaseMap(metadata.widthM, metadata.heightM, metadata.resolution)
+{
+    logicalMetadata_.heightCells = getHeightCells();
+    logicalMetadata_.heightM = getHeightM();
+    logicalMetadata_.resolution = getResolution();
+    logicalMetadata_.widthCells = getWidthCells();
+    logicalMetadata_.widthM = getWidthM();
+
+    logicalMetadata_.loadTime = metadata.loadTime;
+    logicalMetadata_.logicalFilename = metadata.logicalFilename;
+    logicalMetadata_.origin = metadata.origin;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMap::maxCost(unsigned int c, unsigned int r, Grid2d::BaseType cost)
 {
     getGrid()->maxOnPayload(Grid2d::Location(c, r), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::setCost(unsigned int c, unsigned int r, int cost)
+ostream& operator<<(ostream& stream, const LogicalMap& map)
+{
+    stream << "LogicalMap" << endl;
+    stream << *map.getGrid() << endl;
+
+    return stream;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+bool operator==(const LogicalMap& lhs, const LogicalMap& rhs)
+{
+    return lhs.logicalMetadata_ == rhs.logicalMetadata_ &&
+        operator==(static_cast<const BaseMap&>(lhs), static_cast<const BaseMap&>(rhs));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMap::setCost(unsigned int c, unsigned int r, Grid2d::BaseType cost)
 {
     getGrid()->setPayload(Grid2d::Location(c, r), cost);
 }
@@ -51,7 +82,10 @@ void LogicalMap::setObstruction(unsigned int c, unsigned int r)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::setWeights(unsigned int c, unsigned int r,
-    int north, int east, int south, int west)
+    Grid2d::BaseType north,
+    Grid2d::BaseType east,
+    Grid2d::BaseType south,
+    Grid2d::BaseType west)
 {
     getGrid()->setWeights(Grid2d::Location(c, r), north, east, south, west);
 }
@@ -59,17 +93,5 @@ void LogicalMap::setWeights(unsigned int c, unsigned int r,
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 //
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// Global operators
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-ostream& operator<<(ostream& stream, const LogicalMap& map)
-{
-    stream << "LogicalMap" << endl;
-    stream << *map.getGrid() << endl;
-
-    return stream;
-}
 
 } // namespace srs

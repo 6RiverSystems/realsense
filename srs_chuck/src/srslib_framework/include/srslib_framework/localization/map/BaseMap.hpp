@@ -24,7 +24,7 @@ public:
     BaseMap(Grid2d* grid, double resolution);
     virtual ~BaseMap();
 
-    virtual int getCost(unsigned int c, unsigned int r) const = 0;
+    virtual Grid2d::BaseType getCost(unsigned int c, unsigned int r) const = 0;
 
     int getHeightCells() const
     {
@@ -56,9 +56,22 @@ public:
         return widthM_;
     }
 
-    virtual void maxCost(unsigned int c, unsigned int r, int cost) = 0;
+    bool isWithinBounds(unsigned int c, unsigned int r) const
+    {
+        Grid2d::Location location(c, r);
+        return grid_->isWithinBounds(location);
+    }
 
-    virtual void setCost(unsigned int c, unsigned int r, int cost) = 0;
+    virtual void maxCost(unsigned int c, unsigned int r, Grid2d::BaseType cost) = 0;
+
+    friend bool operator==(const BaseMap& lhs, const BaseMap& rhs);
+
+    friend bool operator!=(const BaseMap& lhs, const BaseMap& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    virtual void setCost(unsigned int c, unsigned int r, Grid2d::BaseType cost) = 0;
     virtual void setObstruction(unsigned int c, unsigned int r) = 0;
 
     void transformCells2M(unsigned int cells, double& measurement)

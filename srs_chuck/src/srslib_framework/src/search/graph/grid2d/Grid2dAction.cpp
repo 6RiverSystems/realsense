@@ -24,19 +24,19 @@ const int Grid2dAction::COMMAND_COSTS[] = {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2dAction::ActionResultType Grid2dAction::execute(Grid2d* graph,
-    Grid2dNode* fromNode, ActionEnum action)
+bool Grid2dAction::execute(Grid2d* graph, Grid2dNode* fromNode, ActionEnum action,
+    ActionResultType& result)
 {
     switch (action)
     {
-        case FORWARD: return addForward(graph, fromNode);
-        case BACKWARD: return addBackward(graph, fromNode);
-        case ROTATE_N90: return addRotation(graph, fromNode, ROTATE_N90, -90);
-        case ROTATE_P90: return addRotation(graph, fromNode, ROTATE_P90, +90);
-        case ROTATE_180: return addRotation(graph, fromNode, ROTATE_180, +180);
+        case FORWARD: return addForward(graph, fromNode, result);
+        case BACKWARD: return addBackward(graph, fromNode, result);
+        case ROTATE_N90: return addRotation(graph, fromNode, ROTATE_N90, -90, result);
+        case ROTATE_P90: return addRotation(graph, fromNode, ROTATE_P90, +90, result);
+        case ROTATE_180: return addRotation(graph, fromNode, ROTATE_180, +180, result);
     }
 
-    return ActionResultType(Grid2dPosition(0, 0), Grid2d::PAYLOAD_MAX);
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,7 +54,8 @@ unordered_map<int, string> Grid2dAction::ENUM_NAMES = {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2dAction::ActionResultType Grid2dAction::addBackward(Grid2d* graph, Grid2dNode* fromNode)
+bool Grid2dAction::addBackward(Grid2d* graph, Grid2dNode* fromNode,
+    ActionResultType& result)
 {
     Grid2d::Location neighbor;
     Grid2dPosition position = fromNode->getPosition();
@@ -69,22 +70,24 @@ Grid2dAction::ActionResultType Grid2dAction::addBackward(Grid2d* graph, Grid2dNo
         int cost = fromNode->getTotalCost();
 
         // Add the cost of the command
-        cost = BasicMath::noOverflowAdd(cost, COMMAND_COSTS[Grid2dAction::BACKWARD]);
+        cost += COMMAND_COSTS[Grid2dAction::BACKWARD];
 
         // Add the weight between the parent node and the new location
-        cost = BasicMath::noOverflowAdd(cost, graph->getWeight(currentLocation, directionMovement));
+        cost += graph->getWeight(currentLocation, directionMovement);
 
         // Add the cost of the new location
-        cost = BasicMath::noOverflowAdd(cost, graph->getAggregate(neighbor));
+        cost += cost, graph->getAggregate(neighbor);
 
-        return ActionResultType(Grid2dPosition(neighbor, currentOrientation), cost);
+        result = ActionResultType(Grid2dPosition(neighbor, currentOrientation), cost);
+        return true;
     }
 
-    return ActionResultType(Grid2dPosition(0, 0), Grid2d::PAYLOAD_MAX);
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2dAction::ActionResultType Grid2dAction::addForward(Grid2d* graph, Grid2dNode* fromNode)
+bool Grid2dAction::addForward(Grid2d* graph, Grid2dNode* fromNode,
+    ActionResultType& result)
 {
     Grid2d::Location neighbor;
     Grid2dPosition position = fromNode->getPosition();
@@ -98,23 +101,24 @@ Grid2dAction::ActionResultType Grid2dAction::addForward(Grid2d* graph, Grid2dNod
         int cost = fromNode->getG();
 
         // Add the cost of the command
-        cost = BasicMath::noOverflowAdd(cost, COMMAND_COSTS[Grid2dAction::FORWARD]);
+        cost += COMMAND_COSTS[Grid2dAction::FORWARD];
 
         // Add the weight between the parent node and the new location
-        cost = BasicMath::noOverflowAdd(cost, graph->getWeight(currentLocation, currentOrientation));
+        cost += graph->getWeight(currentLocation, currentOrientation);
 
         // Add the cost of the new location
-        cost = BasicMath::noOverflowAdd(cost, graph->getAggregate(neighbor));
+        cost += graph->getAggregate(neighbor);
 
-        return ActionResultType(Grid2dPosition(neighbor, currentOrientation), cost);
+        result = ActionResultType(Grid2dPosition(neighbor, currentOrientation), cost);
+        return true;
     }
 
-    return ActionResultType(Grid2dPosition(0, 0), Grid2d::PAYLOAD_MAX);
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2dAction::ActionResultType Grid2dAction::addRotation(Grid2d* graph,
-    Grid2dNode* fromNode, ActionEnum action, int angle)
+bool Grid2dAction::addRotation(Grid2d* graph, Grid2dNode* fromNode, ActionEnum action, int angle,
+    ActionResultType& result)
 {
     Grid2dPosition position = fromNode->getPosition();
 
@@ -126,9 +130,10 @@ Grid2dAction::ActionResultType Grid2dAction::addRotation(Grid2d* graph,
     int cost = fromNode->getTotalCost();
 
     // Add the cost of the command
-    cost = BasicMath::noOverflowAdd(cost, COMMAND_COSTS[action]);
+    cost += COMMAND_COSTS[action];
 
-    return ActionResultType(Grid2dPosition(currentLocation, newOrientation), cost);
+    result = ActionResultType(Grid2dPosition(currentLocation, newOrientation), cost);
+    return true;
 }
 
 } // namespace srs

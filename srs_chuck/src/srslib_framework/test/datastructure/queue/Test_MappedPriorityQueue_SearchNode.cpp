@@ -47,10 +47,10 @@ TEST(Test_MappedPriorityQueue, UserDefinedKey)
     queue.push(150, node3);
     queue.push(115, node2);
 
-    ROS_DEBUG_STREAM(queue);
+    cout << queue << endl;
 
     SearchNodeType* item;
     queue.pop(item);
 
-    ROS_DEBUG_STREAM(queue);
+    cout << queue << endl;
 }

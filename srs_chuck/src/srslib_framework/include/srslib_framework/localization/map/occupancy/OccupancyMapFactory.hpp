@@ -20,13 +20,21 @@ namespace srs {
 
 struct OccupancyMapFactory
 {
-    static OccupancyMap* fromMetadata(OccupancyMetadata metadata);
-    static OccupancyMap* fromRosCostMap2D(costmap_2d::Costmap2DROS* rosCostMap,
+    OccupancyMapFactory() :
+        map_(nullptr),
+        metadata_()
+    {}
+
+    OccupancyMap* fromMetadata(OccupancyMetadata metadata);
+    OccupancyMap* fromRosCostMap2D(costmap_2d::Costmap2DROS* rosCostMap,
         double freeThreshold, double occupiedThreshold);
 
 private:
-    static void extract1Channel(SDL_Surface* image, OccupancyMap* map);
-    static void extract3Channel(SDL_Surface* image, OccupancyMap* map);
+    void extract1Channel(SDL_Surface* image);
+    void extract3Channel(SDL_Surface* image);
+
+    OccupancyMetadata metadata_;
+    OccupancyMap* map_;
 };
 
 } // namespace srs

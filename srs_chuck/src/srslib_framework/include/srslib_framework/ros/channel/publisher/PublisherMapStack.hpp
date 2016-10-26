@@ -11,7 +11,7 @@ using namespace std;
 #include <srslib_framework/MapStack.h>
 
 #include <srslib_framework/localization/map/MapStack.hpp>
-#include <srslib_framework/ros/message/MapMessageFactory.hpp>
+#include <srslib_framework/ros/message/MapStackMessageFactory.hpp>
 #include <srslib_framework/ros/channel/publisher/RosPublisher.hpp>
 
 namespace srs {
@@ -29,7 +29,7 @@ public:
 
     srslib_framework::MapStack convertData(const MapStack* data)
     {
-        return MapMessageFactory::mapStack2Msg(data);
+        return MapStackMessageFactory::mapStack2Msg(data);
     }
 };
 

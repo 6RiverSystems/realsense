@@ -63,7 +63,7 @@ TEST(Test_AStar, ForbiddenGoal)
     ASSERT_EQ(0, algorithm.getOpenNodeCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(20, algorithm.getClosedNodeCount()) <<
+    ASSERT_EQ(25, algorithm.getClosedNodeCount()) <<
         "Unexpected number of closed nodes";
 }
 
@@ -86,6 +86,6 @@ TEST(Test_AStar, UnreachableGoal)
     ASSERT_EQ(0, algorithm.getOpenNodeCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(40, algorithm.getClosedNodeCount()) <<
+    ASSERT_EQ(45, algorithm.getClosedNodeCount()) <<
         "Unexpected number of closed nodes";
 }

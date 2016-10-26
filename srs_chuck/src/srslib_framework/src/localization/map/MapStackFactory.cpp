@@ -79,10 +79,8 @@ LogicalMap* MapStackFactory::analizeLogicalNode(string localDirectory, string js
         throw YamlTagException(jsonFilename, TAG_LOGICAL_MAP);
     }
 
-    LogicalMap* logicalMap = LogicalMapFactory::fromJsonFile(logicalMapFilename);
-    logicalMap->setLoadTime(loadTime);
-
-    return logicalMap;
+    LogicalMapFactory logicalMapFactory;
+    return logicalMapFactory.fromJsonFile(logicalMapFilename, loadTime);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -169,7 +167,8 @@ OccupancyMap* MapStackFactory::analizeOccupancyNode(string localDirectory, strin
         throw YamlTagException(jsonFilename, TAG_OCCUPANCY_IMAGE);
     }
 
-    return OccupancyMapFactory::fromMetadata(metadata);
+    OccupancyMapFactory occupancyMapFactory;
+    return occupancyMapFactory.fromMetadata(metadata);
 }
 
 } // namespace srs

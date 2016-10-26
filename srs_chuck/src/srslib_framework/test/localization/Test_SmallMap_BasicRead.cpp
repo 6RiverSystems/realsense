@@ -10,16 +10,19 @@ using namespace std;
 
 #include <ros/ros.h>
 
+#include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMap.hpp>
-#include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
+#include <srslib_framework/localization/map/occupancy/OccupancyMap.hpp>
 
 using namespace srs;
 
 TEST(Test_SmallMap, BasicRead)
 {
-    LogicalMap* logical = LogicalMapFactory::fromJsonFile("data/small-map/small-map-logical.geojson");
+    MapStack* stack = MapStackFactory::fromJsonFile("data/small-map/small-map.yaml", 0);
 
-    cout << *logical << endl;
+    LogicalMap* logical = stack->getLogicalMap();
+    OccupancyMap* occupancy = stack->getOccupancyMap();
 
     ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(0, 0)) <<
         "The cost is not as expected";
@@ -57,11 +60,11 @@ TEST(Test_SmallMap, BasicRead)
 
     ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getWeights(25, 25, Grid2d::ORIENTATION_NORTH)) <<
         "The cost of the weight is not as expected";
-    ASSERT_EQ(333, logical->getWeights(25, 25, Grid2d::ORIENTATION_EAST)) <<
+    ASSERT_EQ(34, logical->getWeights(25, 25, Grid2d::ORIENTATION_EAST)) <<
         "The cost of the weight is not as expected";
-    ASSERT_EQ(222, logical->getWeights(25, 25, Grid2d::ORIENTATION_SOUTH)) <<
+    ASSERT_EQ(23, logical->getWeights(25, 25, Grid2d::ORIENTATION_SOUTH)) <<
         "The cost of the weight is not as expected";
-    ASSERT_EQ(111, logical->getWeights(25, 25, Grid2d::ORIENTATION_WEST)) <<
+    ASSERT_EQ(12, logical->getWeights(25, 25, Grid2d::ORIENTATION_WEST)) <<
         "The cost of the weight is not as expected";
 
     ASSERT_EQ(11, logical->getWeights(15, 15, Grid2d::ORIENTATION_NORTH)) <<
@@ -97,14 +100,14 @@ TEST(Test_SmallMap, BasicRead)
     ASSERT_EQ(33, logical->getWeights(19, 15, Grid2d::ORIENTATION_SOUTH)) <<
         "The cost of the weight is not as expected";
 
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getWeights(15, 15, Grid2d::ORIENTATION_WEST)) <<
+    ASSERT_EQ(Grid2d::WEIGHT_MAX, logical->getWeights(15, 15, Grid2d::ORIENTATION_WEST)) <<
         "The cost of the weight is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getWeights(16, 15, Grid2d::ORIENTATION_WEST)) <<
+    ASSERT_EQ(Grid2d::WEIGHT_MAX, logical->getWeights(16, 15, Grid2d::ORIENTATION_WEST)) <<
         "The cost of the weight is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getWeights(17, 15, Grid2d::ORIENTATION_WEST)) <<
+    ASSERT_EQ(Grid2d::WEIGHT_MAX, logical->getWeights(17, 15, Grid2d::ORIENTATION_WEST)) <<
         "The cost of the weight is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getWeights(18, 15, Grid2d::ORIENTATION_WEST)) <<
+    ASSERT_EQ(Grid2d::WEIGHT_MAX, logical->getWeights(18, 15, Grid2d::ORIENTATION_WEST)) <<
         "The cost of the weight is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getWeights(19, 15, Grid2d::ORIENTATION_WEST)) <<
+    ASSERT_EQ(Grid2d::WEIGHT_MAX, logical->getWeights(19, 15, Grid2d::ORIENTATION_WEST)) <<
         "The cost of the weight is not as expected";
 }

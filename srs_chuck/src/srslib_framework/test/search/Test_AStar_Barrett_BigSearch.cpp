@@ -42,10 +42,10 @@ TEST(Test_AStar, Barrett_BigSearch)
     ASSERT_TRUE(algorithm->search(start, goal)) <<
         "A solution was not found";
 
-    ASSERT_EQ(31189, algorithm->getOpenNodeCount()) <<
+    ASSERT_EQ(1785, algorithm->getOpenNodeCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(27734, algorithm->getClosedNodeCount()) <<
+    ASSERT_EQ(1153, algorithm->getClosedNodeCount()) <<
         "Unexpected number of closed nodes";
 
     algorithm->clear();

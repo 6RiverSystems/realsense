@@ -47,6 +47,11 @@ struct Grid2dSolutionItem
 
     friend bool operator==(const Grid2dSolutionItem& lhs, const Grid2dSolutionItem& rhs)
     {
+        if (&lhs == &rhs)
+        {
+            return true;
+        }
+
         return lhs.actionType == rhs.actionType &&
             PoseMath::equal(lhs.fromPose, rhs.fromPose) &&
             PoseMath::equal(lhs.toPose, rhs.toPose) &&

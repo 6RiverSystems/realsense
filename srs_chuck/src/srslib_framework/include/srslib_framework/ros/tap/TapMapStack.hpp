@@ -13,7 +13,7 @@ using namespace std;
 
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/ros/tap/subscriber/RosSubscriberSingleData.hpp>
-#include <srslib_framework/ros/message/MapMessageFactory.hpp>
+#include <srslib_framework/ros/message/MapStackMessageFactory.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
@@ -37,7 +37,7 @@ public:
         delete pop();
 
         // Create a new Map stack from the message
-        set(MapMessageFactory::msg2MapStack(message));
+        set(MapStackMessageFactory::msg2MapStack(message));
     }
 
     void reset()

@@ -29,6 +29,11 @@ struct Node
 
     bool operator==(const Node<T> &other) const
     {
+        if (this == &other)
+        {
+            return true;
+        }
+
         return a == other.a && b == other.b;
     }
 };

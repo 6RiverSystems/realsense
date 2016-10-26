@@ -54,6 +54,25 @@ struct PoseMessageFactory
     /**
      * @brief Convert a Pose type into a Pose.
      *
+     * @param message Pose to convert
+     *
+     * @return Pose generated from the specified Pose
+     */
+    static Pose<> msg2Pose(const geometry_msgs::Pose& message)
+    {
+        Pose<> pose;
+
+        pose.arrivalTime = 0;
+        pose.x = message.position.x;
+        pose.y = message.position.y;
+        pose.theta = tf::getYaw(message.orientation);
+
+        return pose;
+    }
+
+    /**
+     * @brief Convert a Pose type into a Pose.
+     *
      * @param pose Pose to convert
      * @param timestamp ROS time stamp for the message
      *

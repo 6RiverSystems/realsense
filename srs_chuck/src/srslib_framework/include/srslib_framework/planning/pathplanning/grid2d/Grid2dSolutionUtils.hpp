@@ -17,7 +17,7 @@ namespace srs {
 
 struct Grid2dSolutionUtils
 {
-    static double getTotalCost(Solution<Grid2dSolutionItem>& solution);
+    static int getTotalCost(Solution<Grid2dSolutionItem>& solution);
     static vector<Solution<Grid2dSolutionItem>*> splitSolution(Solution<Grid2dSolutionItem>& solution);
 };
 

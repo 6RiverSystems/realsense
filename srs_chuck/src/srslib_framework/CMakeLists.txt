@@ -26,10 +26,12 @@ set(${PROJECT_NAME}_SOURCES
     src/localization/map/logical/LogicalMapFactory.cpp
     src/localization/map/occupancy/OccupancyMap.cpp
     src/localization/map/occupancy/OccupancyMapFactory.cpp
-    src/localization/map/occupancy/OccupancyMapUtils.cpp
 
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp
+
+    src/ros/message/LogicalMapMessageFactory.cpp
+    src/ros/message/OccupancyMapMessageFactory.cpp
 
     src/search/AStar.cpp
     src/search/graph/grid2d/Grid2dAction.cpp
@@ -42,6 +44,7 @@ set(${PROJECT_NAME}_SOURCES
 set(${PROJECT_NAME}_MSGS
     Imu.msg
     JoypadState.msg
+    LogicalCell.msg
     LogicalMap.msg
     LogicalMetadata.msg
     MapStack.msg
@@ -72,9 +75,10 @@ set(TEST_SOURCES_FILTER
 )
 
 set(TEST_SOURCES_LOCALIZATION
-    test/localization/map/Test_Empty_BasicRead.cpp
-#    test/localization/Test_Map_Reconstruction.cpp
-    test/localization/map/logical/Test_SmallMap_BasicRead.cpp
+    test/localization/Test_Empty_BasicRead.cpp
+    test/localization/Test_Map_Reconstruction.cpp
+    test/localization/Test_MicroMap_BasicRead.cpp
+    test/localization/Test_SmallMap_BasicRead.cpp
 )
 
 set(TEST_SOURCES_MATH

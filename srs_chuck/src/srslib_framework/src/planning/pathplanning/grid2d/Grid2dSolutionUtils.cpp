@@ -6,7 +6,7 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-double Grid2dSolutionUtils::getTotalCost(Solution<Grid2dSolutionItem>& solution)
+int Grid2dSolutionUtils::getTotalCost(Solution<Grid2dSolutionItem>& solution)
 {
     return solution.getGoal().cost;
 }

@@ -4,6 +4,9 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 
-srslib_framework/LogicalMetadata metadata
+int32 cost
 
-srslib_framework/LogicalCell[] data
+int32 north
+int32 east
+int32 south
+int32 west

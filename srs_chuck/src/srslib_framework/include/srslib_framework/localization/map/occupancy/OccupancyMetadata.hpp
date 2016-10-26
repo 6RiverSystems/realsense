@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
@@ -28,7 +29,22 @@ public:
         negate(false)
     {}
 
-    int heightCells;
+    friend bool operator==(const OccupancyMetadata& lhs, const OccupancyMetadata& rhs)
+    {
+        return lhs.heightCells == rhs.heightCells &&
+            BasicMath::equal(lhs.heightM, rhs.heightM, 0.001) &&
+            BasicMath::equal(lhs.loadTime, rhs.loadTime, 1e-10) &&
+            lhs.negate == rhs.negate &&
+            lhs.occupancyFilename == rhs.occupancyFilename &&
+            PoseMath::equal(lhs.origin, rhs.origin) &&
+            BasicMath::equal(lhs.resolution, rhs.resolution, 0.001) &&
+            BasicMath::equal(lhs.thresholdFree, rhs.thresholdFree, 0.001) &&
+            BasicMath::equal(lhs.thresholdOccupied, rhs.thresholdOccupied, 0.001) &&
+            lhs.widthCells == rhs.widthCells &&
+            BasicMath::equal(lhs.widthM, rhs.widthM, 0.001);
+    }
+
+    unsigned int heightCells;
     double heightM;
 
     double loadTime;
@@ -43,7 +59,7 @@ public:
     double thresholdFree;
     double thresholdOccupied;
 
-    int widthCells;
+    unsigned int widthCells;
     double widthM;
 };
 

@@ -119,6 +119,13 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
         // from the current node
         currentNode->getNeighbors(nextSearchNodes);
 
+//        cout << "NEXT ------------------------------------------------------------------------------------------" << endl;
+//        for (auto node : nextSearchNodes)
+//        {
+//            cout << *node << endl;
+//        }
+//        cout << "-----------------------------------------------------------------------------------------------" << endl;
+
         // Try to push the neighbors in the open queue
         pushNodes(nextSearchNodes);
     }
@@ -132,13 +139,6 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void AStar::pushNodes(vector<SearchNode*>& nodes)
 {
-//    cout << "NEXT ------------------------------------------------------------------------------------------" << endl;
-//    for (auto node : nodes)
-//    {
-//        cout << *node << endl;
-//    }
-//    cout << "-----------------------------------------------------------------------------------------------" << endl;
-//
 //    cout << "OPEN ------------------------------------------------------------------------------------------" << endl;
 //    cout << open_ << endl << endl;
 //    cout << "-----------------------------------------------------------------------------------------------" << endl;

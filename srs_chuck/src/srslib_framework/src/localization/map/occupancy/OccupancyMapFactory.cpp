@@ -16,6 +16,9 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 OccupancyMap* OccupancyMapFactory::fromMetadata(OccupancyMetadata metadata)
 {
+    map_ = nullptr;
+    metadata_ = metadata;
+
     SDL_Surface* image = IMG_Load(metadata.occupancyFilename.c_str());
     if (!image)
     {
@@ -23,41 +26,37 @@ OccupancyMap* OccupancyMapFactory::fromMetadata(OccupancyMetadata metadata)
     }
 
     // Copy the image data into the map structure
-    metadata.widthCells = image->w;
-    metadata.heightCells = image->h;
+    metadata_.widthCells = image->w;
+    metadata_.heightCells = image->h;
 
-    OccupancyMap* map = new OccupancyMap(metadata.widthCells, metadata.heightCells, metadata.resolution);
-
-    map->setLoadTime(metadata.loadTime);
-    map->setNegate(metadata.negate);
-    map->setOccupancyFilename(metadata.occupancyFilename);
-    map->setOrigin(metadata.origin);
-    map->setThresholds(metadata.thresholdFree, metadata.thresholdOccupied);
+    map_ = new OccupancyMap(metadata_);
 
     int channels = image->format->BytesPerPixel;
     switch (channels)
     {
         case 1:
-            extract1Channel(image, map);
+            extract1Channel(image);
             break;
 
         case 3:
-            extract3Channel(image, map);
+            extract3Channel(image);
             break;
 
         default:
-            throw InvalidChannelNumberException(metadata.occupancyFilename, channels);
+            throw InvalidChannelNumberException(metadata_.occupancyFilename, channels);
     }
 
     SDL_FreeSurface(image);
 
-    return map;
+    return map_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 OccupancyMap* OccupancyMapFactory::fromRosCostMap2D(costmap_2d::Costmap2DROS* rosCostMap,
     double freeThreshold, double occupiedThreshold)
 {
+    map_ = nullptr;
+
     if (!rosCostMap)
     {
         return nullptr;
@@ -68,73 +67,54 @@ OccupancyMap* OccupancyMapFactory::fromRosCostMap2D(costmap_2d::Costmap2DROS* ro
     unsigned int rows = costMap->getSizeInCellsY();
     unsigned int columns = costMap->getSizeInCellsX();
 
-    OccupancyMap* map = new OccupancyMap(columns, rows, costMap->getResolution());
+    map_ = new OccupancyMap(columns, rows, costMap->getResolution());
+    metadata_ = map_->getMetadata();
 
     for (int row = 0; row < rows; row++)
     {
         for (int col = 0; col < columns; col++)
         {
-            map->setCost(col, row, static_cast<unsigned int>(costMap->getCost(col, row)));
+            map_->setCost(col, row, static_cast<unsigned int>(costMap->getCost(col, row)));
         }
     }
 
-    return map;
+    return map_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void OccupancyMapFactory::extract1Channel(SDL_Surface* image, OccupancyMap* map)
+void OccupancyMapFactory::extract1Channel(SDL_Surface* image)
 {
     const unsigned char maxPixelLevel = numeric_limits<unsigned char>::max();
 
     unsigned char* imagePixels = (unsigned char*)(image->pixels);
     int pitch = image->pitch;
 
-    OccupancyMetadata metadata = map->getMetadata();
-    for (unsigned int row = 0; row < metadata.heightCells; row++)
+    for (unsigned int row = 0; row < metadata_.heightCells; row++)
     {
-        for (unsigned int col = 0; col < metadata.widthCells; col++)
+        for (unsigned int col = 0; col < metadata_.widthCells; col++)
         {
-            // Find the pixel color based on the row, column, and
-            // and pitch
-            unsigned char gray = *(imagePixels + row * pitch + col);
+            // Find the pixel color based on the row, column, and and pitch
+            unsigned char grayLevel = static_cast<unsigned char>(*(imagePixels + row * pitch + col));
 
-            unsigned int cost = static_cast<unsigned int>(
-                metadata.negate ? gray : maxPixelLevel - gray);
-
-            double percentage = cost / 255.0;
-
-            // If the percentage is under the specified threshold
-            // no additional cost is specified
-            cost = percentage < metadata.thresholdFree ?
-                0 : cost;
-
-            // Static obstacles have priority on every other note
-            cost = percentage > metadata.thresholdOccupied ?
-                numeric_limits<unsigned int>::max() : cost;
-
-            // In order to reduce space, the cost is stored only if
-            // different from zero
-            if (cost > 0)
-            {
-                map->setCost(col, metadata.heightCells - row - 1, cost);
-            }
+            // Convert the 8 bit cost into an integer cost and store it
+            Grid2d::BaseType cost = map_->grayLevel2Cost(grayLevel);
+            map_->setCost(col, metadata_.heightCells - row - 1, cost);
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void OccupancyMapFactory::extract3Channel(SDL_Surface* image, OccupancyMap* map)
+void OccupancyMapFactory::extract3Channel(SDL_Surface* image)
 {
     unsigned char* imagePixels = (unsigned char*)(image->pixels);
     int pitch = image->pitch;
 
-    OccupancyMetadata metadata = map->getMetadata();
-    for (unsigned int row = 0; row < metadata.heightCells; row++)
+    for (unsigned int row = 0; row < metadata_.heightCells; row++)
     {
-        for (unsigned int col = 0; col < metadata.widthCells; col++)
+        for (unsigned int col = 0; col < metadata_.widthCells; col++)
         {
             // Find the pixel based on the row, column, and
             // and pitch and number of channels (3)
@@ -152,12 +132,7 @@ void OccupancyMapFactory::extract3Channel(SDL_Surface* image, OccupancyMap* map)
             unsigned int cost = static_cast<unsigned int>(blue);
             cost = red > 0 ? numeric_limits<unsigned int>::max() : cost;
 
-            // In order to reduce space, the cost is stored only if
-            // different from zero
-            if (cost > 0)
-            {
-                map->setCost(col, metadata.heightCells - row - 1, cost);
-            }
+            map_->setCost(col, metadata_.heightCells - row - 1, cost);
         }
     }
 }

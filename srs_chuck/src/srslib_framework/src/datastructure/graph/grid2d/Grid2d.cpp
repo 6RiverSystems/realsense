@@ -1,14 +1,16 @@
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 
+#include <srslib_framework/datastructure/graph/grid2d/OutOfRangeException.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-const int Grid2d::PAYLOAD_MIN = 0;
-const int Grid2d::PAYLOAD_MAX = numeric_limits<int>::max();
-const int Grid2d::WEIGHT_MIN = 0;
-const int Grid2d::WEIGHT_MAX = numeric_limits<int>::max();
+const Grid2d::BaseType Grid2d::PAYLOAD_MIN = 0;
+const Grid2d::BaseType Grid2d::PAYLOAD_MAX = numeric_limits<Grid2d::BaseType>::max();
+const Grid2d::BaseType Grid2d::WEIGHT_MIN = 0;
+const Grid2d::BaseType Grid2d::WEIGHT_MAX = numeric_limits<Grid2d::BaseType>::max();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2d::clear()
@@ -38,7 +40,7 @@ void Grid2d::clear(const Location& location)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-int Grid2d::getAggregate(const Location& location) const
+Grid2d::BaseType Grid2d::getAggregate(const Location& location) const
 {
     Node* node = findNode(location);
     if (node)
@@ -50,7 +52,7 @@ int Grid2d::getAggregate(const Location& location) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-int Grid2d::getPayload(const Location& location) const
+Grid2d::BaseType Grid2d::getPayload(const Location& location) const
 {
     Node* node = findNode(location);
     if (node)
@@ -87,7 +89,7 @@ bool Grid2d::getNeighbor(const Location& location, int orientation, Location& re
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-int Grid2d::getWeight(const Location& location, int orientation) const
+Grid2d::BaseType Grid2d::getWeight(const Location& location, int orientation) const
 {
     if (weightCount_)
     {
@@ -118,10 +120,10 @@ int Grid2d::getWeight(const Location& location, int orientation) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::maxOnPayload(const Location& location, int otherPayload)
+void Grid2d::maxOnPayload(const Location& location, BaseType otherPayload)
 {
     updatePayload(location, otherPayload,
-        [] (int oldPayload, int newPayload) -> int
+        [] (BaseType oldPayload, BaseType newPayload) -> BaseType
         {
             return max(oldPayload, newPayload);
         }
@@ -136,14 +138,14 @@ ostream& operator<<(ostream& stream, const Grid2d& grid)
     stream << "(" << grid.height_ << "x" << grid.width_ << ")" << endl;
 
     grid.printGrid(stream, "Simplified",
-        [] (Grid2d::Node* node) -> int
+        [] (Grid2d::Node* node) -> Grid2d::BaseType
         {
             return node->payload;
         }
     );
 
     grid.print(stream, "Payload",
-        [] (Grid2d::Node* node) -> int
+        [] (Grid2d::Node* node) -> Grid2d::BaseType
         {
             return node->payload;
         }
@@ -152,7 +154,7 @@ ostream& operator<<(ostream& stream, const Grid2d& grid)
     if (grid.aggregate_)
     {
         grid.print(stream, "Aggregate",
-            [] (Grid2d::Node* node) -> int
+            [] (Grid2d::Node* node) -> Grid2d::BaseType
             {
                 return node->aggregate;
             }
@@ -162,28 +164,28 @@ ostream& operator<<(ostream& stream, const Grid2d& grid)
     if (grid.weightCount_)
     {
         grid.print(stream, "North Weights",
-            [] (Grid2d::Node* node) -> int
+            [] (Grid2d::Node* node) -> Grid2d::BaseType
             {
                 return node->weights ? node->weights->north : Grid2d::WEIGHT_MIN;
             }
         );
 
         grid.print(stream, "East Weights",
-            [] (Grid2d::Node* node) -> int
+            [] (Grid2d::Node* node) -> Grid2d::BaseType
             {
                 return node->weights ? node->weights->east : Grid2d::WEIGHT_MIN;
             }
         );
 
         grid.print(stream, "South Weights",
-            [] (Grid2d::Node* node) -> int
+            [] (Grid2d::Node* node) -> Grid2d::BaseType
             {
                 return node->weights ? node->weights->south : Grid2d::WEIGHT_MIN;
             }
         );
 
         grid.print(stream, "West Weights",
-            [] (Grid2d::Node* node) -> int
+            [] (Grid2d::Node* node) -> Grid2d::BaseType
             {
                 return node->weights ? node->weights->west : Grid2d::WEIGHT_MIN;
             }
@@ -193,6 +195,62 @@ ostream& operator<<(ostream& stream, const Grid2d& grid)
     stream << "}";
 
     return stream;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+bool operator==(const Grid2d& lhs, const Grid2d& rhs)
+{
+    // First check addresses
+    if (&lhs == &rhs)
+    {
+        return true;
+    }
+
+    // Check that the dimensions are equal
+    if (lhs.width_ != rhs.width_)
+    {
+        return false;
+    }
+    if (lhs.height_ != rhs.height_)
+    {
+        return false;
+    }
+
+    // Check that the aggregate parameters are equal
+    if (lhs.aggregate_ != rhs.aggregate_)
+    {
+        return false;
+    }
+    if (lhs.aggregateWidth_ != rhs.aggregateWidth_)
+    {
+        return false;
+    }
+    if (lhs.aggregateWidth_ != rhs.aggregateWidth_)
+    {
+        return false;
+    }
+
+    // Check that the grids contain the same number of items
+    if (lhs.getOccupiedCount() != rhs.getOccupiedCount())
+    {
+        return false;
+    }
+    if (lhs.getWeightCount() != rhs.getWeightCount())
+    {
+        return false;
+    }
+
+    // Check that the grids contain the same items
+    for (auto it : lhs.grid_)
+    {
+        Grid2d::Node* node = rhs.findNode(it.first);
+        if (!node || *it.second != *node)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,10 +271,10 @@ void Grid2d::setAggregateSize(unsigned int width, unsigned int height)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::setPayload(const Location& location, int newPayload)
+void Grid2d::setPayload(const Location& location, BaseType newPayload)
 {
     updatePayload(location, newPayload,
-        [] (int oldPayload, int newPayload) -> int
+        [] (BaseType oldPayload, BaseType newPayload) -> BaseType
         {
             return newPayload;
         }
@@ -224,7 +282,8 @@ void Grid2d::setPayload(const Location& location, int newPayload)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::setWeights(const Location& location, int north, int east, int south, int west)
+void Grid2d::setWeights(const Location& location,
+    BaseType north, BaseType east, BaseType south, BaseType west)
 {
     Node* node = findNode(location);
 
@@ -281,7 +340,7 @@ int Grid2d::calculateAggregate(Node* node)
     int yf;
     calculateAggregateArea(node->location.x, node->location.y, xi, xf, yi, yf);
 
-    int aggregate = PAYLOAD_MIN;
+    BaseType aggregate = PAYLOAD_MIN;
     for (int y = yi; y <= yf; ++y)
     {
         for (int x = xi; x <= xf; ++x)
@@ -289,7 +348,7 @@ int Grid2d::calculateAggregate(Node* node)
             auto found = grid_.find(Location(x, y));
             if (found != grid_.end())
             {
-                aggregate += found->second->payload;
+                aggregate = BasicMath::noOverflowAdd<BaseType>(aggregate, found->second->payload);
             }
         }
     }
@@ -315,7 +374,7 @@ void Grid2d::calculateAggregateArea(int x0, int y0, int& xi, int& xf, int& yi, i
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2d::printGrid(ostream& stream, string title,
-    std::function<int (Node*)> fieldSelection) const
+    std::function<BaseType (Node*)> fieldSelection) const
 {
     if (!title.empty())
     {
@@ -329,7 +388,7 @@ void Grid2d::printGrid(ostream& stream, string title,
             Grid2d::Node* node = findNode(Grid2d::Location(x, y));
             if (node)
             {
-                int payload = fieldSelection(node);
+                BaseType payload = fieldSelection(node);
 
                 if (payload == Grid2d::PAYLOAD_MAX)
                 {
@@ -355,7 +414,7 @@ void Grid2d::printGrid(ostream& stream, string title,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2d::print(ostream& stream, string title,
-    std::function<int (Node*)> fieldSelection) const
+    std::function<BaseType (Node*)> fieldSelection) const
 {
     if (!title.empty())
     {
@@ -377,7 +436,7 @@ void Grid2d::print(ostream& stream, string title,
             Grid2d::Node* node = findNode(Grid2d::Location(x, y));
             if (node)
             {
-                int info = fieldSelection(node);
+                BaseType info = fieldSelection(node);
 
                 if (info == Grid2d::PAYLOAD_MAX)
                 {
@@ -389,7 +448,7 @@ void Grid2d::print(ostream& stream, string title,
                 }
                 else
                 {
-                    stream << right << setw(WIDTH) << info;
+                    stream << right << setw(WIDTH) << static_cast<int>(info);
                 }
             }
             else
@@ -411,7 +470,7 @@ void Grid2d::updateAllAggregate()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::updateNodeAggregate(Node* node, int oldPayload)
+void Grid2d::updateNodeAggregate(Node* node, BaseType oldPayload, BaseType newPayload)
 {
     int xi;
     int xf;
@@ -419,8 +478,7 @@ void Grid2d::updateNodeAggregate(Node* node, int oldPayload)
     int yf;
     calculateAggregateArea(node->location.x, node->location.y, xi, xf, yi, yf);
 
-    int delta = BasicMath::noOverflowAdd<int>(node->payload, -oldPayload);
-
+    BaseType delta = BasicMath::noOverflowAdd<BaseType>(newPayload, -oldPayload);
     for (int y = yi; y <= yf; ++y)
     {
         for (int x = xi; x <= xf; ++x)
@@ -429,18 +487,23 @@ void Grid2d::updateNodeAggregate(Node* node, int oldPayload)
             if (found != grid_.end())
             {
                 Node* neighbor = found->second;
-                neighbor->aggregate = BasicMath::noOverflowAdd<int>(neighbor->aggregate, delta);
+                neighbor->aggregate = BasicMath::noOverflowAdd<BaseType>(neighbor->aggregate, delta);
             }
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::updatePayload(const Location& location, int newPayload,
-    std::function<int (int, int)> payloadSelection)
+void Grid2d::updatePayload(const Location& location, BaseType newPayload,
+    std::function<BaseType (BaseType, BaseType)> payloadSelection)
 {
-    int oldPayload = PAYLOAD_MIN;
-    int finalPayload = PAYLOAD_MIN;
+    if (!isWithinBounds(location))
+    {
+        throw OutOfRangeException(location, Location(width_, height_));
+    }
+
+    BaseType oldPayload = PAYLOAD_MIN;
+    BaseType finalPayload = PAYLOAD_MIN;
 
     bool modifiedGrid = true;
 
@@ -460,10 +523,12 @@ void Grid2d::updatePayload(const Location& location, int newPayload,
         // is the minimum available payload
         if (finalPayload > PAYLOAD_MIN)
         {
-            node = addNode(location, finalPayload, PAYLOAD_MIN);
-            node->aggregate = aggregate_ ?
-                BasicMath::noOverflowAdd(calculateAggregate(node), -finalPayload) :
-                node->payload;
+            node = addNode(location, PAYLOAD_MIN, PAYLOAD_MIN);
+            if (aggregate_)
+            {
+                node->aggregate = calculateAggregate(node);
+            }
+            node->payload = finalPayload;
         }
         else
         {
@@ -477,7 +542,13 @@ void Grid2d::updatePayload(const Location& location, int newPayload,
     {
         if (aggregate_)
         {
-            updateNodeAggregate(node, oldPayload);
+            updateNodeAggregate(node, oldPayload, finalPayload);
+        }
+        else
+        {
+            // If no aggregation is calculated, the property
+            // follows the payload (in case aggregation is activated later)
+            node->aggregate = node->payload;
         }
 
         // Prune the grid if there is no additional weight information and

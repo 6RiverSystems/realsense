@@ -11,7 +11,7 @@ using namespace std;
 #include <nav_msgs/MapMetaData.h>
 
 #include <srslib_framework/localization/map/occupancy/OccupancyMetadata.hpp>
-#include <srslib_framework/ros/message/MapMessageFactory.hpp>
+#include <srslib_framework/ros/message/OccupancyMapMessageFactory.hpp>
 #include <srslib_framework/ros/channel/publisher/RosPublisher.hpp>
 
 namespace srs {
@@ -30,7 +30,7 @@ public:
 
     nav_msgs::OccupancyGrid convertData(const OccupancyMap* data)
     {
-        return MapMessageFactory::occupancyMap2Msg(data, frameId_);
+        return OccupancyMapMessageFactory::occupancyMap2Msg(data, frameId_);
     }
 
 private:

@@ -1,5 +1,7 @@
 #include <srslib_framework/localization/map/BaseMap.hpp>
 
+#include <srslib_framework/math/BasicMath.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,6 +49,21 @@ BaseMap::~BaseMap()
     {
         delete grid_;
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+bool operator==(const BaseMap& lhs, const BaseMap& rhs)
+{
+    if (&lhs == &rhs)
+    {
+        return true;
+    }
+
+    return BasicMath::equal(lhs.resolution_, rhs.resolution_, 0.001) &&
+        BasicMath::equal(lhs.widthM_, rhs.widthM_, 0.001) &&
+        BasicMath::equal(lhs.heightM_, rhs.heightM_, 0.001) &&
+        lhs.userSpecifiedGrid_ == rhs.userSpecifiedGrid_ &&
+        *lhs.grid_ == *rhs.grid_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

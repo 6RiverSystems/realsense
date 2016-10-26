@@ -29,6 +29,11 @@ struct Grid2dPosition
 
     friend bool operator==(const Grid2dPosition& lhs, const Grid2dPosition& rhs)
     {
+        if (&lhs == &rhs)
+        {
+            return true;
+        }
+
         return (lhs.location == rhs.location) && (lhs.orientation == rhs.orientation);
     }
 

@@ -32,7 +32,8 @@ TEST(Test_Solution, BasicEmptyGrid)
     Pose<> start = Pose<>(0, 0, 0);
     Pose<> goal = Pose<>(1, 1, 0);
 
-    LogicalMap* logical = LogicalMapFactory::fromGrid2d(&grid, 1);
+    LogicalMapFactory logicalMapFactory;
+    LogicalMap* logical = logicalMapFactory.fromGrid2d(&grid, 1);
 
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromSingleGoal(
         logical, start, goal);

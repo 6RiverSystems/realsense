@@ -21,10 +21,12 @@ namespace srs {
 class Grid2d
 {
 public:
-    static const int PAYLOAD_MIN;
-    static const int PAYLOAD_MAX;
-    static const int WEIGHT_MIN;
-    static const int WEIGHT_MAX;
+    using BaseType = unsigned char;
+
+    static const BaseType PAYLOAD_MIN;
+    static const BaseType PAYLOAD_MAX;
+    static const BaseType WEIGHT_MIN;
+    static const BaseType WEIGHT_MAX;
 
     enum {
         ORIENTATION_NORTH = 90,
@@ -47,12 +49,24 @@ public:
 
         friend bool operator==(const Location& lhs, const Location& rhs)
         {
+            if (&lhs == &rhs)
+            {
+                return true;
+            }
+
             return (lhs.x == rhs.x) && (lhs.y == rhs.y);
         }
 
         friend ostream& operator<<(ostream& stream, const Location& location)
         {
-            return stream << "{" << location.x << ", " << location.y << "}";
+            return stream << location.toString();
+        }
+
+        string toString() const
+        {
+            stringstream stream;
+            stream << "{" << x << ", " << y << "}";
+            return stream.str();
         }
 
         int x;
@@ -101,8 +115,8 @@ public:
             (0 <= location.y && location.y < height_);
     }
 
-    int getAggregate(const Location& location) const;
-    int getPayload(const Location& location) const;
+    BaseType getAggregate(const Location& location) const;
+    BaseType getPayload(const Location& location) const;
 
     unsigned int getHeight() const
     {
@@ -116,7 +130,7 @@ public:
         return grid_.size();
     }
 
-    int getWeight(const Location& location, int orientation) const;
+    BaseType getWeight(const Location& location, int orientation) const;
 
     unsigned int getWeightCount() const
     {
@@ -128,13 +142,20 @@ public:
         return width_;
     }
 
-    void maxOnPayload(const Location& location, int otherPayload);
+    void maxOnPayload(const Location& location, BaseType otherPayload);
 
     friend ostream& operator<<(ostream& stream, const Grid2d& grid);
+    friend bool operator==(const Grid2d& lhs, const Grid2d& rhs);
+
+    friend bool operator!=(const Grid2d& lhs, const Grid2d& rhs)
+    {
+        return !(lhs == rhs);
+    }
 
     void setAggregateSize(unsigned int width, unsigned int height);
-    void setPayload(const Location& location, int newPayload);
-    void setWeights(const Location& location, int north, int east, int south, int west);
+    void setPayload(const Location& location, BaseType newPayload);
+    void setWeights(const Location& location,
+        BaseType north, BaseType east, BaseType south, BaseType west);
 
 private:
     static constexpr int WIDTH = 4;
@@ -157,23 +178,36 @@ private:
 
     struct Weights
     {
-        Weights(int north = WEIGHT_MIN, int east = WEIGHT_MIN,
-            int south = WEIGHT_MIN, int west = WEIGHT_MIN) :
+        Weights(BaseType north = WEIGHT_MIN, BaseType east = WEIGHT_MIN,
+            BaseType south = WEIGHT_MIN, BaseType west = WEIGHT_MIN) :
                 north(north),
                 east(east),
                 south(south),
                 west(west)
         {}
 
-        int north;
-        int east;
-        int south;
-        int west;
+        friend bool operator==(const Weights& lhs, const Weights& rhs)
+        {
+            return lhs.north == rhs.north &&
+                lhs.east == rhs.east &&
+                lhs.south == rhs.south &&
+                lhs.west == rhs.west;
+        }
+
+        friend bool operator!=(const Weights& lhs, const Weights& rhs)
+        {
+            return !(lhs == rhs);
+        }
+
+        BaseType north;
+        BaseType east;
+        BaseType south;
+        BaseType west;
     };
 
     struct Node
     {
-        Node(Location location, int payload, int aggregate) :
+        Node(Location location, BaseType payload, BaseType aggregate) :
             location(location),
             payload(payload),
             aggregate(aggregate),
@@ -194,18 +228,47 @@ private:
             return stream;
         }
 
-        int aggregate;
+        friend bool operator==(const Node& lhs, const Node& rhs)
+        {
+            if (&lhs == &rhs)
+            {
+                return true;
+            }
+            if (lhs.weights && !rhs.weights)
+            {
+                return false;
+            }
+            if (!lhs.weights && rhs.weights)
+            {
+                return false;
+            }
+            if (lhs.weights && *lhs.weights != *rhs.weights)
+            {
+                return false;
+            }
+
+            return lhs.aggregate == rhs.aggregate &&
+                lhs.location == rhs.location &&
+                lhs.payload == rhs.payload;
+        }
+
+        friend bool operator!=(const Node& lhs, const Node& rhs)
+        {
+            return !(lhs == rhs);
+        }
+
+        BaseType aggregate;
 
         const Location location;
 
-        int payload;
+        BaseType payload;
 
         Weights* weights;
     };
 
     using MapType = unordered_map<Location, Node*, Hash, EqualTo>;
 
-    Node* addNode(const Location& location, int payload, int aggregate)
+    Node* addNode(const Location& location, BaseType payload, BaseType aggregate)
     {
         Node* node = new Node(location, payload, aggregate);
         grid_[location] = node;
@@ -227,13 +290,15 @@ private:
         return nullptr;
     }
 
-    void printGrid(ostream& stream, string title, std::function<int (Node*)> fieldSelection) const;
-    void print(ostream& stream, string title, std::function<int (Node*)> fieldSelection) const;
+    void printGrid(ostream& stream, string title,
+        std::function<BaseType (Node*)> fieldSelection) const;
+    void print(ostream& stream, string title,
+        std::function<BaseType (Node*)> fieldSelection) const;
 
     void updateAllAggregate();
-    void updateNodeAggregate(Node* node, int oldCost);
-    void updatePayload(const Location& location, int newPayload,
-        std::function<int (int, int)> payloadSelection);
+    void updateNodeAggregate(Node* node, BaseType oldPayload, BaseType newPayload);
+    void updatePayload(const Location& location, BaseType newPayload,
+        std::function<BaseType (BaseType, BaseType)> payloadSelection);
 
     bool aggregate_;
     unsigned int aggregateWidth_;
@@ -275,6 +340,11 @@ public:
 
         bool operator==(const const_iterator& other) const
         {
+            if (this == &other)
+            {
+                return true;
+            }
+
             return mapIterator_ == other.mapIterator_;
         }
 

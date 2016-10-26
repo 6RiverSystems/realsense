@@ -7,39 +7,22 @@
 
 #include <geometry_msgs/Pose.h>
 
-#include <srslib_framework/MapStack.h>
-#include <srslib_framework/LogicalMetadata.h>
+#include <nav_msgs/MapMetaData.h>
+#include <nav_msgs/OccupancyGrid.h>
+#include <srslib_framework/OccupancyMap.h>
 #include <srslib_framework/OccupancyMetadata.h>
 
-#include <srslib_framework/localization/map/MapStack.hpp>
-#include <srslib_framework/localization/map/logical/LogicalMetadata.hpp>
+#include <srslib_framework/localization/map/occupancy/OccupancyMap.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMetadata.hpp>
-#include <srslib_framework/localization/map/occupancy/OccupancyMapUtils.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
 namespace srs {
 
-struct MapMessageFactory
+struct OccupancyMapMessageFactory
 {
     /**
-     * @brief Convert a Logical Map type into a LogicalMap message.
-     *
-     * @param map Logical map to convert
-     *
-     * @return LogicalMap message generated from the specified logical map
-     */
-    static srslib_framework::LogicalMap map2Msg(const LogicalMap* map)
-    {
-        srslib_framework::LogicalMap msgLogicalMap;
-
-        msgLogicalMap.metadata = metadata2Msg(map->getMetadata());
-
-        return msgLogicalMap;
-    }
-
-    /**
-     * @brief Convert a Logical Map type into a LogicalMap message.
+     * @brief Convert a Occupancy Map type into a LogicalMap message.
      *
      * @param map Logical map to convert
      *
@@ -48,7 +31,7 @@ struct MapMessageFactory
     static srslib_framework::OccupancyMap map2Msg(const OccupancyMap* map)
     {
         vector<int8_t> occupancy;
-        OccupancyMapUtils::map2Occupancy(map, occupancy);
+        map2Vector(map, occupancy);
 
         srslib_framework::OccupancyMap msgOccupancyMap;
 
@@ -59,38 +42,12 @@ struct MapMessageFactory
     }
 
     /**
-     * @brief Convert a MapStack type into a MapStack message.
+     * @brief Convert a Occupancy Map type into a vector of integers.
      *
-     * @param mapStack MapStack to convert
-     *
-     * @return MapStack message generated from the specified MapStack
+     * @param map Occupancy Map to convert
+     * @param occupancy Reference to the vector of integers
      */
-    static srslib_framework::MapStack mapStack2Msg(const MapStack* mapStack)
-    {
-        srslib_framework::MapStack msgMapStack;
-
-        msgMapStack.logical = map2Msg(mapStack->getLogicalMap());
-        msgMapStack.occupancy = map2Msg(mapStack->getOccupancyMap());
-
-        return msgMapStack;
-    }
-
-    /**
-     * @brief Convert a LogicalMetadata into a LogicalMetaData message.
-     *
-     * @param metadata Logical metadata to convert
-     *
-     * @return newly generated message
-     */
-    static srslib_framework::LogicalMetadata metadata2Msg(const LogicalMetadata& metadata)
-    {
-        srslib_framework::LogicalMetadata msgLogicalMetaData;
-
-        msgLogicalMetaData.loadTime = metadata.loadTime;
-        msgLogicalMetaData.logicalFilename = metadata.logicalFilename;
-
-        return msgLogicalMetaData;
-    }
+    static void map2Vector(const OccupancyMap* map, vector<int8_t>& occupancy);
 
     /**
      * @brief Convert a OccupancyMetadata into a OccupancyMetadata message.
@@ -140,21 +97,6 @@ struct MapMessageFactory
     }
 
     /**
-     * @brief Convert a LogicalMap message into a LogicalMap.
-     *
-     * @param message LogicalMap to convert
-     *
-     * @return LogicalMap generated from the specified LogicalMap message
-     */
-    static LogicalMap* msg2LogicalMap(const srslib_framework::LogicalMap& message)
-    {
-        LogicalMap* logical = new LogicalMap(message.metadata.widthCells,
-            message.metadata.heightCells, message.metadata.resolution);
-
-        return logical;
-    }
-
-    /**
      * @brief Convert a OccupancyMap message into a OccupancyMap.
      *
      * @param message OccupancyMap to convert
@@ -163,27 +105,21 @@ struct MapMessageFactory
      */
     static OccupancyMap* msg2OccupancyMap(const srslib_framework::OccupancyMap& message)
     {
-        OccupancyMetadata metadata = msg2OccupancyMetadata(message.metadata);
-        OccupancyMap* occupancyMap = OccupancyMapUtils::occupancy2Map(metadata, message.data);
-
-        return occupancyMap;
+        OccupancyMetadata metadata = msg2Metadata(message.metadata);
+        return vector2Map(metadata, message.data);
     }
 
     /**
-     * @brief Convert a MapMetadata message into a LogicalMetaData.
+     * @brief Convert a OccupancyGrid message into a OccupancyMap.
      *
-     * @param message LogicalMetadata to convert
+     * @param message OccupancyGrid to convert
      *
-     * @return LogicalMetaData generated from the specified MapMetadata message
+     * @return OccupancyMap generated from the specified OccupancyGrid message
      */
-    static LogicalMetadata msg2LogicalMetadata(const srslib_framework::LogicalMetadata& message)
+    static OccupancyMap* msg2OccupancyMap(const nav_msgs::OccupancyGrid& message)
     {
-        LogicalMetadata metadata;
-
-        metadata.loadTime = message.loadTime;
-        metadata.logicalFilename = message.logicalFilename;
-
-        return metadata;
+        OccupancyMetadata metadata = msg2Metadata(message.info);
+        return vector2Map(metadata, message.data);
     }
 
     /**
@@ -193,7 +129,7 @@ struct MapMessageFactory
      *
      * @return OccupancyMetaData generated from the specified MapMetadata message
      */
-    static OccupancyMetadata msg2OccupancyMetadata(const srslib_framework::OccupancyMetadata& message)
+    static OccupancyMetadata msg2Metadata(const srslib_framework::OccupancyMetadata& message)
     {
         OccupancyMetadata metadata;
 
@@ -213,18 +149,23 @@ struct MapMessageFactory
     }
 
     /**
-     * @brief Convert a MapStack message ConstPtr type into a MapStack.
+     * @brief Convert a MapMetadata message into a OccupancyMetaData.
      *
-     * @param message MapStack to convert
+     * @param message OccupancyMetadata to convert
      *
-     * @return MapStack generated from the specified MapStack message
+     * @return OccupancyMetaData generated from the specified MapMetadata message
      */
-    static MapStack* msg2MapStack(srslib_framework::MapStack::ConstPtr message)
+    static OccupancyMetadata msg2Metadata(const nav_msgs::MapMetaData& message)
     {
-        LogicalMap* logical = msg2LogicalMap(message->logical);
-        OccupancyMap* occupancy = msg2OccupancyMap(message->occupancy);
+        OccupancyMetadata metadata;
 
-        return new MapStack(logical, occupancy);
+        metadata.loadTime = message.map_load_time.toSec();
+        metadata.resolution = message.resolution;
+        metadata.widthCells = message.width;
+        metadata.heightCells = message.height;
+        metadata.origin = PoseMessageFactory::msg2Pose(message.origin);
+
+        return metadata;
     }
 
     /**
@@ -235,10 +176,10 @@ struct MapMessageFactory
      *
      * @return Ros OccupancyGrid message generated from the specified occupancy map
      */
-    static nav_msgs::OccupancyGrid occupancyMap2Msg(const OccupancyMap* map, string frameId)
+    static nav_msgs::OccupancyGrid occupancyMap2RosMsg(const OccupancyMap* map, string frameId)
     {
         vector<int8_t> occupancy;
-        OccupancyMapUtils::map2Occupancy(map, occupancy);
+        map2Vector(map, occupancy);
 
         nav_msgs::OccupancyGrid msgOccupancyMap;
 
@@ -248,6 +189,10 @@ struct MapMessageFactory
 
         return msgOccupancyMap;
     }
+
+private:
+    static OccupancyMap* vector2Map(const OccupancyMetadata& metadata,
+        const vector<int8_t>& occupancy);
 };
 
 } // namespace srs

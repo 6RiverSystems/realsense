@@ -4,55 +4,57 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
+
 #include <ros/ros.h>
+#include <nav_msgs/MapMetaData.h>
+#include <nav_msgs/OccupancyGrid.h>
+#include <srslib_framework/LogicalMap.h>
+#include <srslib_framework/OccupancyMap.h>
 
-#include <vector>
-using namespace std;
-
-#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
-#include <srslib_framework/localization/map/MapNote.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
+#include <srslib_framework/localization/map/logical/LogicalMap.hpp>
+#include <srslib_framework/localization/map/occupancy/OccupancyMap.hpp>
+#include <srslib_framework/ros/message/OccupancyMapMessageFactory.hpp>
+#include <srslib_framework/ros/message/LogicalMapMessageFactory.hpp>
 using namespace srs;
 
-#include <srslib_test/utils/MemoryWatch.hpp>
-
-TEST(Test_Map, Reconstruction)
+TEST(Test_Map, LogicalMapReconstruction)
 {
-// ###FS
+    ros::Time::init();
 
-//    test::MemoryWatch memoryWatch;
-//
-//    MapStack* mapStack = MapStackFactory::fromJsonFile("data/empty/empty.yaml");
-//    OccupancyMap* map = mapStack->getOccupancyMap();
-//
-//    ROS_DEBUG_STREAM(*map);
-//
-//    ROS_DEBUG_STREAM(map->getGrid()->getCost(Grid2d::Location(1, 0)));
-//    ROS_DEBUG_STREAM(*(reinterpret_cast<MapNote*>(map->getGrid()->getNote(Grid2d::Location(1, 0)))));
+    MapStack* mapStack = MapStackFactory::fromJsonFile("data/small-map/small-map.yaml");
+    LogicalMap* correct = mapStack->getLogicalMap();
 
-//    vector<int8_t> occupancyMap;
-//    vector<int8_t> notesGrid;
-//
-//    MapFactory::map2Occupancy(map, occupancyMap);
-//    MapFactory::map2Notes(map, notesGrid);
-//
-//    double widthCells = map->getWidthCells();
-//    double heightCells = map->getHeightCells();
-//    double resolution = map->getResolution();
-//
-//    ROS_DEBUG_STREAM("Memory usage: " << memoryWatch.getMemoryUsage());
-//    delete map;
-//
-//    map = new Map(widthCells, heightCells, resolution);
-//    map->setGrid(occupancyMap, notesGrid);
-//
-//    ROS_DEBUG_STREAM(*map);
-//
-//    ROS_DEBUG_STREAM(map->getGrid()->getCost(Grid2d::Location(1, 0)));
-//    ROS_DEBUG_STREAM(*(reinterpret_cast<MapNote*>(map->getGrid()->getNote(Grid2d::Location(1, 0)))));
-//
-//    // TODO: Research the memory leaks in the YAML library
-//    ROS_DEBUG_STREAM("End memory usage: " << memoryWatch.getMemoryUsage());
-//    ROS_DEBUG_STREAM("Zero marker: " << memoryWatch.isZero());
+    srslib_framework::LogicalMap message = LogicalMapMessageFactory::map2Msg(correct);
+    LogicalMap* logical = LogicalMapMessageFactory::msg2LogicalMap(message);
+
+    ASSERT_EQ(*logical, *logical) << "The map does not agree with itself";
+    ASSERT_EQ(*correct, *logical) << "The marshaled map is not as expected";
+}
+
+TEST(Test_Map, OccupancyMapReconstruction)
+{
+    ros::Time::init();
+
+    MapStack* mapStack = MapStackFactory::fromJsonFile("data/small-map/small-map.yaml");
+    OccupancyMap* correct = mapStack->getOccupancyMap();
+
+    srslib_framework::OccupancyMap message = OccupancyMapMessageFactory::map2Msg(correct);
+    OccupancyMap* occupancy = OccupancyMapMessageFactory::msg2OccupancyMap(message);
+
+    ASSERT_EQ(*correct, *occupancy) << "The marshaled map is not as expected";
+}
+
+TEST(Test_Map, RosOccupancyMapReconstruction)
+{
+    ros::Time::init();
+
+    MapStack* mapStack = MapStackFactory::fromJsonFile("data/small-map/small-map.yaml");
+    OccupancyMap* correct = mapStack->getOccupancyMap();
+
+    nav_msgs::OccupancyGrid message = OccupancyMapMessageFactory::occupancyMap2RosMsg(correct, "map");
+    OccupancyMap* occupancy = OccupancyMapMessageFactory::msg2OccupancyMap(message);
+
+    ASSERT_EQ(*correct->getGrid(), *occupancy->getGrid()) << "The marshaled map is not as expected";
 }

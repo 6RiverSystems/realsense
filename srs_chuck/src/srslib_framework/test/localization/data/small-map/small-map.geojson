@@ -6,9 +6,9 @@
             "id": "map",
             "properties": {
                 "origin": [0.0, 0.0, 0.0],
-                "resolution": 100,
-                "width": 3500,
-                "height": 3500
+                "resolution": 0.100,
+                "width": 3.500,
+                "height": 3.500
             }
         }, 
         {
@@ -16,11 +16,11 @@
            "id": "boundary",
            "geometry": {
                "type": "MultiPoint",
-               "coordinates": [[1000, 1000], [3000, 3000]]
+               "coordinates": [[1.000, 1.000], [3.000, 3.000]]
            },
            "properties": {
                 "origin": [0.0, 0.0, 0.0],
-                "envelope_size": 200,
+                "envelope_size": 0.200,
                 "envelope_cost": 200
             }
        },
@@ -32,20 +32,20 @@
                   "id": "obstacle",
                   "geometry": {
                       "type": "MultiPoint",
-                      "coordinates": [[1500, 1500], [2000, 2000]]
+                      "coordinates": [[1.500, 1.500], [2.000, 2.000]]
                   },
                   "properties": {
                        "origin": [0.0, 0.0, 0.0],
-                       "envelope_size": 300,
+                       "envelope_size": 0.300,
                        "envelope_cost": 200
                    }
                },
                {
                   "type": "Feature",
-                  "id": "weight",
+                  "id": "weight_area",
                   "geometry": {
                       "type": "MultiPoint",
-                      "coordinates": [[1500, 1500], [2000, 1500]]
+                      "coordinates": [[1.500, 1.500], [2.000, 1.500]]
                   },
                   "properties": {
                        "north": 11,
@@ -56,16 +56,16 @@
                },
                {
                   "type": "Feature",
-                  "id": "weight",
+                  "id": "weight_area",
                   "geometry": {
                       "type": "Point",
-                      "coordinates": [2500, 2500]
+                      "coordinates": [2.500, 2.500]
                   },
                   "properties": {
                        "north": "max",
-                       "east": 333,
-                       "south": 222,
-                       "west": 111
+                       "east": 34,
+                       "south": 23,
+                       "west": 12
                    }
                }
            ]

@@ -17,11 +17,15 @@ namespace srs {
 class OccupancyMap : public BaseMap
 {
 public:
+    static const int8_t COST_INT8_MAX;
+    static const unsigned char COST_UCHAR_MAX;
+
     OccupancyMap(unsigned int widthCells, unsigned int heightCells, double resolution);
+    OccupancyMap(OccupancyMetadata metadata);
     ~OccupancyMap()
     {}
 
-    int getCost(unsigned int c, unsigned int r) const
+    Grid2d::BaseType getCost(unsigned int c, unsigned int r) const
     {
         return getGrid()->getPayload(Grid2d::Location(c, r));
     }
@@ -31,39 +35,40 @@ public:
         return occupancyMetadata_;
     }
 
-    void maxCost(unsigned int c, unsigned int r, int cost);
+    Grid2d::BaseType grayLevel2Cost(unsigned char level) const
+    {
+        Grid2d::BaseType maxCost = numeric_limits<unsigned char>::max();
+        Grid2d::BaseType newCost = static_cast<Grid2d::BaseType>(
+            occupancyMetadata_.negate ? maxCost - level : level);
+
+        // If the percentage is under the free-cell threshold, the cost is minimal
+        float percentage = static_cast<float>(newCost) / static_cast<float>(maxCost);
+        newCost = percentage < occupancyMetadata_.thresholdFree ?
+            Grid2d::PAYLOAD_MIN :
+            newCost;
+
+        // If the percentage is above the occupied-cell threshold, the cost is the maximum
+        // allowed cost
+        newCost = percentage > occupancyMetadata_.thresholdOccupied ?
+            Grid2d::PAYLOAD_MAX :
+            newCost;
+
+        return newCost;
+    }
+
+    int8_t cost2grayLevel(Grid2d::BaseType intCost) const
+    {
+        int8_t newCost = static_cast<int8_t>(intCost);
+        return occupancyMetadata_.negate ? COST_INT8_MAX - newCost : newCost;
+    }
+
+    void maxCost(unsigned int c, unsigned int r, Grid2d::BaseType cost);
 
     friend ostream& operator<<(ostream& stream, const OccupancyMap& map);
+    friend bool operator==(const OccupancyMap& lhs, const OccupancyMap& rhs);
 
-    void setCost(unsigned int c, unsigned int r, int cost);
-
-    void setLoadTime(double loadTime)
-    {
-        occupancyMetadata_.loadTime = loadTime;
-    }
-
-    void setNegate(bool negate)
-    {
-        occupancyMetadata_.negate = negate;
-    }
-
+    void setCost(unsigned int c, unsigned int r, Grid2d::BaseType cost);
     void setObstruction(unsigned int c, unsigned int r);
-
-    void setOccupancyFilename(string filename)
-    {
-        occupancyMetadata_.occupancyFilename = filename;
-    }
-
-    void setOrigin(Pose<> origin)
-    {
-        occupancyMetadata_.origin = origin;
-    }
-
-    void setThresholds(double free, double occupied)
-    {
-        occupancyMetadata_.thresholdFree = free;
-        occupancyMetadata_.thresholdOccupied = occupied;
-    }
 
 protected:
     OccupancyMetadata occupancyMetadata_;

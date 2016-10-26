@@ -13,6 +13,7 @@ using namespace std;
 #include <tf/LinearMath/Quaternion.h>
 
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
+#include <srslib_framework/ros/message/OccupancyMapMessageFactory.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
@@ -38,7 +39,7 @@ MapServer::MapServer(string name, int argc, char** argv) :
         &MapServer::callbackMapRequest, this);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void MapServer::execute()
 {
     evaluateTriggers();
@@ -59,10 +60,10 @@ bool MapServer::callbackMapRequest(nav_msgs::GetMap::Request &req, nav_msgs::Get
     ROS_INFO("Map request service: Sending map");
 
     vector<int8_t> occupancy;
-    OccupancyMapUtils::map2Occupancy(mapStack_->getOccupancyMap(), occupancy);
+    OccupancyMapMessageFactory::map2Vector(mapStack_->getOccupancyMap(), occupancy);
 
     res.map.header.stamp = ros::Time::now();
-    res.map.info = MapMessageFactory::metadata2RosMsg(mapStack_->getOccupancyMap()->getMetadata());
+    res.map.info = OccupancyMapMessageFactory::metadata2RosMsg(mapStack_->getOccupancyMap()->getMetadata());
     res.map.data = occupancy;
 
     return true;
@@ -80,7 +81,10 @@ void MapServer::evaluateTriggers()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MapServer::publishMap()
 {
+    // Publish the whole map stack
     channelMapStack_.publish(mapStack_);
+
+    // Publish ROS compatible information
     channelRosMapMetadata_.publish(mapStack_->getOccupancyMap()->getMetadata());
     channelRosOccupancyGrid_.publish(mapStack_->getOccupancyMap());
 }

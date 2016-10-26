@@ -17,7 +17,7 @@ struct Grid2dUtils
 {
     static void addRectanglePayload(Grid2d& grid,
         unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
-        unsigned int cost)
+        Grid2d::BaseType cost)
     {
         int deltaX = BasicMath::sgn<int>(xf - xi);
         int deltaY = BasicMath::sgn<int>(yf - yi);
@@ -40,7 +40,7 @@ struct Grid2dUtils
 
     static void addStaticObstacle(Grid2d& grid,
         unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
-        int sizeEnvelopeCells = 0, int costEnvelope = 0)
+        int sizeEnvelopeCells = 0, Grid2d::BaseType costEnvelope = 0)
     {
         // First add the envelope, if specified
         if (sizeEnvelopeCells > 0 && costEnvelope > 0)
@@ -57,7 +57,10 @@ struct Grid2dUtils
 
     static void addWeight(Grid2d& grid,
         unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
-        int north, int east, int south, int west)
+        Grid2d::BaseType north,
+        Grid2d::BaseType east,
+        Grid2d::BaseType south,
+        Grid2d::BaseType west)
     {
         int deltaX = BasicMath::sgn<int>(xf - xi);
         int deltaY = BasicMath::sgn<int>(yf - yi);

@@ -1,0 +1,1754 @@
+{
+	"type": "FeatureCollection",
+	"features": [
+		{
+			"type": "Feature",
+			"properties": {
+				"type": "map",
+				"origin": [0,0,0],
+				"resolution": 0.1,
+				"width": 168.9,
+				"height": 139.4
+			}
+		},
+		{
+			"type": "FeatureCollection",
+			"features": [
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[0,0],
+							[141.8,41.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "1",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[0,41.7],
+							[23.5,80.4]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "2",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[0,80.3],
+							[21.4,86.6]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "3",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[0,86.5],
+							[11.6,119.5]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "4",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[0,119.4],
+							[9.3,139.4]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "5",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[9.1,125.8],
+							[13.4,139.4]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "6",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[11.3,90],
+							[18.6,94.1]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "7",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[13.3,124.3],
+							[128.4,139.4]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "8",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[15.2,94],
+							[17.4,95.5]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "9",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[16.8,119],
+							[17.3,119.5]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "10",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[16.9,100.7],
+							[17.4,101.2]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "11",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[16.9,104.3],
+							[17.4,104.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "12",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[16.9,108.2],
+							[17.4,108.7]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "13",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[16.9,111.8],
+							[17.4,112.3]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "14",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[16.9,115.5],
+							[17.4,116]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "15",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[17,97],
+							[17.5,97.5]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "16",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[22.9,118.9],
+							[23.5,119.4]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "17",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[23,88.8],
+							[23.5,89.3]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "18",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[23,97.1],
+							[23.5,97.6]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "19",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[23,100.8],
+							[23.5,101.3]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "20",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[23,104.5],
+							[23.5,105]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "21",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[23,108.2],
+							[23.5,108.7]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "22",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[23,111.8],
+							[23.5,112.3]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "23",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[23,115.6],
+							[23.5,116.1]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "24",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[23.1,86.2],
+							[23.6,86.7]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "25",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[23.1,91.1],
+							[23.6,91.6]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "26",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[23.1,94.7],
+							[23.6,95.2]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "27",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[23.4,62.6],
+							[25.6,71.1]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "28",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[28.9,44.2],
+							[32.5,80.3]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "29",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[29,86],
+							[32.5,121.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "30",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[35.2,44.3],
+							[38.3,80.1]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "31",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[35.3,86],
+							[38.2,121.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "32",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[41.2,86.1],
+							[44.4,121.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "33",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[41.4,44.2],
+							[44.4,80.1]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "34",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[47.5,44.1],
+							[50.5,80]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "35",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[47.5,86],
+							[50.4,121.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "36",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[53.3,86],
+							[56.7,121.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "37",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[53.4,43.9],
+							[56.9,80]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "38",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[53.5,115.4],
+							[53.9,115.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "39",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[59.7,85.9],
+							[62.6,121.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "40",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[59.8,43.9],
+							[62.7,80]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "41",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[65.7,86],
+							[68.8,121.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "42",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[65.9,43.8],
+							[68.8,80]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "43",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[72,43.6],
+							[75,80]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "44",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[72,85.9],
+							[74.9,121.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "45",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[77.8,85.9],
+							[81.3,121.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "46",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[77.9,44.3],
+							[81.3,80]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "47",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[78,107.9],
+							[78.3,108.6]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "48",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[78,111.7],
+							[78.3,112.2]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "49",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[78.1,104.2],
+							[78.3,104.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "50",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[84.2,85.9],
+							[87.1,121.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "51",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[84.3,44.3],
+							[87.1,79.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "52",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[90.2,85.9],
+							[93.3,121.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "53",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[90.4,44.2],
+							[93.3,79.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "54",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[96.5,44],
+							[99.4,79.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "55",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[96.5,85.8],
+							[99.4,121.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "56",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[102.3,43.6],
+							[106,80.2]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "57",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[102.4,85.9],
+							[105.8,121.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "58",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[108.8,44.1],
+							[111.9,79.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "59",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[108.8,85.8],
+							[111.6,122]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "60",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[114.8,44],
+							[117.9,79.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "61",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[114.8,85.7],
+							[117.7,121.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "62",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[121,44],
+							[124,79.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "63",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[121,85.8],
+							[123.9,121.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "64",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[126.8,44.1],
+							[130.3,79.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "65",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[126.9,85.7],
+							[130.3,122.2]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "66",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[128.3,124.2],
+							[168.9,139.4]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "67",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.1,68.3],
+							[133.6,68.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "68",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.1,88.3],
+							[133.6,88.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "69",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.1,107.7],
+							[133.6,108.2]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "70",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.2,60.9],
+							[133.7,61.4]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "71",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.2,64.6],
+							[133.7,65.1]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "72",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.2,72.1],
+							[133.7,72.6]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "73",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.2,75.7],
+							[133.7,76.2]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "74",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.2,85.6],
+							[133.7,86.2]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "75",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.2,90.6],
+							[133.7,91.1]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "76",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.2,94.1],
+							[133.7,94.7]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "77",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.2,96.7],
+							[133.8,97.2]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "78",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.2,100.3],
+							[133.8,100.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "79",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.2,104.1],
+							[133.8,104.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "80",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.2,111.4],
+							[133.7,111.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "81",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.3,46.4],
+							[133.8,46.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "82",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.3,53.6],
+							[133.8,54.1]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "83",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.3,57.3],
+							[133.8,57.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "84",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.3,79.3],
+							[133.8,79.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "85",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.3,115],
+							[133.8,115.6]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "86",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.3,118.4],
+							[133.8,118.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "87",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[133.4,49.9],
+							[133.9,50.4]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "88",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[139.3,46.4],
+							[139.8,46.9]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "89",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[139.3,64.7],
+							[139.9,65.2]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "90",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[139.3,68.3],
+							[139.8,68.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "91",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[139.3,72],
+							[139.8,72.5]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "92",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[139.3,75.6],
+							[140.1,76.3]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "93",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[139.2,85.1],
+							[142.1,120.6]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "94",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[139.4,57.3],
+							[139.9,57.8]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "95",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[139.4,61],
+							[139.9,61.5]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "96",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[139.4,79.3],
+							[140.4,80.7]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "97",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[139.5,50],
+							[140,50.5]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "98",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[139.5,53.6],
+							[140,54.1]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "99",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[140.9,80],
+							[142.1,85.2]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "100",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[141.3,0],
+							[168.9,124.3]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "101",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[141.6,122.7],
+							[142.1,124.3]
+						]
+					},
+					"properties": {
+						"type": "obstacle",
+						"name": "102",
+						"envelope_size": 0.3,
+						"envelope_cost": 200,
+						"is_border": 1
+					}
+				}
+			]
+		}
+	]
+}

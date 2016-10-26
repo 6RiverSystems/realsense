@@ -30,7 +30,7 @@ public:
 
     nav_msgs::OccupancyGrid convertData(const OccupancyMap* data)
     {
-        return OccupancyMapMessageFactory::occupancyMap2Msg(data, frameId_);
+        return OccupancyMapMessageFactory::occupancyMap2RosMsg(data, frameId_);
     }
 
 private:

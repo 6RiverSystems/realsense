@@ -15,8 +15,9 @@ using namespace std;
 
 namespace srs {
 
-struct LogicalMapFactory
+class LogicalMapFactory
 {
+public:
     LogicalMapFactory() :
         map_(nullptr),
         metadata_()
@@ -28,26 +29,19 @@ struct LogicalMapFactory
 
 private:
     static const string KEYWORD_BOUNDARY;
-
     static const string KEYWORD_COORDINATES;
     static const string KEYWORD_COST_AREA;
-
     static const string KEYWORD_FEATURE_COLLECTION;
     static const string KEYWORD_FEATURES;
-
     static const string KEYWORD_GEOMETRY;
-
-    static const string KEYWORD_ID;
-
     static const string KEYWORD_MAP;
     static const string KEYWORD_MAX;
-
     static const string KEYWORD_OBSTACLE;
-
     static const string KEYWORD_PROPERTIES;
     static const string KEYWORD_PROPERTY_COST_AREA_COST;
     static const string KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_COST;
     static const string KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE;
+    static const string KEYWORD_PROPERTY_FEATURE_TYPE;
     static const string KEYWORD_PROPERTY_MAP_HEIGHT;
     static const string KEYWORD_PROPERTY_MAP_ORIGIN;
     static const string KEYWORD_PROPERTY_MAP_RESOLUTION;
@@ -58,11 +52,9 @@ private:
     static const string KEYWORD_PROPERTY_WEIGHT_AREA_NORTH;
     static const string KEYWORD_PROPERTY_WEIGHT_AREA_SOUTH;
     static const string KEYWORD_PROPERTY_WEIGHT_AREA_WEST;
-
     static const string KEYWORD_TYPE;
     static const string KEYWORD_TYPE_POINT;
     static const string KEYWORD_TYPE_MULTIPOINT;
-
     static const string KEYWORD_WEIGHT_AREA;
 
     void addRectangleCost(Pose<> origin, double widthM, double heightM,
@@ -75,22 +67,24 @@ private:
         Grid2d::BaseType south,
         Grid2d::BaseType west);
 
-    bool findIdInCollection(YAML::Node node, string id, YAML::Node& result);
-    bool findCollection(YAML::Node node, YAML::Node& result);
+    bool findCollection(YAML::Node root, YAML::Node& result);
+    bool findEntityInCollection(YAML::Node root, string entityType, YAML::Node& result);
+    string findEntityType(YAML::Node root);
 
-    void nonTerminalEntities(YAML::Node node);
-    void nonTerminalEntry(YAML::Node node);
-    vector<Pose<>> nonTerminalGeometry(YAML::Node node, int minNumber, int maxNumber);
-    void nonTerminalMap(YAML::Node node);
+    void ntEntities(YAML::Node root);
+    void ntEntry(YAML::Node root);
+    vector<Pose<>> ntGeometry(YAML::Node root, int minNumber, int maxNumber);
 
-    void nonTerminalStatementBoundary(YAML::Node node);
-    void nonTerminalStatementCostArea(YAML::Node node);
-    void nonTerminalStatementObstacle(YAML::Node node);
-    void nonTerminalStatementWeightArea(YAML::Node node);
+    void ntStatementBoundary(YAML::Node root);
+    void ntStatementCostArea(YAML::Node root);
+    void ntStatementMap(YAML::Node root);
+    void ntStatementObstacle(YAML::Node root);
+    void ntStatementWeightArea(YAML::Node root);
 
-    Grid2d::BaseType nonTerminalTypeCost(YAML::Node node, bool required);
-    double nonTerminalTypeDouble(YAML::Node node, bool required);
-    Pose<> nonTerminalTypePoint(YAML::Node node, bool required);
+    Grid2d::BaseType ntValueCost(YAML::Node root, bool required);
+    double ntValueDouble(YAML::Node root, bool required);
+    vector<Pose<>> ntValueMultiPoint(YAML::Node root, bool required);
+    Pose<> ntValuePoint(YAML::Node root, bool required);
 
     LogicalMap* map_;
     LogicalMetadata metadata_;

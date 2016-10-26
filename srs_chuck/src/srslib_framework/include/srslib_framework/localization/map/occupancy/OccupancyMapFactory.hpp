@@ -18,8 +18,9 @@ using namespace std;
 
 namespace srs {
 
-struct OccupancyMapFactory
+class OccupancyMapFactory
 {
+public:
     OccupancyMapFactory() :
         map_(nullptr),
         metadata_()

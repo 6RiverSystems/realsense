@@ -3,8 +3,8 @@
     "features": [
         {
             "type": "Feature",
-            "id": "map",
             "properties": {
+                "type": "map",
                 "origin": [0.0, 0.0, 0.0],
                 "resolution": 0.100,
                 "width": 3.500,
@@ -13,12 +13,12 @@
         }, 
         {
            "type": "Feature",
-           "id": "boundary",
            "geometry": {
                "type": "MultiPoint",
                "coordinates": [[1.000, 1.000], [3.000, 3.000]]
            },
            "properties": {
+                "type": "boundary",
                 "origin": [0.0, 0.0, 0.0],
                 "envelope_size": 0.200,
                 "envelope_cost": 200
@@ -29,12 +29,12 @@
            "features": [
                {
                   "type": "Feature",
-                  "id": "obstacle",
                   "geometry": {
                       "type": "MultiPoint",
                       "coordinates": [[1.500, 1.500], [2.000, 2.000]]
                   },
                   "properties": {
+                       "type": "obstacle",
                        "origin": [0.0, 0.0, 0.0],
                        "envelope_size": 0.300,
                        "envelope_cost": 200
@@ -42,12 +42,12 @@
                },
                {
                   "type": "Feature",
-                  "id": "weight_area",
                   "geometry": {
                       "type": "MultiPoint",
                       "coordinates": [[1.500, 1.500], [2.000, 1.500]]
                   },
                   "properties": {
+                       "type": "weight_area",
                        "north": 11,
                        "east": 22,
                        "south": 33,
@@ -56,12 +56,12 @@
                },
                {
                   "type": "Feature",
-                  "id": "weight_area",
                   "geometry": {
                       "type": "Point",
                       "coordinates": [2.500, 2.500]
                   },
                   "properties": {
+                       "type": "weight_area",
                        "north": "max",
                        "east": 34,
                        "south": 23,

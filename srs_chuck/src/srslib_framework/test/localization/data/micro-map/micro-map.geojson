@@ -3,8 +3,8 @@
     "features": [
         {
             "type": "Feature",
-            "id": "map",
             "properties": {
+                "type": "map",
                 "origin": [0.0, 0.0, 0.0],
                 "resolution": 0.100,
                 "width": 0.300,
@@ -16,35 +16,35 @@
            "features": [
                {
                   "type": "Feature",
-                  "id": "obstacle",
                   "geometry": {
                       "type": "MultiPoint",
                       "coordinates": [[0.000, 0.000], [0.100, 0.100]]
                   },
                   "properties": {
+                       "type": "obstacle",
                        "envelope_size": 0.100,
                        "envelope_cost": 111
                    }
                },
                {
                   "type": "Feature",
-                  "id": "cost_area",
                   "geometry": {
                       "type": "MultiPoint",
                       "coordinates": [[0.200, 0.200], [0.200, 0.200]]
                   },
                   "properties": {
+                       "type": "cost_area",
                        "cost": 128
                    }
                },
                {
                   "type": "Feature",
-                  "id": "weight_area",
                   "geometry": {
                       "type": "Point",
                       "coordinates": [0.200, 0.000]
                   },
                   "properties": {
+                       "type": "weight_area",
                        "north": "max",
                        "east": 77,
                        "south": 222,

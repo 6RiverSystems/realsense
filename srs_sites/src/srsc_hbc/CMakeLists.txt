@@ -5,5 +5,5 @@
 #
 cmake_minimum_required(VERSION 2.8.3)
 
-project(srsc_hpc)
+project(srsc_hbc)
 

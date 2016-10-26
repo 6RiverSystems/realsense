@@ -22,26 +22,19 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 const string LogicalMapFactory::KEYWORD_BOUNDARY = "boundary";
-
 const string LogicalMapFactory::KEYWORD_COORDINATES = "coordinates";
 const string LogicalMapFactory::KEYWORD_COST_AREA = "cost_area";
-
 const string LogicalMapFactory::KEYWORD_FEATURE_COLLECTION = "FeatureCollection";
 const string LogicalMapFactory::KEYWORD_FEATURES = "features";
-
 const string LogicalMapFactory::KEYWORD_GEOMETRY = "geometry";
-
-const string LogicalMapFactory::KEYWORD_ID = "id";
-
 const string LogicalMapFactory::KEYWORD_MAP = "map";
 const string LogicalMapFactory::KEYWORD_MAX = "max";
-
 const string LogicalMapFactory::KEYWORD_OBSTACLE = "obstacle";
-
 const string LogicalMapFactory::KEYWORD_PROPERTIES = "properties";
 const string LogicalMapFactory::KEYWORD_PROPERTY_COST_AREA_COST = "cost";
 const string LogicalMapFactory::KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_COST = "envelope_cost";
 const string LogicalMapFactory::KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE = "envelope_size";
+const string LogicalMapFactory::KEYWORD_PROPERTY_FEATURE_TYPE = "type";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_HEIGHT = "height";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_ORIGIN = "origin";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_RESOLUTION = "resolution";
@@ -52,11 +45,9 @@ const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHT_AREA_EAST = "east";
 const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHT_AREA_NORTH = "north";
 const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHT_AREA_SOUTH = "south";
 const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHT_AREA_WEST = "west";
-
 const string LogicalMapFactory::KEYWORD_TYPE = "type";
 const string LogicalMapFactory::KEYWORD_TYPE_POINT = "Point";
 const string LogicalMapFactory::KEYWORD_TYPE_MULTIPOINT = "MultiPoint";
-
 const string LogicalMapFactory::KEYWORD_WEIGHT_AREA = "weight_area";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +74,7 @@ LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename, double loadTime
     metadata_.loadTime = loadTime;
     metadata_.logicalFilename = jsonFilename;
 
-    nonTerminalEntry(jsonDocument);
+    ntEntry(jsonDocument);
 
     return map_;
 }
@@ -102,7 +93,7 @@ LogicalMap* LogicalMapFactory::fromString(string geoJson, double loadTime)
     metadata_ = LogicalMetadata();
     metadata_.loadTime = loadTime;
 
-    nonTerminalEntry(jsonDocument);
+    ntEntry(jsonDocument);
 
     return map_;
 }
@@ -206,11 +197,11 @@ void LogicalMapFactory::addWeight(Pose<> from, Pose<> to,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool LogicalMapFactory::findCollection(YAML::Node node, YAML::Node& result)
+bool LogicalMapFactory::findCollection(YAML::Node root, YAML::Node& result)
 {
-    if (node.IsSequence())
+    if (root.IsSequence())
     {
-        for (YAML::const_iterator it = node.begin(); it != node.end(); ++it)
+        for (YAML::const_iterator it = root.begin(); it != root.end(); ++it)
         {
             YAML::Node element = *it;
 
@@ -224,12 +215,12 @@ bool LogicalMapFactory::findCollection(YAML::Node node, YAML::Node& result)
     }
     else
     {
-        if (node[KEYWORD_TYPE])
+        if (root[KEYWORD_TYPE])
         {
-            string value = node[KEYWORD_TYPE].as<string>();
+            string value = root[KEYWORD_TYPE].as<string>();
             if (value == KEYWORD_FEATURE_COLLECTION)
             {
-                result = node[KEYWORD_FEATURES];
+                result = root[KEYWORD_FEATURES];
                 return !result.IsNull();
             }
         }
@@ -239,21 +230,19 @@ bool LogicalMapFactory::findCollection(YAML::Node node, YAML::Node& result)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool LogicalMapFactory::findIdInCollection(YAML::Node node, string id, YAML::Node& result)
+bool LogicalMapFactory::findEntityInCollection(YAML::Node root, string entityType, YAML::Node& result)
 {
-    if (node.IsSequence())
+    if (root.IsSequence())
     {
-        for (YAML::const_iterator it = node.begin(); it != node.end(); ++it)
+        for (YAML::const_iterator it = root.begin(); it != root.end(); ++it)
         {
             YAML::Node element = *it;
-            if (element[KEYWORD_ID])
+
+            string type = findEntityType(element);
+            if (entityType == type)
             {
-                string value = element[KEYWORD_ID].as<string>();
-                if (value == id)
-                {
-                    result = element;
-                    return true;
-                }
+                result = element;
+                return true;
             }
         }
     }
@@ -262,41 +251,54 @@ bool LogicalMapFactory::findIdInCollection(YAML::Node node, string id, YAML::Nod
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::nonTerminalEntities(YAML::Node node)
+string LogicalMapFactory::findEntityType(YAML::Node root)
+{
+    YAML::Node type = root[KEYWORD_PROPERTIES][KEYWORD_PROPERTY_FEATURE_TYPE];
+
+    if (type)
+    {
+        return type.as<string>();
+    }
+
+    return "";
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::ntEntities(YAML::Node root)
 {
     // Go through all the obstacles in the collection
-    for (auto entity : node)
+    for (auto entity : root)
     {
-        string entityId = entity[KEYWORD_ID].as<string>();
-        if (entityId == KEYWORD_OBSTACLE)
+        string entityType = findEntityType(entity);
+        if (entityType == KEYWORD_OBSTACLE)
         {
-            nonTerminalStatementObstacle(entity);
+            ntStatementObstacle(entity);
         }
-        else if (entityId == KEYWORD_COST_AREA)
+        else if (entityType == KEYWORD_COST_AREA)
         {
-            nonTerminalStatementCostArea(entity);
+            ntStatementCostArea(entity);
         }
-        else if (entityId == KEYWORD_WEIGHT_AREA)
+        else if (entityType == KEYWORD_WEIGHT_AREA)
         {
-            nonTerminalStatementWeightArea(entity);
+            ntStatementWeightArea(entity);
         }
         else
         {
-            throw UnexpectedFeatureException(metadata_, entityId);
+            throw UnexpectedFeatureException(metadata_, entityType);
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::nonTerminalEntry(YAML::Node node)
+void LogicalMapFactory::ntEntry(YAML::Node root)
 {
     YAML::Node features;
-    if (findCollection(node, features))
+    if (findCollection(root, features))
     {
         YAML::Node mapNode;
-        if (findIdInCollection(features, KEYWORD_MAP, mapNode))
+        if (findEntityInCollection(features, KEYWORD_MAP, mapNode))
         {
-            nonTerminalMap(mapNode);
+            ntStatementMap(mapNode);
         }
         else
         {
@@ -304,15 +306,15 @@ void LogicalMapFactory::nonTerminalEntry(YAML::Node node)
         }
 
         YAML::Node boundaryNode;
-        if (findIdInCollection(features, KEYWORD_BOUNDARY, boundaryNode))
+        if (findEntityInCollection(features, KEYWORD_BOUNDARY, boundaryNode))
         {
-            nonTerminalStatementBoundary(boundaryNode);
+            ntStatementBoundary(boundaryNode);
         }
 
         YAML::Node entitiesNode;
         if (findCollection(features, entitiesNode))
         {
-            nonTerminalEntities(entitiesNode);
+            ntEntities(entitiesNode);
         }
     }
     else
@@ -322,27 +324,25 @@ void LogicalMapFactory::nonTerminalEntry(YAML::Node node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-vector<Pose<>> LogicalMapFactory::nonTerminalGeometry(YAML::Node node,
+vector<Pose<>> LogicalMapFactory::ntGeometry(YAML::Node root,
     int minNumber, int maxNumber)
 {
     vector<Pose<>> coordinates;
 
-    YAML::Node typeNode = node[KEYWORD_TYPE];
+    YAML::Node typeNode = root[KEYWORD_TYPE];
     if (typeNode)
     {
-        YAML::Node coordinatesNode = node[KEYWORD_COORDINATES];
+        YAML::Node coordinatesNode = root[KEYWORD_COORDINATES];
 
         string typeString = typeNode.as<string>();
         if (typeString == KEYWORD_TYPE_POINT)
         {
-            coordinates.push_back(nonTerminalTypePoint(coordinatesNode, true));
+            coordinates.push_back(ntValuePoint(coordinatesNode, true));
         }
         else if (typeString == KEYWORD_TYPE_MULTIPOINT)
         {
-            for (auto coordinate : coordinatesNode)
-            {
-                coordinates.push_back(nonTerminalTypePoint(coordinate, true));
-            }
+            vector<Pose<>> points = ntValueMultiPoint(coordinatesNode, true);
+            coordinates.insert(coordinates.end(), points.begin(), points.end());
         }
         else
         {
@@ -360,32 +360,18 @@ vector<Pose<>> LogicalMapFactory::nonTerminalGeometry(YAML::Node node,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::nonTerminalMap(YAML::Node node)
+void LogicalMapFactory::ntStatementBoundary(YAML::Node root)
 {
-    YAML::Node properties = node[KEYWORD_PROPERTIES];
+    YAML::Node properties = root[KEYWORD_PROPERTIES];
 
-    metadata_.origin = nonTerminalTypePoint(properties[KEYWORD_PROPERTY_MAP_ORIGIN], false);
-    metadata_.resolution = nonTerminalTypeDouble(properties[KEYWORD_PROPERTY_MAP_RESOLUTION], false);
-    metadata_.widthM = nonTerminalTypeDouble(properties[KEYWORD_PROPERTY_MAP_WIDTH], false);
-    metadata_.heightM = nonTerminalTypeDouble(properties[KEYWORD_PROPERTY_MAP_HEIGHT], false);
-
-    map_ = new LogicalMap(metadata_);
-    metadata_ = map_->getMetadata();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::nonTerminalStatementBoundary(YAML::Node node)
-{
-    YAML::Node properties = node[KEYWORD_PROPERTIES];
-
-    double envelopeSize = nonTerminalTypeDouble(properties[KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE], false);
-    Grid2d::BaseType envelopeCost = nonTerminalTypeCost(properties[KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_COST], false);
+    double envelopeSize = ntValueDouble(properties[KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE], false);
+    Grid2d::BaseType envelopeCost = ntValueCost(properties[KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_COST], false);
 
     double widthM = map_->getWidthM();
     double heightM = map_->getHeightM();
     double resolution = map_->getResolution();
 
-    vector<Pose<>> coordinates = nonTerminalGeometry(node[KEYWORD_GEOMETRY], 2, 2);
+    vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
     Pose<> bl = coordinates[0];
     Pose<> tr = coordinates[1];
@@ -404,13 +390,13 @@ void LogicalMapFactory::nonTerminalStatementBoundary(YAML::Node node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::nonTerminalStatementCostArea(YAML::Node node)
+void LogicalMapFactory::ntStatementCostArea(YAML::Node root)
 {
-    YAML::Node properties = node[KEYWORD_PROPERTIES];
+    YAML::Node properties = root[KEYWORD_PROPERTIES];
 
-    Grid2d::BaseType cost = nonTerminalTypeCost(properties[KEYWORD_PROPERTY_COST_AREA_COST], true);
+    Grid2d::BaseType cost = ntValueCost(properties[KEYWORD_PROPERTY_COST_AREA_COST], true);
 
-    vector<Pose<>> coordinates = nonTerminalGeometry(node[KEYWORD_GEOMETRY], 2, 2);
+    vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
     Pose<> bl = coordinates[0];
     Pose<> tr = coordinates[1];
@@ -420,14 +406,28 @@ void LogicalMapFactory::nonTerminalStatementCostArea(YAML::Node node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::nonTerminalStatementObstacle(YAML::Node node)
+void LogicalMapFactory::ntStatementMap(YAML::Node root)
 {
-    YAML::Node properties = node[KEYWORD_PROPERTIES];
+    YAML::Node properties = root[KEYWORD_PROPERTIES];
 
-    double envelopeSize = nonTerminalTypeDouble(properties[KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_SIZE], false);
-    Grid2d::BaseType envelopeCost = nonTerminalTypeCost(properties[KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_COST], false);
+    metadata_.origin = ntValuePoint(properties[KEYWORD_PROPERTY_MAP_ORIGIN], false);
+    metadata_.resolution = ntValueDouble(properties[KEYWORD_PROPERTY_MAP_RESOLUTION], false);
+    metadata_.widthM = ntValueDouble(properties[KEYWORD_PROPERTY_MAP_WIDTH], false);
+    metadata_.heightM = ntValueDouble(properties[KEYWORD_PROPERTY_MAP_HEIGHT], false);
 
-    vector<Pose<>> coordinates = nonTerminalGeometry(node[KEYWORD_GEOMETRY], 2, 2);
+    map_ = new LogicalMap(metadata_);
+    metadata_ = map_->getMetadata();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::ntStatementObstacle(YAML::Node root)
+{
+    YAML::Node properties = root[KEYWORD_PROPERTIES];
+
+    double envelopeSize = ntValueDouble(properties[KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_SIZE], false);
+    Grid2d::BaseType envelopeCost = ntValueCost(properties[KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_COST], false);
+
+    vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
     Pose<> bl = coordinates[0];
     Pose<> tr = coordinates[1];
@@ -437,16 +437,16 @@ void LogicalMapFactory::nonTerminalStatementObstacle(YAML::Node node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::nonTerminalStatementWeightArea(YAML::Node node)
+void LogicalMapFactory::ntStatementWeightArea(YAML::Node root)
 {
-    YAML::Node properties = node[KEYWORD_PROPERTIES];
+    YAML::Node properties = root[KEYWORD_PROPERTIES];
 
-    Grid2d::BaseType northCost = nonTerminalTypeCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_NORTH], false);
-    Grid2d::BaseType eastCost = nonTerminalTypeCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_EAST], false);
-    Grid2d::BaseType southCost = nonTerminalTypeCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_SOUTH], false);
-    Grid2d::BaseType westCost = nonTerminalTypeCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_WEST], false);
+    Grid2d::BaseType northCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_NORTH], false);
+    Grid2d::BaseType eastCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_EAST], false);
+    Grid2d::BaseType southCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_SOUTH], false);
+    Grid2d::BaseType westCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_WEST], false);
 
-    vector<Pose<>> coordinates = nonTerminalGeometry(node[KEYWORD_GEOMETRY], 1, 2);
+    vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 1, 2);
     if (coordinates.size() == 2)
     {
         Pose<> from = coordinates[0];
@@ -461,17 +461,17 @@ void LogicalMapFactory::nonTerminalStatementWeightArea(YAML::Node node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2d::BaseType LogicalMapFactory::nonTerminalTypeCost(YAML::Node node, bool required)
+Grid2d::BaseType LogicalMapFactory::ntValueCost(YAML::Node root, bool required)
 {
     int value = Grid2d::PAYLOAD_MIN;
 
-    if (node)
+    if (root)
     {
-        string cost = node.as<string>();
+        string cost = root.as<string>();
 
         try
         {
-            value = cost != KEYWORD_MAX ? node.as<int>() : Grid2d::PAYLOAD_MAX;
+            value = cost != KEYWORD_MAX ? root.as<int>() : Grid2d::PAYLOAD_MAX;
         }
         catch (exception& e)
         {
@@ -493,15 +493,15 @@ Grid2d::BaseType LogicalMapFactory::nonTerminalTypeCost(YAML::Node node, bool re
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-double LogicalMapFactory::nonTerminalTypeDouble(YAML::Node node, bool required)
+double LogicalMapFactory::ntValueDouble(YAML::Node root, bool required)
 {
     double value = 0.0;
 
-    if (node)
+    if (root)
     {
         try
         {
-            value = node.as<double>();
+            value = root.as<double>();
         }
         catch (exception& e)
         {
@@ -517,15 +517,42 @@ double LogicalMapFactory::nonTerminalTypeDouble(YAML::Node node, bool required)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Pose<> LogicalMapFactory::nonTerminalTypePoint(YAML::Node node, bool required)
+vector<Pose<>> LogicalMapFactory::ntValueMultiPoint(YAML::Node root, bool required)
 {
-    Pose<> value = Pose<>::ZERO;
+    vector<Pose<>> value;
 
-    if (node)
+    if (root)
     {
         try
         {
-            value = node.as<Pose<>>();
+            for (auto point : root)
+            {
+                value.push_back(ntValuePoint(point, true));
+            }
+        }
+        catch (exception& e)
+        {
+            throw PoseExpectedException(metadata_);
+        }
+    }
+    else if (required)
+    {
+        throw PoseExpectedException(metadata_);
+    }
+
+    return value;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+Pose<> LogicalMapFactory::ntValuePoint(YAML::Node root, bool required)
+{
+    Pose<> value = Pose<>::ZERO;
+
+    if (root)
+    {
+        try
+        {
+            value = root.as<Pose<>>();
         }
         catch (exception& e)
         {
@@ -549,18 +576,18 @@ namespace YAML {
 template<>
 struct convert<srs::Pose<double>>
 {
-  static bool decode(const Node& node, srs::Pose<double>& rhs)
+  static bool decode(const Node& root, srs::Pose<double>& rhs)
   {
       // Check if it is a simple or full pose (without theta or with theta)
-      if (node.size() == 2 || node.size() == 3)
+      if (root.size() == 2 || root.size() == 3)
       {
-          rhs.x = node[0].as<double>();
-          rhs.y = node[1].as<double>();
+          rhs.x = root[0].as<double>();
+          rhs.y = root[1].as<double>();
 
           // If theta is expected
-          if (node.size() == 3)
+          if (root.size() == 3)
           {
-              rhs.theta = node[2].as<double>();
+              rhs.theta = root[2].as<double>();
           }
 
           return true;

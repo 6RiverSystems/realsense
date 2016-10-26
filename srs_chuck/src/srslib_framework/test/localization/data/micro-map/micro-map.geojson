@@ -16,6 +16,7 @@
            "features": [
                {
                   "type": "Feature",
+                  "id": "1",
                   "geometry": {
                       "type": "MultiPoint",
                       "coordinates": [[0.000, 0.000], [0.100, 0.100]]
@@ -28,6 +29,7 @@
                },
                {
                   "type": "Feature",
+                  "id": "First Cost Area",
                   "geometry": {
                       "type": "MultiPoint",
                       "coordinates": [[0.200, 0.200], [0.200, 0.200]]
@@ -39,6 +41,7 @@
                },
                {
                   "type": "Feature",
+                  "id": "Weighted area",
                   "geometry": {
                       "type": "Point",
                       "coordinates": [0.200, 0.000]

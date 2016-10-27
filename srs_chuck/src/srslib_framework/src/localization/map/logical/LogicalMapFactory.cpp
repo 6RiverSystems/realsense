@@ -15,7 +15,9 @@ using namespace std;
 #include <srslib_framework/localization/map/logical/exception/PoseExpectedException.hpp>
 #include <srslib_framework/localization/map/logical/exception/PropertyNotFoundException.hpp>
 #include <srslib_framework/localization/map/logical/exception/UnexpectedFeatureException.hpp>
+#include <srslib_framework/localization/map/logical/exception/UnexpectedGeometryException.hpp>
 #include <srslib_framework/localization/map/logical/exception/UnexpectedNumberOfPointsException.hpp>
+#include <srslib_framework/localization/map/logical/exception/UnexpectedValueException.hpp>
 
 namespace srs {
 
@@ -24,11 +26,14 @@ namespace srs {
 const string LogicalMapFactory::KEYWORD_BOUNDARY = "boundary";
 const string LogicalMapFactory::KEYWORD_COORDINATES = "coordinates";
 const string LogicalMapFactory::KEYWORD_COST_AREA = "cost_area";
+const string LogicalMapFactory::KEYWORD_EDGE = "edge";
 const string LogicalMapFactory::KEYWORD_FEATURE_COLLECTION = "FeatureCollection";
 const string LogicalMapFactory::KEYWORD_FEATURES = "features";
 const string LogicalMapFactory::KEYWORD_GEOMETRY = "geometry";
+const string LogicalMapFactory::KEYWORD_GRAPH = "graph";
 const string LogicalMapFactory::KEYWORD_MAP = "map";
 const string LogicalMapFactory::KEYWORD_MAX = "max";
+const string LogicalMapFactory::KEYWORD_NULL = "null";
 const string LogicalMapFactory::KEYWORD_OBSTACLE = "obstacle";
 const string LogicalMapFactory::KEYWORD_PROPERTIES = "properties";
 const string LogicalMapFactory::KEYWORD_PROPERTY_COST_AREA_COST = "cost";
@@ -48,6 +53,7 @@ const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHT_AREA_WEST = "west";
 const string LogicalMapFactory::KEYWORD_TYPE = "type";
 const string LogicalMapFactory::KEYWORD_TYPE_POINT = "Point";
 const string LogicalMapFactory::KEYWORD_TYPE_MULTIPOINT = "MultiPoint";
+const string LogicalMapFactory::KEYWORD_VERTEX = "vertex";
 const string LogicalMapFactory::KEYWORD_WEIGHT_AREA = "weight_area";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -272,15 +278,27 @@ void LogicalMapFactory::ntEntities(YAML::Node root)
         string entityType = findEntityType(entity);
         if (entityType == KEYWORD_OBSTACLE)
         {
-            ntStatementObstacle(entity);
+            ntEntityObstacle(entity);
         }
         else if (entityType == KEYWORD_COST_AREA)
         {
-            ntStatementCostArea(entity);
+            ntEntityCostArea(entity);
         }
         else if (entityType == KEYWORD_WEIGHT_AREA)
         {
-            ntStatementWeightArea(entity);
+            ntEntityWeightArea(entity);
+        }
+        else if (entityType == KEYWORD_EDGE)
+        {
+            ntEntityEdge(entity);
+        }
+        else if (entityType == KEYWORD_GRAPH)
+        {
+            ntEntityGraph(entity);
+        }
+        else if (entityType == KEYWORD_VERTEX)
+        {
+            ntEntityVertex(entity);
         }
         else
         {
@@ -290,77 +308,7 @@ void LogicalMapFactory::ntEntities(YAML::Node root)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::ntEntry(YAML::Node root)
-{
-    YAML::Node features;
-    if (findCollection(root, features))
-    {
-        YAML::Node mapNode;
-        if (findEntityInCollection(features, KEYWORD_MAP, mapNode))
-        {
-            ntStatementMap(mapNode);
-        }
-        else
-        {
-            throw FeatureNotFoundException(metadata_, KEYWORD_MAP);
-        }
-
-        YAML::Node boundaryNode;
-        if (findEntityInCollection(features, KEYWORD_BOUNDARY, boundaryNode))
-        {
-            ntStatementBoundary(boundaryNode);
-        }
-
-        YAML::Node entitiesNode;
-        if (findCollection(features, entitiesNode))
-        {
-            ntEntities(entitiesNode);
-        }
-    }
-    else
-    {
-        throw FeaturesNotFoundException(metadata_);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-vector<Pose<>> LogicalMapFactory::ntGeometry(YAML::Node root,
-    int minNumber, int maxNumber)
-{
-    vector<Pose<>> coordinates;
-
-    YAML::Node typeNode = root[KEYWORD_TYPE];
-    if (typeNode)
-    {
-        YAML::Node coordinatesNode = root[KEYWORD_COORDINATES];
-
-        string typeString = typeNode.as<string>();
-        if (typeString == KEYWORD_TYPE_POINT)
-        {
-            coordinates.push_back(ntValuePoint(coordinatesNode, true));
-        }
-        else if (typeString == KEYWORD_TYPE_MULTIPOINT)
-        {
-            vector<Pose<>> points = ntValueMultiPoint(coordinatesNode, true);
-            coordinates.insert(coordinates.end(), points.begin(), points.end());
-        }
-        else
-        {
-            throw GeoJsonTypeUnsupportedException(metadata_, typeString);
-        }
-    }
-
-    if (coordinates.size() < minNumber || coordinates.size() > maxNumber)
-    {
-        throw UnexpectedNumberOfPointsException(metadata_,
-            minNumber, maxNumber, coordinates.size());
-    }
-
-    return coordinates;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::ntStatementBoundary(YAML::Node root)
+void LogicalMapFactory::ntEntityBoundary(YAML::Node root)
 {
     YAML::Node properties = root[KEYWORD_PROPERTIES];
 
@@ -390,7 +338,7 @@ void LogicalMapFactory::ntStatementBoundary(YAML::Node root)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::ntStatementCostArea(YAML::Node root)
+void LogicalMapFactory::ntEntityCostArea(YAML::Node root)
 {
     YAML::Node properties = root[KEYWORD_PROPERTIES];
 
@@ -406,7 +354,19 @@ void LogicalMapFactory::ntStatementCostArea(YAML::Node root)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::ntStatementMap(YAML::Node root)
+void LogicalMapFactory::ntEntityEdge(YAML::Node root)
+{
+    ntGeometryNull(root[KEYWORD_GEOMETRY]);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::ntEntityGraph(YAML::Node root)
+{
+    ntGeometryNull(root[KEYWORD_GEOMETRY]);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::ntEntityMap(YAML::Node root)
 {
     YAML::Node properties = root[KEYWORD_PROPERTIES];
 
@@ -420,7 +380,7 @@ void LogicalMapFactory::ntStatementMap(YAML::Node root)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::ntStatementObstacle(YAML::Node root)
+void LogicalMapFactory::ntEntityObstacle(YAML::Node root)
 {
     YAML::Node properties = root[KEYWORD_PROPERTIES];
 
@@ -437,7 +397,12 @@ void LogicalMapFactory::ntStatementObstacle(YAML::Node root)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::ntStatementWeightArea(YAML::Node root)
+void LogicalMapFactory::ntEntityVertex(YAML::Node root)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::ntEntityWeightArea(YAML::Node root)
 {
     YAML::Node properties = root[KEYWORD_PROPERTIES];
 
@@ -457,6 +422,100 @@ void LogicalMapFactory::ntStatementWeightArea(YAML::Node root)
     {
         Pose<> from = coordinates[0];
         addWeight(from, from, northCost, eastCost, southCost, westCost);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::ntEntry(YAML::Node root)
+{
+    YAML::Node features;
+    if (findCollection(root, features))
+    {
+        YAML::Node mapNode;
+        if (findEntityInCollection(features, KEYWORD_MAP, mapNode))
+        {
+            ntEntityMap(mapNode);
+        }
+        else
+        {
+            throw FeatureNotFoundException(metadata_, KEYWORD_MAP);
+        }
+
+        YAML::Node boundaryNode;
+        if (findEntityInCollection(features, KEYWORD_BOUNDARY, boundaryNode))
+        {
+            ntEntityBoundary(boundaryNode);
+        }
+
+        YAML::Node entitiesNode;
+        if (findCollection(features, entitiesNode))
+        {
+            ntEntities(entitiesNode);
+        }
+    }
+    else
+    {
+        throw FeaturesNotFoundException(metadata_);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+vector<Pose<>> LogicalMapFactory::ntGeometry(YAML::Node root, int minNumber, int maxNumber)
+{
+    vector<Pose<>> coordinates;
+
+    if (root.IsScalar())
+    {
+        string value = root.as<string>();
+        throw UnexpectedValueException(metadata_, value);
+    }
+    else
+    {
+        YAML::Node typeNode = root[KEYWORD_TYPE];
+        if (typeNode)
+        {
+            YAML::Node coordinatesNode = root[KEYWORD_COORDINATES];
+
+            string typeString = typeNode.as<string>();
+            if (typeString == KEYWORD_TYPE_POINT)
+            {
+                coordinates.push_back(ntValuePoint(coordinatesNode, true));
+            }
+            else if (typeString == KEYWORD_TYPE_MULTIPOINT)
+            {
+                vector<Pose<>> points = ntValueMultiPoint(coordinatesNode, true);
+                coordinates.insert(coordinates.end(), points.begin(), points.end());
+            }
+            else
+            {
+                throw GeoJsonTypeUnsupportedException(metadata_, typeString);
+            }
+        }
+    }
+
+    if (coordinates.size() < minNumber || coordinates.size() > maxNumber)
+    {
+        throw UnexpectedNumberOfPointsException(metadata_,
+            minNumber, maxNumber, coordinates.size());
+    }
+
+    return coordinates;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::ntGeometryNull(YAML::Node root)
+{
+    if (root.IsScalar())
+    {
+        string value = root.as<string>();
+        if (value != KEYWORD_NULL)
+        {
+            throw UnexpectedValueException(metadata_, value);
+        }
+    }
+    else
+    {
+        throw UnexpectedGeometryException(metadata_);
     }
 }
 

@@ -10,24 +10,23 @@ using namespace std;
 
 #include <srslib_framework/search/SearchGoal.hpp>
 #include <srslib_framework/search/SearchNode.hpp>
-#include <srslib_framework/search/graph/grid2d/Grid2dPosition.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dAction.hpp>
 
 namespace srs {
 
 struct Grid2dNode : public SearchNode
 {
-    static Grid2dNode* instanceOfStart(Grid2d* grid, Grid2dPosition position)
+    static Grid2dNode* instanceOfStart(Grid2d* grid, Grid2d::Position position)
     {
         return instanceOf(grid,
             nullptr, Grid2dAction::START,
             position,
-            grid->getAggregate(position.location), 0, nullptr);
+            grid->getAggregate(position), 0, nullptr);
     }
 
     static Grid2dNode* instanceOf(Grid2d* grid,
         Grid2dNode* parentNode, Grid2dAction::ActionEnum parentAction,
-        Grid2dPosition position, int g, int h,
+        Grid2d::Position position, int g, int h,
         SearchGoal* goal);
 
     bool equals(SearchNode* const& rhs) const
@@ -57,14 +56,9 @@ struct Grid2dNode : public SearchNode
         return parentAction_;
     }
 
-    Grid2dPosition getPosition() const
+    Grid2d::Position getPosition() const
     {
         return position_;
-    }
-
-    bool getProhibited() const
-    {
-        return prohibited_;
     }
 
     int getTotalCost() const
@@ -103,7 +97,6 @@ struct Grid2dNode : public SearchNode
             "p: " << hex << reinterpret_cast<const void*>(parentNode_) << dec <<
             ", a: " << parentAction_ <<
             ", pos: " << position_ <<
-            ", x: " << (prohibited_ ? "true" : "false") <<
             ", g: " << g_ <<
             ", h: " << h_ <<
             ", goal: " << *goal_ <<
@@ -113,13 +106,12 @@ struct Grid2dNode : public SearchNode
 protected:
     Grid2dNode(Grid2d* graph,
             Grid2dNode* parentNode, Grid2dAction::ActionEnum parentAction,
-            Grid2dPosition position, bool prohibited, int g, int h,
+            Grid2d::Position position, int g, int h,
             SearchGoal* goal) :
         graph_(graph),
         parentAction_(parentAction),
         parentNode_(parentNode),
         position_(position),
-        prohibited_(prohibited),
         g_(g),
         goal_(goal),
         h_(h)
@@ -137,8 +129,7 @@ private:
 
     Grid2dAction::ActionEnum parentAction_;
     Grid2dNode* parentNode_;
-    Grid2dPosition position_;
-    bool prohibited_;
+    Grid2d::Position position_;
 };
 
 } // namespace srs

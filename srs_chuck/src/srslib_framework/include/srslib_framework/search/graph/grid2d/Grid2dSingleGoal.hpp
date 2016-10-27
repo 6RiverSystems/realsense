@@ -7,20 +7,19 @@
 
 #include <srslib_framework/search/SearchGoal.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
-#include <srslib_framework/search/graph/grid2d/Grid2dPosition.hpp>
 
 namespace srs {
 
 struct Grid2dSingleGoal : public SearchGoal
 {
-    static Grid2dSingleGoal* instanceOf(Grid2dPosition position)
+    static Grid2dSingleGoal* instanceOf(Grid2d::Position position)
     {
         return new Grid2dSingleGoal(position);
     }
 
     int heuristic(const SearchNode* node) const
     {
-        return heuristic((reinterpret_cast<const Grid2dNode*>(node))->getPosition().location);
+        return heuristic((reinterpret_cast<const Grid2dNode*>(node))->getPosition());
     }
 
     bool reached(const SearchNode* node) const
@@ -41,20 +40,19 @@ struct Grid2dSingleGoal : public SearchGoal
     }
 
 private:
-    Grid2dSingleGoal(Grid2dPosition position) :
+    Grid2dSingleGoal(Grid2d::Position position) :
         goalPosition_(position)
     {}
 
     ~Grid2dSingleGoal()
     {}
 
-    int heuristic(Grid2d::Location toLocation) const
+    int heuristic(Grid2d::Position toPosition) const
     {
-        return abs(goalPosition_.location.x - toLocation.x) +
-            abs(goalPosition_.location.y - toLocation.y);
+        return abs(goalPosition_.x - toPosition.x) + abs(goalPosition_.y - toPosition.y);
     }
 
-    Grid2dPosition goalPosition_;
+    Grid2d::Position goalPosition_;
 };
 
 } // namespace srs

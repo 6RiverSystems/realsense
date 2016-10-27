@@ -78,6 +78,7 @@ set(TEST_SOURCES_LOCALIZATION
     test/localization/Test_Empty_BasicRead.cpp
     test/localization/Test_Map_Reconstruction.cpp
     test/localization/Test_MicroMap_BasicRead.cpp
+    test/localization/Test_MicroMap_WithAisles.cpp
     test/localization/Test_SmallMap_BasicRead.cpp
 )
 

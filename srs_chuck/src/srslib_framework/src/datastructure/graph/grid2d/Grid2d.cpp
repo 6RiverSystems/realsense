@@ -52,6 +52,12 @@ Grid2d::BaseType Grid2d::getAggregate(const Location& location) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+Grid2d::BaseType Grid2d::getAggregate(const Position& position) const
+{
+    return getAggregate(Grid2d::Location(position.x, position.y));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 Grid2d::BaseType Grid2d::getPayload(const Location& location) const
 {
     Node* node = findNode(location);
@@ -64,24 +70,30 @@ Grid2d::BaseType Grid2d::getPayload(const Location& location) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool Grid2d::getNeighbor(const Location& location, int orientation, Location& result) const
+Grid2d::BaseType Grid2d::getPayload(const Position& position) const
 {
-    switch (orientation)
+    return getPayload(Grid2d::Location(position.x, position.y));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+bool Grid2d::getNeighbor(const Position& position, Position& result) const
+{
+    switch (position.orientation)
     {
         case ORIENTATION_EAST:
-            result = Location(location.x + 1, location.y);
+            result = Position(position.x + 1, position.y, position.orientation);
             break;
 
         case ORIENTATION_NORTH:
-            result = Location(location.x, location.y + 1);
+            result = Position(position.x, position.y + 1, position.orientation);
             break;
 
         case ORIENTATION_WEST:
-            result = Location(location.x - 1, location.y);
+            result = Position(position.x - 1, position.y, position.orientation);
             break;
 
         case ORIENTATION_SOUTH:
-            result = Location(location.x, location.y - 1);
+            result = Position(position.x, position.y - 1, position.orientation);
             break;
     }
 
@@ -89,14 +101,14 @@ bool Grid2d::getNeighbor(const Location& location, int orientation, Location& re
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2d::BaseType Grid2d::getWeight(const Location& location, int orientation) const
+Grid2d::BaseType Grid2d::getWeight(const Position& position) const
 {
     if (weightCount_)
     {
-        Node* node = findNode(location);
+        Node* node = findNode(Grid2d::Location(position.x, position.y));
         if (node && node->weights)
         {
-            switch (orientation)
+            switch (position.orientation)
             {
                 case ORIENTATION_EAST:
                     return node->weights->east;

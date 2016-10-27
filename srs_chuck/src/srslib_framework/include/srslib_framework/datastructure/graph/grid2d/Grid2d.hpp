@@ -73,6 +73,55 @@ public:
         int y;
     };
 
+    struct Position : public Location
+    {
+        Position(int x = 0, int y = 0, int orientation = 0) :
+            x(x),
+            y(y),
+            orientation(orientation)
+        {}
+
+        Position(Location location, int orientation = 0) :
+            x(location.x),
+            y(location.y),
+            orientation(orientation)
+        {}
+
+        ~Position()
+        {}
+
+        std::size_t hash() const
+        {
+            return x + 1812433253 * y + orientation;
+        }
+
+        friend bool operator==(const Position& lhs, const Position& rhs)
+        {
+            if (&lhs == &rhs)
+            {
+                return true;
+            }
+
+            return (lhs.x == rhs.x) && (lhs.y == rhs.y) && (lhs.orientation == rhs.orientation);
+        }
+
+        friend ostream& operator<<(ostream& stream, const Position& position)
+        {
+            return stream << position.toString();
+        }
+
+        string toString() const
+        {
+            stringstream stream;
+            stream << "{" << x << ", " << y << ", " << orientation << "}";
+            return stream.str();
+        }
+
+        int x;
+        int y;
+        int orientation;
+    };
+
     Grid2d(unsigned int size) :
         width_(size),
         height_(size),
@@ -109,28 +158,24 @@ public:
         return grid_.count(location);
     }
 
-    bool isWithinBounds(const Location& location) const
-    {
-        return (0 <= location.x && location.x < width_) &&
-            (0 <= location.y && location.y < height_);
-    }
-
     BaseType getAggregate(const Location& location) const;
+    BaseType getAggregate(const Position& position) const;
     BaseType getPayload(const Location& location) const;
+    BaseType getPayload(const Position& position) const;
 
     unsigned int getHeight() const
     {
         return height_;
     }
 
-    bool getNeighbor(const Location& location, int orientation, Location& result) const;
+    bool getNeighbor(const Position& position, Position& result) const;
 
     unsigned int getOccupiedCount() const
     {
         return grid_.size();
     }
 
-    BaseType getWeight(const Location& location, int orientation) const;
+    BaseType getWeight(const Position& position) const;
 
     unsigned int getWeightCount() const
     {
@@ -140,6 +185,18 @@ public:
     unsigned int getWidth() const
     {
         return width_;
+    }
+
+    bool isWithinBounds(const Location& location) const
+    {
+        return (0 <= location.x && location.x < width_) &&
+            (0 <= location.y && location.y < height_);
+    }
+
+    bool isWithinBounds(const Position& position) const
+    {
+        return (0 <= position.x && position.x < width_) &&
+            (0 <= position.y && position.y < height_);
     }
 
     void maxOnPayload(const Location& location, BaseType otherPayload);

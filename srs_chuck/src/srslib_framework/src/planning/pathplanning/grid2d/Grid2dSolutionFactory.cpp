@@ -36,7 +36,7 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(BaseMa
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(BaseMap* map,
-    Grid2dPosition& start, Grid2dPosition& goal)
+    Grid2d::Position& start, Grid2d::Position& goal)
 {
     if (!map)
     {
@@ -68,17 +68,10 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(BaseMap* map
     }
 
     // Prepare the start position for the search
-    Grid2d::Location internalStart;
-    int startAngle;
-    PoseAdapter::pose2Map(fromPose, map, internalStart, startAngle);
+    Grid2d::Position start = PoseAdapter::pose2Map(fromPose, map);
 
     // Prepare the goal position for the search
-    Grid2d::Location internalGoal;
-    int goalAngle;
-    PoseAdapter::pose2Map(toPose, map, internalGoal, goalAngle);
-
-    Grid2dPosition start(internalStart, startAngle);
-    Grid2dPosition goal(internalGoal, goalAngle);
+    Grid2d::Position goal = PoseAdapter::pose2Map(toPose, map);
 
     return fromSingleGoal(map, start, goal);
 }
@@ -142,14 +135,14 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map,
         Grid2dNode* toNode = reinterpret_cast<Grid2dNode*>(*toCursor);
 
         map->transformCells2M(
-            fromNode->getPosition().location.x, fromNode->getPosition().location.y,
+            fromNode->getPosition().x, fromNode->getPosition().y,
             fromX, fromY);
 
         fromTheta = AngleMath::deg2Rad<double>(fromNode->getPosition().orientation);
         fromPose = Pose<>(fromX, fromY, AngleMath::normalizeRad<double>(fromTheta));
 
         map->transformCells2M(
-            toNode->getPosition().location.x, toNode->getPosition().location.y,
+            toNode->getPosition().x, toNode->getPosition().y,
             toX, toY);
 
         toTheta = AngleMath::deg2Rad<double>(toNode->getPosition().orientation);

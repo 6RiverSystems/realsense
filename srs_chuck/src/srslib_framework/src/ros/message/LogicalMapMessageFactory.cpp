@@ -25,10 +25,14 @@ void LogicalMapMessageFactory::map2Vector(const LogicalMap* map,
                 cell.cost = static_cast<int32_t>(grid->getPayload(location));
 
                 // Transfer the weights
-                cell.north = static_cast<int32_t>(grid->getWeight(location, Grid2d::ORIENTATION_NORTH));
-                cell.east = static_cast<int32_t>(grid->getWeight(location, Grid2d::ORIENTATION_EAST));
-                cell.south = static_cast<int32_t>(grid->getWeight(location, Grid2d::ORIENTATION_SOUTH));
-                cell.west = static_cast<int32_t>(grid->getWeight(location, Grid2d::ORIENTATION_WEST));
+                cell.north = static_cast<int32_t>(grid->getWeight(
+                    Grid2d::Position(col, row, Grid2d::ORIENTATION_NORTH)));
+                cell.east = static_cast<int32_t>(grid->getWeight(
+                    Grid2d::Position(col, row, Grid2d::ORIENTATION_EAST)));
+                cell.south = static_cast<int32_t>(grid->getWeight(
+                    Grid2d::Position(col, row, Grid2d::ORIENTATION_SOUTH)));
+                cell.west = static_cast<int32_t>(grid->getWeight(
+                    Grid2d::Position(col, row, Grid2d::ORIENTATION_WEST)));
 
                 logical.push_back(cell);
             }

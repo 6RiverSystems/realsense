@@ -29,7 +29,7 @@ public:
         START
     };
 
-    typedef pair<Grid2dPosition, Grid2d::BaseType> ActionResultType;
+    typedef pair<Grid2d::Position, Grid2d::BaseType> ActionResultType;
 
     static array<ActionEnum, 3> ALLOWED_ACTIONS;
 

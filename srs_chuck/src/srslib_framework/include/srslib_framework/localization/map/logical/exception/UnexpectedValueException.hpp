@@ -9,12 +9,12 @@
 
 namespace srs {
 
-class UnexpectedFeatureException: public LogicalMapException
+class UnexpectedValueException: public LogicalMapException
 {
 public:
-    UnexpectedFeatureException(const LogicalMetadata& metadata, const string& feature) :
+    UnexpectedValueException(const LogicalMetadata& metadata, const string& value) :
         LogicalMapException(metadata,
-            "Unexpected feature [" + feature + "]")
+            "Unexpected value [" + value + "]")
     {}
 };
 

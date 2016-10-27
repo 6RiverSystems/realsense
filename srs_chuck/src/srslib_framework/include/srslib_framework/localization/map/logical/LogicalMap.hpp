@@ -36,7 +36,7 @@ public:
 
     Grid2d::BaseType getWeights(unsigned int c, unsigned int r, int orientation) const
     {
-        return getGrid()->getWeight(Grid2d::Location(c, r), orientation);
+        return getGrid()->getWeight(Grid2d::Position(c, r, orientation));
     }
 
     void maxCost(unsigned int c, unsigned int r, Grid2d::BaseType cost);

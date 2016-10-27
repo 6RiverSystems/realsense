@@ -18,7 +18,6 @@ using namespace std;
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dSingleGoal.hpp>
-#include <srslib_framework/search/graph/grid2d/Grid2dPosition.hpp>
 
 #include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
 #include <srslib_test/utils/MemoryWatch.hpp>
@@ -29,14 +28,14 @@ constexpr int GRID_SIZE = 5;
 TEST(Test_AStar, SmallSearchWithWeights)
 {
     Solution<Grid2dSolutionItem> correctSolution;
-    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 1, 0), Pose<>(3, 1, -M_PI_2), 4});
-    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 1, -M_PI_2), Pose<>(3, 0, -M_PI_2), 5});
-    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 0, -M_PI_2), Pose<>(3, 0, -M_PI), 10});
-    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 0, -M_PI), Pose<>(2, 0, -M_PI), 11});
-    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(2, 0, -M_PI), Pose<>(1, 0, -M_PI), 12});
-    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 0, -M_PI), Pose<>(1, 0, M_PI_2), 15});
-    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 0, M_PI_2), Pose<>(1, 1, M_PI_2), 16});
-    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 18});
+    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 1, 0), Pose<>(3, 1, M_PI_2), 2});
+    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 1, M_PI_2), Pose<>(3, 2, M_PI_2), 3});
+    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 2, M_PI_2), Pose<>(3, 2, -M_PI), 5});
+    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 2, -M_PI), Pose<>(2, 2, -M_PI), 6});
+    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(2, 2, -M_PI), Pose<>(1, 2, -M_PI), 7});
+    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 2, -M_PI), Pose<>(1, 2, -M_PI_2), 9});
+    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 2, -M_PI_2), Pose<>(1, 1, -M_PI_2), 10});
+    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, -M_PI_2), Pose<>(1, 1, 0), 12});
 
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     grid.setWeights(Grid2d::Location(2, 1), 0, 0, 0, 100);
@@ -45,8 +44,8 @@ TEST(Test_AStar, SmallSearchWithWeights)
     LogicalMapFactory logicalMapFactory;
     LogicalMap* logical = logicalMapFactory.fromGrid2d(&grid, 1);
 
-    Grid2dPosition start(Grid2d::Location(3, 1), 0);
-    Grid2dPosition goal(Grid2d::Location(1, 1), 0);
+    Grid2d::Position start(3, 1, 0);
+    Grid2d::Position goal(1, 1, 0);
 
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromSingleGoal(
         logical, start, goal);
@@ -63,14 +62,14 @@ TEST(Test_AStar, SmallSearchWithWeights)
 TEST(Test_AStar, SmallSearchWithMoreWeights)
 {
     Solution<Grid2dSolutionItem> correctSolution;
-    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 1, 0), Pose<>(3, 1, -M_PI_2), 4});
-    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 1, -M_PI_2), Pose<>(3, 0, -M_PI_2), 5});
-    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 0, -M_PI_2), Pose<>(3, 0, -M_PI), 10});
-    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 0, -M_PI), Pose<>(2, 0, -M_PI), 11});
-    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(2, 0, -M_PI), Pose<>(1, 0, -M_PI), 12});
-    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 0, -M_PI), Pose<>(1, 0, M_PI_2), 15});
-    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 0, M_PI_2), Pose<>(1, 1, M_PI_2), 16});
-    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 18});
+    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 1, 0), Pose<>(3, 1, M_PI_2), 2});
+    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 1, M_PI_2), Pose<>(3, 2, M_PI_2), 3});
+    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 2, M_PI_2), Pose<>(3, 2, -M_PI), 5});
+    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 2, -M_PI), Pose<>(2, 2, -M_PI), 6});
+    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(2, 2, -M_PI), Pose<>(1, 2, -M_PI), 7});
+    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 2, -M_PI), Pose<>(1, 2, -M_PI_2), 9});
+    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 2, -M_PI_2), Pose<>(1, 1, -M_PI_2), 10});
+    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, -M_PI_2), Pose<>(1, 1, 0), 12});
 
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     grid.setWeights(Grid2d::Location(2, 1), 0, 0, 0, 100);
@@ -79,8 +78,8 @@ TEST(Test_AStar, SmallSearchWithMoreWeights)
     LogicalMapFactory logicalMapFactory;
     LogicalMap* logical = logicalMapFactory.fromGrid2d(&grid, 1);
 
-    Grid2dPosition start(Grid2d::Location(3, 1), 0);
-    Grid2dPosition goal(Grid2d::Location(1, 1), 0);
+    Grid2d::Position start(Grid2d::Location(3, 1), 0);
+    Grid2d::Position goal(Grid2d::Location(1, 1), 0);
 
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromSingleGoal(
         logical, start, goal);

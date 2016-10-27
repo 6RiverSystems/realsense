@@ -8,27 +8,18 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Grid2dNode* Grid2dNode::instanceOf(Grid2d* graph,
     Grid2dNode* parentNode, Grid2dAction::ActionEnum parentAction,
-    Grid2dPosition position, int g, int h,
+    Grid2d::Position position, int g, int h,
     SearchGoal* goal)
 {
-    bool prohibited = graph->getAggregate(position.location) == Grid2d::PAYLOAD_MAX;
-
     return new Grid2dNode(graph,
         parentNode, parentAction,
         position,
-        prohibited, g, h, goal);
+        g, h, goal);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2dNode::getNeighbors(vector<SearchNode*>& neighbors)
 {
-    // If the current node is prohibited, there are no
-    // more actions to expand
-    if (prohibited_)
-    {
-        return;
-    }
-
     Grid2dAction::ActionResultType actionResult;
 
     for (Grid2dAction::ActionEnum action : Grid2dAction::ALLOWED_ACTIONS)

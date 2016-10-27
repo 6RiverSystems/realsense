@@ -9,12 +9,11 @@
 
 namespace srs {
 
-class UnexpectedFeatureException: public LogicalMapException
+class UnexpectedGeometryException: public LogicalMapException
 {
 public:
-    UnexpectedFeatureException(const LogicalMetadata& metadata, const string& feature) :
-        LogicalMapException(metadata,
-            "Unexpected feature [" + feature + "]")
+    UnexpectedGeometryException(const LogicalMetadata& metadata) :
+        LogicalMapException(metadata, "Unexpected geometry construct")
     {}
 };
 

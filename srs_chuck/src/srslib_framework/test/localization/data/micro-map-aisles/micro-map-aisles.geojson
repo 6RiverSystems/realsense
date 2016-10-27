@@ -1,0 +1,124 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "type": "map",
+                "origin": [0.0, 0.0, 0.0],
+                "resolution": 0.100,
+                "width": 0.300,
+                "height": 0.300
+            }
+        },
+        {
+           "type": "FeatureCollection",
+           "features": [
+               {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "MultiPoint",
+                      "coordinates": [[0.000, 0.000], [0.100, 0.100]]
+                  },
+                  "properties": {
+                       "type": "obstacle",
+                       "envelope_size": 0.100,
+                       "envelope_cost": 111
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "MultiPoint",
+                      "coordinates": [[0.200, 0.200], [0.200, 0.200]]
+                  },
+                  "properties": {
+                       "type": "cost_area",
+                       "cost": 128
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "Point",
+                      "coordinates": [0.200, 0.000]
+                  },
+                  "properties": {
+                       "type": "weight_area",
+                       "north": "max",
+                       "east": 77,
+                       "south": 222,
+                       "west": 111
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "id": "SamInduct",
+                  "geometry": {
+                      "type": "Point",
+                      "coordinates": [0.000, 0.000, 0.0]
+                  },
+                  "properties": {
+                       "type": "vertex",
+                       "labels": ["induct", "packout"],
+                       "mfp_id": ["sam"],
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "id": "F01T",
+                  "geometry": {
+                      "type": "Point",
+                      "coordinates": [0.200, 0.200]
+                  },
+                  "properties": {
+                       "type": "vertex"
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "id": "A01T",
+                  "geometry": {
+                      "type": "Point",
+                      "coordinates": [0.000, 0.200]
+                  },
+                  "properties": {
+                       "type": "vertex"
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "id": "F01T_SamInduct",
+                  "geometry": "null",
+                  "properties": {
+                       "type": "edge",
+                       "direction": "false",
+                       "from": "F01T",
+                       "to": "SamInduct"
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "id": "F01T_A01T",
+                  "geometry": "null",
+                  "properties": {
+                       "type": "edge",
+                       "direction": "true",
+                       "from": "F01T",
+                       "to": "A01T"
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "id": "graph1",
+                  "geometry": "null",
+                  "properties": {
+                       "type": "graph",
+                       "vertices": ["F01T", "A01T", "SamInduct"],
+                       "edges": ["F01T_SamInduct", "F01T_A01T"]
+                   }
+               }
+           ]
+       }
+   ]
+}

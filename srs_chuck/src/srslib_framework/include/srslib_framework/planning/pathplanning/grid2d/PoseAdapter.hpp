@@ -15,14 +15,14 @@ namespace srs {
 
 struct PoseAdapter
 {
-    static void pose2Map(Pose<> pose, BaseMap* map, Grid2d::Location& location, int& orientation)
+    static Grid2d::Position pose2Map(Pose<> pose, BaseMap* map)
     {
         unsigned int r = 0;
         unsigned int c = 0;
         map->transformM2Cells(pose, c, r);
 
-        location = Grid2d::Location(c, r);
-        orientation = static_cast<int>(AngleMath::normalizeRad2Deg90(pose.theta));
+        int orientation = static_cast<int>(AngleMath::normalizeRad2Deg90(pose.theta));
+        return Grid2d::Position(c, r, orientation);
     }
 };
 

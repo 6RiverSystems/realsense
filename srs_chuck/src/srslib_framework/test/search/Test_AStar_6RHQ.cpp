@@ -19,7 +19,6 @@ using namespace std;
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
-#include <srslib_framework/search/graph/grid2d/Grid2dPosition.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dSingleGoal.hpp>
 
 using namespace srs;
@@ -32,22 +31,15 @@ TEST(Test_AStar, 6RHQ_NoTrajectory)
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 
     // Prepare the start position for the search
-    Grid2d::Location internalStart;
-    int startAngle;
-    PoseAdapter::pose2Map(startPose, mapStack->getLogicalMap(), internalStart, startAngle);
+    Grid2d::Position startPosition = PoseAdapter::pose2Map(startPose, mapStack->getLogicalMap());
 
     // Prepare the goal position for the search
-    Grid2d::Location internalGoal;
-    int goalAngle;
-    PoseAdapter::pose2Map(goalPose, mapStack->getLogicalMap(), internalGoal, goalAngle);
+    Grid2d::Position goalPosition = PoseAdapter::pose2Map(goalPose, mapStack->getLogicalMap());
 
     Grid2d* grid = mapStack->getLogicalMap()->getGrid();
 
-    Grid2dPosition startPosition(internalStart, startAngle);
-    Grid2dNode* start = Grid2dNode::instanceOfStart(grid, Grid2dPosition(internalStart, startAngle));
-
-    Grid2dPosition goalPosition(internalGoal, goalAngle);
-    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(Grid2dPosition(internalGoal, goalAngle));
+    Grid2dNode* start = Grid2dNode::instanceOfStart(grid, startPosition);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     AStar algorithm;
     ASSERT_TRUE(algorithm.search(start, goal)) <<

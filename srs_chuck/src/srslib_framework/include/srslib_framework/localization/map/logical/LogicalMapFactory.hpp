@@ -31,11 +31,14 @@ private:
     static const string KEYWORD_BOUNDARY;
     static const string KEYWORD_COORDINATES;
     static const string KEYWORD_COST_AREA;
+    static const string KEYWORD_EDGE;
     static const string KEYWORD_FEATURE_COLLECTION;
     static const string KEYWORD_FEATURES;
     static const string KEYWORD_GEOMETRY;
+    static const string KEYWORD_GRAPH;
     static const string KEYWORD_MAP;
     static const string KEYWORD_MAX;
+    static const string KEYWORD_NULL;
     static const string KEYWORD_OBSTACLE;
     static const string KEYWORD_PROPERTIES;
     static const string KEYWORD_PROPERTY_COST_AREA_COST;
@@ -55,6 +58,7 @@ private:
     static const string KEYWORD_TYPE;
     static const string KEYWORD_TYPE_POINT;
     static const string KEYWORD_TYPE_MULTIPOINT;
+    static const string KEYWORD_VERTEX;
     static const string KEYWORD_WEIGHT_AREA;
 
     void addRectangleCost(Pose<> origin, double widthM, double heightM,
@@ -72,14 +76,17 @@ private:
     string findEntityType(YAML::Node root);
 
     void ntEntities(YAML::Node root);
+    void ntEntityBoundary(YAML::Node root);
+    void ntEntityCostArea(YAML::Node root);
+    void ntEntityEdge(YAML::Node root);
+    void ntEntityGraph(YAML::Node root);
+    void ntEntityMap(YAML::Node root);
+    void ntEntityObstacle(YAML::Node root);
+    void ntEntityVertex(YAML::Node root);
+    void ntEntityWeightArea(YAML::Node root);
     void ntEntry(YAML::Node root);
     vector<Pose<>> ntGeometry(YAML::Node root, int minNumber, int maxNumber);
-
-    void ntStatementBoundary(YAML::Node root);
-    void ntStatementCostArea(YAML::Node root);
-    void ntStatementMap(YAML::Node root);
-    void ntStatementObstacle(YAML::Node root);
-    void ntStatementWeightArea(YAML::Node root);
+    void ntGeometryNull(YAML::Node root);
 
     Grid2d::BaseType ntValueCost(YAML::Node root, bool required);
     double ntValueDouble(YAML::Node root, bool required);

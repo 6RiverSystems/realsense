@@ -14,7 +14,7 @@
 	<!--- Move Base -->
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 
-        <param name="base_global_planner" value="global_planner/SrsPlanner"/>
+        <param name="base_global_planner" value="global_planner/SrsPlannerPotentials"/>
 
 		<rosparam file="$(find srsnode_navigation)/config/move_base_params.yaml" command="load" />
 		<rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />

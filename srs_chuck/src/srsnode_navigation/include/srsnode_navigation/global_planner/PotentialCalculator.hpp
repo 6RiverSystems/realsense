@@ -5,6 +5,8 @@
  */
 #pragma once
 
+#include <algorithm>
+
 namespace srs {
 
 class PotentialCalculator
@@ -21,18 +23,7 @@ public:
     virtual float calculatePotential(float* potential,
         unsigned char cost,
         int n,
-        float prev_potential = -1)
-    {
-        if (prev_potential < 0)
-        {
-            float min_h = std::min( potential[n - 1], potential[n + 1] );
-            float min_v = std::min( potential[n - nx_], potential[n + nx_]);
-
-            prev_potential = std::min(min_h, min_v);
-        }
-
-        return prev_potential + cost;
-    }
+        float prev_potential = -1);
 
     virtual void setSize(int nx, int ny)
     {

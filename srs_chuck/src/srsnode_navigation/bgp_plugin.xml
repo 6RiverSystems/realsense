@@ -8,7 +8,7 @@
 -->
 
 <library path="lib/libsrslib_global_planner">
-    <class name="global_planner/SrsPlanner" type="srs::SrsPlanner" 
+    <class name="global_planner/SrsPlannerPotentials" type="srs::SrsPlannerPotentials" 
         base_class_type="nav_core::BaseGlobalPlanner">
         
         <description>

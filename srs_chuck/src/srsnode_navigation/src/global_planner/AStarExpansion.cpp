@@ -1,6 +1,6 @@
 #include <costmap_2d/cost_values.h>
 
-#include <srsnode_navigation/global_planner/AStar.hpp>
+#include <srsnode_navigation/global_planner/AStarExpansion.hpp>
 
 namespace srs {
 

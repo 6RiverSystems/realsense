@@ -7,6 +7,14 @@ cmake_minimum_required(VERSION 2.8.3)
 
 set(PROJECT_NAME srsnode_navigation)
 
+set(${PROJECT_NAME}_SOURCES
+    src/global_planner/QuadraticCalculator.cpp
+    src/global_planner/OrientationFilter.cpp
+    src/global_planner/AStarExpansion.cpp
+    src/global_planner/PotentialCalculator.cpp
+    src/global_planner/GradientPath.cpp
+)
+
 ####################################################################################################
 # Project
 
@@ -52,7 +60,11 @@ catkin_package(
         srslib_framework
 )
 
-add_library(srslib_global_planner src/global_planner/SrsPlanner.cpp)
+add_library(
+    srslib_global_planner src/global_planner/SrsPlannerPotentials.cpp
+    ${${PROJECT_NAME}_SOURCES}
+)
+
 target_link_libraries(srslib_global_planner
     ${catkin_LIBRARIES}
     ${srslib_framework_LIBRARIES}

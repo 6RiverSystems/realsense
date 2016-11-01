@@ -79,13 +79,15 @@ sudo cp ./config/uvc.conf /etc/modprobe.d/
 sudo udevadm control --reload-rules && udevadm trigger
 cd ~/librealsense/scripts
 ./install-r200-udev-fix.sh 
+cd ~/librealsense
+make BACKEND=LIBUVC
+sudo make install
+
 # Optional (check if device is detected)
 sudo dmesg | tail -n 1000
 sudo rm /usr/lib/arm-linux-gnueabihf/libGL.so 
 sudo ln -s /usr/lib/arm-linux-gnueabihf/tegra/libGL.so /usr/lib/arm-linux-gnueabihf/libGL.so
-cd ~/librealsense
-make BACKEND=LIBUVC
-sudo make install
+
 
 # Change all network interfaces to default to eth0 and wlan0
 sudo rm /etc/udev/rules.d/70-persistent-net.rules

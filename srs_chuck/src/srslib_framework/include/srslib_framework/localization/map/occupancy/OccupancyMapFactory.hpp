@@ -26,9 +26,10 @@ public:
         metadata_()
     {}
 
-    OccupancyMap* fromMetadata(OccupancyMetadata metadata);
-    OccupancyMap* fromRosCostMap2D(costmap_2d::Costmap2DROS* rosCostMap,
+    OccupancyMap* fromCostMap2D(costmap_2d::Costmap2D* costMap,
         double freeThreshold, double occupiedThreshold);
+    OccupancyMap* fromGrid2d(Grid2d* grid, double resolution);
+    OccupancyMap* fromMetadata(OccupancyMetadata metadata);
 
 private:
     void extract1Channel(SDL_Surface* image);

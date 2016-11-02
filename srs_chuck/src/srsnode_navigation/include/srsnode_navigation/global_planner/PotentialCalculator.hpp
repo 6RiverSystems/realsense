@@ -7,6 +7,8 @@
 
 #include <algorithm>
 
+#define POT_HIGH 1.0e10
+
 namespace srs {
 
 class PotentialCalculator

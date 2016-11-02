@@ -13,37 +13,37 @@ namespace srs {
 LogicalMap::LogicalMap(double widthM, double heightM, double resolution) :
         BaseMap(widthM, heightM, resolution)
 {
-    logicalMetadata_.heightCells = getHeightCells();
-    logicalMetadata_.heightM = getHeightM();
-    logicalMetadata_.resolution = getResolution();
-    logicalMetadata_.widthCells = getWidthCells();
-    logicalMetadata_.widthM = getWidthM();
+    metadata_.heightCells = getHeightCells();
+    metadata_.heightM = getHeightM();
+    metadata_.resolution = getResolution();
+    metadata_.widthCells = getWidthCells();
+    metadata_.widthM = getWidthM();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 LogicalMap::LogicalMap(Grid2d* grid, double resolution) :
     BaseMap(grid, resolution)
 {
-    logicalMetadata_.heightCells = getHeightCells();
-    logicalMetadata_.heightM = getHeightM();
-    logicalMetadata_.resolution = getResolution();
-    logicalMetadata_.widthCells = getWidthCells();
-    logicalMetadata_.widthM = getWidthM();
+    metadata_.heightCells = getHeightCells();
+    metadata_.heightM = getHeightM();
+    metadata_.resolution = getResolution();
+    metadata_.widthCells = getWidthCells();
+    metadata_.widthM = getWidthM();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 LogicalMap::LogicalMap(LogicalMetadata metadata) :
     BaseMap(metadata.widthM, metadata.heightM, metadata.resolution)
 {
-    logicalMetadata_.heightCells = getHeightCells();
-    logicalMetadata_.heightM = getHeightM();
-    logicalMetadata_.resolution = getResolution();
-    logicalMetadata_.widthCells = getWidthCells();
-    logicalMetadata_.widthM = getWidthM();
+    metadata_.heightCells = getHeightCells();
+    metadata_.heightM = getHeightM();
+    metadata_.resolution = getResolution();
+    metadata_.widthCells = getWidthCells();
+    metadata_.widthM = getWidthM();
 
-    logicalMetadata_.loadTime = metadata.loadTime;
-    logicalMetadata_.logicalFilename = metadata.logicalFilename;
-    logicalMetadata_.origin = metadata.origin;
+    metadata_.loadTime = metadata.loadTime;
+    metadata_.logicalFilename = metadata.logicalFilename;
+    metadata_.origin = metadata.origin;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ ostream& operator<<(ostream& stream, const LogicalMap& map)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 bool operator==(const LogicalMap& lhs, const LogicalMap& rhs)
 {
-    return lhs.logicalMetadata_ == rhs.logicalMetadata_ &&
+    return lhs.metadata_ == rhs.metadata_ &&
         operator==(static_cast<const BaseMap&>(lhs), static_cast<const BaseMap&>(rhs));
 }
 

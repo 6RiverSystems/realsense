@@ -12,29 +12,40 @@ const unsigned char OccupancyMap::COST_UCHAR_MAX = numeric_limits<unsigned char>
 OccupancyMap::OccupancyMap(unsigned int widthCells, unsigned int heightCells, double resolution) :
         BaseMap(widthCells, heightCells, resolution)
 {
-    occupancyMetadata_.heightCells = getHeightCells();
-    occupancyMetadata_.heightM = getHeightM();
-    occupancyMetadata_.resolution = getResolution();
-    occupancyMetadata_.widthCells = getWidthCells();
-    occupancyMetadata_.widthM = getWidthM();
+    metadata_.heightCells = getHeightCells();
+    metadata_.heightM = getHeightM();
+    metadata_.resolution = getResolution();
+    metadata_.widthCells = getWidthCells();
+    metadata_.widthM = getWidthM();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+OccupancyMap::OccupancyMap(Grid2d* grid, double resolution) :
+        BaseMap(grid, resolution)
+{
+    metadata_.heightCells = getHeightCells();
+    metadata_.heightM = getHeightM();
+    metadata_.resolution = getResolution();
+    metadata_.widthCells = getWidthCells();
+    metadata_.widthM = getWidthM();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 OccupancyMap::OccupancyMap(OccupancyMetadata metadata) :
-            BaseMap(metadata.widthCells, metadata.heightCells, metadata.resolution)
+        BaseMap(metadata.widthCells, metadata.heightCells, metadata.resolution)
 {
-    occupancyMetadata_.heightCells = getHeightCells();
-    occupancyMetadata_.heightM = getHeightM();
-    occupancyMetadata_.resolution = getResolution();
-    occupancyMetadata_.widthCells = getWidthCells();
-    occupancyMetadata_.widthM = getWidthM();
+    metadata_.heightCells = getHeightCells();
+    metadata_.heightM = getHeightM();
+    metadata_.resolution = getResolution();
+    metadata_.widthCells = getWidthCells();
+    metadata_.widthM = getWidthM();
 
-    occupancyMetadata_.loadTime = metadata.loadTime;
-    occupancyMetadata_.negate = metadata.negate;
-    occupancyMetadata_.occupancyFilename = metadata.occupancyFilename;
-    occupancyMetadata_.origin = metadata.origin;
-    occupancyMetadata_.thresholdFree = metadata.thresholdFree;
-    occupancyMetadata_.thresholdOccupied = metadata.thresholdOccupied;
+    metadata_.loadTime = metadata.loadTime;
+    metadata_.negate = metadata.negate;
+    metadata_.occupancyFilename = metadata.occupancyFilename;
+    metadata_.origin = metadata.origin;
+    metadata_.thresholdFree = metadata.thresholdFree;
+    metadata_.thresholdOccupied = metadata.thresholdOccupied;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +60,7 @@ ostream& operator<<(ostream& stream, const OccupancyMap& map)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 bool operator==(const OccupancyMap& lhs, const OccupancyMap& rhs)
 {
-    return lhs.occupancyMetadata_ == rhs.occupancyMetadata_ &&
+    return lhs.metadata_ == rhs.metadata_ &&
         operator==(static_cast<const BaseMap&>(lhs), static_cast<const BaseMap&>(rhs));
 }
 

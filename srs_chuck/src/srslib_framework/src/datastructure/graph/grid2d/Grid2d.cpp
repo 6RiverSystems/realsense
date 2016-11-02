@@ -132,6 +132,28 @@ Grid2d::BaseType Grid2d::getWeight(const Position& position) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void Grid2d::getWeights(const Location& location,
+    BaseType& north, BaseType& east, BaseType& south, BaseType& west) const
+{
+    north = WEIGHT_MIN;
+    east = WEIGHT_MIN;
+    south = WEIGHT_MIN;
+    west = WEIGHT_MIN;
+
+    if (weightCount_)
+    {
+        Node* node = findNode(location);
+        if (node && node->weights)
+        {
+            north = node->weights->north;
+            east = node->weights->east;
+            south = node->weights->south;
+            west = node->weights->west;
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2d::maxOnPayload(const Location& location, BaseType otherPayload)
 {
     updatePayload(location, otherPayload,

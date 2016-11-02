@@ -176,6 +176,8 @@ public:
     }
 
     BaseType getWeight(const Position& position) const;
+    void getWeights(const Location& location,
+        BaseType& north, BaseType& east, BaseType& south, BaseType& west) const;
 
     unsigned int getWeightCount() const
     {

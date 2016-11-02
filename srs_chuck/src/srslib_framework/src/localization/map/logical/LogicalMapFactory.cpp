@@ -57,6 +57,24 @@ const string LogicalMapFactory::KEYWORD_VERTEX = "vertex";
 const string LogicalMapFactory::KEYWORD_WEIGHT_AREA = "weight_area";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+LogicalMap* LogicalMapFactory::fromCostMap2D(costmap_2d::Costmap2D* costMap)
+{
+    map_ = new LogicalMap(costMap->getSizeInMetersX(), costMap->getSizeInMetersY(),
+        costMap->getResolution());
+    metadata_ = map_->getMetadata();
+
+    for (int row = 0; row < costMap->getSizeInCellsY(); row++)
+    {
+        for (int col = 0; col < costMap->getSizeInCellsX(); col++)
+        {
+            map_->setCost(col, row, costMap->getCost(col, row));
+        }
+    }
+
+    return map_;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 LogicalMap* LogicalMapFactory::fromGrid2d(Grid2d* grid, double resolution)
 {
     map_ = new LogicalMap(grid, resolution);

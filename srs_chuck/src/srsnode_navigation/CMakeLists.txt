@@ -8,11 +8,18 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srsnode_navigation)
 
 set(${PROJECT_NAME}_SOURCES
+    src/global_planner/AStarCore.cpp
     src/global_planner/QuadraticCalculator.cpp
     src/global_planner/OrientationFilter.cpp
     src/global_planner/AStarExpansion.cpp
     src/global_planner/PotentialCalculator.cpp
     src/global_planner/GradientPath.cpp
+    src/global_planner/GridPath.cpp
+)
+
+set(${PROJECT_NAME}_TEST_SOURCES
+
+    test/TestNavigation_SmallMap.cpp
 )
 
 ####################################################################################################
@@ -36,9 +43,13 @@ find_package(catkin REQUIRED COMPONENTS
     srslib_test
 )
 
-include_directories(include
-    src/
+include_directories(
+    INCLUDE_DIRS
+    LIBRARIES
+    include
+    src
     ${catkin_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS} 
     ${srslib_framework_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
 )
@@ -84,3 +95,25 @@ install(DIRECTORY
 install(FILES bgp_plugin.xml
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
+
+####################################################################################################
+# Tests
+
+if (CATKIN_ENABLE_TESTING)
+#    file(COPY test/data DESTINATION ${CMAKE_BINARY_DIR})
+
+    catkin_add_gtest(TestSuite_Navigation
+        test/TestSuite_Navigation.cpp
+        ${${PROJECT_NAME}_TEST_SOURCES}
+        ${${PROJECT_NAME}_SOURCES}
+    )
+    add_dependencies(${TestSuite_Navigation}
+        ${catkin_EXPORTED_TARGETS}
+        ${srsnode_navigation_EXPORTED_TARGETS}
+    )
+    target_link_libraries(TestSuite_Navigation
+        ${catkin_LIBRARIES}
+        ${OpenCV_LIBRARIES}
+        ${srslib_framework_LIBRARIES}
+    )
+endif()

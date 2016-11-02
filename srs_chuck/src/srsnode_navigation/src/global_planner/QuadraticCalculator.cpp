@@ -2,6 +2,7 @@
 
 namespace srs {
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
 float QuadraticCalculator::calculatePotential(float* potential, unsigned char cost, int n, float prev_potential)
 {
     // get neighbors
@@ -14,25 +15,38 @@ float QuadraticCalculator::calculatePotential(float* potential, unsigned char co
     // find lowest, and its lowest neighbor
     float ta, tc;
     if (l < r)
+    {
         tc = l;
+    }
     else
+    {
         tc = r;
+    }
+
     if (u < d)
+    {
         ta = u;
+    }
     else
+    {
         ta = d;
+    }
 
     float hf = cost; // traversability factor
     float dc = tc - ta;        // relative cost between ta,tc
+
     if (dc < 0)         // tc is lowest
-            {
+    {
         dc = -dc;
         ta = tc;
     }
 
     // calculate new potential
-    if (dc >= hf)        // if too large, use ta-only update
+    if (dc >= hf)
+    {
+        // if too large, use ta-only update
         return ta + hf;
+    }
     else            // two-neighbor interpolation update
     {
         // use quadratic approximation

@@ -31,7 +31,7 @@ public:
 
     LogicalMetadata getMetadata() const
     {
-        return logicalMetadata_;
+        return metadata_;
     }
 
     Grid2d::BaseType getWeights(unsigned int c, unsigned int r, int orientation) const
@@ -53,7 +53,7 @@ public:
         Grid2d::BaseType west);
 
 private:
-    LogicalMetadata logicalMetadata_;
+    LogicalMetadata metadata_;
 };
 
 ostream& operator<<(ostream& stream, const LogicalMap& map);

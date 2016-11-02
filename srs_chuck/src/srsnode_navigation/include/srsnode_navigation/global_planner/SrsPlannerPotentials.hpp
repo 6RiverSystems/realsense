@@ -19,9 +19,8 @@ using namespace std;
 #include <base_local_planner/costmap_model.h>
 
 #include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/localization/map/logical/LogicalMap.hpp>
 #include <srslib_framework/ros/tap/TapMapStack.hpp>
-
-#define POT_HIGH 1.0e10        // unassigned cell potential
 
 #include <geometry_msgs/Point.h>
 #include <nav_msgs/Path.h>
@@ -29,10 +28,9 @@ using namespace std;
 #include <nav_msgs/GetPlan.h>
 #include <dynamic_reconfigure/server.h>
 
-#include <srsnode_navigation/global_planner/PotentialCalculator.hpp>
-#include <srsnode_navigation/global_planner/Expander.hpp>
-#include <srsnode_navigation/global_planner/Traceback.hpp>
+#include <srsnode_navigation/global_planner/AStarCore.hpp>
 #include <srsnode_navigation/global_planner/OrientationFilter.hpp>
+using namespace srs;
 
 namespace srs {
 
@@ -80,43 +78,45 @@ private:
 
     void updateMapStack(costmap_2d::Costmap2DROS* rosCostMap);
 
-    void mapToWorld(double mx, double my, double& wx, double& wy);
-    bool worldToMap(double wx, double wy, double& mx, double& my);
-    void clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, unsigned int mx, unsigned int my);
+//    void clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, unsigned int mx, unsigned int my);
     void publishPotential(float* potential);
 
     void getPlanFromPotential(std::vector<std::pair<float, float>>& path,
-        const geometry_msgs::PoseStamped& goal,
+//        const geometry_msgs::PoseStamped& goal,
         std::vector<geometry_msgs::PoseStamped>& plan);
 
-    double planner_window_x_, planner_window_y_, default_tolerance_;
+    double planner_window_x_;
+    double planner_window_y_;
+    double default_tolerance_;
+
     std::string tf_prefix_;
     boost::mutex mutex_;
-    ros::ServiceServer make_plan_srv_;
+//    ros::ServiceServer make_plan_srv_;
 
 //    PotentialCalculator* p_calc_;
 //    Expander* planner_;
 //    Traceback* path_maker_;
-//    OrientationFilter* orientation_filter_;
+    OrientationFilter* orientation_filter_;
 
     bool publish_potential_;
     ros::Publisher potential_pub_;
     int publish_scale_;
 
 //    void outlineMap(unsigned char* costarr, int nx, int ny, unsigned char value);
-    unsigned char* cost_array_;
+//    unsigned char* cost_array_;
     float* potential_array_;
     unsigned int start_x_, start_y_, end_x_, end_y_;
 
     AStarCore* astarCore_;
 
 //    bool old_navfn_behavior_;
-    float convert_offset_;
 
 //    dynamic_reconfigure::Server<global_planner::GlobalPlannerConfig> *dsrv_;
 //    void reconfigureCB(global_planner::GlobalPlannerConfig &config, uint32_t level);
 
     MapStack* srsMapStack_;
+
+    LogicalMap* logicalMap_;
 
     TapMapStack tapMapStack_;
 };

@@ -8,33 +8,44 @@
 #include <vector>
 #include <algorithm>
 
+#include <costmap_2d/costmap_2d_ros.h>
+#include <costmap_2d/costmap_2d.h>
+
+#include <srslib_framework/localization/map/logical/LogicalMap.hpp>
+
+#include <srsnode_navigation/global_planner/Expander.hpp>
 #include <srsnode_navigation/global_planner/PotentialCalculator.hpp>
-#include <srsnode_navigation/global_planner/SrsPlannerPotentials.hpp>
+#include <srsnode_navigation/global_planner/Traceback.hpp>
 
 namespace srs {
 
 class AStarCore
 {
 public:
-    AStarCore(costmap_2d::Costmap2D* costmap);
+    AStarCore(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap);
 
     bool calculatePath(
-        unsigned int start_x, unsigned int start_y,
-        unsigned int end_x, unsigned int end_y,
-        const geometry_msgs::PoseStamped& goal,
-        std::vector<geometry_msgs::PoseStamped>& plan);
+        double start_x, double start_y,
+        double end_x, double end_y,
+        std::vector<std::pair<float, float>>& path,
+        float*& potentials);
+
+    void mapToWorld(double mx, double my, double& wx, double& wy);
+    bool worldToMap(double wx, double wy, double& mx, double& my);
 
 private:
-    void outlineMap(unsigned char* costarr, int nx, int ny, unsigned char value);
+    void addMapBorder();
 
-    float* potential_array_;
+    costmap_2d::Costmap2D* costMap_;
 
-    costmap_2d::Costmap2D* costmap_;
+    LogicalMap* logicalMap_;
 
-    PotentialCalculator* p_calc_;
+    PotentialCalculator* pCalculator_;
     Expander* planner_;
     Traceback* path_maker_;
-    OrientationFilter* orientation_filter_;
+
+    float convert_offset_;
+
 };
 
 }

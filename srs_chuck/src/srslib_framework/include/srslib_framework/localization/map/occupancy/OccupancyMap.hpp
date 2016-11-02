@@ -21,6 +21,7 @@ public:
     static const unsigned char COST_UCHAR_MAX;
 
     OccupancyMap(unsigned int widthCells, unsigned int heightCells, double resolution);
+    OccupancyMap(Grid2d* grid, double resolution);
     OccupancyMap(OccupancyMetadata metadata);
     ~OccupancyMap()
     {}
@@ -32,24 +33,24 @@ public:
 
     OccupancyMetadata getMetadata() const
     {
-        return occupancyMetadata_;
+        return metadata_;
     }
 
     Grid2d::BaseType grayLevel2Cost(unsigned char level) const
     {
         Grid2d::BaseType maxCost = numeric_limits<unsigned char>::max();
         Grid2d::BaseType newCost = static_cast<Grid2d::BaseType>(
-            occupancyMetadata_.negate ? maxCost - level : level);
+            metadata_.negate ? maxCost - level : level);
 
         // If the percentage is under the free-cell threshold, the cost is minimal
         float percentage = static_cast<float>(newCost) / static_cast<float>(maxCost);
-        newCost = percentage < occupancyMetadata_.thresholdFree ?
+        newCost = percentage < metadata_.thresholdFree ?
             Grid2d::PAYLOAD_MIN :
             newCost;
 
         // If the percentage is above the occupied-cell threshold, the cost is the maximum
         // allowed cost
-        newCost = percentage > occupancyMetadata_.thresholdOccupied ?
+        newCost = percentage > metadata_.thresholdOccupied ?
             Grid2d::PAYLOAD_MAX :
             newCost;
 
@@ -59,7 +60,7 @@ public:
     int8_t cost2grayLevel(Grid2d::BaseType intCost) const
     {
         int8_t newCost = static_cast<int8_t>(intCost);
-        return occupancyMetadata_.negate ? COST_INT8_MAX - newCost : newCost;
+        return metadata_.negate ? COST_INT8_MAX - newCost : newCost;
     }
 
     void maxCost(unsigned int c, unsigned int r, Grid2d::BaseType cost);
@@ -71,7 +72,7 @@ public:
     void setObstruction(unsigned int c, unsigned int r);
 
 protected:
-    OccupancyMetadata occupancyMetadata_;
+    OccupancyMetadata metadata_;
 };
 
 ostream& operator<<(ostream& stream, const OccupancyMap& map);

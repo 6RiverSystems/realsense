@@ -14,6 +14,43 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+OccupancyMap* OccupancyMapFactory::fromCostMap2D(costmap_2d::Costmap2D* costMap,
+    double freeThreshold, double occupiedThreshold)
+{
+    map_ = nullptr;
+
+    if (!costMap)
+    {
+        return nullptr;
+    }
+
+    unsigned int rows = costMap->getSizeInCellsY();
+    unsigned int columns = costMap->getSizeInCellsX();
+
+    map_ = new OccupancyMap(columns, rows, costMap->getResolution());
+    metadata_ = map_->getMetadata();
+
+    for (int row = 0; row < rows; row++)
+    {
+        for (int col = 0; col < columns; col++)
+        {
+            map_->setCost(col, row, static_cast<unsigned int>(costMap->getCost(col, row)));
+        }
+    }
+
+    return map_;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+OccupancyMap* OccupancyMapFactory::fromGrid2d(Grid2d* grid, double resolution)
+{
+    map_ = new OccupancyMap(grid, resolution);
+    metadata_ = map_->getMetadata();
+
+    return map_;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 OccupancyMap* OccupancyMapFactory::fromMetadata(OccupancyMetadata metadata)
 {
     map_ = nullptr;
@@ -47,36 +84,6 @@ OccupancyMap* OccupancyMapFactory::fromMetadata(OccupancyMetadata metadata)
     }
 
     SDL_FreeSurface(image);
-
-    return map_;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-OccupancyMap* OccupancyMapFactory::fromRosCostMap2D(costmap_2d::Costmap2DROS* rosCostMap,
-    double freeThreshold, double occupiedThreshold)
-{
-    map_ = nullptr;
-
-    if (!rosCostMap)
-    {
-        return nullptr;
-    }
-
-    costmap_2d::Costmap2D* costMap = rosCostMap->getCostmap();
-
-    unsigned int rows = costMap->getSizeInCellsY();
-    unsigned int columns = costMap->getSizeInCellsX();
-
-    map_ = new OccupancyMap(columns, rows, costMap->getResolution());
-    metadata_ = map_->getMetadata();
-
-    for (int row = 0; row < rows; row++)
-    {
-        for (int col = 0; col < columns; col++)
-        {
-            map_->setCost(col, row, static_cast<unsigned int>(costMap->getCost(col, row)));
-        }
-    }
 
     return map_;
 }

@@ -9,6 +9,7 @@
 using namespace std;
 
 #include <yaml-cpp/yaml.h>
+#include <costmap_2d/costmap_2d_ros.h>
 
 #include <srslib_framework/localization/map/logical/LogicalMap.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMetadata.hpp>
@@ -23,6 +24,7 @@ public:
         metadata_()
     {}
 
+    LogicalMap* fromCostMap2D(costmap_2d::Costmap2D* costMap);
     LogicalMap* fromGrid2d(Grid2d* grid, double resolution);
     LogicalMap* fromJsonFile(string jsonFilename, double loadTime = 0);
     LogicalMap* fromString(string jsonFilename, double loadTime = 0);

@@ -5,16 +5,19 @@
 
 namespace srs {
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void set_angle(geometry_msgs::PoseStamped* pose, double angle)
 {
     pose->pose.orientation = tf::createQuaternionMsgFromYaw(angle);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
 double getYaw(geometry_msgs::PoseStamped pose)
 {
     return tf::getYaw(pose.pose.orientation);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void OrientationFilter::processPath(const geometry_msgs::PoseStamped& start,
                                     std::vector<geometry_msgs::PoseStamped>& path)
 {
@@ -51,17 +54,19 @@ void OrientationFilter::processPath(const geometry_msgs::PoseStamped& start,
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void OrientationFilter::pointToNext(std::vector<geometry_msgs::PoseStamped>& path, int index)
 {
-  double x0 = path[ index ].pose.position.x,
+    double x0 = path[ index ].pose.position.x,
          y0 = path[ index ].pose.position.y,
          x1 = path[index+1].pose.position.x,
          y1 = path[index+1].pose.position.y;
 
-  double angle = atan2(y1-y0,x1-x0);
-  set_angle(&path[index], angle);
+    double angle = atan2(y1-y0,x1-x0);
+    set_angle(&path[index], angle);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void OrientationFilter::interpolate(std::vector<geometry_msgs::PoseStamped>& path,
                                     int start_index, int end_index)
 {
@@ -69,7 +74,8 @@ void OrientationFilter::interpolate(std::vector<geometry_msgs::PoseStamped>& pat
            end_yaw   = getYaw(path[end_index  ]);
     double diff = angles::shortest_angular_distance(start_yaw, end_yaw);
     double increment = diff/(end_index-start_index);
-    for(int i=start_index; i<=end_index; i++){
+    for (int i = start_index; i <= end_index; i++)
+    {
         double angle = start_yaw + increment * i;
         set_angle(&path[i], angle);
     }

@@ -41,8 +41,10 @@ void RawOdometryHandler::receiveData(ros::Time currentTime, vector<char>& buffer
 	        " current: " << internalTime.toSec());
 	}
 
+	constexpr static double RPM_EPSILON = 0.00001;
+
 	bool isRobotStatic = true;
-	if (fabs(odometryRPMData->rpm_left_wheel) > 0.00001 || fabs(odometryRPMData->rpm_right_wheel) > 0.00001)
+	if (fabs(odometryRPMData->rpm_left_wheel) > RPM_EPSILON || fabs(odometryRPMData->rpm_right_wheel) > RPM_EPSILON)
 	{
 		isRobotStatic = false;
 	}

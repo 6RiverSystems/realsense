@@ -12,7 +12,7 @@
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Twist.h>
 #include <srslib_framework/io/IO.hpp>
-
+#include <srslib_framework/OdometryRPM.h>
 #include <BrainStemEmulator.h>
 #include <BrainStemMessageProcessor.h>
 
@@ -53,7 +53,7 @@ private:
 
 	void OnPing( );
 
-	void OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity );
+	void OnChangeVelocity( const srslib_framework::OdometryRPM::ConstPtr& velocity );
 
 	void OnRosCallback( const std_msgs::String::ConstPtr& msg );
 

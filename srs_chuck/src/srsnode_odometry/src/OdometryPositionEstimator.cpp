@@ -16,7 +16,10 @@ OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	pose_(-1.0, -1.0, -1.0),
 	pingTimer_(),
 	broadcaster_(),
+	resetPoseSub_(),
+	amclVelocityCmdSub_(),
 	rawOdometryRPMSub_(),
+	rpmVelocityCmdPub_(),
 	odometryPosePub_(),
 	pingPub_(),
 	wheelbaseLength_(0.5235),
@@ -48,13 +51,21 @@ void OdometryPositionEstimator::run()
 
 void OdometryPositionEstimator::connect()
 {
+	// Get odometry reading and calculates the robot pose
 	rawOdometryRPMSub_ = nodeHandle_.subscribe<srslib_framework::OdometryRPM>(ODOMETRY_RAW_RPM_TOPIC, 10,
-		std::bind( &OdometryPositionEstimator::RawRPMToVelocity, this, std::placeholders::_1 ));
+		std::bind( &OdometryPositionEstimator::CalculateRobotPose, this, std::placeholders::_1 ));
 
+	// Reset robot pose
 	resetPoseSub_ = nodeHandle_.subscribe<geometry_msgs::PoseWithCovarianceStamped>(INITIAL_POSE_TOPIC, 1,
 			std::bind( &OdometryPositionEstimator::ResetOdomPose, this, std::placeholders::_1 ));
 
+	// Transform velocity command from AMCL to RPM command
+	amclVelocityCmdSub_ = nodeHandle_.subscribe<geometry_msgs::Twist>(ODOMETRY_AMCL_COMMAND, 10,
+			std::bind( &OdometryPositionEstimator::TransformVeclocityToRPM, this, std::placeholders::_1 ));
+
 	odometryPosePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_OUTPUT_TOPIC, 100);
+
+	rpmVelocityCmdPub_ = nodeHandle_.advertise<srslib_framework::OdometryRPM>(ODOMETRY_MOTION_COMMAND, 10);
 
 	pingPub_ = nodeHandle_.advertise<std_msgs::Bool>("/internal/state/ping", 1);
 
@@ -69,9 +80,10 @@ void OdometryPositionEstimator::connect()
 void OdometryPositionEstimator::disconnect()
 {
 	odometryPosePub_.shutdown();
+	rpmVelocityCmdPub_.shutdown();
 }
 
-void OdometryPositionEstimator::RawRPMToVelocity( const srslib_framework::OdometryRPM::ConstPtr& wheelRPM )
+void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::OdometryRPM::ConstPtr& wheelRPM )
 {
 	// If no initial pose is provided, return immediately without any calculation
 	if(pose_.x == (-1.0) && pose_.y == (-1.0) && pose_.theta == (-1.0))
@@ -121,9 +133,6 @@ void OdometryPositionEstimator::RawRPMToVelocity( const srslib_framework::Odomet
 					pose_.x, pose_.y, pose_.theta );
 	}
 
-//	ROS_ERROR_THROTTLE( 1.0, "Pose: %f, %f", pose_.x, pose_.y );
-//	ROS_ERROR_THROTTLE( 1.0, "Pose: x=%f, y=%f, angle:%f", pose_.x, pose_.y, pose_.theta );
-
 	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( pose_.theta );
 
 	// Publish the TF
@@ -146,7 +155,7 @@ void OdometryPositionEstimator::RawRPMToVelocity( const srslib_framework::Odomet
 	odom.pose.pose.position.z = 0.0;
 	odom.pose.pose.orientation = odom_quat;
 
-	// Velocity
+	// Velocitygeometry_msgs
 	odom.twist.twist.linear.x = linearVelocity;
 	odom.twist.twist.linear.y = 0.0;
 	odom.twist.twist.linear.z = 0.0;
@@ -176,9 +185,6 @@ void OdometryPositionEstimator::ResetOdomPose( const geometry_msgs::PoseWithCova
 
 void OdometryPositionEstimator::GetRawOdometryVelocity( const float leftWheelRPM, const float rightWheelRPM, double& linearV, double& angularV)
 {
-	//double leftWheelVelocity = (double)leftWheelRPM / timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * leftWheelRadius_ * 2 * M_PI;
-	//double rightWheelVelocity = (double)rightWheelRPM / timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * rightWheelRadius_ * 2 * M_PI;
-
 	// Calculate left and right wheel velocity
 	double leftWheelVelocity = (double)leftWheelRPM * 2.0 * M_PI * leftWheelRadius_ / 60.0;
 	double rightWheelVelocity = (double)rightWheelRPM * 2.0 * M_PI * rightWheelRadius_ / 60.0;
@@ -186,6 +192,23 @@ void OdometryPositionEstimator::GetRawOdometryVelocity( const float leftWheelRPM
 	// Calculate v and w
 	linearV = ( rightWheelVelocity + leftWheelVelocity ) / 2.0;
 	angularV = ( rightWheelVelocity - leftWheelVelocity ) / wheelbaseLength_ ;
+}
+
+void OdometryPositionEstimator::TransformVeclocityToRPM(const geometry_msgs::Twist::ConstPtr& amclVelocity)
+{
+	// Whenever Twist command is sent from AMCL node, odometry node transforms it to RPM command
+	// and sends it to brainstem
+	double leftMotorSpeed = amclVelocity->linear.x - ((wheelbaseLength_ / 2) * amclVelocity->angular.z);
+	double rightMotorSpeed = amclVelocity->linear.x + ((wheelbaseLength_ / 2) * amclVelocity->angular.z);
+
+	double leftMotorRPM = leftMotorSpeed * 60.0 / 2.0 / M_PI / leftWheelRadius_;
+	double rightMotorRPM = rightMotorSpeed * 60.0 / 2.0 / M_PI / rightWheelRadius_;
+
+	// Publish OdometryRPM message
+	srslib_framework::OdometryRPM rpmVelocity;
+	rpmVelocity.left_wheel_rpm = leftMotorRPM;
+	rpmVelocity.right_wheel_rpm = rightMotorRPM;
+	rpmVelocityCmdPub_.publish(rpmVelocity);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)

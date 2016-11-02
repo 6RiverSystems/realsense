@@ -37,9 +37,11 @@ public:
 
 private:
 
-    void RawRPMToVelocity( const srslib_framework::OdometryRPM::ConstPtr& wheelRPM );
+    void CalculateRobotPose( const srslib_framework::OdometryRPM::ConstPtr& wheelRPM );
 
     void GetRawOdometryVelocity(const float leftWheelCount, const float rightWheelCount, double& v, double& w);
+
+    void TransformVeclocityToRPM(const geometry_msgs::Twist::ConstPtr& amclVelocity);
 
     void ResetOdomPose( const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& resetMsg );
 
@@ -55,7 +57,10 @@ private:
 
 	static constexpr auto ODOMETRY_RAW_RPM_TOPIC = "/internal/sensors/odometry/raw";
 
-	//static constexpr auto ODOMETRY_RAW_COUNT_TOPIC = "/internal/sensors/odometry/count";
+	// Need to rename
+	static constexpr auto ODOMETRY_AMCL_COMMAND = "/internal/sensors/odometry/rpm_velocity";
+
+	static constexpr auto ODOMETRY_MOTION_COMMAND = "/internal/driver/brainstem/cmd_velocity";
 
 	static constexpr auto ODOMETRY_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity";
 
@@ -73,7 +78,11 @@ private:
 
 	ros::Subscriber rawOdometryRPMSub_;
 
+	ros::Subscriber amclVelocityCmdSub_;
+
 	ros::Subscriber resetPoseSub_;
+
+	ros::Publisher rpmVelocityCmdPub_;
 
 	ros::Publisher odometryPosePub_;
 

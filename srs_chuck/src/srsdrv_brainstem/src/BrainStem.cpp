@@ -10,7 +10,6 @@
 #include <std_msgs/Float32.h>
 #include <srslib_framework/MsgHardwareInfo.h>
 #include <srslib_framework/MsgOperationalState.h>
-#include <geometry_msgs/TwistStamped.h>
 #include <srslib_framework/io/SerialIO.hpp>
 #include <srslib_framework/platform/Thread.hpp>
 #include <bitset>
@@ -175,7 +174,7 @@ void BrainStem::CreateSubscribers( )
 	m_pingSubscriber = m_rosNodeHandle.subscribe<std_msgs::Bool>( PING_TOPIC, 10,
 	    std::bind( &BrainStem::OnPing, this ) );
 
-	m_velocitySubscriber = m_rosNodeHandle.subscribe<geometry_msgs::Twist>( VELOCITY_TOPIC, 10,
+	m_velocitySubscriber = m_rosNodeHandle.subscribe<srslib_framework::OdometryRPM>( VELOCITY_TOPIC, 10,
 	    std::bind( &BrainStem::OnChangeVelocity, this, std::placeholders::_1 ) );
 
 	m_llcmdSubscriber = m_rosNodeHandle.subscribe<std_msgs::String>( COMMAND_TOPIC, 100,
@@ -223,22 +222,9 @@ void BrainStem::OnPing( )
 	m_messageProcessor.SendPing( );
 }
 
-void BrainStem::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity )
+void BrainStem::OnChangeVelocity( const srslib_framework::OdometryRPM::ConstPtr& velocityRPM )
 {
-	double rightWheelRadius = 0.0;
-	double leftWheelRadius = 0.0;
-	double wheelbaseLength = 0.0;
-	m_rosNodeHandle.getParam("/srsnode_odometry/robot_leftwheel_radius", leftWheelRadius);
-	m_rosNodeHandle.getParam("/srsnode_odometry/robot_rightwheel_radius", rightWheelRadius);
-	m_rosNodeHandle.getParam("/srsnode_odometry/robot_wheelbase_length", wheelbaseLength);
-
-	double leftMotorSpeed = velocity->linear.x - ((wheelbaseLength / 2) * velocity->angular.z);
-	double rightMotorSpeed = velocity->linear.x + ((wheelbaseLength / 2) * velocity->angular.z);
-
-	double leftMotorSpeedRPM = leftMotorSpeed * 60.0 / 2.0 / M_PI / leftWheelRadius;
-	double rightMotorSpeedRPM = rightMotorSpeed * 60.0 / 2.0 / M_PI / rightWheelRadius;
-
-	m_messageProcessor.SetRPM( leftMotorSpeedRPM, rightMotorSpeedRPM );
+	m_messageProcessor.SetRPM( velocityRPM->left_wheel_rpm, velocityRPM->right_wheel_rpm );
 }
 
 void BrainStem::OnRosCallback(const std_msgs::String::ConstPtr& msg)

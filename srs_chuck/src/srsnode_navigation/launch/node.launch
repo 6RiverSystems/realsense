@@ -15,7 +15,7 @@
 	<!--- Move Base -->
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 		<remap from="/move_base_simple/goal" to="/request/goal"/>
-		<remap from="/cmd_vel" to="/internal/drivers/brainstem/cmd_velocity"/>
+		<remap from="/cmd_vel" to="/internal/sensors/odometry/rpm_velocity"/>
 
 		<!-- Move Base -->
 		<rosparam file="$(find srsnode_navigation)/config/move_base_params.yaml" command="load" />

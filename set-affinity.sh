@@ -14,5 +14,5 @@ do
   echo 'Setting move_base ($pid) to run on CPU 4'
 
   taskset -cp 3 $pid
-  renice -n -5 -p $pid
+#  renice -n -5 -p $pid
 done

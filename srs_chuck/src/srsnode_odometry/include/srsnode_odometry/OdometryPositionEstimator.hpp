@@ -55,12 +55,12 @@ private:
 
     static constexpr double MAX_ALLOWED_PING_DELAY = 0.5; // 50% of the duty cycle
 
-	static constexpr auto ODOMETRY_RAW_RPM_TOPIC = "/internal/sensors/odometry/raw";
+	static constexpr auto ODOMETRY_RPM_RAW_TOPIC = "/internal/sensors/odometry/raw";
 
 	// Need to rename
-	static constexpr auto ODOMETRY_AMCL_COMMAND = "/internal/sensors/odometry/rpm_velocity";
+	static constexpr auto ODOMETRY_RAW_VELOCITY_TOPIC = "/internal/sensors/odometry/raw_velocity";
 
-	static constexpr auto ODOMETRY_MOTION_COMMAND = "/internal/driver/brainstem/cmd_velocity";
+	static constexpr auto ODOMETRY_RPM_COMMAND_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
 
 	static constexpr auto ODOMETRY_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity";
 
@@ -78,7 +78,7 @@ private:
 
 	ros::Subscriber rawOdometryRPMSub_;
 
-	ros::Subscriber amclVelocityCmdSub_;
+	ros::Subscriber rawVelocityCmdSub_;
 
 	ros::Subscriber resetPoseSub_;
 

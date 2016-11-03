@@ -17,7 +17,7 @@ OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	pingTimer_(),
 	broadcaster_(),
 	resetPoseSub_(),
-	amclVelocityCmdSub_(),
+	rawVelocityCmdSub_(),
 	rawOdometryRPMSub_(),
 	rpmVelocityCmdPub_(),
 	odometryPosePub_(),
@@ -51,21 +51,21 @@ void OdometryPositionEstimator::run()
 
 void OdometryPositionEstimator::connect()
 {
-	// Get odometry reading and calculates the robot pose
-	rawOdometryRPMSub_ = nodeHandle_.subscribe<srslib_framework::OdometryRPM>(ODOMETRY_RAW_RPM_TOPIC, 10,
+	// Get odometry reading in rpm and calculates the robot pose
+	rawOdometryRPMSub_ = nodeHandle_.subscribe<srslib_framework::OdometryRPM>(ODOMETRY_RPM_RAW_TOPIC, 10,
 		std::bind( &OdometryPositionEstimator::CalculateRobotPose, this, std::placeholders::_1 ));
 
 	// Reset robot pose
 	resetPoseSub_ = nodeHandle_.subscribe<geometry_msgs::PoseWithCovarianceStamped>(INITIAL_POSE_TOPIC, 1,
 			std::bind( &OdometryPositionEstimator::ResetOdomPose, this, std::placeholders::_1 ));
 
-	// Transform velocity command from AMCL to RPM command
-	amclVelocityCmdSub_ = nodeHandle_.subscribe<geometry_msgs::Twist>(ODOMETRY_AMCL_COMMAND, 10,
+	// Transform velocity command from linear/angular velocity to RPM command
+	rawVelocityCmdSub_ = nodeHandle_.subscribe<geometry_msgs::Twist>(ODOMETRY_RAW_VELOCITY_TOPIC, 10,
 			std::bind( &OdometryPositionEstimator::TransformVeclocityToRPM, this, std::placeholders::_1 ));
 
 	odometryPosePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_OUTPUT_TOPIC, 100);
 
-	rpmVelocityCmdPub_ = nodeHandle_.advertise<srslib_framework::OdometryRPM>(ODOMETRY_MOTION_COMMAND, 10);
+	rpmVelocityCmdPub_ = nodeHandle_.advertise<srslib_framework::OdometryRPM>(ODOMETRY_RPM_COMMAND_TOPIC, 10);
 
 	pingPub_ = nodeHandle_.advertise<std_msgs::Bool>("/internal/state/ping", 1);
 
@@ -194,12 +194,12 @@ void OdometryPositionEstimator::GetRawOdometryVelocity( const float leftWheelRPM
 	angularV = ( rightWheelVelocity - leftWheelVelocity ) / wheelbaseLength_ ;
 }
 
-void OdometryPositionEstimator::TransformVeclocityToRPM(const geometry_msgs::Twist::ConstPtr& amclVelocity)
+void OdometryPositionEstimator::TransformVeclocityToRPM(const geometry_msgs::Twist::ConstPtr& rawVelocity)
 {
-	// Whenever Twist command is sent from AMCL node, odometry node transforms it to RPM command
+	// Whenever Twist command is received, odometry node transforms it to RPM command
 	// and sends it to brainstem
-	double leftMotorSpeed = amclVelocity->linear.x - ((wheelbaseLength_ / 2) * amclVelocity->angular.z);
-	double rightMotorSpeed = amclVelocity->linear.x + ((wheelbaseLength_ / 2) * amclVelocity->angular.z);
+	double leftMotorSpeed = rawVelocity->linear.x - ((wheelbaseLength_ / 2) * rawVelocity->angular.z);
+	double rightMotorSpeed = rawVelocity->linear.x + ((wheelbaseLength_ / 2) * rawVelocity->angular.z);
 
 	double leftMotorRPM = leftMotorSpeed * 60.0 / 2.0 / M_PI / leftWheelRadius_;
 	double rightMotorRPM = rightMotorSpeed * 60.0 / 2.0 / M_PI / rightWheelRadius_;

@@ -11,6 +11,6 @@
     <node name="srsnode_joystick_adapter"
             pkg="srsnode_joystick_adapter" type="srsnode_joystick_adapter"
             output="screen" >
-    	<remap from="/internal/sensors/joystick/velocity" to="/internal/drivers/brainstem/cmd_velocity"/>
+    	<remap from="/internal/sensors/joystick/velocity" to="/internal/sensors/odometry/raw_velocity"/>
     </node>
 </launch>

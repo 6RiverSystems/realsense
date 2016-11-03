@@ -8,8 +8,6 @@
 #include <string>
 using namespace std;
 
-#include <SDL/SDL_image.h>
-
 #include <ros/ros.h>
 #include <costmap_2d/costmap_2d_ros.h>
 
@@ -20,7 +18,22 @@ namespace srs {
 
 struct MapAdapter
 {
-    static costmap_2d::Costmap2D* toCostMap2D(BaseMap* map);
+    static void costMap2D2Vector(const costmap_2d::Costmap2D* map, vector<int8_t>& occupancy);
+
+    static costmap_2d::Costmap2D* map2CostMap2D(BaseMap* map);
+
+    /**
+     * @brief Convert a Occupancy Map type into a vector of integers.
+     *
+     * @param map Occupancy Map to convert
+     * @param occupancy Reference to the vector of integers
+     */
+    static void occupancyMap2Vector(const OccupancyMap* map, vector<int8_t>& occupancy);
+
+    static OccupancyMap* vector2Map(const OccupancyMetadata& metadata,
+        const vector<int8_t>& occupancy);
+
+    static costmap_2d::Costmap2D* weights2CostMap2D(BaseMap* map, int orientation);
 };
 
 } // namespace srs

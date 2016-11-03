@@ -32,7 +32,6 @@ set(${PROJECT_NAME}_SOURCES
     src/robotics/controller/CMUPathController.cpp
 
     src/ros/message/LogicalMapMessageFactory.cpp
-    src/ros/message/OccupancyMapMessageFactory.cpp
 
     src/search/AStar.cpp
     src/search/graph/grid2d/Grid2dAction.cpp

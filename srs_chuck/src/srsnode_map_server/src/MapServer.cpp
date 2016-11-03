@@ -13,6 +13,7 @@ using namespace std;
 #include <tf/LinearMath/Quaternion.h>
 
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
+#include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/ros/message/OccupancyMapMessageFactory.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
@@ -27,7 +28,7 @@ MapServer::MapServer(string name, int argc, char** argv) :
     mapStack_(nullptr)
 {
     rosNodeHandle_.param("map_stack", mapStackFilename_,
-        string("/home/fsantini/projects/repos/ros/srs_sites/src/srsc_empty/map/empty.yaml"));
+        string("/home/fsantini/projects/repos/ros/srs_chuck/src/srsnode_navigation/test/data/one-way/one-way.yaml"));
 
     ROS_INFO_STREAM("Target map stack: " << mapStackFilename_);
 
@@ -60,10 +61,11 @@ bool MapServer::callbackMapRequest(nav_msgs::GetMap::Request &req, nav_msgs::Get
     ROS_INFO("Map request service: Sending map");
 
     vector<int8_t> occupancy;
-    OccupancyMapMessageFactory::map2Vector(mapStack_->getOccupancyMap(), occupancy);
+    MapAdapter::occupancyMap2Vector(mapStack_->getOccupancyMap(), occupancy);
 
     res.map.header.stamp = ros::Time::now();
-    res.map.info = OccupancyMapMessageFactory::metadata2RosMsg(mapStack_->getOccupancyMap()->getMetadata());
+    res.map.info = OccupancyMapMessageFactory::metadata2RosMsg(
+        mapStack_->getOccupancyMap()->getMetadata());
     res.map.data = occupancy;
 
     return true;
@@ -87,6 +89,15 @@ void MapServer::publishMap()
     // Publish ROS compatible information
     channelRosMapMetadata_.publish(mapStack_->getOccupancyMap()->getMetadata());
     channelRosOccupancyGrid_.publish(mapStack_->getOccupancyMap());
+
+    channelEastWeightsGrid_.publish(MapAdapter::weights2CostMap2D(
+        mapStack_->getLogicalMap(), Grid2d::ORIENTATION_EAST));
+    channelNorthWeightsGrid_.publish(MapAdapter::weights2CostMap2D(
+        mapStack_->getLogicalMap(), Grid2d::ORIENTATION_NORTH));
+    channelSouthWeightsGrid_.publish(MapAdapter::weights2CostMap2D(
+        mapStack_->getLogicalMap(), Grid2d::ORIENTATION_SOUTH));
+    channelWestWeightsGrid_.publish(MapAdapter::weights2CostMap2D(
+        mapStack_->getLogicalMap(), Grid2d::ORIENTATION_WEST));
 }
 
 } // namespace srs

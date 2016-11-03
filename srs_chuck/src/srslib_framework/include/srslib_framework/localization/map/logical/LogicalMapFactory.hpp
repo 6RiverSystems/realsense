@@ -65,13 +65,16 @@ private:
 
     void addRectangleCost(Pose<> origin, double widthM, double heightM,
         Grid2d::BaseType cost);
-    void addStaticObstacle(Pose<> origin, double widthM, double heightM,
+    void addObstacle(Pose<> origin, double widthM, double heightM,
         double sizeEnvelopeM = 0.0, Grid2d::BaseType costEnvelope = 0);
-    void addWeight(Pose<> from, Pose<> to,
+    void addWeightArea(Pose<> origin, double widthM, double heightM,
         Grid2d::BaseType north,
         Grid2d::BaseType east,
         Grid2d::BaseType south,
         Grid2d::BaseType west);
+
+    void calculateArea(Pose<> origin, double widthM, double heightM,
+        unsigned int& x0, unsigned int& y0, unsigned int& widthCells, unsigned int& heightCells);
 
     bool findCollection(YAML::Node root, YAML::Node& result);
     bool findEntityInCollection(YAML::Node root, string entityType, YAML::Node& result);

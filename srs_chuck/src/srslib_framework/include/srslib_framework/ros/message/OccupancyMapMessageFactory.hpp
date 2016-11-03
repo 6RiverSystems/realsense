@@ -12,7 +12,9 @@
 #include <srslib_framework/OccupancyMap.h>
 #include <srslib_framework/OccupancyMetadata.h>
 
+#include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMap.hpp>
+#include <srslib_framework/localization/map/occupancy/OccupancyMapFactory.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMetadata.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
@@ -31,7 +33,7 @@ struct OccupancyMapMessageFactory
     static srslib_framework::OccupancyMap map2Msg(const OccupancyMap* map)
     {
         vector<int8_t> occupancy;
-        map2Vector(map, occupancy);
+        MapAdapter::occupancyMap2Vector(map, occupancy);
 
         srslib_framework::OccupancyMap msgOccupancyMap;
 
@@ -40,14 +42,6 @@ struct OccupancyMapMessageFactory
 
         return msgOccupancyMap;
     }
-
-    /**
-     * @brief Convert a Occupancy Map type into a vector of integers.
-     *
-     * @param map Occupancy Map to convert
-     * @param occupancy Reference to the vector of integers
-     */
-    static void map2Vector(const OccupancyMap* map, vector<int8_t>& occupancy);
 
     /**
      * @brief Convert a OccupancyMetadata into a OccupancyMetadata message.
@@ -76,8 +70,7 @@ struct OccupancyMapMessageFactory
     }
 
     /**
-     * @brief Convert a OccupancyMetadata into a ROS Map Metadata message. It adapts the
-     * scale the resolution from millimeters to meters.
+     * @brief Convert a OccupancyMetadata into a ROS Map Metadata message.
      *
      * @param metadata Occupancy metadata to convert
      *
@@ -106,7 +99,9 @@ struct OccupancyMapMessageFactory
     static OccupancyMap* msg2OccupancyMap(const srslib_framework::OccupancyMap& message)
     {
         OccupancyMetadata metadata = msg2Metadata(message.metadata);
-        return vector2Map(metadata, message.data);
+
+        OccupancyMapFactory occupancyMapFactory;
+        return occupancyMapFactory.fromMetadata(metadata, message.data);
     }
 
     /**
@@ -119,7 +114,9 @@ struct OccupancyMapMessageFactory
     static OccupancyMap* msg2OccupancyMap(const nav_msgs::OccupancyGrid& message)
     {
         OccupancyMetadata metadata = msg2Metadata(message.info);
-        return vector2Map(metadata, message.data);
+
+        OccupancyMapFactory occupancyMapFactory;
+        return occupancyMapFactory.fromMetadata(metadata, message.data);
     }
 
     /**
@@ -179,7 +176,7 @@ struct OccupancyMapMessageFactory
     static nav_msgs::OccupancyGrid occupancyMap2RosMsg(const OccupancyMap* map, string frameId)
     {
         vector<int8_t> occupancy;
-        map2Vector(map, occupancy);
+        MapAdapter::occupancyMap2Vector(map, occupancy);
 
         nav_msgs::OccupancyGrid msgOccupancyMap;
 
@@ -189,10 +186,6 @@ struct OccupancyMapMessageFactory
 
         return msgOccupancyMap;
     }
-
-private:
-    static OccupancyMap* vector2Map(const OccupancyMetadata& metadata,
-        const vector<int8_t>& occupancy);
 };
 
 } // namespace srs

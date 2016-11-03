@@ -1,0 +1,38 @@
+{
+	"type": "FeatureCollection",
+	"features": [
+		{
+			"type": "Feature",
+			"properties": {
+				"type": "map",
+				"origin": [0,0,0],
+				"resolution": 0.1,
+				"width": 15,
+				"height": 10
+			}
+		},
+		{
+			"type": "FeatureCollection",
+			"features": [
+				{
+					"type": "Feature",
+					"id": "1",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[0.4,2.4],
+							[14,1]
+						]
+					},
+					"properties": {
+						"type": "weight_area",
+						"north": 0,
+						"east": 0,
+						"south": 0,
+						"west": 100
+					}
+				}
+			]
+		}
+	]
+}

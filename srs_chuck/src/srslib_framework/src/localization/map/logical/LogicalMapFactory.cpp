@@ -129,6 +129,71 @@ LogicalMap* LogicalMapFactory::fromString(string geoJson, double loadTime)
 void LogicalMapFactory::addRectangleCost(Pose<> origin, double widthM, double heightM,
     Grid2d::BaseType cost)
 {
+    unsigned int x0;
+    unsigned int y0;
+
+    unsigned int widthCells;
+    unsigned int heightCells;
+    calculateArea(origin, widthM, heightM, x0, y0, widthCells, heightCells);
+
+    for (unsigned int r = y0; r < y0 + heightCells; ++r)
+    {
+        for (unsigned int c = x0; c < x0 + widthCells; ++c)
+        {
+            if (map_->isWithinBounds(c, r))
+            {
+                map_->maxCost(c, r, cost);
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::addObstacle(Pose<> origin, double widthM, double heightM,
+    double sizeEnvelopeM, Grid2d::BaseType costEnvelope)
+{
+    // First add the envelope, if specified
+    if (sizeEnvelopeM > 0.0 && costEnvelope > 0)
+    {
+        addRectangleCost(PoseMath::add(origin, Pose<>(-sizeEnvelopeM, -sizeEnvelopeM)),
+            widthM + 2 * sizeEnvelopeM, heightM + 2 * sizeEnvelopeM,
+            costEnvelope);
+    }
+
+    // Add the static obstacle
+    addRectangleCost(origin, widthM, heightM, Grid2d::PAYLOAD_MAX);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::addWeightArea(Pose<> origin, double widthM, double heightM,
+    Grid2d::BaseType north,
+    Grid2d::BaseType east,
+    Grid2d::BaseType south,
+    Grid2d::BaseType west)
+{
+    unsigned int x0;
+    unsigned int y0;
+
+    unsigned int widthCells;
+    unsigned int heightCells;
+    calculateArea(origin, widthM, heightM, x0, y0, widthCells, heightCells);
+
+    for (unsigned int r = y0; r < y0 + heightCells; ++r)
+    {
+        for (unsigned int c = x0; c < x0 + widthCells; ++c)
+        {
+            if (map_->isWithinBounds(c, r))
+            {
+                map_->setWeights(c, r, north, east, south, west);
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::calculateArea(Pose<> origin, double widthM, double heightM,
+    unsigned int& x0, unsigned int& y0, unsigned int& widthCells, unsigned int& heightCells)
+{
     double newWidthM = widthM;
     double c = origin.x;
     if (c < 0)
@@ -147,77 +212,13 @@ void LogicalMapFactory::addRectangleCost(Pose<> origin, double widthM, double he
         r = 0;
     }
 
-    unsigned int x0;
-    unsigned int y0;
     map_->transformM2Cells(c, r, x0, y0);
 
-    unsigned int widthCells;
     map_->transformM2Cells(newWidthM, widthCells);
     widthCells = max<unsigned int>(1, widthCells);
 
-    unsigned int heightCells;
     map_->transformM2Cells(newHeightM, heightCells);
     heightCells = max<unsigned int>(1, heightCells);
-
-    for (unsigned int r = y0; r < y0 + heightCells; ++r)
-    {
-        for (unsigned int c = x0; c < x0 + widthCells; ++c)
-        {
-            if (map_->isWithinBounds(c, r))
-            {
-                map_->maxCost(c, r, cost);
-            }
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::addStaticObstacle(Pose<> origin, double widthM, double heightM,
-    double sizeEnvelopeM, Grid2d::BaseType costEnvelope)
-{
-    // First add the envelope, if specified
-    if (sizeEnvelopeM > 0.0 && costEnvelope > 0)
-    {
-        addRectangleCost(PoseMath::add(origin, Pose<>(-sizeEnvelopeM, -sizeEnvelopeM)),
-            widthM + 2 * sizeEnvelopeM, heightM + 2 * sizeEnvelopeM,
-            costEnvelope);
-    }
-
-    // Add the static obstacle
-    addRectangleCost(origin, widthM, heightM, Grid2d::PAYLOAD_MAX);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::addWeight(Pose<> from, Pose<> to,
-    Grid2d::BaseType north,
-    Grid2d::BaseType east,
-    Grid2d::BaseType south,
-    Grid2d::BaseType west)
-{
-    unsigned int xi;
-    unsigned int yi;
-    map_->transformM2Cells(from, xi, yi);
-
-    unsigned int xf;
-    unsigned int yf;
-    map_->transformM2Cells(to, xf, yf);
-
-    int deltaX = BasicMath::sgn<int>(xf - xi);
-    int deltaY = BasicMath::sgn<int>(yf - yi);
-
-    unsigned int c;
-    unsigned int r = yi;
-    do
-    {
-        c = xi;
-        do
-        {
-            map_->setWeights(c, r, north, east, south, west);
-            c += deltaX;
-        } while (c != (xf + deltaX));
-
-        r += deltaY;
-    } while (r != (yf + deltaY));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -339,20 +340,22 @@ void LogicalMapFactory::ntEntityBoundary(YAML::Node root)
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
-    Pose<> bl = coordinates[0];
-    Pose<> tr = coordinates[1];
+    Pose<> o0 = coordinates[0];
+    Pose<> s = coordinates[1];
 
     // Add the bottom border
-    addStaticObstacle(Pose<>::ZERO, widthM, bl.y, envelopeSize, envelopeCost);
+    addObstacle(Pose<>::ZERO, widthM, o0.y, envelopeSize, envelopeCost);
 
     // Add the left border
-    addStaticObstacle(Pose<>(0, bl.y), bl.x, heightM - bl.y, envelopeSize, envelopeCost);
+    addObstacle(Pose<>(0, o0.y), o0.x, heightM - o0.y, envelopeSize, envelopeCost);
 
     // Add the top border
-    addStaticObstacle(Pose<>(bl.x, tr.y), widthM - bl.x, heightM - tr.y, envelopeSize, envelopeCost);
+    Pose<> t0 = Pose<>(o0.x, o0.y + s.y);
+    addObstacle(Pose<>(o0.x, t0.y), widthM - o0.x, heightM - t0.y, envelopeSize, envelopeCost);
 
     // Add the right border
-    addStaticObstacle(Pose<>(tr.x, bl.y), widthM - tr.x, tr.y - bl.y, envelopeSize, envelopeCost);
+    t0 = Pose<>(o0.x + s.x, o0.y);
+    addObstacle(t0, widthM - t0.x, t0.y - o0.y, envelopeSize, envelopeCost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -365,10 +368,10 @@ void LogicalMapFactory::ntEntityCostArea(YAML::Node root)
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
     Pose<> bl = coordinates[0];
-    Pose<> tr = coordinates[1];
+    Pose<> size = coordinates[1];
 
     // Add the static obstacle
-    addRectangleCost(bl, abs(tr.x - bl.x), abs(tr.y - bl.y), cost);
+    addRectangleCost(bl, size.x, size.y, cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -407,11 +410,16 @@ void LogicalMapFactory::ntEntityObstacle(YAML::Node root)
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
-    Pose<> bl = coordinates[0];
-    Pose<> tr = coordinates[1];
-
-    // Add the static obstacle
-    addStaticObstacle(bl, abs(tr.x - bl.x), abs(tr.y - bl.y), envelopeSize, envelopeCost);
+    Pose<> o0 = coordinates[0];
+    if (coordinates.size() == 2)
+    {
+        Pose<> size = coordinates[1];
+        addObstacle(o0, size.x, size.y, envelopeSize, envelopeCost);
+    }
+    else if (coordinates.size() == 1)
+    {
+        addObstacle(o0, metadata_.resolution, metadata_.resolution, envelopeSize, envelopeCost);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -430,16 +438,16 @@ void LogicalMapFactory::ntEntityWeightArea(YAML::Node root)
     Grid2d::BaseType westCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_WEST], false);
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 1, 2);
+    Pose<> o0 = coordinates[0];
     if (coordinates.size() == 2)
     {
-        Pose<> from = coordinates[0];
-        Pose<> to = coordinates[1];
-        addWeight(from, to, northCost, eastCost, southCost, westCost);
+        Pose<> size = coordinates[1];
+        addWeightArea(o0, size.x, size.y, northCost, eastCost, southCost, westCost);
     }
     else if (coordinates.size() == 1)
     {
-        Pose<> from = coordinates[0];
-        addWeight(from, from, northCost, eastCost, southCost, westCost);
+        addWeightArea(o0, metadata_.resolution, metadata_.resolution,
+            northCost, eastCost, southCost, westCost);
     }
 }
 

@@ -430,7 +430,14 @@ void Grid2d::printGrid(ostream& stream, string title,
                 }
                 else if (payload == Grid2d::PAYLOAD_MIN)
                 {
-                    stream << ". ";
+                    if (node->weights)
+                    {
+                        stream << "' ";
+                    }
+                    else
+                    {
+                        stream << ". ";
+                    }
                 }
                 else
                 {

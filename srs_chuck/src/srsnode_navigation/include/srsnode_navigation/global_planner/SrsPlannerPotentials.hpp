@@ -76,7 +76,7 @@ protected:
 private:
     void initializeParams();
 
-    void updateMapStack(costmap_2d::Costmap2DROS* rosCostMap);
+    void updateMapStack(costmap_2d::Costmap2D* rosCostMap);
 
 //    void clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, unsigned int mx, unsigned int my);
     void publishPotential(float* potential);
@@ -115,8 +115,6 @@ private:
 //    void reconfigureCB(global_planner::GlobalPlannerConfig &config, uint32_t level);
 
     MapStack* srsMapStack_;
-
-    LogicalMap* logicalMap_;
 
     TapMapStack tapMapStack_;
 };

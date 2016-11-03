@@ -46,6 +46,14 @@ public:
         return resolution_;
     }
 
+    void getWeights(unsigned int c, unsigned int r,
+        Grid2d::BaseType& north, Grid2d::BaseType& east,
+        Grid2d::BaseType& south, Grid2d::BaseType& west) const
+    {
+        Grid2d::Location location(c, r);
+        grid_->getWeights(location, north, east, south, west);
+    }
+
     int getWidthCells() const
     {
         return grid_->getWidth();

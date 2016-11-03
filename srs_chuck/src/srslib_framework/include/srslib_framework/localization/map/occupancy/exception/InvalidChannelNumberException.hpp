@@ -16,7 +16,7 @@ class InvalidChannelNumberException: public SrsRuntimeErrorException
 {
 public:
     InvalidChannelNumberException(const string& filename, int channels) :
-        SrsRuntimeErrorException("The image must have Single or RGB channels [" +
+        SrsRuntimeErrorException("The image must have Mono, RGB, or RGBA channels [" +
             filename + ", " + to_string(channels) + "]")
     {}
 };

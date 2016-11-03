@@ -19,7 +19,8 @@ set(${PROJECT_NAME}_SOURCES
 
 set(${PROJECT_NAME}_TEST_SOURCES
 
-    test/TestNavigation_SmallMap.cpp
+    test/TestNavigation_OneWay.cpp
+#    test/TestNavigation_SmallMap.cpp
 )
 
 ####################################################################################################
@@ -100,12 +101,12 @@ install(FILES bgp_plugin.xml
 # Tests
 
 if (CATKIN_ENABLE_TESTING)
-#    file(COPY test/data DESTINATION ${CMAKE_BINARY_DIR})
 
     catkin_add_gtest(TestSuite_Navigation
         test/TestSuite_Navigation.cpp
         ${${PROJECT_NAME}_TEST_SOURCES}
         ${${PROJECT_NAME}_SOURCES}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
     )
     add_dependencies(${TestSuite_Navigation}
         ${catkin_EXPORTED_TARGETS}

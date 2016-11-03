@@ -14,10 +14,15 @@
 	
     <!-- Map server -->
     <include file="$(find srsnode_map_server)/launch/node.launch">
-        <arg name="map_stack" value="$(find srsc_empty)/map/empty.yaml" />
+        <arg name="map_stack" value="$(find srsnode_navigation)/test/data/one-way/one-way.yaml" />
     </include>
 
 <!--
+
+    <include file="$(find srsnode_map_server)/launch/node.launch">
+        <arg name="map_stack" value="$(find srsc_barrett)/map/barrett.yaml" />
+    </include>
+
     <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_empty)/map/empty.yaml" >
         <remap from="map" to="/internal/state/map/ros_occupancy"/>
         <remap from="map_metadata" to="/internal/state/map/info"/>

@@ -51,7 +51,7 @@ OccupancyMap* OccupancyMapFactory::fromGrid2d(Grid2d* grid, double resolution)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-OccupancyMap* OccupancyMapFactory::fromMetadata(OccupancyMetadata metadata)
+OccupancyMap* OccupancyMapFactory::fromMetadata(const OccupancyMetadata& metadata)
 {
     map_ = nullptr;
     metadata_ = metadata;
@@ -72,11 +72,15 @@ OccupancyMap* OccupancyMapFactory::fromMetadata(OccupancyMetadata metadata)
     switch (channels)
     {
         case 1:
-            extract1Channel(image);
+            extractMonoChannel(image);
             break;
 
         case 3:
-            extract3Channel(image);
+            extractRGBChannel(image);
+            break;
+
+        case 4:
+            extractRGBAChannel(image);
             break;
 
         default:
@@ -89,10 +93,34 @@ OccupancyMap* OccupancyMapFactory::fromMetadata(OccupancyMetadata metadata)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+OccupancyMap* OccupancyMapFactory::fromMetadata(const OccupancyMetadata& metadata,
+    const vector<int8_t>& occupancy)
+{
+    OccupancyMap* map = new OccupancyMap(metadata);
+
+    auto occupancyIterator = occupancy.begin();
+
+    for (int row = 0; row < metadata.heightCells; row++)
+    {
+        for (int col = 0; col < metadata.widthCells; col++)
+        {
+            // Convert the 8 bit cost into an integer cost and store it
+            int8_t grayLevel = *occupancyIterator;
+            Grid2d::BaseType cost = map->grayLevel2Cost(static_cast<unsigned char>(grayLevel));
+            map->setCost(col, row, cost);
+
+            occupancyIterator++;
+        }
+    }
+
+    return map;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void OccupancyMapFactory::extract1Channel(SDL_Surface* image)
+void OccupancyMapFactory::extractMonoChannel(SDL_Surface* image)
 {
     const unsigned char maxPixelLevel = numeric_limits<unsigned char>::max();
 
@@ -114,7 +142,7 @@ void OccupancyMapFactory::extract1Channel(SDL_Surface* image)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void OccupancyMapFactory::extract3Channel(SDL_Surface* image)
+void OccupancyMapFactory::extractRGBChannel(SDL_Surface* image)
 {
     unsigned char* imagePixels = (unsigned char*)(image->pixels);
     int pitch = image->pitch;
@@ -126,6 +154,37 @@ void OccupancyMapFactory::extract3Channel(SDL_Surface* image)
             // Find the pixel based on the row, column, and
             // and pitch and number of channels (3)
             unsigned char* pixel = imagePixels + row * pitch + col * 3;
+
+            // Extract the colors
+            unsigned char red = *pixel;
+            unsigned char green = *(pixel + 1);
+            unsigned char blue = *(pixel + 2);
+            unsigned char alpha = *(pixel + 3);
+
+            MapNote* note = green > 0 ? MapNote::instanceOf(green) : nullptr;
+
+            // Static obstacles have priority on every other note
+            unsigned int cost = static_cast<unsigned int>(blue);
+            cost = red > 0 ? numeric_limits<unsigned int>::max() : cost;
+
+            map_->setCost(col, metadata_.heightCells - row - 1, cost);
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void OccupancyMapFactory::extractRGBAChannel(SDL_Surface* image)
+{
+    unsigned char* imagePixels = (unsigned char*)(image->pixels);
+    int pitch = image->pitch;
+
+    for (unsigned int row = 0; row < metadata_.heightCells; row++)
+    {
+        for (unsigned int col = 0; col < metadata_.widthCells; col++)
+        {
+            // Find the pixel based on the row, column, and
+            // and pitch and number of channels (3)
+            unsigned char* pixel = imagePixels + row * pitch + col * 4;
 
             // Extract the colors
             unsigned char red = *pixel;

@@ -15,6 +15,11 @@ using namespace std;
 #include <srslib_framework/ros/channel/ChannelMapStack.hpp>
 #include <srslib_framework/ros/channel/ChannelRosMapMetadata.hpp>
 #include <srslib_framework/ros/channel/ChannelRosOccupancyGrid.hpp>
+#include <srslib_framework/ros/channel/ChannelRosMapWeightsNorth.hpp>
+#include <srslib_framework/ros/channel/ChannelRosMapWeightsEast.hpp>
+#include <srslib_framework/ros/channel/ChannelRosMapWeightsSouth.hpp>
+#include <srslib_framework/ros/channel/ChannelRosMapWeightsWest.hpp>
+#include <srslib_framework/ros/channel/publisher/PublisherRosCostGrid.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
 #include <srslib_framework/ros/unit/RosUnit.hpp>
 
@@ -49,6 +54,11 @@ private:
     ChannelMapStack channelMapStack_;
     ChannelRosMapMetadata channelRosMapMetadata_;
     ChannelRosOccupancyGrid channelRosOccupancyGrid_;
+
+    ChannelRosMapWeightsNorth channelNorthWeightsGrid_;
+    ChannelRosMapWeightsEast channelEastWeightsGrid_;
+    ChannelRosMapWeightsSouth channelSouthWeightsGrid_;
+    ChannelRosMapWeightsWest channelWestWeightsGrid_;
 
     ros::ServiceServer serviceMapRequest_;
 

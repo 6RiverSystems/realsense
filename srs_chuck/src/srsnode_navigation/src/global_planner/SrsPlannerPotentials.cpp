@@ -33,12 +33,12 @@ SrsPlannerPotentials::SrsPlannerPotentials() :
     costmap_(NULL),
     initialized_(false),
     allow_unknown_(true),
-    logicalMap_(nullptr)
+    astarCore_(nullptr)
 {
     ROS_WARN("SrsPlanner::SrsPlanner() called");
 
     initializeParams();
-    updateMapStack(nullptr);
+    //updateMapStack(nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,8 @@ SrsPlannerPotentials::SrsPlannerPotentials() :
         srsMapStack_(nullptr),
         costmap_(NULL),
         initialized_(false),
-        allow_unknown_(true)
+        allow_unknown_(true),
+        astarCore_(nullptr)
 {
     ROS_WARN("SrsPlanner::SrsPlanner(...) called");
 
@@ -56,7 +57,6 @@ SrsPlannerPotentials::SrsPlannerPotentials() :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
     SrsPlannerPotentials::~SrsPlannerPotentials()
 {
-    delete astarCore_;
     delete srsMapStack_;
 
 //    if (p_calc_)
@@ -77,7 +77,7 @@ void SrsPlannerPotentials::initialize(std::string name, costmap_2d::Costmap2D* c
         ROS_WARN("SrsPlanner::initialize(...) called");
 
         initializeParams();
-        //### updateMapStack(costmap);
+        //updateMapStack(costmap);
 
         costmap_ = costmap;
         frame_id_ = frame_id;
@@ -147,13 +147,6 @@ void SrsPlannerPotentials::initialize(std::string name, costmap_2d::Costmap2D* c
 //        dsrv_->setCallback(cb);
 
         potential_array_ = nullptr;
-
-        delete logicalMap_;
-
-        LogicalMapFactory logicalMapFactory;
-        logicalMap_ = logicalMapFactory.fromCostMap2D(costmap);
-
-        astarCore_ = new AStarCore(logicalMap_, costmap);
         initialized_ = true;
     }
     else
@@ -216,6 +209,8 @@ bool SrsPlannerPotentials::makePlan(
         return false;
     }
 
+    astarCore_ = new AStarCore(srsMapStack_->getLogicalMap(), costmap_);
+
 //    double wx = ;
 //    double wy = start.pose.position.y;
 
@@ -274,10 +269,10 @@ bool SrsPlannerPotentials::makePlan(
 
 //    planner_->clearEndpoint(costmap_->getCharMap(), potential_array_, goal_x_i, goal_y_i, 2);
 
-    if (publish_potential_)
-    {
+//    if (publish_potential_)
+//    {
         publishPotential(potential_array_);
-    }
+//    }
 
     if (found)
     {
@@ -300,6 +295,9 @@ bool SrsPlannerPotentials::makePlan(
     delete potential_array_;
     potential_array_ = nullptr;
 
+    delete astarCore_;
+    astarCore_ = nullptr;
+
     return !path.empty();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -311,7 +309,7 @@ void SrsPlannerPotentials::initializeParams()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerPotentials::updateMapStack(costmap_2d::Costmap2DROS* rosCostMap)
+void SrsPlannerPotentials::updateMapStack(costmap_2d::Costmap2D* rosCostMap)
 {
     // Make sure that the neither the logical not the occupancy maps
     // have been re-published. In case, destroy what we have and
@@ -419,8 +417,6 @@ void SrsPlannerPotentials::getPlanFromPotential(
     for (int i = path.size() - 1; i>=0; i--)
     {
         std::pair<float, float> point = path[i];
-
-        cout << point.first << "-" << point.second << endl;
 
         double world_x;
         double world_y;

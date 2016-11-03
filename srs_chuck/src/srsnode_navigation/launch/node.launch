@@ -11,17 +11,17 @@
     <remap from="/move_base_simple/goal" to="/request/goal"/>
     <remap from="/cmd_vel" to="/internal/drivers/brainstem/cmd_velocity"/>
 
-	<!--- Move Base -->
-	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <!--- Move Base -->
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 
         <param name="base_global_planner" value="global_planner/SrsPlannerPotentials"/>
 
-		<rosparam file="$(find srsnode_navigation)/config/move_base_params.yaml" command="load" />
-		<rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
-		<rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
-		<rosparam file="$(find srsnode_navigation)/config/local_costmap_params.yaml" command="load" />
-		<rosparam file="$(find srsnode_navigation)/config/global_costmap_params.yaml" command="load" />
-		<rosparam file="$(find srsnode_navigation)/config/local_planner_params.yaml" command="load" />
-		<rosparam file="$(find srsnode_navigation)/config/global_planner_params.yaml" command="load" />
-	</node>
+        <rosparam file="$(find srsnode_navigation)/config/move_base_params.yaml" command="load" />
+        <rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find srsnode_navigation)/config/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find srsnode_navigation)/config/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find srsnode_navigation)/config/local_planner_params.yaml" command="load" />
+        <rosparam file="$(find srsnode_navigation)/config/global_planner_params.yaml" command="load" />
+    </node>
 </launch>

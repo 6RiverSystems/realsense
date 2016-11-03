@@ -29,11 +29,13 @@ public:
     OccupancyMap* fromCostMap2D(costmap_2d::Costmap2D* costMap,
         double freeThreshold, double occupiedThreshold);
     OccupancyMap* fromGrid2d(Grid2d* grid, double resolution);
-    OccupancyMap* fromMetadata(OccupancyMetadata metadata);
+    OccupancyMap* fromMetadata(const OccupancyMetadata& metadata);
+    OccupancyMap* fromMetadata(const OccupancyMetadata& metadata, const vector<int8_t>& occupancy);
 
 private:
-    void extract1Channel(SDL_Surface* image);
-    void extract3Channel(SDL_Surface* image);
+    void extractMonoChannel(SDL_Surface* image);
+    void extractRGBChannel(SDL_Surface* image);
+    void extractRGBAChannel(SDL_Surface* image);
 
     OccupancyMetadata metadata_;
     OccupancyMap* map_;

@@ -36,8 +36,13 @@ namespace internal {
     static const string MAP_ROS_OCCUPANCY = "/internal/state/map/ros_occupancy";
     static const string MAP_ROS_METADATA = "/internal/state/map/ros_metadata";
     static const string MAP_STACK = "/internal/state/map/stack";
+    static const string MAP_ROS_WEIGHTS_EAST = "/internal/state/map/weights_east";
+    static const string MAP_ROS_WEIGHTS_NORTH = "/internal/state/map/weights_north";
+    static const string MAP_ROS_WEIGHTS_SOUTH = "/internal/state/map/weights_south";
+    static const string MAP_ROS_WEIGHTS_WEST = "/internal/state/map/weights_west";
 
     static const string ROBOT_POSE = "/internal/state/robot/pose";
+
 
 } // namespace internal
 

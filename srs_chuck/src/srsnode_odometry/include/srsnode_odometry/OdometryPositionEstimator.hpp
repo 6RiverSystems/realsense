@@ -57,7 +57,7 @@ private:
 
 	static constexpr auto ODOMETRY_RPM_RAW_TOPIC = "/internal/sensors/odometry/raw";
 
-	// Need to rename
+	// NEED TO RENAME
 	static constexpr auto ODOMETRY_RAW_VELOCITY_TOPIC = "/internal/sensors/odometry/raw_velocity";
 
 	static constexpr auto ODOMETRY_RPM_COMMAND_TOPIC = "/internal/drivers/brainstem/cmd_velocity";

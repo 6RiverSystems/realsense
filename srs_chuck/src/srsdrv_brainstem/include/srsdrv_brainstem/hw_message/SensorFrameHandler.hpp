@@ -55,12 +55,10 @@ private:
     BRAINSTEM_MESSAGE_END
 
     void publishImu();
-    void publishOdometry();
     void publishOdometryCount(int32_t leftWheelDiff, int32_t rightWheelDiff);
     void publishSensorFrame();
 
     ros::Publisher pubImu_;
-    //ros::Publisher pubOdometry_;
     ros::Publisher pubOdometryCount_;
     ros::Publisher pubSensorFrame_;
 

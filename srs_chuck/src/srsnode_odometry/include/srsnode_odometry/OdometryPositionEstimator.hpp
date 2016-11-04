@@ -41,7 +41,7 @@ private:
 
     void GetRawOdometryVelocity(const float leftWheelCount, const float rightWheelCount, double& v, double& w);
 
-    void TransformVeclocityToRPM(const geometry_msgs::Twist::ConstPtr& amclVelocity);
+    void TransformVeclocityToRPM(const geometry_msgs::Twist::ConstPtr& velocity);
 
     void ResetOdomPose( const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& resetMsg );
 
@@ -55,16 +55,17 @@ private:
 
     static constexpr double MAX_ALLOWED_PING_DELAY = 0.5; // 50% of the duty cycle
 
-	static constexpr auto ODOMETRY_RPM_RAW_TOPIC = "/internal/sensors/odometry/raw";
+	static constexpr auto ODOMETRY_RPM_RAW_TOPIC = "/internal/sensors/odometry/rpm/raw";
 
-	// NEED TO RENAME
-	static constexpr auto ODOMETRY_RAW_VELOCITY_TOPIC = "/internal/sensors/odometry/raw_velocity";
+	static constexpr auto ODOMETRY_RAW_VELOCITY_TOPIC = "/internal/sensors/odometry/velocity/cmd";
 
-	static constexpr auto ODOMETRY_RPM_COMMAND_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
+	static constexpr auto ODOMETRY_RPM_COMMAND_TOPIC = "/internal/sensors/odometry/rpm/cmd";
 
-	static constexpr auto ODOMETRY_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity";
+	static constexpr auto ODOMETRY_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity/pose";
 
 	static constexpr auto INITIAL_POSE_TOPIC = "/request/initial_pose";
+
+	static constexpr auto PING_COMMAND_TOPIC = "/internal/state/ping";
 
     ros::NodeHandle nodeHandle_;
 

@@ -10,7 +10,6 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Bool.h>
-#include <geometry_msgs/Twist.h>
 #include <srslib_framework/io/IO.hpp>
 #include <srslib_framework/OdometryRPM.h>
 #include <BrainStemEmulator.h>
@@ -67,7 +66,7 @@ private:
 
 	static constexpr auto CONNECTED_TOPIC = "/internal/drivers/brainstem/connected";
 
-	static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
+	static constexpr auto VELOCITY_TOPIC = "/internal/sensors/odometry/rpm/cmd";
 
 	static constexpr auto PING_TOPIC = "/internal/state/ping";
 

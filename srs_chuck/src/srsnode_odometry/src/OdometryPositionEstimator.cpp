@@ -59,15 +59,15 @@ void OdometryPositionEstimator::connect()
 	resetPoseSub_ = nodeHandle_.subscribe<geometry_msgs::PoseWithCovarianceStamped>(INITIAL_POSE_TOPIC, 1,
 			std::bind( &OdometryPositionEstimator::ResetOdomPose, this, std::placeholders::_1 ));
 
-	// Subscriber to transform velocity command from linear/angular velocity format to RPM format
+	// Subscriber to transform velocity command from linear/angular velocity to RPM format
 	rawVelocityCmdSub_ = nodeHandle_.subscribe<geometry_msgs::Twist>(ODOMETRY_RAW_VELOCITY_TOPIC, 10,
 			std::bind( &OdometryPositionEstimator::TransformVeclocityToRPM, this, std::placeholders::_1 ));
 
-	odometryPosePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_OUTPUT_TOPIC, 100);
+	odometryPosePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_OUTPUT_TOPIC, 10);
 
 	rpmVelocityCmdPub_ = nodeHandle_.advertise<srslib_framework::OdometryRPM>(ODOMETRY_RPM_COMMAND_TOPIC, 10);
 
-	pingPub_ = nodeHandle_.advertise<std_msgs::Bool>("/internal/state/ping", 1);
+	pingPub_ = nodeHandle_.advertise<std_msgs::Bool>(PING_COMMAND_TOPIC, 1);
 
 	// Register dynamic configuration callback
 	configServer_.setCallback(boost::bind(&OdometryPositionEstimator::cfgCallback, this, _1, _2));
@@ -155,7 +155,7 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 	odom.pose.pose.position.z = 0.0;
 	odom.pose.pose.orientation = odom_quat;
 
-	// Velocitygeometry_msgs
+	// Velocity
 	odom.twist.twist.linear.x = linearVelocity;
 	odom.twist.twist.linear.y = 0.0;
 	odom.twist.twist.linear.z = 0.0;

@@ -9,7 +9,7 @@
 
 namespace srs {
 
-const string RawOdometryHandler::TOPIC_RAW_ODOMETRY = "/internal/sensors/odometry/raw";
+const string RawOdometryHandler::TOPIC_RAW_ODOMETRY = "/internal/sensors/odometry/rpm/raw";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods

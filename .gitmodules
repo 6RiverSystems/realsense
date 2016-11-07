@@ -1,0 +1,3 @@
+[submodule "srs_chuck/src/laser_filters"]
+	path = srs_chuck/src/laser_filters
+	url = https://github.com/6RiverSystems/laser_filters.git

@@ -90,7 +90,7 @@ function showChuck() {
 function stopChuck() {
   echo "Stopping mfp-ros service"
   sudo service mfp-ros stop
-  
+
   echo "Stopping mfp-bridge service"
   sudo service mfp-bridge stop
 }
@@ -123,6 +123,13 @@ recordChuck() {
 rosbag record -O slam-lidar-rs /scan /internal/sensors/odometry/velocity /tf /camera/depth/image_raw /camera/depth/camera_info /camera/rgb/image_raw /camera/rgb/camera_info
 }
 
+recordChuckNav() {
+  #rosbag record --split --buffsize=0 --duration=5m /camera/color/camera_info /camera/color/image_raw /camera/depth/camera_info /camera/depth/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
+rosbag record -O nav-data /internal/sensors/lidar/scan/raw /internal/sensors/odometry/velocity/cmd /internal/sensors/odometry/velocity/pose /internal/sensors/odometry/rpm/raw /internal/sensors/odometry/rpm/cmd /tf
+}
+
+
+
 alias chucklog=logChuck
 alias chuckupdate=updateChuck
 alias chuckclean=cleanChuck
@@ -133,3 +140,4 @@ alias chuckstop=stopChuck
 alias chuckrestart=restartChuck
 alias chuckshow=showChuck
 alias chuckrecord=recordChuck
+alias chuckrecordnav=recordChuckNav

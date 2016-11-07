@@ -28,7 +28,7 @@ using namespace std;
 #include <nav_msgs/GetPlan.h>
 #include <dynamic_reconfigure/server.h>
 
-#include <srsnode_navigation/global_planner/AStarCore.hpp>
+#include <srsnode_navigation/global_planner/AStarPotentials.hpp>
 #include <srsnode_navigation/global_planner/OrientationFilter.hpp>
 using namespace srs;
 
@@ -107,7 +107,7 @@ private:
     float* potential_array_;
     unsigned int start_x_, start_y_, end_x_, end_y_;
 
-    AStarCore* astarCore_;
+    AStarPotentials* astar_;
 
 //    bool old_navfn_behavior_;
 

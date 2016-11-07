@@ -19,10 +19,10 @@
 
 namespace srs {
 
-class AStarCore
+class AStarPotentials
 {
 public:
-    AStarCore(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap);
+    AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap);
 
     bool calculatePath(
         double start_x, double start_y,
@@ -31,6 +31,7 @@ public:
         float*& potentials);
 
     void mapToWorld(double mx, double my, double& wx, double& wy);
+
     bool worldToMap(double wx, double wy, double& mx, double& my);
 
 private:
@@ -40,12 +41,10 @@ private:
 
     LogicalMap* logicalMap_;
 
-    PotentialCalculator* pCalculator_;
-    Expander* planner_;
+    PotentialCalculator* potentialCalculator_;
     Traceback* path_maker_;
 
-    float convert_offset_;
-
+    Expander* stateExpander_;
 };
 
 }

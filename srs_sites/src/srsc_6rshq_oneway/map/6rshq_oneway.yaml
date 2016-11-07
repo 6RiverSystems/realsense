@@ -6,14 +6,14 @@
 
 {
     occupancy: {
-        image: barrett.pgm,
+        image: 6rshq_oneway.pgm,
         resolution: 0.100,
         origin: [0, 0, 0],
-        negate: 1,
+        negate: 0,
         occupied_thresh: 0.65,
         free_thresh: 0.196,
     },
     logical: {
-        map: barrett.geojson
+        map: 6rshq_oneway.geojson
     }
 }

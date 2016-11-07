@@ -13,7 +13,7 @@ using namespace std;
 #include <srslib_framework/localization/map/occupancy/OccupancyMapFactory.hpp>
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
-#include <srsnode_navigation/global_planner/AStarCore.hpp>
+#include <srsnode_navigation/global_planner/AStarPotentials.hpp>
 using namespace srs;
 
 constexpr int GRID_SIZE = 15;
@@ -76,11 +76,11 @@ TEST(Test_Navigation, SmallMap)
     LogicalMapFactory logicalMapFactory;
     LogicalMap* logical = logicalMapFactory.fromGrid2d(&grid, 1);
 
-    costmap_2d::Costmap2D* cost2d = MapAdapter::toCostMap2D(logical);
+    costmap_2d::Costmap2D* cost2d = MapAdapter::map2CostMap2D(logical);
 
     cout << *logical << endl;
 
-    AStarCore astar(logical, cost2d);
+    AStarPotentials astar(logical, cost2d);
     std::vector<std::pair<float, float>> path;
     float* potentials;
 

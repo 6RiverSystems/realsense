@@ -13,6 +13,7 @@ using namespace std;
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
+#include <srslib_framework/platform/StopWatch.hpp>
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dSingleGoal.hpp>
@@ -38,13 +39,17 @@ TEST(Test_AStar, Barrett_BigSearch)
         startPosition);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
+    StopWatch timer;
+
     ASSERT_TRUE(algorithm->search(start, goal)) <<
         "A solution was not found";
 
-    ASSERT_EQ(8135, algorithm->getOpenNodeCount()) <<
+    cout << "Elapsed time: " << timer.elapsed() << "s" << endl;
+
+    ASSERT_EQ(4082, algorithm->getOpenNodeCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(39431, algorithm->getClosedNodeCount()) <<
+    ASSERT_EQ(18390, algorithm->getClosedNodeCount()) <<
         "Unexpected number of closed nodes";
 
     algorithm->clear();

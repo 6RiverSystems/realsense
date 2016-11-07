@@ -1,4 +1,4 @@
-#include <srsnode_navigation/global_planner/AStarCore.hpp>
+#include <srsnode_navigation/global_planner/AStarPotentials.hpp>
 
 #include <srsnode_navigation/global_planner/QuadraticCalculator.hpp>
 #include <srsnode_navigation/global_planner/GradientPath.hpp>
@@ -8,7 +8,7 @@
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-AStarCore::AStarCore(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap)
+AStarPotentials::AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap)
 {
     costMap_ = costMap;
     logicalMap_ = logicalMap;
@@ -16,16 +16,15 @@ AStarCore::AStarCore(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap)
     int sizeX = costMap_->getSizeInCellsX();
     int sizeY = costMap_->getSizeInCellsY();
 
-    pCalculator_ = new PotentialCalculator(sizeX, sizeY); // new QuadraticCalculator(sizeX, sizeY);
+    // potentialCalculator_ = new PotentialCalculator(sizeX, sizeY);
+    potentialCalculator_ = new QuadraticCalculator(sizeX, sizeY);
 
-    planner_ = new AStarExpansion(logicalMap, costMap, pCalculator_);
-    path_maker_ = new GridPath(pCalculator_); // GradientPath(pCalculator_);
-
-    convert_offset_ = 0.5;
+    stateExpander_ = new AStarExpansion(logicalMap, costMap, potentialCalculator_);
+    path_maker_ = new GridPath(potentialCalculator_); // GradientPath(pCalculator_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool AStarCore::calculatePath(
+bool AStarPotentials::calculatePath(
     double start_x, double start_y,
     double goal_x, double goal_y,
     std::vector<std::pair<float, float>>& path,
@@ -34,7 +33,7 @@ bool AStarCore::calculatePath(
     int sizeX = costMap_->getSizeInCellsX();
     int sizeY = costMap_->getSizeInCellsY();
 
-    pCalculator_->setSize(sizeX, sizeY);
+    potentialCalculator_->setSize(sizeX, sizeY);
     path_maker_->setSize(sizeX, sizeY);
 
     potentials = new float[sizeX * sizeY];
@@ -69,12 +68,12 @@ bool AStarCore::calculatePath(
     costMap_->setCost(start_x_i, start_y_i, costmap_2d::FREE_SPACE);
     addMapBorder();
 
-    bool found = planner_->calculatePotentials(start_x_d, start_y_d,
+    bool found = stateExpander_->calculatePotentials(start_x_d, start_y_d,
         goal_x_d, goal_y_d,
         sizeX * sizeY * 2,
         potentials);
 
-    planner_->clearEndpoint(potentials, goal_x_i, goal_y_i, 2);
+    stateExpander_->clearEndpoint(potentials, goal_x_i, goal_y_i, 2);
     if (found)
     {
         path_maker_->getPath(potentials, start_x_d, start_y_d, goal_x_d, goal_y_d, path);
@@ -84,14 +83,14 @@ bool AStarCore::calculatePath(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void AStarCore::mapToWorld(double mx, double my, double& wx, double& wy)
+void AStarPotentials::mapToWorld(double mx, double my, double& wx, double& wy)
 {
-    wx = costMap_->getOriginX() + (mx+convert_offset_) * costMap_->getResolution();
-    wy = costMap_->getOriginY() + (my+convert_offset_) * costMap_->getResolution();
+    wx = costMap_->getOriginX() + (mx + 0.5) * costMap_->getResolution();
+    wy = costMap_->getOriginY() + (my + 0.5) * costMap_->getResolution();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool AStarCore::worldToMap(double wx, double wy, double& mx, double& my)
+bool AStarPotentials::worldToMap(double wx, double wy, double& mx, double& my)
 {
     double origin_x = costMap_->getOriginX();
     double origin_y = costMap_->getOriginY();
@@ -102,8 +101,8 @@ bool AStarCore::worldToMap(double wx, double wy, double& mx, double& my)
         return false;
     }
 
-    mx = (wx - origin_x) / resolution - convert_offset_;
-    my = (wy - origin_y) / resolution - convert_offset_;
+    mx = (wx - origin_x) / resolution - 0.5;
+    my = (wy - origin_y) / resolution - 0.5;
 
     if (mx < costMap_->getSizeInCellsX() && my < costMap_->getSizeInCellsY())
     {
@@ -117,7 +116,7 @@ bool AStarCore::worldToMap(double wx, double wy, double& mx, double& my)
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void AStarCore::addMapBorder()
+void AStarPotentials::addMapBorder()
 {
     unsigned char* costs = costMap_->getCharMap();
     int sizeX = costMap_->getSizeInCellsX();

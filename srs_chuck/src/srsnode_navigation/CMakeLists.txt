@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srsnode_navigation)
 
 set(${PROJECT_NAME}_SOURCES
-    src/global_planner/AStarCore.cpp
+    src/global_planner/AStarPotentials.cpp
     src/global_planner/QuadraticCalculator.cpp
     src/global_planner/OrientationFilter.cpp
     src/global_planner/AStarExpansion.cpp
@@ -20,7 +20,8 @@ set(${PROJECT_NAME}_SOURCES
 set(${PROJECT_NAME}_TEST_SOURCES
 
     test/TestNavigation_OneWay.cpp
-#    test/TestNavigation_SmallMap.cpp
+    test/TestNavigation_Barrett_BigSearch.cpp
+    test/TestNavigation_SmallMap.cpp
 )
 
 ####################################################################################################

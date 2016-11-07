@@ -340,22 +340,22 @@ void LogicalMapFactory::ntEntityBoundary(YAML::Node root)
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
-    Pose<> o0 = coordinates[0];
-    Pose<> s = coordinates[1];
+    Pose<> p1 = coordinates[0];
+    Pose<> p2 = coordinates[1];
 
     // Add the bottom border
-    addObstacle(Pose<>::ZERO, widthM, o0.y, envelopeSize, envelopeCost);
+    addObstacle(Pose<>::ZERO, widthM, p1.y, envelopeSize, envelopeCost);
 
     // Add the left border
-    addObstacle(Pose<>(0, o0.y), o0.x, heightM - o0.y, envelopeSize, envelopeCost);
+    addObstacle(Pose<>(0, p1.y), p1.x, heightM - p1.y, envelopeSize, envelopeCost);
 
     // Add the top border
-    Pose<> t0 = Pose<>(o0.x, o0.y + s.y);
-    addObstacle(Pose<>(o0.x, t0.y), widthM - o0.x, heightM - t0.y, envelopeSize, envelopeCost);
+    Pose<> t0 = Pose<>(p1.x, p2.y);
+    addObstacle(Pose<>(p1.x, t0.y), widthM - p1.x, heightM - t0.y, envelopeSize, envelopeCost);
 
     // Add the right border
-    t0 = Pose<>(o0.x + s.x, o0.y);
-    addObstacle(t0, widthM - t0.x, t0.y - o0.y, envelopeSize, envelopeCost);
+    t0 = Pose<>(p2.x, p1.y);
+    addObstacle(t0, widthM - t0.x, t0.y - p1.y, envelopeSize, envelopeCost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -367,11 +367,11 @@ void LogicalMapFactory::ntEntityCostArea(YAML::Node root)
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
-    Pose<> bl = coordinates[0];
-    Pose<> size = coordinates[1];
+    Pose<> p1 = coordinates[0];
+    Pose<> p2 = coordinates[1];
 
     // Add the static obstacle
-    addRectangleCost(bl, size.x, size.y, cost);
+    addRectangleCost(p1, abs(p1.x - p2.x), abs(p1.y - p2.y), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -410,15 +410,15 @@ void LogicalMapFactory::ntEntityObstacle(YAML::Node root)
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
-    Pose<> o0 = coordinates[0];
+    Pose<> p1 = coordinates[0];
     if (coordinates.size() == 2)
     {
-        Pose<> size = coordinates[1];
-        addObstacle(o0, size.x, size.y, envelopeSize, envelopeCost);
+        Pose<> p2 = coordinates[1];
+        addObstacle(p1, abs(p1.x - p2.x), abs(p1.y - p2.y), envelopeSize, envelopeCost);
     }
     else if (coordinates.size() == 1)
     {
-        addObstacle(o0, metadata_.resolution, metadata_.resolution, envelopeSize, envelopeCost);
+        addObstacle(p1, metadata_.resolution, metadata_.resolution, envelopeSize, envelopeCost);
     }
 }
 
@@ -438,15 +438,16 @@ void LogicalMapFactory::ntEntityWeightArea(YAML::Node root)
     Grid2d::BaseType westCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_WEST], false);
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 1, 2);
-    Pose<> o0 = coordinates[0];
+    Pose<> p1 = coordinates[0];
     if (coordinates.size() == 2)
     {
-        Pose<> size = coordinates[1];
-        addWeightArea(o0, size.x, size.y, northCost, eastCost, southCost, westCost);
+        Pose<> p2 = coordinates[1];
+        addWeightArea(p1, abs(p1.x - p2.x), abs(p1.y - p2.y),
+            northCost, eastCost, southCost, westCost);
     }
     else if (coordinates.size() == 1)
     {
-        addWeightArea(o0, metadata_.resolution, metadata_.resolution,
+        addWeightArea(p1, metadata_.resolution, metadata_.resolution,
             northCost, eastCost, southCost, westCost);
     }
 }

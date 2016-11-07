@@ -11,9 +11,7 @@ using namespace std;
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
-//#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
-//#include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
-#include <srsnode_navigation/global_planner/AStarCore.hpp>
+#include <srsnode_navigation/global_planner/AStarPotentials.hpp>
 using namespace srs;
 
 constexpr int GRID_SIZE = 15;
@@ -47,7 +45,7 @@ TEST(Test_Navigation, OneWay)
 
     costmap_2d::Costmap2D* cost2d = MapAdapter::map2CostMap2D(logical);
 
-    AStarCore astar(logical, cost2d);
+    AStarPotentials astar(logical, cost2d);
     std::vector<std::pair<float, float>> path;
     float* potentials;
 

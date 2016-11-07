@@ -58,9 +58,8 @@ void OdometryPositionEstimator::run()
 		sscanf( pszWheelBaseLength, "%lf", &wheelbaseLength_ );
 	}
 
-    ROS_INFO_STREAM("Odometry Configuration: motorCountPerRev=" << motorCountPerRev_ <<
-		", gearboxRatio_=" << gearboxRatio_ <<
-		", wheelbaseLength_=" << wheelbaseLength_ <<
+    ROS_INFO_STREAM("Odometry Configuration:"
+		" wheelbaseLength_=" << wheelbaseLength_ <<
 		", leftWheelRadius_=" << leftWheelRadius_ <<
 		", rightWheelRadius_=" << rightWheelRadius_);
 

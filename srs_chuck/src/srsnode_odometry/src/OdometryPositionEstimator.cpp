@@ -16,11 +16,12 @@ OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	pose_(-1.0, -1.0, -1.0),
 	pingTimer_(),
 	broadcaster_(),
-	rawOdometryCountSub_(),
+	resetPoseSub_(),
+	rawVelocityCmdSub_(),
+	rawOdometryRPMSub_(),
+	rpmVelocityCmdPub_(),
 	odometryPosePub_(),
 	pingPub_(),
-	motorCountPerRev_(4096),
-	gearboxRatio_(10.0),
 	wheelbaseLength_(0.5235),
 	leftWheelRadius_(0.10243),
 	rightWheelRadius_(0.10243)
@@ -75,15 +76,23 @@ void OdometryPositionEstimator::run()
 
 void OdometryPositionEstimator::connect()
 {
-	rawOdometryCountSub_ = nodeHandle_.subscribe<srslib_framework::Odometry>(ODOMETRY_RAW_COUNT_TOPIC, 10,
-		std::bind( &OdometryPositionEstimator::RawOdomCountToVelocity, this, std::placeholders::_1 ));
+	// Subscriber to get odometry reading (in rpm) and calculates the robot pose
+	rawOdometryRPMSub_ = nodeHandle_.subscribe<srslib_framework::OdometryRPM>(ODOMETRY_RPM_RAW_TOPIC, 10,
+		std::bind( &OdometryPositionEstimator::CalculateRobotPose, this, std::placeholders::_1 ));
 
+	// Subscriber to reset robot pose when necessary
 	resetPoseSub_ = nodeHandle_.subscribe<geometry_msgs::PoseWithCovarianceStamped>(INITIAL_POSE_TOPIC, 1,
 			std::bind( &OdometryPositionEstimator::ResetOdomPose, this, std::placeholders::_1 ));
 
-	odometryPosePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_OUTPUT_TOPIC, 100);
+	// Subscriber to transform velocity command from linear/angular velocity to RPM format
+	rawVelocityCmdSub_ = nodeHandle_.subscribe<geometry_msgs::Twist>(ODOMETRY_RAW_VELOCITY_TOPIC, 10,
+			std::bind( &OdometryPositionEstimator::TransformVeclocityToRPM, this, std::placeholders::_1 ));
 
-	pingPub_ = nodeHandle_.advertise<std_msgs::Bool>("/internal/state/ping", 1);
+	odometryPosePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_OUTPUT_TOPIC, 10);
+
+	rpmVelocityCmdPub_ = nodeHandle_.advertise<srslib_framework::OdometryRPM>(ODOMETRY_RPM_COMMAND_TOPIC, 10);
+
+	pingPub_ = nodeHandle_.advertise<std_msgs::Bool>(PING_COMMAND_TOPIC, 1);
 
 	// Register dynamic configuration callback
 	configServer_.setCallback(boost::bind(&OdometryPositionEstimator::cfgCallback, this, _1, _2));
@@ -96,9 +105,10 @@ void OdometryPositionEstimator::connect()
 void OdometryPositionEstimator::disconnect()
 {
 	odometryPosePub_.shutdown();
+	rpmVelocityCmdPub_.shutdown();
 }
 
-void OdometryPositionEstimator::RawOdomCountToVelocity( const srslib_framework::Odometry::ConstPtr& encoderCount )
+void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::OdometryRPM::ConstPtr& wheelRPM )
 {
 	// If no initial pose is provided, return immediately without any calculation
 	if(pose_.x == (-1.0) && pose_.y == (-1.0) && pose_.theta == (-1.0))
@@ -107,24 +117,18 @@ void OdometryPositionEstimator::RawOdomCountToVelocity( const srslib_framework::
 		return;
 	}
 
-	static ros::Time s_lastTime = encoderCount->header.stamp;
+	static ros::Time s_lastTime = wheelRPM->header.stamp;
 	static Pose<> s_lastPose = pose_;
 
 	// Update current time and calculate time interval between two consecutive messages
-	ros::Time currentTime = encoderCount->header.stamp;
-
-	// Skip first round calculation (if dfTimeDelta = 0 -> v,w = NaN)
-	if(!TimeMath::isTimeElapsed(0.00001, s_lastTime, currentTime))
-	{
-		return;
-	}
+	ros::Time currentTime = wheelRPM->header.stamp;
 
 	double dfTimeDelta = (currentTime - s_lastTime).toSec();
 
 	// Calculate linear and angular velocity
 	double linearVelocity = 0.0;
 	double angularVelocity = 0.0;
-	GetRawOdometryVelocity(encoderCount->left_wheel, encoderCount->right_wheel, dfTimeDelta, linearVelocity, angularVelocity);
+	GetRawOdometryVelocity(wheelRPM->left_wheel_rpm, wheelRPM->right_wheel_rpm, linearVelocity, angularVelocity);
 
 	// Message declarations
 	geometry_msgs::TransformStamped odom_trans;
@@ -147,15 +151,12 @@ void OdometryPositionEstimator::RawOdomCountToVelocity( const srslib_framework::
     	pose_ = PoseMath::translate<>(pose_, linearVelocity * dfTimeDelta, 0.0);
     }
 
-	// Display status in DEBUG MODE
+	// Display status in DEBUG MODE whenever pose has been changed
 	if(pose_.x != s_lastPose.x || pose_.y != s_lastPose.y || pose_.theta != s_lastPose.theta)
 	{
 		ROS_DEBUG( "Estimated Pose Changed: x=%f, y=%f, theta=%f",
 					pose_.x, pose_.y, pose_.theta );
 	}
-
-//	ROS_ERROR_THROTTLE( 1.0, "Pose: %f, %f", pose_.x, pose_.y );
-//	ROS_ERROR_THROTTLE( 1.0, "Pose: x=%f, y=%f, angle:%f", pose_.x, pose_.y, pose_.theta );
 
 	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( pose_.theta );
 
@@ -207,15 +208,32 @@ void OdometryPositionEstimator::ResetOdomPose( const geometry_msgs::PoseWithCova
 	ROS_DEBUG("Robot pose has been set to x= %f, y= %f, theta= %f", pose_.x, pose_.y, pose_.theta);
 }
 
-void OdometryPositionEstimator::GetRawOdometryVelocity( const int32_t leftWheelCount, const int32_t rightWheelCount, double timeInterval, double& linearV, double& angularV)
+void OdometryPositionEstimator::GetRawOdometryVelocity( const float leftWheelRPM, const float rightWheelRPM, double& linearV, double& angularV)
 {
 	// Calculate left and right wheel velocity
-	double leftWheelVelocity = (double)leftWheelCount / timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * leftWheelRadius_ * 2 * M_PI;
-	double rightWheelVelocity = (double)rightWheelCount / timeInterval / (double)motorCountPerRev_ / (double) gearboxRatio_ * rightWheelRadius_ * 2 * M_PI;
+	double leftWheelVelocity = (double)leftWheelRPM * 2.0 * M_PI * leftWheelRadius_ / 60.0;
+	double rightWheelVelocity = (double)rightWheelRPM * 2.0 * M_PI * rightWheelRadius_ / 60.0;
 
 	// Calculate v and w
-	linearV = ( rightWheelVelocity + leftWheelVelocity ) / 2;
+	linearV = ( rightWheelVelocity + leftWheelVelocity ) / 2.0;
 	angularV = ( rightWheelVelocity - leftWheelVelocity ) / wheelbaseLength_ ;
+}
+
+void OdometryPositionEstimator::TransformVeclocityToRPM(const geometry_msgs::Twist::ConstPtr& rawVelocity)
+{
+	// Whenever Twist command is received, odometry node transforms it to RPM command
+	// and sends it to brainstem
+	double leftMotorSpeed = rawVelocity->linear.x - ((wheelbaseLength_ / 2) * rawVelocity->angular.z);
+	double rightMotorSpeed = rawVelocity->linear.x + ((wheelbaseLength_ / 2) * rawVelocity->angular.z);
+
+	double leftMotorRPM = leftMotorSpeed * 60.0 / 2.0 / M_PI / leftWheelRadius_;
+	double rightMotorRPM = rightMotorSpeed * 60.0 / 2.0 / M_PI / rightWheelRadius_;
+
+	// Publish OdometryRPM message
+	srslib_framework::OdometryRPM rpmVelocity;
+	rpmVelocity.left_wheel_rpm = leftMotorRPM;
+	rpmVelocity.right_wheel_rpm = rightMotorRPM;
+	rpmVelocityCmdPub_.publish(rpmVelocity);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)
@@ -236,8 +254,6 @@ void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)
 
 void OdometryPositionEstimator::cfgCallback(srsnode_odometry::RobotSetupConfig &config, uint32_t level)
 {
-	motorCountPerRev_ = config.motor_count_per_rev;
-	gearboxRatio_ = config.gearbox_ratio;
 	wheelbaseLength_ = config.robot_wheelbase_length;
 	leftWheelRadius_ = config.robot_leftwheel_radius;
 	rightWheelRadius_ = config.robot_rightwheel_radius;

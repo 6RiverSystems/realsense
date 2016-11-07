@@ -16,7 +16,7 @@
 #include <tf/transform_datatypes.h>
 #include <dynamic_reconfigure/server.h>
 #include <srsnode_odometry/RobotSetupConfig.h>
-#include <srslib_framework/Odometry.h>
+#include <srslib_framework/OdometryRPM.h>
 #include <srslib_framework/ros/RosTap.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
@@ -37,9 +37,11 @@ public:
 
 private:
 
-    void RawOdomCountToVelocity( const srslib_framework::Odometry::ConstPtr& encoderCount );
+    void CalculateRobotPose( const srslib_framework::OdometryRPM::ConstPtr& wheelRPM );
 
-    void GetRawOdometryVelocity(const int32_t leftWheelCount, const int32_t rightWheelCount, double timeInterval, double& v, double& w);
+    void GetRawOdometryVelocity(const float leftWheelCount, const float rightWheelCount, double& v, double& w);
+
+    void TransformVeclocityToRPM(const geometry_msgs::Twist::ConstPtr& velocity);
 
     void ResetOdomPose( const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& resetMsg );
 
@@ -53,11 +55,17 @@ private:
 
     static constexpr double MAX_ALLOWED_PING_DELAY = 0.5; // 50% of the duty cycle
 
-	static constexpr auto ODOMETRY_RAW_COUNT_TOPIC = "/internal/sensors/odometry/count";
+	static constexpr auto ODOMETRY_RPM_RAW_TOPIC = "/internal/sensors/odometry/rpm/raw";
 
-	static constexpr auto ODOMETRY_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity";
+	static constexpr auto ODOMETRY_RAW_VELOCITY_TOPIC = "/internal/sensors/odometry/velocity/cmd";
+
+	static constexpr auto ODOMETRY_RPM_COMMAND_TOPIC = "/internal/sensors/odometry/rpm/cmd";
+
+	static constexpr auto ODOMETRY_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity/pose";
 
 	static constexpr auto INITIAL_POSE_TOPIC = "/request/initial_pose";
+
+	static constexpr auto PING_COMMAND_TOPIC = "/internal/state/ping";
 
     ros::NodeHandle nodeHandle_;
 
@@ -69,17 +77,17 @@ private:
 
 	dynamic_reconfigure::Server<srsnode_odometry::RobotSetupConfig> configServer_;
 
-	ros::Subscriber rawOdometryCountSub_;
+	ros::Subscriber rawOdometryRPMSub_;
+
+	ros::Subscriber rawVelocityCmdSub_;
 
 	ros::Subscriber resetPoseSub_;
+
+	ros::Publisher rpmVelocityCmdPub_;
 
 	ros::Publisher odometryPosePub_;
 
 	ros::Publisher pingPub_;
-
-	int motorCountPerRev_;
-
-	double gearboxRatio_;
 
 	double wheelbaseLength_;
 

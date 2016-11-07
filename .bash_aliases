@@ -5,16 +5,12 @@ function getChuckDirectory() {
   NC='\033[0m' # No Color
 
   baseDirectory=~/ros
-  if [ "$ENV" != "ros" ]; then
-    baseDirectory="/home/rivs/projects/$ENV/ros"
-  fi
 
   logFile="$baseDirectory/log/ros.log"
 }
 
 function printInfo() {
   echo -e "${BLUE}*************************************************************"
-  echo -e "${BLUE}*** ${YELLOW}ENV: $ENV"
   echo -e "${BLUE}*** ${YELLOW}ROS directory: $baseDirectory"
   echo -e "${BLUE}*** ${YELLOW}Log file: $logFile"
   echo -e "${BLUE}*************************************************************"

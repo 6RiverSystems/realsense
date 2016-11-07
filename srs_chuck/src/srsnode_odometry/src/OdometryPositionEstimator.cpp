@@ -39,6 +39,31 @@ void OdometryPositionEstimator::run()
 
 	connect();
 
+	char* pszLeftWheelRadius = getenv("ROBOT_LEFT_WHEEL_RADIUS");
+	char* pszRightWheelRadius = getenv("ROBOT_RIGHT_WHEEL_RADIUS");
+	char* pszWheelBaseLength = getenv("ROBOT_WHEEL_BASE");
+
+	if( pszLeftWheelRadius )
+	{
+		sscanf( pszLeftWheelRadius, "%lf", &leftWheelRadius_ );
+	}
+
+	if( pszRightWheelRadius )
+	{
+		sscanf( pszRightWheelRadius, "%lf", &rightWheelRadius_ );
+	}
+
+	if( pszWheelBaseLength )
+	{
+		sscanf( pszWheelBaseLength, "%lf", &wheelbaseLength_ );
+	}
+
+    ROS_INFO_STREAM("Odometry Configuration: motorCountPerRev=" << motorCountPerRev_ <<
+		", gearboxRatio_=" << gearboxRatio_ <<
+		", wheelbaseLength_=" << wheelbaseLength_ <<
+		", leftWheelRadius_=" << leftWheelRadius_ <<
+		", rightWheelRadius_=" << rightWheelRadius_);
+
 	while(ros::ok())
 	{
 		ros::spinOnce();

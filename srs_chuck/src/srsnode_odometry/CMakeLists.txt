@@ -19,7 +19,6 @@ project(${PROJECT_NAME})
 set(PROJECT_NODE ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
-set(CMAKE_BUILD_TYPE Debug)
 
 #set(Boost_ADDITIONAL_VERSIONS "1.61" "1.61.0")
 

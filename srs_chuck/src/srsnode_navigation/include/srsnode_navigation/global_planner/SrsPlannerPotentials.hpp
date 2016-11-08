@@ -54,69 +54,51 @@ public:
         double tolerance,
         std::vector<geometry_msgs::PoseStamped>& plan);
 
-    bool computePotential(const geometry_msgs::Point& world_point);
-
-    bool getPlanFromPotential(double start_x, double start_y, double end_x, double end_y,
-                              const geometry_msgs::PoseStamped& goal,
-                              std::vector<geometry_msgs::PoseStamped>& plan);
-    double getPointPotential(const geometry_msgs::Point& world_point);
-
-    bool validPointPotential(const geometry_msgs::Point& world_point);
-    bool validPointPotential(const geometry_msgs::Point& world_point, double tolerance);
-    void publishPlan(const std::vector<geometry_msgs::PoseStamped>& path);
-    bool makePlanService(nav_msgs::GetPlan::Request& req, nav_msgs::GetPlan::Response& resp);
-
-protected:
-
-    costmap_2d::Costmap2D* costmap_;
-    std::string frame_id_;
-    ros::Publisher plan_pub_;
-    bool initialized_, allow_unknown_, visualize_potential_;
-
 private:
+    void getPlanFromPotential(std::vector<std::pair<float, float>>& path,
+        std::vector<geometry_msgs::PoseStamped>& plan);
+
     void initializeParams();
+
+    void publishPlan(const std::vector<geometry_msgs::PoseStamped>& path);
+    void publishPotential(float* potential);
 
     void updateMapStack(costmap_2d::Costmap2D* rosCostMap);
 
-//    void clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, unsigned int mx, unsigned int my);
-    void publishPotential(float* potential);
-
-    void getPlanFromPotential(std::vector<std::pair<float, float>>& path,
-//        const geometry_msgs::PoseStamped& goal,
-        std::vector<geometry_msgs::PoseStamped>& plan);
-
-    double planner_window_x_;
-    double planner_window_y_;
-    double default_tolerance_;
-
-    std::string tf_prefix_;
-    boost::mutex mutex_;
-//    ros::ServiceServer make_plan_srv_;
-
-//    PotentialCalculator* p_calc_;
-//    Expander* planner_;
-//    Traceback* path_maker_;
-    OrientationFilter* orientation_filter_;
-
-    bool publish_potential_;
-    ros::Publisher potential_pub_;
-    int publish_scale_;
-
-//    void outlineMap(unsigned char* costarr, int nx, int ny, unsigned char value);
-//    unsigned char* cost_array_;
-    float* potential_array_;
-    unsigned int start_x_, start_y_, end_x_, end_y_;
-
+    bool allow_unknown_;
     AStarPotentials* astar_;
 
-//    bool old_navfn_behavior_;
+    costmap_2d::Costmap2D* costmap_;
 
-//    dynamic_reconfigure::Server<global_planner::GlobalPlannerConfig> *dsrv_;
-//    void reconfigureCB(global_planner::GlobalPlannerConfig &config, uint32_t level);
+    double default_tolerance_;
+
+    std::string frame_id_;
+
+    bool initialized_;
+
+    boost::mutex mutex_;
+
+    OrientationFilter* orientation_filter_;
+
+    ros::Publisher plan_pub_;
+    double planner_window_x_;
+    double planner_window_y_;
+    ros::Publisher potential_pub_;
+    float* potential_array_;
+    bool publish_potential_;
+    int publish_scale_;
+
+//    unsigned int start_x_;
+//    unsigned int start_y_;
+//    unsigned int end_x_;
+//    unsigned int end_y_;
 
     MapStack* srsMapStack_;
 
     TapMapStack tapMapStack_;
+    std::string tf_prefix_;
+
+    bool visualize_potential_;
 };
 
 } // namespace srs

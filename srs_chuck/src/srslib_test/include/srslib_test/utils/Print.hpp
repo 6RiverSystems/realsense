@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef PRINT_HPP_
-#define PRINT_HPP_
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -58,9 +57,34 @@ struct Print
 
         return output.str();
     }
+
+    template<unsigned int PRECISION = 6, typename TYPE = float>
+    static string printToString(TYPE* matrix, unsigned int columns, unsigned int rows)
+    {
+        ostringstream output;
+
+        output << setw(PRECISION + 2) << "  ";
+        for (int col = 0; col < columns; ++col) {
+            output << setw(PRECISION + 2) << col << " ";
+        }
+
+        output << endl;
+        for (int row = rows - 1; row >= 0; row--)
+        {
+            output << setw(PRECISION + 2) << row << " ";
+            for (int col = 0; col < columns; ++col)
+            {
+                TYPE value = *(matrix + (row * columns) + col);
+
+                output << setfill(' ') << setw(PRECISION + 5) << scientific <<
+                    setprecision(PRECISION - 3) << value;
+            }
+            output << endl;
+        }
+
+        return output.str();
+    }
 };
 
 } // namespace test
 } // namespace srs
-
-#endif // PRINT_HPP_

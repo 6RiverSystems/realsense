@@ -41,8 +41,8 @@ private:
 
     LogicalMap* logicalMap_;
 
+    Traceback* pathBuilder_;
     PotentialCalculator* potentialCalculator_;
-    Traceback* path_maker_;
 
     Expander* stateExpander_;
 };

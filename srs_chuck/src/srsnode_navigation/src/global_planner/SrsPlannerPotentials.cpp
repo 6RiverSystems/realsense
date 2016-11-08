@@ -166,10 +166,7 @@ bool SrsPlannerPotentials::makePlan(
         plan,
         potential_array_);
 
-//    if (publish_potential_)
-//    {
-        publishPotential(potential_array_);
-//    }
+    publishPotential(potential_array_);
 
     if (found)
     {
@@ -201,54 +198,6 @@ bool SrsPlannerPotentials::makePlan(
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerPotentials::initializeParams()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerPotentials::updateMapStack(costmap_2d::Costmap2D* rosCostMap)
-{
-    // Make sure that the neither the logical not the occupancy maps
-    // have been re-published. In case, destroy what we have and
-    // ask for a new stack
-    if (tapMapStack_.newDataAvailable())
-    {
-        delete srsMapStack_;
-        srsMapStack_ = tapMapStack_.pop();
-    }
-
-    // TODO: Sync the obstruction map in the stack with the new rosCostMap
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerPotentials::publishPlan(const std::vector<geometry_msgs::PoseStamped>& path)
-{
-    if (!initialized_)
-    {
-        ROS_ERROR(
-                "This planner has not been initialized yet, but it is being used, please call initialize() before use");
-        return;
-    }
-
-    //create a message for the plan
-    nav_msgs::Path gui_path;
-    gui_path.poses.resize(path.size());
-
-    if (!path.empty())
-    {
-        gui_path.header.frame_id = path[0].header.frame_id;
-        gui_path.header.stamp = path[0].header.stamp;
-    }
-
-    for (unsigned int i = 0; i < path.size(); i++)
-    {
-        gui_path.poses[i] = path[i];
-    }
-
-    plan_pub_.publish(gui_path);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlannerPotentials::getPlanFromPotential(
     std::vector<std::pair<float, float>>& path,
     std::vector<geometry_msgs::PoseStamped>& plan)
@@ -277,6 +226,32 @@ void SrsPlannerPotentials::getPlanFromPotential(
 
         plan.push_back(pose);
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void SrsPlannerPotentials::initializeParams()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void SrsPlannerPotentials::publishPlan(const std::vector<geometry_msgs::PoseStamped>& path)
+{
+    //create a message for the plan
+    nav_msgs::Path gui_path;
+    gui_path.poses.resize(path.size());
+
+    if (!path.empty())
+    {
+        gui_path.header.frame_id = path[0].header.frame_id;
+        gui_path.header.stamp = path[0].header.stamp;
+    }
+
+    for (unsigned int i = 0; i < path.size(); i++)
+    {
+        gui_path.poses[i] = path[i];
+    }
+
+    plan_pub_.publish(gui_path);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -331,6 +306,21 @@ void SrsPlannerPotentials::publishPotential(float* potential)
     }
 
     potential_pub_.publish(grid);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void SrsPlannerPotentials::updateMapStack(costmap_2d::Costmap2D* rosCostMap)
+{
+    // Make sure that the neither the logical not the occupancy maps
+    // have been re-published. In case, destroy what we have and
+    // ask for a new stack
+    if (tapMapStack_.newDataAvailable())
+    {
+        delete srsMapStack_;
+        srsMapStack_ = tapMapStack_.pop();
+    }
+
+    // TODO: Sync the obstruction map in the stack with the new rosCostMap
 }
 
 } // namespace srs

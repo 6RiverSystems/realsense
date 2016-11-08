@@ -3,7 +3,8 @@
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-float QuadraticCalculator::calculatePotential(float* potential, unsigned char cost, int n, float prev_potential)
+float QuadraticCalculator::calculatePotential(float* potential, unsigned char cost,
+    int n, float prev_potential)
 {
     // get neighbors
     float u, d, l, r;

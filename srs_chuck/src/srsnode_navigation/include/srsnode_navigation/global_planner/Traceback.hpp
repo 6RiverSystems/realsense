@@ -1,3 +1,8 @@
+/*
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
+ *
+ * This is proprietary software, unauthorized distribution is not permitted.
+ */
 #pragma once
 
 #include <srsnode_navigation/global_planner/PotentialCalculator.hpp>
@@ -6,23 +11,33 @@ namespace srs {
 
 class Traceback {
 public:
-    Traceback(PotentialCalculator* p_calc) : p_calc_(p_calc)
+    Traceback(PotentialCalculator* p_calc) :
+        p_calc_(p_calc)
     {}
 
     virtual ~Traceback()
     {}
 
-    virtual bool getPath(float* potential, double start_x, double start_y, double end_x, double end_y, std::vector<std::pair<float, float> >& path) = 0;
-    virtual void setSize(int xs, int ys) {
+    inline int getIndex(int x, int y)
+    {
+        return x + y * xs_;
+    }
+
+    virtual bool getPath(float* potential,
+        double start_x, double start_y, double end_x, double end_y,
+        std::vector<std::pair<float, float> >& path) = 0;
+
+    void setLethalCost(unsigned char lethal_cost)
+    {
+        lethal_cost_ = lethal_cost;
+    }
+
+    virtual void setSize(int xs, int ys)
+    {
         xs_ = xs;
         ys_ = ys;
     }
-    inline int getIndex(int x, int y) {
-        return x + y * xs_;
-    }
-    void setLethalCost(unsigned char lethal_cost) {
-        lethal_cost_ = lethal_cost;
-    }
+
 protected:
     int xs_, ys_;
     unsigned char lethal_cost_;

@@ -2,7 +2,7 @@
 
 #include <pluginlib/class_list_macros.h>
 
-PLUGINLIB_EXPORT_CLASS(srs::SrsPlanner, nav_core::BaseGlobalPlanner)
+PLUGINLIB_EXPORT_CLASS(srs::SrsPlannerConventional, nav_core::BaseGlobalPlanner)
 
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
@@ -17,7 +17,7 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-SrsPlanner::SrsPlanner() :
+SrsPlannerConventional::SrsPlannerConventional() :
     srsMapStack_(nullptr)
 {
     ROS_WARN("SrsPlanner::SrsPlanner() called");
@@ -27,7 +27,7 @@ SrsPlanner::SrsPlanner() :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-SrsPlanner::SrsPlanner(string name, costmap_2d::Costmap2DROS* rosCostMap) :
+SrsPlannerConventional::SrsPlannerConventional(string name, costmap_2d::Costmap2DROS* rosCostMap) :
     srsMapStack_(nullptr)
 {
     ROS_WARN("SrsPlanner::SrsPlanner(...) called");
@@ -36,13 +36,13 @@ SrsPlanner::SrsPlanner(string name, costmap_2d::Costmap2DROS* rosCostMap) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-SrsPlanner::~SrsPlanner()
+SrsPlannerConventional::~SrsPlannerConventional()
 {
     delete srsMapStack_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostMap)
+void SrsPlannerConventional::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostMap)
 {
     ROS_WARN("SrsPlanner::initialize() called");
 
@@ -51,7 +51,7 @@ void SrsPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostM
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool SrsPlanner::makePlan(
+bool SrsPlannerConventional::makePlan(
     const geometry_msgs::PoseStamped& start,
     const geometry_msgs::PoseStamped& goal,
     vector<geometry_msgs::PoseStamped>& plan)
@@ -118,12 +118,12 @@ bool SrsPlanner::makePlan(
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlanner::initializeParams()
+void SrsPlannerConventional::initializeParams()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlanner::updateMapStack(costmap_2d::Costmap2DROS* rosCostMap)
+void SrsPlannerConventional::updateMapStack(costmap_2d::Costmap2DROS* rosCostMap)
 {
     // Make sure that the neither the logical not the occupancy maps
     // have been re-published. In case, destroy what we have and

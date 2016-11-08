@@ -6,8 +6,7 @@
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-AStarExpansion::AStarExpansion(LogicalMap* logicalMap,
-    costmap_2d::Costmap2D* costMap,
+AStarExpansion::AStarExpansion(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap,
     PotentialCalculator* pCalculator) :
         Expander(logicalMap, costMap, pCalculator)
 {}

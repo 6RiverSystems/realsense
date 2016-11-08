@@ -73,7 +73,7 @@ public:
         int y;
     };
 
-    struct Position : public Location
+    struct Position
     {
         Position(int x = 0, int y = 0, int orientation = 0) :
             x(x),

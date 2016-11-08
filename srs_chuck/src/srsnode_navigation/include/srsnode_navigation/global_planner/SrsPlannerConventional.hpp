@@ -22,11 +22,11 @@ using namespace std;
 
 namespace srs {
 
-class SrsPlanner : public nav_core::BaseGlobalPlanner
+class SrsPlannerConventional : public nav_core::BaseGlobalPlanner
 {
 public:
-    SrsPlanner();
-    SrsPlanner(string name, costmap_2d::Costmap2DROS* rosCostMap);
+    SrsPlannerConventional();
+    SrsPlannerConventional(string name, costmap_2d::Costmap2DROS* rosCostMap);
     virtual ~SrsPlanner();
 
     void initialize(string name, costmap_2d::Costmap2DROS* rosCostMap);

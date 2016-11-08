@@ -29,7 +29,7 @@ void MapAdapter::costMap2D2Vector(const costmap_2d::Costmap2D* map, vector<int8_
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(OccupancyMap* map)
+costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(BaseMap* map)
 {
     unsigned int rows = map->getHeightCells();
     unsigned int columns = map->getWidthCells();
@@ -41,8 +41,7 @@ costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(OccupancyMap* map)
     {
         for (int col = 0; col < columns; col++)
         {
-            Grid2d::BaseType cost = map->getCost(col, row);
-            costMap->setCost(col, row, map->cost2grayLevel(cost));
+            costMap->setCost(col, row, map->getCost(col, row));
         }
     }
 

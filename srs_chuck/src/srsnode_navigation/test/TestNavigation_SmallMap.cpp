@@ -13,30 +13,11 @@ using namespace std;
 #include <srslib_framework/localization/map/occupancy/OccupancyMapFactory.hpp>
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
+#include <srslib_test/utils/Print.hpp>
 #include <srsnode_navigation/global_planner/AStarPotentials.hpp>
 using namespace srs;
 
 constexpr int GRID_SIZE = 15;
-
-void printPotentials(float* potentials)
-{
-    cout << setw(8) << "  ";
-    for (int col = 0; col < GRID_SIZE; ++col) {
-        cout << setw(8) << col << " ";
-    }
-
-    cout << endl;
-    for (int row = GRID_SIZE - 1; row >= 0; row--)
-    {
-        cout << setw(8) << row << " ";
-        for (int col = 0; col < GRID_SIZE; ++col)
-        {
-            float p = *(potentials + (row * GRID_SIZE) + col);
-            cout << setw(8) << p << " ";
-        }
-        cout << endl;
-    }
-}
 
 TEST(Test_Navigation, SmallMap)
 {
@@ -91,7 +72,7 @@ TEST(Test_Navigation, SmallMap)
             cout << step.first << " - " << step.second << endl;
         }
 
-        printPotentials(potentials);
+        cout << test::Print::printToString(potentials, GRID_SIZE, GRID_SIZE);
     }
     else
     {

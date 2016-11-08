@@ -20,7 +20,7 @@ AStarPotentials::AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* 
     potentialCalculator_ = new QuadraticCalculator(sizeX, sizeY);
 
     stateExpander_ = new AStarExpansion(logicalMap, costMap, potentialCalculator_);
-    path_maker_ = new GridPath(potentialCalculator_); // GradientPath(pCalculator_);
+    pathBuilder_ = new GridPath(potentialCalculator_); // GradientPath(pCalculator_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ bool AStarPotentials::calculatePath(
     int sizeY = costMap_->getSizeInCellsY();
 
     potentialCalculator_->setSize(sizeX, sizeY);
-    path_maker_->setSize(sizeX, sizeY);
+    pathBuilder_->setSize(sizeX, sizeY);
 
     potentials = new float[sizeX * sizeY];
 
@@ -76,7 +76,7 @@ bool AStarPotentials::calculatePath(
     stateExpander_->clearEndpoint(potentials, goal_x_i, goal_y_i, 2);
     if (found)
     {
-        path_maker_->getPath(potentials, start_x_d, start_y_d, goal_x_d, goal_y_d, path);
+        pathBuilder_->getPath(potentials, start_x_d, start_y_d, goal_x_d, goal_y_d, path);
     }
 
     return found;

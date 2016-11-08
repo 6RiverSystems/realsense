@@ -12,12 +12,12 @@
 
 namespace srs {
 
-struct Index {
-    Index(int a, float b)
-    {
-        i = a;
-        cost = b;
-    }
+struct Index
+{
+    Index(int a, float b) :
+        i(a),
+        cost(b)
+    {}
 
     int i;
     float cost;
@@ -34,8 +34,7 @@ struct greater1
 class AStarExpansion : public Expander
 {
 public:
-    AStarExpansion(LogicalMap* logicalMap,
-        costmap_2d::Costmap2D* costMap,
+    AStarExpansion(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap,
         PotentialCalculator* pCalculator);
 
     bool calculatePotentials(

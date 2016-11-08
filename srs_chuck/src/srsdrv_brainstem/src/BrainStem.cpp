@@ -10,7 +10,6 @@
 #include <std_msgs/Float32.h>
 #include <srslib_framework/MsgHardwareInfo.h>
 #include <srslib_framework/MsgOperationalState.h>
-#include <geometry_msgs/TwistStamped.h>
 #include <srslib_framework/io/SerialIO.hpp>
 #include <srslib_framework/platform/Thread.hpp>
 #include <bitset>
@@ -27,7 +26,6 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
     m_connectedPublisher( ),
 	m_llcmdSubscriber( ),
 	m_llEventPublisher( ),
-	m_hardwareInfoPublisher( ),
 	m_operationalStatePublisher( ),
 	m_voltagePublisher( ),
 	m_pSerialIO( new SerialIO( "brainstem" ) ),
@@ -122,29 +120,6 @@ void BrainStem::OnButtonEvent( LED_ENTITIES eButtonId )
 		ROS_ERROR( "Unknown button entity %d", eButtonId );
 	}
 }
-
-void BrainStem::OnHardwareInfo( uint32_t uniqueId[4], uint8_t chassisGeneration, uint8_t brainstemHwVersion,
-	const std::string& strBrainstemSwVersion )
-{
-	char pszUid[255] = { '\0' };
-	sprintf( pszUid, "%08X-%08X-%08X-%08X", uniqueId[0], uniqueId[1], uniqueId[2], uniqueId[3] );
-
-	std::string strName( getenv( "ROBOT_NAME" ) );
-
-	ROS_INFO_STREAM( "Hardware Info => name: " << strName << ", id: " << pszUid <<
-		", chassisGeneration: " << unsigned( chassisGeneration ) << ", brainstemHwVersion: " << unsigned( brainstemHwVersion ) <<
-		", brainstemSwVersion: " << strBrainstemSwVersion );
-
-	srslib_framework::MsgHardwareInfo msg;
-	msg.name = strName;
-	msg.uid = pszUid;
-	msg.chassisGeneration = chassisGeneration;
-	msg.brainstemHwVersion = brainstemHwVersion;
-	msg.brainstemSwVersion = strBrainstemSwVersion;
-
-	m_hardwareInfoPublisher.publish( msg );
-}
-
 void BrainStem::OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_DATA& motionStatus,
 	const FAILURE_STATUS_DATA& failureStatus )
 {
@@ -199,7 +174,7 @@ void BrainStem::CreateSubscribers( )
 	m_pingSubscriber = m_rosNodeHandle.subscribe<std_msgs::Bool>( PING_TOPIC, 10,
 	    std::bind( &BrainStem::OnPing, this ) );
 
-	m_velocitySubscriber = m_rosNodeHandle.subscribe<geometry_msgs::Twist>( VELOCITY_TOPIC, 10,
+	m_velocitySubscriber = m_rosNodeHandle.subscribe<srslib_framework::OdometryRPM>( VELOCITY_TOPIC, 10,
 	    std::bind( &BrainStem::OnChangeVelocity, this, std::placeholders::_1 ) );
 
 	m_llcmdSubscriber = m_rosNodeHandle.subscribe<std_msgs::String>( COMMAND_TOPIC, 100,
@@ -209,9 +184,6 @@ void BrainStem::CreateSubscribers( )
 void BrainStem::CreatePublishers( )
 {
 	m_connectedPublisher = m_rosNodeHandle.advertise<std_msgs::Bool>( CONNECTED_TOPIC, 1, true );
-
-	m_hardwareInfoPublisher = m_rosNodeHandle.advertise<srslib_framework::MsgHardwareInfo>(
-	    HARDWARE_INFO_TOPIC, 1, true );
 
 	m_operationalStatePublisher = m_rosNodeHandle.advertise<srslib_framework::MsgOperationalState>(
 	    OPERATIONAL_STATE_TOPIC, 1, true );
@@ -227,9 +199,6 @@ void BrainStem::SetupCallbacks( )
 		this, std::placeholders::_1 ) );
 
 	m_messageProcessor.SetButtonCallback( std::bind( &BrainStem::OnButtonEvent, this, std::placeholders::_1 ) );
-
-	m_messageProcessor.SetHardwareInfoCallback( std::bind( &BrainStem::OnHardwareInfo, this,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
 
 	m_messageProcessor.SetOperationalStateCallback( std::bind( &BrainStem::OnOperationalStateChanged, this,
 		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
@@ -253,9 +222,9 @@ void BrainStem::OnPing( )
 	m_messageProcessor.SendPing( );
 }
 
-void BrainStem::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity )
+void BrainStem::OnChangeVelocity( const srslib_framework::OdometryRPM::ConstPtr& velocityRPM )
 {
-	m_messageProcessor.SetVelocity( velocity->linear.x, velocity->angular.z );
+	m_messageProcessor.SetRPM( velocityRPM->left_wheel_rpm, velocityRPM->right_wheel_rpm );
 }
 
 void BrainStem::OnRosCallback(const std_msgs::String::ConstPtr& msg)

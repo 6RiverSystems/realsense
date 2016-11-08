@@ -27,16 +27,16 @@ BrainStemEmulator::~BrainStemEmulator( )
 
 void BrainStemEmulator::CreateSubscribers( )
 {
-	m_velocitySubscriber = m_rosNodeHandle.subscribe<geometry_msgs::Twist>(VELOCITY_TOPIC, 10,
+	m_velocitySubscriber = m_rosNodeHandle.subscribe<srslib_framework::OdometryRPM>(VELOCITY_TOPIC, 10,
 		std::bind( &BrainStemEmulator::OnChangeVelocity, this, std::placeholders::_1 ) );
 }
 
 void BrainStemEmulator::CreatePublishers( )
 {
-	m_odometryPublisher = m_rosNodeHandle.advertise<geometry_msgs::TwistStamped>(ODOMETRY_TOPIC, 20);
+	m_odometryPublisher = m_rosNodeHandle.advertise<srslib_framework::OdometryRPM>(ODOMETRY_TOPIC, 20);
 }
 
-void BrainStemEmulator::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity )
+void BrainStemEmulator::OnChangeVelocity( const srslib_framework::OdometryRPM::ConstPtr& velocity )
 {
 	// Change the current velocity
 	m_velocity = *velocity;
@@ -44,13 +44,13 @@ void BrainStemEmulator::OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& 
 
 void BrainStemEmulator::PublishOdometry(const ros::TimerEvent& event)
 {
-    geometry_msgs::TwistStamped msgTwistStamped;
+	srslib_framework::OdometryRPM msg;
 
-    msgTwistStamped.header.stamp = ros::Time::now( );
-    msgTwistStamped.twist.linear.x = m_velocity.linear.x;
-    msgTwistStamped.twist.angular.z = m_velocity.angular.z;
+    msg.header.stamp = ros::Time::now( );
+    msg.left_wheel_rpm = m_velocity.left_wheel_rpm;
+    msg.right_wheel_rpm = m_velocity.right_wheel_rpm;
 
-	m_odometryPublisher.publish(msgTwistStamped);
+	m_odometryPublisher.publish(msg);
 }
 
 }

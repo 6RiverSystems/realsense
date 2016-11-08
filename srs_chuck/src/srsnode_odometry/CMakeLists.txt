@@ -19,13 +19,13 @@ project(${PROJECT_NAME})
 set(PROJECT_NODE ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
-set(CMAKE_BUILD_TYPE Debug)
 
 #set(Boost_ADDITIONAL_VERSIONS "1.61" "1.61.0")
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
     tf
+    dynamic_reconfigure
     srslib_framework
     srslib_test
 )
@@ -35,6 +35,10 @@ include_directories(include
     ${catkin_INCLUDE_DIRS}
     ${srslib_framework_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
+)
+
+generate_dynamic_reconfigure_options(
+  cfg/RobotSetup.cfg
 )
 
 ####################################################################################################
@@ -52,6 +56,7 @@ add_executable(${PROJECT_NODE}
 add_dependencies(${PROJECT_NODE}
     ${catkin_EXPORTED_TARGETS}
     ${srsnode_midbrain_EXPORTED_TARGETS}
+    ${PROJECT_NAME}_gencfg
 )
 
 target_link_libraries(${PROJECT_NODE}

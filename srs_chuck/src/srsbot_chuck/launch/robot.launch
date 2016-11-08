@@ -8,15 +8,12 @@
 <launch>
     <!-- Declare the parameters passed by the main launch file -->
     <arg name="robot_configuration" default="" />
-    <arg name="emulation" default="false" />
+    <arg name="use_sim_time" />
+    <arg name="start_bridge" />
 
     <!-- Robot description -->
     <param name="robot_description" command="$(find xacro)/xacro.py $(find srsbot_chuck)/urdf/chuck.urdf.xacro" />
 
-    <!-- Message remapping -->
-    <remap from="/map" to="/internal/state/map/ros_occupancy"/>
-    <remap from="/map_metadata" to="/internal/state/map/ros_metadata"/>
-    
     <!-- Joint and robot state publishers -->
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
@@ -24,28 +21,12 @@
     <!-- Brainstem Hardware Driver -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
 
-    <!-- Sick LIDAR -->
-<!--
-	<include file="$(find sick_tim)/launch/sick_tim571_2050101.launch" />
--->
-	<!-- Realsense -->
-<!--
-    <include file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" >
-        <arg name="simulation" value="$(arg emulation)" />
-    </include>
--->
-
     <!-- Joystick -->
-    <include file="$(find srsnode_joystick_adapter)/launch/node.launch" />
+    <include unless="$(arg use_sim_time)" file="$(find srsnode_joystick_adapter)/launch/node.launch" />
 
     <!-- Raw Odometry -->
 	<include file="$(find srsnode_odometry)/launch/node.launch" />
 
-    <!-- Navigation Stack -->
-	<include file="$(find srsnode_navigation)/launch/node.launch" />
-
     <!-- Launch the ros-bridge -->
-    <!--
-    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
-    -->
+    <include if="$(arg start_bridge)" file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
 </launch>

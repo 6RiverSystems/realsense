@@ -15,13 +15,14 @@ namespace srs {
 
 enum class BRAIN_STEM_MSG
 {
-	MESSAGE					= 0x3C, // '<'
-	BUTTON_PRESSED			= 0x42, // 'B'
-	HARDWARE_INFO			= 0x59, // 'Y'
-	OPERATIONAL_STATE		= 0x47, // 'G'
-    SENSOR_FRAME            = 0x4F, // 'O'
-	SYSTEM_VOLTAGE			= 0x56, // 'V'
-	UNKNOWN
+    MESSAGE = 0x3C, // '<'
+    BUTTON_PRESSED = 0x42, // 'B'
+    HARDWARE_INFO = 0x59, // 'Y'
+    OPERATIONAL_STATE = 0x47, // 'G'
+    SENSOR_FRAME = 0x4F, // 'O'
+	RAW_ODOMETRY = 0x52, // 'R'
+    SYSTEM_VOLTAGE = 0x56, // 'V'
+    UNKNOWN
 };
 
 enum class BRAIN_STEM_CMD
@@ -38,6 +39,7 @@ enum class BRAIN_STEM_CMD
 	SET_MOTION_STATUS		= 0x32, // '2'
 	SET_TOTE_LIGHTS			= 0x39, // '9'
 	SET_VELOCITY			= 0x76, // 'v'
+	SET_VELOCITY_RPM        = 0x72, // 'r'
 	STARTUP					= 0x38, // '8'
 	SHUTDOWN				= 0x78, // 'x'
 	UNKNOWN
@@ -95,7 +97,6 @@ enum FAILURE_STATUS
 	LEFT_MOTOR			= 4
 };
 
-
 // We need to make sure that these are byte packed
 #pragma pack(push, 1)
 
@@ -109,15 +110,6 @@ struct LIGHT_UPDATE_DATA
 	uint8_t 	cmd;
 	uint8_t 	entitiy; 				// Light identifier - see LED_ENTITIES
 	uint8_t 	mode;   				// Light mode - see LED_MODE
-};
-
-struct HARDWARE_INFORMATION_DATA
-{
-	uint8_t 	cmd;
-	uint32_t	uniqueId[4];			// hardware unique identifier (unique across all robots)
-	uint8_t		chassisGeneration; 		// chassis generation
-	uint8_t		brainstemHwVersion; 	// brainstem hardware version
-//	char*	    brainstemSwVersion;		// brainstem software version
 };
 
 struct MOTION_STATUS_DATA
@@ -180,6 +172,13 @@ struct ODOMETRY_DATA
 	uint32_t	timestamp;
 	float		linear_velocity;
 	float		angular_velocity;
+};
+
+struct ODOMETRY_RPM_DATA
+{
+	uint8_t		cmd;
+	float		left_wheel_rpm;
+	float		right_wheel_rpm;
 };
 
 // Back to normal packing

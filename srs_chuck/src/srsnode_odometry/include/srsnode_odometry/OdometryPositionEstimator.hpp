@@ -10,9 +10,13 @@
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/TwistStamped.h>
-#include <tf/transform_broadcaster.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
-#include <srslib_framework/ros/tap/RosTap.hpp>
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_datatypes.h>
+#include <dynamic_reconfigure/server.h>
+#include <srsnode_odometry/RobotSetupConfig.h>
+#include <srslib_framework/OdometryRPM.h>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
@@ -32,9 +36,17 @@ public:
 
 private:
 
-    void RawOdometryVelocity( const geometry_msgs::TwistStamped::ConstPtr& estimatedVelocity );
+    void CalculateRobotPose( const srslib_framework::OdometryRPM::ConstPtr& wheelRPM );
+
+    void GetRawOdometryVelocity(const float leftWheelCount, const float rightWheelCount, double& v, double& w);
+
+    void TransformVeclocityToRPM(const geometry_msgs::Twist::ConstPtr& velocity);
+
+    void ResetOdomPose( const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& resetMsg );
 
     void pingCallback(const ros::TimerEvent& event);
+
+    void cfgCallback(srsnode_odometry::RobotSetupConfig &config, uint32_t level);
 
     static constexpr double REFRESH_RATE_HZ = 100;
 
@@ -42,13 +54,19 @@ private:
 
     static constexpr double MAX_ALLOWED_PING_DELAY = 0.5; // 50% of the duty cycle
 
-	static constexpr auto ODOMETRY_RAW_TOPIC = "/internal/sensors/odometry/raw";
+	static constexpr auto ODOMETRY_RPM_RAW_TOPIC = "/internal/sensors/odometry/rpm/raw";
 
-	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/velocity";
+	static constexpr auto ODOMETRY_RAW_VELOCITY_TOPIC = "/internal/sensors/odometry/velocity/cmd";
+
+	static constexpr auto ODOMETRY_RPM_COMMAND_TOPIC = "/internal/sensors/odometry/rpm/cmd";
+
+	static constexpr auto ODOMETRY_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity/pose";
+
+	static constexpr auto INITIAL_POSE_TOPIC = "/request/initial_pose";
+
+	static constexpr auto PING_COMMAND_TOPIC = "/internal/state/ping";
 
     ros::NodeHandle nodeHandle_;
-
-    geometry_msgs::Twist twist_;
 
     Pose<> pose_;
 
@@ -56,11 +74,25 @@ private:
 
 	tf::TransformBroadcaster broadcaster_;
 
-	ros::Subscriber rawOdometrySub_;
+	dynamic_reconfigure::Server<srsnode_odometry::RobotSetupConfig> configServer_;
 
-	ros::Publisher odometryPub_;
+	ros::Subscriber rawOdometryRPMSub_;
+
+	ros::Subscriber rawVelocityCmdSub_;
+
+	ros::Subscriber resetPoseSub_;
+
+	ros::Publisher rpmVelocityCmdPub_;
+
+	ros::Publisher odometryPosePub_;
 
 	ros::Publisher pingPub_;
+
+	double wheelbaseLength_;
+
+	double leftWheelRadius_;
+
+	double rightWheelRadius_;
 
 };
 

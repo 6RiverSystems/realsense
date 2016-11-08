@@ -10,6 +10,7 @@
 #include <tf/transform_datatypes.h>
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 #include <srslib_framework/Pose.h>
 
@@ -171,6 +172,25 @@ struct PoseMessageFactory
     static Pose<> poseStamped2Pose(geometry_msgs::PoseStamped::ConstPtr message)
     {
         return poseStamped2Pose(*message);
+    }
+
+    /**
+     * @brief Convert a PoseWithCovarianceStampedConstPtr type into a Pose.
+     *
+     * @param message PoseWithCovarianceStampedConstPtr to convert
+     *
+     * @return Pose generated from the specified PoseWithCovarianceStampedConstPtr
+     */
+    static Pose<> poseStampedWithCovariance2Pose(geometry_msgs::PoseWithCovarianceStampedConstPtr message)
+    {
+        Pose<> pose;
+
+        pose.arrivalTime = TimeMath::time2number(message->header.stamp);
+        pose.x = message->pose.pose.position.x;
+        pose.y = message->pose.pose.position.y;
+        pose.theta = tf::getYaw(message->pose.pose.orientation);
+
+        return pose;
     }
 };
 

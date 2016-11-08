@@ -63,7 +63,9 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_vecBridgeCallbacks["PAUSE"] = { std::bind( &BrainStemMessageProcessor::OnPause, this, std::placeholders::_1 ), 1 };
 	m_vecBridgeCallbacks["CLEAR_MOTION_STATUS"] = { std::bind( &BrainStemMessageProcessor::ClearMotionStatus, this ), 0 };
 
+    hwMessageHandlers_[rawOdometryHandler_.getKey()] = &rawOdometryHandler_;
     hwMessageHandlers_[sensorFrameHandler_.getKey()] = &sensorFrameHandler_;
+    hwMessageHandlers_[hardwareInfoHandler_.getKey()] = &hardwareInfoHandler_;
 }
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor( )
@@ -83,11 +85,6 @@ void BrainStemMessageProcessor::SetConnectionChangedCallback( ConnectionChangedF
 void BrainStemMessageProcessor::SetButtonCallback( ButtonCallbackFn buttonCallback )
 {
 	m_buttonCallback = buttonCallback;
-}
-
-void BrainStemMessageProcessor::SetHardwareInfoCallback( HardwareInfoCallbackFn hardwareInfoCallback )
-{
-	m_hardwareInfoCallback = hardwareInfoCallback;
 }
 
 void BrainStemMessageProcessor::SetOperationalStateCallback( OperationalStateCallbackFn operationalStateCallback )
@@ -144,19 +141,6 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 			{
 				ROS_ERROR_STREAM( "Unknown button pressed: " << (int)eButtonId );
 			}
-            return;
-		}
-
-		case BRAIN_STEM_MSG::HARDWARE_INFO:
-		{
-			HARDWARE_INFORMATION_DATA* pHardwareInfo = reinterpret_cast<HARDWARE_INFORMATION_DATA*>( buffer.data( ) );
-
-			char* pszBrainStemVersion = (char*)buffer.data( ) + sizeof(HARDWARE_INFORMATION_DATA);
-
-			std::string strBrainStemVersion( pszBrainStemVersion );
-
-			m_hardwareInfoCallback( pHardwareInfo->uniqueId, pHardwareInfo->chassisGeneration,
-				pHardwareInfo->brainstemHwVersion, strBrainStemVersion );
             return;
 		}
 
@@ -238,6 +222,31 @@ void BrainStemMessageProcessor::SendPing( )
 
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
 }
+
+void BrainStemMessageProcessor::SetRPM( double leftWheelRPM, double rightWheelRPM )
+{
+	ODOMETRY_RPM_DATA msg = {
+	    static_cast<uint8_t>( BRAIN_STEM_CMD::SET_VELOCITY_RPM ),
+	    static_cast<float>( leftWheelRPM ),
+	    static_cast<float>( rightWheelRPM )
+	};
+
+	static double s_leftWheelRPM = leftWheelRPM;
+	static double s_rightWheelRPM = rightWheelRPM;
+
+	if( leftWheelRPM != s_leftWheelRPM ||
+		rightWheelRPM != s_rightWheelRPM )
+	{
+		ROS_DEBUG_NAMED( "velocity_rpm", "Odometry: SetRPM: %f, %f", leftWheelRPM, rightWheelRPM );
+
+		s_leftWheelRPM = leftWheelRPM;
+		s_rightWheelRPM = rightWheelRPM;
+	}
+
+	// Send the RPM down to the motors
+	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+}
+
 
 void BrainStemMessageProcessor::SetVelocity( double dfLinear, double dfAngular )
 {

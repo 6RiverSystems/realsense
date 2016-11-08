@@ -8,9 +8,9 @@
 <launch>
     <node name="joy" pkg="joy" type="joy_node" required="true" />
 
-    <remap from="/internal/sensors/joystick/velocity" to="/internal/drivers/brainstem/cmd_velocity"/>
-
     <node name="srsnode_joystick_adapter"
             pkg="srsnode_joystick_adapter" type="srsnode_joystick_adapter"
-            output="screen" />
+            output="screen" >
+    	<remap from="/internal/sensors/joystick/velocity" to="/internal/sensors/odometry/velocity/cmd"/>
+    </node>
 </launch>

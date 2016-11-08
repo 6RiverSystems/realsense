@@ -7,6 +7,7 @@
 #ifndef BRAINSTEM_EMULATOR_HPP_
 #define BRAINSTEM_EMULATOR_HPP_
 
+#include <srslib_framework/OdometryRPM.h>
 #include <ros/ros.h>
 
 namespace srs
@@ -27,7 +28,7 @@ private:
 
 	void CreatePublishers( );
 
-	void OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity );
+	void OnChangeVelocity( const srslib_framework::OdometryRPM::ConstPtr& velocity );
 
 	void PublishOdometry(const ros::TimerEvent& event);
 
@@ -35,9 +36,9 @@ private:
 
 	static constexpr auto ODOMETRY_RATE_HZ = 100;
 
-	static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
+	static constexpr auto VELOCITY_TOPIC = "/internal/sensors/odometry/rpm/raw";
 
-	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/raw";
+	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/rpm/cmd";
 
 	ros::NodeHandle 			m_rosNodeHandle;
 
@@ -47,7 +48,7 @@ private:
 
 	ros::Publisher				m_odometryPublisher;
 
-	geometry_msgs::Twist		m_velocity;
+	srslib_framework::OdometryRPM		m_velocity;
 
 };
 

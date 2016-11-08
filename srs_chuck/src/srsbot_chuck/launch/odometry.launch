@@ -6,18 +6,23 @@
   *
 -->
 <launch>
+    <arg name="use_sim_time" default="true"/>
+    <arg name="start_bridge" default="true" />
+
     <!-- Chuck Stack -->
-    <include file="$(find srsbot_chuck)/launch/robot.launch" />
+	<include file="$(find srsbot_chuck)/launch/robot.launch" >
+    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+        <arg name="start_bridge" value="$(arg start_bridge)" />
+    </include>
 
-    <!-- Fixed /odom frame to /map frame TF -->
-    <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
+	<!-- Fixed /odom frame to /map frame TF -->
+	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
 
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_6rhq_sortwall)/map/6rhq_sortwall.yaml" />
+    <!-- Navigation Stack -->
+	<include file="$(find srsnode_navigation)/launch/node.launch" >
+    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+	</include>
 
-<!--
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_6rhq_sortwall)/map/6rhq_sortwall.yaml" >
-        <remap from="map" to="/internal/state/map/ros_occupancy"/>
-        <remap from="map_metadata" to="/internal/state/map/info"/>
-    </node>
--->
+	<!-- Launch Map -->
+	<include file="$(find srsc_common)/launch/map.launch" />
 </launch>

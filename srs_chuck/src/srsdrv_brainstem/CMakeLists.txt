@@ -12,6 +12,8 @@ set(${PROJECT_NAME}_SOURCES
     src/BrainStem.cpp
 	src/BrainStemEmulator.cpp
     src/hw_message/SensorFrameHandler.cpp
+    src/hw_message/RawOdometryHandler.cpp
+    src/hw_message/HardwareInfoHandler.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES
@@ -26,7 +28,6 @@ project(${PROJECT_NAME})
 set(PROJECT_NODE ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
-set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp

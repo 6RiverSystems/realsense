@@ -21,7 +21,6 @@ project(${PROJECT_NAME})
 set(PROJECT_NODE ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
-set(CMAKE_BUILD_TYPE Debug)
 
 #set(Boost_ADDITIONAL_VERSIONS "1.61" "1.61.0")
 
@@ -72,17 +71,17 @@ target_link_libraries(${PROJECT_NODE}
 
 ####################################################################################################
 # Tests
-
-if (CATKIN_ENABLE_TESTING)
-    catkin_add_gtest(Test_Reflexes
-        test/Test_Reflexes.cpp
-        src/ObstacleDetector.cpp
-    )
-    add_dependencies(Test_Reflexes
-        ${catkin_EXPORTED_TARGETS}
-        ${srsnode_midbrain_EXPORTED_TARGETS}
-    )
-    target_link_libraries(Test_Reflexes
-        ${srslib_framework_LIBRARIES}
-    )
-endif()
+#
+#if (CATKIN_ENABLE_TESTING)
+#    catkin_add_gtest(Test_Reflexes
+#        test/Test_Reflexes.cpp
+#        src/ObstacleDetector.cpp
+#    )
+#    add_dependencies(Test_Reflexes
+#        ${catkin_EXPORTED_TARGETS}
+#        ${srsnode_midbrain_EXPORTED_TARGETS}
+#    )
+#    target_link_libraries(Test_Reflexes
+#        ${srslib_framework_LIBRARIES}
+#    )
+#endif()

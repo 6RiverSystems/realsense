@@ -6,25 +6,28 @@
   *
 -->
 <launch>
-    <arg name="simulation" default="false" />
+    <arg name="use_sim_time" default="false"/>
+    <arg name="start_bridge" default="true" />
 
     <!-- Chuck Stack -->
-	<include file="$(find srsbot_chuck)/launch/robot.launch" />
+	<include file="$(find srsbot_chuck)/launch/robot.launch" >
+    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+    	<arg name="start_bridge" value="$(arg start_bridge)" />
+	</include>
+
+    <!-- Sensors -->
+	<include file="$(find srsbot_chuck)/launch/sensors.launch" >
+    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+	</include>
+
+    <!-- Navigation Stack -->
+	<include file="$(find srsnode_navigation)/launch/node.launch" >
+    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+	</include>
 
     <!-- Launch AMCL Localization -->
 	<include file="$(find srsnode_localization)/launch/amcl.launch" />
 
-    <!-- Intel Realsense R200 -->
-    <include file="$(find realsense_camera)/launch/r200_nodelet_rgbd.launch" >
-        <arg name="load_driver" unless="$(arg simulation)" value="true" />
-    </include>
-
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_6rhq_sortwall)/map/6rhq_sortwall.yaml" />
-
-<!--
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_6rhq_sortwall)/map/6rhq_sortwall.yaml" >
-        <remap from="map" to="/internal/state/map/ros_occupancy"/>
-        <remap from="map_metadata" to="/internal/state/map/info"/>
-    </node>
--->
+	<!-- Launch Map -->
+	<include file="$(find srsc_common)/launch/map.launch" />
 </launch>

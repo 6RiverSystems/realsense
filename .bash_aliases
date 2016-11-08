@@ -1,4 +1,3 @@
-
 #!/bin/bash
 function getChuckDirectory() {
   BLUE='\033[0;34m'
@@ -6,16 +5,12 @@ function getChuckDirectory() {
   NC='\033[0m' # No Color
 
   baseDirectory=~/ros
-  if [ "$ENV" != "ros" ]; then
-    baseDirectory="/home/rivs/projects/$ENV/ros"
-  fi
 
   logFile="$baseDirectory/log/ros.log"
 }
 
 function printInfo() {
   echo -e "${BLUE}*************************************************************"
-  echo -e "${BLUE}*** ${YELLOW}ENV: $ENV"
   echo -e "${BLUE}*** ${YELLOW}ROS directory: $baseDirectory"
   echo -e "${BLUE}*** ${YELLOW}Log file: $logFile"
   echo -e "${BLUE}*************************************************************"
@@ -38,11 +33,11 @@ function buildChuck() {
   printInfo &&
 
   pushd "$baseDirectory/srs_chuck" &&
-  catkin_make &&
+  catkin_make -j8 &&
   source devel/setup.bash &&
   popd &&
   pushd "$baseDirectory/srs_sites" &&
-  catkin_make &&
+  catkin_make -j8 &&
   source devel/setup.bash &&
 
   source "$baseDirectory/srs_sites/devel/setup.bash"
@@ -89,9 +84,7 @@ function showChuck() {
 
   export DISPLAY=:0
 
-  rviz -d ~/ros/srs_sites/src/srsc_6rhq_rviz/rviz/config.rviz &
-
-  rqt &
+  rviz -d ~/ros/srs_chuck/src/srsbot_chuck/rviz/config.rviz
 }
 
 function stopChuck() {
@@ -114,7 +107,7 @@ function restartChuck() {
   stopChuck
 
   echo "Waiting for services to completely stop"
-  sleep 30s
+  sleep 5s
 
   startChuck
 }
@@ -126,7 +119,8 @@ logChuck() {
 }
 
 recordChuck() {
-  rosbag record --split --buffsize=0 --duration=2m /camera/color/camera_info /camera/color/image_raw /camera/depth/camera_info /camera/depth/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
+  #rosbag record --split --buffsize=0 --duration=5m /camera/color/camera_info /camera/color/image_raw /camera/depth/camera_info /camera/depth/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
+rosbag record -O slam-lidar-rs /scan /internal/sensors/odometry/velocity /tf /camera/depth/image_raw /camera/depth/camera_info /camera/rgb/image_raw /camera/rgb/camera_info
 }
 
 alias chucklog=logChuck

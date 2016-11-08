@@ -10,9 +10,8 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Bool.h>
-#include <geometry_msgs/Twist.h>
 #include <srslib_framework/io/IO.hpp>
-
+#include <srslib_framework/OdometryRPM.h>
 #include <BrainStemEmulator.h>
 #include <BrainStemMessageProcessor.h>
 
@@ -34,9 +33,6 @@ public:
 
 	void OnButtonEvent( LED_ENTITIES eButtonId );
 
-	void OnHardwareInfo( uint32_t uniqueId[4], uint8_t chassisGeneration, uint8_t brainstemHwVersion,
-		const std::string& strBrainstemSwVersion );
-
 	void OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_DATA& motionStatus,
 		const FAILURE_STATUS_DATA& failureStatus );
 
@@ -56,7 +52,7 @@ private:
 
 	void OnPing( );
 
-	void OnChangeVelocity( const geometry_msgs::Twist::ConstPtr& velocity );
+	void OnChangeVelocity( const srslib_framework::OdometryRPM::ConstPtr& velocity );
 
 	void OnRosCallback( const std_msgs::String::ConstPtr& msg );
 
@@ -64,15 +60,13 @@ private:
 
 	static constexpr auto REFRESH_RATE_HZ = 100;
 
-	static constexpr auto HARDWARE_INFO_TOPIC = "/info/hardware";
-
 	static constexpr auto OPERATIONAL_STATE_TOPIC = "/info/operational_state";
 
 	static constexpr auto VOLTAGE_TOPIC = "/info/voltage";
 
 	static constexpr auto CONNECTED_TOPIC = "/internal/drivers/brainstem/connected";
 
-	static constexpr auto VELOCITY_TOPIC = "/internal/drivers/brainstem/cmd_velocity";
+	static constexpr auto VELOCITY_TOPIC = "/internal/sensors/odometry/rpm/cmd";
 
 	static constexpr auto PING_TOPIC = "/internal/state/ping";
 
@@ -92,8 +86,6 @@ private:
 	ros::Subscriber				m_velocitySubscriber;
 
 	ros::Publisher				m_llEventPublisher;
-
-	ros::Publisher				m_hardwareInfoPublisher;
 
 	ros::Publisher				m_operationalStatePublisher;
 

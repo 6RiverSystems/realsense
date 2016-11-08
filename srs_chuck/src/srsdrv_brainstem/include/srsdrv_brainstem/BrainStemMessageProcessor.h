@@ -19,6 +19,8 @@ using namespace std;
 #include <srsdrv_brainstem/BrainStemMessages.h>
 #include <srsdrv_brainstem/hw_message/BrainstemMessageHandler.hpp>
 #include <srsdrv_brainstem/hw_message/SensorFrameHandler.hpp>
+#include <srsdrv_brainstem/hw_message/RawOdometryHandler.hpp>
+#include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
 
 namespace srs {
 
@@ -72,8 +74,6 @@ private:
 
 	ButtonCallbackFn						m_buttonCallback;
 
-	HardwareInfoCallbackFn					m_hardwareInfoCallback;
-
 	OperationalStateCallbackFn				m_operationalStateCallback;
 
 	VoltageCallbackFn						m_voltageCallback;
@@ -90,8 +90,6 @@ public:
 
 	void SetButtonCallback( ButtonCallbackFn buttonCallback );
 
-	void SetHardwareInfoCallback( HardwareInfoCallbackFn hardwareInfoCallback );
-
 	void SetOperationalStateCallback( OperationalStateCallbackFn operationalStateCallback );
 
 	void SetVoltageCallback( VoltageCallbackFn voltageCallback );
@@ -103,6 +101,8 @@ public:
 	void GetHardwareInformation( );
 
 	void SendPing( );
+
+	void SetRPM( double leftWheelRPM, double rightWheelRPM );
 
 	void SetVelocity( double dfLinear, double dfAngular );
 
@@ -144,9 +144,13 @@ private:
 
 	void Pause( bool bPause );
 
-	MessageHandlerMapType hwMessageHandlers_;
+    MessageHandlerMapType hwMessageHandlers_;
 
     SensorFrameHandler sensorFrameHandler_;
+
+    RawOdometryHandler rawOdometryHandler_;
+
+    HardwareInfoHandler hardwareInfoHandler_;
 };
 
 } /* namespace srs */

@@ -6,22 +6,22 @@
   *
 -->
 <launch>
-<!--
-    <remap from="/map" to="/internal/state/map/ros_occupancy"/>
-    <remap from="/map_metadata" to="/internal/state/map/info"/>
--->
-    <arg name="simulation" default="false" />
+    <arg name="use_sim_time" default="false"/>
+    <arg name="start_bridge" default="true" />
 
-	<!-- Fixed /odom frame to /map frame TF -->
-	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
+	<remap from="/map" to="/internal/state/map/grid"/>
+    <remap from="/map_metadata" to="/internal/state/map/info"/>
 
     <!-- Chuck Stack -->
-	<include file="$(find srsbot_chuck)/launch/robot.launch" />
+	<include file="$(find srsbot_chuck)/launch/robot.launch" >
+    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+        <arg name="start_bridge" value="$(arg start_bridge)" />
+	</include>
 
-    <!-- Intel Realsense R200 -->
-    <include file="$(find realsense_camera)/launch/r200_nodelet_rgbd.launch" >
-        <arg name="load_driver" unless="$(arg simulation)" value="true" />
-    </include>
+    <!-- Sensors -->
+	<include file="$(find srsbot_chuck)/launch/sensors.launch"
+    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+	</include>
 
     <!-- GMapping -->
 	<include file="$(find srsnode_localization)/launch/gmapping.launch" />

@@ -33,11 +33,11 @@ function buildChuck() {
   printInfo &&
 
   pushd "$baseDirectory/srs_chuck" &&
-  catkin_make -j8 &&
+  catkin_make -DCMAKE_BUILD_TYPE=Release -j8 &&
   source devel/setup.bash &&
   popd &&
   pushd "$baseDirectory/srs_sites" &&
-  catkin_make -j8 &&
+  catkin_make -DCMAKE_BUILD_TYPE=Release -j8 &&
   source devel/setup.bash &&
 
   source "$baseDirectory/srs_sites/devel/setup.bash"

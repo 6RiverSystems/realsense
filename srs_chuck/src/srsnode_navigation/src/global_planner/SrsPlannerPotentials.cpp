@@ -154,12 +154,6 @@ bool SrsPlannerPotentials::makePlan(
 
     std::vector<std::pair<float, float>> plan;
 
-    cout << "sx: " << start.pose.position.x << endl;
-    cout << "sy: " << start.pose.position.y << endl;
-
-    cout << "gx: " << goal.pose.position.x << endl;
-    cout << "gy: " << goal.pose.position.y << endl;
-
     bool found = astar_->calculatePath(
         start.pose.position.x, start.pose.position.y,
         goal.pose.position.x, goal.pose.position.y,

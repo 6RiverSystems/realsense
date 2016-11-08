@@ -4,7 +4,6 @@
 .pydevproject
 **/.metadata
 **/.settings/*
-**/src/CMakeLists.txt
 **/devel
 **/build
 **/install

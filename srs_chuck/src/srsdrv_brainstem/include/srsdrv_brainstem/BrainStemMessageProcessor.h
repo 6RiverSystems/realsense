@@ -102,6 +102,8 @@ public:
 
 	void SendPing( );
 
+	void SetRPM( double leftWheelRPM, double rightWheelRPM );
+
 	void SetVelocity( double dfLinear, double dfAngular );
 
 	void SetConnected( bool bIsConnected );

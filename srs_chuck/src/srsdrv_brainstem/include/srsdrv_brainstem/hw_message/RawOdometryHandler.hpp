@@ -38,9 +38,13 @@ private:
         float rpm_right_wheel;
     BRAINSTEM_MESSAGE_END
 
-	void publishOdometry(float leftWheelRpm, float rightWheelRpm);
+	void publishOdometry(float leftWheelRPM, float rightWheelRPM);
 
     ros::Publisher pubOdometry_;
+
+    double lastHwOdometryTime_;
+
+    ros::Time lastRosOdometryTime_;
 };
 
 } // namespace srs

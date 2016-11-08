@@ -23,7 +23,7 @@ class SensorFrameHandler : public BrainstemMessageHandler
 public:
     static constexpr char SENSOR_FRAME_KEY = static_cast<char>(BRAIN_STEM_MSG::SENSOR_FRAME);
 
-    static const string TOPIC_ODOMETRY;
+    //static const string TOPIC_ODOMETRY;
     static const string TOPIC_IMU;
     static const string TOPIC_SENSOR_FRAME;
     static const string TOPIC_ODOMETRY_COUNT;
@@ -55,12 +55,10 @@ private:
     BRAINSTEM_MESSAGE_END
 
     void publishImu();
-    void publishOdometry();
     void publishOdometryCount(int32_t leftWheelDiff, int32_t rightWheelDiff);
     void publishSensorFrame();
 
     ros::Publisher pubImu_;
-    ros::Publisher pubOdometry_;
     ros::Publisher pubOdometryCount_;
     ros::Publisher pubSensorFrame_;
 

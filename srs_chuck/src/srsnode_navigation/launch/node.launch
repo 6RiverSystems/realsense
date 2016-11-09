@@ -13,7 +13,7 @@
 	<remap from="/initialpose" to="/request/initial_pose"/>
 
 	<!--- Move Base -->
-	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" launch-prefix="taskset -c 3">
 		<remap from="/move_base_simple/goal" to="/request/goal"/>
 		<remap from="/cmd_vel" to="/internal/sensors/odometry/velocity/cmd"/>
 

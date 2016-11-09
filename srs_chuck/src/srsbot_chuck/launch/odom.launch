@@ -6,12 +6,18 @@
   *
 -->
 <launch>
-	<!-- Fixed /odom frame to /map frame TF -->
-	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
+    <arg name="use_sim_time" default="false"/>
+    <arg name="start_bridge" default="false" />
+
+    <!-- Fixed /odom frame to /map frame TF -->
+    <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
 
     <!-- Chuck Stack -->
-	<include file="$(find srsbot_chuck)/launch/robot.launch" />
-	
+    <include file="$(find srsbot_chuck)/launch/robot.launch">
+        <arg name="use_sim_time" value="$(arg use_sim_time)" />
+        <arg name="start_bridge" value="$(arg start_bridge)" />
+    </include>
+
     <!-- Map server -->
     <include file="$(find srsnode_map_server)/launch/node.launch">
         <arg name="map_stack" value="$(find srsc_6rshq_oneway)/map/6rshq_oneway.yaml" />

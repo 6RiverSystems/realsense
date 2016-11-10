@@ -76,8 +76,15 @@ struct Print
             {
                 TYPE value = *(matrix + (row * columns) + col);
 
+                if (value < 1e10)
+                {
                 output << setfill(' ') << setw(PRECISION + 5) << scientific <<
                     setprecision(PRECISION - 3) << value;
+                }
+                else
+                {
+                    output << setw(PRECISION + 1) << ".";
+                }
             }
             output << endl;
         }

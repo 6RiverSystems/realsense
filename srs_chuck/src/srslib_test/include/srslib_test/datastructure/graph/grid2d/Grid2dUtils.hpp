@@ -38,7 +38,7 @@ struct Grid2dUtils
         } while (r != (yf + deltaY));
     }
 
-    static void addStaticObstacle(Grid2d& grid,
+    static void addObstacle(Grid2d& grid,
         unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
         int sizeEnvelopeCells = 0, Grid2d::BaseType costEnvelope = 0)
     {
@@ -55,7 +55,7 @@ struct Grid2dUtils
         addRectanglePayload(grid, xi, yi, xf, yf, Grid2d::PAYLOAD_MAX);
     }
 
-    static void addWeight(Grid2d& grid,
+    static void addWeights(Grid2d& grid,
         unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
         Grid2d::BaseType north,
         Grid2d::BaseType east,

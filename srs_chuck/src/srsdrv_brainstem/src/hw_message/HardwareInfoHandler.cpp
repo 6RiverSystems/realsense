@@ -20,7 +20,12 @@ HardwareInfoHandler::HardwareInfoHandler() :
     pubHardwareInfo_ = rosNodeHandle_.advertise<srslib_framework::MsgHardwareInfo>(
         TOPIC_HARDWARE_INFO, 1, true);
 
-    robotName_ = string(getenv("ROBOT_NAME"));
+    robotName_ = "";
+    char* robotName = getenv("ROBOT_NAME");
+    if (robotName)
+    {
+        robotName_ = string(robotName);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

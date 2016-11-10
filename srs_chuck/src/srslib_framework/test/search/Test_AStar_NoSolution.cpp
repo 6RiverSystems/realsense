@@ -23,7 +23,7 @@ constexpr int GRID_SIZE = 5;
 TEST(Test_AStar, NoSolution)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
-    test::Grid2dUtils::addStaticObstacle(grid, 0, 0, GRID_SIZE - 1, GRID_SIZE - 1);
+    test::Grid2dUtils::addObstacle(grid, 0, 0, GRID_SIZE - 1, GRID_SIZE - 1);
 
     AStar algorithm;
 
@@ -48,7 +48,7 @@ TEST(Test_AStar, ForbiddenGoal)
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
 
-    test::Grid2dUtils::addStaticObstacle(grid, 1, 0, GRID_SIZE - 1, GRID_SIZE - 1);
+    test::Grid2dUtils::addObstacle(grid, 1, 0, GRID_SIZE - 1, GRID_SIZE - 1);
 
     Grid2d::Position startPosition(0, 0, 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
@@ -71,7 +71,7 @@ TEST(Test_AStar, UnreachableGoal)
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
 
-    test::Grid2dUtils::addStaticObstacle(grid, 2, 0, 2, GRID_SIZE - 1);
+    test::Grid2dUtils::addObstacle(grid, 2, 0, 2, GRID_SIZE - 1);
 
     Grid2d::Position startPosition(0, 0, 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);

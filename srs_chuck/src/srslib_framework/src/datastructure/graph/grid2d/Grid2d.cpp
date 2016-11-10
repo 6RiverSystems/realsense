@@ -7,10 +7,13 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
+const Grid2d::BaseType Grid2d::PAYLOAD_NO_INFORMATION = -1;
 const Grid2d::BaseType Grid2d::PAYLOAD_MIN = 0;
-const Grid2d::BaseType Grid2d::PAYLOAD_MAX = numeric_limits<Grid2d::BaseType>::max();
+const Grid2d::BaseType Grid2d::PAYLOAD_MAX = 100;
+
+const Grid2d::BaseType Grid2d::WEIGHT_NO_INFORMATION = -1;
 const Grid2d::BaseType Grid2d::WEIGHT_MIN = 0;
-const Grid2d::BaseType Grid2d::WEIGHT_MAX = numeric_limits<Grid2d::BaseType>::max();
+const Grid2d::BaseType Grid2d::WEIGHT_MAX = 100;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2d::clear()
@@ -48,7 +51,7 @@ Grid2d::BaseType Grid2d::getAggregate(const Location& location) const
         return node->aggregate;
     }
 
-    return PAYLOAD_MIN;
+    return PAYLOAD_NO_INFORMATION;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +69,7 @@ Grid2d::BaseType Grid2d::getPayload(const Location& location) const
         return node->payload;
     }
 
-    return PAYLOAD_MIN;
+    return PAYLOAD_NO_INFORMATION;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,6 +98,9 @@ bool Grid2d::getNeighbor(const Position& position, Position& result) const
         case ORIENTATION_SOUTH:
             result = Position(position.x, position.y - 1, position.orientation);
             break;
+
+        default:
+            return false;
     }
 
     return isWithinBounds(result);
@@ -123,22 +129,22 @@ Grid2d::BaseType Grid2d::getWeight(const Position& position) const
                     return node->weights->south;
 
                 default:
-                    return PAYLOAD_MAX;
+                    return WEIGHT_NO_INFORMATION;
             }
         }
     }
 
-    return WEIGHT_MIN;
+    return WEIGHT_NO_INFORMATION;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2d::getWeights(const Location& location,
     BaseType& north, BaseType& east, BaseType& south, BaseType& west) const
 {
-    north = WEIGHT_MIN;
-    east = WEIGHT_MIN;
-    south = WEIGHT_MIN;
-    west = WEIGHT_MIN;
+    north = WEIGHT_NO_INFORMATION;
+    east = WEIGHT_NO_INFORMATION;
+    south = WEIGHT_NO_INFORMATION;
+    west = WEIGHT_NO_INFORMATION;
 
     if (weightCount_)
     {
@@ -200,28 +206,28 @@ ostream& operator<<(ostream& stream, const Grid2d& grid)
         grid.print(stream, "North Weights",
             [] (Grid2d::Node* node) -> Grid2d::BaseType
             {
-                return node->weights ? node->weights->north : Grid2d::WEIGHT_MIN;
+                return node->weights ? node->weights->north : Grid2d::WEIGHT_NO_INFORMATION;
             }
         );
 
         grid.print(stream, "East Weights",
             [] (Grid2d::Node* node) -> Grid2d::BaseType
             {
-                return node->weights ? node->weights->east : Grid2d::WEIGHT_MIN;
+                return node->weights ? node->weights->east : Grid2d::WEIGHT_NO_INFORMATION;
             }
         );
 
         grid.print(stream, "South Weights",
             [] (Grid2d::Node* node) -> Grid2d::BaseType
             {
-                return node->weights ? node->weights->south : Grid2d::WEIGHT_MIN;
+                return node->weights ? node->weights->south : Grid2d::WEIGHT_NO_INFORMATION;
             }
         );
 
         grid.print(stream, "West Weights",
             [] (Grid2d::Node* node) -> Grid2d::BaseType
             {
-                return node->weights ? node->weights->west : Grid2d::WEIGHT_MIN;
+                return node->weights ? node->weights->west : Grid2d::WEIGHT_NO_INFORMATION;
             }
         );
     }
@@ -321,8 +327,8 @@ void Grid2d::setWeights(const Location& location,
 {
     Node* node = findNode(location);
 
-    bool nonZeroWeights = north > WEIGHT_MIN || east > WEIGHT_MIN ||
-        south > WEIGHT_MIN || west > WEIGHT_MIN;
+    bool nonZeroWeights = north > WEIGHT_NO_INFORMATION || east > WEIGHT_NO_INFORMATION ||
+        south > WEIGHT_NO_INFORMATION || west > WEIGHT_NO_INFORMATION;
 
     if (!node)
     {
@@ -446,7 +452,7 @@ void Grid2d::printGrid(ostream& stream, string title,
             }
             else
             {
-                stream << ". ";
+                stream << "* ";
             }
         }
         stream << endl;
@@ -462,6 +468,7 @@ void Grid2d::print(ostream& stream, string title,
         stream << endl << title << endl;
     }
 
+    const int WIDTH = 4;
     stream << right << setw(WIDTH) << ' ';
     for (int x = 0; x < width_; ++x)
     {
@@ -483,6 +490,10 @@ void Grid2d::print(ostream& stream, string title,
                 {
                     stream << right << setw(WIDTH) << "#";
                 }
+                else if (info == Grid2d::PAYLOAD_NO_INFORMATION)
+                {
+                    stream << right << setw(WIDTH) << "*";
+                }
                 else if (info == Grid2d::PAYLOAD_MIN)
                 {
                     stream << right << setw(WIDTH) << ".";
@@ -494,7 +505,7 @@ void Grid2d::print(ostream& stream, string title,
             }
             else
             {
-                stream << right << setw(WIDTH) << ".";
+                stream << right << setw(WIDTH) << "*";
             }
         }
         stream << endl;

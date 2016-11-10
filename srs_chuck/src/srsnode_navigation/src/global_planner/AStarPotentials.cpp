@@ -5,6 +5,8 @@
 #include <srsnode_navigation/global_planner/GridPath.hpp>
 #include <srsnode_navigation/global_planner/AStarExpansion.hpp>
 
+#include <srslib_test/utils/Print.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +78,8 @@ bool AStarPotentials::calculatePath(
     stateExpander_->clearEndpoint(potentials, goal_x_i, goal_y_i, 2);
     if (found)
     {
+        cout << test::Print::printToString(potentials, sizeX, sizeY);
+
         pathBuilder_->getPath(potentials, start_x_d, start_y_d, goal_x_d, goal_y_d, path);
     }
 
@@ -85,8 +89,8 @@ bool AStarPotentials::calculatePath(
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void AStarPotentials::mapToWorld(double mx, double my, double& wx, double& wy)
 {
-    wx = costMap_->getOriginX() + (mx + 0.5) * costMap_->getResolution();
-    wy = costMap_->getOriginY() + (my + 0.5) * costMap_->getResolution();
+    wx = costMap_->getOriginX() + mx * costMap_->getResolution();
+    wy = costMap_->getOriginY() + my * costMap_->getResolution();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,8 +105,8 @@ bool AStarPotentials::worldToMap(double wx, double wy, double& mx, double& my)
         return false;
     }
 
-    mx = (wx - origin_x) / resolution - 0.5;
-    my = (wy - origin_y) / resolution - 0.5;
+    mx = (wx - origin_x) / resolution;
+    my = (wy - origin_y) / resolution;
 
     if (mx < costMap_->getSizeInCellsX() && my < costMap_->getSizeInCellsY())
     {

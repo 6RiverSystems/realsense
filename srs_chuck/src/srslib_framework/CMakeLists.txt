@@ -78,10 +78,10 @@ set(TEST_SOURCES_FILTER
 
 set(TEST_SOURCES_LOCALIZATION
     test/localization/Test_Empty_BasicRead.cpp
-    test/localization/Test_Map_Reconstruction.cpp
-    test/localization/Test_MicroMap_BasicRead.cpp
-    test/localization/Test_MicroMap_WithAisles.cpp
-    test/localization/Test_SmallMap_BasicRead.cpp
+#    test/localization/Test_Map_Reconstruction.cpp
+#    test/localization/Test_MicroMap_BasicRead.cpp
+#    test/localization/Test_MicroMap_WithAisles.cpp
+#    test/localization/Test_SmallMap_BasicRead.cpp
 )
 
 set(TEST_SOURCES_MATH
@@ -127,6 +127,7 @@ project(${PROJECT_NAME})
 set(PROJECT_LIBRARY ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
+set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp

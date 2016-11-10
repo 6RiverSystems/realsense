@@ -6,7 +6,6 @@
 
 #include <srslib_framework/exception/io/FailedToOpenFileException.hpp>
 #include <srslib_framework/localization/map/occupancy/exception/InvalidChannelNumberException.hpp>
-#include <srslib_framework/localization/map/MapNote.hpp>
 
 namespace srs {
 
@@ -29,7 +28,7 @@ void MapAdapter::costMap2D2Vector(const costmap_2d::Costmap2D* map, vector<int8_
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(BaseMap* map)
+costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(OccupancyMap* map)
 {
     unsigned int rows = map->getHeightCells();
     unsigned int columns = map->getWidthCells();
@@ -41,7 +40,10 @@ costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(BaseMap* map)
     {
         for (int col = 0; col < columns; col++)
         {
-            costMap->setCost(col, row, map->getCost(col, row));
+            Grid2d::BaseType cost = map->getCost(col, row);
+            cost = cost == Grid2d::PAYLOAD_NO_INFORMATION ? 0 : cost;
+
+            costMap->setCost(col, row, cost);
         }
     }
 
@@ -61,7 +63,7 @@ void MapAdapter::occupancyMap2Vector(const OccupancyMap* map, vector<int8_t>& oc
             for (int col = 0; col < grid->getWidth(); col++)
             {
                 Grid2d::BaseType cost = grid->getPayload(Grid2d::Location(col, row));
-                occupancy.push_back(map->cost2grayLevel(cost));
+                occupancy.push_back(map->cost2gray(cost));
             }
         }
     }

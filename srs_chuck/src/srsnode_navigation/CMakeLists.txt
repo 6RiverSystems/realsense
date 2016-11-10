@@ -20,7 +20,7 @@ set(${PROJECT_NAME}_SOURCES
 set(${PROJECT_NAME}_TEST_SOURCES
 
     test/TestNavigation_OneWay.cpp
-    test/TestNavigation_Barrett_BigSearch.cpp
+#    test/TestNavigation_Barrett_BigSearch.cpp
     test/TestNavigation_SmallMap.cpp
 )
 
@@ -30,6 +30,7 @@ set(${PROJECT_NAME}_TEST_SOURCES
 project(${PROJECT_NAME})
 
 set(PROJECT_NODE ${PROJECT_NAME})
+set(TEST_WORKING_DIR ${PROJECT_SOURCE_DIR}/../srslib_test/data)
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
 set(CMAKE_BUILD_TYPE Debug)
@@ -107,7 +108,7 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite_Navigation.cpp
         ${${PROJECT_NAME}_TEST_SOURCES}
         ${${PROJECT_NAME}_SOURCES}
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
+        WORKING_DIRECTORY ${TEST_WORKING_DIR}
     )
     add_dependencies(${TestSuite_Navigation}
         ${catkin_EXPORTED_TARGETS}

@@ -36,31 +36,84 @@ public:
         return metadata_;
     }
 
-    Grid2d::BaseType grayLevel2Cost(unsigned char level) const
+    Grid2d::BaseType gray2Cost(unsigned char level) const
     {
-        Grid2d::BaseType maxCost = numeric_limits<unsigned char>::max();
-        Grid2d::BaseType newCost = static_cast<Grid2d::BaseType>(
-            metadata_.negate ? maxCost - level : level);
+        float colorAverage = static_cast<float>(level);
+        colorAverage = metadata_.negate ? 255.0 - colorAverage : colorAverage;
+        float percentage = (255.0 - static_cast<float>(colorAverage)) / 255.0;
+
+        // If the percentage is above the occupied-cell threshold, the cost is
+        // the maximum allowed cost
+        Grid2d::BaseType newCost = Grid2d::PAYLOAD_NO_INFORMATION;
+
+        if (percentage > metadata_.thresholdOccupied)
+        {
+            newCost = Grid2d::PAYLOAD_MAX;
+        }
 
         // If the percentage is under the free-cell threshold, the cost is minimal
-        float percentage = static_cast<float>(newCost) / static_cast<float>(maxCost);
-        newCost = percentage < metadata_.thresholdFree ?
-            Grid2d::PAYLOAD_MIN :
-            newCost;
-
-        // If the percentage is above the occupied-cell threshold, the cost is the maximum
-        // allowed cost
-        newCost = percentage > metadata_.thresholdOccupied ?
-            Grid2d::PAYLOAD_MAX :
-            newCost;
+        if (percentage < metadata_.thresholdFree)
+        {
+            newCost = Grid2d::PAYLOAD_MIN;
+        }
 
         return newCost;
     }
 
-    int8_t cost2grayLevel(Grid2d::BaseType intCost) const
+    Grid2d::BaseType rgb2Cost(unsigned char r, unsigned char g, unsigned char b) const
     {
-        int8_t newCost = static_cast<int8_t>(intCost);
-        return metadata_.negate ? COST_INT8_MAX - newCost : newCost;
+        float colorAverage = (static_cast<float>(r) + static_cast<float>(g) +
+            static_cast<float>(b)) / 3.0;
+        colorAverage = metadata_.negate ? 255.0 - colorAverage : colorAverage;
+        float percentage = (255.0  - static_cast<float>(colorAverage)) / 255.0;
+
+        Grid2d::BaseType newCost = Grid2d::PAYLOAD_NO_INFORMATION;
+
+        // If the percentage is above the occupied-cell threshold, the cost is
+        // the maximum allowed cost
+        if (percentage > metadata_.thresholdOccupied)
+        {
+            newCost = Grid2d::PAYLOAD_MAX;
+        }
+
+        // If the percentage is under the free-cell threshold, the cost is minimal
+        if (percentage < metadata_.thresholdFree)
+        {
+            newCost = Grid2d::PAYLOAD_MIN;
+        }
+
+        return newCost;
+    }
+
+    Grid2d::BaseType rgba2Cost(unsigned char r, unsigned char g, unsigned char b, unsigned char a) const
+    {
+        float colorAverage = (static_cast<float>(r) + static_cast<float>(g) +
+            static_cast<float>(b) + static_cast<float>(a)) / 4.0;
+        colorAverage = metadata_.negate ? 255.0 - colorAverage : colorAverage;
+        float percentage = (255.0  - static_cast<float>(colorAverage)) / 255.0;
+
+        Grid2d::BaseType newCost = Grid2d::PAYLOAD_NO_INFORMATION;
+
+        // If the percentage is above the occupied-cell threshold, the cost is
+        // the maximum allowed cost
+        if (percentage > metadata_.thresholdOccupied)
+        {
+            newCost = Grid2d::PAYLOAD_MAX;
+        }
+
+        // If the percentage is under the free-cell threshold, the cost is minimal
+        if (percentage < metadata_.thresholdFree)
+        {
+            newCost = Grid2d::PAYLOAD_MIN;
+        }
+
+        return newCost;
+    }
+
+    int8_t cost2gray(Grid2d::BaseType cost) const
+    {
+        int8_t c = static_cast<int8_t>(cost);
+        return c;
     }
 
     void maxCost(unsigned int c, unsigned int r, Grid2d::BaseType cost);

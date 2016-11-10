@@ -20,10 +20,8 @@ public:
     Expander(LogicalMap* logicalMap,
         costmap_2d::Costmap2D* costMap,
         PotentialCalculator* pCalculator) :
-            unknown_(false),
             lethal_cost_(253),
             neutral_cost_(50),
-            factor_(3.0),
             logicalGrid_(logicalMap->getGrid()),
             costGrid_(costMap->getCharMap()),
             pCalculator_(pCalculator),
@@ -50,16 +48,6 @@ public:
     void setNeutralCost(unsigned char neutral_cost)
     {
         neutral_cost_ = neutral_cost;
-    }
-
-    void setFactor(float factor)
-    {
-        factor_ = factor;
-    }
-
-    void setHasUnknown(bool unknown)
-    {
-        unknown_ = unknown;
     }
 
     void clearEndpoint(float* potentials, int gx, int gy, int s)
@@ -98,11 +86,9 @@ protected:
 
     int nx_, ny_, ns_;
 
-    bool unknown_;
     unsigned char lethal_cost_;
     unsigned char neutral_cost_;
     int cells_visited_;
-    float factor_;
 
     PotentialCalculator* pCalculator_;
     Grid2d* logicalGrid_;

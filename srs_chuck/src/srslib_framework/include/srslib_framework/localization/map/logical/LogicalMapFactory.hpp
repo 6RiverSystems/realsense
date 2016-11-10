@@ -27,7 +27,7 @@ public:
     LogicalMap* fromCostMap2D(costmap_2d::Costmap2D* costMap);
     LogicalMap* fromGrid2d(Grid2d* grid, double resolution);
     LogicalMap* fromJsonFile(string jsonFilename, double loadTime = 0);
-    LogicalMap* fromString(string jsonFilename, double loadTime = 0);
+    LogicalMap* fromString(string geoJson, double loadTime = 0);
 
 private:
     static const string KEYWORD_BOUNDARY;

@@ -9,7 +9,9 @@ namespace srs {
 AStarExpansion::AStarExpansion(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap,
     PotentialCalculator* pCalculator) :
         Expander(logicalMap, costMap, pCalculator)
-{}
+{
+    setLethalCost(Grid2d::PAYLOAD_MAX);
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 bool AStarExpansion::calculatePotentials(
@@ -63,23 +65,34 @@ bool AStarExpansion::calculatePotentials(
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void AStarExpansion::add(float* potentials,
     float prev_potential,
-    int next_i, float weight,
+    int next_i, Grid2d::BaseType weight,
     int end_x, int end_y)
 {
+    float floatWeight = 0; //weight * 100;
+    if (weight == Grid2d::WEIGHT_NO_INFORMATION)
+    {
+        floatWeight = 0;
+    }
+
     if (potentials[next_i] < POT_HIGH)
     {
         return;
     }
 
-    if (costGrid_[next_i] >= lethal_cost_ &&
-        !(unknown_ && costGrid_[next_i] == costmap_2d::NO_INFORMATION))
+    if (costGrid_[next_i] >= lethal_cost_)
     {
         return;
     }
 
+    float cost = costGrid_[next_i];
+    if (costGrid_[next_i] == Grid2d::PAYLOAD_NO_INFORMATION)
+    {
+        cost = 0;
+    }
+
     potentials[next_i] = pCalculator_->calculatePotential(potentials,
-        costGrid_[next_i] + neutral_cost_,
-        next_i, prev_potential) + (weight * 10);
+        cost + neutral_cost_,
+        next_i, prev_potential) + floatWeight;
 
     int x;
     int y;

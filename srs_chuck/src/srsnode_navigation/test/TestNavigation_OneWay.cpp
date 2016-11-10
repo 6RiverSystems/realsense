@@ -25,13 +25,15 @@ TEST(Test_Navigation, OneWay)
 
     cout << *logical << endl;
 
-    costmap_2d::Costmap2D* cost2d = MapAdapter::map2CostMap2D(logical);
+    cout << *(mapStack->getOccupancyMap()) << endl;
+
+    costmap_2d::Costmap2D* cost2d = MapAdapter::map2CostMap2D(mapStack->getOccupancyMap());
 
     AStarPotentials astar(logical, cost2d);
     std::vector<std::pair<float, float>> path;
     float* potentials;
 
-    if (astar.calculatePath(1, 7, 14, 7, path, potentials))
+    if (astar.calculatePath(1, 1, 4, 1, path, potentials))
     {
         for (auto step : path)
         {

@@ -20,7 +20,7 @@ struct MapAdapter
 {
     static void costMap2D2Vector(const costmap_2d::Costmap2D* map, vector<int8_t>& occupancy);
 
-    static costmap_2d::Costmap2D* map2CostMap2D(BaseMap* map);
+    static costmap_2d::Costmap2D* map2CostMap2D(OccupancyMap* map);
 
     /**
      * @brief Convert a Occupancy Map type into a vector of integers.

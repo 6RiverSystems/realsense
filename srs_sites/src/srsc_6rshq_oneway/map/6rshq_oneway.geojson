@@ -27,7 +27,7 @@
 					"properties": {
 						"type": "obstacle",
 						"envelope_size": 0.3,
-						"envelope_cost": 200,
+						"envelope_cost": 70,
 						"is_border": 1
 					}
 				},
@@ -44,7 +44,7 @@
 					"properties": {
 						"type": "obstacle",
 						"envelope_size": 0.3,
-						"envelope_cost": 200,
+						"envelope_cost": 70,
 						"is_border": 1
 					}
 				},
@@ -61,7 +61,7 @@
 					"properties": {
 						"type": "obstacle",
 						"envelope_size": 0.3,
-						"envelope_cost": 200,
+						"envelope_cost": 70,
 						"is_border": 1
 					}
 				},
@@ -78,7 +78,7 @@
 					"properties": {
 						"type": "obstacle",
 						"envelope_size": 0.3,
-						"envelope_cost": 200,
+						"envelope_cost": 70,
 						"is_border": 0
 					}
 				},
@@ -113,7 +113,7 @@
 					"properties": {
 						"type": "obstacle",
 						"envelope_size": 0.3,
-						"envelope_cost": 200,
+						"envelope_cost": 70,
 						"is_border": 0
 					}
 				},
@@ -130,7 +130,7 @@
 					"properties": {
 						"type": "obstacle",
 						"envelope_size": 0.3,
-						"envelope_cost": 200,
+						"envelope_cost": 70,
 						"is_border": 1
 					}
 				}

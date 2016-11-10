@@ -21,10 +21,13 @@ namespace srs {
 class Grid2d
 {
 public:
-    using BaseType = unsigned char;
+    using BaseType = char;
 
+    static const BaseType PAYLOAD_NO_INFORMATION;
     static const BaseType PAYLOAD_MIN;
     static const BaseType PAYLOAD_MAX;
+
+    static const BaseType WEIGHT_NO_INFORMATION;
     static const BaseType WEIGHT_MIN;
     static const BaseType WEIGHT_MAX;
 
@@ -217,8 +220,6 @@ public:
         BaseType north, BaseType east, BaseType south, BaseType west);
 
 private:
-    static constexpr int WIDTH = 4;
-
     struct EqualTo
     {
         bool operator()(const Location& lhs, const Location& rhs) const

@@ -28,7 +28,8 @@ MapServer::MapServer(string name, int argc, char** argv) :
     mapStack_(nullptr)
 {
     rosNodeHandle_.param("map_stack", mapStackFilename_,
-        string("/home/fsantini/projects/repos/ros/srs_chuck/src/srsnode_navigation/test/data/one-way/one-way.yaml"));
+//        string("/home/fsantini/projects/repos/ros/srs_chuck/src/srsnode_navigation/test/data/one-way/one-way.yaml"));
+        string("/home/fsantini/projects/repos/ros/srs_sites/src/srsc_empty/map/empty.yaml"));
 
     ROS_INFO_STREAM("Target map stack: " << mapStackFilename_);
 

@@ -67,7 +67,7 @@ TEST(Test_AStar, SearchAroundObstacle)
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
 
-    test::Grid2dUtils::addStaticObstacle(grid, 2, 0, 2, 3);
+    test::Grid2dUtils::addObstacle(grid, 2, 0, 2, 3);
 
     Grid2d::Position startPosition(0, 0, 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);

@@ -46,7 +46,7 @@ public:
 private:
     void add(float* potentials,
         float prev_potential,
-        int next_i, float weigth,
+        int next_i, Grid2d::BaseType weight,
         int end_x, int end_y);
 
     std::vector<Index> queue_;

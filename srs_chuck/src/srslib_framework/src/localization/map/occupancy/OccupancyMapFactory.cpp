@@ -6,7 +6,6 @@
 
 #include <srslib_framework/exception/io/FailedToOpenFileException.hpp>
 #include <srslib_framework/localization/map/occupancy/exception/InvalidChannelNumberException.hpp>
-#include <srslib_framework/localization/map/MapNote.hpp>
 
 namespace srs {
 
@@ -106,7 +105,7 @@ OccupancyMap* OccupancyMapFactory::fromMetadata(const OccupancyMetadata& metadat
         {
             // Convert the 8 bit cost into an integer cost and store it
             int8_t grayLevel = *occupancyIterator;
-            Grid2d::BaseType cost = map->grayLevel2Cost(static_cast<unsigned char>(grayLevel));
+            Grid2d::BaseType cost = map->gray2Cost(static_cast<char>(grayLevel));
             map->setCost(col, row, cost);
 
             occupancyIterator++;
@@ -132,10 +131,10 @@ void OccupancyMapFactory::extractMonoChannel(SDL_Surface* image)
         for (unsigned int col = 0; col < metadata_.widthCells; col++)
         {
             // Find the pixel color based on the row, column, and and pitch
-            unsigned char grayLevel = static_cast<unsigned char>(*(imagePixels + row * pitch + col));
+            char grayLevel = static_cast<char>(*(imagePixels + row * pitch + col));
 
-            // Convert the 8 bit cost into an integer cost and store it
-            Grid2d::BaseType cost = map_->grayLevel2Cost(grayLevel);
+            // Convert the 8 bit cost into a cost and store it
+            Grid2d::BaseType cost = map_->gray2Cost(grayLevel);
             map_->setCost(col, metadata_.heightCells - row - 1, cost);
         }
     }
@@ -159,14 +158,9 @@ void OccupancyMapFactory::extractRGBChannel(SDL_Surface* image)
             unsigned char red = *pixel;
             unsigned char green = *(pixel + 1);
             unsigned char blue = *(pixel + 2);
-            unsigned char alpha = *(pixel + 3);
 
-            MapNote* note = green > 0 ? MapNote::instanceOf(green) : nullptr;
-
-            // Static obstacles have priority on every other note
-            unsigned int cost = static_cast<unsigned int>(blue);
-            cost = red > 0 ? numeric_limits<unsigned int>::max() : cost;
-
+            // Convert the RGB pixel color into a cost and store it
+            Grid2d::BaseType cost = map_->rgb2Cost(red, green, blue);
             map_->setCost(col, metadata_.heightCells - row - 1, cost);
         }
     }
@@ -192,12 +186,8 @@ void OccupancyMapFactory::extractRGBAChannel(SDL_Surface* image)
             unsigned char blue = *(pixel + 2);
             unsigned char alpha = *(pixel + 3);
 
-            MapNote* note = green > 0 ? MapNote::instanceOf(green) : nullptr;
-
-            // Static obstacles have priority on every other note
-            unsigned int cost = static_cast<unsigned int>(blue);
-            cost = red > 0 ? numeric_limits<unsigned int>::max() : cost;
-
+            // Convert the RGBA pixel color into a cost and store it
+            Grid2d::BaseType cost = map_->rgba2Cost(red, green, blue, alpha);
             map_->setCost(col, metadata_.heightCells - row - 1, cost);
         }
     }

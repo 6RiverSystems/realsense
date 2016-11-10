@@ -55,7 +55,9 @@ private:
 
     static constexpr double MAX_ALLOWED_PING_DELAY = 0.5; // 50% of the duty cycle
 
-	static constexpr auto ODOMETRY_RPM_RAW_TOPIC = "/internal/sensors/odometry/rpm/raw";
+    static constexpr double MAX_ALLOWED_ODOM_DELAY = 0.02; // 20ms
+
+	static constexpr auto ODOMETRY_RPM_RAW_TOPIC = "/internal/sensors/odometry/rpm/raw2";
 
 	static constexpr auto ODOMETRY_RAW_VELOCITY_TOPIC = "/internal/sensors/odometry/velocity/cmd";
 
@@ -70,6 +72,8 @@ private:
     ros::NodeHandle nodeHandle_;
 
     Pose<> pose_;
+
+	ros::Time lastPoseTime_;
 
     ros::Timer pingTimer_;
 

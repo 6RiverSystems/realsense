@@ -13,6 +13,7 @@ namespace srs {
 
 OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	nodeHandle_(nodeName),
+	lastPoseTime_(ros::Time::now() + ros::Duration(5.0)),
 	pose_(-1.0, -1.0, -1.0),
 	pingTimer_(),
 	broadcaster_(),
@@ -197,6 +198,7 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 
 	// Update the last time
 	s_lastTime = currentTime;
+	lastPoseTime_ = ros::Time::now();
 	s_lastPose = pose_;
 }
 
@@ -242,13 +244,19 @@ void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)
 
     pingPub_.publish(message);
 
-    double delay = (event.current_real - event.current_expected).toSec();
+    double pingDelay = (event.current_real - event.current_expected).toSec();
 
     // We should never be falling behind by more than 500ms
-    if ( delay > (1.0f / PING_HZ) * MAX_ALLOWED_PING_DELAY)
+    if ( pingDelay > (1.0f / PING_HZ) * MAX_ALLOWED_PING_DELAY)
     {
-        ROS_ERROR_STREAM( "Motion ping exceeded allowable delay: " << delay );
+        ROS_ERROR_STREAM( "Motion ping exceeded allowable delay: " << pingDelay );
     }
+
+	double odomDelay = (ros::Time::now() - lastPoseTime_).toSec();
+
+	if (odomDelay > MAX_ALLOWED_ODOM_DELAY) {
+		ROS_ERROR_STREAM_THROTTLE( 5.0f, "Odometry topic not published in: " << odomDelay );
+	}
 }
 
 void OdometryPositionEstimator::cfgCallback(srsnode_odometry::RobotSetupConfig &config, uint32_t level)

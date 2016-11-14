@@ -78,8 +78,6 @@ bool AStarPotentials::calculatePath(
     stateExpander_->clearEndpoint(potentials, goal_x_i, goal_y_i, 2);
     if (found)
     {
-        cout << test::Print::printToString(potentials, sizeX, sizeY);
-
         pathBuilder_->getPath(potentials, start_x_d, start_y_d, goal_x_d, goal_y_d, path);
     }
 

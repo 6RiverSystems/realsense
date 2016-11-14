@@ -42,9 +42,10 @@ public:
 
     void reset()
     {
-        RosSubscriber::reset();
-
+        // Reset the data, and then reset the subscriber
         set(nullptr);
+
+        RosSubscriber::reset();
     }
 };
 

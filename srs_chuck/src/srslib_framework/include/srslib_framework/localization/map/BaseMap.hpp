@@ -82,36 +82,36 @@ public:
     virtual void setCost(unsigned int c, unsigned int r, Grid2d::BaseType cost) = 0;
     virtual void setObstruction(unsigned int c, unsigned int r) = 0;
 
-    void transformCells2M(unsigned int cells, double& measurement)
+    void transformCells2M(unsigned int cells, double& measurement) const
     {
         // The precision is down to 1mm
         measurement = round(static_cast<double>(cells) * resolution_ * 1e3) / 1e3;
     }
 
-    void transformCells2M(unsigned int c, unsigned int r, double& x, double& y)
+    void transformCells2M(unsigned int c, unsigned int r, double& x, double& y) const
     {
         transformCells2M(c, x);
         transformCells2M(r, y);
     }
 
-    void transformCells2M(unsigned int c, unsigned int r, Pose<>& p)
+    void transformCells2M(unsigned int c, unsigned int r, Pose<>& p) const
     {
         transformCells2M(c, p.x);
         transformCells2M(r, p.y);
     }
 
-    void transformM2Cells(double mesurement, unsigned int& cells)
+    void transformM2Cells(double mesurement, unsigned int& cells) const
     {
         cells = static_cast<unsigned int>(round(mesurement / resolution_));
     }
 
-    void transformM2Cells(double x, double y, unsigned int& c, unsigned int& r)
+    void transformM2Cells(double x, double y, unsigned int& c, unsigned int& r) const
     {
         transformM2Cells(x, c);
         transformM2Cells(y, r);
     }
 
-    void transformM2Cells(Pose<> p, unsigned int& c, unsigned int& r)
+    void transformM2Cells(Pose<> p, unsigned int& c, unsigned int& r) const
     {
         transformM2Cells(p.x, c);
         transformM2Cells(p.y, r);

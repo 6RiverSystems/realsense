@@ -148,13 +148,14 @@ public:
 
     void reset()
     {
-        RosSubscriber::reset();
-
+        // Reset the data, and then reset the subscriber
         joystickLeft_ = Velocity<>::INVALID;
         joystickRight_ = Velocity<>::INVALID;
 
         fill(currentButtons_, currentButtons_ + MAX_NUMBER_BUTTONS, 0);
         fill(previousButtons_, previousButtons_ + MAX_NUMBER_BUTTONS, 0);
+
+        RosSubscriber::reset();
     }
 
     virtual void set(Velocity<> joystickLeft, Velocity<> joystickRight)

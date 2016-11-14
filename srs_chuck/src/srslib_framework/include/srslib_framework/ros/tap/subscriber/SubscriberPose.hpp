@@ -39,9 +39,10 @@ public:
 
     void reset()
     {
-        RosSubscriber::reset();
-
+        // Reset the data, and then reset the subscriber
         set(Pose<>::INVALID);
+
+        RosSubscriber::reset();
     }
 };
 

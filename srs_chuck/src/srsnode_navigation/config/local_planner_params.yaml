@@ -10,7 +10,7 @@ DWAPlannerROS:
   min_rot_vel: 0.05
   rot_stopped_vel: 1.0
 
-  acc_lim_x: 0.5
+  acc_lim_x: 0.7
   acc_lim_theta: 2.5
   acc_limit_trans: 0.5
 
@@ -23,12 +23,12 @@ DWAPlannerROS:
   sim_granularity: 0.1
   angular_sim_granularity: 0.1
   vx_samples: 14
-  vtheta_samples: 8
+  vtheta_samples: 20
   meter_scoring: true
 
 # Trajectory Scoring Parameters
-  path_distance_bias: 32 #32.0      # weighting for how much it should stick to the global path plan
-  goal_distance_bias: 16 #16.0      # wighting for how much it should attempt to reach its goal
+  path_distance_bias: 32        # weighting for how much it should stick to the global path plan
+  goal_distance_bias: 16        # wighting for how much it should attempt to reach its goal
   occdist_scale: 0.01           # weighting for how much the controller should avoid obstacles
   forward_point_distance: 0.325 # how far along to place an additional scoring point
   stop_time_buffer: 0.2         # amount of time a robot must stop in before colliding for a valid traj.
@@ -51,6 +51,6 @@ DWAPlannerROS:
   vy_samples: 0
 
 # topics
-  odom_topic: /internal/sensors/odometry/velocity/pose
+#  odom_topic: /internal/sensors/odometry/velocity/estimate
 
   use_dwa: true

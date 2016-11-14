@@ -22,6 +22,7 @@ OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	rawOdometryRPMSub_(),
 	rpmVelocityCmdPub_(),
 	odometryPosePub_(),
+	odometryPoseEstimatePub_(),
 	pingPub_(),
 	wheelbaseLength_(0.5235),
 	leftWheelRadius_(0.10243),
@@ -38,6 +39,7 @@ void OdometryPositionEstimator::run()
 {
 	ros::Rate refreshRate(REFRESH_RATE_HZ);
 
+  readParams();
 	connect();
 
 	char* pszLeftWheelRadius = getenv("ROBOT_LEFT_WHEEL_RADIUS");
@@ -74,6 +76,13 @@ void OdometryPositionEstimator::run()
 	disconnect();
 }
 
+void OdometryPositionEstimator::readParams()
+{
+    nodeHandle_.param("linear_acceleration_rate", linear_acceleration_rate_, linear_acceleration_rate_);
+    nodeHandle_.param("angular_acceleration_rate", angular_acceleration_rate_, angular_acceleration_rate_);
+    nodeHandle_.param("velocity_loop_delays", velocity_loop_delays_, velocity_loop_delays_);
+}
+
 void OdometryPositionEstimator::connect()
 {
 	// Subscriber to get odometry reading (in rpm) and calculates the robot pose
@@ -90,7 +99,9 @@ void OdometryPositionEstimator::connect()
 
 	odometryPosePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_OUTPUT_TOPIC, 10);
 
-	rpmVelocityCmdPub_ = nodeHandle_.advertise<srslib_framework::OdometryRPM>(ODOMETRY_RPM_COMMAND_TOPIC, 10);
+    odometryPoseEstimatePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_ESTIMATE_OUTPUT_TOPIC, 10);
+
+    rpmVelocityCmdPub_ = nodeHandle_.advertise<srslib_framework::OdometryRPM>(ODOMETRY_RPM_COMMAND_TOPIC, 10);
 
 	pingPub_ = nodeHandle_.advertise<std_msgs::Bool>(PING_COMMAND_TOPIC, 1);
 
@@ -191,6 +202,12 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 	// Publish the Odometry
 	odometryPosePub_.publish( odom );
 
+    // Get and publish the forward estimated velocities
+    nav_msgs::Odometry odom_estimate;
+    odom_estimate = odom;
+    odom_estimate.twist.twist = getEstimatedRobotVel(linearVelocity, angularVelocity, currentTime.toSec());
+    odometryPoseEstimatePub_.publish( odom_estimate );
+
 	std_msgs::Bool message;
     message.data = true;
 
@@ -200,6 +217,57 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 	s_lastTime = currentTime;
 	lastPoseTime_ = ros::Time::now();
 	s_lastPose = pose_;
+}
+
+geometry_msgs::Twist OdometryPositionEstimator::getEstimatedRobotVel(double reported_linear_vel, double reported_angular_vel, double reported_time)
+{
+    // Estimate current velocities from odometry and command velocities.
+    // Copy out data
+    geometry_msgs::Twist cmd_vel;
+    double cmd_vel_time = 0;
+    {
+      boost::mutex::scoped_lock lock(cmd_vel_mutex_);
+      cmd_vel = cmd_vel_;
+      cmd_vel_time = cmd_vel_time_;
+    }
+    // Get the current time
+    double current_time = ros::Time::now().toSec();
+
+    double time_since_measurement = current_time - reported_time; // Unsure if these clocks are the same.
+
+    // Estimate
+    geometry_msgs::Twist estimated_vel;
+    if ((current_time - cmd_vel_time) > cmd_vel_timeout_)
+    {
+      // It's been too long since a cmd vel was sent.  Use the reported velocity.
+      ROS_DEBUG("cmd vel has a timeout.");
+      estimated_vel.linear.x = reported_linear_vel;
+      estimated_vel.angular.z = reported_angular_vel;
+    }
+    else
+    {
+      double estimate_dt = time_since_measurement + velocity_loop_delays_;
+      ROS_DEBUG("Estimate dt: %f", estimate_dt);
+      estimated_vel.linear.x = forwardEstimateVelocity(reported_linear_vel, cmd_vel.linear.x, linear_acceleration_rate_, estimate_dt);
+      estimated_vel.angular.z = forwardEstimateVelocity(reported_angular_vel, cmd_vel.angular.z, angular_acceleration_rate_, estimate_dt);
+      ROS_DEBUG("Vels cmd: [%f, %f], est: [%f, %f], reported: [%f, %f]", cmd_vel.linear.x, cmd_vel.angular.x, estimated_vel.linear.x, reported_linear_vel, estimated_vel.angular.z, reported_angular_vel);
+    }
+    return estimated_vel;
+}
+
+double OdometryPositionEstimator::forwardEstimateVelocity(double old, double cmd, double accel, double dt)
+{
+    // Make sure that signs work correctly.
+    double res = 0;
+    if (old > cmd)
+    {
+      res = std::max(old - accel*dt, cmd);
+    }
+    else
+    {
+      res = std::min(old + accel*dt, cmd);
+    }
+    return res;
 }
 
 void OdometryPositionEstimator::ResetOdomPose( const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& assignedPose )
@@ -235,7 +303,13 @@ void OdometryPositionEstimator::TransformVeclocityToRPM(const geometry_msgs::Twi
 	rpmVelocity.left_wheel_rpm = leftMotorRPM;
 	rpmVelocity.right_wheel_rpm = rightMotorRPM;
 	rpmVelocityCmdPub_.publish(rpmVelocity);
+
+  // Also, store it.
+  boost::mutex::scoped_lock lock(cmd_vel_mutex_);
+  cmd_vel_ = *rawVelocity;
+  cmd_vel_time_ = ros::Time::now().toSec();  // Record whatever time it is.
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)
 {

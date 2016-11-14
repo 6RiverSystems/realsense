@@ -32,29 +32,3 @@ TEST(Test_Map, LogicalMapReconstruction)
     ASSERT_EQ(*logical, *logical) << "The map does not agree with itself";
     ASSERT_EQ(*correct, *logical) << "The marshaled map is not as expected";
 }
-
-TEST(Test_Map, OccupancyMapReconstruction)
-{
-    ros::Time::init();
-
-    MapStack* mapStack = MapStackFactory::fromJsonFile("data/small-map/small-map.yaml");
-    OccupancyMap* correct = mapStack->getOccupancyMap();
-
-    srslib_framework::OccupancyMap message = OccupancyMapMessageFactory::map2Msg(correct);
-    OccupancyMap* occupancy = OccupancyMapMessageFactory::msg2OccupancyMap(message);
-
-    ASSERT_EQ(*correct, *occupancy) << "The marshaled map is not as expected";
-}
-
-TEST(Test_Map, RosOccupancyMapReconstruction)
-{
-    ros::Time::init();
-
-    MapStack* mapStack = MapStackFactory::fromJsonFile("data/small-map/small-map.yaml");
-    OccupancyMap* correct = mapStack->getOccupancyMap();
-
-    nav_msgs::OccupancyGrid message = OccupancyMapMessageFactory::occupancyMap2RosMsg(correct, "map");
-    OccupancyMap* occupancy = OccupancyMapMessageFactory::msg2OccupancyMap(message);
-
-    ASSERT_EQ(*correct->getGrid(), *occupancy->getGrid()) << "The marshaled map is not as expected";
-}

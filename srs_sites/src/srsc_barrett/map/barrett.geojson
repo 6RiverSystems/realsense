@@ -4,7 +4,8 @@
 		{
 			"type": "Feature",
 			"properties": {
-				"type": "map",
+				"object": "map",
+				"version": "1",
 				"origin": [0,0,0],
 				"resolution": 0.1,
 				"width": 36.5,
@@ -25,7 +26,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 1
@@ -42,7 +43,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 1
@@ -59,7 +60,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 1
@@ -76,7 +77,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 1
@@ -93,7 +94,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 0
@@ -110,7 +111,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 1
@@ -127,7 +128,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 0
@@ -144,7 +145,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 0
@@ -161,7 +162,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 0
@@ -178,7 +179,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 0
@@ -195,7 +196,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 0
@@ -212,7 +213,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 0
@@ -229,7 +230,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 0
@@ -246,7 +247,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 0
@@ -263,7 +264,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 0
@@ -280,7 +281,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 0
@@ -297,7 +298,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 0
@@ -314,7 +315,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 0
@@ -331,7 +332,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 1
@@ -348,7 +349,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 1
@@ -365,7 +366,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 1
@@ -382,7 +383,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 1
@@ -399,7 +400,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 1
@@ -416,7 +417,7 @@
 						]
 					},
 					"properties": {
-						"type": "obstacle",
+						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
 						"is_border": 1

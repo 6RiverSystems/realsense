@@ -11,6 +11,7 @@ using namespace std;
 #include <yaml-cpp/yaml.h>
 #include <costmap_2d/costmap_2d_ros.h>
 
+#include <srslib_framework/localization/map/MapNote.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMap.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMetadata.hpp>
 
@@ -38,34 +39,42 @@ private:
     static const string KEYWORD_FEATURES;
     static const string KEYWORD_GEOMETRY;
     static const string KEYWORD_GRAPH;
+    static const string KEYWORD_ID;
+    static const string KEYWORD_LABELED_AREA;
     static const string KEYWORD_MAP;
     static const string KEYWORD_MAX;
     static const string KEYWORD_NULL;
+    static const string KEYWORD_OBJECT;
     static const string KEYWORD_OBSTACLE;
     static const string KEYWORD_PROPERTIES;
     static const string KEYWORD_PROPERTY_COST_AREA_COST;
     static const string KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_COST;
     static const string KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE;
-    static const string KEYWORD_PROPERTY_FEATURE_TYPE;
+    static const string KEYWORD_PROPERTY_FEATURE_OBJECT;
+    static const string KEYWORD_PROPERTY_LABEL_AREA_LABEL;
+    static const string KEYWORD_PROPERTY_LABEL_AREA_HONK;
+    static const string KEYWORD_PROPERTY_LABEL_AREA_NOTES;
     static const string KEYWORD_PROPERTY_MAP_HEIGHT;
     static const string KEYWORD_PROPERTY_MAP_ORIGIN;
     static const string KEYWORD_PROPERTY_MAP_RESOLUTION;
     static const string KEYWORD_PROPERTY_MAP_WIDTH;
     static const string KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_COST;
     static const string KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_SIZE;
-    static const string KEYWORD_PROPERTY_WEIGHT_AREA_EAST;
-    static const string KEYWORD_PROPERTY_WEIGHT_AREA_NORTH;
-    static const string KEYWORD_PROPERTY_WEIGHT_AREA_SOUTH;
-    static const string KEYWORD_PROPERTY_WEIGHT_AREA_WEST;
+    static const string KEYWORD_PROPERTY_WEIGHTED_AREA_EAST;
+    static const string KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH;
+    static const string KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH;
+    static const string KEYWORD_PROPERTY_WEIGHTED_AREA_WEST;
     static const string KEYWORD_TYPE;
     static const string KEYWORD_TYPE_POINT;
     static const string KEYWORD_TYPE_MULTIPOINT;
     static const string KEYWORD_VERTEX;
-    static const string KEYWORD_WEIGHT_AREA;
+    static const string KEYWORD_WEIGHTED_AREA;
 
-    void addRectangleCost(Pose<> origin, double widthM, double heightM,
+    void addCostArea(Pose<> origin, double widthM, double heightM,
         Grid2d::BaseType cost);
-    void addObstacle(Pose<> origin, double widthM, double heightM,
+    void addLabelArea(Pose<> origin, double widthM, double heightM,
+        string label, MapNote note);
+    void addObstacleArea(Pose<> origin, double widthM, double heightM,
         double sizeEnvelopeM = 0.0, Grid2d::BaseType costEnvelope = 0);
     void addWeightArea(Pose<> origin, double widthM, double heightM,
         Grid2d::BaseType north,
@@ -78,13 +87,14 @@ private:
 
     bool findCollection(YAML::Node root, YAML::Node& result);
     bool findEntityInCollection(YAML::Node root, string entityType, YAML::Node& result);
-    string findEntityType(YAML::Node root);
+    string findEntityObject(YAML::Node root);
 
     void ntEntities(YAML::Node root);
     void ntEntityBoundary(YAML::Node root);
     void ntEntityCostArea(YAML::Node root);
     void ntEntityEdge(YAML::Node root);
     void ntEntityGraph(YAML::Node root);
+    void ntEntityLabelArea(YAML::Node root);
     void ntEntityMap(YAML::Node root);
     void ntEntityObstacle(YAML::Node root);
     void ntEntityVertex(YAML::Node root);
@@ -92,11 +102,14 @@ private:
     void ntEntry(YAML::Node root);
     vector<Pose<>> ntGeometry(YAML::Node root, int minNumber, int maxNumber);
     void ntGeometryNull(YAML::Node root);
+    YAML::Node ntProperties(YAML::Node root);
 
     Grid2d::BaseType ntValueCost(YAML::Node root, bool required);
     double ntValueDouble(YAML::Node root, bool required);
+    MapNote ntValueMapNote(YAML::Node root, bool required);
     vector<Pose<>> ntValueMultiPoint(YAML::Node root, bool required);
     Pose<> ntValuePoint(YAML::Node root, bool required);
+    string ntValueString(YAML::Node root, bool required);
 
     LogicalMap* map_;
     LogicalMetadata metadata_;

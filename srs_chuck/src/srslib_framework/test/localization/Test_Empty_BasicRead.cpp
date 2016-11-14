@@ -35,29 +35,29 @@ TEST(Test_Empty, BasicRead)
     ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(194, 90)) <<
         "The cost is not as expected";
 
-    ASSERT_EQ(200, logical->getCost(20, 15)) <<
+    ASSERT_EQ(70, logical->getCost(21, 16)) <<
         "The cost is not as expected";
-    ASSERT_EQ(200, logical->getCost(20, 89)) <<
+    ASSERT_EQ(70, logical->getCost(21, 89)) <<
         "The cost is not as expected";
-    ASSERT_EQ(200, logical->getCost(193, 15)) <<
+    ASSERT_EQ(70, logical->getCost(193, 16)) <<
         "The cost is not as expected";
-    ASSERT_EQ(200, logical->getCost(193, 89)) <<
+    ASSERT_EQ(70, logical->getCost(193, 89)) <<
         "The cost is not as expected";
-    ASSERT_EQ(200, logical->getCost(22, 17)) <<
+    ASSERT_EQ(70, logical->getCost(23, 18)) <<
         "The cost is not as expected";
-    ASSERT_EQ(200, logical->getCost(22, 87)) <<
+    ASSERT_EQ(70, logical->getCost(23, 87)) <<
         "The cost is not as expected";
-    ASSERT_EQ(200, logical->getCost(191, 17)) <<
+    ASSERT_EQ(70, logical->getCost(191, 18)) <<
         "The cost is not as expected";
-    ASSERT_EQ(200, logical->getCost(191, 87)) <<
+    ASSERT_EQ(70, logical->getCost(191, 87)) <<
         "The cost is not as expected";
 
-    ASSERT_EQ(Grid2d::PAYLOAD_MIN, logical->getCost(23, 18)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(24, 19)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MIN, logical->getCost(23, 86)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(24, 86)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MIN, logical->getCost(190, 18)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(190, 19)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MIN, logical->getCost(190, 86)) <<
+    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(190, 86)) <<
         "The cost is not as expected";
 }

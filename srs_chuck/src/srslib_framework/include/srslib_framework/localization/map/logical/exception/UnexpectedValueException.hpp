@@ -14,7 +14,7 @@ class UnexpectedValueException: public LogicalMapException
 public:
     UnexpectedValueException(const LogicalMetadata& metadata, const string& value) :
         LogicalMapException(metadata,
-            "Unexpected value [" + value + "]")
+            "Unexpected value {" + value + "}")
     {}
 };
 

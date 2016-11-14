@@ -18,16 +18,16 @@ public:
     UnexpectedNumberOfPointsException(const LogicalMetadata& metadata,
         int expected, int actual) :
             LogicalMapException(metadata,
-                "The geometry does not define enough points [expected: " +
-                to_string(expected) + ", actual: " + to_string(actual) + "]")
+                "The geometry does not define enough points {expected: " +
+                to_string(expected) + ", actual: " + to_string(actual) + "}")
     {}
 
     UnexpectedNumberOfPointsException(const LogicalMetadata& metadata,
         int fromExpected, int toExpected, int actual) :
             LogicalMapException(metadata,
-                "The geometry does not define enough points [expected: <" +
-                to_string(fromExpected) + " - " + to_string(toExpected) + ">" +
-                ", actual: " + to_string(actual) + "]")
+                "The geometry does not define enough points {expected: [" +
+                to_string(fromExpected) + " - " + to_string(toExpected) + "]" +
+                ", actual: " + to_string(actual) + "}")
     {}
 };
 

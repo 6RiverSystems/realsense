@@ -11,6 +11,7 @@ using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/map/BaseMap.hpp>
+#include <srslib_framework/localization/map/MapNote.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMetadata.hpp>
 
 namespace srs {
@@ -18,11 +19,54 @@ namespace srs {
 class LogicalMap : public BaseMap
 {
 public:
+    struct LabeledArea
+    {
+        friend ostream& operator<<(ostream& stream, const LabeledArea& labeledArea)
+        {
+            return stream << "{" <<
+                "l: '" << labeledArea.label <<
+                "', a: [" << labeledArea.xi << ", " << labeledArea.yi << ", " <<
+                    labeledArea.xf << ", " << labeledArea.yf <<
+                "], n: " << labeledArea.note <<
+                "}";
+        }
+
+        friend bool operator==(const LabeledArea& lhs, const LabeledArea& rhs)
+        {
+            return lhs.label == rhs.label &&
+                lhs.note == rhs.note &&
+                lhs.xi == rhs.xi &&
+                lhs.yi == rhs.yi &&
+                lhs.xf == rhs.xf &&
+                lhs.yf== rhs.yf;
+        }
+
+        string label;
+
+        MapNote note;
+
+        unsigned int xf;
+        unsigned int xi;
+
+        unsigned int yf;
+        unsigned int yi;
+    };
+
     LogicalMap(double widthM, double heightM, double resolution);
     LogicalMap(Grid2d* grid, double resolution);
     LogicalMap(LogicalMetadata metadata);
     ~LogicalMap()
     {}
+
+    void addLabeledArea(unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
+        string label, MapNote note);
+
+    void checkAreas(unsigned int c, unsigned int r, vector<string>& areas) const;
+
+    vector<LabeledArea> getAreas() const
+    {
+        return labeledAreas_;
+    }
 
     Grid2d::BaseType getCost(unsigned int c, unsigned int r) const
     {
@@ -53,6 +97,8 @@ public:
         Grid2d::BaseType west);
 
 private:
+    vector<LabeledArea> labeledAreas_;
+
     LogicalMetadata metadata_;
 };
 

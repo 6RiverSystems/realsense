@@ -9,12 +9,13 @@
 
 namespace srs {
 
-class FeaturesNotFoundException: public LogicalMapException
+class PropertyExpectedException: public LogicalMapException
 {
 public:
-    FeaturesNotFoundException(const LogicalMetadata& metadata) :
+    PropertyExpectedException(const LogicalMetadata& metadata,
+        const string& feature, const string& property) :
         LogicalMapException(metadata,
-            "The file file does not contain a features section.")
+            "The entity does not contain the required property {" + feature + ", " + property + "}")
     {}
 };
 

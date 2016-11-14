@@ -4,7 +4,8 @@
         {
             "type": "Feature",
             "properties": {
-                "type": "map",
+                "object": "map",
+                "version": "1",
                 "origin": [0.0, 0.0, 0.0],
                 "resolution": 0.100,
                 "width": 0.300,
@@ -22,7 +23,7 @@
                       "coordinates": [[0.000, 0.000], [0.100, 0.100]]
                   },
                   "properties": {
-                       "type": "obstacle",
+                       "object": "obstacle",
                        "envelope_size": 0.100,
                        "envelope_cost": 111
                    }
@@ -35,7 +36,7 @@
                       "coordinates": [[0.200, 0.200], [0.200, 0.200]]
                   },
                   "properties": {
-                       "type": "cost_area",
+                       "object": "cost_area",
                        "cost": 128
                    }
                },
@@ -47,7 +48,7 @@
                       "coordinates": [0.200, 0.000]
                   },
                   "properties": {
-                       "type": "weight_area",
+                       "object": "weighted_area",
                        "north": "max",
                        "east": 77,
                        "south": 222,

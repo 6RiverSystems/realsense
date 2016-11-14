@@ -14,7 +14,7 @@ class UnexpectedFeatureException: public LogicalMapException
 public:
     UnexpectedFeatureException(const LogicalMetadata& metadata, const string& feature) :
         LogicalMapException(metadata,
-            "Unexpected feature [" + feature + "]")
+            "Unexpected feature {" + feature + "}")
     {}
 };
 

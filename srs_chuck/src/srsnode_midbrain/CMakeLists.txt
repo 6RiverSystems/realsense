@@ -8,6 +8,7 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srsnode_midbrain)
 set(PROJECT_MAIN src/midbrain_node.cpp)
 set(${PROJECT_NAME}_SOURCES
+
     src/Midbrain.cpp
     src/ObstacleDetector.cpp
     src/Reflexes.cpp

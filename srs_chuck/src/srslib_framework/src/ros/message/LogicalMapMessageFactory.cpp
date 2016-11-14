@@ -6,6 +6,26 @@ namespace srs {
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapMessageFactory::areas2Vector(const LogicalMap* map,
+    vector<srslib_framework::LogicalArea>& areas)
+{
+    areas.clear();
+
+    for (auto area : map->getAreas())
+    {
+        srslib_framework::LogicalArea msgArea;
+        msgArea.label = area.label;
+        msgArea.xi = area.xi;
+        msgArea.yi = area.yi;
+        msgArea.xf = area.xf;
+        msgArea.yf = area.yf;
+        msgArea.note = note2Msg(area.note);
+
+        areas.push_back(msgArea);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapMessageFactory::map2Vector(const LogicalMap* map,
     vector<srslib_framework::LogicalCell>& logical)
 {
@@ -37,6 +57,40 @@ void LogicalMapMessageFactory::map2Vector(const LogicalMap* map,
                 logical.push_back(cell);
             }
         }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+MapNote LogicalMapMessageFactory::msg2Note(srslib_framework::MapNote message)
+{
+    MapNote note;
+
+    if (message.honk)
+    {
+        note.join(MapNote::HONK);
+    }
+
+    return note;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+srslib_framework::MapNote LogicalMapMessageFactory::note2Msg(MapNote note)
+{
+    srslib_framework::MapNote msgNote;
+
+    msgNote.honk = note.honk();
+
+    return msgNote;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapMessageFactory::vector2Areas(const vector<srslib_framework::LogicalArea>& areas,
+    LogicalMap* logical)
+{
+    for (auto area : areas)
+    {
+        MapNote note = msg2Note(area.note);
+        logical->addLabeledArea(area.xi, area.yi, area.xf, area.yf, area.label, note);
     }
 }
 

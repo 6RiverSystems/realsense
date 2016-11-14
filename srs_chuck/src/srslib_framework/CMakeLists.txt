@@ -12,13 +12,6 @@ set(${PROJECT_NAME}_SOURCES
 
     src/io/SerialIO.cpp
 
-    src/planning/pathplanning/grid2d/Grid2dSolutionItem.cpp
-    src/planning/pathplanning/grid2d/Grid2dSolutionFactory.cpp
-    src/planning/pathplanning/grid2d/Grid2dSolutionUtils.cpp
-
-    src/robotics/controller/BaseController.cpp
-    src/robotics/controller/CMUPathController.cpp
-
     src/localization/map/BaseMap.cpp
     src/localization/map/MapAdapter.cpp
     src/localization/map/MapNote.cpp
@@ -27,6 +20,12 @@ set(${PROJECT_NAME}_SOURCES
     src/localization/map/logical/LogicalMapFactory.cpp
     src/localization/map/occupancy/OccupancyMap.cpp
     src/localization/map/occupancy/OccupancyMapFactory.cpp
+
+    src/planning/pathplanning/grid2d/Grid2dSolutionItem.cpp
+    src/planning/pathplanning/grid2d/Grid2dSolutionFactory.cpp
+    src/planning/pathplanning/grid2d/Grid2dSolutionUtils.cpp
+
+    src/platform/CrashHandler.cpp
 
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp
@@ -38,15 +37,16 @@ set(${PROJECT_NAME}_SOURCES
     src/search/graph/grid2d/Grid2dNode.cpp
 
     src/utils/Logging.cpp
-    src/utils/CrashHandler.cpp
 )
 
 set(${PROJECT_NAME}_MSGS
     Imu.msg
     JoypadState.msg
+    LogicalArea.msg
     LogicalCell.msg
     LogicalMap.msg
     LogicalMetadata.msg
+    MapNote.msg
     MapStack.msg
     MsgHardwareInfo.msg
     MsgOperationalState.msg
@@ -78,10 +78,10 @@ set(TEST_SOURCES_FILTER
 
 set(TEST_SOURCES_LOCALIZATION
     test/localization/Test_Empty_BasicRead.cpp
-#    test/localization/Test_Map_Reconstruction.cpp
-#    test/localization/Test_MicroMap_BasicRead.cpp
-#    test/localization/Test_MicroMap_WithAisles.cpp
-#    test/localization/Test_SmallMap_BasicRead.cpp
+    test/localization/Test_MicroMap_BasicRead.cpp
+    test/localization/Test_MicroMap_MapNote.cpp
+    test/localization/Test_MicroMap_WithAisles.cpp
+    test/localization/Test_SmallMap_BasicRead.cpp
 )
 
 set(TEST_SOURCES_MATH
@@ -102,8 +102,17 @@ set(TEST_SOURCES_PLANNING
     test/planning/pathplanning/grid2d/Test_Trajectory_SingleRotation.cpp
 )
 
+set(TEST_SOURCES_PLATFORM
+    test/platform/Test_CrashHandler.cpp
+)
+
 set(TEST_SOURCES_ROBOTICS
     test/robotics/robot/Test_Chuck.cpp
+)
+
+set(TEST_SOURCES_ROS
+    test/ros/message/Test_LogicalMap_Reconstruction.cpp
+    test/ros/message/Test_OccupancyMap_Reconstruction.cpp
 )
 
 set(TEST_SOURCES_SEARCH
@@ -266,6 +275,16 @@ if (CATKIN_ENABLE_TESTING)
         ${PROJECT_LIBRARY}
     )
 
+    catkin_add_gtest(TestSuite_Platform
+        test/TestSuite.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_PLATFORM}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/platform
+    )
+    target_link_libraries(TestSuite_Platform
+        ${PROJECT_LIBRARY}
+    )
+
     catkin_add_gtest(TestSuite_Robotics
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
@@ -273,6 +292,16 @@ if (CATKIN_ENABLE_TESTING)
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/robotics
     )
     target_link_libraries(TestSuite_Robotics
+        ${PROJECT_LIBRARY}
+    )
+
+    catkin_add_gtest(TestSuite_Ros
+        test/TestSuite.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_ROS}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/ros
+    )
+    target_link_libraries(TestSuite_Ros
         ${PROJECT_LIBRARY}
     )
 

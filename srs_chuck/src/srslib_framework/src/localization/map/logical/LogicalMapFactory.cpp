@@ -8,12 +8,16 @@ using namespace std;
 #include <srslib_framework/exception/yaml/FailedToParseJsonException.hpp>
 #include <srslib_framework/localization/map/logical/exception/CostExpectedException.hpp>
 #include <srslib_framework/localization/map/logical/exception/DoubleExpectedException.hpp>
-#include <srslib_framework/localization/map/logical/exception/FeatureNotFoundException.hpp>
-#include <srslib_framework/localization/map/logical/exception/FeaturesNotFoundException.hpp>
+#include <srslib_framework/localization/map/logical/exception/FeatureExpectedException.hpp>
+#include <srslib_framework/localization/map/logical/exception/FeaturesExpectedException.hpp>
 #include <srslib_framework/localization/map/logical/exception/GeoJsonTypeUnsupportedException.hpp>
 #include <srslib_framework/localization/map/logical/exception/InvalidCostValueException.hpp>
+#include <srslib_framework/localization/map/logical/exception/InvalidMapNoteFlagException.hpp>
+#include <srslib_framework/localization/map/logical/exception/MapNoteExpectedException.hpp>
 #include <srslib_framework/localization/map/logical/exception/PoseExpectedException.hpp>
-#include <srslib_framework/localization/map/logical/exception/PropertyNotFoundException.hpp>
+#include <srslib_framework/localization/map/logical/exception/PropertiesExpectedException.hpp>
+#include <srslib_framework/localization/map/logical/exception/PropertyExpectedException.hpp>
+#include <srslib_framework/localization/map/logical/exception/StringExpectedException.hpp>
 #include <srslib_framework/localization/map/logical/exception/UnexpectedFeatureException.hpp>
 #include <srslib_framework/localization/map/logical/exception/UnexpectedGeometryException.hpp>
 #include <srslib_framework/localization/map/logical/exception/UnexpectedNumberOfPointsException.hpp>
@@ -31,6 +35,8 @@ const string LogicalMapFactory::KEYWORD_FEATURE_COLLECTION = "FeatureCollection"
 const string LogicalMapFactory::KEYWORD_FEATURES = "features";
 const string LogicalMapFactory::KEYWORD_GEOMETRY = "geometry";
 const string LogicalMapFactory::KEYWORD_GRAPH = "graph";
+const string LogicalMapFactory::KEYWORD_ID = "id";
+const string LogicalMapFactory::KEYWORD_LABELED_AREA = "labeled_area";
 const string LogicalMapFactory::KEYWORD_MAP = "map";
 const string LogicalMapFactory::KEYWORD_MAX = "max";
 const string LogicalMapFactory::KEYWORD_NULL = "null";
@@ -39,22 +45,25 @@ const string LogicalMapFactory::KEYWORD_PROPERTIES = "properties";
 const string LogicalMapFactory::KEYWORD_PROPERTY_COST_AREA_COST = "cost";
 const string LogicalMapFactory::KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_COST = "envelope_cost";
 const string LogicalMapFactory::KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE = "envelope_size";
-const string LogicalMapFactory::KEYWORD_PROPERTY_FEATURE_TYPE = "type";
+const string LogicalMapFactory::KEYWORD_PROPERTY_FEATURE_OBJECT = "object";
+const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_LABEL = "label";
+const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_HONK = "honk";
+const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_NOTES = "notes";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_HEIGHT = "height";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_ORIGIN = "origin";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_RESOLUTION = "resolution";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_WIDTH = "width";
 const string LogicalMapFactory::KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_COST = "envelope_cost";
 const string LogicalMapFactory::KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_SIZE = "envelope_size";
-const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHT_AREA_EAST = "east";
-const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHT_AREA_NORTH = "north";
-const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHT_AREA_SOUTH = "south";
-const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHT_AREA_WEST = "west";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_EAST = "east";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH = "north";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH = "south";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_WEST = "west";
 const string LogicalMapFactory::KEYWORD_TYPE = "type";
 const string LogicalMapFactory::KEYWORD_TYPE_POINT = "Point";
 const string LogicalMapFactory::KEYWORD_TYPE_MULTIPOINT = "MultiPoint";
 const string LogicalMapFactory::KEYWORD_VERTEX = "vertex";
-const string LogicalMapFactory::KEYWORD_WEIGHT_AREA = "weight_area";
+const string LogicalMapFactory::KEYWORD_WEIGHTED_AREA = "weighted_area";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 LogicalMap* LogicalMapFactory::fromCostMap2D(costmap_2d::Costmap2D* costMap)
@@ -126,7 +135,7 @@ LogicalMap* LogicalMapFactory::fromString(string geoJson, double loadTime)
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::addRectangleCost(Pose<> origin, double widthM, double heightM,
+void LogicalMapFactory::addCostArea(Pose<> origin, double widthM, double heightM,
     Grid2d::BaseType cost)
 {
     unsigned int x0;
@@ -149,19 +158,33 @@ void LogicalMapFactory::addRectangleCost(Pose<> origin, double widthM, double he
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapFactory::addObstacle(Pose<> origin, double widthM, double heightM,
+void LogicalMapFactory::addLabelArea(Pose<> origin, double widthM, double heightM,
+    string label, MapNote note)
+{
+    unsigned int x0;
+    unsigned int y0;
+
+    unsigned int widthCells;
+    unsigned int heightCells;
+    calculateArea(origin, widthM, heightM, x0, y0, widthCells, heightCells);
+
+    map_->addLabeledArea(x0, y0, x0 + widthCells, y0 + heightCells, label, note);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::addObstacleArea(Pose<> origin, double widthM, double heightM,
     double sizeEnvelopeM, Grid2d::BaseType costEnvelope)
 {
     // First add the envelope, if specified
     if (sizeEnvelopeM > 0.0 && costEnvelope > 0)
     {
-        addRectangleCost(PoseMath::add(origin, Pose<>(-sizeEnvelopeM, -sizeEnvelopeM)),
+        addCostArea(PoseMath::add(origin, Pose<>(-sizeEnvelopeM, -sizeEnvelopeM)),
             widthM + 2 * sizeEnvelopeM, heightM + 2 * sizeEnvelopeM,
             costEnvelope);
     }
 
     // Add the static obstacle
-    addRectangleCost(origin, widthM, heightM, Grid2d::PAYLOAD_MAX);
+    addCostArea(origin, widthM, heightM, Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +286,7 @@ bool LogicalMapFactory::findEntityInCollection(YAML::Node root, string entityTyp
         {
             YAML::Node element = *it;
 
-            string type = findEntityType(element);
+            string type = findEntityObject(element);
             if (entityType == type)
             {
                 result = element;
@@ -276,13 +299,13 @@ bool LogicalMapFactory::findEntityInCollection(YAML::Node root, string entityTyp
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-string LogicalMapFactory::findEntityType(YAML::Node root)
+string LogicalMapFactory::findEntityObject(YAML::Node root)
 {
-    YAML::Node type = root[KEYWORD_PROPERTIES][KEYWORD_PROPERTY_FEATURE_TYPE];
+    YAML::Node object = root[KEYWORD_PROPERTIES][KEYWORD_PROPERTY_FEATURE_OBJECT];
 
-    if (type)
+    if (object)
     {
-        return type.as<string>();
+        return object.as<string>();
     }
 
     return "";
@@ -294,18 +317,10 @@ void LogicalMapFactory::ntEntities(YAML::Node root)
     // Go through all the obstacles in the collection
     for (auto entity : root)
     {
-        string entityType = findEntityType(entity);
-        if (entityType == KEYWORD_OBSTACLE)
-        {
-            ntEntityObstacle(entity);
-        }
-        else if (entityType == KEYWORD_COST_AREA)
+        string entityType = findEntityObject(entity);
+        if (entityType == KEYWORD_COST_AREA)
         {
             ntEntityCostArea(entity);
-        }
-        else if (entityType == KEYWORD_WEIGHT_AREA)
-        {
-            ntEntityWeightArea(entity);
         }
         else if (entityType == KEYWORD_EDGE)
         {
@@ -315,9 +330,21 @@ void LogicalMapFactory::ntEntities(YAML::Node root)
         {
             ntEntityGraph(entity);
         }
+        else if (entityType == KEYWORD_LABELED_AREA)
+        {
+            ntEntityLabelArea(entity);
+        }
+        else if (entityType == KEYWORD_OBSTACLE)
+        {
+            ntEntityObstacle(entity);
+        }
         else if (entityType == KEYWORD_VERTEX)
         {
             ntEntityVertex(entity);
+        }
+        else if (entityType == KEYWORD_WEIGHTED_AREA)
+        {
+            ntEntityWeightArea(entity);
         }
         else
         {
@@ -344,18 +371,18 @@ void LogicalMapFactory::ntEntityBoundary(YAML::Node root)
     Pose<> p2 = coordinates[1];
 
     // Add the bottom border
-    addObstacle(Pose<>::ZERO, widthM, p1.y, envelopeSize, envelopeCost);
+    addObstacleArea(Pose<>::ZERO, widthM, p1.y, envelopeSize, envelopeCost);
 
     // Add the left border
-    addObstacle(Pose<>(0, p1.y), p1.x, heightM - p1.y, envelopeSize, envelopeCost);
+    addObstacleArea(Pose<>(0, p1.y), p1.x, heightM - p1.y, envelopeSize, envelopeCost);
 
     // Add the top border
     Pose<> t0 = Pose<>(p1.x, p2.y);
-    addObstacle(Pose<>(p1.x, t0.y), widthM - p1.x, heightM - t0.y, envelopeSize, envelopeCost);
+    addObstacleArea(Pose<>(p1.x, t0.y), widthM - p1.x, heightM - t0.y, envelopeSize, envelopeCost);
 
     // Add the right border
     t0 = Pose<>(p2.x, p1.y);
-    addObstacle(t0, widthM - t0.x, t0.y - p1.y, envelopeSize, envelopeCost);
+    addObstacleArea(t0, abs(widthM - t0.x), abs(t0.y - p2.y), envelopeSize, envelopeCost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -370,8 +397,8 @@ void LogicalMapFactory::ntEntityCostArea(YAML::Node root)
     Pose<> p1 = coordinates[0];
     Pose<> p2 = coordinates[1];
 
-    // Add the static obstacle
-    addRectangleCost(p1, abs(p1.x - p2.x), abs(p1.y - p2.y), cost);
+    // Add the cost area
+    addCostArea(p1, abs(p1.x - p2.x), abs(p1.y - p2.y), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -384,6 +411,23 @@ void LogicalMapFactory::ntEntityEdge(YAML::Node root)
 void LogicalMapFactory::ntEntityGraph(YAML::Node root)
 {
     ntGeometryNull(root[KEYWORD_GEOMETRY]);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::ntEntityLabelArea(YAML::Node root)
+{
+    YAML::Node properties = ntProperties(root);
+
+    string label = ntValueString(properties[KEYWORD_PROPERTY_LABEL_AREA_LABEL], true);
+    MapNote note = ntValueMapNote(properties[KEYWORD_PROPERTY_LABEL_AREA_NOTES], true);
+
+    vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
+
+    Pose<> p1 = coordinates[0];
+    Pose<> p2 = coordinates[1];
+
+    // Add the label area
+    addLabelArea(p1, abs(p1.x - p2.x), abs(p1.y - p2.y), label, note);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -414,11 +458,11 @@ void LogicalMapFactory::ntEntityObstacle(YAML::Node root)
     if (coordinates.size() == 2)
     {
         Pose<> p2 = coordinates[1];
-        addObstacle(p1, abs(p1.x - p2.x), abs(p1.y - p2.y), envelopeSize, envelopeCost);
+        addObstacleArea(p1, abs(p1.x - p2.x), abs(p1.y - p2.y), envelopeSize, envelopeCost);
     }
     else if (coordinates.size() == 1)
     {
-        addObstacle(p1, metadata_.resolution, metadata_.resolution, envelopeSize, envelopeCost);
+        addObstacleArea(p1, metadata_.resolution, metadata_.resolution, envelopeSize, envelopeCost);
     }
 }
 
@@ -430,12 +474,12 @@ void LogicalMapFactory::ntEntityVertex(YAML::Node root)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::ntEntityWeightArea(YAML::Node root)
 {
-    YAML::Node properties = root[KEYWORD_PROPERTIES];
+    YAML::Node properties = ntProperties(root);
 
-    Grid2d::BaseType northCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_NORTH], false);
-    Grid2d::BaseType eastCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_EAST], false);
-    Grid2d::BaseType southCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_SOUTH], false);
-    Grid2d::BaseType westCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHT_AREA_WEST], false);
+    Grid2d::BaseType northCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH], false);
+    Grid2d::BaseType eastCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_EAST], false);
+    Grid2d::BaseType southCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH], false);
+    Grid2d::BaseType westCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_WEST], false);
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 1, 2);
     Pose<> p1 = coordinates[0];
@@ -465,7 +509,7 @@ void LogicalMapFactory::ntEntry(YAML::Node root)
         }
         else
         {
-            throw FeatureNotFoundException(metadata_, KEYWORD_MAP);
+            throw FeatureExpectedException(metadata_, KEYWORD_MAP);
         }
 
         YAML::Node boundaryNode;
@@ -482,7 +526,7 @@ void LogicalMapFactory::ntEntry(YAML::Node root)
     }
     else
     {
-        throw FeaturesNotFoundException(metadata_);
+        throw FeaturesExpectedException(metadata_);
     }
 }
 
@@ -547,6 +591,21 @@ void LogicalMapFactory::ntGeometryNull(YAML::Node root)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+YAML::Node LogicalMapFactory::ntProperties(YAML::Node root)
+{
+    YAML::Node properties = root[KEYWORD_PROPERTIES];
+
+    if (!properties)
+    {
+        string id = root[KEYWORD_ID].as<string>();
+
+        throw PropertiesExpectedException(metadata_, id);
+    }
+
+    return properties;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 Grid2d::BaseType LogicalMapFactory::ntValueCost(YAML::Node root, bool required)
 {
     int value = Grid2d::PAYLOAD_MIN;
@@ -603,6 +662,35 @@ double LogicalMapFactory::ntValueDouble(YAML::Node root, bool required)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+MapNote LogicalMapFactory::ntValueMapNote(YAML::Node root, bool required)
+{
+    MapNote value = MapNote();
+
+    if (root)
+    {
+        for (auto flag : root)
+        {
+            string flagValue = flag.as<string>();
+
+            if (flagValue == KEYWORD_PROPERTY_LABEL_AREA_HONK)
+            {
+                value.join(MapNote::HONK);
+            }
+            else
+            {
+                throw InvalidMapNoteFlagException(metadata_, flagValue);
+            }
+        }
+    }
+    else if (required)
+    {
+        throw MapNoteExpectedException(metadata_);
+    }
+
+    return value;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 vector<Pose<>> LogicalMapFactory::ntValueMultiPoint(YAML::Node root, bool required)
 {
     vector<Pose<>> value;
@@ -648,6 +736,30 @@ Pose<> LogicalMapFactory::ntValuePoint(YAML::Node root, bool required)
     else if (required)
     {
         throw PoseExpectedException(metadata_);
+    }
+
+    return value;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+string LogicalMapFactory::ntValueString(YAML::Node root, bool required)
+{
+    string value = "";
+
+    if (root)
+    {
+        try
+        {
+            value = root.as<string>();
+        }
+        catch (exception& e)
+        {
+            throw StringExpectedException(metadata_);
+        }
+    }
+    else if (required)
+    {
+        throw StringExpectedException(metadata_);
     }
 
     return value;

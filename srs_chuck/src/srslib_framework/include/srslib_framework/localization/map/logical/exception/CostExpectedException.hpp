@@ -14,7 +14,7 @@ class CostExpectedException: public LogicalMapException
 public:
     CostExpectedException(const LogicalMetadata& metadata) :
         LogicalMapException(metadata,
-            "Expected value of type double or 'max'")
+            "Expected value of type Double or 'max'")
     {}
 };
 

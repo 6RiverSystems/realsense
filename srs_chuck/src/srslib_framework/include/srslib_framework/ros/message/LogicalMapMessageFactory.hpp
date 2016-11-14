@@ -31,10 +31,14 @@ struct LogicalMapMessageFactory
         vector<srslib_framework::LogicalCell> logical;
         map2Vector(map, logical);
 
+        vector<srslib_framework::LogicalArea> areas;
+        areas2Vector(map, areas);
+
         srslib_framework::LogicalMap msgLogicalMap;
 
         msgLogicalMap.metadata = metadata2Msg(map->getMetadata());
         msgLogicalMap.data = logical;
+        msgLogicalMap.areas = areas;
 
         return msgLogicalMap;
     }
@@ -72,7 +76,11 @@ struct LogicalMapMessageFactory
     static LogicalMap* msg2LogicalMap(const srslib_framework::LogicalMap& message)
     {
         LogicalMetadata metadata = msg2Metadata(message.metadata);
-        return vector2Map(metadata, message.data);
+
+        LogicalMap* logical = vector2Map(metadata, message.data);
+        vector2Areas(message.areas, logical);
+
+        return logical;
     }
 
     /**
@@ -99,11 +107,19 @@ struct LogicalMapMessageFactory
     }
 
 private:
+    static void areas2Vector(const LogicalMap* map,
+        vector<srslib_framework::LogicalArea>& areas);
+
     static void map2Vector(const LogicalMap* map,
         vector<srslib_framework::LogicalCell>& logical);
+    static MapNote msg2Note(srslib_framework::MapNote message);
+
+    static srslib_framework::MapNote note2Msg(MapNote note);
 
     static LogicalMap* vector2Map(const LogicalMetadata& metadata,
         const vector<srslib_framework::LogicalCell>& logical);
+    static void vector2Areas(const vector<srslib_framework::LogicalArea>& areas,
+        LogicalMap* logical);
 };
 
 } // namespace srs

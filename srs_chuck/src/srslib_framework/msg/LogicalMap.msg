@@ -7,3 +7,4 @@
 srslib_framework/LogicalMetadata metadata
 
 srslib_framework/LogicalCell[] data
+srslib_framework/LogicalArea[] areas

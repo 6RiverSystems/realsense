@@ -14,7 +14,7 @@ class GeoJsonTypeUnsupportedException: public LogicalMapException
 public:
     GeoJsonTypeUnsupportedException(const LogicalMetadata& metadata, const string& type) :
         LogicalMapException(metadata,
-            "GeoJson type not supported [" + type + "]")
+            "GeoJson type not supported {" + type + "}")
     {}
 };
 

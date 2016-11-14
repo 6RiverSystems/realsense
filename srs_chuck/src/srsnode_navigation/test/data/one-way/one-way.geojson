@@ -4,7 +4,8 @@
 		{
 			"type": "Feature",
 			"properties": {
-				"type": "map",
+				"object": "map",
+				"version": "1",
 				"origin": [0,0,0],
 				"resolution": 0.1,
 				"width": 15,
@@ -16,7 +17,7 @@
 			"features": [
 				{
 					"type": "Feature",
-					"id": "1",
+					"id": 1,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
@@ -25,11 +26,11 @@
 						]
 					},
 					"properties": {
-						"type": "weight_area",
-						"north": 0,
-						"east": 0,
-						"south": 0,
-						"west": 100
+						"object": "labeled_area",
+						"label": "test1",
+						"notes": [
+							"honk"
+						]
 					}
 				}
 			]

@@ -17,8 +17,8 @@ class InvalidCostValueException: public LogicalMapException
 public:
     InvalidCostValueException(const LogicalMetadata& metadata, int value, int minValue, int maxValue) :
         LogicalMapException(metadata,
-            "Invalid cost value [actual: " + to_string(value) +
-            ", range: {" + to_string(minValue) + ", " + to_string(maxValue) + "}")
+            "Invalid cost value {actual: " + to_string(value) +
+            ", range: [" + to_string(minValue) + ", " + to_string(maxValue) + "]}")
     {}
 };
 

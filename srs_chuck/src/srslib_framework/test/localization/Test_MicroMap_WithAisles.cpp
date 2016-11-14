@@ -27,6 +27,5 @@ TEST(Test_MicroMap, ReadAisles)
 {
     MapStack* stack = MapStackFactory::fromJsonFile("data/micro-map-aisles/micro-map-aisles.yaml", 0);
 
-    LogicalMap* logical = stack->getLogicalMap();
-    OccupancyMap* occupancy = stack->getOccupancyMap();
+    // The test is not to produce an exception
 }

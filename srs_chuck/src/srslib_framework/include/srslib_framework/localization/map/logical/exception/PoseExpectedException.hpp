@@ -14,7 +14,7 @@ class PoseExpectedException: public LogicalMapException
 public:
     PoseExpectedException(const LogicalMetadata& metadata) :
         LogicalMapException(metadata,
-            "Expected value of type pose")
+            "Expected value of type Pose")
     {}
 };
 

@@ -9,13 +9,12 @@
 
 namespace srs {
 
-class PropertyNotFoundException: public LogicalMapException
+class MapNoteExpectedException: public LogicalMapException
 {
 public:
-    PropertyNotFoundException(const LogicalMetadata& metadata,
-        const string& feature, const string& property) :
+    MapNoteExpectedException(const LogicalMetadata& metadata) :
         LogicalMapException(metadata,
-            "The entity does not contain the required property [" + feature + ", " + property + "]")
+            "Expected value of type MapNote")
     {}
 };
 

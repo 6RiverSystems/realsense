@@ -47,6 +47,35 @@ LogicalMap::LogicalMap(LogicalMetadata metadata) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMap::addLabeledArea(unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
+    string label, MapNote note)
+{
+    LabeledArea area;
+    area.xi = xi;
+    area.yi = yi;
+    area.xf = xf;
+    area.yf = yf;
+    area.label = label;
+    area.note = note;
+
+    labeledAreas_.push_back(area);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMap::checkAreas(unsigned int c, unsigned int r, vector<string>& areas) const
+{
+    areas.clear();
+
+    for (auto area : labeledAreas_)
+    {
+        if (area.xi >= c &&  c <= area.xf && area.yi >= r && r <= area.yf)
+        {
+            areas.push_back(area.label);
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::maxCost(unsigned int c, unsigned int r, Grid2d::BaseType cost)
 {
     getGrid()->maxOnPayload(Grid2d::Location(c, r), cost);
@@ -58,6 +87,11 @@ ostream& operator<<(ostream& stream, const LogicalMap& map)
     stream << "LogicalMap" << endl;
     stream << *map.getGrid() << endl;
 
+    for (auto area : map.labeledAreas_)
+    {
+        stream << area << endl;
+    }
+
     return stream;
 }
 
@@ -65,7 +99,8 @@ ostream& operator<<(ostream& stream, const LogicalMap& map)
 bool operator==(const LogicalMap& lhs, const LogicalMap& rhs)
 {
     return lhs.metadata_ == rhs.metadata_ &&
-        operator==(static_cast<const BaseMap&>(lhs), static_cast<const BaseMap&>(rhs));
+        operator==(static_cast<const BaseMap&>(lhs), static_cast<const BaseMap&>(rhs)) &&
+        lhs.labeledAreas_ == rhs.labeledAreas_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

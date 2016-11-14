@@ -14,7 +14,7 @@ class DoubleExpectedException: public LogicalMapException
 public:
     DoubleExpectedException(const LogicalMetadata& metadata) :
         LogicalMapException(metadata,
-            "Expected value of type double")
+            "Expected value of type Double")
     {}
 };
 

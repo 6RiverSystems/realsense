@@ -1,4 +1,4 @@
-<!-- 
+<!--
   *
   * (c) Copyright 2015-2016 River Systems, all rights reserved.
   *
@@ -16,8 +16,9 @@
 
     <!-- Joint and robot state publishers -->
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <param name="use_tf_static" value="true" />
+    </node>
     <!-- Brainstem Hardware Driver -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
 

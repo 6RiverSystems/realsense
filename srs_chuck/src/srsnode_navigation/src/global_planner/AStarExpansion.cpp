@@ -68,7 +68,7 @@ void AStarExpansion::add(float* potentials,
     int next_i, Grid2d::BaseType weight,
     int end_x, int end_y)
 {
-    float floatWeight = 0; //weight * 100;
+    float floatWeight = weight * 100;
     if (weight == Grid2d::WEIGHT_NO_INFORMATION)
     {
         floatWeight = 0;

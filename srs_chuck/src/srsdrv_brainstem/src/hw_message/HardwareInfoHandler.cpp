@@ -13,7 +13,7 @@ const string HardwareInfoHandler::TOPIC_HARDWARE_INFO = "/info/hardware";
 // Public methods
 
 HardwareInfoHandler::HardwareInfoHandler() :
-    BrainstemMessageHandler(HARDWARE_INFO_KEY),
+    HardwareMessageHandler(HARDWARE_INFO_KEY),
     chassisGeneration_(0),
     brainstemHwVersion_(0)
 {
@@ -31,7 +31,7 @@ HardwareInfoHandler::HardwareInfoHandler() :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void HardwareInfoHandler::receiveData(ros::Time currentTime, vector<char>& buffer)
 {
-    HardwareInfoData* hwInfo = reinterpret_cast<HardwareInfoData*>(buffer.data());
+    MsgHardwareInfo* hwInfo = reinterpret_cast<MsgHardwareInfo*>(buffer.data());
 
     char rawUid[255];
     sprintf(rawUid, "%04X%04X-%04X-%04X-%04X-%04X%04X%04X",
@@ -45,7 +45,7 @@ void HardwareInfoHandler::receiveData(ros::Time currentTime, vector<char>& buffe
     chassisGeneration_ = static_cast<unsigned int>(hwInfo->chassisGeneration);
     brainstemHwVersion_ = static_cast<unsigned int>(hwInfo->brainstemHwVersion);
 
-    char* brainstemVersionPointer = reinterpret_cast<char*>(buffer.data()) + sizeof(HardwareInfoData);
+    char* brainstemVersionPointer = reinterpret_cast<char*>(buffer.data()) + sizeof(MsgHardwareInfo);
     brainstemSwVersion_ = string(brainstemVersionPointer);
 
     ROS_INFO_STREAM("Hardware Info {" <<

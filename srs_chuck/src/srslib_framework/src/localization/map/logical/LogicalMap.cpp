@@ -58,21 +58,32 @@ void LogicalMap::addLabeledArea(unsigned int xi, unsigned int yi, unsigned int x
     area.label = label;
     area.note = note;
 
-    labeledAreas_.push_back(area);
+    labeledAreas_[label] = area;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::checkAreas(unsigned int c, unsigned int r, vector<string>& areas) const
+void LogicalMap::checkAreas(unsigned int c, unsigned int r, LabeledAreaMapType& areas) const
 {
     areas.clear();
 
     for (auto area : labeledAreas_)
     {
-        if (area.xi >= c &&  c <= area.xf && area.yi >= r && r <= area.yf)
+        if (c >= area.second.xi &&  c <= area.second.xf &&
+            r >= area.second.yi && r <= area.second.yf)
         {
-            areas.push_back(area.label);
+            areas[area.first] = area.second;
         }
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMap::checkAreas(double x, double y, LabeledAreaMapType& areas) const
+{
+    unsigned int c;
+    unsigned int r;
+    transformM2Cells(x, y, c, r);
+
+    checkAreas(c, r, areas);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +100,7 @@ ostream& operator<<(ostream& stream, const LogicalMap& map)
 
     for (auto area : map.labeledAreas_)
     {
-        stream << area << endl;
+        stream << area.second << endl;
     }
 
     return stream;

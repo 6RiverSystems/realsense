@@ -8,12 +8,16 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srsdrv_brainstem)
 set(PROJECT_MAIN src/BrainStem.cpp)
 set(${PROJECT_NAME}_SOURCES
+
     src/BrainStemMessageProcessor.cpp
     src/BrainStem.cpp
 	src/BrainStemEmulator.cpp
+	
     src/hw_message/SensorFrameHandler.cpp
     src/hw_message/RawOdometryHandler.cpp
     src/hw_message/HardwareInfoHandler.cpp
+    
+    src/sw_message/HonkHandler.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES

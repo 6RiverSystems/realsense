@@ -60,8 +60,6 @@ private:
 
 	static constexpr auto ODOMETRY_RPM_COMMAND_TOPIC = "/internal/sensors/odometry/rpm/cmd";
 
-	static constexpr auto ODOMETRY_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity/pose";
-
 	static constexpr auto INITIAL_POSE_TOPIC = "/request/initial_pose";
 
 	static constexpr auto PING_COMMAND_TOPIC = "/internal/state/ping";

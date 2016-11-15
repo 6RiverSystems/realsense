@@ -5,17 +5,17 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/tap/subscriber/SubscriberPose.hpp>
+#include <srslib_framework/ros/channel/publisher/PublisherBoolean.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
-class TapInitialPose :
-    public SubscriberPose
+class ChannelHwCmd_Honk :
+    public PublisherBoolean
 {
 public:
-    TapInitialPose() :
-        SubscriberPose(ChuckTopics::internal::SWCMD_INITIAL_POSE)
+    ChannelHwCmd_Honk() :
+        PublisherBoolean(ChuckTopics::internal::HWCMD_HONK)
     {}
 };
 

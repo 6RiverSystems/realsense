@@ -5,17 +5,17 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/tap/subscriber/SubscriberPose.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberRosOdometry.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
-class TapInitialPose :
-    public SubscriberPose
+class TapSensorOdometryPose :
+    public SubscriberRosOdometry
 {
 public:
-    TapInitialPose() :
-        SubscriberPose(ChuckTopics::internal::SWCMD_INITIAL_POSE)
+    TapSensorOdometryPose() :
+        SubscriberRosOdometry(ChuckTopics::sensor::ODOMETRY_POSE)
     {}
 };
 

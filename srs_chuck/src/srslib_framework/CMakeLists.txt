@@ -40,6 +40,7 @@ set(${PROJECT_NAME}_SOURCES
 )
 
 set(${PROJECT_NAME}_MSGS
+    HwCmd_Honk.msg
     Imu.msg
     JoypadState.msg
     LogicalArea.msg

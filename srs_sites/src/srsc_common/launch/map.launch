@@ -6,7 +6,7 @@
   *
 -->
 <launch>
-	<arg name="customer_site" value="$(optenv CUSTOMER_SITE empty)" />
+    <arg name="customer_site" value="$(optenv CUSTOMER_SITE empty)" />
     <arg name="customer_map" value="$(optenv CUSTOMER_MAP empty)" />
 
     <include file="$(find srsnode_map_server)/launch/node.launch">

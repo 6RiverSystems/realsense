@@ -30,7 +30,7 @@ namespace internal {
 
     static const string GOTO_GOAL = "/move_base_simple/goal";
 
-    static const string INITIAL_POSE = "/internal/command/initial_pose";
+    static const string HWCMD_HONK = "/internal/hw_cmd/honk";
 
     static const string MAP_LOGICAL = "/internal/state/map/complete";
     static const string MAP_ROS_OCCUPANCY = "/internal/state/map/ros_occupancy";
@@ -43,6 +43,7 @@ namespace internal {
 
     static const string ROBOT_POSE = "/internal/state/robot/pose";
 
+    static const string SWCMD_INITIAL_POSE = "/internal/sw_cmd/initial_pose";
 
 } // namespace internal
 
@@ -51,6 +52,8 @@ namespace sensor {
     static const string JOYPAD_STATE = "/internal/sensors/joypad/state";
 
     static const string JOYSTICK_RAW = "/joy";
+
+    static const string ODOMETRY_POSE = "/internal/sensors/odometry/pose";
 }
 
 namespace service {

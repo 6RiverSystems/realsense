@@ -10,10 +10,12 @@ using namespace std;
 
 #include <ros/ros.h>
 
+#include <srslib_framework/ros/tap/subscriber/Subject.hpp>
+
 namespace srs {
 
 template<typename MESSAGE>
-class RosSubscriber
+class RosSubscriber : public Subject<RosSubscriber<MESSAGE>>
 {
 public:
     RosSubscriber(string topic,
@@ -77,7 +79,12 @@ protected:
     {
         hasNeverReported_ = false;
 
+        // Let the specific subscriber to decode the message
         receiveData(message);
+
+        // Notify all the observers that some
+        // some new data is available
+        Subject<RosSubscriber<MESSAGE>>::notify();
     }
 
 private:

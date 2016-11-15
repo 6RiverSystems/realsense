@@ -36,9 +36,9 @@ private:
 
 	static constexpr auto ODOMETRY_RATE_HZ = 100;
 
-	static constexpr auto VELOCITY_TOPIC = "/internal/sensors/odometry/rpm/raw";
+	static constexpr auto VELOCITY_TOPIC = "/internal/sensors/odometry/rpm/cmd";
 
-	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/rpm/cmd";
+	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/rpm/raw";
 
 	ros::NodeHandle 			m_rosNodeHandle;
 

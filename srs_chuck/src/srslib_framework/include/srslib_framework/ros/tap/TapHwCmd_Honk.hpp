@@ -6,15 +6,16 @@
 #pragma once
 
 #include <srslib_framework/ros/tap/subscriber/SubscriberBoolean.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
-class RosTapCmd_Pause :
+class TapHwCmd_Honk :
     public SubscriberBoolean
 {
 public:
-    RosTapCmd_Pause() :
-        SubscriberBoolean("/request/pause")
+    TapHwCmd_Honk() :
+        SubscriberBoolean(ChuckTopics::internal::HWCMD_HONK)
     {}
 };
 

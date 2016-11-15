@@ -6,7 +6,9 @@
   *
 -->
 <launch>
-    <arg name="customer_map" value="6rhq.yaml" />
+    <arg name="customer_site" value="srsc_6rshq_oneway" />
+    <arg name="customer_map" value="6rshq_oneway" />
+
     <arg name="robot_configuration" value="$(optenv ROBOT_NAME development).yaml" />
     <arg name="emulation" value="true" />
 

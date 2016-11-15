@@ -7,6 +7,7 @@
 
 #include <string>
 #include <sstream>
+#include <unordered_map>
 using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
@@ -52,6 +53,8 @@ public:
         unsigned int yi;
     };
 
+    using LabeledAreaMapType = unordered_map<string, LabeledArea>;
+
     LogicalMap(double widthM, double heightM, double resolution);
     LogicalMap(Grid2d* grid, double resolution);
     LogicalMap(LogicalMetadata metadata);
@@ -61,9 +64,10 @@ public:
     void addLabeledArea(unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
         string label, MapNote note);
 
-    void checkAreas(unsigned int c, unsigned int r, vector<string>& areas) const;
+    void checkAreas(unsigned int c, unsigned int r, LabeledAreaMapType& areas) const;
+    void checkAreas(double x, double y, LabeledAreaMapType& areas) const;
 
-    vector<LabeledArea> getAreas() const
+    LabeledAreaMapType getAreas() const
     {
         return labeledAreas_;
     }
@@ -97,7 +101,7 @@ public:
         Grid2d::BaseType west);
 
 private:
-    vector<LabeledArea> labeledAreas_;
+    LabeledAreaMapType labeledAreas_;
 
     LogicalMetadata metadata_;
 };

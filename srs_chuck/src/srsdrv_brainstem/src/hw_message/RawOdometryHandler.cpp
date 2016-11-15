@@ -15,7 +15,7 @@ const string RawOdometryHandler::TOPIC_RAW_ODOMETRY = "/internal/sensors/odometr
 // Public methods
 
 RawOdometryHandler::RawOdometryHandler() :
-    BrainstemMessageHandler(RAW_ODOMETRY_KEY),
+    HardwareMessageHandler(RAW_ODOMETRY_KEY),
     lastHwOdometryTime_(0),
     lastRosOdometryTime_(ros::Time::now())
 {
@@ -26,7 +26,7 @@ RawOdometryHandler::RawOdometryHandler() :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void RawOdometryHandler::receiveData(ros::Time currentTime, vector<char>& buffer)
 {
-	RawOdometryData* odometryRPMData = reinterpret_cast<RawOdometryData*>(buffer.data());
+    MsgRawOdometry* odometryRPMData = reinterpret_cast<MsgRawOdometry*>(buffer.data());
 
 	ros::Time internalTime = currentTime;
 	bool timeSliceExpired = TimeMath::isTimeElapsed(OUT_OF_SYNC_TIMEOUT,

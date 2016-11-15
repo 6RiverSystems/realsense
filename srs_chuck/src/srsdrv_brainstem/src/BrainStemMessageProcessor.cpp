@@ -21,7 +21,8 @@ using namespace ros;
 
 BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) :
 	m_pIO( pIO ),
-	m_mapMotionStatus( )
+	m_mapMotionStatus( ),
+    honkHandler_(this)
 {
 	m_mapEntityButton[LED_ENTITIES::TOTE0]		= "TOTE0";
 	m_mapEntityButton[LED_ENTITIES::TOTE1]		= "TOTE1";
@@ -184,7 +185,7 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 
     // Go through the registered message handlers and
     // communicate the data if the key matches
-    MessageHandlerMapType::iterator handler = hwMessageHandlers_.find(messageKey);
+    HwMessageHandlerMapType::iterator handler = hwMessageHandlers_.find(messageKey);
     if (handler != hwMessageHandlers_.end())
     {
         handler->second->receiveData(currentTime, buffer);

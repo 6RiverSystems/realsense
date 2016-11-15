@@ -25,7 +25,7 @@ const string SensorFrameHandler::TOPIC_SENSOR_FRAME = "/internal/sensors/sensor_
 // Public methods
 
 SensorFrameHandler::SensorFrameHandler() :
-    BrainstemMessageHandler(SENSOR_FRAME_KEY),
+    HardwareMessageHandler(SENSOR_FRAME_KEY),
     lastHwSensorFrameTime_(0),
     lastRosSensorFrameTime_(ros::Time::now()),
     currentOdometry_(Odometry<>::ZERO)
@@ -73,7 +73,7 @@ int32_t calculateOdometryDiff(uint32_t current, uint32_t& last)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SensorFrameHandler::receiveData(ros::Time currentTime, vector<char>& buffer)
 {
-    SensorFrameData* sensorData = reinterpret_cast<SensorFrameData*>(buffer.data());
+    MsgSensorFrame* sensorData = reinterpret_cast<MsgSensorFrame*>(buffer.data());
 
     ros::Time internalTime = currentTime;
     bool timeSliceExpired = TimeMath::isTimeElapsed(OUT_OF_SYNC_TIMEOUT,

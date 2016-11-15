@@ -17,10 +17,12 @@ using namespace std;
 #include <srslib_framework/io/IO.hpp>
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
-#include <srsdrv_brainstem/hw_message/BrainstemMessageHandler.hpp>
+#include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
 #include <srsdrv_brainstem/hw_message/SensorFrameHandler.hpp>
 #include <srsdrv_brainstem/hw_message/RawOdometryHandler.hpp>
 #include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
+
+#include <srsdrv_brainstem/sw_message/HonkHandler.hpp>
 
 namespace srs {
 
@@ -40,7 +42,7 @@ public:
     void processHardwareMessage(vector<char> buffer);
     void processRosMessage(const string& strMessage);
 
-    typedef map<char, BrainstemMessageHandler*> MessageHandlerMapType;
+    using HwMessageHandlerMapType = map<char, HardwareMessageHandler*>;
 
 	typedef std::function<void(bool)> ConnectionChangedFn;
 
@@ -84,7 +86,12 @@ public:
 
 	virtual ~BrainStemMessageProcessor( );
 
-// Message Callbacks
+    void sendCommand(char* command, std::size_t size)
+    {
+        WriteToSerialPort(command, size);
+    }
+
+    // Message Callbacks
 
 	void SetConnectionChangedCallback( ConnectionChangedFn connectionChangedCallback );
 
@@ -144,13 +151,14 @@ private:
 
 	void Pause( bool bPause );
 
-    MessageHandlerMapType hwMessageHandlers_;
+    HwMessageHandlerMapType hwMessageHandlers_;
+
+    HardwareInfoHandler hardwareInfoHandler_;
+    HonkHandler honkHandler_;
 
     SensorFrameHandler sensorFrameHandler_;
 
     RawOdometryHandler rawOdometryHandler_;
-
-    HardwareInfoHandler hardwareInfoHandler_;
 };
 
 } /* namespace srs */

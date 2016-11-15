@@ -3,12 +3,12 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef POSEMESSAGEFACTORY_HPP_
-#define POSEMESSAGEFACTORY_HPP_
+#pragma once
 
 #include <ros/ros.h>
 #include <tf/transform_datatypes.h>
 #include <nav_msgs/Path.h>
+#include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 
@@ -41,7 +41,7 @@ struct PoseMessageFactory
     }
 
     /**
-     * @brief Convert a PoseConstPtr type into a Pose.
+     * @brief Convert a Pose pointer type into a Pose.
      *
      * @param message Pose to convert
      *
@@ -53,7 +53,19 @@ struct PoseMessageFactory
     }
 
     /**
-     * @brief Convert a Pose type into a Pose.
+     * @brief Convert a ROS Odometry pointer type into a Pose.
+     *
+     * @param message Pose to convert
+     *
+     * @return Pose generated from the specified Pose
+     */
+    static Pose<> msg2Pose(nav_msgs::Odometry::ConstPtr message)
+    {
+        return msg2Pose(*message);
+    }
+
+    /**
+     * @brief Convert a ROS Pose type into a Pose.
      *
      * @param message Pose to convert
      *
@@ -67,6 +79,25 @@ struct PoseMessageFactory
         pose.x = message.position.x;
         pose.y = message.position.y;
         pose.theta = tf::getYaw(message.orientation);
+
+        return pose;
+    }
+
+    /**
+     * @brief Convert a ROS Odometry type into a Pose.
+     *
+     * @param message Pose to convert
+     *
+     * @return Pose generated from the specified Pose
+     */
+    static Pose<> msg2Pose(const nav_msgs::Odometry& message)
+    {
+        Pose<> pose;
+
+        pose.arrivalTime = TimeMath::time2number(message.header.stamp);
+        pose.x = message.pose.pose.position.x;
+        pose.y = message.pose.pose.position.y;
+        pose.theta = tf::getYaw(message.pose.pose.orientation);
 
         return pose;
     }
@@ -195,5 +226,3 @@ struct PoseMessageFactory
 };
 
 } // namespace srs
-
-#endif // POSEMESSAGEFACTORY_HPP_

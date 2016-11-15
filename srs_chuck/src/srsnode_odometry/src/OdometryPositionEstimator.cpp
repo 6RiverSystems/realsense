@@ -5,9 +5,11 @@
  */
 
 #include <srsnode_odometry/OdometryPositionEstimator.hpp>
-#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
+
 #include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
+#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
@@ -87,7 +89,7 @@ void OdometryPositionEstimator::connect()
 	rawVelocityCmdSub_ = nodeHandle_.subscribe<geometry_msgs::Twist>(ODOMETRY_RAW_VELOCITY_TOPIC, 10,
 			std::bind( &OdometryPositionEstimator::TransformVeclocityToRPM, this, std::placeholders::_1 ));
 
-	odometryPosePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_OUTPUT_TOPIC, 10);
+	odometryPosePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ChuckTopics::sensor::ODOMETRY_POSE, 10);
 
 	rpmVelocityCmdPub_ = nodeHandle_.advertise<srslib_framework::OdometryRPM>(ODOMETRY_RPM_COMMAND_TOPIC, 10);
 

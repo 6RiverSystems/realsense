@@ -5,17 +5,19 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/tap/subscriber/SubscriberBoolean.hpp>
-
 namespace srs {
 
-class RosTapCmd_Shutdown :
-    public SubscriberBoolean
+template <class SUBJECT>
+class Observer
 {
 public:
-    RosTapCmd_Shutdown() :
-        SubscriberBoolean("/request/shutdown")
+    Observer()
     {}
+
+    virtual ~Observer()
+    {}
+
+    virtual void notified(SUBJECT* subject) = 0;
 };
 
 } // namespace srs

@@ -3,39 +3,25 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef BRAINSTEMMESSAGEHANDLER_HPP_
-#define BRAINSTEMMESSAGEHANDLER_HPP_
+#pragma once
 
 #include <string>
 using namespace std;
 
 #include <ros/ros.h>
 
-// Define the macros for the beginning and end of a
-// brainstem message. The macro automatically define the
-// strict packing pragma and the struct for the
-// message data
-#define BRAINSTEM_MESSAGE_BEGIN(name) \
-    _Pragma("pack(push, 1)") \
-    struct name \
-    {
-
-#define BRAINSTEM_MESSAGE_END \
-    }; \
-    _Pragma("pack(pop)")
-
 namespace srs {
 
-class BrainstemMessageHandler
+class HardwareMessageHandler
 {
 public:
-    BrainstemMessageHandler(char messageKey, string nameSpace = "~") :
+    HardwareMessageHandler(char messageKey, string nameSpace = "~") :
         messageKey_(messageKey)
     {
         rosNodeHandle_ = ros::NodeHandle(nameSpace);
     }
 
-    virtual ~BrainstemMessageHandler()
+    virtual ~HardwareMessageHandler()
     {}
 
     char getKey() const
@@ -58,5 +44,3 @@ private:
 };
 
 } // namespace srs
-
-#endif // BRAINSTEMMESSAGEHANDLER_HPP_

@@ -14,12 +14,12 @@ void LogicalMapMessageFactory::areas2Vector(const LogicalMap* map,
     for (auto area : map->getAreas())
     {
         srslib_framework::LogicalArea msgArea;
-        msgArea.label = area.label;
-        msgArea.xi = area.xi;
-        msgArea.yi = area.yi;
-        msgArea.xf = area.xf;
-        msgArea.yf = area.yf;
-        msgArea.note = note2Msg(area.note);
+        msgArea.label = area.second.label;
+        msgArea.xi = area.second.xi;
+        msgArea.yi = area.second.yi;
+        msgArea.xf = area.second.xf;
+        msgArea.yf = area.second.yf;
+        msgArea.note = note2Msg(area.second.note);
 
         areas.push_back(msgArea);
     }

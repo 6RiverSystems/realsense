@@ -10,10 +10,7 @@ set(PROJECT_MAIN src/executive_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
     src/Executive.cpp
-    include/${PROJECT_NAME}/tap/RosTapCmd_Goal.hpp
-    include/${PROJECT_NAME}/tap/RosTapCmd_InitialPose.hpp
-    include/${PROJECT_NAME}/tap/RosTapCmd_Pause.hpp
-    include/${PROJECT_NAME}/tap/RosTapCmd_Shutdown.hpp
+    src/LabeledAreasDetector.cpp
 )
 
 ####################################################################################################
@@ -24,6 +21,7 @@ project(${PROJECT_NAME})
 set(PROJECT_NODE ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
+set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp

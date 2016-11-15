@@ -3,14 +3,11 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef CRASH_HANDLER_HPP_
-#define CRASH_HANDLER_HPP_
+#pragma once
 
 namespace srs
 {
 
-void InstallCrashHandlers( );
+void InstallCrashHandlers();
 
 } // namespace srs
-
-#endif // CRASH_HANDLER_HPP_

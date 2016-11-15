@@ -374,10 +374,10 @@ void Grid2d::setWeights(const Location& location,
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 int Grid2d::calculateAggregate(Node* node)
 {
-    int xi;
-    int xf;
-    int yi;
-    int yf;
+    int xi = 0;
+    int xf = 0;
+    int yi = 0;
+    int yf = 0;
     calculateAggregateArea(node->location.x, node->location.y, xi, xf, yi, yf);
 
     BaseType aggregate = PAYLOAD_MIN;
@@ -524,10 +524,10 @@ void Grid2d::updateAllAggregate()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Grid2d::updateNodeAggregate(Node* node, BaseType oldPayload, BaseType newPayload)
 {
-    int xi;
-    int xf;
-    int yi;
-    int yf;
+    int xi = 0;
+    int xf = 0;
+    int yi = 0;
+    int yf = 0;
     calculateAggregateArea(node->location.x, node->location.y, xi, xf, yi, yf);
 
     BaseType delta = BasicMath::noOverflowAdd<BaseType>(newPayload, -oldPayload);
@@ -573,7 +573,7 @@ void Grid2d::updatePayload(const Location& location, BaseType newPayload,
 
         // Do not create a new node if the specified payload
         // is the minimum available payload
-        if (finalPayload > PAYLOAD_MIN)
+        if (finalPayload >= PAYLOAD_MIN)
         {
             node = addNode(location, PAYLOAD_MIN, PAYLOAD_MIN);
             if (aggregate_)
@@ -605,7 +605,7 @@ void Grid2d::updatePayload(const Location& location, BaseType newPayload,
 
         // Prune the grid if there is no additional weight information and
         // the new cost of the node is the minimum
-        if (finalPayload == PAYLOAD_MIN)
+        if (finalPayload <= PAYLOAD_NO_INFORMATION)
         {
             if (!node->weights)
             {

@@ -16,7 +16,8 @@
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" launch-prefix="taskset -c 3">
 		<remap from="/move_base_simple/goal" to="/request/goal"/>
 		<remap from="/cmd_vel" to="/internal/sensors/odometry/velocity/cmd"/>
-    <remap from="/odom" to="/internal/sensors/odometry/velocity/estimate"/>
+		<remap from="/odom" to="/internal/sensors/odometry/velocity/estimate"/>
+
 		<!-- Move Base -->
 		<rosparam file="$(find srsnode_navigation)/config/move_base_params.yaml" command="load" />
 

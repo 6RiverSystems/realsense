@@ -106,9 +106,6 @@ function startChuck() {
 function restartChuck() {
   stopChuck
 
-  echo "Waiting for services to completely stop"
-  sleep 5s
-
   startChuck
 }
 
@@ -131,10 +128,8 @@ rosbag record -O nav-data /internal/sensors/lidar/scan/raw /internal/sensors/odo
 
 
 alias chucklog=logChuck
-alias chuckupdate=updateChuck
 alias chuckclean=cleanChuck
 alias chuckbuild=buildChuck
-alias chuckrun=runChuck
 alias chuckstart=startChuck
 alias chuckstop=stopChuck
 alias chuckrestart=restartChuck

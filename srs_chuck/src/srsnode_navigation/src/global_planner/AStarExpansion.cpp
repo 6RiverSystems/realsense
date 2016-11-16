@@ -56,9 +56,16 @@ bool AStarExpansion::calculatePotentials(
 
         logicalGrid_->getWeights(Grid2d::Location(x, y), north, east, south, west);
 
+        cout <<"east" << endl; //////
         add(potentials, potentials[i], i + 1, east, end_x, end_y);
+
+        cout <<"west" << endl; //////
         add(potentials, potentials[i], i - 1, west, end_x, end_y);
+
+        cout <<"north" << endl; //////
         add(potentials, potentials[i], i + nx_, north, end_x, end_y);
+
+        cout <<"south" << endl; //////
         add(potentials, potentials[i], i - nx_, south, end_x, end_y);
     }
 
@@ -88,13 +95,15 @@ void AStarExpansion::add(float* potentials,
 
     if (potentials[next_i] < POT_HIGH)
     {
-        cout << "POT_HIGH: " << potentials[next_i] << endl; //////
+        cout << "Explored: " << potentials[next_i] << endl; //////
+        cout << "==============================================================================" << endl; //////
         return;
     }
 
     if (costGrid_[next_i] >= lethal_cost_)
     {
         cout << "lethal_cost_: " << static_cast<int>(lethal_cost_) << endl; //////
+        cout << "==============================================================================" << endl; //////
         return;
     }
 

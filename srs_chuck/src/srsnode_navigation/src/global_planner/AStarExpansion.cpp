@@ -63,7 +63,7 @@ bool AStarExpansion::calculatePotentials(
         add(potentials, potentials[i], i - nx_, south, end_x, end_y);
     }
 
-    cout <<"return false" << endl; //////
+    cout << endl << "return false" << endl; //////
     return false;
 }
 
@@ -73,35 +73,36 @@ void AStarExpansion::add(float* potentials,
     int next_i, Grid2d::BaseType weight,
     int end_x, int end_y)
 {
-    cout <<"-----------------------------------------------------------------------------" << endl; //////
-    cout <<"prev_potential: " << prev_potential << endl; //////
-    cout <<"next_i: " << next_i << endl; //////
-    cout <<"weight: " << weight << endl; //////
-    cout <<"end_x: " << end_x << ", end_y: " << end_y << endl; //////
+    cout << "-----------------------------------------------------------------------------" << endl; //////
+    cout << "prev_potential: " << prev_potential << endl; //////
+    cout << "next_i: " << next_i << endl; //////
+    cout << "costGrid_[next_i]: " << static_cast<int>(costGrid_[next_i]) << endl; /////
+    cout << "weight: " << static_cast<int>(weight) << endl; //////
+    cout << "end_x: " << end_x << ", end_y: " << end_y << endl; //////
 
     float floatWeight = weight * 100;
     if (weight == Grid2d::WEIGHT_NO_INFORMATION)
     {
-        cout <<"no info" << endl; //////
+        cout << "no info" << endl; //////
         floatWeight = 0;
     }
 
     if (potentials[next_i] < POT_HIGH)
     {
-        cout <<"POT_HIGH: " << potentials[next_i] << endl; //////
+        cout << "POT_HIGH: " << potentials[next_i] << endl; //////
         return;
     }
 
     if (costGrid_[next_i] >= lethal_cost_)
     {
-        cout <<"lethal_cost_: " << costGrid_[next_i] << endl; //////
+        cout << "lethal_cost_: " << static_cast<int>(lethal_cost_) << endl; //////
         return;
     }
 
     float cost = costGrid_[next_i];
     if (costGrid_[next_i] == Grid2d::PAYLOAD_NO_INFORMATION)
     {
-        cout <<"PAYLOAD_NO_INFORMATION" << endl; //////
+        cout << "PAYLOAD_NO_INFORMATION" << endl; //////
         cost = 0;
     }
 
@@ -109,20 +110,20 @@ void AStarExpansion::add(float* potentials,
         cost + neutral_cost_,
         next_i, prev_potential) + floatWeight;
 
-    cout <<"potentials[next_i]: " << potentials[next_i] << endl; //////
+    cout << "potentials[next_i]: " << potentials[next_i] << endl; //////
     int x;
     int y;
     index2Coordinates(next_i, x, y);
 
     float distance = abs(end_x - x) + abs(end_y - y);
 
-    cout <<"distance: " << distance << endl; //////
+    cout << "distance: " << distance << endl; //////
 
     queue_.push_back(Index(next_i, potentials[next_i] + distance * neutral_cost_));
     std::push_heap(queue_.begin(), queue_.end(), greater1());
 
-    cout <<"queue push: " << potentials[next_i] + distance * neutral_cost_ << endl; //////
-    cout <<"==============================================================================" << endl; //////
+    cout << "queue push: " << potentials[next_i] + distance * neutral_cost_ << endl; //////
+    cout << "==============================================================================" << endl; //////
 }
 
 } // namespace srs

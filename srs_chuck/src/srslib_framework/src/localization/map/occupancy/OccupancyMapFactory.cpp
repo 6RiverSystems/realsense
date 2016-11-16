@@ -26,7 +26,8 @@ OccupancyMap* OccupancyMapFactory::fromCostMap2D(costmap_2d::Costmap2D* costMap,
     unsigned int rows = costMap->getSizeInCellsY();
     unsigned int columns = costMap->getSizeInCellsX();
 
-    map_ = new OccupancyMap(columns, rows, costMap->getResolution());
+    map_ = new OccupancyMap(columns, rows, costMap->getResolution(),
+        Pose<>(costMap->getOriginX(), costMap->getOriginY(), 0));
     metadata_ = map_->getMetadata();
 
     for (int row = 0; row < rows; row++)
@@ -41,9 +42,9 @@ OccupancyMap* OccupancyMapFactory::fromCostMap2D(costmap_2d::Costmap2D* costMap,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-OccupancyMap* OccupancyMapFactory::fromGrid2d(Grid2d* grid, double resolution)
+OccupancyMap* OccupancyMapFactory::fromGrid2d(Grid2d* grid, double resolution, Pose<> origin)
 {
-    map_ = new OccupancyMap(grid, resolution);
+    map_ = new OccupancyMap(grid, resolution, origin);
     metadata_ = map_->getMetadata();
 
     return map_;

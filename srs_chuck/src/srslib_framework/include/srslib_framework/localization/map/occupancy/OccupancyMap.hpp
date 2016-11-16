@@ -20,8 +20,9 @@ public:
     static const int8_t COST_INT8_MAX;
     static const unsigned char COST_UCHAR_MAX;
 
-    OccupancyMap(unsigned int widthCells, unsigned int heightCells, double resolution);
-    OccupancyMap(Grid2d* grid, double resolution);
+    OccupancyMap(unsigned int widthCells, unsigned int heightCells,
+        double resolution, Pose<> origin);
+    OccupancyMap(Grid2d* grid, double resolution, Pose<> origin);
     OccupancyMap(OccupancyMetadata metadata);
     ~OccupancyMap()
     {}

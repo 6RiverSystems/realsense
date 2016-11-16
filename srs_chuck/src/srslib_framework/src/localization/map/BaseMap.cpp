@@ -8,22 +8,24 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-BaseMap::BaseMap(unsigned int widthCells, unsigned int heightCells, double resolution) :
+BaseMap::BaseMap(unsigned int widthCells, unsigned int heightCells, double resolution, Pose<> origin) :
         grid_(nullptr),
         resolution_(resolution),
         widthM_(widthCells * resolution),
         heightM_(heightCells * resolution),
+        origin_(origin),
         userSpecifiedGrid_(false)
 {
     grid_ = new Grid2d(widthCells, heightCells);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-BaseMap::BaseMap(double widthM, double heightM, double resolution) :
+BaseMap::BaseMap(double widthM, double heightM, double resolution, Pose<> origin) :
         grid_(nullptr),
         resolution_(resolution),
         widthM_(widthM),
         heightM_(heightM),
+        origin_(origin),
         userSpecifiedGrid_(false)
 {
     unsigned int widthCells = static_cast<unsigned int>(round(widthM / resolution_));
@@ -33,8 +35,9 @@ BaseMap::BaseMap(double widthM, double heightM, double resolution) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-BaseMap::BaseMap(Grid2d* grid, double resolution) :
-        resolution_(resolution)
+BaseMap::BaseMap(Grid2d* grid, double resolution, Pose<> origin) :
+        resolution_(resolution),
+        origin_(origin)
 {
     userSpecifiedGrid_ = grid != nullptr;
     grid_ = userSpecifiedGrid_ ? grid : new Grid2d(0, 0);

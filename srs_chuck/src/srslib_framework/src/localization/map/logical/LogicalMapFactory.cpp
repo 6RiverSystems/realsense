@@ -69,7 +69,8 @@ const string LogicalMapFactory::KEYWORD_WEIGHTED_AREA = "weighted_area";
 LogicalMap* LogicalMapFactory::fromCostMap2D(costmap_2d::Costmap2D* costMap)
 {
     map_ = new LogicalMap(costMap->getSizeInMetersX(), costMap->getSizeInMetersY(),
-        costMap->getResolution());
+        costMap->getResolution(),
+        Pose<>(costMap->getOriginX(), costMap->getOriginY(), 0));
     metadata_ = map_->getMetadata();
 
     for (int row = 0; row < costMap->getSizeInCellsY(); row++)
@@ -84,9 +85,9 @@ LogicalMap* LogicalMapFactory::fromCostMap2D(costmap_2d::Costmap2D* costMap)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap* LogicalMapFactory::fromGrid2d(Grid2d* grid, double resolution)
+LogicalMap* LogicalMapFactory::fromGrid2d(Grid2d* grid, double resolution, Pose<> origin)
 {
-    map_ = new LogicalMap(grid, resolution);
+    map_ = new LogicalMap(grid, resolution, origin);
     metadata_ = map_->getMetadata();
 
     return map_;
@@ -138,16 +139,16 @@ LogicalMap* LogicalMapFactory::fromString(string geoJson, double loadTime)
 void LogicalMapFactory::addCostArea(Pose<> origin, double widthM, double heightM,
     Grid2d::BaseType cost)
 {
-    unsigned int x0;
-    unsigned int y0;
+    unsigned int c0;
+    unsigned int r0;
 
     unsigned int widthCells;
     unsigned int heightCells;
-    calculateArea(origin, widthM, heightM, x0, y0, widthCells, heightCells);
+    calculateArea(origin, widthM, heightM, c0, r0, widthCells, heightCells);
 
-    for (unsigned int r = y0; r < y0 + heightCells; ++r)
+    for (unsigned int r = r0; r < r0 + heightCells; ++r)
     {
-        for (unsigned int c = x0; c < x0 + widthCells; ++c)
+        for (unsigned int c = c0; c < c0 + widthCells; ++c)
         {
             if (map_->isWithinBounds(c, r))
             {
@@ -161,14 +162,14 @@ void LogicalMapFactory::addCostArea(Pose<> origin, double widthM, double heightM
 void LogicalMapFactory::addLabelArea(Pose<> origin, double widthM, double heightM,
     string label, MapNote note)
 {
-    unsigned int x0;
-    unsigned int y0;
+    unsigned int c0;
+    unsigned int r0;
 
     unsigned int widthCells;
     unsigned int heightCells;
-    calculateArea(origin, widthM, heightM, x0, y0, widthCells, heightCells);
+    calculateArea(origin, widthM, heightM, c0, r0, widthCells, heightCells);
 
-    map_->addLabeledArea(x0, y0, x0 + widthCells, y0 + heightCells, label, note);
+    map_->addLabeledArea(c0, r0, c0 + widthCells, r0 + heightCells, label, note);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,16 +195,16 @@ void LogicalMapFactory::addWeightArea(Pose<> origin, double widthM, double heigh
     Grid2d::BaseType south,
     Grid2d::BaseType west)
 {
-    unsigned int x0;
-    unsigned int y0;
+    unsigned int c0;
+    unsigned int r0;
 
     unsigned int widthCells;
     unsigned int heightCells;
-    calculateArea(origin, widthM, heightM, x0, y0, widthCells, heightCells);
+    calculateArea(origin, widthM, heightM, c0, r0, widthCells, heightCells);
 
-    for (unsigned int r = y0; r < y0 + heightCells; ++r)
+    for (unsigned int r = r0; r < r0 + heightCells; ++r)
     {
-        for (unsigned int c = x0; c < x0 + widthCells; ++c)
+        for (unsigned int c = c0; c < c0 + widthCells; ++c)
         {
             if (map_->isWithinBounds(c, r))
             {
@@ -215,32 +216,32 @@ void LogicalMapFactory::addWeightArea(Pose<> origin, double widthM, double heigh
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::calculateArea(Pose<> origin, double widthM, double heightM,
-    unsigned int& x0, unsigned int& y0, unsigned int& widthCells, unsigned int& heightCells)
+    unsigned int& c0, unsigned int& r0, unsigned int& widthCells, unsigned int& heightCells)
 {
     double newWidthM = widthM;
-    double c = origin.x;
-    if (c < 0)
+    double x = origin.x;
+    if (x < metadata_.origin.x)
     {
-        newWidthM += c;
+        newWidthM += x;
         newWidthM = newWidthM > 0 ? newWidthM : 0;
-        c = 0;
+        x = metadata_.origin.x;
     }
 
     double newHeightM = heightM;
-    double r = origin.y;
-    if (r < 0)
+    double y = origin.y;
+    if (y < metadata_.origin.y)
     {
-        newHeightM += r;
+        newHeightM += y;
         newHeightM = newHeightM > 0 ? newHeightM : 0;
-        r = 0;
+        y = metadata_.origin.y;
     }
 
-    map_->transformM2Cells(c, r, x0, y0);
+    map_->transformM2Cells(x, y, c0, r0);
 
-    map_->transformM2Cells(newWidthM, widthCells);
+    map_->convertM2Cells(newWidthM, widthCells);
     widthCells = max<unsigned int>(1, widthCells);
 
-    map_->transformM2Cells(newHeightM, heightCells);
+    map_->convertM2Cells(newHeightM, heightCells);
     heightCells = max<unsigned int>(1, heightCells);
 }
 

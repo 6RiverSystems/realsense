@@ -19,10 +19,21 @@ namespace srs {
 class BaseMap
 {
 public:
-    BaseMap(unsigned int widthCells, unsigned int heightCells, double resolution);
-    BaseMap(double widthM, double heightM, double resolution);
-    BaseMap(Grid2d* grid, double resolution);
+    BaseMap(unsigned int widthCells, unsigned int heightCells, double resolution, Pose<> origin);
+    BaseMap(double widthM, double heightM, double resolution, Pose<> origin);
+    BaseMap(Grid2d* grid, double resolution, Pose<> origin);
     virtual ~BaseMap();
+
+    void convertCells2M(unsigned int cells, double& m) const
+    {
+        // The precision is down to 1mm
+        m = round(static_cast<double>(cells) * resolution_ * 1e3) / 1e3;
+    }
+
+    void convertM2Cells(double m, unsigned int& cells) const
+    {
+        cells = static_cast<unsigned int>(round(m / resolution_));
+    }
 
     virtual Grid2d::BaseType getCost(unsigned int c, unsigned int r) const = 0;
 
@@ -82,39 +93,34 @@ public:
     virtual void setCost(unsigned int c, unsigned int r, Grid2d::BaseType cost) = 0;
     virtual void setObstruction(unsigned int c, unsigned int r) = 0;
 
-    void transformCells2M(unsigned int cells, double& measurement) const
-    {
-        // The precision is down to 1mm
-        measurement = round(static_cast<double>(cells) * resolution_ * 1e3) / 1e3;
-    }
-
     void transformCells2M(unsigned int c, unsigned int r, double& x, double& y) const
     {
-        transformCells2M(c, x);
-        transformCells2M(r, y);
+        convertCells2M(c, x);
+        x += origin_.x;
+
+        convertCells2M(r, y);
+        y += origin_.y;
     }
 
     void transformCells2M(unsigned int c, unsigned int r, Pose<>& p) const
     {
-        transformCells2M(c, p.x);
-        transformCells2M(r, p.y);
-    }
+        convertCells2M(c, p.x);
+        p.x += origin_.x;
 
-    void transformM2Cells(double mesurement, unsigned int& cells) const
-    {
-        cells = static_cast<unsigned int>(round(mesurement / resolution_));
+        convertCells2M(r, p.y);
+        p.y += origin_.y;
     }
 
     void transformM2Cells(double x, double y, unsigned int& c, unsigned int& r) const
     {
-        transformM2Cells(x, c);
-        transformM2Cells(y, r);
+        convertM2Cells(x - origin_.x, c);
+        convertM2Cells(y - origin_.y, r);
     }
 
     void transformM2Cells(Pose<> p, unsigned int& c, unsigned int& r) const
     {
-        transformM2Cells(p.x, c);
-        transformM2Cells(p.y, r);
+        convertM2Cells(p.x - origin_.x, c);
+        convertM2Cells(p.y - origin_.y, r);
     }
 
 private:

@@ -1,49 +1,51 @@
 close all;
+RESOLUTION = 0.05;
+ORIGIN = [-10, -10, 0];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Main map layer
 map = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-obstacles.png', ...
-    0.05);
+    RESOLUTION, ORIGIN);
 showMap(map);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One-way layer
 layerOneway = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-oneway.png', ...
-    0.05);
+    RESOLUTION, ORIGIN);
 showMap(layerOneway);
 
 layerOneway = convertToWeightedArea(layerOneway, 1, 0, 0, 0, 100);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Honk layer
 layerHonk = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-honk.png', ...
-    0.05);
+    RESOLUTION, ORIGIN);
 showMap(layerHonk);
 
 layerHonk = convertToLabeledArea(layerHonk, 1, 'honk1', {'honk'});
 layerHonk = convertToLabeledArea(layerHonk, 2, 'honk2', {'honk'});
  
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One-way layer
 
-% AA-------------------------------------BB       
-% |                                       |       
-% |                                       |     
-% A --------------------------------------B       
-% |                                       |       
-% |     *****************************     |       
-% |     *****************************     |       
-% |                                       |       
-% C-(P2)D------------------------------(P1)-E     
+% AA-------------------------------------BB
+% |                                       |
+% |                                       |
+% A --------------------------------------B
+% |                                       |
+% |     *****************************     |
+% |     *****************************     |
+% |                                       |
+% C-(P2)D------------------------------(P1)-E
 % |       |                               |
-% |       |  ************************     |      
-% |       |  ************************     |       
-% |       |                  P3           |   
-% F-------G-------------------------------H 
-% |                                       | 
-% |                                       | 
-% |                                       | 
-% FF-------------------------------------HH 
+% |       |  ************************     |
+% |       |  ************************     |
+% |       |                  P3           |
+% F-------G-------------------------------H
+% |                                       |
+% |                                       |
+% |                                       |
+% FF-------------------------------------HH
 
 map = addVertex(map, 'A', 'xy', [2.748 8.349]);
 map = addVertex(map, 'B', 'xy', [17.606 8.349]);

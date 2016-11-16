@@ -32,52 +32,64 @@ bool GridPath::getPath(float* potential,
         float min_val = 1e10;
         int min_x = 0, min_y = 0;
 
-        if (checkP(current.first, current.second + 1, potential, min_val))
-        {
-            min_x = current.first;
-            min_y = current.second + 1;
-        }
-        if (checkP(current.first, current.second - 1, potential, min_val))
-        {
-            min_x = current.first;
-            min_y = current.second - 1;
-        }
-        if (checkP(current.first - 1, current.second, potential, min_val))
-        {
-            min_x = current.first - 1;
-            min_y = current.second;
-        }
-        if (checkP(current.first + 1, current.second, potential, min_val))
-        {
-            min_x = current.first + 1;
-            min_y = current.second;
-        }
-//        for (int xd = -1; xd <= 1; xd++) {
-//            for (int yd = -1; yd <= 1; yd++) {
-//                if (xd == 0 && yd == 0)
-//                    continue;
-//                int x = current.first + xd, y = current.second + yd;
-//                int index = getIndex(x, y);
-//                if (potential[index] < min_val) {
-//                    min_val = potential[index];
-//                    min_x = x;
-//                    min_y = y;
-//                }
-//            }
+//        if (checkP(current.first, current.second + 1, potential, min_val))
+//        {
+//            min_x = current.first;
+//            min_y = current.second + 1;
+//        }
+//        if (checkP(current.first, current.second - 1, potential, min_val))
+//        {
+//            min_x = current.first;
+//            min_y = current.second - 1;
+//        }
+//        if (checkP(current.first - 1, current.second, potential, min_val))
+//        {
+//            min_x = current.first - 1;
+//            min_y = current.second;
+//        }
+//        if (checkP(current.first + 1, current.second, potential, min_val))
+//        {
+//            min_x = current.first + 1;
+//            min_y = current.second;
 //        }
 
+        for (int xd = -1; xd <= 1; xd++)
+        {
+            for (int yd = -1; yd <= 1; yd++)
+            {
+                if (xd == 0 && yd == 0)
+                {
+                    continue;
+                }
+
+                int x = current.first + xd, y = current.second + yd;
+                int index = getIndex(x, y);
+
+                if (potential[index] < min_val)
+                {
+                    min_val = potential[index];
+                    min_x = x;
+                    min_y = y;
+                }
+            }
+        }
+
         if (min_x == 0 && min_y == 0)
+        {
             return false;
+        }
 
         current.first = min_x;
         current.second = min_y;
         path.push_back(current);
 
-        if(c++>ns*4){
+        if (c++>ns*4)
+        {
             return false;
         }
 
     }
+
     return true;
 }
 

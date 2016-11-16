@@ -9,8 +9,9 @@ const int8_t OccupancyMap::COST_INT8_MAX = numeric_limits<int8_t>::max();
 const unsigned char OccupancyMap::COST_UCHAR_MAX = numeric_limits<unsigned char>::max();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-OccupancyMap::OccupancyMap(unsigned int widthCells, unsigned int heightCells, double resolution) :
-        BaseMap(widthCells, heightCells, resolution)
+OccupancyMap::OccupancyMap(unsigned int widthCells, unsigned int heightCells,
+    double resolution, Pose<> origin) :
+        BaseMap(widthCells, heightCells, resolution, origin)
 {
     metadata_.heightCells = getHeightCells();
     metadata_.heightM = getHeightM();
@@ -20,8 +21,8 @@ OccupancyMap::OccupancyMap(unsigned int widthCells, unsigned int heightCells, do
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-OccupancyMap::OccupancyMap(Grid2d* grid, double resolution) :
-        BaseMap(grid, resolution)
+OccupancyMap::OccupancyMap(Grid2d* grid, double resolution, Pose<> origin) :
+        BaseMap(grid, resolution, origin)
 {
     metadata_.heightCells = getHeightCells();
     metadata_.heightM = getHeightM();
@@ -32,7 +33,7 @@ OccupancyMap::OccupancyMap(Grid2d* grid, double resolution) :
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 OccupancyMap::OccupancyMap(OccupancyMetadata metadata) :
-        BaseMap(metadata.widthCells, metadata.heightCells, metadata.resolution)
+        BaseMap(metadata.widthCells, metadata.heightCells, metadata.resolution, metadata.origin)
 {
     metadata_.heightCells = getHeightCells();
     metadata_.heightM = getHeightM();

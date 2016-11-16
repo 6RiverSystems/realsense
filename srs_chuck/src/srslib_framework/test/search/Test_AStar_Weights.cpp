@@ -42,7 +42,7 @@ TEST(Test_AStar, SmallSearchWithWeights)
     grid.setWeights(Grid2d::Location(3, 1), 0, 0, 0, 100);
 
     LogicalMapFactory logicalMapFactory;
-    LogicalMap* logical = logicalMapFactory.fromGrid2d(&grid, 1);
+    LogicalMap* logical = logicalMapFactory.fromGrid2d(&grid, 1, Pose<>::ZERO);
 
     Grid2d::Position start(3, 1, 0);
     Grid2d::Position goal(1, 1, 0);
@@ -76,7 +76,7 @@ TEST(Test_AStar, SmallSearchWithMoreWeights)
     grid.setWeights(Grid2d::Location(3, 1), 0, 0, 0, 100);
 
     LogicalMapFactory logicalMapFactory;
-    LogicalMap* logical = logicalMapFactory.fromGrid2d(&grid, 1);
+    LogicalMap* logical = logicalMapFactory.fromGrid2d(&grid, 1, Pose<>::ZERO);
 
     Grid2d::Position start(Grid2d::Location(3, 1), 0);
     Grid2d::Position goal(Grid2d::Location(1, 1), 0);

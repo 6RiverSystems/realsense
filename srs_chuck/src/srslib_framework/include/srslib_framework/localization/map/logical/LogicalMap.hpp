@@ -55,8 +55,8 @@ public:
 
     using LabeledAreaMapType = unordered_map<string, LabeledArea>;
 
-    LogicalMap(double widthM, double heightM, double resolution);
-    LogicalMap(Grid2d* grid, double resolution);
+    LogicalMap(double widthM, double heightM, double resolution, Pose<> origin);
+    LogicalMap(Grid2d* grid, double resolution, Pose<> origin);
     LogicalMap(LogicalMetadata metadata);
     ~LogicalMap()
     {}

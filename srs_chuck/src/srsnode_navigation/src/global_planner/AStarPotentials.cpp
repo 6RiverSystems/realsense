@@ -69,20 +69,23 @@ bool AStarPotentials::calculatePath(
     costMap_->setCost(start_x_i, start_y_i, costmap_2d::FREE_SPACE);
     addMapBorder();
 
-    ROS_DEBUG_STREAM("start_x: " << start_x);
-    ROS_DEBUG_STREAM("start_y: " << start_y);
-    ROS_DEBUG_STREAM("goal_x: " << goal_x);
-    ROS_DEBUG_STREAM("goal_y: " << goal_y);
+    cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+    cout <<"start_x: " << start_x << endl; //////
+    cout <<"start_y: " << start_y << endl; //////
+    cout <<"goal_x: " << goal_x << endl; //////
+    cout <<"goal_y: " << goal_y << endl; //////
 
-    ROS_DEBUG_STREAM("start_x_d: " << start_x_d);
-    ROS_DEBUG_STREAM("start_y_d: " << start_y_d);
-    ROS_DEBUG_STREAM("goal_x_d: " << goal_x_d);
-    ROS_DEBUG_STREAM("goal_y_d: " << goal_y_d);
+    cout <<"start_x_d: " << start_x_d << endl; //////
+    cout <<"start_y_d: " << start_y_d << endl; //////
+    cout <<"goal_x_d: " << goal_x_d << endl; //////
+    cout <<"goal_y_d: " << goal_y_d << endl; //////
 
     bool found = stateExpander_->calculatePotentials(start_x_d, start_y_d,
         goal_x_d, goal_y_d,
         sizeX * sizeY * 2,
         potentials);
+
+    cout << "#####################################################################################" << endl;
 
     stateExpander_->clearEndpoint(potentials, goal_x_i, goal_y_i, 2);
     if (found)

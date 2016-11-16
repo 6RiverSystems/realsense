@@ -21,7 +21,7 @@ namespace srs {
 class Grid2d
 {
 public:
-    using BaseType = char;
+    using BaseType = int8_t;
 
     static const BaseType PAYLOAD_NO_INFORMATION;
     static const BaseType PAYLOAD_MIN;

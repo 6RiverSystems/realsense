@@ -10,7 +10,6 @@ AStarExpansion::AStarExpansion(LogicalMap* logicalMap, costmap_2d::Costmap2D* co
     PotentialCalculator* pCalculator) :
         Expander(logicalMap, costMap, pCalculator)
 {
-    setLethalCost(Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -72,7 +72,7 @@ private:
 
 	static constexpr auto ODOMETRY_ESTIMATE_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity/estimate";
 
-	static constexpr auto INITIAL_POSE_TOPIC = "/request/initial_pose";
+	static constexpr auto INITIAL_POSE_TOPIC = "/request/odometry/initial_pose";
 
 	static constexpr auto PING_COMMAND_TOPIC = "/internal/state/ping";
 

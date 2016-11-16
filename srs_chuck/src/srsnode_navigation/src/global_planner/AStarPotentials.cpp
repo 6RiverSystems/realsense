@@ -87,6 +87,8 @@ bool AStarPotentials::calculatePath(
 
     cout << "#####################################################################################" << endl;
 
+    costMap_->saveMap("cost_map.pgm");
+
     stateExpander_->clearEndpoint(potentials, goal_x_i, goal_y_i, 2);
     if (found)
     {

@@ -56,16 +56,16 @@ bool AStarExpansion::calculatePotentials(
 
         logicalGrid_->getWeights(Grid2d::Location(x, y), north, east, south, west);
 
-        cout <<"east" << endl; //////
+        cout <<"east: " << x + 1<< ", " << y << endl; //////
         add(potentials, potentials[i], i + 1, east, end_x, end_y);
 
-        cout <<"west" << endl; //////
+        cout <<"west: " << x - 1 << ", " << y << endl; //////
         add(potentials, potentials[i], i - 1, west, end_x, end_y);
 
-        cout <<"north" << endl; //////
+        cout <<"north: " << x << ", " << y + 1 << endl; //////
         add(potentials, potentials[i], i + nx_, north, end_x, end_y);
 
-        cout <<"south" << endl; //////
+        cout <<"south: " << x << ", " << y - 1 << endl; //////
         add(potentials, potentials[i], i - nx_, south, end_x, end_y);
     }
 

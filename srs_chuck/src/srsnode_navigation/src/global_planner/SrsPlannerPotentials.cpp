@@ -177,8 +177,10 @@ bool SrsPlannerPotentials::makePlan(
     }
     else
     {
-        ROS_ERROR("Failed to get a plan.");
+        ROS_ERROR("Failed to get a plan. Saving map.");
+        costmap_->saveMap("cost_map.pgm");
     }
+
 
     delete potential_array_;
     potential_array_ = nullptr;

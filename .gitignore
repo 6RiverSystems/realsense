@@ -8,4 +8,5 @@
 **/install
 **/logs
 **/.ptp*
+**/bags
 .catkin_tools

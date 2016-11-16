@@ -52,7 +52,6 @@ bool AStarPotentials::calculatePath(
     double goal_y_d;
     worldToMap(wx, wy, goal_x_d, goal_y_d);
 
-
     unsigned int start_x_i;
     unsigned int start_y_i;
     if (!costMap_->worldToMap(start_x, start_y, start_x_i, start_y_i))
@@ -69,6 +68,16 @@ bool AStarPotentials::calculatePath(
 
     costMap_->setCost(start_x_i, start_y_i, costmap_2d::FREE_SPACE);
     addMapBorder();
+
+    ROS_DEBUG_STREAM("start_x: " << start_x);
+    ROS_DEBUG_STREAM("start_y: " << start_y);
+    ROS_DEBUG_STREAM("goal_x: " << goal_x);
+    ROS_DEBUG_STREAM("goal_y: " << goal_y);
+
+    ROS_DEBUG_STREAM("start_x_d: " << start_x_d);
+    ROS_DEBUG_STREAM("start_y_d: " << start_y_d);
+    ROS_DEBUG_STREAM("goal_x_d: " << goal_x_d);
+    ROS_DEBUG_STREAM("goal_y_d: " << goal_y_d);
 
     bool found = stateExpander_->calculatePotentials(start_x_d, start_y_d,
         goal_x_d, goal_y_d,

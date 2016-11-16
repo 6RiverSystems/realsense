@@ -9,6 +9,9 @@
 #include <sstream>
 using namespace std;
 
+#include <costmap_2d/costmap_2d.h>
+
+#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/map/BaseMap.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMap.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMap.hpp>
@@ -18,43 +21,22 @@ namespace srs {
 class MapStack
 {
 public:
-    MapStack() :
-        logical_(nullptr),
-        occupancy_(nullptr)
-    {}
+    MapStack(LogicalMap* logical = nullptr,
+        OccupancyMap* occupancy = nullptr,
+        costmap_2d::Costmap2D* costMap2d = nullptr);
+    ~MapStack();
 
-    MapStack(LogicalMap* logical, OccupancyMap* occupancy) :
-        logical_(logical),
-        occupancy_(occupancy)
-    {}
-
-    ~MapStack()
-    {
-        delete logical_;
-        delete occupancy_;
-    }
-
-    LogicalMap* getLogicalMap() const
-    {
-        return logical_;
-    }
-
-    OccupancyMap* getObstructionMap() const
-    {
-        // TODO: The obstruction map is in general of type OccupancyMap. However,
-        // for now, we simply return the occupancy map instead. There will be a
-        // method to merge in new information to generate a new obstruction map
-        return occupancy_;
-    }
-
-    OccupancyMap* getOccupancyMap() const
-    {
-        return occupancy_;
-    }
+    costmap_2d::Costmap2D* getCostMap2d() const;
+    LogicalMap* getLogicalMap() const;
+    bool getNeighbor(const Grid2d::Position& position, Grid2d::Position& result) const;
+    OccupancyMap* getOccupancyMap() const;
+    int getTotalCost(const Grid2d::Position& position) const;
+    Grid2d::BaseType getWeight(const Grid2d::Position& position) const;
 
 private:
     LogicalMap* logical_;
     OccupancyMap* occupancy_;
+    costmap_2d::Costmap2D* costMap2d_;
 };
 
 } // namespace srs

@@ -10,6 +10,7 @@
     <arg name="robot_configuration" default="" />
     <arg name="use_sim_time" />
     <arg name="start_bridge" />
+    <arg name="emulation_mode" default="false" />
 
     <!-- Robot description -->
     <param name="robot_description" command="$(find xacro)/xacro.py $(find srsbot_chuck)/urdf/chuck.urdf.xacro" />
@@ -26,7 +27,9 @@
     <include unless="$(arg use_sim_time)" file="$(find srsnode_joystick_adapter)/launch/node.launch" />
 
     <!-- Raw Odometry -->
-	<include file="$(find srsnode_odometry)/launch/node.launch" />
+	<include file="$(find srsnode_odometry)/launch/node.launch">
+        <arg name="emulation_mode" value="$(arg emulation_mode)"/>
+    </include>
 
     <!-- Launch the ros-bridge -->
     <include if="$(arg start_bridge)" file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />

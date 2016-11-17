@@ -22,7 +22,9 @@ AStarPotentials::AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* 
     potentialCalculator_ = new QuadraticCalculator(sizeX, sizeY);
 
     stateExpander_ = new AStarExpansion(logicalMap, costMap, potentialCalculator_);
-    pathBuilder_ = new GridPath(potentialCalculator_); // GradientPath(pCalculator_);
+
+    // pathBuilder_ = new GridPath(potentialCalculator_);
+    pathBuilder_ = new GradientPath(potentialCalculator_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,25 +71,10 @@ bool AStarPotentials::calculatePath(
     costMap_->setCost(start_x_i, start_y_i, costmap_2d::FREE_SPACE);
     addMapBorder();
 
-    cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    cout <<"start_x: " << start_x << endl; //////
-    cout <<"start_y: " << start_y << endl; //////
-    cout <<"goal_x: " << goal_x << endl; //////
-    cout <<"goal_y: " << goal_y << endl; //////
-
-    cout <<"start_x_d: " << start_x_d << endl; //////
-    cout <<"start_y_d: " << start_y_d << endl; //////
-    cout <<"goal_x_d: " << goal_x_d << endl; //////
-    cout <<"goal_y_d: " << goal_y_d << endl; //////
-
     bool found = stateExpander_->calculatePotentials(start_x_d, start_y_d,
         goal_x_d, goal_y_d,
         sizeX * sizeY * 2,
         potentials);
-
-    cout << "#####################################################################################" << endl;
-
-    costMap_->saveMap("cost_map.pgm");
 
     stateExpander_->clearEndpoint(potentials, goal_x_i, goal_y_i, 2);
     if (found)

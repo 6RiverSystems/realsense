@@ -58,34 +58,38 @@ struct Print
         return output.str();
     }
 
-    template<unsigned int PRECISION = 6, typename TYPE = float>
-    static string printToString(TYPE* matrix, unsigned int columns, unsigned int rows)
+    template<unsigned int PRECISION = 9, typename TYPE = float>
+    static string printToString(TYPE* matrix,
+        unsigned int columns, unsigned int rows,
+        TYPE threshold = 1e10)
     {
         ostringstream output;
 
-        output << setw(PRECISION + 2) << "  ";
-        for (int col = 0; col < columns; ++col) {
-            output << setw(PRECISION + 2) << col << " ";
+        output << setw(PRECISION + 1) << "  ";
+        for (int col = 0; col < columns; ++col)
+        {
+            output << setw(PRECISION + 1) << col;
         }
 
         output << endl;
         for (int row = rows - 1; row >= 0; row--)
         {
-            output << setw(PRECISION + 2) << row << " ";
+            output << setw(PRECISION + 1) << row;
             for (int col = 0; col < columns; ++col)
             {
                 TYPE value = *(matrix + (row * columns) + col);
 
-                if (value < 1e10)
+                if (value < threshold)
                 {
-                output << setfill(' ') << setw(PRECISION + 5) << scientific <<
-                    setprecision(PRECISION - 3) << value;
+                    output << setfill(' ') << setw(PRECISION + 1) << scientific <<
+                        setprecision(PRECISION - 7) << value;
                 }
                 else
                 {
                     output << setw(PRECISION + 1) << ".";
                 }
             }
+
             output << endl;
         }
 

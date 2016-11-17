@@ -10,6 +10,7 @@ AStarExpansion::AStarExpansion(LogicalMap* logicalMap, costmap_2d::Costmap2D* co
     PotentialCalculator* pCalculator) :
         Expander(logicalMap, costMap, pCalculator)
 {
+    setNeutralCost(1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,14 +34,14 @@ bool AStarExpansion::calculatePotentials(
     while (queue_.size() > 0 && cycle < cycles)
     {
         Index top = queue_[0];
-        std::pop_heap(queue_.begin(), queue_.end(), greater1());
+
+        std::pop_heap(queue_.begin(), queue_.end(), GreaterThan());
         queue_.pop_back();
 
         int i = top.i;
         if (i == goal_i)
         {
             return true;
-            cout <<"return true: i: " << i << ", goal_i: " << goal_i << endl; //////
         }
 
         Grid2d::BaseType north = 0;
@@ -52,24 +53,14 @@ bool AStarExpansion::calculatePotentials(
         int y;
         index2Coordinates(i, x, y);
 
-        cout <<"Evaluating loc: " << x << ", " << y << endl; //////
-
         logicalGrid_->getWeights(Grid2d::Location(x, y), north, east, south, west);
 
-        cout <<"east: " << x + 1<< ", " << y << endl; //////
         add(potentials, potentials[i], i + 1, east, end_x, end_y);
-
-        cout <<"west: " << x - 1 << ", " << y << endl; //////
         add(potentials, potentials[i], i - 1, west, end_x, end_y);
-
-        cout <<"north: " << x << ", " << y + 1 << endl; //////
         add(potentials, potentials[i], i + nx_, north, end_x, end_y);
-
-        cout <<"south: " << x << ", " << y - 1 << endl; //////
         add(potentials, potentials[i], i - nx_, south, end_x, end_y);
     }
 
-    cout << endl << "return false" << endl; //////
     return false;
 }
 
@@ -79,59 +70,38 @@ void AStarExpansion::add(float* potentials,
     int next_i, Grid2d::BaseType weight,
     int end_x, int end_y)
 {
-    cout << "-----------------------------------------------------------------------------" << endl; //////
-    cout << "prev_potential: " << prev_potential << endl; //////
-    cout << "next_i: " << next_i << endl; //////
-    cout << "costGrid_[next_i]: " << static_cast<int>(costGrid_[next_i]) << endl; /////
-    cout << "weight: " << static_cast<int>(weight) << endl; //////
-    cout << "end_x: " << end_x << ", end_y: " << end_y << endl; //////
-
-    float floatWeight = weight * 100;
-    if (weight == Grid2d::WEIGHT_NO_INFORMATION)
+    float nextPotential = potentials[next_i];
+    if (nextPotential < POT_HIGH)
     {
-        cout << "no info" << endl; //////
-        floatWeight = 0;
-    }
-
-    if (potentials[next_i] < POT_HIGH)
-    {
-        cout << "Explored: " << potentials[next_i] << endl; //////
-        cout << "==============================================================================" << endl; //////
         return;
     }
 
     if (costGrid_[next_i] >= lethal_cost_)
     {
-        cout << "lethal_cost_: " << static_cast<int>(lethal_cost_) << endl; //////
-        cout << "==============================================================================" << endl; //////
         return;
     }
 
-    float cost = costGrid_[next_i];
-    if (costGrid_[next_i] == Grid2d::PAYLOAD_NO_INFORMATION)
+    float weightContribution = weight * WEIGHT_RATIO;
+    if (weight <= Grid2d::WEIGHT_NO_INFORMATION)
     {
-        cout << "PAYLOAD_NO_INFORMATION" << endl; //////
-        cost = 0;
+        weightContribution = 0;
     }
 
-    potentials[next_i] = pCalculator_->calculatePotential(potentials,
-        cost + neutral_cost_,
-        next_i, prev_potential) + floatWeight;
+    nextPotential = pCalculator_->calculatePotential(potentials,
+        costGrid_[next_i] + neutral_cost_,
+        next_i, prev_potential) + weightContribution;
 
-    cout << "potentials[next_i]: " << potentials[next_i] << endl; //////
+    potentials[next_i] = nextPotential;
+
     int x;
     int y;
     index2Coordinates(next_i, x, y);
 
     float distance = abs(end_x - x) + abs(end_y - y);
+    float gh = nextPotential + distance * neutral_cost_;
 
-    cout << "distance: " << distance << endl; //////
-
-    queue_.push_back(Index(next_i, potentials[next_i] + distance * neutral_cost_));
-    std::push_heap(queue_.begin(), queue_.end(), greater1());
-
-    cout << "queue push: " << potentials[next_i] + distance * neutral_cost_ << endl; //////
-    cout << "==============================================================================" << endl; //////
+    queue_.push_back(Index(next_i, gh));
+    std::push_heap(queue_.begin(), queue_.end(), GreaterThan());
 }
 
 } // namespace srs

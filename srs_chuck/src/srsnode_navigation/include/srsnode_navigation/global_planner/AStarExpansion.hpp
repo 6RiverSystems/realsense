@@ -23,7 +23,7 @@ struct Index
     float cost;
 };
 
-struct greater1
+struct GreaterThan
 {
     bool operator()(const Index& a, const Index& b) const
     {
@@ -44,6 +44,8 @@ public:
         float* potentials);
 
 private:
+    static constexpr float WEIGHT_RATIO = 1.0;
+
     void add(float* potentials,
         float prev_potential,
         int next_i, Grid2d::BaseType weight,

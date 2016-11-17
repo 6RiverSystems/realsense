@@ -10,7 +10,7 @@ AStarExpansion::AStarExpansion(LogicalMap* logicalMap, costmap_2d::Costmap2D* co
     PotentialCalculator* pCalculator) :
         Expander(logicalMap, costMap, pCalculator)
 {
-    setNeutralCost(1);
+    setNeutralCost(10);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,15 +87,21 @@ void AStarExpansion::add(float* potentials,
         weightContribution = 0;
     }
 
+    int x;
+    int y;
+    index2Coordinates(next_i, x, y);
+
+    Grid2d::BaseType logicalCost = logicalGrid_->getPayload(Grid2d::Location(x, y));
+    if (logicalCost >= Grid2d::PAYLOAD_MAX)
+    {
+        return;
+    }
+
     nextPotential = pCalculator_->calculatePotential(potentials,
         costGrid_[next_i] + neutral_cost_,
         next_i, prev_potential) + weightContribution;
 
     potentials[next_i] = nextPotential;
-
-    int x;
-    int y;
-    index2Coordinates(next_i, x, y);
 
     float distance = abs(end_x - x) + abs(end_y - y);
     float gh = nextPotential + distance * neutral_cost_;

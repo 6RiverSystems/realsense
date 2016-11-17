@@ -44,7 +44,7 @@ public:
         float* potentials);
 
 private:
-    static constexpr float WEIGHT_RATIO = 1.0;
+    static constexpr float WEIGHT_RATIO = 100.0;
 
     void add(float* potentials,
         float prev_potential,

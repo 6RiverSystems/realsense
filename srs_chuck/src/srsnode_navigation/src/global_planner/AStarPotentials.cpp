@@ -23,8 +23,8 @@ AStarPotentials::AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* 
 
     stateExpander_ = new AStarExpansion(logicalMap, costMap, potentialCalculator_);
 
-    // pathBuilder_ = new GridPath(potentialCalculator_);
-    pathBuilder_ = new GradientPath(potentialCalculator_);
+    pathBuilder_ = new GridPath(potentialCalculator_);
+    // pathBuilder_ = new GradientPath(potentialCalculator_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

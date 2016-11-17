@@ -16,7 +16,7 @@ namespace srs {
 OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	nodeHandle_(nodeName),
 	lastPoseTime_(ros::Time::now() + ros::Duration(5.0)),
-	pose_(-1.0, -1.0, -1.0),
+	pose_(0.0, 0.0, 0.0),
 	pingTimer_(),
 	broadcaster_(),
 	resetPoseSub_(),

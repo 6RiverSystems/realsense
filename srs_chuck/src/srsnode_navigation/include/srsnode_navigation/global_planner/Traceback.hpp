@@ -5,14 +5,17 @@
  */
 #pragma once
 
+#include <vector>
+using namespace std;
+
 #include <srsnode_navigation/global_planner/PotentialCalculator.hpp>
 
 namespace srs {
 
 class Traceback {
 public:
-    Traceback(PotentialCalculator* p_calc) :
-        p_calc_(p_calc)
+    Traceback(PotentialCalculator* potentialCalculator) :
+        pCalculator_(potentialCalculator)
     {}
 
     virtual ~Traceback()
@@ -23,9 +26,9 @@ public:
         return x + y * xs_;
     }
 
-    virtual bool getPath(float* potential,
+    virtual bool getPath(float* potentials,
         double start_x, double start_y, double end_x, double end_y,
-        std::vector<std::pair<float, float> >& path) = 0;
+        vector<pair<float, float> >& path) = 0;
 
     void setLethalCost(unsigned char lethal_cost)
     {
@@ -39,9 +42,11 @@ public:
     }
 
 protected:
-    int xs_, ys_;
+    int xs_;
+    int ys_;
+
     unsigned char lethal_cost_;
-    PotentialCalculator* p_calc_;
+    PotentialCalculator* pCalculator_;
 };
 
 } // namespace srs

@@ -21,7 +21,7 @@ namespace srs {
 class Grid2d
 {
 public:
-    using BaseType = int8_t;
+    using BaseType = unsigned char;
 
     static const BaseType PAYLOAD_NO_INFORMATION;
     static const BaseType PAYLOAD_MIN;
@@ -128,18 +128,12 @@ public:
     Grid2d(unsigned int size) :
         width_(size),
         height_(size),
-        aggregate_(false),
-        aggregateHeight_(0),
-        aggregateWidth_(0),
         weightCount_(0)
     {}
 
     Grid2d(unsigned int width, unsigned int height) :
         width_(width),
         height_(height),
-        aggregate_(false),
-        aggregateHeight_(0),
-        aggregateWidth_(0),
         weightCount_(0)
     {}
 
@@ -161,8 +155,6 @@ public:
         return grid_.count(location);
     }
 
-    BaseType getAggregate(const Location& location) const;
-    BaseType getAggregate(const Position& position) const;
     BaseType getPayload(const Location& location) const;
     BaseType getPayload(const Position& position) const;
 
@@ -214,7 +206,6 @@ public:
         return !(lhs == rhs);
     }
 
-    void setAggregateSize(unsigned int width, unsigned int height);
     void setPayload(const Location& location, BaseType newPayload);
     void setWeights(const Location& location,
         BaseType north, BaseType east, BaseType south, BaseType west);
@@ -267,10 +258,9 @@ private:
 
     struct Node
     {
-        Node(Location location, BaseType payload, BaseType aggregate) :
+        Node(Location location, BaseType payload) :
             location(location),
             payload(payload),
-            aggregate(aggregate),
             weights(nullptr)
         {}
 
@@ -283,8 +273,7 @@ private:
         {
             stream << "Node "<< hex << reinterpret_cast<long>(node) << dec << " {" << endl;
             stream << "l: " << node->location <<
-                ", p: " << node->payload <<
-                ", a: " << node->aggregate << "\n}";
+                ", p: " << node->payload << "\n}";
             return stream;
         }
 
@@ -307,8 +296,7 @@ private:
                 return false;
             }
 
-            return lhs.aggregate == rhs.aggregate &&
-                lhs.location == rhs.location &&
+            return lhs.location == rhs.location &&
                 lhs.payload == rhs.payload;
         }
 
@@ -316,8 +304,6 @@ private:
         {
             return !(lhs == rhs);
         }
-
-        BaseType aggregate;
 
         const Location location;
 
@@ -328,16 +314,13 @@ private:
 
     using MapType = unordered_map<Location, Node*, Hash, EqualTo>;
 
-    Node* addNode(const Location& location, BaseType payload, BaseType aggregate)
+    Node* addNode(const Location& location, BaseType payload)
     {
-        Node* node = new Node(location, payload, aggregate);
+        Node* node = new Node(location, payload);
         grid_[location] = node;
 
         return node;
     }
-
-    int calculateAggregate(Node* node);
-    void calculateAggregateArea(int x0, int y0, int& xi, int& xf, int& yi, int& yf);
 
     Node* findNode(const Location& location) const
     {
@@ -355,14 +338,8 @@ private:
     void print(ostream& stream, string title,
         std::function<BaseType (Node*)> fieldSelection) const;
 
-    void updateAllAggregate();
-    void updateNodeAggregate(Node* node, BaseType oldPayload, BaseType newPayload);
     void updatePayload(const Location& location, BaseType newPayload,
         std::function<BaseType (BaseType, BaseType)> payloadSelection);
-
-    bool aggregate_;
-    unsigned int aggregateWidth_;
-    unsigned int aggregateHeight_;
 
     MapType grid_;
 

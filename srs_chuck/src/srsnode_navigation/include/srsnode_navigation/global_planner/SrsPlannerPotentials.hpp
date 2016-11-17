@@ -15,18 +15,16 @@ using namespace std;
 #include <nav_core/base_global_planner.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <angles/angles.h>
-#include <base_local_planner/world_model.h>
-#include <base_local_planner/costmap_model.h>
+
+#include <nav_msgs/Path.h>
+#include <tf/transform_datatypes.h>
+#include <dynamic_reconfigure/server.h>
 
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMap.hpp>
 #include <srslib_framework/ros/tap/TapMapStack.hpp>
 
-#include <geometry_msgs/Point.h>
-#include <nav_msgs/Path.h>
-#include <tf/transform_datatypes.h>
-#include <nav_msgs/GetPlan.h>
-#include <dynamic_reconfigure/server.h>
+#include <srsnode_navigation/SrsPlannerConfig.h>
 
 #include <srsnode_navigation/global_planner/AStarPotentials.hpp>
 #include <srsnode_navigation/global_planner/OrientationFilter.hpp>
@@ -55,50 +53,48 @@ public:
         std::vector<geometry_msgs::PoseStamped>& plan);
 
 private:
+    void onConfigChange(srsnode_navigation::SrsPlannerConfig& config, uint32_t level);
+
     void getPlanFromPotential(std::vector<std::pair<float, float>>& path,
         std::vector<geometry_msgs::PoseStamped>& plan);
-
-    void initializeParams();
 
     void publishPlan(const std::vector<geometry_msgs::PoseStamped>& path);
     void publishPotential(float* potential);
 
     void updateMapStack(costmap_2d::Costmap2D* rosCostMap);
 
-    bool allow_unknown_;
+    bool allowUnknown_;
     AStarPotentials* astar_;
 
-    costmap_2d::Costmap2D* costmap_;
-
-    double default_tolerance_;
-
-    std::string frame_id_;
+    dynamic_reconfigure::Server<srsnode_navigation::SrsPlannerConfig> configServer_;
+    costmap_2d::Costmap2D* costMap_;
 
     bool initialized_;
 
+    unsigned int lethalCost_;
+
     boost::mutex mutex_;
 
-    OrientationFilter* orientation_filter_;
+    unsigned int neutralCost_;
 
-    ros::Publisher plan_pub_;
-    double planner_window_x_;
-    double planner_window_y_;
-    ros::Publisher potential_pub_;
-    float* potential_array_;
-    bool publish_potential_;
-    int publish_scale_;
+    OrientationFilter* orientationFilter_;
 
-//    unsigned int start_x_;
-//    unsigned int start_y_;
-//    unsigned int end_x_;
-//    unsigned int end_y_;
+    ros::Publisher planPublisher_;
+    ros::Publisher potentialPublisher_;
+    float* potentialArray_;
+    bool publishPotential_;
+    int publishScale_;
 
     MapStack* srsMapStack_;
 
     TapMapStack tapMapStack_;
-    std::string tf_prefix_;
+    std::string tfFrameid_;
+    std::string tfPrefix_;
 
-    bool visualize_potential_;
+    bool useGridPath_;
+    bool useQuadratic_;
+
+    unsigned int weightRatio_;
 };
 
 } // namespace srs

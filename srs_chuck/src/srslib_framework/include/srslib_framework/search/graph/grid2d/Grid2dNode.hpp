@@ -21,7 +21,7 @@ struct Grid2dNode : public SearchNode
         return instanceOf(grid,
             nullptr, Grid2dAction::START,
             position,
-            grid->getAggregate(position), 0, nullptr);
+            grid->getPayload(position), 0, nullptr);
     }
 
     static Grid2dNode* instanceOf(Grid2d* grid,

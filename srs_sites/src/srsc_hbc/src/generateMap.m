@@ -1,13 +1,18 @@
 close all;
 
+RESOLUTION = 0.05;
+ORIGIN = [0, 0, 0];
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Main map layer
-map = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-obstacles.png');
+map = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-obstacles.png', ...
+    RESOLUTION, ORIGIN);
 showMap(map);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Honk layer
-layerHonk = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-honk.png');
+layerHonk = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-honk.png', ...
+    RESOLUTION, ORIGIN);
 showMap(layerHonk);
 
 layerHonk = convertToLabeledArea(layerHonk, 1, 'honk1', {'honk'});

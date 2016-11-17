@@ -124,58 +124,6 @@ TEST(Test_Graph2d, AddWithMax)
         "Location payload in " << P_3_3 << " is not as expected";
 }
 
-TEST(Test_Graph2d, BasicAggregate)
-{
-    Grid2d grid(10);
-
-    grid.setAggregateSize(1, 1);
-
-    grid.maxOnPayload(P_1_1, 10);
-    grid.maxOnPayload(P_3_3, 30);
-
-    ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
-        "Location payload in " << P_1_1 << " is not as expected";
-    ASSERT_EQ(30, grid.getPayload(P_3_3)) <<
-        "Location payload in " << P_3_3 << " is not as expected";
-
-    ASSERT_EQ(10, grid.getAggregate(P_1_1)) <<
-        "Location aggregate in " << P_1_1 << " is not as expected";
-    ASSERT_EQ(30, grid.getAggregate(P_3_3)) <<
-        "Location aggregate in " << P_3_3 << " is not as expected";
-}
-
-TEST(Test_Graph2d, AggregateChange)
-{
-    Grid2d grid(10);
-
-    grid.setAggregateSize(1, 1);
-
-    grid.maxOnPayload(P_1_1, 10);
-    grid.maxOnPayload(P_3_3, 30);
-
-    ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
-        "Location payload in " << P_1_1 << " is not as expected";
-    ASSERT_EQ(30, grid.getPayload(P_3_3)) <<
-        "Location payload in " << P_3_3 << " is not as expected";
-
-    ASSERT_EQ(10, grid.getAggregate(P_1_1)) <<
-        "Location aggregate in " << P_1_1 << " is not as expected";
-    ASSERT_EQ(30, grid.getAggregate(P_3_3)) <<
-        "Location aggregate in " << P_3_3 << " is not as expected";
-
-    grid.setAggregateSize(2, 2);
-
-    ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
-        "Location payload in " << P_1_1 << " is not as expected";
-    ASSERT_EQ(30, grid.getPayload(P_3_3)) <<
-        "Location payload in " << P_3_3 << " is not as expected";
-
-    ASSERT_EQ(40, grid.getAggregate(P_1_1)) <<
-        "Location aggregate in " << P_1_1 << " is not as expected";
-    ASSERT_EQ(40, grid.getAggregate(P_3_3)) <<
-        "Location aggregate in " << P_3_3 << " is not as expected";
-}
-
 TEST(Test_Graph2d, BasicWeigths)
 {
     Grid2d grid(10);
@@ -184,7 +132,8 @@ TEST(Test_Graph2d, BasicWeigths)
     grid.setPayload(P_3_3, 30);
     grid.setWeights(P_3_3, 11, 22, 33, 44);
 
-    ASSERT_EQ(Grid2d::WEIGHT_NO_INFORMATION, grid.getWeight(Grid2d::Position(P_1_1, Grid2d::ORIENTATION_NORTH))) <<
+    ASSERT_EQ(Grid2d::WEIGHT_NO_INFORMATION,
+        grid.getWeight(Grid2d::Position(P_1_1, Grid2d::ORIENTATION_NORTH))) <<
         "North weight in location " << P_1_1 << " is not as expected";
 
     ASSERT_EQ(11, grid.getWeight(Grid2d::Position(P_3_3, Grid2d::ORIENTATION_NORTH))) <<

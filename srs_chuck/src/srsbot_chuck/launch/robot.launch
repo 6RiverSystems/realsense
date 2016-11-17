@@ -19,14 +19,20 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
         <param name="use_tf_static" value="true" />
     </node>
+    
     <!-- Brainstem Hardware Driver -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
 
     <!-- Joystick -->
     <include unless="$(arg use_sim_time)" file="$(find srsnode_joystick_adapter)/launch/node.launch" />
 
+    <!-- Navigation -->
+    <include file="$(find srsnode_navigation)/launch/node.launch">
+        <arg name="use_sim_time" value="$(arg use_sim_time)" />
+    </include>
+
     <!-- Raw Odometry -->
-	<include file="$(find srsnode_odometry)/launch/node.launch" />
+    <include file="$(find srsnode_odometry)/launch/node.launch" />
 
     <!-- Launch the ros-bridge -->
     <include if="$(arg start_bridge)" file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />

@@ -44,8 +44,6 @@ public:
         float* potentials);
 
 private:
-    static constexpr float WEIGHT_RATIO = 100.0;
-
     void add(float* potentials,
         float prev_potential,
         int next_i, Grid2d::BaseType weight,

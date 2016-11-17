@@ -5,15 +5,13 @@
  */
 #pragma once
 
-#include <algorithm>
-
-#define POT_HIGH 1.0e10
-
 namespace srs {
 
 class PotentialCalculator
 {
 public:
+    static const float MAX_POTENTIAL;
+
     PotentialCalculator(int nx, int ny)
     {
         setSize(nx, ny);
@@ -22,8 +20,8 @@ public:
     virtual ~PotentialCalculator()
     {}
 
-    virtual float calculatePotential(float* potential,
-        unsigned char cost,
+    virtual float calculatePotential(float* potentials,
+        unsigned int cost,
         int n,
         float prev_potential = -1);
 
@@ -35,11 +33,6 @@ public:
     }
 
 protected:
-    inline int toIndex(int x, int y)
-    {
-        return x + nx_ * y;
-    }
-
     int nx_;
     int ny_;
     int ns_;

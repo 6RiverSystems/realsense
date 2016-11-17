@@ -68,7 +68,7 @@ bool Grid2dAction::addBackward(Grid2d* graph, Grid2dNode* fromNode,
         // Calculate the motion cost
         int motionCost = COMMAND_COSTS[Grid2dAction::BACKWARD];
         motionCost += graph->getWeight(fromPosition);
-        motionCost += graph->getAggregate(neighbor);
+        motionCost += graph->getPayload(neighbor);
 
         if (motionCost < Grid2d::PAYLOAD_MAX)
         {
@@ -92,7 +92,7 @@ bool Grid2dAction::addForward(Grid2d* graph, Grid2dNode* fromNode,
         // Calculate the motion cost
         int motionCost = COMMAND_COSTS[Grid2dAction::FORWARD];
         motionCost += graph->getWeight(fromPosition);
-        motionCost += graph->getAggregate(neighbor);
+        motionCost += graph->getPayload(neighbor);
 
         if (motionCost < Grid2d::PAYLOAD_MAX)
         {
@@ -116,7 +116,7 @@ bool Grid2dAction::addRotation(Grid2d* graph, Grid2dNode* fromNode, ActionEnum a
     // Calculate the motion cost
     int motionCost = COMMAND_COSTS[action];
     motionCost += graph->getWeight(fromPosition);
-    motionCost += graph->getAggregate(motion);
+    motionCost += graph->getPayload(motion);
 
     if (motionCost < Grid2d::PAYLOAD_MAX)
     {

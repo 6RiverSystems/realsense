@@ -18,10 +18,19 @@ struct Grid2dNode : public SearchNode
 {
     static Grid2dNode* instanceOfStart(Grid2d* grid, Grid2d::Position position)
     {
+        int localCost = grid->getPayload(position);
+        if (Grid2dAction::isCostAvailable(localCost))
+        {
+            return instanceOf(grid,
+                nullptr, Grid2dAction::START,
+                position,
+                localCost, 0, nullptr);
+        }
+
         return instanceOf(grid,
             nullptr, Grid2dAction::START,
             position,
-            grid->getPayload(position), 0, nullptr);
+            Grid2d::PAYLOAD_MAX, 0, nullptr);
     }
 
     static Grid2dNode* instanceOf(Grid2d* grid,

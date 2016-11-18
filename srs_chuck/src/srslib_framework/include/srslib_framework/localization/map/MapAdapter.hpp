@@ -23,6 +23,15 @@ struct MapAdapter
     static costmap_2d::Costmap2D* map2CostMap2D(OccupancyMap* map);
 
     /**
+     * @brief Convert a Occupancy Map type into a vector of integers with values
+     * specifically expected by the current ROS AMCL implementation.
+     *
+     * @param map Occupancy Map to convert
+     * @param occupancy Reference to the vector of integers
+     */
+    static void occupancyMap2AmclVector(const OccupancyMap* map, vector<int8_t>& occupancy);
+
+    /**
      * @brief Convert a Occupancy Map type into a vector of integers.
      *
      * @param map Occupancy Map to convert

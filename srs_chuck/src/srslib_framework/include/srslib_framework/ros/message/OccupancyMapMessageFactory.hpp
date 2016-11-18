@@ -166,6 +166,29 @@ struct OccupancyMapMessageFactory
     }
 
     /**
+     * @brief Convert a Occupancy Map type into a ROS OccupancyGrid message with
+     * specific values for the current ROS AMCL implementation.
+     *
+     * @param map Occupancy map to convert
+     * @param frameId Frame id of the occupancy map
+     *
+     * @return Ros OccupancyGrid message generated from the specified occupancy map
+     */
+    static nav_msgs::OccupancyGrid occupancyMap2RosAmclMsg(const OccupancyMap* map, string frameId)
+    {
+        vector<int8_t> occupancy;
+        MapAdapter::occupancyMap2AmclVector(map, occupancy);
+
+        nav_msgs::OccupancyGrid msgOccupancyMap;
+
+        msgOccupancyMap.info = metadata2RosMsg(map->getMetadata());
+        msgOccupancyMap.data = occupancy;
+        msgOccupancyMap.header.frame_id = frameId;
+
+        return msgOccupancyMap;
+    }
+
+    /**
      * @brief Convert a Occupancy Map type into a ROS OccupancyGrid message.
      *
      * @param map Occupancy map to convert

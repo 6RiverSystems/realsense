@@ -5,17 +5,17 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/channel/publisher/PublisherRosAmclOccupancyGrid.hpp>
+#include <srslib_framework/ros/channel/publisher/PublisherRosOccupancyGrid.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
-class ChannelRosOccupancyGrid :
+class ChannelRosAmclOccupancyGrid :
     public PublisherRosOccupancyGrid
 {
 public:
-    ChannelRosOccupancyGrid() :
-        PublisherRosAmclOccupancyGrid(ChuckTopics::internal::MAP_ROS_OCCUPANCY, "map", 1, true)
+    ChannelRosAmclOccupancyGrid() :
+        PublisherRosOccupancyGrid(ChuckTopics::internal::MAP_ROS_AMCL_OCCUPANCY, "map", 1, true)
     {}
 };
 

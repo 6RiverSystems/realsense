@@ -51,6 +51,40 @@ costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(OccupancyMap* map)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void MapAdapter::occupancyMap2AmclVector(const OccupancyMap* map, vector<int8_t>& occupancy)
+{
+    occupancy.clear();
+
+    Grid2d* grid = map->getGrid();
+    if (grid)
+    {
+        for (int row = 0; row < grid->getHeight(); row++)
+        {
+            for (int col = 0; col < grid->getWidth(); col++)
+            {
+                Grid2d::BaseType cost = grid->getPayload(Grid2d::Location(col, row));
+
+                int8_t adaptedCost = static_cast<int8_t>(cost);
+                if (cost == Grid2d::PAYLOAD_NO_INFORMATION)
+                {
+                    adaptedCost = -1;
+                }
+                else if (cost == Grid2d::PAYLOAD_MIN)
+                {
+                    adaptedCost = 0;
+                }
+                else if (cost == Grid2d::PAYLOAD_MAX)
+                {
+                    adaptedCost = 100;
+                }
+
+                occupancy.push_back(adaptedCost);
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void MapAdapter::occupancyMap2Vector(const OccupancyMap* map, vector<int8_t>& occupancy)
 {
     occupancy.clear();

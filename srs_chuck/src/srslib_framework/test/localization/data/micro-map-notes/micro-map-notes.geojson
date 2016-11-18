@@ -24,7 +24,7 @@
                   "properties": {
                        "object": "labeled_area",
                        "label": "test1",
-                       "note": [
+                       "notes": [
                             "beep"
                        ]
                    }

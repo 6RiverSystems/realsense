@@ -20,14 +20,18 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
         <param name="use_tf_static" value="true" />
     </node>
+    
     <!-- Brainstem Hardware Driver -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
 
     <!-- Joystick -->
     <include unless="$(arg use_sim_time)" file="$(find srsnode_joystick_adapter)/launch/node.launch" />
 
+    <!-- Executive -->
+    <include file="$(find srsnode_executive)/launch/node.launch" />
+
     <!-- Raw Odometry -->
-	<include file="$(find srsnode_odometry)/launch/node.launch">
+    <include file="$(find srsnode_odometry)/launch/node.launch">
         <arg name="emulation_mode" value="$(arg emulation_mode)"/>
     </include>
 

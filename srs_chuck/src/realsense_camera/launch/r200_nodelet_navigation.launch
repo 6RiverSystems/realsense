@@ -1,6 +1,6 @@
 <!-- Launch file used in navigation package -->
 <launch>
-  <arg name="manager"      value="nodelet_manager" />
+  <arg name="manager"      value="r200_nodelet_manager" />
   <arg name="camera"       default="camera" />
   <arg name="camera_type"  default="R200" /> <!-- Type of camera -->
   <arg name="serial_no"    default="" />

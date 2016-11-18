@@ -9,38 +9,46 @@
 	<arg name="camera" default="camera" />
 	<arg name="simulation" default="false" />
 
-	<node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+	<remap from="/camera/depth/points" to="/internal/sensors/rgbd/depth/points"/>
 
-	<!-- Run a VoxelGrid filter to clean NaNs and downsample the data -->
-    <node pkg="nodelet" type="nodelet" name="VoxelGrid" args="load pcl/VoxelGrid pcl_manager" output="screen">
-        <remap from="~input" to="/camera/depth/points" />
-        <rosparam>
-            filter_field_name: z
-            filter_limit_min: -0.1
-            filter_limit_max: 1000
-            filter_limit_negative: False
-            leaf_size: 0.10
-        </rosparam>
- 	</node>
+	<!-- Intel Realsense R200 driver -->
+	<include file="$(find realsense_camera)/launch/r200_nodelet_navigation.launch" >
+        <arg name="enable_color" value="false" />
+        <arg name="enable_tf" value="false" />
+    </include>
 
-   <node pkg="nodelet" type="nodelet" name="PassThrough" args="load pcl/PassThrough pcl_manager" output="screen">
-        <remap from="~input" to="/VoxelGrid/output"/>
+	<!-- Point cloud to laser scan conversion -->
+	<node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+
+        <remap from="cloud_in" to="/internal/sensors/rgbd/depth/points"/>
+        <remap from="scan" to="/internal/sensors/rgbd/scan"/>
         <rosparam>
-            filter_field_name: z
-            filter_limit_min: 0.3
-            filter_limit_max: 3.5
-            filter_limit_negative: False
+            target_frame: laser_frame # Leave disabled to output scan in pointcloud frame
+            transform_tolerance: 0.05
+            min_height: 0.03
+            max_height: 3.0
+
+            angle_min: -1.5708 # -M_PI/2
+            angle_max: 1.5708 # M_PI/2
+            angle_increment: 0.008 # M_PI/360.0
+            scan_time: 0.3333
+            range_min: 0.3
+            range_max: 8.0
+            use_inf: true
+
+            # Concurrency level, affects number of pointclouds queued for processing, thread number governed by nodelet manager
+            # 0 : Detect number of cores
+            # 1 : Single threaded
+            # 2->inf : Parallelism level
+            concurrency_level: 0
         </rosparam>
+    </node>
+    	
+	<node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="rgbd_laser_filter">
+		<remap from="scan" to="/internal/sensors/rgbd/scan" />
+		<remap from="scan_filtered" to="/internal/sensors/rgbd/scan/filtered" />
+		<rosparam command="load" file="$(find srsnode_laser_filters)/config/laser_filter.yaml" />
 	</node>
-
-	<node pkg="nodelet" type="nodelet" name="StatisticalOutlier" args="load pcl/StatisticalOutlierRemoval pcl_manager" output="screen">
-        <remap from="~input" to="/PassThrough/output"/>
-        <remap from="~output" to="/camera/depth/points/filtered"/>
-        <rosparam>
-               mean_k: 10
-               stddev: 0.05
-        </rosparam>
-	</node>
-
+	
 </launch>
 

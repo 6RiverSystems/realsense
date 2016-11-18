@@ -6,9 +6,10 @@
   *
 -->
 <launch>
-  <node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="laser_filter">
-    <remap from="scan_filtered" to="/internal/sensors/lidar/scan/filtered" />
-    <rosparam command="load" file="$(find srsnode_laser_filters)/config/laser_filter.yaml" />
-  </node>
-</launch>
 
+	<node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="lidar_laser_filter">
+		<remap from="scan_filtered" to="/internal/sensors/lidar/scan/filtered" />
+		<rosparam command="load" file="$(find srsnode_laser_filters)/config/laser_filter.yaml" />
+	</node>
+
+</launch>

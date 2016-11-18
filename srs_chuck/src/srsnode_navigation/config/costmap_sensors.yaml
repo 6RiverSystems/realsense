@@ -1,26 +1,27 @@
-#observation_sources: r200_rgbd sick_lidar
-observation_sources: sick_lidar
+obstacles_laser:
+  observation_sources: sick_lidar
+  sick_lidar: {
+    sensor_frame: sick_lidar,
+    data_type: LaserScan,
+    topic: /internal/sensors/lidar/scan/filtered,
+    marking: true,
+    clearing: true,
+    min_obstacle_height: 0.0,
+    max_obstacle_height: 3.0,
+    expected_update_rate: 0.25,
+    inf_is_valid: true
+  }
 
-sick_lidar: {
-  sensor_frame: sick_lidar,
-  data_type: LaserScan,
-  topic: /internal/sensors/lidar/scan/filtered,
-  marking: true,
-  clearing: true,
-  min_obstacle_height: 0.0,
-  max_obstacle_height: 3.0,
-  expected_update_rate: 0.25,
-  inf_is_valid: true
-}
-
-r200_rgbd: {
-  sensor_frame: camera_depth_frame,
-  data_type: PointCloud2,
-  topic: /camera/depth/points/filtered,
-  marking: true,
-  clearing: true,
-  min_obstacle_height: 0.30,
-  max_obstacle_height: 3.0,
-  expected_update_rate: 0.25,
-  inf_is_valid: true
-}
+obstacles_lidar:
+  observation_sources: r200_rgbd
+  r200_rgbd: {
+    sensor_frame: camera_depth_frame,
+    data_type: LaserScan,
+    topic: /internal/sensors/rgbd/scan/filtered,
+    marking: true,
+    clearing: true,
+    min_obstacle_height: 0.30,
+    max_obstacle_height: 3.0,
+    expected_update_rate: 0.25,
+    inf_is_valid: true
+  }

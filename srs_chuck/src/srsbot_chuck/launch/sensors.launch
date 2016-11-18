@@ -16,6 +16,6 @@
     <!-- Laser Filters -->
 	<include file="$(find srsnode_laser_filters)/launch/driver.launch" />
 
-    <!-- Intel Realsense R200 -->
-    <!-- <include unless="$(arg use_sim_time)" file="$(find realsense_camera)/launch/r200_nodelet_rgbd.launch" /> -->
+    <!-- RGBD => Laserscan -->
+    <include unless="$(arg use_sim_time)" file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" />
 </launch>

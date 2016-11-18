@@ -10,6 +10,4 @@ using namespace std;
 
 TEST(Test_Platform, CrashHandler)
 {
-    char* n = nullptr;
-    string s(n);
 }

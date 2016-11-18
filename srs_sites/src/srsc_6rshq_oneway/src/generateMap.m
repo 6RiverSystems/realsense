@@ -6,24 +6,24 @@ ORIGIN = [-10, -10, 0];
 % Main map layer
 map = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-obstacles.png', ...
     RESOLUTION, ORIGIN);
-showMap(map);
+showMap(map, 'Obstacles');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One-way layer
 layerOneway = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-oneway.png', ...
     RESOLUTION, ORIGIN);
-showMap(layerOneway);
+showMap(layerOneway, 'One-ways');
 
 layerOneway = convertToWeightedArea(layerOneway, 1, 0, 0, 0, 100);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Honk layer
-layerHonk = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-beep.png', ...
+layerBeep = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-beep.png', ...
     RESOLUTION, ORIGIN);
-showMap(layerHonk);
+showMap(layerBeep, 'Beeps');
 
-layerHonk = convertToLabeledArea(layerHonk, 1, 'beep1', {'beep'});
-layerHonk = convertToLabeledArea(layerHonk, 2, 'beep2', {'beep'});
+layerBeep = convertToLabeledArea(layerBeep, 1, 'beep1', {'beep'});
+layerBeep = convertToLabeledArea(layerBeep, 2, 'beep2', {'beep'});
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One-way layer
@@ -127,8 +127,8 @@ map = addGraph(map, '6rshq_graph', ...
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map
-map = addLayer(map, {layerHonk, layerOneway});
-showMap(map);
+map = addLayer(map, {layerBeep, layerOneway});
+showMap(map, 'Complete map');
 
 saveGeoJsonMap(map, ...
     '/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/map/6rshq_oneway.geojson');

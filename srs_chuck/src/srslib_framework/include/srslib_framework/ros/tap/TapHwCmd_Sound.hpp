@@ -5,17 +5,17 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/tap/subscriber/SubscriberBoolean.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberSound.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
-class TapHwCmd_Honk :
-    public SubscriberBoolean
+class TapHwCmd_Sound :
+    public SubscriberSound
 {
 public:
-    TapHwCmd_Honk() :
-        SubscriberBoolean(ChuckTopics::internal::HWCMD_HONK)
+    TapHwCmd_Sound() :
+        SubscriberSound(ChuckTopics::internal::HWCMD_SOUND)
     {}
 };
 

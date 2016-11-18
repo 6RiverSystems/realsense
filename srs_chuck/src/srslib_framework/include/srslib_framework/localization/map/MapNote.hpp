@@ -14,49 +14,49 @@ namespace srs {
 class MapNote
 {
 public:
-    static const MapNote HONK;
+    static const MapNote BEEP;
 
     static MapNote* instanceOf(const MapNote& note);
 
     MapNote() :
-        honk_(false)
+        beep_(false)
     {}
 
-    MapNote(bool honk) :
-        honk_(honk)
+    MapNote(bool beep) :
+        beep_(beep)
     {}
 
     void join(const MapNote& note)
     {
-        honk_ |= note.honk_;
+        beep_ |= note.beep_;
     }
 
-    inline bool honk() const
+    inline bool beep() const
     {
-        return honk_;
+        return beep_;
     }
 
     friend ostream& operator<<(ostream& stream, const MapNote& mapNote)
     {
         stream << "{" <<
-            (mapNote.honk_ ? "honk" : "");
+            (mapNote.beep_ ? "beep" : "");
 
         return stream << "}";
     }
 
     friend bool operator==(const MapNote& lhs, const MapNote& rhs)
     {
-        return lhs.honk_ == rhs.honk_;
+        return lhs.beep_ == rhs.beep_;
     }
 
     inline void reset()
     {
-        honk_ = false;
+        beep_ = false;
     }
 
 private:
 
-    bool honk_ : 1;
+    bool beep_;
 };
 
 } // namespace srs

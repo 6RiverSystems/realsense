@@ -47,7 +47,7 @@ const string LogicalMapFactory::KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_COST = "envel
 const string LogicalMapFactory::KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE = "envelope_size";
 const string LogicalMapFactory::KEYWORD_PROPERTY_FEATURE_OBJECT = "object";
 const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_LABEL = "label";
-const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_HONK = "honk";
+const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_BEEP = "beep";
 const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_NOTES = "notes";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_HEIGHT = "height";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_ORIGIN = "origin";
@@ -144,7 +144,9 @@ void LogicalMapFactory::addCostArea(Pose<> origin, double widthM, double heightM
 
     unsigned int widthCells;
     unsigned int heightCells;
-    calculateArea(origin, widthM, heightM, c0, r0, widthCells, heightCells);
+
+    Pose<> newOrigin = PoseMath::subtract(origin, metadata_.origin);
+    calculateArea(newOrigin, widthM, heightM, c0, r0, widthCells, heightCells);
 
     for (unsigned int r = r0; r < r0 + heightCells; ++r)
     {
@@ -167,7 +169,9 @@ void LogicalMapFactory::addLabelArea(Pose<> origin, double widthM, double height
 
     unsigned int widthCells;
     unsigned int heightCells;
-    calculateArea(origin, widthM, heightM, c0, r0, widthCells, heightCells);
+
+    Pose<> newOrigin = PoseMath::subtract(origin, metadata_.origin);
+    calculateArea(newOrigin, widthM, heightM, c0, r0, widthCells, heightCells);
 
     map_->addLabeledArea(c0, r0, c0 + widthCells, r0 + heightCells, label, note);
 }
@@ -200,7 +204,9 @@ void LogicalMapFactory::addWeightArea(Pose<> origin, double widthM, double heigh
 
     unsigned int widthCells;
     unsigned int heightCells;
-    calculateArea(origin, widthM, heightM, c0, r0, widthCells, heightCells);
+
+    Pose<> newOrigin = PoseMath::subtract(origin, metadata_.origin);
+    calculateArea(newOrigin, widthM, heightM, c0, r0, widthCells, heightCells);
 
     for (unsigned int r = r0; r < r0 + heightCells; ++r)
     {
@@ -673,9 +679,9 @@ MapNote LogicalMapFactory::ntValueMapNote(YAML::Node root, bool required)
         {
             string flagValue = flag.as<string>();
 
-            if (flagValue == KEYWORD_PROPERTY_LABEL_AREA_HONK)
+            if (flagValue == KEYWORD_PROPERTY_LABEL_AREA_BEEP)
             {
-                value.join(MapNote::HONK);
+                value.join(MapNote::BEEP);
             }
             else
             {

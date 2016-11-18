@@ -17,7 +17,7 @@ set(${PROJECT_NAME}_SOURCES
     src/hw_message/RawOdometryHandler.cpp
     src/hw_message/HardwareInfoHandler.cpp
     
-    src/sw_message/HonkHandler.cpp
+    src/sw_message/SoundHandler.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES

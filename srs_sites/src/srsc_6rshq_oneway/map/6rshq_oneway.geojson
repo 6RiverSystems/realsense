@@ -671,9 +671,9 @@
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "honk1",
+						"label": "beep1",
 						"notes": [
-							"honk"
+							"beep"
 						]
 					}
 				},
@@ -689,9 +689,9 @@
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "honk2",
+						"label": "beep2",
 						"notes": [
-							"honk"
+							"beep"
 						]
 					}
 				},

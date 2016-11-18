@@ -22,7 +22,7 @@ using namespace ros;
 BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) :
 	m_pIO( pIO ),
 	m_mapMotionStatus( ),
-    honkHandler_(this)
+    soundHandler_(this)
 {
 	m_mapEntityButton[LED_ENTITIES::TOTE0]		= "TOTE0";
 	m_mapEntityButton[LED_ENTITIES::TOTE1]		= "TOTE1";

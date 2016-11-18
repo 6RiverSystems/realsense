@@ -96,31 +96,25 @@ public:
     void transformCells2M(unsigned int c, unsigned int r, double& x, double& y) const
     {
         convertCells2M(c, x);
-        x += origin_.x;
-
         convertCells2M(r, y);
-        y += origin_.y;
     }
 
     void transformCells2M(unsigned int c, unsigned int r, Pose<>& p) const
     {
         convertCells2M(c, p.x);
-        p.x += origin_.x;
-
         convertCells2M(r, p.y);
-        p.y += origin_.y;
     }
 
     void transformM2Cells(double x, double y, unsigned int& c, unsigned int& r) const
     {
-        convertM2Cells(x - origin_.x, c);
-        convertM2Cells(y - origin_.y, r);
+        convertM2Cells(x, c);
+        convertM2Cells(y, r);
     }
 
     void transformM2Cells(Pose<> p, unsigned int& c, unsigned int& r) const
     {
-        convertM2Cells(p.x - origin_.x, c);
-        convertM2Cells(p.y - origin_.y, r);
+        convertM2Cells(p.x, c);
+        convertM2Cells(p.y, r);
     }
 
 private:

@@ -65,9 +65,9 @@ MapNote LogicalMapMessageFactory::msg2Note(srslib_framework::MapNote message)
 {
     MapNote note;
 
-    if (message.honk)
+    if (message.beep)
     {
-        note.join(MapNote::HONK);
+        note.join(MapNote::BEEP);
     }
 
     return note;
@@ -78,7 +78,7 @@ srslib_framework::MapNote LogicalMapMessageFactory::note2Msg(MapNote note)
 {
     srslib_framework::MapNote msgNote;
 
-    msgNote.honk = note.honk();
+    msgNote.beep = note.beep();
 
     return msgNote;
 }

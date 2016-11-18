@@ -165,6 +165,15 @@ struct PoseMath
     }
 
     template<typename TYPE = double>
+    inline static Pose<TYPE> subtract(Pose<TYPE> p1, Pose<TYPE> p2)
+    {
+        return Pose<TYPE>(
+            p1.x - p2.x,
+            p1.y - p2.y,
+            AngleMath::normalizeRad(p1.theta - p2.theta));
+    }
+
+    template<typename TYPE = double>
     inline static Pose<TYPE> translate(Pose<TYPE> p, TYPE forward, TYPE sideway)
     {
         return Pose<TYPE>(

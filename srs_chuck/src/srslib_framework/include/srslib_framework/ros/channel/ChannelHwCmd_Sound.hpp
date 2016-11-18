@@ -5,17 +5,17 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/channel/publisher/PublisherBoolean.hpp>
+#include <srslib_framework/ros/channel/publisher/PublisherSound.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
-class ChannelHwCmd_Honk :
-    public PublisherBoolean
+class ChannelHwCmd_Sound :
+    public PublisherSound
 {
 public:
-    ChannelHwCmd_Honk() :
-        PublisherBoolean(ChuckTopics::internal::HWCMD_HONK)
+    ChannelHwCmd_Sound() :
+        PublisherSound(ChuckTopics::internal::HWCMD_SOUND)
     {}
 };
 

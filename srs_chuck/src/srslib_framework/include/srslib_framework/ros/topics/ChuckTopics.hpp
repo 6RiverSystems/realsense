@@ -30,7 +30,7 @@ namespace internal {
 
     static const string GOTO_GOAL = "/move_base_simple/goal";
 
-    static const string HWCMD_HONK = "/internal/hw_cmd/honk";
+    static const string HWCMD_SOUND = "/internal/hw_cmd/sound";
 
     static const string MAP_ROS_AMCL_OCCUPANCY = "/internal/state/map/ros_amcl_occupancy";
     static const string MAP_LOGICAL = "/internal/state/map/complete";

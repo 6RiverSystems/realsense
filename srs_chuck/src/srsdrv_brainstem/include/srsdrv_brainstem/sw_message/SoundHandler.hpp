@@ -5,35 +5,29 @@
  */
 #pragma once
 
-#include <std_msgs/Bool.h>
+#include <srslib_framework/Sound.h>
 
-#include <srslib_framework/ros/tap/TapHwCmd_Honk.hpp>
 #include <srslib_framework/ros/tap/subscriber/RosSubscriber.hpp>
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
+#include <srslib_framework/ros/tap/TapHwCmd_Sound.hpp>
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
 #include <srsdrv_brainstem/sw_message/SoftwareMessageHandler.hpp>
 
 namespace srs {
 
-class HonkHandler : public SoftwareMessageHandler, public Observer<RosSubscriber<std_msgs::Bool>>
+class SoundHandler : public SoftwareMessageHandler, public Observer<RosSubscriber<srslib_framework::Sound>>
 {
 public:
-    HonkHandler(BrainStemMessageProcessor* owner);
+    SoundHandler(BrainStemMessageProcessor* owner);
 
-    virtual ~HonkHandler()
+    virtual ~SoundHandler()
     {}
 
-    void notified(RosSubscriber<std_msgs::Bool>* subject);
+    void notified(RosSubscriber<srslib_framework::Sound>* subject);
 
 private:
-    static constexpr unsigned int HONK_VOLUME = 100;
-    static constexpr unsigned int HONK_BASE_FREQUENCY = 3000;
-    static constexpr unsigned int HONK_CYCLE_RATE = 250;
-    static constexpr unsigned int HONK_DUTY_CYCLE = 32;
-    static constexpr unsigned int HONK_CYCLES = 65000;
-
-    HW_MESSAGE_BEGIN(MsgHonk)
+    HW_MESSAGE_BEGIN(MsgSound)
         uint8_t cmd;
         uint8_t volume;
         uint16_t baseFrequency;
@@ -42,7 +36,7 @@ private:
         uint16_t numberOfCycles;
     HW_MESSAGE_END
 
-    TapHwCmd_Honk tapHonk_;
+    TapHwCmd_Sound tapSound_;
 };
 
 } // namespace srs

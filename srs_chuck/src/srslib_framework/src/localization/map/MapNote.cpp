@@ -5,7 +5,7 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Constant initialization
 
-const MapNote MapNote::HONK = MapNote(true);
+const MapNote MapNote::BEEP = MapNote(true);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
@@ -15,7 +15,7 @@ MapNote* MapNote::instanceOf(const MapNote& originalNote)
 {
     MapNote* newNote = new MapNote();
 
-    newNote->honk_ = originalNote.honk_;
+    newNote->beep_ = originalNote.beep_;
 
     return newNote;
 }

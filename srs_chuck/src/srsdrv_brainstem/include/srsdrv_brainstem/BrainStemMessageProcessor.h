@@ -22,7 +22,7 @@ using namespace std;
 #include <srsdrv_brainstem/hw_message/RawOdometryHandler.hpp>
 #include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
 
-#include <srsdrv_brainstem/sw_message/HonkHandler.hpp>
+#include <srsdrv_brainstem/sw_message/SoundHandler.hpp>
 
 namespace srs {
 
@@ -154,7 +154,7 @@ private:
     HwMessageHandlerMapType hwMessageHandlers_;
 
     HardwareInfoHandler hardwareInfoHandler_;
-    HonkHandler honkHandler_;
+    SoundHandler soundHandler_;
 
     SensorFrameHandler sensorFrameHandler_;
 

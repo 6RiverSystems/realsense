@@ -10,7 +10,7 @@
     <arg name="robot_configuration" default="" />
     <arg name="use_sim_time" />
     <arg name="start_bridge" />
-    <arg name="emulation_mode" default="false" />
+    <arg name="emulation_mode" />
 
     <!-- Robot description -->
     <param name="robot_description" command="$(find xacro)/xacro.py $(find srsbot_chuck)/urdf/chuck.urdf.xacro" />
@@ -20,6 +20,7 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
         <param name="use_tf_static" value="true" />
     </node>
+
     <!-- Brainstem Hardware Driver -->
     <include file="$(find srsdrv_brainstem)/launch/driver.launch" />
 

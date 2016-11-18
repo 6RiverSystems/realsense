@@ -40,13 +40,13 @@ private:
 
 	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/rpm/raw";
 
-	ros::NodeHandle 			m_rosNodeHandle;
+	ros::NodeHandle 					m_rosNodeHandle;
 
-	ros::Timer					m_odometryTimer;
+	ros::Timer							m_odometryTimer;
 
-	ros::Subscriber				m_velocitySubscriber;
+	ros::Subscriber						m_velocitySubscriber;
 
-	ros::Publisher				m_odometryPublisher;
+	ros::Publisher						m_odometryPublisher;
 
 	srslib_framework::OdometryRPM		m_velocity;
 

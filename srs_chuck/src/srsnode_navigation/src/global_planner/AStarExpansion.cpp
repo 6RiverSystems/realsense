@@ -10,7 +10,6 @@ AStarExpansion::AStarExpansion(LogicalMap* logicalMap, costmap_2d::Costmap2D* co
     PotentialCalculator* pCalculator) :
         Expander(logicalMap, costMap, pCalculator)
 {
-    setLethalCost(Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,19 +21,20 @@ bool AStarExpansion::calculatePotentials(
 {
     queue_.clear();
 
-    int start_i = toIndex(start_x, start_y);
+    int start_i = coordinates2Index(start_x, start_y);
     queue_.push_back(Index(start_i, 0));
 
-    std::fill(potentials, potentials + ns_, POT_HIGH);
+    std::fill(potentials, potentials + ns_, PotentialCalculator::MAX_POTENTIAL);
     potentials[start_i] = 0;
 
-    int goal_i = toIndex(end_x, end_y);
+    int goal_i = coordinates2Index(end_x, end_y);
     int cycle = 0;
 
     while (queue_.size() > 0 && cycle < cycles)
     {
         Index top = queue_[0];
-        std::pop_heap(queue_.begin(), queue_.end(), greater1());
+
+        std::pop_heap(queue_.begin(), queue_.end(), GreaterThan());
         queue_.pop_back();
 
         int i = top.i;
@@ -51,6 +51,7 @@ bool AStarExpansion::calculatePotentials(
         int x;
         int y;
         index2Coordinates(i, x, y);
+
         logicalGrid_->getWeights(Grid2d::Location(x, y), north, east, south, west);
 
         add(potentials, potentials[i], i + 1, east, end_x, end_y);
@@ -68,40 +69,55 @@ void AStarExpansion::add(float* potentials,
     int next_i, Grid2d::BaseType weight,
     int end_x, int end_y)
 {
-    float floatWeight = weight * 100;
+    float nextPotential = potentials[next_i];
+    unsigned int currentCost = costGrid_[next_i];
+
+    if (nextPotential < PotentialCalculator::MAX_POTENTIAL)
+    {
+        return;
+    }
+
+    if (!allowUnknown_ && currentCost == costmap_2d::NO_INFORMATION)
+    {
+        return;
+    }
+
+    if (currentCost >= lethalCost_)
+    {
+        return;
+    }
+
+    unsigned int weightContribution = weight * weightRatio_;
     if (weight == Grid2d::WEIGHT_NO_INFORMATION)
     {
-        floatWeight = 0;
+        weightContribution = 0;
     }
-
-    if (potentials[next_i] < POT_HIGH)
-    {
-        return;
-    }
-
-    if (costGrid_[next_i] >= lethal_cost_)
-    {
-        return;
-    }
-
-    float cost = costGrid_[next_i];
-    if (costGrid_[next_i] == Grid2d::PAYLOAD_NO_INFORMATION)
-    {
-        cost = 0;
-    }
-
-    potentials[next_i] = pCalculator_->calculatePotential(potentials,
-        cost + neutral_cost_,
-        next_i, prev_potential) + floatWeight;
 
     int x;
     int y;
     index2Coordinates(next_i, x, y);
 
-    float distance = abs(end_x - x) + abs(end_y - y);
+    Grid2d::BaseType logicalCost = logicalGrid_->getPayload(Grid2d::Location(x, y));
+    if (logicalCost == Grid2d::PAYLOAD_MAX)
+    {
+        return;
+    }
+    if (!allowUnknown_ && logicalCost == Grid2d::PAYLOAD_NO_INFORMATION)
+    {
+        return;
+    }
 
-    queue_.push_back(Index(next_i, potentials[next_i] + distance * neutral_cost_));
-    std::push_heap(queue_.begin(), queue_.end(), greater1());
+    nextPotential = pCalculator_->calculatePotential(potentials,
+        currentCost + neutralCost_,
+        next_i, prev_potential) + weightContribution;
+
+    potentials[next_i] = nextPotential;
+
+    float distance = abs(end_x - x) + abs(end_y - y);
+    float gh = nextPotential + distance * neutralCost_;
+
+    queue_.push_back(Index(next_i, gh));
+    std::push_heap(queue_.begin(), queue_.end(), GreaterThan());
 }
 
 } // namespace srs

@@ -6,7 +6,7 @@
   *
 -->
 <launch>
-    <arg name="use_sim_time" default="false"/>
+    <arg name="use_sim_time" default="true"/>
     <arg name="start_bridge" default="false" />
 
     <!-- Fixed /odom frame to /map frame TF -->

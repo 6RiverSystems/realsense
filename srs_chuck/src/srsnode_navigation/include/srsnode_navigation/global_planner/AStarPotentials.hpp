@@ -22,9 +22,19 @@ namespace srs {
 class AStarPotentials
 {
 public:
+    struct SearchParameters
+    {
+        bool useQuadratic;
+        bool useGridPath;
+        bool allowUnknown;
+        unsigned int lethalCost;
+        unsigned int neutralCost;
+        unsigned int weightRatio;
+    };
+
     AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap);
 
-    bool calculatePath(
+    bool calculatePath(SearchParameters searchParams,
         double start_x, double start_y,
         double end_x, double end_y,
         std::vector<std::pair<float, float>>& path,

@@ -93,6 +93,39 @@ OccupancyMap* OccupancyMapFactory::fromMetadata(const OccupancyMetadata& metadat
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+OccupancyMap* OccupancyMapFactory::fromMetadataRawCost(const OccupancyMetadata& metadata)
+{
+    map_ = nullptr;
+    metadata_ = metadata;
+
+    SDL_Surface* image = IMG_Load(metadata.occupancyFilename.c_str());
+    if (!image)
+    {
+        throw FailedToOpenFileException(metadata.occupancyFilename);
+    }
+
+    // Copy the image data into the map structure
+    metadata_.widthCells = image->w;
+    metadata_.heightCells = image->h;
+
+    map_ = new OccupancyMap(metadata_);
+
+    int channels = image->format->BytesPerPixel;
+    if (channels == 1)
+    {
+        extractMonoChannelRaw(image);
+    }
+    else
+    {
+        throw InvalidChannelNumberException(metadata_.occupancyFilename, channels);
+    }
+
+    SDL_FreeSurface(image);
+
+    return map_;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 OccupancyMap* OccupancyMapFactory::fromMetadata(const OccupancyMetadata& metadata,
     const vector<int8_t>& occupancy)
 {
@@ -106,6 +139,7 @@ OccupancyMap* OccupancyMapFactory::fromMetadata(const OccupancyMetadata& metadat
         {
             // Convert the 8 bit cost into an integer cost and store it
             int8_t grayLevel = *occupancyIterator;
+
             Grid2d::BaseType cost = map->gray2Cost(static_cast<char>(grayLevel));
             map->setCost(col, row, cost);
 
@@ -132,12 +166,31 @@ void OccupancyMapFactory::extractMonoChannel(SDL_Surface* image)
         for (unsigned int col = 0; col < metadata_.widthCells; col++)
         {
             // Find the pixel color based on the row, column, and and pitch
-            // Pgm pixels range from 0 to 255.
+            // PGM pixels range from 0 to 255
             unsigned char grayLevel = static_cast<unsigned char>(*(imagePixels + row * pitch + col));
 
             // Convert the 8 bit cost into a cost and store it
             Grid2d::BaseType cost = map_->gray2Cost(grayLevel);
+            map_->setCost(col, metadata_.heightCells - row - 1, cost);
+        }
+    }
+}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void OccupancyMapFactory::extractMonoChannelRaw(SDL_Surface* image)
+{
+    const unsigned char maxPixelLevel = numeric_limits<unsigned char>::max();
+
+    unsigned char* imagePixels = (unsigned char*)(image->pixels);
+    int pitch = image->pitch;
+
+    for (unsigned int row = 0; row < metadata_.heightCells; row++)
+    {
+        for (unsigned int col = 0; col < metadata_.widthCells; col++)
+        {
+            // Find the pixel color based on the row, column, and and pitch
+            // PGM pixels range from 0 to 255
+            Grid2d::BaseType cost = static_cast<unsigned char>(*(imagePixels + row * pitch + col));
             map_->setCost(col, metadata_.heightCells - row - 1, cost);
         }
     }

@@ -189,128 +189,128 @@ Solution<Grid2dSolutionItem>* calculateSolution(Pose<> start, Pose<> goal)
     return gridSolution;
 }
 
-// Test of the aisle E01-T ---> E01-B
-TEST(Test_Solution, Barrett_Aisles_E01T_E01B)
-{
-    Solution<Grid2dSolutionItem>* solution = calculateSolution(E01T, E01B);
-
-    ASSERT_FALSE(solution->empty()) << "No solution was found";
-
-    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
-        "Rotate commands were found in the solution";
-
-    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
-    ASSERT_EQ(539, totalCost) << "The cost is not as expected.";
-}
-
-// Test of the aisle E02-T ---> E02-B
-TEST(Test_Solution, Barrett_Aisles_E02T_E02B)
-{
-    Solution<Grid2dSolutionItem>* solution = calculateSolution(E02T, E02B);
-
-    ASSERT_FALSE(solution->empty()) << "No solution was found";
-
-    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
-        "Rotate commands were found in the solution";
-
-    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
-    ASSERT_EQ(426, totalCost) << "The cost is not as expected.";
-}
-
-// Test of the aisle E03-T ---> E03-B
-TEST(Test_Solution, Barrett_Aisles_E03T_E03B)
-{
-    Solution<Grid2dSolutionItem>* solution = calculateSolution(E03T, E03B);
-
-    ASSERT_FALSE(solution->empty()) << "No solution was found";
-
-    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
-        "Rotate commands were found in the solution";
-
-    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
-    ASSERT_EQ(426, totalCost) << "The cost is not as expected.";
-}
-
-// Test of the aisle E04-T ---> E04-B
-TEST(Test_Solution, Barrett_Aisles_E04T_E04B)
-{
-    Solution<Grid2dSolutionItem>* solution = calculateSolution(E04T, E04B);
-
-    ASSERT_FALSE(solution->empty()) << "No solution was found";
-
-    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
-        "Rotate commands were found in the solution";
-
-    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
-    ASSERT_EQ(426, totalCost) << "The cost is not as expected.";
-}
-
-// Test of the aisle CD-T ---> CD-B
-TEST(Test_Solution, Barrett_Aisles_CDT_CDB)
-{
-    Solution<Grid2dSolutionItem>* solution = calculateSolution(CDT, CDB);
-
-    ASSERT_FALSE(solution->empty()) << "No solution was found";
-
-    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
-        "Rotate commands were found in the solution";
-
-    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
-    ASSERT_EQ(652, totalCost) << "The cost is not as expected.";
-}
-
-// Test of the aisle AB-T ---> AB-B
-TEST(Test_Solution, Barrett_Aisles_ABT_ABB)
-{
-    Solution<Grid2dSolutionItem>* solution = calculateSolution(ABT, ABB);
-
-    ASSERT_FALSE(solution->empty()) << "No solution was found";
-
-    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
-        "Rotate commands were found in the solution";
-
-    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
-    ASSERT_EQ(652, totalCost) << "The cost is not as expected.";
-}
-
-// Test of the aisle H01-T ---> H01-B
-TEST(Test_Solution, Barrett_Aisles_H01T_H01B)
-{
-    Solution<Grid2dSolutionItem>* solution = calculateSolution(H01T, H01B);
-
-    ASSERT_FALSE(solution->empty()) << "No solution was found";
-
-    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
-        "Rotate commands were found in the solution";
-
-    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
-    ASSERT_EQ(596, totalCost) << "The cost is not as expected.";
-}
-
-// Test of the aisle G01-T ---> G01-B
-TEST(Test_Solution, Barrett_Aisles_G01T_G01B)
-{
-    Solution<Grid2dSolutionItem>* solution = calculateSolution(G01T, G01B);
-
-    ASSERT_FALSE(solution->empty()) << "No solution was found";
-
-    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
-        "Rotate commands were found in the solution";
-
-    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
-    ASSERT_EQ(596, totalCost) << "The cost is not as expected.";
-}
-
-// Test of the aisle F01-T ---> F01-B
-TEST(Test_Solution, Barrett_Aisles_F01T_F01B)
-{
-    Solution<Grid2dSolutionItem>* solution = calculateSolution(F01T, F01B);
-
-    ASSERT_FALSE(solution->empty()) << "No solution was found";
-
-    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
-        "Rotate commands were found in the solution";
-
-    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
-    ASSERT_EQ(596, totalCost) << "The cost is not as expected.";
-}
+//// Test of the aisle E01-T ---> E01-B
+//TEST(Test_Solution, Barrett_Aisles_E01T_E01B)
+//{
+//    Solution<Grid2dSolutionItem>* solution = calculateSolution(E01T, E01B);
+//
+//    ASSERT_FALSE(solution->empty()) << "No solution was found";
+//
+//    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
+//        "Rotate commands were found in the solution";
+//
+//    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
+//    ASSERT_EQ(539, totalCost) << "The cost is not as expected.";
+//}
+//
+//// Test of the aisle E02-T ---> E02-B
+//TEST(Test_Solution, Barrett_Aisles_E02T_E02B)
+//{
+//    Solution<Grid2dSolutionItem>* solution = calculateSolution(E02T, E02B);
+//
+//    ASSERT_FALSE(solution->empty()) << "No solution was found";
+//
+//    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
+//        "Rotate commands were found in the solution";
+//
+//    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
+//    ASSERT_EQ(426, totalCost) << "The cost is not as expected.";
+//}
+//
+//// Test of the aisle E03-T ---> E03-B
+//TEST(Test_Solution, Barrett_Aisles_E03T_E03B)
+//{
+//    Solution<Grid2dSolutionItem>* solution = calculateSolution(E03T, E03B);
+//
+//    ASSERT_FALSE(solution->empty()) << "No solution was found";
+//
+//    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
+//        "Rotate commands were found in the solution";
+//
+//    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
+//    ASSERT_EQ(426, totalCost) << "The cost is not as expected.";
+//}
+//
+//// Test of the aisle E04-T ---> E04-B
+//TEST(Test_Solution, Barrett_Aisles_E04T_E04B)
+//{
+//    Solution<Grid2dSolutionItem>* solution = calculateSolution(E04T, E04B);
+//
+//    ASSERT_FALSE(solution->empty()) << "No solution was found";
+//
+//    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
+//        "Rotate commands were found in the solution";
+//
+//    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
+//    ASSERT_EQ(426, totalCost) << "The cost is not as expected.";
+//}
+//
+//// Test of the aisle CD-T ---> CD-B
+//TEST(Test_Solution, Barrett_Aisles_CDT_CDB)
+//{
+//    Solution<Grid2dSolutionItem>* solution = calculateSolution(CDT, CDB);
+//
+//    ASSERT_FALSE(solution->empty()) << "No solution was found";
+//
+//    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
+//        "Rotate commands were found in the solution";
+//
+//    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
+//    ASSERT_EQ(652, totalCost) << "The cost is not as expected.";
+//}
+//
+//// Test of the aisle AB-T ---> AB-B
+//TEST(Test_Solution, Barrett_Aisles_ABT_ABB)
+//{
+//    Solution<Grid2dSolutionItem>* solution = calculateSolution(ABT, ABB);
+//
+//    ASSERT_FALSE(solution->empty()) << "No solution was found";
+//
+//    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
+//        "Rotate commands were found in the solution";
+//
+//    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
+//    ASSERT_EQ(652, totalCost) << "The cost is not as expected.";
+//}
+//
+//// Test of the aisle H01-T ---> H01-B
+//TEST(Test_Solution, Barrett_Aisles_H01T_H01B)
+//{
+//    Solution<Grid2dSolutionItem>* solution = calculateSolution(H01T, H01B);
+//
+//    ASSERT_FALSE(solution->empty()) << "No solution was found";
+//
+//    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
+//        "Rotate commands were found in the solution";
+//
+//    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
+//    ASSERT_EQ(596, totalCost) << "The cost is not as expected.";
+//}
+//
+//// Test of the aisle G01-T ---> G01-B
+//TEST(Test_Solution, Barrett_Aisles_G01T_G01B)
+//{
+//    Solution<Grid2dSolutionItem>* solution = calculateSolution(G01T, G01B);
+//
+//    ASSERT_FALSE(solution->empty()) << "No solution was found";
+//
+//    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
+//        "Rotate commands were found in the solution";
+//
+//    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
+//    ASSERT_EQ(596, totalCost) << "The cost is not as expected.";
+//}
+//
+//// Test of the aisle F01-T ---> F01-B
+//TEST(Test_Solution, Barrett_Aisles_F01T_F01B)
+//{
+//    Solution<Grid2dSolutionItem>* solution = calculateSolution(F01T, F01B);
+//
+//    ASSERT_FALSE(solution->empty()) << "No solution was found";
+//
+//    ASSERT_FALSE(test::PathPlanningUtils::checkForNoRotate(solution)) <<
+//        "Rotate commands were found in the solution";
+//
+//    double totalCost = Grid2dSolutionUtils::getTotalCost(*solution);
+//    ASSERT_EQ(596, totalCost) << "The cost is not as expected.";
+//}

@@ -1,4 +1,12 @@
+/*
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
+ *
+ * This is proprietary software, unauthorized distribution is not permitted.
+ */
 #pragma once
+
+#include <cmath>
+using namespace std;
 
 #include <srsnode_navigation/global_planner/Traceback.hpp>
 #include <srsnode_navigation/global_planner/PotentialCalculator.hpp>
@@ -25,7 +33,8 @@ class GradientPath : public Traceback
         //
         bool getPath(float* potential, double start_x, double start_y, double end_x, double end_y, std::vector<std::pair<float, float> >& path);
     private:
-        inline int getNearestPoint(int stc, float dx, float dy) {
+        inline int getNearestPoint(int stc, float dx, float dy)
+        {
             int pt = stc + (int)round(dx) + (int)(xs_ * round(dy));
             return std::max(0, std::min(xs_ * ys_ - 1, pt));
         }

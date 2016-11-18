@@ -20,12 +20,13 @@ public:
     Expander(LogicalMap* logicalMap,
         costmap_2d::Costmap2D* costMap,
         PotentialCalculator* pCalculator) :
-            lethal_cost_(253),
-            neutral_cost_(50),
+            lethalCost_(253),
+            neutralCost_(10),
             logicalGrid_(logicalMap->getGrid()),
             costGrid_(costMap->getCharMap()),
             pCalculator_(pCalculator),
-            cells_visited_(0)
+            weightRatio_(100.0),
+            allowUnknown_(true)
     {
         nx_ = costMap->getSizeInCellsX();
         ny_ = costMap->getSizeInCellsY();
@@ -35,36 +36,46 @@ public:
     virtual ~Expander()
     {}
 
+    void allowUnknown(bool value)
+    {
+        allowUnknown_ = value;
+    }
+
     virtual bool calculatePotentials(
         double start_x, double start_y,
         double end_x, double end_y,
         int cycles, float* potential) = 0;
 
-    void setLethalCost(unsigned char lethal_cost)
+    void setLethalCost(unsigned int lethal_cost)
     {
-        lethal_cost_ = lethal_cost;
+        lethalCost_ = lethal_cost;
     }
 
-    void setNeutralCost(unsigned char neutral_cost)
+    void setNeutralCost(unsigned int neutral_cost)
     {
-        neutral_cost_ = neutral_cost;
+        neutralCost_ = neutral_cost;
+    }
+
+    void setWeightRatio(unsigned int ratio)
+    {
+        weightRatio_ = ratio;
     }
 
     void clearEndpoint(float* potentials, int gx, int gy, int s)
     {
-        int startCell = toIndex(gx, gy);
+        int startCell = coordinates2Index(gx, gy);
 
         for (int i =- s; i <= s; i++)
         {
-            for(int j=-s;j<=s;j++)
+            for (int j = -s; j <= s; j++)
             {
                 int n = startCell + i + nx_ * j;
-                if (potentials[n] < POT_HIGH)
+                if (potentials[n] < PotentialCalculator::MAX_POTENTIAL)
                 {
                     continue;
                 }
 
-                float c = costGrid_[n] + neutral_cost_;
+                float c = costGrid_[n] + neutralCost_;
                 float potential = pCalculator_->calculatePotential(potentials, c, n);
 
                 potentials[n] = potential;
@@ -79,20 +90,26 @@ protected:
         y = index / nx_;
     }
 
-    inline int toIndex(int x, int y)
+    inline int coordinates2Index(int x, int y)
     {
         return x + nx_ * y;
     }
 
-    int nx_, ny_, ns_;
+    bool allowUnknown_;
 
-    unsigned char lethal_cost_;
-    unsigned char neutral_cost_;
-    int cells_visited_;
+    unsigned char* costGrid_;
+
+    unsigned int lethalCost_;
+    Grid2d* logicalGrid_;
+
+    int nx_;
+    int ny_;
+    int ns_;
+    unsigned int neutralCost_;
 
     PotentialCalculator* pCalculator_;
-    Grid2d* logicalGrid_;
-    unsigned char* costGrid_;
+
+    unsigned int weightRatio_;
 };
 
 }

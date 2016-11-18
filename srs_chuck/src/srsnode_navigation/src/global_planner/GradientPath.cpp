@@ -95,15 +95,15 @@ bool GradientPath::getPath(float* potential,
         int stcpx = stc - xs_;
 
         // check for potentials at eight positions near cell
-        if (potential[stc] >= POT_HIGH ||
-            potential[stc + 1] >= POT_HIGH ||
-            potential[stc - 1] >= POT_HIGH ||
-            potential[stcnx] >= POT_HIGH ||
-            potential[stcnx + 1] >= POT_HIGH ||
-            potential[stcnx - 1] >= POT_HIGH ||
-            potential[stcpx] >= POT_HIGH ||
-            potential[stcpx + 1] >= POT_HIGH ||
-            potential[stcpx - 1] >= POT_HIGH ||
+        if (potential[stc] >= PotentialCalculator::MAX_POTENTIAL ||
+            potential[stc + 1] >= PotentialCalculator::MAX_POTENTIAL ||
+            potential[stc - 1] >= PotentialCalculator::MAX_POTENTIAL ||
+            potential[stcnx] >= PotentialCalculator::MAX_POTENTIAL ||
+            potential[stcnx + 1] >= PotentialCalculator::MAX_POTENTIAL ||
+            potential[stcnx - 1] >= PotentialCalculator::MAX_POTENTIAL ||
+            potential[stcpx] >= PotentialCalculator::MAX_POTENTIAL ||
+            potential[stcpx + 1] >= PotentialCalculator::MAX_POTENTIAL ||
+            potential[stcpx - 1] >= PotentialCalculator::MAX_POTENTIAL ||
             oscillation_detected)
         {
             cout << "[Path] Pot fn boundary, following grid ()" <<
@@ -164,7 +164,7 @@ bool GradientPath::getPath(float* potential,
             dx = 0;
             dy = 0;
 
-            if (potential[stc] >= POT_HIGH)
+            if (potential[stc] >= PotentialCalculator::MAX_POTENTIAL)
             {
                 cout << "[PathCalc] No path found, high potential" << endl;
                 return 0;
@@ -236,30 +236,30 @@ float GradientPath::gradCell(float* potential, int n)
     float dy = 0.0;
 
     // check for in an obstacle
-    if (cv >= POT_HIGH) {
-        if (potential[n - 1] < POT_HIGH)
+    if (cv >= PotentialCalculator::MAX_POTENTIAL) {
+        if (potential[n - 1] < PotentialCalculator::MAX_POTENTIAL)
             dx = -lethal_cost_;
-        else if (potential[n + 1] < POT_HIGH)
+        else if (potential[n + 1] < PotentialCalculator::MAX_POTENTIAL)
             dx = lethal_cost_;
 
-        if (potential[n - xs_] < POT_HIGH)
+        if (potential[n - xs_] < PotentialCalculator::MAX_POTENTIAL)
             dy = -lethal_cost_;
-        else if (potential[xs_ + 1] < POT_HIGH)
+        else if (potential[xs_ + 1] < PotentialCalculator::MAX_POTENTIAL)
             dy = lethal_cost_;
     }
 
     else                // not in an obstacle
     {
         // dx calc, average to sides
-        if (potential[n - 1] < POT_HIGH)
+        if (potential[n - 1] < PotentialCalculator::MAX_POTENTIAL)
             dx += potential[n - 1] - cv;
-        if (potential[n + 1] < POT_HIGH)
+        if (potential[n + 1] < PotentialCalculator::MAX_POTENTIAL)
             dx += cv - potential[n + 1];
 
         // dy calc, average to sides
-        if (potential[n - xs_] < POT_HIGH)
+        if (potential[n - xs_] < PotentialCalculator::MAX_POTENTIAL)
             dy += potential[n - xs_] - cv;
-        if (potential[n + xs_] < POT_HIGH)
+        if (potential[n + xs_] < PotentialCalculator::MAX_POTENTIAL)
             dy += cv - potential[n + xs_];
     }
 

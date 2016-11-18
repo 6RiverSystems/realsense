@@ -5,6 +5,8 @@
  */
 #pragma once
 
+#include <iostream>
+
 #include <nav_msgs/Path.h>
 
 namespace srs {
@@ -24,8 +26,16 @@ public:
     void interpolate(std::vector<geometry_msgs::PoseStamped>& path,
                      int start_index, int end_index);
 
-    void setMode(OrientationMode new_mode){ omode_ = new_mode; }
-    void setMode(int new_mode){ setMode((OrientationMode) new_mode); }
+    void setMode(OrientationMode new_mode)
+    {
+        omode_ = new_mode;
+    }
+
+    void setMode(int new_mode)
+    {
+        setMode(static_cast<OrientationMode>(new_mode));
+    }
+
 protected:
     OrientationMode omode_;
 };

@@ -23,7 +23,7 @@ struct Index
     float cost;
 };
 
-struct greater1
+struct GreaterThan
 {
     bool operator()(const Index& a, const Index& b) const
     {

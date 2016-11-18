@@ -1,4 +1,4 @@
-<!-- 
+<!--
   *
   * (c) Copyright 2015-2016 River Systems, all rights reserved.
   *
@@ -8,30 +8,31 @@
 <launch>
     <arg name="use_sim_time" />
 
-    <remap from="/scan" to="/internal/sensors/lidar/scan/filtered"/>
-    <remap from="/map" to="/internal/state/map/ros_occupancy"/>
-    <remap from="/initialpose" to="/request/initial_pose"/>
+	<remap from="/scan" to="/internal/sensors/lidar/scan/filtered"/>
+	<remap from="/map" to="/internal/state/map/ros_occupancy"/>
+	<remap from="/initialpose" to="/request/initial_pose"/>
 
-    <!--- Move Base -->
-    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" launch-prefix="taskset -c 3">
-        <remap from="/move_base_simple/goal" to="/request/goal"/>
-        <remap from="/cmd_vel" to="/internal/sensors/odometry/velocity/cmd"/>
+	<!--- Move Base -->
+	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" launch-prefix="taskset -c 3">
+		<remap from="/move_base_simple/goal" to="/request/goal"/>
+		<remap from="/cmd_vel" to="/internal/sensors/odometry/velocity/cmd"/>
+		<remap from="/odom" to="/internal/sensors/odometry/velocity/estimate"/>
 
         <param name="base_global_planner" value="global_planner/SrsPlannerPotentials"/>
 
-        <!-- Move Base -->
-        <rosparam file="$(find srsnode_navigation)/config/move_base_params.yaml" command="load" />
+		<!-- Move Base -->
+		<rosparam file="$(find srsnode_navigation)/config/move_base_params.yaml" command="load" />
 
-        <!-- Global Costmap -->
-        <rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
-        <rosparam unless="$(arg use_sim_time)" file="$(find srsnode_navigation)/config/costmap_sensors.yaml" command="load" ns="global_costmap" />
-        <rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
-        <rosparam unless="$(arg use_sim_time)" file="$(find srsnode_navigation)/config/costmap_sensors.yaml" command="load" ns="local_costmap" />
-        <rosparam file="$(find srsnode_navigation)/config/local_costmap_params.yaml" command="load" />
-        <rosparam file="$(find srsnode_navigation)/config/global_costmap_params.yaml" command="load" />
-        <rosparam file="$(find srsnode_navigation)/config/local_planner_params.yaml" command="load" />
+		<!-- Global Costmap -->
+		<rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+		<rosparam unless="$(arg use_sim_time)" file="$(find srsnode_navigation)/config/costmap_sensors.yaml" command="load" ns="global_costmap" />
+		<rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+		<rosparam unless="$(arg use_sim_time)" file="$(find srsnode_navigation)/config/costmap_sensors.yaml" command="load" ns="local_costmap" />
+		<rosparam file="$(find srsnode_navigation)/config/local_costmap_params.yaml" command="load" />
+		<rosparam file="$(find srsnode_navigation)/config/global_costmap_params.yaml" command="load" />
+		<rosparam file="$(find srsnode_navigation)/config/local_planner_params.yaml" command="load" />
 
-        <!-- Global Planner -->
-        <rosparam file="$(find srsnode_navigation)/config/global_planner_params.yaml" command="load" />
-    </node>
+		<!-- Global Planner -->
+		<rosparam file="$(find srsnode_navigation)/config/global_planner_params.yaml" command="load" />
+	</node>
 </launch>

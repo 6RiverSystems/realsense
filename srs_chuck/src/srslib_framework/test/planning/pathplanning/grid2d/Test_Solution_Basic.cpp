@@ -23,9 +23,9 @@ TEST(Test_Solution, BasicEmptyGrid)
 {
     Solution<Grid2dSolutionItem> correctSolution;
     correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(0, 0, 0), Pose<>(1, 0, 0), 1});
-    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 0, 0), Pose<>(1, 0, M_PI_2), 4});
-    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 0, M_PI_2), Pose<>(1, 1, M_PI_2), 5});
-    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 7});
+    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 0, 0), Pose<>(1, 0, M_PI_2), 3});
+    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 0, M_PI_2), Pose<>(1, 1, M_PI_2), 4});
+    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 6});
 
     Grid2d grid(GRID_SIZE, GRID_SIZE);
 
@@ -37,8 +37,6 @@ TEST(Test_Solution, BasicEmptyGrid)
 
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromSingleGoal(
         logical, start, goal);
-
-    cout << *gridSolution << endl;
 
     // The solution agrees with itself
     ASSERT_EQ(*gridSolution, *gridSolution) <<

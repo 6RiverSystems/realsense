@@ -8,7 +8,7 @@
 <launch>
 	<remap from="/map" to="/internal/state/map/grid"/>
 	<remap from="/initialpose" to="/request/initial_pose"/>
-	<remap from="odom" to="/internal/sensors/odometry/velocity"/>  
+	<remap from="odom" to="/internal/sensors/odometry/velocity/cmd"/>  
 
 	<!-- Choose visualization -->
 	<arg name="rviz"						default="false" />
@@ -39,7 +39,7 @@
 	<arg name="scan_cloud_topic"			default="/scan_cloud"/>
 
 	<arg name="visual_odometry"				default="false"/>				<!-- Generate visual odometry -->
-	<arg name="odom_topic"					default="/internal/sensors/odometry/velocity"/> <!-- Odometry topic used if visual_odometry is false -->
+	<arg name="odom_topic"					default="/internal/sensors/odometry/velocity/cmd"/> <!-- Odometry topic used if visual_odometry is false -->
 	<arg name="odom_frame_id"				default=""/>					<!-- If set, TF is used to get odometry instead of the topic -->
 
 	<arg name="namespace"					default="rtabmap"/>

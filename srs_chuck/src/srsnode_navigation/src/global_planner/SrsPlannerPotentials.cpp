@@ -24,24 +24,33 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlannerPotentials::SrsPlannerPotentials() :
     srsMapStack_(nullptr),
-    costmap_(NULL),
+    costMap_(nullptr),
     initialized_(false),
-    allow_unknown_(true),
-    astar_(nullptr)
+    astar_(nullptr),
+    useQuadratic_(true),
+    useGridPath_(true),
+    allowUnknown_(true),
+    publishPotential_(false),
+    lethalCost_(253),
+    neutralCost_(10)
 {
     ROS_WARN("SrsPlannerPotentials::SrsPlannerPotentials() called");
 
-    initializeParams();
     updateMapStack(nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlannerPotentials::SrsPlannerPotentials(string name, costmap_2d::Costmap2DROS* rosCostMap) :
     srsMapStack_(nullptr),
-    costmap_(NULL),
+    costMap_(nullptr),
     initialized_(false),
-    allow_unknown_(true),
-    astar_(nullptr)
+    astar_(nullptr),
+    useQuadratic_(true),
+    useGridPath_(true),
+    allowUnknown_(true),
+    publishPotential_(false),
+    lethalCost_(253),
+    neutralCost_(10)
 {
     ROS_WARN("SrsPlannerPotentials::SrsPlannerPotentials(...) called");
 
@@ -62,33 +71,31 @@ void SrsPlannerPotentials::initialize(std::string name, costmap_2d::Costmap2D* c
     {
         ROS_WARN("SrsPlannerPotentials::initialize(...) called");
 
-        initializeParams();
-        //updateMapStack(costmap);
+        orientationFilter_ = new OrientationFilter();
 
-        costmap_ = costmap;
-        frame_id_ = frame_id;
+        configServer_.setCallback(boost::bind(&SrsPlannerPotentials::onConfigChange, this, _1, _2));
 
-        orientation_filter_ = new OrientationFilter();
+        updateMapStack(costmap);
+
+        costMap_ = costmap;
+        tfFrameid_ = frame_id;
 
         ros::NodeHandle private_nh("~/" + name);
 
-        plan_pub_ = private_nh.advertise<nav_msgs::Path>("plan", 1);
-        potential_pub_ = private_nh.advertise<nav_msgs::OccupancyGrid>("potential", 1);
+        planPublisher_ = private_nh.advertise<nav_msgs::Path>("plan", 1);
+        potentialPublisher_ = private_nh.advertise<nav_msgs::OccupancyGrid>("potential", 1);
 
-        private_nh.param("planner_window_x", planner_window_x_, 0.0);
-        private_nh.param("planner_window_y", planner_window_y_, 0.0);
-        private_nh.param("default_tolerance", default_tolerance_, 0.0);
-        private_nh.param("publish_scale", publish_scale_, 100);
+        private_nh.param("publish_scale", publishScale_, 100);
 
         ros::NodeHandle prefix_nh;
-        tf_prefix_ = tf::getPrefixParam(prefix_nh);
+        tfPrefix_ = tf::getPrefixParam(prefix_nh);
 
-        potential_array_ = nullptr;
+        potentialArray_ = nullptr;
         initialized_ = true;
     }
     else
     {
-        ROS_WARN("This planner has already been initialized, you can't call it twice, doing nothing");
+        ROS_WARN("Planner has already been initialized");
     }
 }
 
@@ -111,7 +118,7 @@ bool SrsPlannerPotentials::makePlan(
     // Make sure that we get the latest Map Stack
     updateMapStack(nullptr);
 
-    return makePlan(start, goal, default_tolerance_, plan);
+    return makePlan(start, goal, 0, plan);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,44 +130,48 @@ bool SrsPlannerPotentials::makePlan(
 
     if (!initialized_)
     {
-        ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
+        ROS_ERROR("This planner has not been initialized yet. Please call initialize() first");
         return false;
     }
 
     path.clear();
 
-    ros::NodeHandle n;
-    std::string global_frame = frame_id_;
-
-    if (tf::resolve(tf_prefix_, goal.header.frame_id) != tf::resolve(tf_prefix_, global_frame))
+    if (tf::resolve(tfPrefix_, goal.header.frame_id) != tf::resolve(tfPrefix_, tfFrameid_))
     {
         ROS_ERROR("The goal pose passed to this planner must be in the %s frame.  It is instead in the %s frame.",
-            tf::resolve(tf_prefix_, global_frame).c_str(), tf::resolve(tf_prefix_, goal.header.frame_id).c_str());
+            tf::resolve(tfPrefix_, tfFrameid_).c_str(), tf::resolve(tfPrefix_, goal.header.frame_id).c_str());
         return false;
     }
 
-    if (tf::resolve(tf_prefix_, start.header.frame_id) != tf::resolve(tf_prefix_, global_frame))
+    if (tf::resolve(tfPrefix_, start.header.frame_id) != tf::resolve(tfPrefix_, tfFrameid_))
     {
         ROS_ERROR("The start pose passed to this planner must be in the %s frame.  It is instead in the %s frame.",
-            tf::resolve(tf_prefix_, global_frame).c_str(), tf::resolve(tf_prefix_, start.header.frame_id).c_str());
+            tf::resolve(tfPrefix_, tfFrameid_).c_str(), tf::resolve(tfPrefix_, start.header.frame_id).c_str());
         return false;
     }
 
-    astar_ = new AStarPotentials(srsMapStack_->getLogicalMap(), costmap_);
+    astar_ = new AStarPotentials(srsMapStack_->getLogicalMap(), costMap_);
 
-    // clear the starting cell within the costmap because we know it can't be an obstacle
     tf::Stamped<tf::Pose> start_pose;
     tf::poseStampedMsgToTF(start, start_pose);
 
     std::vector<std::pair<float, float>> plan;
 
-    bool found = astar_->calculatePath(
+    AStarPotentials::SearchParameters searchParams;
+    searchParams.useQuadratic = useQuadratic_;
+    searchParams.useGridPath = useGridPath_;
+    searchParams.allowUnknown = allowUnknown_;
+    searchParams.lethalCost = lethalCost_;
+    searchParams.neutralCost = neutralCost_;
+    searchParams.weightRatio = weightRatio_;
+
+    bool found = astar_->calculatePath(searchParams,
         start.pose.position.x, start.pose.position.y,
         goal.pose.position.x, goal.pose.position.y,
         plan,
-        potential_array_);
+        potentialArray_);
 
-    publishPotential(potential_array_);
+    publishPotential(potentialArray_);
 
     if (found)
     {
@@ -170,18 +181,19 @@ bool SrsPlannerPotentials::makePlan(
         goal_copy.header.stamp = ros::Time::now();
         path.push_back(goal_copy);
 
-        // add orientations if needed
-        orientation_filter_->processPath(start, path);
+        orientationFilter_->processPath(start, path);
 
         publishPlan(path);
     }
     else
     {
-        ROS_ERROR("Failed to get a plan.");
+        ROS_ERROR("Failed to get a plan. Saving map.");
+        costMap_->saveMap("cost_map.pgm");
     }
 
-    delete potential_array_;
-    potential_array_ = nullptr;
+
+    delete potentialArray_;
+    potentialArray_ = nullptr;
 
     delete astar_;
     astar_ = nullptr;
@@ -209,7 +221,7 @@ void SrsPlannerPotentials::getPlanFromPotential(
 
         geometry_msgs::PoseStamped pose;
         pose.header.stamp = plan_time;
-        pose.header.frame_id = frame_id_;
+        pose.header.frame_id = tfFrameid_;
         pose.pose.position.x = world_x;
         pose.pose.position.y = world_y;
         pose.pose.position.z = 0.0;
@@ -223,14 +235,22 @@ void SrsPlannerPotentials::getPlanFromPotential(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerPotentials::initializeParams()
+void SrsPlannerPotentials::onConfigChange(srsnode_navigation::SrsPlannerConfig& config, uint32_t level)
 {
+    useQuadratic_ = config.use_quadratic;
+    useGridPath_ = config.use_grid_path;
+    allowUnknown_ = config.allow_unknown;
+    lethalCost_ = config.lethal_cost;
+    neutralCost_ = config.neutral_cost;
+    publishPotential_ = config.publish_potential;
+    weightRatio_ = config.weight_ratio;
+
+    orientationFilter_->setMode(config.orientation_mode);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlannerPotentials::publishPlan(const std::vector<geometry_msgs::PoseStamped>& path)
 {
-    //create a message for the plan
     nav_msgs::Path gui_path;
     gui_path.poses.resize(path.size());
 
@@ -245,19 +265,19 @@ void SrsPlannerPotentials::publishPlan(const std::vector<geometry_msgs::PoseStam
         gui_path.poses[i] = path[i];
     }
 
-    plan_pub_.publish(gui_path);
+    planPublisher_.publish(gui_path);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlannerPotentials::publishPotential(float* potential)
 {
-    int nx = costmap_->getSizeInCellsX();
-    int ny = costmap_->getSizeInCellsY();
+    int nx = costMap_->getSizeInCellsX();
+    int ny = costMap_->getSizeInCellsY();
 
-    double resolution = costmap_->getResolution();
+    double resolution = costMap_->getResolution();
 
     nav_msgs::OccupancyGrid grid;
-    grid.header.frame_id = frame_id_;
+    grid.header.frame_id = tfFrameid_;
     grid.header.stamp = ros::Time::now();
     grid.info.resolution = resolution;
 
@@ -266,7 +286,7 @@ void SrsPlannerPotentials::publishPotential(float* potential)
 
     double wx;
     double wy;
-    costmap_->mapToWorld(0, 0, wx, wy);
+    costMap_->mapToWorld(0, 0, wx, wy);
     grid.info.origin.position.x = wx - resolution / 2;
     grid.info.origin.position.y = wy - resolution / 2;
     grid.info.origin.position.z = 0.0;
@@ -277,8 +297,8 @@ void SrsPlannerPotentials::publishPotential(float* potential)
     float max = 0.0;
     for (unsigned int i = 0; i < grid.data.size(); i++)
     {
-        float potential = potential_array_[i];
-        if (potential < POT_HIGH)
+        float potential = potentialArray_[i];
+        if (potential < PotentialCalculator::MAX_POTENTIAL)
         {
             if (potential > max)
             {
@@ -289,17 +309,17 @@ void SrsPlannerPotentials::publishPotential(float* potential)
 
     for (unsigned int i = 0; i < grid.data.size(); i++)
     {
-        if (potential_array_[i] >= POT_HIGH)
+        if (potentialArray_[i] >= PotentialCalculator::MAX_POTENTIAL)
         {
             grid.data[i] = -1;
         }
         else
         {
-            grid.data[i] = potential_array_[i] * publish_scale_ / max;
+            grid.data[i] = potentialArray_[i] * publishScale_ / max;
         }
     }
 
-    potential_pub_.publish(grid);
+    potentialPublisher_.publish(grid);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -313,8 +333,6 @@ void SrsPlannerPotentials::updateMapStack(costmap_2d::Costmap2D* rosCostMap)
         delete srsMapStack_;
         srsMapStack_ = tapMapStack_.pop();
     }
-
-    // TODO: Sync the obstruction map in the stack with the new rosCostMap
 }
 
 } // namespace srs

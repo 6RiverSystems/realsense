@@ -10,23 +10,17 @@
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-AStarPotentials::AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap)
+AStarPotentials::AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap) :
+    potentialCalculator_(nullptr),
+    pathBuilder_(nullptr),
+    stateExpander_(nullptr)
 {
     costMap_ = costMap;
     logicalMap_ = logicalMap;
-
-    int sizeX = costMap_->getSizeInCellsX();
-    int sizeY = costMap_->getSizeInCellsY();
-
-    // potentialCalculator_ = new PotentialCalculator(sizeX, sizeY);
-    potentialCalculator_ = new QuadraticCalculator(sizeX, sizeY);
-
-    stateExpander_ = new AStarExpansion(logicalMap, costMap, potentialCalculator_);
-    pathBuilder_ = new GridPath(potentialCalculator_); // GradientPath(pCalculator_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool AStarPotentials::calculatePath(
+bool AStarPotentials::calculatePath(SearchParameters searchParams,
     double start_x, double start_y,
     double goal_x, double goal_y,
     std::vector<std::pair<float, float>>& path,
@@ -35,8 +29,29 @@ bool AStarPotentials::calculatePath(
     int sizeX = costMap_->getSizeInCellsX();
     int sizeY = costMap_->getSizeInCellsY();
 
+    delete potentialCalculator_;
+
+    potentialCalculator_ = searchParams.useQuadratic ?
+        new QuadraticCalculator(sizeX, sizeY) :
+        new PotentialCalculator(sizeX, sizeY);
     potentialCalculator_->setSize(sizeX, sizeY);
+
+    if (searchParams.useGridPath)
+    {
+        pathBuilder_ = new GridPath(potentialCalculator_);
+    }
+    else
+    {
+        pathBuilder_ = new GradientPath(potentialCalculator_);
+    }
     pathBuilder_->setSize(sizeX, sizeY);
+    pathBuilder_->setLethalCost(searchParams.lethalCost);
+
+    stateExpander_ = new AStarExpansion(logicalMap_, costMap_, potentialCalculator_);
+    stateExpander_->allowUnknown(searchParams.allowUnknown);
+    stateExpander_->setLethalCost(searchParams.lethalCost);
+    stateExpander_->setWeightRatio(searchParams.weightRatio);
+    stateExpander_->setNeutralCost(searchParams.neutralCost);
 
     potentials = new float[sizeX * sizeY];
 
@@ -51,7 +66,6 @@ bool AStarPotentials::calculatePath(
     double goal_x_d;
     double goal_y_d;
     worldToMap(wx, wy, goal_x_d, goal_y_d);
-
 
     unsigned int start_x_i;
     unsigned int start_y_i;

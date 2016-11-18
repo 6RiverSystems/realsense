@@ -3,15 +3,15 @@
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-float QuadraticCalculator::calculatePotential(float* potential, unsigned char cost,
+float QuadraticCalculator::calculatePotential(float* potentials, unsigned int cost,
     int n, float prev_potential)
 {
     // get neighbors
     float u, d, l, r;
-    l = potential[n - 1];
-    r = potential[n + 1];
-    u = potential[n - nx_];
-    d = potential[n + nx_];
+    l = potentials[n - 1];
+    r = potentials[n + 1];
+    u = potentials[n - nx_];
+    d = potentials[n + nx_];
 
     // find lowest, and its lowest neighbor
     float ta, tc;

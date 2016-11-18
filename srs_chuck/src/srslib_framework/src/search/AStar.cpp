@@ -3,6 +3,8 @@
 #include <iostream>
 using namespace std;
 
+#define DEBUG_ASTAR 0
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,27 +70,7 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
 
     clear();
 
-#if DEBUG_ASTAR
-    cout << "OPEN ------------------------------------------------------------------------------------------" << endl;
-    cout << open_ << endl << endl;
-    cout << "-----------------------------------------------------------------------------------------------" << endl;
-
-    cout << "CLOSED ----------------------------------------------------------------------------------------" << endl;
-    for (auto node : closed_)
-    {
-        cout << *node << endl;
-    }
-    cout << "-----------------------------------------------------------------------------------------------" << endl;
-#endif
-    // Add the starting node to the open queue
-    open_.push(startNode_->getTotalCost(), startNode_);
-
-    vector<SearchNode*> nextSearchNodes;
-
-    SearchNode* currentNode = nullptr;
-    while (!open_.empty())
-    {
-#if DEBUG_ASTAR
+    #if DEBUG_ASTAR
         cout << "OPEN ------------------------------------------------------------------------------------------" << endl;
         cout << open_ << endl << endl;
         cout << "-----------------------------------------------------------------------------------------------" << endl;
@@ -99,17 +81,39 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
             cout << *node << endl;
         }
         cout << "-----------------------------------------------------------------------------------------------" << endl;
-#endif
+    #endif
+
+    // Add the starting node to the open queue
+    open_.push(startNode_->getTotalCost(), startNode_);
+
+    vector<SearchNode*> nextSearchNodes;
+
+    SearchNode* currentNode = nullptr;
+    while (!open_.empty())
+    {
+        #if DEBUG_ASTAR
+            cout << "OPEN ------------------------------------------------------------------------------------------" << endl;
+            cout << open_ << endl << endl;
+            cout << "-----------------------------------------------------------------------------------------------" << endl;
+
+            cout << "CLOSED ----------------------------------------------------------------------------------------" << endl;
+            for (auto node : closed_)
+            {
+                cout << *node << endl;
+            }
+            cout << "-----------------------------------------------------------------------------------------------" << endl;
+        #endif
+
         // The current node is popped from the priority queue and
         // immediately declared closed
         open_.pop(currentNode);
         closed_.insert(currentNode);
 
-#if DEBUG_ASTAR
-        cout << "===============================================================================================" << endl;
-        cout << *currentNode << endl;
-        cout << "===============================================================================================" << endl;
-#endif
+        #if DEBUG_ASTAR
+            cout << "===============================================================================================" << endl;
+            cout << *currentNode << endl;
+            cout << "===============================================================================================" << endl;
+        #endif
 
         // If the current node satisfies its goal, then
         // exit and return the solution
@@ -123,14 +127,14 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
         // from the current node
         currentNode->getNeighbors(nextSearchNodes);
 
-#if DEBUG_ASTAR
-        cout << "NEXT ------------------------------------------------------------------------------------------" << endl;
-        for (auto node : nextSearchNodes)
-        {
-            cout << *node << endl;
-        }
-        cout << "-----------------------------------------------------------------------------------------------" << endl;
-#endif
+        #if DEBUG_ASTAR
+            cout << "NEXT ------------------------------------------------------------------------------------------" << endl;
+            for (auto node : nextSearchNodes)
+            {
+                cout << *node << endl;
+            }
+            cout << "-----------------------------------------------------------------------------------------------" << endl;
+        #endif
 
         // Try to push the neighbors in the open queue
         pushNodes(nextSearchNodes);
@@ -145,25 +149,25 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void AStar::pushNodes(vector<SearchNode*>& nodes)
 {
-#if DEBUG_ASTAR
-    cout << "OPEN ------------------------------------------------------------------------------------------" << endl;
-    cout << open_ << endl << endl;
-    cout << "-----------------------------------------------------------------------------------------------" << endl;
+    #if DEBUG_ASTAR
+        cout << "OPEN ------------------------------------------------------------------------------------------" << endl;
+        cout << open_ << endl << endl;
+        cout << "-----------------------------------------------------------------------------------------------" << endl;
 
-    cout << "CLOSED ----------------------------------------------------------------------------------------" << endl;
-    for (auto node : closed_)
-    {
-        cout << *node << endl;
-    }
-    cout << "-----------------------------------------------------------------------------------------------" << endl;
-#endif
+        cout << "CLOSED ----------------------------------------------------------------------------------------" << endl;
+        for (auto node : closed_)
+        {
+            cout << *node << endl;
+        }
+        cout << "-----------------------------------------------------------------------------------------------" << endl;
+    #endif
 
     for (auto node : nodes)
     {
 
-#if DEBUG_ASTAR
-        cout << "Evaluating: " << *node;
-#endif
+        #if DEBUG_ASTAR
+            cout << "Evaluating: " << *node;
+        #endif
 
         if (!closed_.count(node))
         {
@@ -180,9 +184,9 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
 
                     open_.push(node->getTotalCost(), node);
 
-#if DEBUG_ASTAR
-                    cout << endl << "Better solution: pushed" << endl;
-#endif
+                    #if DEBUG_ASTAR
+                        cout << endl << "Better solution: pushed" << endl;
+                    #endif
                 }
                 else
                 {
@@ -191,9 +195,9 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
                     // and do not do anything else
                     node->release();
 
-#if DEBUG_ASTAR
-                    cout << endl << "Worse solution: pruned (freed)" << endl;
-#endif
+                    #if DEBUG_ASTAR
+                        cout << endl << "Worse solution: pruned (freed)" << endl;
+                    #endif
                 }
             }
             else
@@ -202,9 +206,9 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
                 // add it right away
                 open_.push(node->getTotalCost(), node);
 
-#if DEBUG_ASTAR
-                cout << endl << "Inserted" << endl;
-#endif
+                #if DEBUG_ASTAR
+                    cout << endl << "Inserted" << endl;
+                #endif
             }
         }
         else
@@ -213,17 +217,17 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
             // is no need to add it again. It can be removed
             node->release();
 
-#if DEBUG_ASTAR
-            cout << endl << "In the closed list: pruned (freed)" << endl;
-#endif
+            #if DEBUG_ASTAR
+                cout << endl << "In the closed list: pruned (freed)" << endl;
+            #endif
         }
     }
 
     nodes.clear();
 
-#if DEBUG_ASTAR
-    cout << "DONE ------------------------------------------------------------------------------------------" << endl << endl;
-#endif
+    #if DEBUG_ASTAR
+        cout << "DONE ------------------------------------------------------------------------------------------" << endl << endl;
+    #endif
 }
 
 } // namespace srs

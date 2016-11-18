@@ -29,12 +29,14 @@ public:
         START
     };
 
-    typedef pair<Grid2d::Position, Grid2d::BaseType> ActionResultType;
+    typedef pair<Grid2d::Position, unsigned int> ActionResultType;
 
     static array<ActionEnum, 3> ALLOWED_ACTIONS;
 
     static bool execute(Grid2d* graph, Grid2dNode* fromNode, ActionEnum action,
         ActionResultType& result);
+
+    static bool isCostAvailable(int& cost);
 
     friend ostream& operator<<(ostream& stream, const ActionEnum& action)
     {

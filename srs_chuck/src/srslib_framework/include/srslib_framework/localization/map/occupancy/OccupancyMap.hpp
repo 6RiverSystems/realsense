@@ -113,8 +113,7 @@ public:
 
     int8_t cost2gray(Grid2d::BaseType cost) const
     {
-        int8_t c = static_cast<int8_t>(cost);
-        return c;
+        return static_cast<int8_t>(cost);
     }
 
     void maxCost(unsigned int c, unsigned int r, Grid2d::BaseType cost);

@@ -67,13 +67,20 @@ bool Grid2dAction::addBackward(Grid2d* graph, Grid2dNode* fromNode,
     {
         // Calculate the motion cost
         int motionCost = COMMAND_COSTS[Grid2dAction::BACKWARD];
-        motionCost += graph->getWeight(fromPosition);
-        motionCost += graph->getAggregate(neighbor);
 
-        if (motionCost < Grid2d::PAYLOAD_MAX)
+        int localCost = graph->getWeight(fromPosition);
+        if (isCostAvailable(localCost))
         {
-            result = ActionResultType(neighbor, fromNode->getG() + motionCost);
-            return true;
+            motionCost += localCost;
+
+            localCost = graph->getPayload(neighbor);
+            if (isCostAvailable(localCost))
+            {
+                motionCost += localCost;
+
+                result = ActionResultType(neighbor, fromNode->getG() + motionCost);
+                return true;
+            }
         }
     }
 
@@ -91,13 +98,20 @@ bool Grid2dAction::addForward(Grid2d* graph, Grid2dNode* fromNode,
     {
         // Calculate the motion cost
         int motionCost = COMMAND_COSTS[Grid2dAction::FORWARD];
-        motionCost += graph->getWeight(fromPosition);
-        motionCost += graph->getAggregate(neighbor);
 
-        if (motionCost < Grid2d::PAYLOAD_MAX)
+        int localCost = graph->getWeight(fromPosition);
+        if (isCostAvailable(localCost))
         {
-            result = ActionResultType(neighbor, fromNode->getG() + motionCost);
-            return true;
+            motionCost += localCost;
+
+            localCost = graph->getPayload(neighbor);
+            if (isCostAvailable(localCost))
+            {
+                motionCost += localCost;
+
+                result = ActionResultType(neighbor, fromNode->getG() + motionCost);
+                return true;
+            }
         }
     }
 
@@ -113,18 +127,18 @@ bool Grid2dAction::addRotation(Grid2d* graph, Grid2dNode* fromNode, ActionEnum a
     int newOrientation = AngleMath::normalizeDeg<int>(fromPosition.orientation + angle);
     Grid2d::Position motion = Grid2d::Position(fromPosition.x, fromPosition.y, newOrientation);
 
-    // Calculate the motion cost
-    int motionCost = COMMAND_COSTS[action];
-    motionCost += graph->getWeight(fromPosition);
-    motionCost += graph->getAggregate(motion);
+    result = ActionResultType(motion, fromNode->getG() + COMMAND_COSTS[action]);
+    return true;
+}
 
-    if (motionCost < Grid2d::PAYLOAD_MAX)
+////////////////////////////////////////////////////////////////////////////////////////////////////
+bool Grid2dAction::isCostAvailable(int& cost)
+{
+    if (cost == Grid2d::PAYLOAD_NO_INFORMATION)
     {
-        result = ActionResultType(motion, fromNode->getG() + motionCost);
-        return true;
+        cost = 0;
     }
-
-    return false;
+    return cost < Grid2d::PAYLOAD_MAX;
 }
 
 } // namespace srs

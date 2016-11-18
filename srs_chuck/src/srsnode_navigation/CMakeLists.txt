@@ -19,9 +19,10 @@ set(${PROJECT_NAME}_SOURCES
 
 set(${PROJECT_NAME}_TEST_SOURCES
 
-    test/TestNavigation_OneWay.cpp
+#    test/TestNavigation_OneWay.cpp
+#    test/TestNavigation_WithCostMap.cpp
 #    test/TestNavigation_Barrett_BigSearch.cpp
-    test/TestNavigation_SmallMap.cpp
+#    test/TestNavigation_SmallMap.cpp
 )
 
 ####################################################################################################
@@ -33,7 +34,7 @@ set(PROJECT_NODE ${PROJECT_NAME})
 set(TEST_WORKING_DIR ${PROJECT_SOURCE_DIR}/../srslib_test/data)
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
-set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
@@ -44,6 +45,10 @@ find_package(catkin REQUIRED COMPONENTS
     pluginlib
     srslib_framework
     srslib_test
+)
+
+generate_dynamic_reconfigure_options(
+    cfg/SrsPlanner.cfg
 )
 
 include_directories(

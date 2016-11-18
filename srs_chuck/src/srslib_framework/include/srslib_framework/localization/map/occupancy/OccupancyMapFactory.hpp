@@ -31,9 +31,11 @@ public:
     OccupancyMap* fromGrid2d(Grid2d* grid, double resolution, Pose<> origin);
     OccupancyMap* fromMetadata(const OccupancyMetadata& metadata);
     OccupancyMap* fromMetadata(const OccupancyMetadata& metadata, const vector<int8_t>& occupancy);
+    OccupancyMap* fromMetadataRawCost(const OccupancyMetadata& metadata);
 
 private:
     void extractMonoChannel(SDL_Surface* image);
+    void extractMonoChannelRaw(SDL_Surface* image);
     void extractRGBChannel(SDL_Surface* image);
     void extractRGBAChannel(SDL_Surface* image);
 

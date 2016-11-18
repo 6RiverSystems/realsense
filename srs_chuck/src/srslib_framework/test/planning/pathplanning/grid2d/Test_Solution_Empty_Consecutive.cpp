@@ -41,7 +41,6 @@ TEST(Test_Trajectory, Empty_Consecutive)
 
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromConsecutiveGoals(
         mapStack->getOccupancyMap(), robotPose, goals);
-    cout << *gridSolution << endl;
 
     Chuck chuck;
     Trajectory<> trajectory;
@@ -51,6 +50,4 @@ TEST(Test_Trajectory, Empty_Consecutive)
 
     solutionConverter.fromSolution(gridSolution2);
     solutionConverter.getTrajectory(trajectory);
-
-    cout << trajectory << endl;
 }

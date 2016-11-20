@@ -21,6 +21,15 @@ namespace debug {
 
 } // namespace debug
 
+namespace driver {
+
+    static const string BRAINSTEM_CMD_SOUND = "/internal/drivers/brainstem/cmd/sound";
+    static const string BRAINSTEM_STATE_CONNECTED = "/internal/drivers/brainstem/state/connected";
+
+    static const string ODOMETRY_CMD_VELOCITY = "/internal/sensors/odometry/velocity/cmd";
+
+} // namespace debug
+
 namespace internal {
 
     static const string GOAL_ARRIVED = "/internal/state/goal/arrived";
@@ -29,8 +38,6 @@ namespace internal {
     static const string GOAL_TARGET_AREA = "/internal/state/goal/target_area";
 
     static const string GOTO_GOAL = "/move_base_simple/goal";
-
-    static const string HWCMD_SOUND = "/internal/hw_cmd/sound";
 
     static const string MAP_ROS_AMCL_OCCUPANCY = "/internal/state/map/ros_amcl_occupancy";
     static const string MAP_LOGICAL = "/internal/state/map/complete";

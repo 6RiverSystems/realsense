@@ -9,7 +9,7 @@
 
 #include <srslib_framework/ros/tap/subscriber/RosSubscriber.hpp>
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
-#include <srslib_framework/ros/tap/TapHwCmd_Sound.hpp>
+#include <srslib_framework/ros/tap/TapBrainstemCmd_Sound.hpp>
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
 #include <srsdrv_brainstem/sw_message/SoftwareMessageHandler.hpp>
@@ -36,7 +36,7 @@ private:
         uint16_t numberOfCycles;
     HW_MESSAGE_END
 
-    TapHwCmd_Sound tapSound_;
+    TapBrainstemCmd_Sound tapSound_;
 };
 
 } // namespace srs

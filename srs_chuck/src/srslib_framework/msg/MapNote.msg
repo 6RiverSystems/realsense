@@ -4,4 +4,4 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 
-bool beep
+bool warning_beep

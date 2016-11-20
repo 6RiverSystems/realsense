@@ -10,12 +10,12 @@
 
 namespace srs {
 
-class TapHwCmd_Sound :
+class TapBrainstemCmd_Sound :
     public SubscriberSound
 {
 public:
-    TapHwCmd_Sound() :
-        SubscriberSound(ChuckTopics::internal::HWCMD_SOUND)
+    TapBrainstemCmd_Sound() :
+        SubscriberSound(ChuckTopics::driver::BRAINSTEM_CMD_SOUND)
     {}
 };
 

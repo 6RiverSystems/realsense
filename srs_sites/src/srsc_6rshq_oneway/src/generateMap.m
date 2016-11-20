@@ -18,12 +18,12 @@ layerOneway = convertToWeightedArea(layerOneway, 1, 0, 0, 0, 100);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Honk layer
-layerBeep = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-beep.png', ...
+layerBeep = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-warning_beep.png', ...
     RESOLUTION, ORIGIN);
 showMap(layerBeep, 'Beeps');
 
-layerBeep = convertToLabeledArea(layerBeep, 1, 'beep1', {'beep'});
-layerBeep = convertToLabeledArea(layerBeep, 2, 'beep2', {'beep'});
+layerBeep = convertToLabeledArea(layerBeep, 1, 'wb1', {'warning_beep'});
+layerBeep = convertToLabeledArea(layerBeep, 2, 'wb2', {'warning_beep'});
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One-way layer

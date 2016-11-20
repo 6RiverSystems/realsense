@@ -21,7 +21,7 @@ SoundHandler::SoundHandler(BrainStemMessageProcessor* owner) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SoundHandler::notified(RosSubscriber<srslib_framework::Sound>* subject)
 {
-    TapHwCmd_Sound* tap = static_cast<TapHwCmd_Sound*>(subject);
+    TapBrainstemCmd_Sound* tap = static_cast<TapBrainstemCmd_Sound*>(subject);
     Sound sound = tap->pop();
 
     MsgSound msgSound = {

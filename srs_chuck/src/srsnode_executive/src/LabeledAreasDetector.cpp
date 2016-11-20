@@ -6,7 +6,7 @@
 namespace srs {
 
 const Sound LabeledAreasDetector::SOUND_OFF = Sound(0, 3000, 250, 32, 0);
-const Sound LabeledAreasDetector::BEEP = Sound(100, 3000, 250, 32, 65000);
+const Sound LabeledAreasDetector::WARNING_BEEP = Sound(100, 3000, 250, 32, 65000);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
@@ -62,9 +62,9 @@ void LabeledAreasDetector::interpretArea(LogicalMap::LabeledArea area, Direction
     ROS_INFO_STREAM_COND_NAMED(direction == DirectionEnum::EXITING,
         "executive", "Exiting area " << area);
 
-    if (area.note.beep())
+    if (area.note.warning_beep())
     {
-        channelSound_.publish(direction == DirectionEnum::ENTERING ? BEEP : SOUND_OFF);
+        channelSound_.publish(direction == DirectionEnum::ENTERING ? WARNING_BEEP : SOUND_OFF);
     }
 }
 

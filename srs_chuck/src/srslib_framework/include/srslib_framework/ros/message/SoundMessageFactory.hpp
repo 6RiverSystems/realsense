@@ -14,7 +14,7 @@ namespace srs {
 struct SoundMessageFactory
 {
     /**
-     * @brief Convert a Sound type into a Beep message.
+     * @brief Convert a Sound type into a Sound message.
      *
      * @param sound Sound to convert
      *
@@ -34,7 +34,7 @@ struct SoundMessageFactory
     }
 
     /**
-     * @brief Convert a Beep message type into a Sound.
+     * @brief Convert a Sound message type into a Sound.
      *
      * @param message Message to convert
      *
@@ -54,7 +54,7 @@ struct SoundMessageFactory
     }
 
     /**
-     * @brief Convert a Beep message type into a Sound.
+     * @brief Convert a Sound message type into a Sound.
      *
      * @param message Message to convert
      *

@@ -11,7 +11,7 @@
 #include <srslib_framework/ros/tap/TapMapStack.hpp>
 #include <srslib_framework/ros/tap/TapSensorOdometryPose.hpp>
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
-#include <srslib_framework/ros/channel/ChannelHwCmd_Sound.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemCmd_Sound.hpp>
 
 namespace srs {
 
@@ -27,7 +27,7 @@ public:
 
 private:
     static const Sound SOUND_OFF;
-    static const Sound BEEP;
+    static const Sound WARNING_BEEP;
 
     enum DirectionEnum {
         ENTERING, EXITING
@@ -37,7 +37,7 @@ private:
 
     void updateMapStack();
 
-    ChannelHwCmd_Sound channelSound_;
+    ChannelBrainstemCmd_Sound channelSound_;
     LogicalMap::LabeledAreaMapType currentLabeledAreas_;
 
     tf::TransformListener listener_;

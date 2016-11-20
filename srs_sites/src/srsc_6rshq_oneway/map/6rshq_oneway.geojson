@@ -673,7 +673,7 @@
 						"object": "labeled_area",
 						"label": "beep1",
 						"notes": [
-							"beep"
+							"warning_beep"
 						]
 					}
 				},
@@ -691,7 +691,7 @@
 						"object": "labeled_area",
 						"label": "beep2",
 						"notes": [
-							"beep"
+							"warning_beep"
 						]
 					}
 				},

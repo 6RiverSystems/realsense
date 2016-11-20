@@ -10,12 +10,12 @@
 
 namespace srs {
 
-class ChannelHwCmd_Sound :
+class ChannelBrainstemCmd_Sound :
     public PublisherSound
 {
 public:
-    ChannelHwCmd_Sound() :
-        PublisherSound(ChuckTopics::internal::HWCMD_SOUND)
+    ChannelBrainstemCmd_Sound() :
+        PublisherSound(ChuckTopics::driver::BRAINSTEM_CMD_SOUND)
     {}
 };
 

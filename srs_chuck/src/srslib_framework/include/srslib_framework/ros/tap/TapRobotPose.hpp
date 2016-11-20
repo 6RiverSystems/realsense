@@ -5,18 +5,71 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/tap/subscriber/SubscriberPose.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <ros/ros.h>
+#include <tf/tf.h>
+#include <tf/transform_listener.h>
+
+#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/ros/tap/subscriber/SingleDataSource.hpp>
 
 namespace srs {
 
 class TapRobotPose :
-    public SubscriberPose
+    public SingleDataSource<Pose<>>
 {
 public:
-    TapRobotPose() :
-        SubscriberPose(ChuckTopics::internal::ROBOT_POSE)
+    TapRobotPose()
     {}
+
+    virtual ~TapRobotPose()
+    {}
+
+    virtual Pose<> peek() const
+    {
+        return data_;
+    }
+
+    virtual Pose<> pop()
+    {
+        updatePose();
+
+        return data_;
+    }
+
+    virtual void reset()
+    {
+        data_ = Pose<>::INVALID;
+    }
+
+    virtual void set(Pose<> data)
+    {
+        // Nothing to do
+    }
+
+private:
+    void updatePose()
+    {
+        try
+        {
+            tf::StampedTransform robotTransform;
+            tfListener_.lookupTransform("/map", "/base_footprint", ros::Time(0), robotTransform);
+
+            tf::Vector3 location = robotTransform.getOrigin();
+            tf::Quaternion orientation = robotTransform.getRotation();
+
+            data_ = Pose<>(location.getX(), location.getY(), tf::getYaw(orientation));
+
+            ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "tap_robot_pose", "Robot pose" << data_);
+        }
+        catch(const tf::TransformException& e)
+        {
+            ROS_ERROR_STREAM_THROTTLE_NAMED(1.0, "tap_robot_pose", "TF Exception: " << e.what());
+        }
+    }
+
+    Pose<> data_;
+
+    tf::TransformListener tfListener_;
 };
 
 } // namespace srs

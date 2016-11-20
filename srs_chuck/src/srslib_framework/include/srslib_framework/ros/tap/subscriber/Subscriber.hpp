@@ -15,7 +15,8 @@ using namespace std;
 namespace srs {
 
 template<typename MESSAGE>
-class Subscriber : public Subject<Subscriber<MESSAGE>>
+class Subscriber :
+    public Subject<Subscriber<MESSAGE>>
 {
 public:
     Subscriber(string topic,

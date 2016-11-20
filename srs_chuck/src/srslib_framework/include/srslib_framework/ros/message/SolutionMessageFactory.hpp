@@ -3,10 +3,10 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef SOLUTIONMESSAGEFACTORY_HPP_
-#define SOLUTIONMESSAGEFACTORY_HPP_
+#pragma once
 
 #include <srslib_framework/Pose.h>
+#include <srslib_framework/MsgSolution.h>
 #include <srslib_framework/MsgSolutionItem.h>
 
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
@@ -164,5 +164,3 @@ struct SolutionMessageFactory
 };
 
 } // namespace srs
-
-#endif // SOLUTIONMESSAGEFACTORY_HPP_

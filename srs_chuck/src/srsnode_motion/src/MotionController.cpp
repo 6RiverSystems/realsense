@@ -39,8 +39,8 @@ MotionController::MotionController(double dT) :
     activeController_(nullptr),
     rosNodeHandle_()
 {
-    pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>(
-        "/internal/drivers/brainstem/cmd_velocity", 100);
+//    pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>(
+//        "/internal/cmd_velocity", 100);
 
     pubLookAheadDistance_ = rosNodeHandle_.advertise<std_msgs::Float64>(
         "/internal/motion/look_ahead_distance", 1);

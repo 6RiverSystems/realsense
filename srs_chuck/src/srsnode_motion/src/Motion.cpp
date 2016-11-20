@@ -131,7 +131,7 @@ void Motion::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::connectAllTaps()
 {
-    tapBrainStem_.connectTap();
+    // ###FS tapBrainStem_.connectTap();
     tapSensorFrame_.connectTap();
     tapAps_.connectTap();
     tapInternalGoalSolution_.connectTap();
@@ -146,7 +146,7 @@ void Motion::connectAllTaps()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::disconnectAllTaps()
 {
-    tapBrainStem_.disconnectTap();
+    // ###FS tapBrainStem_.disconnectTap();
     tapSensorFrame_.disconnectTap();
     tapAps_.disconnectTap();
     tapInternalGoalSolution_.disconnectTap();
@@ -558,12 +558,12 @@ void Motion::publishLocalized()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishPose()
 {
-    Pose<> robotPose = positionEstimator_.getPose();
-
-    if (robotPose.isValid())
-    {
-        pubRobotPose_.publish(robotPose);
-    }
+//    Pose<> robotPose = positionEstimator_.getPose();
+//
+//    if (robotPose.isValid())
+//    {
+//        pubRobotPose_.publish(robotPose);
+//    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

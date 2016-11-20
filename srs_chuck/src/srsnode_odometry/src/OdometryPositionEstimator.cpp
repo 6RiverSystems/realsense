@@ -96,7 +96,7 @@ void OdometryPositionEstimator::connect()
 			std::bind( &OdometryPositionEstimator::ResetOdomPose, this, std::placeholders::_1 ));
 
 	// Subscriber to transform velocity command from linear/angular velocity to RPM format
-	rawVelocityCmdSub_ = nodeHandle_.subscribe<geometry_msgs::Twist>(ODOMETRY_RAW_VELOCITY_TOPIC, 10,
+	rawVelocityCmdSub_ = nodeHandle_.subscribe<geometry_msgs::Twist>(ChuckTopics::driver::ODOMETRY_CMD_VELOCITY, 10,
 			std::bind( &OdometryPositionEstimator::TransformVeclocityToRPM, this, std::placeholders::_1 ));
 
 	odometryPosePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ChuckTopics::sensor::ODOMETRY_POSE, 10);

@@ -6,6 +6,7 @@
 #pragma once
 
 #include <srslib_framework/ros/unit/RosUnit.hpp>
+#include <srslib_framework/ros/tap/TapRobotPose.hpp>
 
 #include <srsnode_executive/LabeledAreasDetector.hpp>
 
@@ -34,7 +35,7 @@ private:
 
     Pose<> robotPose_;
 
-    tf::TransformListener tfListener_;
+    TapRobotPose tapRobotPose_;
 };
 
 } // namespace srs

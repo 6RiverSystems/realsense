@@ -1,13 +1,6 @@
 #include <srsnode_executive/Executive.hpp>
 
 #include <ros/ros.h>
-#include <tf/tf.h>
-#include <tf/transform_listener.h>
-
-#include <geometry_msgs/PolygonStamped.h>
-
-#include <srslib_framework/Pose.h>
-#include <srslib_framework/MsgSolution.h>
 
 #include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
@@ -72,23 +65,7 @@ void Executive::findActiveNodes(vector<string>& nodes)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::updateRobotPose()
 {
-    try
-    {
-        tf::StampedTransform robotTransform;
-        tfListener_.lookupTransform("/map", "/base_footprint", ros::Time(0), robotTransform);
-
-        tf::Vector3 location = robotTransform.getOrigin();
-        tf::Quaternion orientation = robotTransform.getRotation();
-        robotPose_ = Pose<>(location.getX(), location.getY(), tf::getYaw(orientation));
-
-        ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "executive", "Robot pose" << robotPose_);
-    }
-    catch(const tf::TransformException& e)
-    {
-        ROS_ERROR_STREAM_THROTTLE_NAMED(1.0, "executive", "TF Exception: " << e.what());
-    }
-
+    robotPose_ = tapRobotPose_.pop();
 }
-
 
 } // namespace srs

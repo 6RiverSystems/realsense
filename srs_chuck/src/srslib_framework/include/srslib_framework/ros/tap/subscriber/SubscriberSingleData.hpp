@@ -16,7 +16,9 @@ using namespace std;
 namespace srs {
 
 template<typename MESSAGE, typename TYPE>
-class SubscriberSingleData : public Subscriber<MESSAGE>, public SingleDataSource<TYPE>
+class SubscriberSingleData :
+    public Subscriber<MESSAGE>,
+    public SingleDataSource<TYPE>
 {
 public:
     SubscriberSingleData(string topic,

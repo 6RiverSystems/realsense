@@ -15,6 +15,7 @@
 #include <bitset>
 
 #include <srslib_framework/math/BasicMath.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs
 {
@@ -183,7 +184,8 @@ void BrainStem::CreateSubscribers( )
 
 void BrainStem::CreatePublishers( )
 {
-	m_connectedPublisher = m_rosNodeHandle.advertise<std_msgs::Bool>( CONNECTED_TOPIC, 1, true );
+	m_connectedPublisher = m_rosNodeHandle.advertise<std_msgs::Bool>(
+	    ChuckTopics::driver::BRAINSTEM_STATE_CONNECTED, 1, true );
 
 	m_operationalStatePublisher = m_rosNodeHandle.advertise<srslib_framework::MsgOperationalState>(
 	    OPERATIONAL_STATE_TOPIC, 1, true );

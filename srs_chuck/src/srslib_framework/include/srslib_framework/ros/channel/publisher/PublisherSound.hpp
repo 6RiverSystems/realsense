@@ -10,20 +10,20 @@ using namespace std;
 
 #include <srslib_framework/Sound.h>
 
-#include <srslib_framework/ros/channel/publisher/RosPublisher.hpp>
+#include <srslib_framework/ros/channel/publisher/Publisher.hpp>
 #include <srslib_framework/ros/message/SoundMessageFactory.hpp>
 
 namespace srs {
 
 class PublisherSound :
-    public RosPublisher<srslib_framework::Sound, const Sound&>
+    public Publisher<srslib_framework::Sound, const Sound&>
 {
 public:
     PublisherSound(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
-            RosPublisher(topic, buffer, latched, nameSpace)
+            Publisher(topic, buffer, latched, nameSpace)
     {}
 
     srslib_framework::Sound convertData(const Sound& data)

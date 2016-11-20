@@ -10,19 +10,19 @@ using namespace std;
 
 #include <geometry_msgs/PolygonStamped.h>
 
-#include <srslib_framework/ros/channel/publisher/RosPublisherStamped.hpp>
+#include <srslib_framework/ros/channel/publisher/PublisherStamped.hpp>
 
 namespace srs {
 
 class PublisherPolygonStamped :
-    public RosPublisherStamped<geometry_msgs::PolygonStamped, const vector<Pose<>>&>
+    public PublisherStamped<geometry_msgs::PolygonStamped, const vector<Pose<>>&>
 {
 public:
     PublisherPolygonStamped(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
-            RosPublisherStamped(topic, buffer, latched, nameSpace)
+            PublisherStamped(topic, buffer, latched, nameSpace)
     {}
 
     geometry_msgs::PolygonStamped convertData(const vector<Pose<>>& data, const ros::Time timestamp)

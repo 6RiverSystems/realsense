@@ -10,20 +10,20 @@ using namespace std;
 
 #include <srslib_framework/Pose.h>
 
-#include <srslib_framework/ros/channel/publisher/RosPublisher.hpp>
+#include <srslib_framework/ros/channel/publisher/Publisher.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
 namespace srs {
 
 class PublisherPose :
-    public RosPublisher<srslib_framework::Pose, const Pose<>&>
+    public Publisher<srslib_framework::Pose, const Pose<>&>
 {
 public:
     PublisherPose(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
-            RosPublisher(topic, buffer, latched, nameSpace)
+            Publisher(topic, buffer, latched, nameSpace)
     {}
 
     srslib_framework::Pose convertData(const Pose<>& data)

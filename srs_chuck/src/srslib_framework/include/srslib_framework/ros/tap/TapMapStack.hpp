@@ -12,18 +12,18 @@ using namespace std;
 #include <srslib_framework/MapStack.h>
 
 #include <srslib_framework/localization/map/MapStack.hpp>
-#include <srslib_framework/ros/tap/subscriber/RosSubscriberSingleData.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberSingleData.hpp>
 #include <srslib_framework/ros/message/MapStackMessageFactory.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
 class TapMapStack :
-    public RosSubscriberSingleData<srslib_framework::MapStack, MapStack*>
+    public SubscriberSingleData<srslib_framework::MapStack, MapStack*>
 {
 public:
     TapMapStack() :
-            RosSubscriberSingleData(ChuckTopics::internal::MAP_STACK, 1, "~")
+            SubscriberSingleData(ChuckTopics::internal::MAP_STACK, 1, "~")
     {
         reset();
     }
@@ -45,7 +45,7 @@ public:
         // Reset the data, and then reset the subscriber
         set(nullptr);
 
-        RosSubscriber::reset();
+        Subscriber::reset();
     }
 };
 

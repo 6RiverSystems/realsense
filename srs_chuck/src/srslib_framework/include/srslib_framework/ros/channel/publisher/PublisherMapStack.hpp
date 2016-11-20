@@ -12,19 +12,19 @@ using namespace std;
 
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/ros/message/MapStackMessageFactory.hpp>
-#include <srslib_framework/ros/channel/publisher/RosPublisher.hpp>
+#include <srslib_framework/ros/channel/publisher/Publisher.hpp>
 
 namespace srs {
 
 class PublisherMapStack :
-    public RosPublisher<srslib_framework::MapStack, const MapStack*>
+    public Publisher<srslib_framework::MapStack, const MapStack*>
 {
 public:
     PublisherMapStack(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
-            RosPublisher(topic, buffer, latched, nameSpace)
+            Publisher(topic, buffer, latched, nameSpace)
     {}
 
     srslib_framework::MapStack convertData(const MapStack* data)

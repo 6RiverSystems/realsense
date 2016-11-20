@@ -12,19 +12,19 @@ using namespace std;
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 #include <srslib_framework/robotics/Velocity.hpp>
-#include <srslib_framework/ros/tap/subscriber/RosSubscriberSingleData.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberSingleData.hpp>
 #include <srslib_framework/ros/message/VelocityMessageFactory.hpp>
 
 namespace srs {
 
 class SubscriberPoseWithCovarianceStamped :
-    public RosSubscriberSingleData<geometry_msgs::PoseWithCovarianceStamped, Pose<>>
+    public SubscriberSingleData<geometry_msgs::PoseWithCovarianceStamped, Pose<>>
 {
 public:
     SubscriberPoseWithCovarianceStamped(string topic,
         unsigned int queueLength = 10,
         string nameSpace = "~") :
-            RosSubscriberSingleData(topic, queueLength, nameSpace)
+            SubscriberSingleData(topic, queueLength, nameSpace)
     {
         reset();
     }
@@ -45,7 +45,7 @@ public:
         // Reset the data, and then reset the subscriber
         set(Pose<>::INVALID);
 
-        RosSubscriber::reset();
+        Subscriber::reset();
     }
 };
 

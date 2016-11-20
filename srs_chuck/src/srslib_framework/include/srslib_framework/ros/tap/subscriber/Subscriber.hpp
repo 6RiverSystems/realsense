@@ -15,10 +15,10 @@ using namespace std;
 namespace srs {
 
 template<typename MESSAGE>
-class RosSubscriber : public Subject<RosSubscriber<MESSAGE>>
+class Subscriber : public Subject<Subscriber<MESSAGE>>
 {
 public:
-    RosSubscriber(string topic,
+    Subscriber(string topic,
         unsigned int queueLength,
         string nameSpace) :
         topic_(topic),
@@ -27,10 +27,10 @@ public:
     {
         rosNodeHandle_ = ros::NodeHandle(nameSpace);
         dataSubscriber_ = rosNodeHandle_.subscribe(topic_, queueLength,
-            &RosSubscriber::onDataReceived, this);
+            &Subscriber::onDataReceived, this);
     }
 
-    virtual ~RosSubscriber()
+    virtual ~Subscriber()
     {
         dataSubscriber_.shutdown();
     }
@@ -84,7 +84,7 @@ protected:
 
         // Notify all the observers that some
         // some new data is available
-        Subject<RosSubscriber<MESSAGE>>::notify();
+        Subject<Subscriber<MESSAGE>>::notify();
     }
 
 private:

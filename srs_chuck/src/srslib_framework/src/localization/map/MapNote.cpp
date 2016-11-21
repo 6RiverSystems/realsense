@@ -5,7 +5,7 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Constant initialization
 
-const MapNote MapNote::WARNING_BEEP = MapNote(true);
+const MapNote MapNote::WARNING_SOUND = MapNote(true);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
@@ -15,7 +15,7 @@ MapNote* MapNote::instanceOf(const MapNote& originalNote)
 {
     MapNote* newNote = new MapNote();
 
-    newNote->warning_beep_ = originalNote.warning_beep_;
+    newNote->warningSound_ = originalNote.warningSound_;
 
     return newNote;
 }

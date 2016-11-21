@@ -27,7 +27,7 @@ public:
 
 private:
     static const Sound SOUND_OFF;
-    static const Sound WARNING_BEEP;
+    static const Sound WARNING_SOUND;
 
     enum DirectionEnum {
         ENTERING, EXITING

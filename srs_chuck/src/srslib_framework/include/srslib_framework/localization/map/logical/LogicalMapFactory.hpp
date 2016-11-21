@@ -52,7 +52,7 @@ private:
     static const string KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE;
     static const string KEYWORD_PROPERTY_FEATURE_OBJECT;
     static const string KEYWORD_PROPERTY_LABEL_AREA_LABEL;
-    static const string KEYWORD_PROPERTY_LABEL_AREA_WARNING_BEEP;
+    static const string KEYWORD_PROPERTY_LABEL_AREA_WARNING_SOUND;
     static const string KEYWORD_PROPERTY_LABEL_AREA_NOTES;
     static const string KEYWORD_PROPERTY_MAP_HEIGHT;
     static const string KEYWORD_PROPERTY_MAP_ORIGIN;

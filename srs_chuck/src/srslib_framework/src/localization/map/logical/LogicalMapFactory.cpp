@@ -47,7 +47,7 @@ const string LogicalMapFactory::KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_COST = "envel
 const string LogicalMapFactory::KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE = "envelope_size";
 const string LogicalMapFactory::KEYWORD_PROPERTY_FEATURE_OBJECT = "object";
 const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_LABEL = "label";
-const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_WARNING_BEEP = "warning_beep";
+const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_WARNING_SOUND = "warning_sound";
 const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_NOTES = "notes";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_HEIGHT = "height";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_ORIGIN = "origin";
@@ -679,9 +679,9 @@ MapNote LogicalMapFactory::ntValueMapNote(YAML::Node root, bool required)
         {
             string flagValue = flag.as<string>();
 
-            if (flagValue == KEYWORD_PROPERTY_LABEL_AREA_WARNING_BEEP)
+            if (flagValue == KEYWORD_PROPERTY_LABEL_AREA_WARNING_SOUND)
             {
-                value.join(MapNote::WARNING_BEEP);
+                value.join(MapNote::WARNING_SOUND);
             }
             else
             {

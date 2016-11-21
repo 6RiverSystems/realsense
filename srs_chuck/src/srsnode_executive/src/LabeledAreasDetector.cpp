@@ -62,7 +62,7 @@ void LabeledAreasDetector::interpretArea(LogicalMap::LabeledArea area, Direction
     ROS_INFO_STREAM_COND_NAMED(direction == DirectionEnum::EXITING,
         "executive", "Exiting area " << area);
 
-    if (area.note.warning_beep())
+    if (area.note.warning_sound())
     {
         channelSound_.publish(direction == DirectionEnum::ENTERING ? WARNING_BEEP : SOUND_OFF);
     }

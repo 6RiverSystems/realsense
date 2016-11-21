@@ -5,9 +5,12 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/unit/RosUnit.hpp>
+#include <srslib_framework/behavior/behavior_tree/composite/Sequence.hpp>
 #include <srslib_framework/ros/tap/TapRobotPose.hpp>
+#include <srslib_framework/ros/tap/TapMapStack.hpp>
+#include <srslib_framework/ros/unit/RosUnit.hpp>
 
+#include <srsnode_executive/ExecutiveContext.hpp>
 #include <srsnode_executive/LabeledAreasDetector.hpp>
 
 namespace srs {
@@ -29,12 +32,14 @@ private:
 
     void findActiveNodes(vector<string>& nodes);
 
-    void updateRobotPose();
+    void updateContext();
 
+    ExecutiveContext context_;
     LabeledAreasDetector labeledAreasDetector_;
 
-    Pose<> robotPose_;
+    Sequence<ExecutiveContext> mainSequence_;
 
+    TapMapStack tapMapStack_;
     TapRobotPose tapRobotPose_;
 };
 

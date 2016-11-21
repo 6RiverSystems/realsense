@@ -18,12 +18,12 @@ layerOneway = convertToWeightedArea(layerOneway, 1, 0, 0, 0, 100);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Honk layer
-layerBeep = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-warning_beep.png', ...
+layerWarningSound = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-warning_sound.png', ...
     RESOLUTION, ORIGIN);
-showMap(layerBeep, 'Beeps');
+showMap(layerWarningSound, 'Warning sounds');
 
-layerBeep = convertToLabeledArea(layerBeep, 1, 'wb1', {'warning_beep'});
-layerBeep = convertToLabeledArea(layerBeep, 2, 'wb2', {'warning_beep'});
+layerWarningSound = convertToLabeledArea(layerWarningSound, 1, 'ws1', {'warning_sound'});
+layerWarningSound = convertToLabeledArea(layerWarningSound, 2, 'ws2', {'warning_sound'});
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One-way layer
@@ -127,7 +127,7 @@ map = addGraph(map, '6rshq_graph', ...
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map
-map = addLayer(map, {layerBeep, layerOneway});
+map = addLayer(map, {layerWarningSound, layerOneway});
 showMap(map, 'Complete map');
 
 saveGeoJsonMap(map, ...

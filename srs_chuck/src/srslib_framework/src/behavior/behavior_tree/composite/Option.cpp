@@ -5,18 +5,18 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<class CONTEXT>
-typename Sequence<CONTEXT>::ResultType Sequence<CONTEXT>::execute(CONTEXT* context)
+typename Option<CONTEXT>::ResultType Option<CONTEXT>::execute(CONTEXT* context)
 {
     for (auto child : Composite<CONTEXT>::children_)
     {
         ResultType childResult = child->execute(context);
-        if (childResult != ResultType::SUCCEDED)
+        if (childResult != ResultType::FAILED)
         {
             return childResult;
         }
     }
 
-    return ResultType::SUCCEDED;
+    return ResultType::FAILED;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -5,18 +5,14 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<class CONTEXT>
-typename Sequence<CONTEXT>::ResultType Sequence<CONTEXT>::execute(CONTEXT* context)
+typename TreeNode<CONTEXT>::NodeResult TreeNodeWithCondition<CONTEXT>::execute(CONTEXT* context)
 {
-    for (auto child : Composite<CONTEXT>::children_)
+    if (preCondition_)
     {
-        ResultType childResult = child->execute(context);
-        if (childResult != ResultType::SUCCEDED)
-        {
-            return childResult;
-        }
+        return preCondition_->execute(context);
     }
 
-    return ResultType::SUCCEDED;
+    return TreeNode<CONTEXT>::NodeResult::SUCCEDED;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

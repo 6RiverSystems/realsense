@@ -22,8 +22,9 @@ TreeNode<ExecutiveContext>::NodeResult FindLabeledAreas::execute(ExecutiveContex
             if (context->currentLabeledAreas.find(area.second.label) ==
                 context->currentLabeledAreas.end())
             {
-//                context->activeLabeledAreas.push_back(pair<area.second,
-//                    ExecutiveContext::DirectionEnum::ENTERING>);
+                context->activeLabeledAreas.push_back(ExecutiveContext::ActiveLabelType(
+                        area.second,
+                        ExecutiveContext::DirectionEnum::ENTERING));
             }
         }
 
@@ -32,18 +33,20 @@ TreeNode<ExecutiveContext>::NodeResult FindLabeledAreas::execute(ExecutiveContex
         {
             if (touchedAreas.find(area.second.label) == touchedAreas.end())
             {
-//                context->activeLabeledAreas.push_back(pair<area.second,
-//                    ExecutiveContext::DirectionEnum::EXITING>);
+                context->activeLabeledAreas.push_back(ExecutiveContext::ActiveLabelType(
+                        area.second,
+                        ExecutiveContext::DirectionEnum::EXITING));
             }
         }
 
-        // Determine in which areas the robot is residing
+        // Determine in which areas the robot is staying
         for (auto area : context->currentLabeledAreas)
         {
             if (touchedAreas.find(area.second.label) != touchedAreas.end())
             {
-//                context->activeLabeledAreas.push_back(pair<area.second,
-//                    ExecutiveContext::DirectionEnum::RESIDING>);
+                context->activeLabeledAreas.push_back(ExecutiveContext::ActiveLabelType(
+                        area.second,
+                        ExecutiveContext::DirectionEnum::STAYING));
             }
         }
 

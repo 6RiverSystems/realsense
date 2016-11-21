@@ -13,11 +13,13 @@ namespace srs {
 struct ExecutiveContext
 {
     enum DirectionEnum {
-        ENTERING, EXITING, RESIDING
+        ENTERING, EXITING, STAYING
     };
 
+    using ActiveLabelType = pair<LogicalMap::LabeledArea, DirectionEnum>;
+
     LogicalMap::LabeledAreaMapType currentLabeledAreas;
-    vector<pair<LogicalMap::LabeledArea, DirectionEnum>> activeLabeledAreas;
+    vector<ActiveLabelType> activeLabeledAreas;
 
     MapStack* mapStack;
 

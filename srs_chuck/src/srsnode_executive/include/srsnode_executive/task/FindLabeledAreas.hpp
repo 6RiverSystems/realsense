@@ -24,7 +24,6 @@ public:
     {}
 
     TreeNode<ExecutiveContext>::NodeResult execute(ExecutiveContext* context);
-private:
 };
 
 } // namespace srs

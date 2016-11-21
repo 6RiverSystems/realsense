@@ -17,14 +17,9 @@ namespace srs {
 Executive::Executive(string name, int argc, char** argv) :
     RosUnit(name, argc, argv, REFRESH_RATE_HZ)
 {
-//    IsEnteringWarningSoundArea enteringWarningSoundArea_;
-//    IsExitingWarningSoundArea exitingWarningSoundArea_;
-//    playWarningSound_ = PlayWarningSound(&enteringWarningSoundArea_);
-//    stopSound_ = StopSound(&exitingWarningSoundArea_);
-
     mainSequence_ = Sequence<ExecutiveContext>({
         new FindLabeledAreas(),
-        new PlayWarningSound()
+        new PlayWarningSound(new IsEnteringWarningSoundArea())
     });
 
     context_.robotPose = Pose<>::INVALID;

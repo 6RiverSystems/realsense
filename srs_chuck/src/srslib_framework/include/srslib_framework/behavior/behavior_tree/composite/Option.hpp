@@ -15,21 +15,21 @@ using namespace std;
 namespace srs {
 
 template<class CONTEXT>
-class Sequence :
+class Option :
     public Composite<CONTEXT>
 {
 public:
     using ResultType = typename Composite<CONTEXT>::ResultType;
 
-    Sequence() :
+    Option() :
         Composite<CONTEXT>()
     {}
 
-    Sequence(initializer_list<TreeNode<CONTEXT>*> children) :
+    Option(initializer_list<TreeNode<CONTEXT>*> children) :
         Composite<CONTEXT>(children)
     {}
 
-    virtual ~Sequence()
+    virtual ~Option()
     {}
 
     virtual ResultType execute(CONTEXT* context);
@@ -37,4 +37,4 @@ public:
 
 } // namespace srs
 
-#include <behavior/behavior_tree/composite/Sequence.cpp>
+#include <behavior/behavior_tree/composite/Option.cpp>

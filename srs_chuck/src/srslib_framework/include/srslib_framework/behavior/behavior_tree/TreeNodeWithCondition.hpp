@@ -11,20 +11,24 @@
 namespace srs {
 
 template<class CONTEXT>
-class PreconditionedTreeNode :
+class TreeNodeWithCondition :
     public TreeNode<CONTEXT>
 {
 public:
-    PreconditionedTreeNode(Condition<CONTEXT>* preCondition = nullptr) :
+    TreeNodeWithCondition(Condition<CONTEXT>* preCondition = nullptr) :
         TreeNode<CONTEXT>(),
         preCondition_(preCondition)
     {}
 
-    virtual ~PreconditionedTreeNode()
+    virtual ~TreeNodeWithCondition()
     {}
+
+    virtual typename TreeNode<CONTEXT>::NodeResult execute(CONTEXT* context);
 
 protected:
     Condition<CONTEXT>* preCondition_;
 };
 
 } // namespace srs
+
+#include <behavior/behavior_tree/TreeNodeWithCondition.cpp>

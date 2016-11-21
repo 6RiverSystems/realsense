@@ -5,17 +5,17 @@
  */
 #pragma once
 
-#include <srslib_framework/behavior/behavior_tree/PreconditionedTreeNode.hpp>
+#include <srslib_framework/behavior/behavior_tree/TreeNodeWithCondition.hpp>
 
 namespace srs {
 
 template<class CONTEXT>
 class Task :
-    public PreconditionedTreeNode<CONTEXT>
+    public TreeNodeWithCondition<CONTEXT>
 {
 public:
     Task(Condition<CONTEXT>* preCondition = nullptr) :
-        PreconditionedTreeNode<CONTEXT>(preCondition)
+        TreeNodeWithCondition<CONTEXT>(preCondition)
     {}
 
     virtual ~Task()

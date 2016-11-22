@@ -2894,8 +2894,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[63.625,26.725],
-							[65.125,29.675]
+							[63.625,47.575],
+							[65.125,48.875]
 						]
 					},
 					"properties": {
@@ -2912,8 +2912,26 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[63.625,47.575],
-							[65.125,48.875]
+							[63.625,7.175],
+							[65.125,8.775]
+						]
+					},
+					"properties": {
+						"object": "weighted_area",
+						"north": 0,
+						"east": 0,
+						"south": 0,
+						"west": 100
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 168,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[63.625,26.725],
+							[65.125,29.675]
 						]
 					},
 					"properties": {
@@ -2930,8 +2948,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[63.625,7.175],
-							[65.125,8.775]
+							[63.625,26.725],
+							[65.125,29.675]
 						]
 					},
 					"properties": {
@@ -2939,24 +2957,6 @@
 						"north": 0,
 						"east": 100,
 						"south": 0,
-						"west": 0
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 169,
-					"geometry": {
-						"type": "MultiPoint",
-						"coordinates": [
-							[14.425,27.775],
-							[63.625,28.625]
-						]
-					},
-					"properties": {
-						"object": "weighted_area",
-						"north": 10,
-						"east": 0,
-						"south": 10,
 						"west": 0
 					}
 				}

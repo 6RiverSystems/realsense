@@ -16,7 +16,7 @@ using namespace std;
 namespace srs {
 
 class PublisherJoypadState :
-    public Publisher<srslib_framework::JoypadState, const JoypadState&>
+    public Publisher<const JoypadState&, srslib_framework::JoypadState>
 {
 public:
     PublisherJoypadState(string topic,

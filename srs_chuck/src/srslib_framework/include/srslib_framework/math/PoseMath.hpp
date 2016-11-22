@@ -37,8 +37,9 @@ struct PoseMath
      * @brief Return TRUE if the poses are similar. In order to consider them
      * similar:
      *
-     * - The difference between x must be less than 0.001 m
-     * - The difference between angles must be less than 0.005 deg
+     * - The difference between the x coordinates must be less than 0.001m
+     * - The difference between the y coordinates must be less than 0.001m
+     * - The difference between angles must be less than 0.005deg (0.001rad)
      *
      * @param lhv Left hand pose
      * @param rhv Right-hand pose

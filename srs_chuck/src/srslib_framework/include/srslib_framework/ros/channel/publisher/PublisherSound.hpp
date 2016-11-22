@@ -16,7 +16,7 @@ using namespace std;
 namespace srs {
 
 class PublisherSound :
-    public Publisher<srslib_framework::Sound, const Sound&>
+    public Publisher<const Sound&, srslib_framework::Sound>
 {
 public:
     PublisherSound(string topic,

@@ -8,32 +8,27 @@
 #include <string>
 using namespace std;
 
-#include <std_msgs/Bool.h>
+#include <srslib_framework/Pose.h>
 
 #include <srslib_framework/ros/channel/publisher/Publisher.hpp>
+#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
 namespace srs {
 
-class PublisherBoolean :
-    public Publisher<const bool, std_msgs::Bool>
+class PublisherPose :
+    public Publisher<const Pose<>&, srslib_framework::Pose>
 {
 public:
-    PublisherBoolean(string topic,
+    PublisherPose(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
             Publisher(topic, buffer, latched, nameSpace)
     {}
 
-    ~PublisherBoolean()
-    {}
-
-    std_msgs::Bool convertData(const bool data)
+    srslib_framework::Pose convertData(const Pose<>& data)
     {
-        std_msgs::Bool message;
-        message.data = data;
-
-        return message;
+        return PoseMessageFactory::pose2Msg(data);
     }
 };
 

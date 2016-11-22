@@ -14,16 +14,16 @@ using namespace std;
 
 namespace srs {
 
-template<typename MESSAGE, typename TYPE>
+template<typename TYPE, typename MESSAGE>
 class PublisherStamped :
-    public Publisher<MESSAGE, TYPE>
+    public Publisher<TYPE, MESSAGE>
 {
 public:
     PublisherStamped(string topic,
         unsigned int buffer,
         bool latched,
         string nameSpace) :
-            Publisher<MESSAGE, TYPE>(topic, buffer, latched, nameSpace)
+            Publisher<TYPE, MESSAGE>(topic, buffer, latched, nameSpace)
     {}
 
     virtual ~PublisherStamped()
@@ -32,7 +32,7 @@ public:
     virtual void publish(TYPE data, const ros::Time timestamp = ros::Time::now())
     {
         MESSAGE message = convertData(data, timestamp);
-        Publisher<MESSAGE, TYPE>::publishMessage(message);
+        Publisher<TYPE, MESSAGE>::publishMessage(message);
     }
 
     MESSAGE convertData(TYPE data)

@@ -15,7 +15,7 @@
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 
 // #include <srslib_framework/ros/channel/ChannelRobotPose.hpp>
-// #include <srslib_framework/ros/tap/RosTapBrainStem.hpp>
+#include <srslib_framework/ros/tap/RosTapBrainStem.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_GoalSolution.hpp>
 #include <srslib_framework/ros/tap/TapInitialPose.hpp>
 #include <srslib_framework/ros/tap/TapJoypad.hpp>
@@ -75,7 +75,7 @@ private:
     void stepNode();
     void stepEmulation();
 
-    // ###FS AStar<Grid2d> algorithm_;
+    // AStar<Grid2d> algorithm_;
 
     dynamic_reconfigure::Server<MotionConfig> configServer_;
     ros::Time currentTime_;
@@ -94,8 +94,8 @@ private:
     ros::Time previousTime_;
     ros::Publisher pubOdometry_;
     ros::Publisher pubPing_;
-    // ###FS PublisherPose pubRobotAccOdometry_;
-    // ###FS ChannelRobotPose pubRobotPose_;
+    // PublisherPose pubRobotAccOdometry_;
+    // ChannelRobotPose pubRobotPose_;
     ros::Publisher pubStatusGoalArrived_;
     ros::Publisher pubStatusGoalLanding_;
     ros::Publisher pubRobotLocalized_;
@@ -110,7 +110,7 @@ private:
     double simulatedT_;
 
     RosTapAps tapAps_;
-    // ###FS RosTapBrainStem tapBrainStem_;
+    RosTapBrainStem tapBrainStem_;
     RosTapSensorFrame tapSensorFrame_;
     RosTapInternal_GoalSolution tapInternalGoalSolution_;
     TapInitialPose tapInitialPose_;

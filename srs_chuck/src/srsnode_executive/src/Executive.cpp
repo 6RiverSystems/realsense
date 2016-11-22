@@ -31,6 +31,7 @@ void Executive::execute()
 {
     updateContext();
 
+    mainSequence_.execute(&context_);
 //    playWarningSound_.execute(&context_);
 //    stopSound_.execute(&context_);
 

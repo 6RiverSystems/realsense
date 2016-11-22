@@ -66,21 +66,21 @@ bool operator==(const OccupancyMap& lhs, const OccupancyMap& rhs)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void OccupancyMap::maxCost(unsigned int c, unsigned int r, Grid2d::BaseType cost)
+void OccupancyMap::maxCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost)
 {
-    getGrid()->maxOnPayload(Grid2d::Location(c, r), cost);
+    getGrid()->maxOnPayload(Grid2d::Location(cCells, rCells), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void OccupancyMap::setCost(unsigned int c, unsigned int r, Grid2d::BaseType cost)
+void OccupancyMap::setCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost)
 {
-    getGrid()->setPayload(Grid2d::Location(c, r), cost);
+    getGrid()->setPayload(Grid2d::Location(cCells, rCells), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void OccupancyMap::setObstruction(unsigned int c, unsigned int r)
+void OccupancyMap::setObstacle(unsigned int cCells, unsigned int rCells)
 {
-    getGrid()->setPayload(Grid2d::Location(c, r), Grid2d::PAYLOAD_MAX);
+    getGrid()->setPayload(Grid2d::Location(cCells, rCells), Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

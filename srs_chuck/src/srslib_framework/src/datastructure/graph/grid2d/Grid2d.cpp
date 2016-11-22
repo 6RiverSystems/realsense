@@ -12,7 +12,7 @@ const Grid2d::BaseType Grid2d::PAYLOAD_MAX = 254;
 const Grid2d::BaseType Grid2d::PAYLOAD_NO_INFORMATION = 255;
 
 const Grid2d::BaseType Grid2d::WEIGHT_MIN = 0;
-const Grid2d::BaseType Grid2d::WEIGHT_MAX = 255;
+const Grid2d::BaseType Grid2d::WEIGHT_MAX = 254;
 const Grid2d::BaseType Grid2d::WEIGHT_NO_INFORMATION = 255;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

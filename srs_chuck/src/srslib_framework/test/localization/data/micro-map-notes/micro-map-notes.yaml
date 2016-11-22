@@ -5,7 +5,7 @@
 #
 {
     occupancy: {
-        image: micro-map-notes.png,
+        image: micro-map-notes.pgm,
         resolution: 0.100,
         origin: [0, 0, 0],
         negate: 0,

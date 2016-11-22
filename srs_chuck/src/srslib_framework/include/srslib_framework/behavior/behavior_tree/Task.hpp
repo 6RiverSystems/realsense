@@ -20,6 +20,8 @@ public:
 
     virtual ~Task()
     {}
+
+    virtual typename TreeNode<CONTEXT>::NodeResult execute(CONTEXT* context);
 };
 
 } // namespace srs

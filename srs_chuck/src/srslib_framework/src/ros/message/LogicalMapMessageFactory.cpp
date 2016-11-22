@@ -15,10 +15,10 @@ void LogicalMapMessageFactory::areas2Vector(const LogicalMap* map,
     {
         srslib_framework::LogicalArea msgArea;
         msgArea.label = area.second.label;
-        msgArea.xi = area.second.xi;
-        msgArea.yi = area.second.yi;
-        msgArea.xf = area.second.xf;
-        msgArea.yf = area.second.yf;
+        msgArea.ciCells = area.second.ci;
+        msgArea.riCells = area.second.ri;
+        msgArea.cfCells = area.second.cf;
+        msgArea.rfCells = area.second.rf;
         msgArea.note = note2Msg(area.second.note);
 
         areas.push_back(msgArea);
@@ -90,7 +90,8 @@ void LogicalMapMessageFactory::vector2Areas(const vector<srslib_framework::Logic
     for (auto area : areas)
     {
         MapNote note = msg2Note(area.note);
-        logical->addLabeledArea(area.xi, area.yi, area.xf, area.yf, area.label, note);
+        logical->addLabeledArea(area.ciCells, area.riCells, area.cfCells, area.rfCells,
+            area.label, note);
     }
 }
 

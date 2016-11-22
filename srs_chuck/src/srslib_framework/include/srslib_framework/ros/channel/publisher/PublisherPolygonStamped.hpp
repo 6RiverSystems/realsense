@@ -15,7 +15,7 @@ using namespace std;
 namespace srs {
 
 class PublisherPolygonStamped :
-    public PublisherStamped<geometry_msgs::PolygonStamped, const vector<Pose<>>&>
+    public PublisherStamped<const vector<Pose<>>&, geometry_msgs::PolygonStamped>
 {
 public:
     PublisherPolygonStamped(string topic,

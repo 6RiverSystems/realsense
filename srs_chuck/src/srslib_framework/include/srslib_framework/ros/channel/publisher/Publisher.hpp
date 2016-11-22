@@ -12,7 +12,7 @@ using namespace std;
 
 namespace srs {
 
-template<typename MESSAGE, typename TYPE>
+template<typename TYPE, typename MESSAGE>
 class Publisher
 {
 public:

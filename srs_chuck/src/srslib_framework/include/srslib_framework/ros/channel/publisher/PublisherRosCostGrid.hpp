@@ -18,7 +18,7 @@ using namespace std;
 namespace srs {
 
 class PublisherRosCostGrid :
-    public PublisherStamped<nav_msgs::OccupancyGrid, const costmap_2d::Costmap2D*>
+    public PublisherStamped<const costmap_2d::Costmap2D*, nav_msgs::OccupancyGrid>
 {
 public:
     PublisherRosCostGrid(string topic, string frameId,

@@ -29,7 +29,7 @@
 						"object": "labeled_area",
 						"label": "test1",
 						"notes": [
-							"honk"
+							"warning_sound"
 						]
 					}
 				},

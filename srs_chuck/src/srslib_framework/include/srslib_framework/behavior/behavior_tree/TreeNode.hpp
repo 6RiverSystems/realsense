@@ -11,6 +11,8 @@ template<class CONTEXT>
 class TreeNode
 {
 public:
+    using ResultType = typename TreeNode<CONTEXT>::NodeResult;
+
     enum NodeResult {
         FAILED,
         RUNNING,

@@ -17,7 +17,7 @@ using namespace std;
 namespace srs {
 
 class PublisherRosMapMetadata :
-    public Publisher<nav_msgs::MapMetaData, const OccupancyMetadata&>
+    public Publisher<const OccupancyMetadata&, nav_msgs::MapMetaData>
 {
 public:
     PublisherRosMapMetadata(string topic,

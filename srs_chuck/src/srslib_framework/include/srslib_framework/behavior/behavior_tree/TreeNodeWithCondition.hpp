@@ -15,6 +15,8 @@ class TreeNodeWithCondition :
     public TreeNode<CONTEXT>
 {
 public:
+    using ResultType = typename TreeNode<CONTEXT>::NodeResult;
+
     TreeNodeWithCondition(Condition<CONTEXT>* preCondition = nullptr) :
         TreeNode<CONTEXT>(),
         preCondition_(preCondition)
@@ -23,7 +25,7 @@ public:
     virtual ~TreeNodeWithCondition()
     {}
 
-    virtual typename TreeNode<CONTEXT>::NodeResult execute(CONTEXT* context);
+    virtual ResultType execute(CONTEXT* context);
 
 protected:
     Condition<CONTEXT>* preCondition_;

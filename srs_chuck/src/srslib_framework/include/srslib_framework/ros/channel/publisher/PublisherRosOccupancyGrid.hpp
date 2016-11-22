@@ -17,7 +17,7 @@ using namespace std;
 namespace srs {
 
 class PublisherRosOccupancyGrid :
-    public Publisher<nav_msgs::OccupancyGrid, const OccupancyMap*>
+    public Publisher<const OccupancyMap*, nav_msgs::OccupancyGrid>
 {
 public:
     PublisherRosOccupancyGrid(string topic, string frameId,

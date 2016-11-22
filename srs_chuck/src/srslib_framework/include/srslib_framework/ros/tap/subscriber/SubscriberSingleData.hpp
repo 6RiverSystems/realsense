@@ -11,14 +11,11 @@ using namespace std;
 #include <ros/ros.h>
 
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
-#include <srslib_framework/ros/tap/subscriber/SingleDataSource.hpp>
 
 namespace srs {
 
 template<typename MESSAGE, typename TYPE>
-class SubscriberSingleData :
-    public Subscriber<MESSAGE>,
-    public SingleDataSource<TYPE>
+class SubscriberSingleData : public Subscriber<MESSAGE>
 {
 public:
     SubscriberSingleData(string topic,
@@ -31,12 +28,12 @@ public:
     virtual ~SubscriberSingleData()
     {}
 
-    virtual TYPE peek() const
+    TYPE peek() const
     {
         return data_;
     }
 
-    virtual TYPE pop()
+    TYPE pop()
     {
         Subscriber<MESSAGE>::declareStale();
         return data_;

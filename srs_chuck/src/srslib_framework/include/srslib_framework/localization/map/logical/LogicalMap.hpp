@@ -26,8 +26,8 @@ public:
         {
             return stream << "{" <<
                 "l: '" << labeledArea.label <<
-                "', a: [" << labeledArea.xi << ", " << labeledArea.yi << ", " <<
-                    labeledArea.xf << ", " << labeledArea.yf <<
+                "', a: [" << labeledArea.ci << ", " << labeledArea.ri << ", " <<
+                    labeledArea.cf << ", " << labeledArea.rf <<
                 "], n: " << labeledArea.note <<
                 "}";
         }
@@ -36,21 +36,21 @@ public:
         {
             return lhs.label == rhs.label &&
                 lhs.note == rhs.note &&
-                lhs.xi == rhs.xi &&
-                lhs.yi == rhs.yi &&
-                lhs.xf == rhs.xf &&
-                lhs.yf== rhs.yf;
+                lhs.ci == rhs.ci &&
+                lhs.ri == rhs.ri &&
+                lhs.cf == rhs.cf &&
+                lhs.rf== rhs.rf;
         }
 
         string label;
 
         MapNote note;
 
-        unsigned int xf;
-        unsigned int xi;
+        unsigned int cf;
+        unsigned int ci;
 
-        unsigned int yf;
-        unsigned int yi;
+        unsigned int rf;
+        unsigned int ri;
     };
 
     using LabeledAreaMapType = unordered_map<string, LabeledArea>;
@@ -61,20 +61,21 @@ public:
     ~LogicalMap()
     {}
 
-    void addLabeledArea(unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
+    void addLabeledArea(unsigned int ciCells, unsigned int riCells,
+        unsigned int cfCells, unsigned int rfCells,
         string label, MapNote note);
 
-    void checkAreas(unsigned int c, unsigned int r, LabeledAreaMapType& areas) const;
-    void checkAreas(double x, double y, LabeledAreaMapType& areas) const;
+    void checkAreas(unsigned int cCells, unsigned int rCells, LabeledAreaMapType& areas) const;
+    void checkAreas(double xM, double yM, LabeledAreaMapType& areas) const;
 
     LabeledAreaMapType getAreas() const
     {
         return labeledAreas_;
     }
 
-    Grid2d::BaseType getCost(unsigned int c, unsigned int r) const
+    Grid2d::BaseType getCost(unsigned int cCells, unsigned int rCells) const
     {
-        return getGrid()->getPayload(Grid2d::Location(c, r));
+        return getGrid()->getPayload(Grid2d::Location(cCells, rCells));
     }
 
     LogicalMetadata getMetadata() const
@@ -82,19 +83,19 @@ public:
         return metadata_;
     }
 
-    Grid2d::BaseType getWeights(unsigned int c, unsigned int r, int orientation) const
+    Grid2d::BaseType getWeights(unsigned int cCells, unsigned int rCells, int orientation) const
     {
-        return getGrid()->getWeight(Grid2d::Position(c, r, orientation));
+        return getGrid()->getWeight(Grid2d::Position(cCells, rCells, orientation));
     }
 
-    void maxCost(unsigned int c, unsigned int r, Grid2d::BaseType cost);
+    void maxCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost);
 
     friend ostream& operator<<(ostream& stream, const LogicalMap& map);
     friend bool operator==(const LogicalMap& lhs, const LogicalMap& rhs);
 
-    void setCost(unsigned int c, unsigned int r, Grid2d::BaseType cost);
-    void setObstruction(unsigned int c, unsigned int r);
-    void setWeights(unsigned int c, unsigned int r,
+    void setCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost);
+    void setObstacle(unsigned int cCells, unsigned int rCells);
+    void setWeights(unsigned int cCells, unsigned int rCells,
         Grid2d::BaseType north,
         Grid2d::BaseType east,
         Grid2d::BaseType south,

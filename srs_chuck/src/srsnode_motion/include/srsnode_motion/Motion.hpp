@@ -15,7 +15,7 @@
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 
 // #include <srslib_framework/ros/channel/ChannelRobotPose.hpp>
-#include <srslib_framework/ros/tap/RosTapBrainStem.hpp>
+// #include <srslib_framework/ros/tap/RosTapBrainStem.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_GoalSolution.hpp>
 #include <srslib_framework/ros/tap/TapInitialPose.hpp>
 #include <srslib_framework/ros/tap/TapJoypad.hpp>
@@ -110,7 +110,7 @@ private:
     double simulatedT_;
 
     RosTapAps tapAps_;
-    RosTapBrainStem tapBrainStem_;
+    // RosTapBrainStem tapBrainStem_;
     RosTapSensorFrame tapSensorFrame_;
     RosTapInternal_GoalSolution tapInternalGoalSolution_;
     TapInitialPose tapInitialPose_;

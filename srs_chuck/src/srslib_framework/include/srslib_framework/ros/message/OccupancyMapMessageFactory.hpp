@@ -33,7 +33,7 @@ struct OccupancyMapMessageFactory
     static srslib_framework::OccupancyMap map2Msg(const OccupancyMap* map)
     {
         vector<int8_t> occupancy;
-        MapAdapter::occupancyMap2Vector(map, occupancy);
+        MapAdapter::baseMap2Vector(map, occupancy);
 
         srslib_framework::OccupancyMap msgOccupancyMap;
 
@@ -199,7 +199,7 @@ struct OccupancyMapMessageFactory
     static nav_msgs::OccupancyGrid occupancyMap2RosMsg(const OccupancyMap* map, string frameId)
     {
         vector<int8_t> occupancy;
-        MapAdapter::occupancyMap2Vector(map, occupancy);
+        MapAdapter::baseMap2Vector(map, occupancy);
 
         nav_msgs::OccupancyGrid msgOccupancyMap;
 

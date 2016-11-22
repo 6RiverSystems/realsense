@@ -111,11 +111,6 @@ public:
         return newCost;
     }
 
-    int8_t cost2gray(Grid2d::BaseType cost) const
-    {
-        return static_cast<int8_t>(cost);
-    }
-
     void maxCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost);
 
     friend ostream& operator<<(ostream& stream, const OccupancyMap& map);

@@ -5,14 +5,20 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template<class CONTEXT>
-typename TreeNode<CONTEXT>::NodeResult TreeNodeWithCondition<CONTEXT>::execute(CONTEXT* context)
+Task::NodeResult Task<CONTEXT>::execute(CONTEXT* context)
 {
+    Task::NodeResult conditionResult = Task::NodeResult::SUCCEDED;
     if (preCondition_)
     {
-        return preCondition_->execute(context);
+        conditionResult = preCondition_->evaluate(context);
     }
 
-    return TreeNode<CONTEXT>::NodeResult::SUCCEDED;
+    if (conditionResult == Task::NodeResult::SUCCEDED)
+    {
+        return run(context);
+    }
+
+    return conditionResult;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

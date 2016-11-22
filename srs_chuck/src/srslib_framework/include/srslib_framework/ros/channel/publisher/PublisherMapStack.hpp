@@ -17,11 +17,7 @@ using namespace std;
 namespace srs {
 
 class PublisherMapStack :
-<<<<<<< HEAD
-    public Publisher<srslib_framework::MapStack, const MapStack*>
-=======
     public Publisher<const MapStack*, srslib_framework::MapStack>
->>>>>>> feature/astar-potential-test
 {
 public:
     PublisherMapStack(string topic,

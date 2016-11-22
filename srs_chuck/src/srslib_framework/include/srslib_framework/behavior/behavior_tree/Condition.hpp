@@ -19,6 +19,14 @@ public:
 
     virtual ~Condition()
     {}
+
+    virtual ResultType evaluate(CONTEXT* context) = 0;
+
+protected:
+    virtual ResultType execute(CONTEXT* context)
+    {
+        return evaluate(context);
+    }
 };
 
 } // namespace srs

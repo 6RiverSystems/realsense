@@ -11,13 +11,13 @@ template<class CONTEXT>
 class TreeNode
 {
 public:
-    using ResultType = typename TreeNode<CONTEXT>::NodeResult;
-
     enum NodeResult {
         FAILED,
         RUNNING,
         SUCCEDED
     };
+
+    using ResultType = typename TreeNode<CONTEXT>::NodeResult;
 
     TreeNode()
     {}
@@ -25,6 +25,7 @@ public:
     virtual ~TreeNode()
     {}
 
+protected:
     virtual NodeResult execute(CONTEXT* context) = 0;
 };
 

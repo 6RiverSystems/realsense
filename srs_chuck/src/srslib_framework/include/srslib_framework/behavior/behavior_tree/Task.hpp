@@ -5,23 +5,42 @@
  */
 #pragma once
 
-#include <srslib_framework/behavior/behavior_tree/TreeNodeWithCondition.hpp>
+#include <srslib_framework/behavior/behavior_tree/TreeNode.hpp>
 
 namespace srs {
 
 template<class CONTEXT>
 class Task :
-    public TreeNodeWithCondition<CONTEXT>
+    public TreeNode<CONTEXT>
 {
 public:
+    using ResultType = typename TreeNodeWithCondition<CONTEXT>::ResultType;
+
     Task(Condition<CONTEXT>* preCondition = nullptr) :
-        TreeNodeWithCondition<CONTEXT>(preCondition)
+        TreeNode<CONTEXT>(preCondition)
     {}
 
     virtual ~Task()
     {}
 
-    virtual typename TreeNode<CONTEXT>::NodeResult execute(CONTEXT* context);
+    virtual ResultType run(CONTEXT* context) = 0;
+
+protected:
+    virtual ResultType execute(CONTEXT* context)
+    {
+        Task::NodeResult conditionResult = Task::NodeResult::SUCCEDED;
+        if (preCondition_)
+        {
+            conditionResult = preCondition_->evaluate(context);
+        }
+
+        if (conditionResult == Task::NodeResult::SUCCEDED)
+        {
+            return run(context);
+        }
+
+        return conditionResult;
+    }
 };
 
 } // namespace srs

@@ -11,18 +11,18 @@ using namespace std;
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 
-#include <srslib_framework/ros/tap/subscriber/RosSubscriberSingleData.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberSingleData.hpp>
 
 namespace srs {
 
 class SubscriberBoolean :
-    public RosSubscriberSingleData<std_msgs::Bool, bool>
+    public SubscriberSingleData<std_msgs::Bool, bool>
 {
 public:
     SubscriberBoolean(string topic,
         unsigned int queueLength = 10,
         string nameSpace = "~") :
-            RosSubscriberSingleData(topic, queueLength, nameSpace)
+            SubscriberSingleData(topic, queueLength, nameSpace)
     {}
 
     ~SubscriberBoolean()

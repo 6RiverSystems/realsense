@@ -12,19 +12,19 @@ using namespace std;
 #include <srslib_framework/JoypadState.h>
 
 #include <srslib_framework/robotics/device/JoypadState.hpp>
-#include <srslib_framework/ros/tap/subscriber/RosSubscriberSingleData.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberSingleData.hpp>
 #include <srslib_framework/ros/message/JoypadStateMessageFactory.hpp>
 
 namespace srs {
 
 class SubscriberJoypadState :
-    public RosSubscriberSingleData<srslib_framework::JoypadState, JoypadState>
+    public SubscriberSingleData<srslib_framework::JoypadState, JoypadState>
 {
 public:
     SubscriberJoypadState(string topic,
         unsigned int queueLength = 10,
         string nameSpace = "~") :
-            RosSubscriberSingleData(topic, queueLength, nameSpace)
+            SubscriberSingleData(topic, queueLength, nameSpace)
     {
         reset();
     }

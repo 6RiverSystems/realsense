@@ -10,22 +10,22 @@ using namespace std;
 
 #include <ros/ros.h>
 
-#include <srslib_framework/ros/tap/subscriber/RosSubscriber.hpp>
+#include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 
 namespace srs {
 
 template<typename MESSAGE, typename TYPE>
-class RosSubscriberSingleData : public RosSubscriber<MESSAGE>
+class SubscriberSingleData : public Subscriber<MESSAGE>
 {
 public:
-    RosSubscriberSingleData(string topic,
+    SubscriberSingleData(string topic,
         unsigned int queueLength,
         string nameSpace) :
-            RosSubscriber<MESSAGE>(topic, queueLength, nameSpace),
+            Subscriber<MESSAGE>(topic, queueLength, nameSpace),
             data_(TYPE())
     {}
 
-    virtual ~RosSubscriberSingleData()
+    virtual ~SubscriberSingleData()
     {}
 
     TYPE peek() const
@@ -35,20 +35,20 @@ public:
 
     TYPE pop()
     {
-        RosSubscriber<MESSAGE>::declareStale();
+        Subscriber<MESSAGE>::declareStale();
         return data_;
     }
 
     virtual void reset()
     {
-        RosSubscriber<MESSAGE>::reset();
+        Subscriber<MESSAGE>::reset();
 
         data_ = TYPE();
     }
 
     virtual void set(TYPE data)
     {
-        RosSubscriber<MESSAGE>::set();
+        Subscriber<MESSAGE>::set();
 
         data_ = data;
     }

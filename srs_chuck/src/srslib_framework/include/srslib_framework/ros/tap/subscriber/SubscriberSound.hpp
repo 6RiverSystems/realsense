@@ -12,19 +12,19 @@ using namespace std;
 #include <srslib_framework/Sound.h>
 
 #include <srslib_framework/robotics/device/Sound.hpp>
-#include <srslib_framework/ros/tap/subscriber/RosSubscriberSingleData.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberSingleData.hpp>
 #include <srslib_framework/ros/message/SoundMessageFactory.hpp>
 
 namespace srs {
 
 class SubscriberSound :
-    public RosSubscriberSingleData<srslib_framework::Sound, Sound>
+    public SubscriberSingleData<srslib_framework::Sound, Sound>
 {
 public:
     SubscriberSound(string topic,
         unsigned int queueLength = 10,
         string nameSpace = "~") :
-            RosSubscriberSingleData(topic, queueLength, nameSpace)
+            SubscriberSingleData(topic, queueLength, nameSpace)
     {
         reset();
     }

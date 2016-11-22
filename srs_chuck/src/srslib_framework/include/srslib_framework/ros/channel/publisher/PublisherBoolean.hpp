@@ -10,19 +10,19 @@ using namespace std;
 
 #include <std_msgs/Bool.h>
 
-#include <srslib_framework/ros/channel/publisher/RosPublisher.hpp>
+#include <srslib_framework/ros/channel/publisher/Publisher.hpp>
 
 namespace srs {
 
 class PublisherBoolean :
-    public RosPublisher<std_msgs::Bool, const bool>
+    public Publisher<const bool, std_msgs::Bool>
 {
 public:
     PublisherBoolean(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
-            RosPublisher(topic, buffer, latched, nameSpace)
+            Publisher(topic, buffer, latched, nameSpace)
     {}
 
     ~PublisherBoolean()

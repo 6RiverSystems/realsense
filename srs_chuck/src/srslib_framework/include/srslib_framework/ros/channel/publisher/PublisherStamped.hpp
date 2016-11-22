@@ -10,29 +10,29 @@ using namespace std;
 
 #include <ros/ros.h>
 
-#include <srslib_framework/ros/channel/publisher/RosPublisher.hpp>
+#include <srslib_framework/ros/channel/publisher/Publisher.hpp>
 
 namespace srs {
 
-template<typename MESSAGE, typename TYPE>
-class RosPublisherStamped :
-    public RosPublisher<MESSAGE, TYPE>
+template<typename TYPE, typename MESSAGE>
+class PublisherStamped :
+    public Publisher<TYPE, MESSAGE>
 {
 public:
-    RosPublisherStamped(string topic,
+    PublisherStamped(string topic,
         unsigned int buffer,
         bool latched,
         string nameSpace) :
-            RosPublisher<MESSAGE, TYPE>(topic, buffer, latched, nameSpace)
+            Publisher<TYPE, MESSAGE>(topic, buffer, latched, nameSpace)
     {}
 
-    virtual ~RosPublisherStamped()
+    virtual ~PublisherStamped()
     {}
 
     virtual void publish(TYPE data, const ros::Time timestamp = ros::Time::now())
     {
         MESSAGE message = convertData(data, timestamp);
-        RosPublisher<MESSAGE, TYPE>::publishMessage(message);
+        Publisher<TYPE, MESSAGE>::publishMessage(message);
     }
 
     MESSAGE convertData(TYPE data)

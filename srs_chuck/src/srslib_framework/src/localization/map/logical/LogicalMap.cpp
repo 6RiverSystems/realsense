@@ -47,14 +47,15 @@ LogicalMap::LogicalMap(LogicalMetadata metadata) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::addLabeledArea(unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
+void LogicalMap::addLabeledArea(unsigned int ciCells, unsigned int riCells,
+    unsigned int cfCells, unsigned int rfCells,
     string label, MapNote note)
 {
     LabeledArea area;
-    area.xi = xi;
-    area.yi = yi;
-    area.xf = xf;
-    area.yf = yf;
+    area.ci = ciCells;
+    area.ri = riCells;
+    area.cf = cfCells;
+    area.rf = rfCells;
     area.label = label;
     area.note = note;
 
@@ -62,14 +63,14 @@ void LogicalMap::addLabeledArea(unsigned int xi, unsigned int yi, unsigned int x
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::checkAreas(unsigned int c, unsigned int r, LabeledAreaMapType& areas) const
+void LogicalMap::checkAreas(unsigned int cCells, unsigned int rCells, LabeledAreaMapType& areas) const
 {
     areas.clear();
 
     for (auto area : labeledAreas_)
     {
-        if (c >= area.second.xi &&  c <= area.second.xf &&
-            r >= area.second.yi && r <= area.second.yf)
+        if (cCells >= area.second.ci &&  cCells <= area.second.cf &&
+            rCells >= area.second.ri && rCells <= area.second.rf)
         {
             areas[area.first] = area.second;
         }
@@ -77,19 +78,19 @@ void LogicalMap::checkAreas(unsigned int c, unsigned int r, LabeledAreaMapType& 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::checkAreas(double x, double y, LabeledAreaMapType& areas) const
+void LogicalMap::checkAreas(double xM, double yM, LabeledAreaMapType& areas) const
 {
     unsigned int c;
     unsigned int r;
-    transformM2Cells(x, y, c, r);
+    transformM2Cells(xM, yM, c, r);
 
     checkAreas(c, r, areas);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::maxCost(unsigned int c, unsigned int r, Grid2d::BaseType cost)
+void LogicalMap::maxCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost)
 {
-    getGrid()->maxOnPayload(Grid2d::Location(c, r), cost);
+    getGrid()->maxOnPayload(Grid2d::Location(cCells, rCells), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,25 +116,25 @@ bool operator==(const LogicalMap& lhs, const LogicalMap& rhs)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::setCost(unsigned int c, unsigned int r, Grid2d::BaseType cost)
+void LogicalMap::setCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost)
 {
-    getGrid()->setPayload(Grid2d::Location(c, r), cost);
+    getGrid()->setPayload(Grid2d::Location(cCells, rCells), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::setObstruction(unsigned int c, unsigned int r)
+void LogicalMap::setObstacle(unsigned int cCells, unsigned int rCells)
 {
-    getGrid()->setPayload(Grid2d::Location(c, r), Grid2d::PAYLOAD_MAX);
+    getGrid()->setPayload(Grid2d::Location(cCells, rCells), Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::setWeights(unsigned int c, unsigned int r,
+void LogicalMap::setWeights(unsigned int cCells, unsigned int rCells,
     Grid2d::BaseType north,
     Grid2d::BaseType east,
     Grid2d::BaseType south,
     Grid2d::BaseType west)
 {
-    getGrid()->setWeights(Grid2d::Location(c, r), north, east, south, west);
+    getGrid()->setWeights(Grid2d::Location(cCells, rCells), north, east, south, west);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

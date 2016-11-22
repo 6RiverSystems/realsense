@@ -35,7 +35,7 @@ public:
         cells = static_cast<unsigned int>(round(m / resolution_));
     }
 
-    virtual Grid2d::BaseType getCost(unsigned int c, unsigned int r) const = 0;
+    virtual Grid2d::BaseType getCost(unsigned int cCells, unsigned int rCells) const = 0;
 
     int getHeightCells() const
     {
@@ -57,11 +57,11 @@ public:
         return resolution_;
     }
 
-    void getWeights(unsigned int c, unsigned int r,
+    void getWeights(unsigned int cCells, unsigned int rCells,
         Grid2d::BaseType& north, Grid2d::BaseType& east,
         Grid2d::BaseType& south, Grid2d::BaseType& west) const
     {
-        Grid2d::Location location(c, r);
+        Grid2d::Location location(cCells, rCells);
         grid_->getWeights(location, north, east, south, west);
     }
 
@@ -75,13 +75,13 @@ public:
         return widthM_;
     }
 
-    bool isWithinBounds(unsigned int c, unsigned int r) const
+    bool isWithinBounds(unsigned int cCells, unsigned int rCells) const
     {
-        Grid2d::Location location(c, r);
+        Grid2d::Location location(cCells, rCells);
         return grid_->isWithinBounds(location);
     }
 
-    virtual void maxCost(unsigned int c, unsigned int r, Grid2d::BaseType cost) = 0;
+    virtual void maxCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost) = 0;
 
     friend bool operator==(const BaseMap& lhs, const BaseMap& rhs);
 
@@ -90,19 +90,19 @@ public:
         return !(lhs == rhs);
     }
 
-    virtual void setCost(unsigned int c, unsigned int r, Grid2d::BaseType cost) = 0;
-    virtual void setObstruction(unsigned int c, unsigned int r) = 0;
+    virtual void setCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost) = 0;
+    virtual void setObstacle(unsigned int cCells, unsigned int rCells) = 0;
 
-    void transformCells2M(unsigned int c, unsigned int r, double& x, double& y) const
+    void transformCells2M(unsigned int cCells, unsigned int rCells, double& x, double& y) const
     {
-        convertCells2M(c, x);
-        convertCells2M(r, y);
+        convertCells2M(cCells, x);
+        convertCells2M(rCells, y);
     }
 
-    void transformCells2M(unsigned int c, unsigned int r, Pose<>& p) const
+    void transformCells2M(unsigned int cCells, unsigned int rCells, Pose<>& p) const
     {
-        convertCells2M(c, p.x);
-        convertCells2M(r, p.y);
+        convertCells2M(cCells, p.x);
+        convertCells2M(rCells, p.y);
     }
 
     void transformM2Cells(double x, double y, unsigned int& c, unsigned int& r) const

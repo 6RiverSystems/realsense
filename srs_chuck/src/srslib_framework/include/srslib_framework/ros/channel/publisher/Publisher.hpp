@@ -12,11 +12,11 @@ using namespace std;
 
 namespace srs {
 
-template<typename MESSAGE, typename TYPE>
-class RosPublisher
+template<typename TYPE, typename MESSAGE>
+class Publisher
 {
 public:
-    RosPublisher(string topic,
+    Publisher(string topic,
             unsigned int queueLength,
             bool latched,
             string nameSpace) :
@@ -26,7 +26,7 @@ public:
         dataPublisher_ = rosNodeHandle_.advertise<MESSAGE>(topic_, queueLength, latched);
     }
 
-    virtual ~RosPublisher()
+    virtual ~Publisher()
     {}
 
     string getTopic() const

@@ -13,19 +13,19 @@ using namespace std;
 #include <nav_msgs/MapMetaData.h>
 
 #include <srslib_framework/ros/message/CostMap2DMessageFactory.hpp>
-#include <srslib_framework/ros/channel/publisher/RosPublisherStamped.hpp>
+#include <srslib_framework/ros/channel/publisher/PublisherStamped.hpp>
 
 namespace srs {
 
 class PublisherRosCostGrid :
-    public RosPublisherStamped<nav_msgs::OccupancyGrid, const costmap_2d::Costmap2D*>
+    public PublisherStamped<const costmap_2d::Costmap2D*, nav_msgs::OccupancyGrid>
 {
 public:
     PublisherRosCostGrid(string topic, string frameId,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
-            RosPublisherStamped(topic, buffer, latched, nameSpace),
+            PublisherStamped(topic, buffer, latched, nameSpace),
             frameId_(frameId)
     {}
 

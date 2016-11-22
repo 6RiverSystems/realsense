@@ -12,19 +12,19 @@ using namespace std;
 #include <nav_msgs/Odometry.h>
 
 #include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/ros/tap/subscriber/RosSubscriberSingleData.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberSingleData.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
 namespace srs {
 
 class SubscriberRosOdometry :
-    public RosSubscriberSingleData<nav_msgs::Odometry, Pose<>>
+    public SubscriberSingleData<nav_msgs::Odometry, Pose<>>
 {
 public:
     SubscriberRosOdometry(string topic,
         unsigned int queueLength = 10,
         string nameSpace = "~") :
-            RosSubscriberSingleData(topic, queueLength, nameSpace)
+            SubscriberSingleData(topic, queueLength, nameSpace)
     {
         reset();
     }
@@ -44,13 +44,13 @@ public:
 
     double popAngularVelocity()
     {
-        RosSubscriber::declareStale();
+        Subscriber::declareStale();
         return angularVelocity_;
     }
 
     double popLinearVelocity()
     {
-        RosSubscriber::declareStale();
+        Subscriber::declareStale();
         return linearVelocity_;
     }
 
@@ -68,7 +68,7 @@ public:
         linearVelocity_ = 0.0;
         angularVelocity_ = 0.0;
 
-        RosSubscriber::reset();
+        Subscriber::reset();
     }
 
 private:

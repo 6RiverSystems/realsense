@@ -79,9 +79,9 @@ struct SolutionMessageFactory
 
         for (auto solutionItem : message.items)
         {
-            Grid2dSolutionItem Grid2dSolutionItem = msg2Grid2dSolutionItem(solutionItem);
+            Grid2dSolutionItem grid2dSolutionItem = msg2Grid2dSolutionItem(solutionItem);
 
-            solution.push_back(Grid2dSolutionItem);
+            solution.push_back(grid2dSolutionItem);
         }
 
         return solution;

@@ -3,7 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#pragma one
+#pragma once
 
 #include <string>
 using namespace std;

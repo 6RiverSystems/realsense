@@ -558,12 +558,12 @@ void Motion::publishLocalized()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishPose()
 {
-    Pose<> robotPose = positionEstimator_.getPose();
-
-    if (robotPose.isValid())
-    {
-        pubRobotPose_.publish(robotPose);
-    }
+//    Pose<> robotPose = positionEstimator_.getPose();
+//
+//    if (robotPose.isValid())
+//    {
+//        pubRobotPose_.publish(robotPose);
+//    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

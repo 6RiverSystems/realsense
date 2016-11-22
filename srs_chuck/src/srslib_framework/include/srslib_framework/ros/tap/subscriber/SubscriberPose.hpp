@@ -12,19 +12,19 @@ using namespace std;
 #include <srslib_framework/Pose.h>
 
 #include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/ros/tap/subscriber/RosSubscriberSingleData.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberSingleData.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
 namespace srs {
 
 class SubscriberPose :
-    public RosSubscriberSingleData<srslib_framework::Pose, Pose<>>
+    public SubscriberSingleData<srslib_framework::Pose, Pose<>>
 {
 public:
     SubscriberPose(string topic,
         unsigned int queueLength = 10,
         string nameSpace = "~") :
-            RosSubscriberSingleData(topic, queueLength, nameSpace)
+            SubscriberSingleData(topic, queueLength, nameSpace)
     {
         reset();
     }
@@ -42,7 +42,7 @@ public:
         // Reset the data, and then reset the subscriber
         set(Pose<>::INVALID);
 
-        RosSubscriber::reset();
+        Subscriber::reset();
     }
 };
 

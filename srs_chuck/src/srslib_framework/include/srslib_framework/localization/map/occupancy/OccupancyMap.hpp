@@ -27,9 +27,9 @@ public:
     ~OccupancyMap()
     {}
 
-    Grid2d::BaseType getCost(unsigned int c, unsigned int r) const
+    Grid2d::BaseType getCost(unsigned int cCells, unsigned int rCells) const
     {
-        return getGrid()->getPayload(Grid2d::Location(c, r));
+        return getGrid()->getPayload(Grid2d::Location(cCells, rCells));
     }
 
     OccupancyMetadata getMetadata() const
@@ -116,13 +116,13 @@ public:
         return static_cast<int8_t>(cost);
     }
 
-    void maxCost(unsigned int c, unsigned int r, Grid2d::BaseType cost);
+    void maxCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost);
 
     friend ostream& operator<<(ostream& stream, const OccupancyMap& map);
     friend bool operator==(const OccupancyMap& lhs, const OccupancyMap& rhs);
 
-    void setCost(unsigned int c, unsigned int r, Grid2d::BaseType cost);
-    void setObstruction(unsigned int c, unsigned int r);
+    void setCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost);
+    void setObstacle(unsigned int cCells, unsigned int rCells);
 
 protected:
     OccupancyMetadata metadata_;

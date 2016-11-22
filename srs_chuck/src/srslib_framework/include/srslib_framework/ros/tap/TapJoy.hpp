@@ -11,13 +11,13 @@ using namespace std;
 #include <sensor_msgs/Joy.h>
 
 #include <srslib_framework/robotics/Velocity.hpp>
-#include <srslib_framework/ros/tap/subscriber/RosSubscriber.hpp>
+#include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
 class TapJoy :
-    public RosSubscriber<sensor_msgs::Joy>
+    public Subscriber<sensor_msgs::Joy>
 {
 public:
     enum ButtonEnum {
@@ -37,7 +37,7 @@ public:
     };
 
     TapJoy() :
-        RosSubscriber(ChuckTopics::sensor::JOYSTICK_RAW, 10, "~"),
+        Subscriber(ChuckTopics::sensor::JOYSTICK_RAW, 10, "~"),
         joystickLeft_(Velocity<>::INVALID),
         joystickRight_(Velocity<>::INVALID)
     {
@@ -155,12 +155,12 @@ public:
         fill(currentButtons_, currentButtons_ + MAX_NUMBER_BUTTONS, 0);
         fill(previousButtons_, previousButtons_ + MAX_NUMBER_BUTTONS, 0);
 
-        RosSubscriber::reset();
+        Subscriber::reset();
     }
 
     virtual void set(Velocity<> joystickLeft, Velocity<> joystickRight)
     {
-        RosSubscriber::set();
+        Subscriber::set();
 
         joystickLeft_ = joystickLeft;
         joystickRight_ = joystickRight;

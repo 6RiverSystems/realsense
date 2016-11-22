@@ -7,7 +7,7 @@
 
 #include <srslib_framework/Sound.h>
 
-#include <srslib_framework/ros/tap/subscriber/RosSubscriber.hpp>
+#include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_Sound.hpp>
 
@@ -16,7 +16,7 @@
 
 namespace srs {
 
-class SoundHandler : public SoftwareMessageHandler, public Observer<RosSubscriber<srslib_framework::Sound>>
+class SoundHandler : public SoftwareMessageHandler, public Observer<Subscriber<srslib_framework::Sound>>
 {
 public:
     SoundHandler(BrainStemMessageProcessor* owner);
@@ -24,7 +24,7 @@ public:
     virtual ~SoundHandler()
     {}
 
-    void notified(RosSubscriber<srslib_framework::Sound>* subject);
+    void notified(Subscriber<srslib_framework::Sound>* subject);
 
 private:
     HW_MESSAGE_BEGIN(MsgSound)

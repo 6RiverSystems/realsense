@@ -49,8 +49,6 @@ namespace internal {
     static const string MAP_ROS_WEIGHTS_WEST = "/internal/state/map/weights_west";
     static const string MAP_STACK = "/internal/state/map/stack";
 
-    static const string ROBOT_POSE = "/internal/state/robot/pose";
-
     static const string SWCMD_INITIAL_POSE = "/internal/sw_cmd/initial_pose";
 
 } // namespace internal

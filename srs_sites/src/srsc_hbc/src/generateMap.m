@@ -18,31 +18,31 @@ layerWarningSound = convertToLabeledArea(layerWarningSound, 'all', 'ws', {'warni
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One way West
-layerOneWayWest = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-one_way_west.png', ...
+layerOneWayWestEast = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-one_way_west-east.png', ...
     RESOLUTION, ORIGIN);
-showMap(layerOneWayWest, 'West weight');
+showMap(layerOneWayWestEast, 'West weight');
 
-layerOneWayWest = convertToWeightedArea(layerOneWayWest, 'all', 0, 0, 0, 100);
+layerOneWayWestEast = convertToWeightedArea(layerOneWayWestEast, 'all', 0, 0, 0, 100);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One way East
-layerOneWayEast = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-one_way_east.png', ...
+layerOneWayEastWest = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-one_way_east-west.png', ...
     RESOLUTION, ORIGIN);
-showMap(layerOneWayEast, 'East weight');
+showMap(layerOneWayEastWest, 'East weight');
 
-layerOneWayEast = convertToWeightedArea(layerOneWayEast, 'all', 0, 100, 0, 0);
+layerOneWayEastWest = convertToWeightedArea(layerOneWayEastWest, 'all', 0, 100, 0, 0);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One way North-South
-layerOneWayNorthSouth = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-one_way_north_south.png', ...
+layerOneWayNorthSouth = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-one_way_meeting.png', ...
     RESOLUTION, ORIGIN);
-showMap(layerOneWayNorthSouth, 'North-South weight');
+showMap(layerOneWayNorthSouth, 'Meeting area');
 
-layerOneWayNorthSouth = convertToWeightedArea(layerOneWayNorthSouth, 'all', 10, 0, 10, 0);
+layerOneWayNorthSouth = convertToCostArea(layerOneWayNorthSouth, 'all', 20);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map
-map = addLayer(map, {layerWarningSound, layerOneWayWest, layerOneWayEast, layerOneWayNorthSouth});
+map = addLayer(map, {layerWarningSound, layerOneWayWestEast, layerOneWayEastWest, layerOneWayNorthSouth});
 showMap(map, 'Total map');
 
 saveGeoJsonMap(map, ...

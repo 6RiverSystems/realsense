@@ -46,10 +46,10 @@ TEST(Test_AStar, Barrett_BigSearch)
 
     cout << "Elapsed time: " << timer.elapsed() << "s" << endl;
 
-    ASSERT_EQ(4082, algorithm->getOpenNodeCount()) <<
+    ASSERT_EQ(18367, algorithm->getOpenNodeCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(18390, algorithm->getClosedNodeCount()) <<
+    ASSERT_EQ(28141, algorithm->getClosedNodeCount()) <<
         "Unexpected number of closed nodes";
 
     algorithm->clear();

@@ -22,7 +22,25 @@ TEST(Test_MicroMap, MapNotes)
     MapStack* stack = MapStackFactory::fromJsonFile("data/micro-map-notes/micro-map-notes.yaml", 0);
 
     LogicalMap* logical = stack->getLogicalMap();
-    OccupancyMap* occupancy = stack->getOccupancyMap();
+    LogicalMap::LabeledAreaMapType areas = logical->getAreas();
 
-    cout << *logical << endl;
+    ASSERT_EQ(2, areas.size()) << "The number of defined areas is not as expected";
+
+    ASSERT_EQ(1, areas.count("test1")) << "The 'test1' area was not defined";
+    LogicalMap::LabeledArea area1 = areas["test1"];
+    ASSERT_EQ("test1", area1.label) << "The 'test1' area label is not as expected";
+    ASSERT_EQ(2, area1.ci) << "The 'test1' area initial X coordinate is not as expected";
+    ASSERT_EQ(2, area1.ri) << "The 'test1' area initial Y coordinate is not as expected";
+    ASSERT_EQ(2, area1.cf) << "The 'test1' area final X coordinate is not as expected";
+    ASSERT_EQ(2, area1.rf) << "The 'test1' area final Y coordinate is not as expected";
+    ASSERT_EQ(MapNote::WARNING_SOUND, area1.note) << "The map note is not as expected";
+
+    ASSERT_EQ(1, areas.count("test2")) << "The 'test2' area was not defined";
+    LogicalMap::LabeledArea area2 = areas["test2"];
+    ASSERT_EQ("test2", area2.label) << "The 'test2' area label is not as expected";
+    ASSERT_EQ(0, area2.ci) << "The 'test2' area initial X coordinate is not as expected";
+    ASSERT_EQ(0, area2.ri) << "The 'test2' area initial Y coordinate is not as expected";
+    ASSERT_EQ(2, area2.cf) << "The 'test2' area final X coordinate is not as expected";
+    ASSERT_EQ(1, area2.rf) << "The 'test2' area final Y coordinate is not as expected";
+    ASSERT_EQ(MapNote::WARNING_SOUND, area2.note) << "The map note is not as expected";
 }

@@ -148,6 +148,9 @@ void LogicalMapFactory::addCostArea(Pose<> origin, double widthM, double heightM
     Pose<> newOrigin = PoseMath::subtract(origin, metadata_.origin);
     calculateArea(newOrigin, widthM, heightM, c0, r0, widthCells, heightCells);
 
+    widthCells = max<unsigned int>(1, widthCells);
+    heightCells = max<unsigned int>(1, heightCells);
+
     for (unsigned int r = r0; r < r0 + heightCells; ++r)
     {
         for (unsigned int c = c0; c < c0 + widthCells; ++c)
@@ -208,6 +211,9 @@ void LogicalMapFactory::addWeightArea(Pose<> origin, double widthM, double heigh
     Pose<> newOrigin = PoseMath::subtract(origin, metadata_.origin);
     calculateArea(newOrigin, widthM, heightM, c0, r0, widthCells, heightCells);
 
+    widthCells = max<unsigned int>(1, widthCells);
+    heightCells = max<unsigned int>(1, heightCells);
+
     for (unsigned int r = r0; r < r0 + heightCells; ++r)
     {
         for (unsigned int c = c0; c < c0 + widthCells; ++c)
@@ -245,10 +251,10 @@ void LogicalMapFactory::calculateArea(Pose<> origin, double widthM, double heigh
     map_->transformM2Cells(x, y, c0, r0);
 
     map_->convertM2Cells(newWidthM, widthCells);
-    widthCells = max<unsigned int>(1, widthCells);
+    widthCells = max<unsigned int>(0, widthCells);
 
     map_->convertM2Cells(newHeightM, heightCells);
-    heightCells = max<unsigned int>(1, heightCells);
+    heightCells = max<unsigned int>(0, heightCells);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -39,7 +39,7 @@ TEST(Test_AStar, NoSolution)
     ASSERT_EQ(0, algorithm.getOpenNodeCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(1, algorithm.getClosedNodeCount()) <<
+    ASSERT_EQ(4, algorithm.getClosedNodeCount()) <<
         "Unexpected number of closed nodes";
 }
 

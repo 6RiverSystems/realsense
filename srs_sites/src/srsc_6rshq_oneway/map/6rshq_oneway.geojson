@@ -671,7 +671,7 @@
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "beep1",
+						"label": "ws1",
 						"notes": [
 							"warning_sound"
 						]
@@ -684,12 +684,12 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[14.7,4.5],
-							[18.4,6.25]
+							[16.95,6.25]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "beep2",
+						"label": "ws2",
 						"notes": [
 							"warning_sound"
 						]
@@ -698,6 +698,24 @@
 				{
 					"type": "Feature",
 					"id": 46,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[17,1.75],
+							[18.5,9.25]
+						]
+					},
+					"properties": {
+						"object": "labeled_area",
+						"label": "ws3",
+						"notes": [
+							"warning_sound"
+						]
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 47,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [

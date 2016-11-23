@@ -51,6 +51,7 @@ bool AStarPotentials::calculatePath(SearchParameters searchParams,
     stateExpander_->allowUnknown(searchParams.allowUnknown);
     stateExpander_->setLethalCost(searchParams.lethalCost);
     stateExpander_->setWeightRatio(searchParams.weightRatio);
+    stateExpander_->setLogicalCostRatio(searchParams.logicalCostRatio);
     stateExpander_->setNeutralCost(searchParams.neutralCost);
 
     potentials = new float[sizeX * sizeY];

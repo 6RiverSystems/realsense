@@ -113,6 +113,7 @@ void AStarExpansion::add(float* potentials,
     {
         logicalCost = 0;
     }
+    logicalCost *= logicalCostRatio_;
 
     nextPotential = pCalculator_->calculatePotential(potentials,
         currentCost + neutralCost_,

@@ -23,7 +23,15 @@ layerWarningSound = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/sr
 showMap(layerWarningSound, 'Warning sound');
 
 layerWarningSound = convertToLabeledArea(layerWarningSound, 'all', 'ws', {'warning_sound'});
- 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Cost area layer
+layerCostArea = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-cost_area.png', ...
+    RESOLUTION, ORIGIN);
+showMap(layerCostArea, 'Higher cost area');
+
+layerCostArea = convertToCostArea(layerCostArea, 'all', 20);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One-way layer
 
@@ -126,7 +134,7 @@ map = addGraph(map, '6rshq_graph', ...
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map
-map = addLayer(map, {layerWarningSound, layerOneway});
+map = addLayer(map, {layerWarningSound, layerOneway, layerCostArea});
 showMap(map, 'Complete map');
 
 saveGeoJsonMap(map, ...

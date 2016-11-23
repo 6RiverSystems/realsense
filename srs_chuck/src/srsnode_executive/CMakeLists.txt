@@ -11,6 +11,7 @@ set(${PROJECT_NAME}_SOURCES
 
     src/Executive.cpp
     src/LabeledAreasDetector.cpp
+    src/request/RequestWarningSound.cpp
 )
 
 ####################################################################################################

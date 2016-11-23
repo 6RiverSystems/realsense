@@ -30,6 +30,7 @@ public:
         unsigned int lethalCost;
         unsigned int neutralCost;
         unsigned int weightRatio;
+        unsigned int logicalCostRatio;
     };
 
     AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap);

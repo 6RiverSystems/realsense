@@ -72,6 +72,7 @@ private:
     bool initialized_;
 
     unsigned int lethalCost_;
+    unsigned int logicalCostRatio_;
 
     boost::mutex mutex_;
 

@@ -77,6 +77,9 @@ void AStarExpansion::add(float* potentials,
         return;
     }
 
+    // If the occupancy map has no information on a specific location,
+    // and the exploration for unknown location is disabled, the
+    // expansion of the node will not continue
     if (!allowUnknown_ && currentCost == costmap_2d::NO_INFORMATION)
     {
         return;
@@ -102,14 +105,19 @@ void AStarExpansion::add(float* potentials,
     {
         return;
     }
-    if (!allowUnknown_ && logicalCost == Grid2d::PAYLOAD_NO_INFORMATION)
+
+    // No-information in the logical map is different from no-information
+    // in the occupancy map. If the logical map does not have any information
+    // for a specific location, there is no additional cost attached to it
+    if (logicalCost == Grid2d::PAYLOAD_NO_INFORMATION)
     {
-        return;
+        logicalCost = 0;
     }
+    logicalCost *= logicalCostRatio_;
 
     nextPotential = pCalculator_->calculatePotential(potentials,
         currentCost + neutralCost_,
-        next_i, prev_potential) + weightContribution;
+        next_i, prev_potential) + weightContribution + logicalCost;
 
     potentials[next_i] = nextPotential;
 

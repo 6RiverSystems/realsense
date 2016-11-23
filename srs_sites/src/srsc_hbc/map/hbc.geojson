@@ -2944,20 +2944,17 @@
 				},
 				{
 					"type": "Feature",
-					"id": 168,
+					"id": "1",
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[63.625,26.725],
-							[65.125,29.675]
+							[14.425,27.775],
+							[63.625,28.625]
 						]
 					},
 					"properties": {
-						"object": "weighted_area",
-						"north": 0,
-						"east": 100,
-						"south": 0,
-						"west": 0
+						"object": "cost_area",
+						"cost": 100
 					}
 				}
 			]

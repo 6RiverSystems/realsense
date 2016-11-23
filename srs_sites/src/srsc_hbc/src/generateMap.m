@@ -34,15 +34,15 @@ layerOneWayEastWest = convertToWeightedArea(layerOneWayEastWest, 'all', 0, 100, 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One way North-South
-layerOneWayNorthSouth = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-one_way_meeting.png', ...
+layerMeeting = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-one_way_meeting.png', ...
     RESOLUTION, ORIGIN);
-showMap(layerOneWayNorthSouth, 'Meeting area');
+showMap(layerMeeting, 'Meeting area');
 
-layerOneWayNorthSouth = convertToCostArea(layerOneWayNorthSouth, 'all', 20);
+layerMeeting = convertToCostArea(layerMeeting, 'all', 100);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map
-map = addLayer(map, {layerWarningSound, layerOneWayWestEast, layerOneWayEastWest, layerOneWayNorthSouth});
+map = addLayer(map, {layerWarningSound, layerOneWayWestEast, layerOneWayEastWest, layerMeeting});
 showMap(map, 'Total map');
 
 saveGeoJsonMap(map, ...

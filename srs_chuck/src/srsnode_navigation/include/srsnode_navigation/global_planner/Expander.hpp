@@ -25,7 +25,8 @@ public:
             logicalGrid_(logicalMap->getGrid()),
             costGrid_(costMap->getCharMap()),
             pCalculator_(pCalculator),
-            weightRatio_(100.0),
+            weightRatio_(100),
+            logicalCostRatio_(100),
             allowUnknown_(true)
     {
         nx_ = costMap->getSizeInCellsX();
@@ -59,6 +60,11 @@ public:
     void setWeightRatio(unsigned int ratio)
     {
         weightRatio_ = ratio;
+    }
+
+    void setLogicalCostRatio(unsigned int ratio)
+    {
+        logicalCostRatio_ = ratio;
     }
 
     void clearEndpoint(float* potentials, int gx, int gy, int s)
@@ -101,6 +107,7 @@ protected:
 
     unsigned int lethalCost_;
     Grid2d* logicalGrid_;
+    unsigned int logicalCostRatio_;
 
     int nx_;
     int ny_;

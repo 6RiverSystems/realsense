@@ -5,9 +5,6 @@
 
 namespace srs {
 
-const Sound LabeledAreasDetector::SOUND_OFF = Sound(0, 3000, 250, 32, 0);
-const Sound LabeledAreasDetector::WARNING_SOUND = Sound(100, 3000, 250, 32, 65000);
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
@@ -29,7 +26,8 @@ void LabeledAreasDetector::evaluatePose(Pose<> robotPose)
         LogicalMap::LabeledAreaMapType touchedAreas;
         logicalMap_->checkAreas(robotPose.x, robotPose.y, touchedAreas);
 
-        // Determine which areas the robot is entering
+        // Determine which areas the robot is entering, and count
+        // the requests for the different states
         for (auto area : touchedAreas)
         {
             if (currentLabeledAreas_.find(area.second.label) == currentLabeledAreas_.end())
@@ -38,7 +36,18 @@ void LabeledAreasDetector::evaluatePose(Pose<> robotPose)
             }
         }
 
-        // Determine which areas the robot is exiting
+        // Determine which areas the robot is staying in, and count
+        // the requests for the different states
+        for (auto area : touchedAreas)
+        {
+            if (currentLabeledAreas_.find(area.second.label) != currentLabeledAreas_.end())
+            {
+                interpretArea(area.second, DirectionEnum::STAYING);
+            }
+        }
+
+        // Determine which areas the robot is exiting, and count
+        // the requests for the different states
         for (auto area : currentLabeledAreas_)
         {
             if (touchedAreas.find(area.second.label) == touchedAreas.end())
@@ -47,8 +56,16 @@ void LabeledAreasDetector::evaluatePose(Pose<> robotPose)
             }
         }
 
+        executeRequests();
+
         currentLabeledAreas_ = touchedAreas;
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LabeledAreasDetector::executeRequests()
+{
+    requestWarningSound_.execute();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,14 +74,35 @@ void LabeledAreasDetector::evaluatePose(Pose<> robotPose)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LabeledAreasDetector::interpretArea(LogicalMap::LabeledArea area, DirectionEnum direction)
 {
-    ROS_INFO_STREAM_COND_NAMED(direction == DirectionEnum::ENTERING,
-        "executive", "Entering area " << area);
-    ROS_INFO_STREAM_COND_NAMED(direction == DirectionEnum::EXITING,
-        "executive", "Exiting area " << area);
-
-    if (area.note.warning_sound())
+    switch (direction)
     {
-        channelSound_.publish(direction == DirectionEnum::ENTERING ? WARNING_SOUND : SOUND_OFF);
+        case DirectionEnum::ENTERING:
+
+            ROS_INFO_STREAM_NAMED("executive", "Entering area " << area);
+            if (area.note.warning_sound())
+            {
+                requestWarningSound_.request();
+            }
+
+            break;
+
+        case DirectionEnum::STAYING:
+
+            ROS_DEBUG_STREAM_NAMED("executive", "Staying in area " << area);
+
+            // Nothing to do at the moment
+
+            break;
+
+        case DirectionEnum::EXITING:
+
+            ROS_INFO_STREAM_NAMED("executive", "Exiting area " << area);
+            if (area.note.warning_sound())
+            {
+                requestWarningSound_.release();
+            }
+
+            break;
     }
 }
 

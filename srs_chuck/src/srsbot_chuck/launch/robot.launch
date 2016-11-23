@@ -28,9 +28,12 @@
     <include unless="$(arg use_sim_time)" file="$(find srsnode_joystick_adapter)/launch/node.launch" />
 
     <!-- Executive -->
-    <!--
     <include file="$(find srsnode_executive)/launch/node.launch" />
-    -->
+
+    <!-- Navigation -->
+    <include file="$(find srsnode_navigation)/launch/node.launch">
+        <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    </include>
 
     <!-- Raw Odometry -->
     <include file="$(find srsnode_odometry)/launch/node.launch">

@@ -40,7 +40,7 @@ namespace internal {
     static const string GOTO_GOAL = "/move_base_simple/goal";
 
     static const string MAP_ROS_AMCL_OCCUPANCY = "/internal/state/map/ros_amcl_occupancy";
-    static const string MAP_LOGICAL = "/internal/state/map/complete";
+    static const string MAP_ROS_LOGICAL = "/internal/state/map/ros_logical";
     static const string MAP_ROS_METADATA = "/internal/state/map/ros_metadata";
     static const string MAP_ROS_OCCUPANCY = "/internal/state/map/ros_occupancy";
     static const string MAP_ROS_WEIGHTS_EAST = "/internal/state/map/weights_east";

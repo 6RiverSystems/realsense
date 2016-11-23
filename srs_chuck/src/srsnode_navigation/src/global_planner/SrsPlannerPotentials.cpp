@@ -30,7 +30,7 @@ SrsPlannerPotentials::SrsPlannerPotentials() :
     useQuadratic_(true),
     useGridPath_(true),
     allowUnknown_(true),
-    publishPotential_(false),
+    publishPotential_(true),
     lethalCost_(253),
     neutralCost_(10)
 {
@@ -48,7 +48,7 @@ SrsPlannerPotentials::SrsPlannerPotentials(string name, costmap_2d::Costmap2DROS
     useQuadratic_(true),
     useGridPath_(true),
     allowUnknown_(true),
-    publishPotential_(false),
+    publishPotential_(true),
     lethalCost_(253),
     neutralCost_(10)
 {
@@ -171,7 +171,10 @@ bool SrsPlannerPotentials::makePlan(
         plan,
         potentialArray_);
 
-    publishPotential(potentialArray_);
+    if (publishPotential_)
+    {
+        publishPotential(potentialArray_);
+    }
 
     if (found)
     {
@@ -280,7 +283,8 @@ void SrsPlannerPotentials::publishPotential(float* potential)
     grid.header.frame_id = tfFrameid_;
     grid.header.stamp = ros::Time::now();
     grid.info.resolution = resolution;
-
+    grid.info.origin.position.x = costMap_->getOriginX();
+    grid.info.origin.position.y = costMap_->getOriginY();
     grid.info.width = nx;
     grid.info.height = ny;
 

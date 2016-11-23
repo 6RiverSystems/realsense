@@ -8,6 +8,9 @@ map = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc
     RESOLUTION, ORIGIN);
 showMap(map, 'Obstacles');
 
+% Make sure that the border is marked and sealed
+map = convertToBorderObstacle(map, [1, 2, 3, 4, 5, 6, 7, 8, 9, 63, 92, 96, 97], 1, 1);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Warning sound layer
 layerWarningSound = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-warning_sound.png', ...

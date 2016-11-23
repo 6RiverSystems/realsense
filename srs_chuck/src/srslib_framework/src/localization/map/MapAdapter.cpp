@@ -110,7 +110,7 @@ costmap_2d::Costmap2D* MapAdapter::weights2CostMap2D(BaseMap* map, int orientati
     unsigned int columns = map->getWidthCells();
 
     costmap_2d::Costmap2D* costMap = new costmap_2d::Costmap2D(columns, rows,
-        map->getResolution(), 0, 0);
+        map->getResolution(), map->getOrigin().x, map->getOrigin().y);
 
     Grid2d::BaseType north;
     Grid2d::BaseType east;

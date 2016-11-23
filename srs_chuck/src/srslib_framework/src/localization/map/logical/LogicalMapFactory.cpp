@@ -145,8 +145,7 @@ void LogicalMapFactory::addCostArea(Pose<> origin, double widthM, double heightM
     unsigned int widthCells;
     unsigned int heightCells;
 
-    Pose<> newOrigin = PoseMath::subtract(origin, metadata_.origin);
-    calculateArea(newOrigin, widthM, heightM, c0, r0, widthCells, heightCells);
+    calculateArea(origin, widthM, heightM, c0, r0, widthCells, heightCells);
 
     widthCells = max<unsigned int>(1, widthCells);
     heightCells = max<unsigned int>(1, heightCells);
@@ -173,8 +172,7 @@ void LogicalMapFactory::addLabelArea(Pose<> origin, double widthM, double height
     unsigned int widthCells;
     unsigned int heightCells;
 
-    Pose<> newOrigin = PoseMath::subtract(origin, metadata_.origin);
-    calculateArea(newOrigin, widthM, heightM, c0, r0, widthCells, heightCells);
+    calculateArea(origin, widthM, heightM, c0, r0, widthCells, heightCells);
 
     map_->addLabeledArea(c0, r0, c0 + widthCells, r0 + heightCells, label, note);
 }
@@ -208,8 +206,7 @@ void LogicalMapFactory::addWeightArea(Pose<> origin, double widthM, double heigh
     unsigned int widthCells;
     unsigned int heightCells;
 
-    Pose<> newOrigin = PoseMath::subtract(origin, metadata_.origin);
-    calculateArea(newOrigin, widthM, heightM, c0, r0, widthCells, heightCells);
+    calculateArea(origin, widthM, heightM, c0, r0, widthCells, heightCells);
 
     widthCells = max<unsigned int>(1, widthCells);
     heightCells = max<unsigned int>(1, heightCells);
@@ -230,22 +227,24 @@ void LogicalMapFactory::addWeightArea(Pose<> origin, double widthM, double heigh
 void LogicalMapFactory::calculateArea(Pose<> origin, double widthM, double heightM,
     unsigned int& c0, unsigned int& r0, unsigned int& widthCells, unsigned int& heightCells)
 {
+    Pose<> newOrigin = PoseMath::subtract(origin, metadata_.origin);
+
     double newWidthM = widthM;
-    double x = origin.x;
-    if (x < metadata_.origin.x)
+    double x = newOrigin.x;
+    if (x < 0)
     {
         newWidthM += x;
         newWidthM = newWidthM > 0 ? newWidthM : 0;
-        x = metadata_.origin.x;
+        x = 0;
     }
 
     double newHeightM = heightM;
-    double y = origin.y;
-    if (y < metadata_.origin.y)
+    double y = newOrigin.y;
+    if (y < 0)
     {
         newHeightM += y;
         newHeightM = newHeightM > 0 ? newHeightM : 0;
-        y = metadata_.origin.y;
+        y = 0;
     }
 
     map_->transformM2Cells(x, y, c0, r0);

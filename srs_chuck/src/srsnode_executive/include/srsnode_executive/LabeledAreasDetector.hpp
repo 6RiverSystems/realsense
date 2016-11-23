@@ -9,9 +9,8 @@
 
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/ros/tap/TapMapStack.hpp>
-#include <srslib_framework/ros/tap/TapSensorOdometryPose.hpp>
-#include <srslib_framework/ros/tap/subscriber/Observer.hpp>
-#include <srslib_framework/ros/channel/ChannelBrainstemCmd_Sound.hpp>
+
+#include <srsnode_executive/request/RequestWarningSound.hpp>
 
 namespace srs {
 
@@ -26,22 +25,22 @@ public:
     void evaluatePose(Pose<> robotPose);
 
 private:
-    static const Sound SOUND_OFF;
-    static const Sound WARNING_SOUND;
-
     enum DirectionEnum {
-        ENTERING, EXITING
+        ENTERING, EXITING, STAYING
     };
+
+    void executeRequests();
 
     void interpretArea(LogicalMap::LabeledArea area, DirectionEnum direction);
 
     void updateMapStack();
 
-    ChannelBrainstemCmd_Sound channelSound_;
     LogicalMap::LabeledAreaMapType currentLabeledAreas_;
 
     tf::TransformListener listener_;
     LogicalMap* logicalMap_;
+
+    RequestWarningSound requestWarningSound_;
 
     MapStack* srsMapStack_;
 

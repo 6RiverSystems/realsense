@@ -5,6 +5,9 @@
  */
 #pragma once
 
+#include <cstdint>
+using namespace std;
+
 namespace srs {
 
 struct Sound

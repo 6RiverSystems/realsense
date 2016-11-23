@@ -6,10 +6,10 @@
 			"properties": {
 				"object": "map",
 				"version": "1",
-				"origin": [0,0,0],
-				"resolution": 0.1,
-				"width": 168.9,
-				"height": 139.4
+				"origin": [-0.025,-0.025,0],
+				"resolution": 0.05,
+				"width": 84.45,
+				"height": 69.7
 			}
 		},
 		{
@@ -21,8 +21,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[0,97.8],
-							[141.7,139.3]
+							[-0.025,48.875],
+							[70.825,69.625]
 						]
 					},
 					"properties": {
@@ -38,8 +38,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[0,59],
-							[23.2,97.7]
+							[-0.025,29.475],
+							[11.575,48.825]
 						]
 					},
 					"properties": {
@@ -55,8 +55,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[0,52.8],
-							[21.3,58.9]
+							[-0.025,26.375],
+							[10.625,29.425]
 						]
 					},
 					"properties": {
@@ -72,8 +72,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[0,20],
-							[11.3,52.7]
+							[-0.025,9.975],
+							[5.625,26.325]
 						]
 					},
 					"properties": {
@@ -89,8 +89,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[0,0],
-							[9.1,20]
+							[-0.025,-0.025],
+							[4.525,9.975]
 						]
 					},
 					"properties": {
@@ -106,8 +106,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[9.2,0],
-							[13.3,13.3]
+							[4.575,-0.025],
+							[6.625,6.625]
 						]
 					},
 					"properties": {
@@ -123,8 +123,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11.4,45.3],
-							[18.5,49.2]
+							[5.675,22.625],
+							[9.225,24.575]
 						]
 					},
 					"properties": {
@@ -140,8 +140,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[13.4,0],
-							[128.3,14.5]
+							[6.675,-0.025],
+							[64.125,7.225]
 						]
 					},
 					"properties": {
@@ -157,8 +157,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[15.5,43.9],
-							[17,45.2]
+							[7.725,21.925],
+							[8.475,22.575]
 						]
 					},
 					"properties": {
@@ -174,8 +174,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.8,19.8],
-							[17.3,20.3]
+							[8.375,9.875],
+							[8.625,10.125]
 						]
 					},
 					"properties": {
@@ -191,8 +191,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.9,38.1],
-							[17.4,38.6]
+							[8.425,19.025],
+							[8.675,19.275]
 						]
 					},
 					"properties": {
@@ -208,8 +208,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.9,34.5],
-							[17.4,35]
+							[8.425,17.225],
+							[8.675,17.475]
 						]
 					},
 					"properties": {
@@ -225,8 +225,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.9,30.6],
-							[17.4,31.1]
+							[8.425,15.275],
+							[8.675,15.525]
 						]
 					},
 					"properties": {
@@ -242,8 +242,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.9,27],
-							[17.4,27.5]
+							[8.425,13.475],
+							[8.675,13.725]
 						]
 					},
 					"properties": {
@@ -259,8 +259,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.9,23.3],
-							[17.4,23.8]
+							[8.425,11.625],
+							[8.675,11.875]
 						]
 					},
 					"properties": {
@@ -276,8 +276,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[17,41.8],
-							[17.5,42.3]
+							[8.475,20.875],
+							[8.725,21.125]
 						]
 					},
 					"properties": {
@@ -293,8 +293,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[22.9,19.9],
-							[23.5,20.4]
+							[11.425,9.925],
+							[11.725,10.175]
 						]
 					},
 					"properties": {
@@ -310,8 +310,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[23,50],
-							[23.5,50.5]
+							[11.475,24.975],
+							[11.725,25.225]
 						]
 					},
 					"properties": {
@@ -327,8 +327,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[23,41.7],
-							[23.5,42.2]
+							[11.475,20.825],
+							[11.725,21.075]
 						]
 					},
 					"properties": {
@@ -344,8 +344,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[23,38],
-							[23.5,38.5]
+							[11.475,18.975],
+							[11.725,19.225]
 						]
 					},
 					"properties": {
@@ -361,8 +361,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[23,34.3],
-							[23.5,34.8]
+							[11.475,17.125],
+							[11.725,17.375]
 						]
 					},
 					"properties": {
@@ -378,8 +378,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[23,30.6],
-							[23.5,31.1]
+							[11.475,15.275],
+							[11.725,15.525]
 						]
 					},
 					"properties": {
@@ -395,8 +395,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[23,27],
-							[23.5,27.5]
+							[11.475,13.475],
+							[11.725,13.725]
 						]
 					},
 					"properties": {
@@ -412,8 +412,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[23,23.2],
-							[23.5,23.7]
+							[11.475,11.575],
+							[11.725,11.825]
 						]
 					},
 					"properties": {
@@ -429,8 +429,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[23.1,52.6],
-							[23.6,53.1]
+							[11.525,26.275],
+							[11.775,26.525]
 						]
 					},
 					"properties": {
@@ -446,8 +446,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[23.1,47.7],
-							[23.6,48.2]
+							[11.525,23.825],
+							[11.775,24.075]
 						]
 					},
 					"properties": {
@@ -463,8 +463,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[23.1,44.1],
-							[23.6,44.6]
+							[11.525,22.025],
+							[11.775,22.275]
 						]
 					},
 					"properties": {
@@ -480,8 +480,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[23.3,68.4],
-							[25.5,76.5]
+							[11.625,34.175],
+							[12.725,38.225]
 						]
 					},
 					"properties": {
@@ -497,8 +497,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.9,59.4],
-							[32.5,95.2]
+							[14.425,29.675],
+							[16.225,47.575]
 						]
 					},
 					"properties": {
@@ -514,8 +514,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.9,17.6],
-							[32.4,53.5]
+							[14.425,8.775],
+							[16.175,26.725]
 						]
 					},
 					"properties": {
@@ -531,8 +531,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[35.3,59.4],
-							[38.1,95.2]
+							[17.625,29.675],
+							[19.025,47.575]
 						]
 					},
 					"properties": {
@@ -548,8 +548,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[35.3,17.6],
-							[37.8,53.5]
+							[17.625,8.775],
+							[18.875,26.725]
 						]
 					},
 					"properties": {
@@ -565,8 +565,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[41.5,59.4],
-							[44.2,95.2]
+							[20.725,29.675],
+							[22.075,47.575]
 						]
 					},
 					"properties": {
@@ -582,8 +582,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[41.6,17.6],
-							[44.1,53.5]
+							[20.775,8.775],
+							[22.025,26.725]
 						]
 					},
 					"properties": {
@@ -599,8 +599,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[47.8,59.4],
-							[50.2,95.2]
+							[23.875,29.675],
+							[25.075,47.575]
 						]
 					},
 					"properties": {
@@ -616,8 +616,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[47.8,17.6],
-							[50.2,53.5]
+							[23.875,8.775],
+							[25.075,26.725]
 						]
 					},
 					"properties": {
@@ -633,8 +633,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[54,17.6],
-							[56.7,53.5]
+							[26.975,8.775],
+							[28.325,26.725]
 						]
 					},
 					"properties": {
@@ -650,8 +650,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[54.2,59.4],
-							[56.7,95.2]
+							[27.075,29.675],
+							[28.325,47.575]
 						]
 					},
 					"properties": {
@@ -667,8 +667,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[59.9,59.4],
-							[62.4,95.2]
+							[29.925,29.675],
+							[31.175,47.575]
 						]
 					},
 					"properties": {
@@ -684,8 +684,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[60,17.6],
-							[62.4,53.5]
+							[29.975,8.775],
+							[31.175,26.725]
 						]
 					},
 					"properties": {
@@ -701,8 +701,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[65.9,17.6],
-							[68.7,53.5]
+							[32.925,8.775],
+							[34.325,26.725]
 						]
 					},
 					"properties": {
@@ -718,8 +718,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66,59.4],
-							[68.6,95.2]
+							[32.975,29.675],
+							[34.275,47.575]
 						]
 					},
 					"properties": {
@@ -735,8 +735,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[72,17.6],
-							[74.7,53.5]
+							[35.975,8.775],
+							[37.325,26.725]
 						]
 					},
 					"properties": {
@@ -752,8 +752,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[72.4,59.4],
-							[74.8,95.2]
+							[36.175,29.675],
+							[37.375,47.575]
 						]
 					},
 					"properties": {
@@ -769,8 +769,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[78.3,59.4],
-							[81.3,95.2]
+							[39.125,29.675],
+							[40.625,47.575]
 						]
 					},
 					"properties": {
@@ -786,8 +786,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[78.5,17.6],
-							[81.1,53.5]
+							[39.225,8.775],
+							[40.525,26.725]
 						]
 					},
 					"properties": {
@@ -803,8 +803,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[84.3,17.6],
-							[86.9,53.5]
+							[42.125,8.775],
+							[43.425,26.725]
 						]
 					},
 					"properties": {
@@ -820,8 +820,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[84.5,59.4],
-							[86.9,95.2]
+							[42.225,29.675],
+							[43.425,47.575]
 						]
 					},
 					"properties": {
@@ -837,8 +837,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[90.5,17.6],
-							[93,53.5]
+							[45.225,8.775],
+							[46.475,26.725]
 						]
 					},
 					"properties": {
@@ -854,8 +854,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[90.6,59.4],
-							[93.2,95.2]
+							[45.275,29.675],
+							[46.575,47.575]
 						]
 					},
 					"properties": {
@@ -871,8 +871,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[96.7,17.6],
-							[99.1,53.5]
+							[48.325,8.775],
+							[49.525,26.725]
 						]
 					},
 					"properties": {
@@ -888,8 +888,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[96.8,59.4],
-							[99.3,95.2]
+							[48.375,29.675],
+							[49.625,47.575]
 						]
 					},
 					"properties": {
@@ -905,8 +905,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[102.6,17.6],
-							[105.8,53.5]
+							[51.275,8.775],
+							[52.875,26.725]
 						]
 					},
 					"properties": {
@@ -922,8 +922,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[103,59.4],
-							[106,95.2]
+							[51.475,29.675],
+							[52.975,47.575]
 						]
 					},
 					"properties": {
@@ -939,8 +939,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[109,59.4],
-							[111.9,95.2]
+							[54.475,29.675],
+							[55.925,47.575]
 						]
 					},
 					"properties": {
@@ -956,8 +956,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[109.1,17.6],
-							[111.5,53.5]
+							[54.525,8.775],
+							[55.725,26.725]
 						]
 					},
 					"properties": {
@@ -973,8 +973,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[115.1,59.4],
-							[117.8,95.2]
+							[57.525,29.675],
+							[58.875,47.575]
 						]
 					},
 					"properties": {
@@ -990,8 +990,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[115.1,17.6],
-							[117.4,53.5]
+							[57.525,8.775],
+							[58.675,26.725]
 						]
 					},
 					"properties": {
@@ -1007,8 +1007,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[121.2,59.4],
-							[123.8,95.2]
+							[60.575,29.675],
+							[61.875,47.575]
 						]
 					},
 					"properties": {
@@ -1024,8 +1024,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[121.3,17.6],
-							[123.7,53.5]
+							[60.625,8.775],
+							[61.825,26.725]
 						]
 					},
 					"properties": {
@@ -1041,8 +1041,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[127.3,59.4],
-							[130.3,95.2]
+							[63.625,29.675],
+							[65.125,47.575]
 						]
 					},
 					"properties": {
@@ -1058,8 +1058,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[127.3,17.6],
-							[130.3,53.5]
+							[63.625,8.775],
+							[65.125,26.725]
 						]
 					},
 					"properties": {
@@ -1075,8 +1075,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[128.4,0],
-							[168.9,14.5]
+							[64.175,-0.025],
+							[84.425,7.225]
 						]
 					},
 					"properties": {
@@ -1092,8 +1092,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.1,70.5],
-							[133.6,71]
+							[66.525,35.225],
+							[66.775,35.475]
 						]
 					},
 					"properties": {
@@ -1109,8 +1109,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.1,50.5],
-							[133.6,51]
+							[66.525,25.225],
+							[66.775,25.475]
 						]
 					},
 					"properties": {
@@ -1126,8 +1126,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.1,31.1],
-							[133.6,31.6]
+							[66.525,15.525],
+							[66.775,15.775]
 						]
 					},
 					"properties": {
@@ -1143,8 +1143,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.2,77.9],
-							[133.7,78.4]
+							[66.575,38.925],
+							[66.825,39.175]
 						]
 					},
 					"properties": {
@@ -1160,8 +1160,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.2,74.2],
-							[133.7,74.7]
+							[66.575,37.075],
+							[66.825,37.325]
 						]
 					},
 					"properties": {
@@ -1177,8 +1177,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.2,66.7],
-							[133.7,67.2]
+							[66.575,33.325],
+							[66.825,33.575]
 						]
 					},
 					"properties": {
@@ -1194,8 +1194,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.2,63.1],
-							[133.7,63.6]
+							[66.575,31.525],
+							[66.825,31.775]
 						]
 					},
 					"properties": {
@@ -1211,8 +1211,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.2,53.2],
-							[133.7,53.7]
+							[66.575,26.575],
+							[66.825,26.825]
 						]
 					},
 					"properties": {
@@ -1228,8 +1228,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.2,48.2],
-							[133.7,48.7]
+							[66.575,24.075],
+							[66.825,24.325]
 						]
 					},
 					"properties": {
@@ -1245,8 +1245,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.2,44.6],
-							[133.7,45.2]
+							[66.575,22.275],
+							[66.825,22.575]
 						]
 					},
 					"properties": {
@@ -1262,8 +1262,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.2,38.5],
-							[133.8,39]
+							[66.575,19.225],
+							[66.875,19.475]
 						]
 					},
 					"properties": {
@@ -1279,8 +1279,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.2,27.4],
-							[133.7,27.9]
+							[66.575,13.675],
+							[66.825,13.925]
 						]
 					},
 					"properties": {
@@ -1296,8 +1296,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.3,92.4],
-							[133.8,92.9]
+							[66.625,46.175],
+							[66.875,46.425]
 						]
 					},
 					"properties": {
@@ -1313,8 +1313,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.3,85.2],
-							[133.8,85.7]
+							[66.625,42.575],
+							[66.875,42.825]
 						]
 					},
 					"properties": {
@@ -1330,8 +1330,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.3,81.5],
-							[133.8,82]
+							[66.625,40.725],
+							[66.875,40.975]
 						]
 					},
 					"properties": {
@@ -1347,8 +1347,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.3,59.5],
-							[133.8,60]
+							[66.625,29.725],
+							[66.875,29.975]
 						]
 					},
 					"properties": {
@@ -1364,8 +1364,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.3,42.1],
-							[133.8,42.6]
+							[66.625,21.025],
+							[66.875,21.275]
 						]
 					},
 					"properties": {
@@ -1381,8 +1381,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.3,34.6],
-							[133.8,35.1]
+							[66.625,17.275],
+							[66.875,17.525]
 						]
 					},
 					"properties": {
@@ -1398,8 +1398,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.3,23.7],
-							[133.8,24.2]
+							[66.625,11.825],
+							[66.875,12.075]
 						]
 					},
 					"properties": {
@@ -1415,8 +1415,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.3,20.4],
-							[133.8,20.9]
+							[66.625,10.175],
+							[66.875,10.425]
 						]
 					},
 					"properties": {
@@ -1432,8 +1432,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[133.4,88.9],
-							[133.9,89.4]
+							[66.675,44.425],
+							[66.925,44.675]
 						]
 					},
 					"properties": {
@@ -1449,8 +1449,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[139.3,92.4],
-							[139.8,92.9]
+							[69.625,46.175],
+							[69.875,46.425]
 						]
 					},
 					"properties": {
@@ -1466,8 +1466,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[139.3,70.5],
-							[139.8,71]
+							[69.625,35.225],
+							[69.875,35.475]
 						]
 					},
 					"properties": {
@@ -1483,8 +1483,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[139.3,66.8],
-							[139.8,67.3]
+							[69.625,33.375],
+							[69.875,33.625]
 						]
 					},
 					"properties": {
@@ -1500,8 +1500,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[139.3,63.2],
-							[139.8,63.7]
+							[69.625,31.575],
+							[69.875,31.825]
 						]
 					},
 					"properties": {
@@ -1517,8 +1517,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[139.4,81.5],
-							[139.9,82]
+							[69.675,40.725],
+							[69.925,40.975]
 						]
 					},
 					"properties": {
@@ -1534,8 +1534,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[139.4,77.8],
-							[139.9,78.3]
+							[69.675,38.875],
+							[69.925,39.125]
 						]
 					},
 					"properties": {
@@ -1551,8 +1551,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[139.4,74.1],
-							[139.9,74.6]
+							[69.675,37.025],
+							[69.925,37.275]
 						]
 					},
 					"properties": {
@@ -1568,8 +1568,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[139.4,18.8],
-							[141.7,54.1]
+							[69.675,9.375],
+							[70.825,27.025]
 						]
 					},
 					"properties": {
@@ -1585,8 +1585,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[139.5,88.8],
-							[140,89.3]
+							[69.725,44.375],
+							[69.975,44.625]
 						]
 					},
 					"properties": {
@@ -1602,8 +1602,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[139.5,85.2],
-							[140,85.7]
+							[69.725,42.575],
+							[69.975,42.825]
 						]
 					},
 					"properties": {
@@ -1619,8 +1619,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[139.5,58.6],
-							[140.4,59.9]
+							[69.725,29.275],
+							[70.175,29.925]
 						]
 					},
 					"properties": {
@@ -1636,8 +1636,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[141,54.2],
-							[141.7,59.2]
+							[70.475,27.075],
+							[70.825,29.575]
 						]
 					},
 					"properties": {
@@ -1653,8 +1653,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[141.8,14.5],
-							[168.9,139.3]
+							[70.875,7.225],
+							[84.425,69.625]
 						]
 					},
 					"properties": {
@@ -1670,8 +1670,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.9,95.3],
-							[130.3,97.8]
+							[14.425,47.625],
+							[65.125,48.875]
 						]
 					},
 					"properties": {
@@ -1688,8 +1688,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.9,57.3],
-							[130.3,59.3]
+							[14.425,28.625],
+							[65.125,29.625]
 						]
 					},
 					"properties": {
@@ -1706,8 +1706,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.9,53.6],
-							[130.3,55.6]
+							[14.425,26.775],
+							[65.125,27.775]
 						]
 					},
 					"properties": {
@@ -1724,8 +1724,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.9,14.4],
-							[130.3,17.5]
+							[14.425,7.175],
+							[65.125,8.725]
 						]
 					},
 					"properties": {
@@ -1742,8 +1742,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[32.4,89.2],
-							[35.3,95.2]
+							[16.175,44.575],
+							[17.625,47.575]
 						]
 					},
 					"properties": {
@@ -1760,8 +1760,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[32.4,59.4],
-							[35.3,65.4]
+							[16.175,29.675],
+							[17.625,32.675]
 						]
 					},
 					"properties": {
@@ -1778,8 +1778,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[32.4,47.5],
-							[35.3,53.5]
+							[16.175,23.725],
+							[17.625,26.725]
 						]
 					},
 					"properties": {
@@ -1796,8 +1796,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[32.4,17.6],
-							[35.3,23.6]
+							[16.175,8.775],
+							[17.625,11.775]
 						]
 					},
 					"properties": {
@@ -1814,8 +1814,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[37.8,47.5],
-							[41.6,53.5]
+							[18.875,23.725],
+							[20.775,26.725]
 						]
 					},
 					"properties": {
@@ -1832,8 +1832,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[37.8,17.6],
-							[41.6,23.6]
+							[18.875,8.775],
+							[20.775,11.775]
 						]
 					},
 					"properties": {
@@ -1850,8 +1850,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[38.1,89.2],
-							[41.5,95.2]
+							[19.025,44.575],
+							[20.725,47.575]
 						]
 					},
 					"properties": {
@@ -1868,8 +1868,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[38.1,59.4],
-							[41.5,65.4]
+							[19.025,29.675],
+							[20.725,32.675]
 						]
 					},
 					"properties": {
@@ -1886,8 +1886,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[44.1,47.5],
-							[47.8,53.5]
+							[22.025,23.725],
+							[23.875,26.725]
 						]
 					},
 					"properties": {
@@ -1904,8 +1904,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[44.1,17.6],
-							[47.8,23.6]
+							[22.025,8.775],
+							[23.875,11.775]
 						]
 					},
 					"properties": {
@@ -1922,8 +1922,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[44.2,89.2],
-							[47.8,95.2]
+							[22.075,44.575],
+							[23.875,47.575]
 						]
 					},
 					"properties": {
@@ -1940,8 +1940,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[44.2,59.4],
-							[47.8,65.4]
+							[22.075,29.675],
+							[23.875,32.675]
 						]
 					},
 					"properties": {
@@ -1958,8 +1958,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[50.1,59.4],
-							[54.2,65.4]
+							[25.025,29.675],
+							[27.075,32.675]
 						]
 					},
 					"properties": {
@@ -1976,8 +1976,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[50.2,89.2],
-							[54.2,95.2]
+							[25.075,44.575],
+							[27.075,47.575]
 						]
 					},
 					"properties": {
@@ -1994,8 +1994,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[50.2,47.5],
-							[54,53.5]
+							[25.075,23.725],
+							[26.975,26.725]
 						]
 					},
 					"properties": {
@@ -2012,8 +2012,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[50.2,17.6],
-							[54,23.6]
+							[25.075,8.775],
+							[26.975,11.775]
 						]
 					},
 					"properties": {
@@ -2030,8 +2030,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[56.7,89.2],
-							[59.9,95.2]
+							[28.325,44.575],
+							[29.925,47.575]
 						]
 					},
 					"properties": {
@@ -2048,8 +2048,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[56.7,59.4],
-							[59.9,65.4]
+							[28.325,29.675],
+							[29.925,32.675]
 						]
 					},
 					"properties": {
@@ -2066,8 +2066,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[56.7,47.5],
-							[60,53.5]
+							[28.325,23.725],
+							[29.975,26.725]
 						]
 					},
 					"properties": {
@@ -2084,8 +2084,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[56.7,17.6],
-							[60,23.6]
+							[28.325,8.775],
+							[29.975,11.775]
 						]
 					},
 					"properties": {
@@ -2102,8 +2102,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[62.4,89.2],
-							[66,95.2]
+							[31.175,44.575],
+							[32.975,47.575]
 						]
 					},
 					"properties": {
@@ -2120,8 +2120,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[62.4,59.4],
-							[66,65.4]
+							[31.175,29.675],
+							[32.975,32.675]
 						]
 					},
 					"properties": {
@@ -2138,8 +2138,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[62.4,47.5],
-							[65.9,53.5]
+							[31.175,23.725],
+							[32.925,26.725]
 						]
 					},
 					"properties": {
@@ -2156,8 +2156,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[62.4,17.6],
-							[65.9,23.6]
+							[31.175,8.775],
+							[32.925,11.775]
 						]
 					},
 					"properties": {
@@ -2174,8 +2174,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[68.6,89.2],
-							[72.4,95.2]
+							[34.275,44.575],
+							[36.175,47.575]
 						]
 					},
 					"properties": {
@@ -2192,8 +2192,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[68.6,59.4],
-							[72.4,65.4]
+							[34.275,29.675],
+							[36.175,32.675]
 						]
 					},
 					"properties": {
@@ -2210,8 +2210,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[68.7,47.5],
-							[72,53.5]
+							[34.325,23.725],
+							[35.975,26.725]
 						]
 					},
 					"properties": {
@@ -2228,8 +2228,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[68.7,17.6],
-							[72,23.6]
+							[34.325,8.775],
+							[35.975,11.775]
 						]
 					},
 					"properties": {
@@ -2246,8 +2246,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[74.7,47.5],
-							[78.5,53.5]
+							[37.325,23.725],
+							[39.225,26.725]
 						]
 					},
 					"properties": {
@@ -2264,8 +2264,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[74.7,17.6],
-							[78.5,23.6]
+							[37.325,8.775],
+							[39.225,11.775]
 						]
 					},
 					"properties": {
@@ -2282,8 +2282,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[74.8,89.2],
-							[78.3,95.2]
+							[37.375,44.575],
+							[39.125,47.575]
 						]
 					},
 					"properties": {
@@ -2300,8 +2300,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[74.8,59.4],
-							[78.3,65.4]
+							[37.375,29.675],
+							[39.125,32.675]
 						]
 					},
 					"properties": {
@@ -2318,8 +2318,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[81.1,47.5],
-							[84.3,53.5]
+							[40.525,23.725],
+							[42.125,26.725]
 						]
 					},
 					"properties": {
@@ -2336,8 +2336,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[81.1,17.6],
-							[84.3,23.6]
+							[40.525,8.775],
+							[42.125,11.775]
 						]
 					},
 					"properties": {
@@ -2354,8 +2354,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[81.3,89.2],
-							[84.5,95.2]
+							[40.625,44.575],
+							[42.225,47.575]
 						]
 					},
 					"properties": {
@@ -2372,8 +2372,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[81.3,59.4],
-							[84.5,65.4]
+							[40.625,29.675],
+							[42.225,32.675]
 						]
 					},
 					"properties": {
@@ -2390,8 +2390,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[86.9,89.2],
-							[90.6,95.2]
+							[43.425,44.575],
+							[45.275,47.575]
 						]
 					},
 					"properties": {
@@ -2408,8 +2408,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[86.9,59.4],
-							[90.6,65.4]
+							[43.425,29.675],
+							[45.275,32.675]
 						]
 					},
 					"properties": {
@@ -2426,8 +2426,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[86.9,47.5],
-							[90.5,53.5]
+							[43.425,23.725],
+							[45.225,26.725]
 						]
 					},
 					"properties": {
@@ -2444,8 +2444,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[86.9,17.6],
-							[90.5,23.6]
+							[43.425,8.775],
+							[45.225,11.775]
 						]
 					},
 					"properties": {
@@ -2462,8 +2462,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[93,47.5],
-							[96.7,53.5]
+							[46.475,23.725],
+							[48.325,26.725]
 						]
 					},
 					"properties": {
@@ -2480,8 +2480,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[93,17.6],
-							[96.7,23.6]
+							[46.475,8.775],
+							[48.325,11.775]
 						]
 					},
 					"properties": {
@@ -2498,8 +2498,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[93.2,89.2],
-							[96.8,95.2]
+							[46.575,44.575],
+							[48.375,47.575]
 						]
 					},
 					"properties": {
@@ -2516,8 +2516,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[93.2,59.4],
-							[96.8,65.4]
+							[46.575,29.675],
+							[48.375,32.675]
 						]
 					},
 					"properties": {
@@ -2534,8 +2534,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[99.1,47.5],
-							[102.6,53.5]
+							[49.525,23.725],
+							[51.275,26.725]
 						]
 					},
 					"properties": {
@@ -2552,8 +2552,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[99.1,17.6],
-							[102.6,23.6]
+							[49.525,8.775],
+							[51.275,11.775]
 						]
 					},
 					"properties": {
@@ -2570,8 +2570,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[99.3,89.2],
-							[103,95.2]
+							[49.625,44.575],
+							[51.475,47.575]
 						]
 					},
 					"properties": {
@@ -2588,8 +2588,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[99.3,59.4],
-							[103,65.4]
+							[49.625,29.675],
+							[51.475,32.675]
 						]
 					},
 					"properties": {
@@ -2606,8 +2606,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[105.8,47.5],
-							[109.1,53.5]
+							[52.875,23.725],
+							[54.525,26.725]
 						]
 					},
 					"properties": {
@@ -2624,8 +2624,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[105.8,17.6],
-							[109.1,23.6]
+							[52.875,8.775],
+							[54.525,11.775]
 						]
 					},
 					"properties": {
@@ -2642,8 +2642,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[106,89.2],
-							[109,95.2]
+							[52.975,44.575],
+							[54.475,47.575]
 						]
 					},
 					"properties": {
@@ -2660,8 +2660,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[106,59.4],
-							[109,65.4]
+							[52.975,29.675],
+							[54.475,32.675]
 						]
 					},
 					"properties": {
@@ -2678,8 +2678,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[111.5,47.5],
-							[115.1,53.5]
+							[55.725,23.725],
+							[57.525,26.725]
 						]
 					},
 					"properties": {
@@ -2696,8 +2696,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[111.5,17.6],
-							[115.1,23.6]
+							[55.725,8.775],
+							[57.525,11.775]
 						]
 					},
 					"properties": {
@@ -2714,8 +2714,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[111.9,89.2],
-							[115.1,95.2]
+							[55.925,44.575],
+							[57.525,47.575]
 						]
 					},
 					"properties": {
@@ -2732,8 +2732,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[111.9,59.4],
-							[115.1,65.4]
+							[55.925,29.675],
+							[57.525,32.675]
 						]
 					},
 					"properties": {
@@ -2750,8 +2750,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[117.4,47.5],
-							[121.3,53.5]
+							[58.675,23.725],
+							[60.625,26.725]
 						]
 					},
 					"properties": {
@@ -2768,8 +2768,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[117.4,17.6],
-							[121.3,23.6]
+							[58.675,8.775],
+							[60.625,11.775]
 						]
 					},
 					"properties": {
@@ -2786,8 +2786,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[117.8,89.2],
-							[121.2,95.2]
+							[58.875,44.575],
+							[60.575,47.575]
 						]
 					},
 					"properties": {
@@ -2804,8 +2804,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[117.8,59.4],
-							[121.2,65.4]
+							[58.875,29.675],
+							[60.575,32.675]
 						]
 					},
 					"properties": {
@@ -2822,8 +2822,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[123.7,47.5],
-							[127.3,53.5]
+							[61.825,23.725],
+							[63.625,26.725]
 						]
 					},
 					"properties": {
@@ -2840,8 +2840,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[123.7,17.6],
-							[127.3,23.6]
+							[61.825,8.775],
+							[63.625,11.775]
 						]
 					},
 					"properties": {
@@ -2858,8 +2858,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[123.8,89.2],
-							[127.3,95.2]
+							[61.875,44.575],
+							[63.625,47.575]
 						]
 					},
 					"properties": {
@@ -2876,8 +2876,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[123.8,59.4],
-							[127.3,65.4]
+							[61.875,29.675],
+							[63.625,32.675]
 						]
 					},
 					"properties": {
@@ -2894,8 +2894,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[127.3,53.5],
-							[130.3,59.4]
+							[63.625,47.575],
+							[65.125,48.875]
 						]
 					},
 					"properties": {
@@ -2912,8 +2912,26 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[127.3,95.2],
-							[130.3,97.8]
+							[63.625,7.175],
+							[65.125,8.775]
+						]
+					},
+					"properties": {
+						"object": "weighted_area",
+						"north": 0,
+						"east": 0,
+						"south": 0,
+						"west": 100
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 168,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[63.625,26.725],
+							[65.125,29.675]
 						]
 					},
 					"properties": {
@@ -2930,8 +2948,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[127.3,14.4],
-							[130.3,17.6]
+							[63.625,26.725],
+							[65.125,29.675]
 						]
 					},
 					"properties": {
@@ -2939,24 +2957,6 @@
 						"north": 0,
 						"east": 100,
 						"south": 0,
-						"west": 0
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 169,
-					"geometry": {
-						"type": "MultiPoint",
-						"coordinates": [
-							[28.9,55.6],
-							[127.3,57.3]
-						]
-					},
-					"properties": {
-						"object": "weighted_area",
-						"north": 10,
-						"east": 0,
-						"south": 10,
 						"west": 0
 					}
 				}

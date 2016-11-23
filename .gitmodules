@@ -1,4 +1,6 @@
 [submodule "srs_chuck/src/laser_filters"]
 	path = srs_chuck/src/laser_filters
 	url = git@github.com:6RiverSystems/laser_filters.git
-
+[submodule "srs_chuck/src/navigation"]
+   path = srs_chuck/src/navigation
+   url = git@github.com:6RiverSystems/navigation.git

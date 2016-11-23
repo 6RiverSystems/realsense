@@ -743,7 +743,7 @@
 					},
 					"properties": {
 						"object": "cost_area",
-						"cost": 20
+						"cost": 100
 					}
 				}
 			]

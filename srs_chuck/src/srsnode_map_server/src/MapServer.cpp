@@ -60,7 +60,7 @@ bool MapServer::callbackMapRequest(nav_msgs::GetMap::Request &req, nav_msgs::Get
     ROS_INFO("Map request service: Sending map");
 
     vector<int8_t> occupancy;
-    MapAdapter::occupancyMap2Vector(mapStack_->getOccupancyMap(), occupancy);
+    MapAdapter::baseMap2Vector(mapStack_->getOccupancyMap(), occupancy);
 
     res.map.header.stamp = ros::Time::now();
     res.map.info = OccupancyMapMessageFactory::metadata2RosMsg(

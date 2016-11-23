@@ -52,6 +52,11 @@ public:
         return grid_;
     }
 
+    Pose<> getOrigin() const
+    {
+        return origin_;
+    }
+
     double getResolution() const
     {
         return resolution_;

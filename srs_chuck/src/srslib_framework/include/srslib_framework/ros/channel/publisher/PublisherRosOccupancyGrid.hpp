@@ -10,8 +10,8 @@ using namespace std;
 
 #include <nav_msgs/MapMetaData.h>
 
-#include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/ros/channel/publisher/Publisher.hpp>
+#include <srslib_framework/ros/message/MapStackMessageFactory.hpp>
 
 namespace srs {
 
@@ -29,7 +29,7 @@ public:
 
     nav_msgs::OccupancyGrid convertData(const BaseMap* data)
     {
-        return MapAdapter::baseMap2RosMsg(data, frameId_);
+        return MapStackMessageFactory::baseMap2RosMsg(data, frameId_);
     }
 
 private:

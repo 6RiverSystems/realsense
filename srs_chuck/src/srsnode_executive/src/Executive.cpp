@@ -2,12 +2,6 @@
 
 #include <ros/ros.h>
 
-#include <srsnode_executive/condition/IsEnteringWarningSoundArea.hpp>
-#include <srsnode_executive/condition/IsExitingWarningSoundArea.hpp>
-#include <srsnode_executive/task/PlayWarningSound.hpp>
-#include <srsnode_executive/task/FindLabeledAreas.hpp>
-#include <srsnode_executive/task/StopSound.hpp>
-
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,11 +11,6 @@ namespace srs {
 Executive::Executive(string name, int argc, char** argv) :
     RosUnit(name, argc, argv, REFRESH_RATE_HZ)
 {
-    mainSequence_ = Sequence<ExecutiveContext>({
-        new FindLabeledAreas(),
-        new PlayWarningSound(new IsEnteringWarningSoundArea())
-    });
-
     context_.robotPose = Pose<>::INVALID;
     context_.mapStack = nullptr;
 }
@@ -31,11 +20,7 @@ void Executive::execute()
 {
     updateContext();
 
-    mainSequence_.execute(&context_);
-//    playWarningSound_.execute(&context_);
-//    stopSound_.execute(&context_);
-
-    // labeledAreasDetector_.evaluatePose(context_.robotPose);
+    labeledAreasDetector_.evaluatePose(context_.robotPose);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

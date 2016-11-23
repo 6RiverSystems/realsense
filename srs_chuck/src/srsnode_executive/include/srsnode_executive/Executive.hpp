@@ -5,7 +5,6 @@
  */
 #pragma once
 
-#include <srslib_framework/behavior/behavior_tree/composite/Sequence.hpp>
 #include <srslib_framework/ros/tap/TapRobotPose.hpp>
 #include <srslib_framework/ros/tap/TapMapStack.hpp>
 #include <srslib_framework/ros/unit/RosUnit.hpp>
@@ -36,8 +35,6 @@ private:
 
     ExecutiveContext context_;
     LabeledAreasDetector labeledAreasDetector_;
-
-    Sequence<ExecutiveContext> mainSequence_;
 
     TapMapStack tapMapStack_;
     TapRobotPose tapRobotPose_;

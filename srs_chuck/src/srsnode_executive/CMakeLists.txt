@@ -11,12 +11,7 @@ set(${PROJECT_NAME}_SOURCES
 
     src/Executive.cpp
     src/LabeledAreasDetector.cpp
-    src/condition/IsEnteringWarningSoundArea.cpp
-    src/condition/IsExitingWarningSoundArea.cpp
     src/request/RequestWarningSound.cpp
-    src/task/FindLabeledAreas.cpp
-    src/task/PlayWarningSound.cpp
-    src/task/StopSound.cpp
 )
 
 ####################################################################################################

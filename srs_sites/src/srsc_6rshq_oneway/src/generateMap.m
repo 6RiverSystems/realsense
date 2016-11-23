@@ -30,7 +30,7 @@ layerCostArea = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6
     RESOLUTION, ORIGIN);
 showMap(layerCostArea, 'Higher cost area');
 
-layerCostArea = convertToCostArea(layerCostArea, 'all', 20);
+layerCostArea = convertToCostArea(layerCostArea, 'all', 100);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One-way layer

@@ -17,7 +17,7 @@ namespace srs
 RealsenseDriver::RealsenseDriver( ) :
 	rosNodeHandle_( ),
 	depthSubscriber_( rosNodeHandle_.subscribe<sensor_msgs::Image>( "/camera/depth/image_raw", 100,
-		std::bind( &RealsenseDriver::OnDepthData, this, std::placeholders::_1 ) ) ),
+		std::bind( &RealsenseDriver::OnDepthData, this, std::placeholders::_1 ) ) )
 {
 
 }

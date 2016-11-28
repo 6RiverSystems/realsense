@@ -2,6 +2,8 @@
 
 #include <ros/ros.h>
 
+#include <srslib_framework/math/VelocityMath.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,7 +22,8 @@ void Executive::execute()
 {
     updateContext();
 
-    labeledAreasDetector_.evaluatePose(context_.robotPose);
+    taskDetectLabeledAreas_.run(context_);
+    taskPlayWarningSound_.run(context_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,30 +36,10 @@ void Executive::initialize()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Executive::findActiveNodes(vector<string>& nodes)
-{
-    nodes.clear();
-
-    ros::V_string rosMasterNodes;
-    ros::master::getNodes(rosMasterNodes);
-
-    string nameSpace = rosNodeHandle_.getNamespace();
-
-    for (auto node : rosMasterNodes)
-    {
-        if (node.find("srsnode") != string::npos &&
-            node.find(nameSpace) == string::npos)
-        {
-            nodes.push_back(node);
-            ROS_INFO_STREAM(node);
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::updateContext()
 {
     context_.robotPose = tapRobotPose_.pop();
+    context_.commandedVelocity = tapCommandedVelocity_.pop();
 
     // Make sure that the neither the logical not the occupancy maps
     // have been re-published. In case, destroy what we have and
@@ -65,6 +48,9 @@ void Executive::updateContext()
     {
         context_.mapStack = tapMapStack_.pop();
     }
+
+    // Determine if the robot is currently moving
+    context_.isRobotMoving = !VelocityMath::equal(context_.commandedVelocity, Velocity<>::ZERO);
 }
 
 } // namespace srs

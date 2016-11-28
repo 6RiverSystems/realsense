@@ -7,6 +7,9 @@
 
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/robotics/Velocity.hpp>
+
+#include <srsnode_executive/resource/Resource.hpp>
 
 namespace srs {
 
@@ -18,11 +21,17 @@ struct ExecutiveContext
 
     using ActiveLabelType = pair<LogicalMap::LabeledArea, DirectionEnum>;
 
-    LogicalMap::LabeledAreaMapType currentLabeledAreas;
     vector<ActiveLabelType> activeLabeledAreas;
+
+    Velocity<> commandedVelocity;
+
+    bool isRobotMoving;
 
     MapStack* mapStack;
 
+    vector<ActiveLabelType> previousLabeledAreas;
+
+    Resource resourceSound;
     Pose<> robotPose;
 };
 

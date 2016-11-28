@@ -8,23 +8,25 @@
 #include <srslib_framework/robotics/device/Sound.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemCmd_Sound.hpp>
 
-#include <srsnode_executive/request/Request.hpp>
+#include <srsnode_executive/task/Task.hpp>
 
 namespace srs {
 
-class RequestWarningSound : public Request
+class TaskPlayWarningSound : public Task
 {
 public:
     static const Sound SOUND_OFF;
     static const Sound WARNING_SOUND;
 
-    RequestWarningSound() :
-        Request()
+    TaskPlayWarningSound()
     {
         channelSound_.publish(SOUND_OFF);
     }
 
-    void task();
+    virtual ~TaskPlayWarningSound()
+    {}
+
+    void run(ExecutiveContext& context);
 
 private:
     ChannelBrainstemCmd_Sound channelSound_;

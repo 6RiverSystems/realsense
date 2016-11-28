@@ -12,6 +12,7 @@ using namespace std;
 #include <tf/tf.h>
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
@@ -101,25 +102,30 @@ public:
     void transformCells2M(unsigned int cCells, unsigned int rCells, double& x, double& y) const
     {
         convertCells2M(cCells, x);
+        x += origin_.x;
+
         convertCells2M(rCells, y);
+        y += origin_.y;
     }
 
     void transformCells2M(unsigned int cCells, unsigned int rCells, Pose<>& p) const
     {
         convertCells2M(cCells, p.x);
         convertCells2M(rCells, p.y);
+
+        p = PoseMath::add(p, origin_);
     }
 
     void transformM2Cells(double x, double y, unsigned int& c, unsigned int& r) const
     {
-        convertM2Cells(x, c);
-        convertM2Cells(y, r);
+        convertM2Cells(x - origin_.x, c);
+        convertM2Cells(y - origin_.y, r);
     }
 
     void transformM2Cells(Pose<> p, unsigned int& c, unsigned int& r) const
     {
-        convertM2Cells(p.x, c);
-        convertM2Cells(p.y, r);
+        convertM2Cells(p.x - origin_.x, c);
+        convertM2Cells(p.y - origin_.y, r);
     }
 
 private:

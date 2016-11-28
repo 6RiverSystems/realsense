@@ -10,8 +10,8 @@ set(PROJECT_MAIN src/executive_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
     src/Executive.cpp
-    src/LabeledAreasDetector.cpp
-    src/request/RequestWarningSound.cpp
+    src/task/TaskDetectLabeledAreas.cpp
+    src/task/TaskPlayWarningSound.cpp
 )
 
 ####################################################################################################

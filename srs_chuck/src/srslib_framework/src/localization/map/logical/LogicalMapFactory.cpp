@@ -247,7 +247,8 @@ void LogicalMapFactory::calculateArea(Pose<> origin, double widthM, double heigh
         y = 0;
     }
 
-    map_->transformM2Cells(x, y, c0, r0);
+    map_->convertM2Cells(x, c0);
+    map_->convertM2Cells(y, r0);
 
     map_->convertM2Cells(newWidthM, widthCells);
     widthCells = max<unsigned int>(0, widthCells);

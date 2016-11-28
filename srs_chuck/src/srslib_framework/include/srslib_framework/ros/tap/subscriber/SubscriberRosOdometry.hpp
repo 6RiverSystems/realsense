@@ -12,6 +12,7 @@ using namespace std;
 #include <nav_msgs/Odometry.h>
 
 #include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/robotics/Velocity.hpp>
 #include <srslib_framework/ros/tap/subscriber/SubscriberSingleData.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
@@ -32,26 +33,15 @@ public:
     ~SubscriberRosOdometry()
     {}
 
-    double peekAngularVelocity() const
+    Velocity<> peekVelocity() const
     {
-        return angularVelocity_;
+        return velocity_;
     }
 
-    double peekLinearVelocity() const
-    {
-        return linearVelocity_;
-    }
-
-    double popAngularVelocity()
+    Velocity<> popVelocity()
     {
         Subscriber::declareStale();
-        return angularVelocity_;
-    }
-
-    double popLinearVelocity()
-    {
-        Subscriber::declareStale();
-        return linearVelocity_;
+        return velocity_;
     }
 
     void receiveData(const nav_msgs::Odometry::ConstPtr message)
@@ -63,17 +53,13 @@ public:
     {
         // Reset the data, and then reset the subscriber
         set(Pose<>::INVALID);
-        set(Pose<>::INVALID);
-
-        linearVelocity_ = 0.0;
-        angularVelocity_ = 0.0;
+        velocity_ = Velocity<>::INVALID;
 
         Subscriber::reset();
     }
 
 private:
-    double linearVelocity_;
-    double angularVelocity_;
+    Velocity<> velocity_;
 };
 
 } // namespace srs

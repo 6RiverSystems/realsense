@@ -16,9 +16,9 @@ namespace srs {
 class Command
 {
 public:
-    const int COMMAND = 0;
-    const int PARAM_1 = 1;
-    const int PARAM_2 = 2;
+    static constexpr int COMMAND = 0;
+    static constexpr int PARAM_1 = 1;
+    static constexpr int PARAM_2 = 2;
 
     Command(int minExpectedArguments = 0) :
         minExpectedArguments_(minExpectedArguments)

@@ -1,24 +1,8 @@
 #include <srsnode_executive/Executive.hpp>
 
 #include <ros/ros.h>
-#include <tf/tf.h>
-#include <tf/transform_listener.h>
 
-#include <geometry_msgs/PolygonStamped.h>
-
-#include <srslib_framework/Pose.h>
-#include <srslib_framework/MsgSolution.h>
-
-#include <srslib_framework/math/AngleMath.hpp>
-#include <srslib_framework/math/PoseMath.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/PoseAdapter.hpp>
-#include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
-#include <srslib_framework/ros/message/SolutionMessageFactory.hpp>
-#include <srslib_framework/ros/service/RosCallEmpty.hpp>
-#include <srslib_framework/ros/service/RosCallSetBool.hpp>
-#include <srslib_framework/ros/service/RosCallSolution.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/math/VelocityMath.hpp>
 
 namespace srs {
 
@@ -27,16 +11,22 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Executive::Executive(string name, int argc, char** argv) :
-    RosUnit(name, argc, argv, REFRESH_RATE_HZ)
+    RosUnit(name, argc, argv, REFRESH_RATE_HZ),
+    commandLineHandler_(this)
 {
+    context_.robotPose = Pose<>::INVALID;
+    context_.mapStack = nullptr;
+    context_.isRobotMoving = false;
+    context_.isRobotPaused = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::execute()
 {
-    updateRobotPose();
+    updateContext();
 
-    labeledAreasDetector_.evaluatePose(robotPose_);
+    taskDetectLabeledAreas_.run(context_);
+    taskPlayWarningSound_.run(context_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,46 +39,23 @@ void Executive::initialize()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Executive::findActiveNodes(vector<string>& nodes)
+void Executive::updateContext()
 {
-    nodes.clear();
+    context_.robotPose = tapRobotPose_.pop();
+    context_.commandedVelocity = tapCommandedVelocity_.pop();
 
-    ros::V_string rosMasterNodes;
-    ros::master::getNodes(rosMasterNodes);
-
-    string nameSpace = rosNodeHandle_.getNamespace();
-
-    for (auto node : rosMasterNodes)
+    // Make sure that the neither the logical not the occupancy maps
+    // have been re-published. In case, destroy what we have and
+    // ask for a new stack
+    if (tapMapStack_.newDataAvailable())
     {
-        if (node.find("srsnode") != string::npos &&
-            node.find(nameSpace) == string::npos)
-        {
-            nodes.push_back(node);
-            ROS_INFO_STREAM(node);
-        }
+        context_.mapStack = tapMapStack_.pop();
     }
+
+    // Determine if the robot is currently moving
+    context_.isRobotMoving = !VelocityMath::equal(context_.commandedVelocity, Velocity<>::ZERO);
+
+    // The Pause state is handled by one of the commands
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void Executive::updateRobotPose()
-{
-    try
-    {
-        tf::StampedTransform robotTransform;
-        tfListener_.lookupTransform("/map", "/base_footprint", ros::Time(0), robotTransform);
-
-        tf::Vector3 location = robotTransform.getOrigin();
-        tf::Quaternion orientation = robotTransform.getRotation();
-        robotPose_ = Pose<>(location.getX(), location.getY(), tf::getYaw(orientation));
-
-        ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "executive", "Robot pose" << robotPose_);
-    }
-    catch(const tf::TransformException& e)
-    {
-        ROS_ERROR_STREAM_THROTTLE_NAMED(1.0, "executive", "TF Exception: " << e.what());
-    }
-
-}
-
 
 } // namespace srs

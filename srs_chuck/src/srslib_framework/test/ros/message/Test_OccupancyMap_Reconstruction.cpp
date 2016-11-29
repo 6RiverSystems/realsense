@@ -17,31 +17,33 @@
 #include <srslib_framework/localization/map/occupancy/OccupancyMap.hpp>
 #include <srslib_framework/ros/message/OccupancyMapMessageFactory.hpp>
 #include <srslib_framework/ros/message/LogicalMapMessageFactory.hpp>
+#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 using namespace srs;
 
-//TEST(Test_Map, OccupancyMapReconstruction)
-//{
-//    ros::Time::init();
-//
-//    MapStack* mapStack = MapStackFactory::fromJsonFile("data/small-map/small-map.yaml");
-//    OccupancyMap* correct = mapStack->getOccupancyMap();
-//
-//    srslib_framework::OccupancyMap message = OccupancyMapMessageFactory::map2Msg(correct);
-//    OccupancyMap* occupancy = OccupancyMapMessageFactory::msg2OccupancyMap(message);
-//
-//    ASSERT_EQ(*occupancy, *occupancy) << "The map does not agree with itself";
-//    ASSERT_EQ(*correct, *occupancy) << "The marshaled map is not as expected";
-//}
+TEST(Test_Map, OccupancyMapReconstruction)
+{
+    ros::Time::init();
 
-//TEST(Test_Map, RosOccupancyMapReconstruction)
-//{
-//    ros::Time::init();
-//
-//    MapStack* mapStack = MapStackFactory::fromJsonFile("data/small-map/small-map.yaml");
-//    OccupancyMap* correct = mapStack->getOccupancyMap();
-//
-//    nav_msgs::OccupancyGrid message = OccupancyMapMessageFactory::occupancyMap2RosMsg(correct, "map");
-//    OccupancyMap* occupancy = OccupancyMapMessageFactory::msg2OccupancyMap(message);
-//
-//    ASSERT_EQ(*correct->getGrid(), *occupancy->getGrid()) << "The marshaled map is not as expected";
-//}
+    MapStack* mapStack = MapStackFactory::fromJsonFile("message/data/small-map/small-map.yaml");
+    OccupancyMap* correct = mapStack->getOccupancyMap();
+
+    srslib_framework::OccupancyMap message = OccupancyMapMessageFactory::map2Msg(correct);
+    OccupancyMap* occupancy = OccupancyMapMessageFactory::msg2OccupancyMap(message);
+
+    ASSERT_EQ(*occupancy, *occupancy) << "The map does not agree with itself";
+    ASSERT_EQ(*correct, *occupancy) << "The marshaled map is not as expected";
+}
+
+TEST(Test_Map, RosOccupancyMapReconstruction)
+{
+    ros::Time::init();
+
+    MapStack* mapStack = MapStackFactory::fromJsonFile("message/data/small-map/small-map.yaml");
+    OccupancyMap* correct = mapStack->getOccupancyMap();
+
+    nav_msgs::OccupancyGrid message = OccupancyMapMessageFactory::occupancyMap2RosMsg(correct,
+        ChuckTransforms::MAP);
+    OccupancyMap* occupancy = OccupancyMapMessageFactory::msg2OccupancyMap(message);
+
+    ASSERT_EQ(*correct->getGrid(), *occupancy->getGrid()) << "The marshaled map is not as expected";
+}

@@ -12,6 +12,7 @@ using namespace std;
 #include <nav_msgs/GetMap.h>
 
 #include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/ros/channel/ChannelRosLogicalGrid.hpp>
 #include <srslib_framework/ros/channel/ChannelMapStack.hpp>
 #include <srslib_framework/ros/channel/ChannelRosMapMetadata.hpp>
 #include <srslib_framework/ros/channel/ChannelRosOccupancyGrid.hpp>
@@ -54,6 +55,7 @@ private:
 
     ChannelMapStack channelMapStack_;
     ChannelRosMapMetadata channelRosMapMetadata_;
+    ChannelRosLogicalGrid channelRosLogicalGrid_;
     ChannelRosOccupancyGrid channelRosOccupancyGrid_;
     ChannelRosAmclOccupancyGrid channelRosAmclOccupancyGrid_;
 

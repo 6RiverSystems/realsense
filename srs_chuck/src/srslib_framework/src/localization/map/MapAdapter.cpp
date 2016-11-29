@@ -13,6 +13,25 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void MapAdapter::baseMap2Vector(const BaseMap* map, vector<int8_t>& occupancy)
+{
+    occupancy.clear();
+
+    Grid2d* grid = map->getGrid();
+    if (grid)
+    {
+        for (int row = 0; row < grid->getHeight(); row++)
+        {
+            for (int col = 0; col < grid->getWidth(); col++)
+            {
+                int8_t cost = static_cast<int8_t>(grid->getPayload(Grid2d::Location(col, row)));
+                occupancy.push_back(cost);
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void MapAdapter::costMap2D2Vector(const costmap_2d::Costmap2D* map, vector<int8_t>& occupancy)
 {
     occupancy.resize(map->getSizeInCellsX() * map->getSizeInCellsY(), 0);
@@ -85,32 +104,13 @@ void MapAdapter::occupancyMap2AmclVector(const OccupancyMap* map, vector<int8_t>
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MapAdapter::occupancyMap2Vector(const OccupancyMap* map, vector<int8_t>& occupancy)
-{
-    occupancy.clear();
-
-    Grid2d* grid = map->getGrid();
-    if (grid)
-    {
-        for (int row = 0; row < grid->getHeight(); row++)
-        {
-            for (int col = 0; col < grid->getWidth(); col++)
-            {
-                Grid2d::BaseType cost = grid->getPayload(Grid2d::Location(col, row));
-                occupancy.push_back(map->cost2gray(cost));
-            }
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 costmap_2d::Costmap2D* MapAdapter::weights2CostMap2D(BaseMap* map, int orientation)
 {
     unsigned int rows = map->getHeightCells();
     unsigned int columns = map->getWidthCells();
 
     costmap_2d::Costmap2D* costMap = new costmap_2d::Costmap2D(columns, rows,
-        map->getResolution(), 0, 0);
+        map->getResolution(), map->getOrigin().x, map->getOrigin().y);
 
     Grid2d::BaseType north;
     Grid2d::BaseType east;

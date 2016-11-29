@@ -54,13 +54,42 @@ struct VelocityMessageFactory
     }
 
     /**
-     * @brief Convert a TwistStampedConstPtr type into a Velocity.
+     * @brief Convert a TwistStamped pointer type into a Velocity.
      *
      * @param message TwistStampedConstPtr to convert
      *
      * @return Velocity generated from the specified TwistStampedConstPtr
      */
-    static Velocity<> msg2Velocity(geometry_msgs::TwistStampedConstPtr message)
+    static Velocity<> msg2Velocity(geometry_msgs::TwistStamped::ConstPtr message)
+    {
+        return msg2Velocity(*message);
+    }
+
+    /**
+     * @brief Convert a Twist type into a Velocity.
+     *
+     * @param message Twist to convert
+     *
+     * @return Velocity generated from the specified Twist
+     */
+    static Velocity<> msg2Velocity(geometry_msgs::Twist message)
+    {
+        Velocity<> velocity;
+
+        velocity.linear = message.linear.x;
+        velocity.angular = message.angular.z;
+
+        return velocity;
+    }
+
+    /**
+     * @brief Convert a Twist pointer type into a Velocity.
+     *
+     * @param message Twist pointer to convert
+     *
+     * @return Velocity generated from the specified TwistStampedConstPtr
+     */
+    static Velocity<> msg2Velocity(geometry_msgs::Twist::ConstPtr message)
     {
         return msg2Velocity(*message);
     }

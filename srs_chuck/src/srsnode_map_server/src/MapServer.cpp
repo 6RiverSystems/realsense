@@ -16,6 +16,7 @@ using namespace std;
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/ros/message/OccupancyMapMessageFactory.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 
 namespace srs {
 
@@ -31,7 +32,7 @@ MapServer::MapServer(string name, int argc, char** argv) :
 
     ROS_INFO_STREAM("Target map stack: " << mapStackFilename_);
 
-    rosNodeHandle_.param("/frame_id", frameId_, string("map"));
+    rosNodeHandle_.param("/frame_id", frameId_, ChuckTransforms::MAP);
 
     mapStack_ = MapStackFactory::fromJsonFile(mapStackFilename_);
 
@@ -60,7 +61,7 @@ bool MapServer::callbackMapRequest(nav_msgs::GetMap::Request &req, nav_msgs::Get
     ROS_INFO("Map request service: Sending map");
 
     vector<int8_t> occupancy;
-    MapAdapter::occupancyMap2Vector(mapStack_->getOccupancyMap(), occupancy);
+    MapAdapter::baseMap2Vector(mapStack_->getOccupancyMap(), occupancy);
 
     res.map.header.stamp = ros::Time::now();
     res.map.info = OccupancyMapMessageFactory::metadata2RosMsg(
@@ -88,6 +89,7 @@ void MapServer::publishMap()
     // Publish ROS compatible information
     channelRosMapMetadata_.publish(mapStack_->getOccupancyMap()->getMetadata());
     channelRosOccupancyGrid_.publish(mapStack_->getOccupancyMap());
+    channelRosLogicalGrid_.publish(mapStack_->getLogicalMap());
     channelRosAmclOccupancyGrid_.publish(mapStack_->getOccupancyMap());
 
     channelEastWeightsGrid_.publish(MapAdapter::weights2CostMap2D(

@@ -15,6 +15,7 @@
 #include <bitset>
 
 #include <srslib_framework/math/BasicMath.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs
 {
@@ -130,7 +131,7 @@ void BrainStem::OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_
 		", backEStop: " << motionStatus.backEStop <<
 		", wirelessEStop: " << motionStatus.wirelessEStop <<
 		", bumpSensor: " << motionStatus.bumpSensor <<
-		", pause: " << motionStatus.pause <<
+		", free-spin: " << motionStatus.freeSpin <<
 		", hardStop: " << motionStatus.hardStop <<
 		", safetyProcessorFailure: " << failureStatus.safetyProcessorFailure <<
 		", brainstemFailure: " << failureStatus.brainstemFailure <<
@@ -148,7 +149,7 @@ void BrainStem::OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_
 	msg.backEStop = motionStatus.backEStop;
 	msg.wirelessEStop = motionStatus.wirelessEStop;
 	msg.bumpSensor = motionStatus.bumpSensor;
-	msg.pause = motionStatus.pause;
+	msg.pause = motionStatus.freeSpin;
 	msg.hardStop = motionStatus.hardStop;
 	msg.safetyProcessorFailure = failureStatus.safetyProcessorFailure;
 	msg.brainstemFailure = failureStatus.brainstemFailure;
@@ -183,7 +184,8 @@ void BrainStem::CreateSubscribers( )
 
 void BrainStem::CreatePublishers( )
 {
-	m_connectedPublisher = m_rosNodeHandle.advertise<std_msgs::Bool>( CONNECTED_TOPIC, 1, true );
+	m_connectedPublisher = m_rosNodeHandle.advertise<std_msgs::Bool>(
+	    ChuckTopics::driver::BRAINSTEM_STATE_CONNECTED, 1, true );
 
 	m_operationalStatePublisher = m_rosNodeHandle.advertise<srslib_framework::MsgOperationalState>(
 	    OPERATIONAL_STATE_TOPIC, 1, true );

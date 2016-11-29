@@ -11,12 +11,13 @@ set(${PROJECT_NAME}_SOURCES
 
     src/BrainStemMessageProcessor.cpp
     src/BrainStem.cpp
-	src/BrainStemEmulator.cpp
-	
+    src/BrainStemEmulator.cpp
+
     src/hw_message/SensorFrameHandler.cpp
     src/hw_message/RawOdometryHandler.cpp
     src/hw_message/HardwareInfoHandler.cpp
-    
+
+    src/sw_message/FreeSpinHandler.cpp
     src/sw_message/SoundHandler.cpp
 )
 

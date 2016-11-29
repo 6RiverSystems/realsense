@@ -131,7 +131,7 @@ void Motion::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::connectAllTaps()
 {
-    tapBrainStem_.connectTap();
+    // ###FS tapBrainStem_.connectTap();
     tapSensorFrame_.connectTap();
     tapAps_.connectTap();
     tapInternalGoalSolution_.connectTap();
@@ -146,7 +146,7 @@ void Motion::connectAllTaps()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::disconnectAllTaps()
 {
-    tapBrainStem_.disconnectTap();
+    // ###FS tapBrainStem_.disconnectTap();
     tapSensorFrame_.disconnectTap();
     tapAps_.disconnectTap();
     tapInternalGoalSolution_.disconnectTap();
@@ -468,27 +468,27 @@ void Motion::publishCovariance()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishGoalLanding()
 {
-    geometry_msgs::PolygonStamped messageLanding;
-
-    messageLanding.header.frame_id = "map";
-    messageLanding.header.stamp = ros::Time::now();
-
-    vector<geometry_msgs::Point32> polygon;
-    vector<Pose<>> landingArea;
-
-    motionController_.getLanding(landingArea);
-    for (auto pose : landingArea)
-    {
-        geometry_msgs::Point32 corner;
-        corner.x = pose.x;
-        corner.y = pose.y;
-        corner.z = 0.0;
-
-        polygon.push_back(corner);
-    }
-    messageLanding.polygon.points = polygon;
-
-    pubStatusGoalLanding_.publish(messageLanding);
+//    geometry_msgs::PolygonStamped messageLanding;
+//
+//    messageLanding.header.frame_id = "map";
+//    messageLanding.header.stamp = ros::Time::now();
+//
+//    vector<geometry_msgs::Point32> polygon;
+//    vector<Pose<>> landingArea;
+//
+//    motionController_.getLanding(landingArea);
+//    for (auto pose : landingArea)
+//    {
+//        geometry_msgs::Point32 corner;
+//        corner.x = pose.x;
+//        corner.y = pose.y;
+//        corner.z = 0.0;
+//
+//        polygon.push_back(corner);
+//    }
+//    messageLanding.polygon.points = polygon;
+//
+//    pubStatusGoalLanding_.publish(messageLanding);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -501,50 +501,50 @@ void Motion::publishImu()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Motion::publishOdometry()
 {
-    Pose<> currentPose = positionEstimator_.getPose();
-
-    if (currentPose.isValid())
-    {
-        Velocity<> currentVelocity = positionEstimator_.getVelocity();
-
-        geometry_msgs::Quaternion orientation = tf::createQuaternionMsgFromYaw(currentPose.theta);
-
-        // Publish the TF of the pose
-        geometry_msgs::TransformStamped messagePoseTf;
-        messagePoseTf.header.frame_id = "srsnode_motion/odometry";
-        messagePoseTf.child_frame_id = "base_footprint";
-
-        messagePoseTf.header.stamp = currentTime_;
-        messagePoseTf.transform.translation.x = currentPose.x;
-        messagePoseTf.transform.translation.y = currentPose.y;
-        messagePoseTf.transform.translation.z = 0.0;
-        messagePoseTf.transform.rotation = orientation;
-
-        rosTfBroadcaster_.sendTransform(messagePoseTf);
-
-        // Publish the required odometry for the planners
-        nav_msgs::Odometry messageOdometry;
-        messageOdometry.header.stamp = currentTime_;
-        messageOdometry.header.frame_id = "srsnode_motion/odometry";
-        messageOdometry.child_frame_id = "base_footprint";
-
-        // Position
-        messageOdometry.pose.pose.position.x = currentPose.x;
-        messageOdometry.pose.pose.position.y = currentPose.y;
-        messageOdometry.pose.pose.position.z = 0.0;
-        messageOdometry.pose.pose.orientation = orientation;
-
-        // Velocity
-        messageOdometry.twist.twist.linear.x = currentVelocity.linear;
-        messageOdometry.twist.twist.linear.y = 0.0;
-        messageOdometry.twist.twist.linear.z = 0.0;
-        messageOdometry.twist.twist.angular.x = 0.0;
-        messageOdometry.twist.twist.angular.y = 0.0;
-        messageOdometry.twist.twist.angular.z = currentVelocity.angular;
-
-        // Publish the Odometry
-        pubOdometry_.publish(messageOdometry);
-    }
+//    Pose<> currentPose = positionEstimator_.getPose();
+//
+//    if (currentPose.isValid())
+//    {
+//        Velocity<> currentVelocity = positionEstimator_.getVelocity();
+//
+//        geometry_msgs::Quaternion orientation = tf::createQuaternionMsgFromYaw(currentPose.theta);
+//
+//        // Publish the TF of the pose
+//        geometry_msgs::TransformStamped messagePoseTf;
+//        messagePoseTf.header.frame_id = "srsnode_motion/odometry";
+//        messagePoseTf.child_frame_id = "base_footprint";
+//
+//        messagePoseTf.header.stamp = currentTime_;
+//        messagePoseTf.transform.translation.x = currentPose.x;
+//        messagePoseTf.transform.translation.y = currentPose.y;
+//        messagePoseTf.transform.translation.z = 0.0;
+//        messagePoseTf.transform.rotation = orientation;
+//
+//        rosTfBroadcaster_.sendTransform(messagePoseTf);
+//
+//        // Publish the required odometry for the planners
+//        nav_msgs::Odometry messageOdometry;
+//        messageOdometry.header.stamp = currentTime_;
+//        messageOdometry.header.frame_id = "srsnode_motion/odometry";
+//        messageOdometry.child_frame_id = "base_footprint";
+//
+//        // Position
+//        messageOdometry.pose.pose.position.x = currentPose.x;
+//        messageOdometry.pose.pose.position.y = currentPose.y;
+//        messageOdometry.pose.pose.position.z = 0.0;
+//        messageOdometry.pose.pose.orientation = orientation;
+//
+//        // Velocity
+//        messageOdometry.twist.twist.linear.x = currentVelocity.linear;
+//        messageOdometry.twist.twist.linear.y = 0.0;
+//        messageOdometry.twist.twist.linear.z = 0.0;
+//        messageOdometry.twist.twist.angular.x = 0.0;
+//        messageOdometry.twist.twist.angular.y = 0.0;
+//        messageOdometry.twist.twist.angular.z = currentVelocity.angular;
+//
+//        // Publish the Odometry
+//        pubOdometry_.publish(messageOdometry);
+//    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -23,6 +23,7 @@ using namespace std;
 #include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
 
 #include <srsdrv_brainstem/sw_message/SoundHandler.hpp>
+#include <srsdrv_brainstem/sw_message/FreeSpinHandler.hpp>
 
 namespace srs {
 
@@ -68,8 +69,6 @@ private:
 
 	std::map<std::string, LED_MODE>			m_mapLedMode;
 
-	std::map<std::string, MOTION_STATUS>	m_mapMotionStatus;
-
 	std::map<std::string, Handler>			m_vecBridgeCallbacks;
 
 	ConnectionChangedFn						m_connectionChangedCallback;
@@ -89,6 +88,11 @@ public:
     void sendCommand(char* command, std::size_t size)
     {
         WriteToSerialPort(command, size);
+    }
+
+    void setMotionStatus(const std::bitset<8>& motionStatusSet, bool bSetValues)
+    {
+        SetMotionStatus(motionStatusSet, bSetValues);
     }
 
     // Message Callbacks
@@ -137,8 +141,6 @@ private:
 
 	void OnUpdateLights( std::vector<std::string> vecParams );
 
-	void OnPause( std::vector<std::string> vecParams );
-
 	void ClearMotionStatus( );
 
 	void OnStartup( std::vector<std::string> vecParams );
@@ -149,12 +151,11 @@ private:
 
 private:
 
-	void Pause( bool bPause );
-
     HwMessageHandlerMapType hwMessageHandlers_;
 
     HardwareInfoHandler hardwareInfoHandler_;
     SoundHandler soundHandler_;
+    FreeSpinHandler freeSpinHandler_;
 
     SensorFrameHandler sensorFrameHandler_;
 

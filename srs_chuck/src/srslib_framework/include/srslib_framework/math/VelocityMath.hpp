@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef VELOCITYMATH_HPP_
-#define VELOCITYMATH_HPP_
+#pragma once
 
 #include <cmath>
 #include <limits>
@@ -39,5 +38,3 @@ struct VelocityMath
 };
 
 } // namespace srs
-
-#endif // VELOCITYMATH_HPP_

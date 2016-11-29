@@ -7,6 +7,7 @@
 
 #include <srslib_framework/ros/channel/publisher/PublisherRosAmclOccupancyGrid.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 
 namespace srs {
 
@@ -15,7 +16,8 @@ class ChannelRosAmclOccupancyGrid :
 {
 public:
     ChannelRosAmclOccupancyGrid() :
-        PublisherRosAmclOccupancyGrid(ChuckTopics::internal::MAP_ROS_AMCL_OCCUPANCY, "map", 1, true)
+        PublisherRosAmclOccupancyGrid(ChuckTopics::internal::MAP_ROS_AMCL_OCCUPANCY,
+            ChuckTransforms::MAP, 1, true)
     {}
 };
 

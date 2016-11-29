@@ -64,8 +64,6 @@ private:
 
 	static constexpr auto VOLTAGE_TOPIC = "/info/voltage";
 
-	static constexpr auto CONNECTED_TOPIC = "/internal/drivers/brainstem/connected";
-
 	static constexpr auto VELOCITY_TOPIC = "/internal/sensors/odometry/rpm/cmd";
 
 	static constexpr auto PING_TOPIC = "/internal/state/ping";

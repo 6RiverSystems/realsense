@@ -7,42 +7,34 @@
 
 namespace srs {
 
-class Request
+class Resource
 {
 public:
-    Request(int initialRequest = 0) :
+    Resource(int initialRequest = 0) :
         requestCounter_(initialRequest),
         previousCounter_(initialRequest)
     {}
 
-    virtual ~Request()
+    virtual ~Resource()
     {}
 
     bool confirmed()
+    {
+        return requestCounter_;
+    }
+
+    void freeze()
     {
         if (requestCounter_ > 0)
         {
             requestCounter_ = 1;
         }
-
         previousCounter_ = requestCounter_;
-        return requestCounter_;
-    }
-
-    bool execute()
-    {
-        if (hasChanged())
-        {
-            task();
-            return true;
-        }
-
-        return false;
     }
 
     bool hasChanged()
     {
-        return previousCounter_ != requestCounter_;
+        return (previousCounter_ > 0) != (requestCounter_ > 0);
     }
 
     void release()
@@ -54,8 +46,6 @@ public:
     {
         requestCounter_++;
     }
-
-    virtual void task() = 0;
 
 protected:
     int previousCounter_;

@@ -22,11 +22,6 @@
     	<arg name="use_sim_time" value="$(arg use_sim_time)" />
 	</include>
 
-    <!-- Navigation Stack -->
-	<include file="$(find srsnode_navigation)/launch/node.launch">
-        <arg name="use_sim_time" value="$(arg use_sim_time)" />
-	</include>
-
     <!-- Launch AMCL Localization -->
 	<include file="$(find srsnode_localization)/launch/amcl.launch" />
 

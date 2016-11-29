@@ -33,7 +33,7 @@ enum class BRAIN_STEM_MSG
     HARDWARE_INFO = 0x59, // 'Y'
     OPERATIONAL_STATE = 0x47, // 'G'
     SENSOR_FRAME = 0x4F, // 'O'
-	RAW_ODOMETRY = 0x52, // 'R'
+    RAW_ODOMETRY = 0x52, // 'R'
     SYSTEM_VOLTAGE = 0x56, // 'V'
     UNKNOWN
 };
@@ -100,12 +100,12 @@ enum class LED_MODE
 
 enum MOTION_STATUS
 {
-	FRONT_E_STOP 		= 0,
-	BACK_E_STOP 		= 1,
-	WIRELESS_E_STOP 	= 2,
-	BUMP_SENSOR			= 3,
-	PAUSE 				= 4,
-	HARD_STOP 			= 5
+    FRONT_E_STOP = 0,
+    BACK_E_STOP = 1,
+    WIRELESS_E_STOP = 2,
+    BUMP_SENSOR = 3,
+    FREE_SPIN = 4,
+    HARD_STOP = 5
 };
 
 enum FAILURE_STATUS
@@ -134,12 +134,12 @@ struct LIGHT_UPDATE_DATA
 
 struct MOTION_STATUS_DATA
 {
-	bool		frontEStop; 			// front eStop state
-	bool		backEStop; 				// back eStop state
-	bool		wirelessEStop; 			// wireless eStop state
-	bool		bumpSensor; 			// bump sensor state
-	bool		pause; 					// paused state
-	bool		hardStop; 				// hard stop state
+    bool frontEStop; //< Front eStop state
+    bool backEStop; //< Back eStop state
+    bool wirelessEStop; //< Wireless eStop state
+    bool bumpSensor; //< Bump sensor state
+    bool freeSpin; //< Free-spin state
+    bool hardStop; //< hard stop state
 };
 
 struct FAILURE_STATUS_DATA

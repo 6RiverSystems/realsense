@@ -24,6 +24,11 @@ public:
     ~Executive()
     {}
 
+    void setPauseState(bool newState)
+    {
+        context_.isRobotPaused = newState;
+    }
+
 protected:
     void execute();
 

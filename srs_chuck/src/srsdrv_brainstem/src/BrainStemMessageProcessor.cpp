@@ -21,7 +21,6 @@ using namespace ros;
 
 BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) :
 	m_pIO( pIO ),
-	// ###FS m_mapMotionStatus( ),
     soundHandler_(this),
     freeSpinHandler_(this)
 {
@@ -49,12 +48,6 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_mapLedMode["SELECT"] 					= LED_MODE::SELECT;
 	m_mapLedMode["RAPID_BLINK"] 			= LED_MODE::RAPID_BLINK;
 
-	// ###FS
-//	m_mapMotionStatus["WIRELESS_E_STOP"]	= MOTION_STATUS::WIRELESS_E_STOP;
-//	m_mapMotionStatus["BUMP_SENSOR"]		= MOTION_STATUS::BUMP_SENSOR;
-//	m_mapMotionStatus["PAUSE"]				= MOTION_STATUS::FREE_SPIN;
-//	m_mapMotionStatus["HARD_STOP"]			= MOTION_STATUS::HARD_STOP;
-
 	for( auto& kv : m_mapEntityButton )
 	{
 		m_mapButtonEntity[kv.second] = kv.first;
@@ -63,7 +56,6 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_vecBridgeCallbacks["UI"] = { std::bind( &BrainStemMessageProcessor::OnUpdateLights, this, std::placeholders::_1 ), 2 };
 	m_vecBridgeCallbacks["STOP"] = { std::bind( &BrainStemMessageProcessor::OnHardStop, this ), 0 };
 	m_vecBridgeCallbacks["STARTUP"] = { std::bind( &BrainStemMessageProcessor::OnStartup, this, std::placeholders::_1 ), 0 };
-// ###FS	m_vecBridgeCallbacks["PAUSE"] = { std::bind( &BrainStemMessageProcessor::OnPause, this, std::placeholders::_1 ), 1 };
 	m_vecBridgeCallbacks["CLEAR_MOTION_STATUS"] = { std::bind( &BrainStemMessageProcessor::ClearMotionStatus, this ), 0 };
 
     hwMessageHandlers_[rawOdometryHandler_.getKey()] = &rawOdometryHandler_;
@@ -466,14 +458,6 @@ void BrainStemMessageProcessor::OnStartup( std::vector<std::string> vecParams )
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
 }
 
-// ###FS
-//void BrainStemMessageProcessor::OnPause( std::vector<std::string> vecParams )
-//{
-//	std::string& strPaused = vecParams[0];
-//
-//	Pause( strPaused == "ON" );
-//}
-
 void BrainStemMessageProcessor::ClearMotionStatus( )
 {
 	ROS_DEBUG( "Clearing motion status." );
@@ -501,14 +485,5 @@ void BrainStemMessageProcessor::WriteToSerialPort( char* pszData, std::size_t dw
 		ROS_ERROR_THROTTLE_NAMED( 60, "BrainStem", "Attempt to write to the brain stem, but the serial port is not open!" );
 	}
 }
-
-// ###FS
-//void BrainStemMessageProcessor::Pause( bool bPaused )
-//{
-//	std::bitset<8> pauseSet;
-//	pauseSet.set( MOTION_STATUS::PAUSE, true );
-//
-//	SetMotionStatus( pauseSet, bPaused );
-//}
 
 } /* namespace srs */

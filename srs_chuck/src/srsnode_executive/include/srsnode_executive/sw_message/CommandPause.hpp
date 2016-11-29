@@ -11,22 +11,17 @@
 
 namespace srs {
 
+class Executive;
+
 class CommandPause : public Command
 {
 public:
-    CommandPause() :
-        Command(1)
-    {}
+    CommandPause(Executive* owner);
 
     virtual ~CommandPause()
     {}
 
-    bool execute(const vector<string>& params)
-    {
-        freeSpin_.publish(getSwitchParam(params, PARAM_1));
-
-        return true;
-    }
+    bool execute(const vector<string>& params);
 
 private:
     ChannelBrainstemCmd_FreeSpin freeSpin_;

@@ -69,8 +69,6 @@ private:
 
 	std::map<std::string, LED_MODE>			m_mapLedMode;
 
-	// ###FS std::map<std::string, MOTION_STATUS>	m_mapMotionStatus;
-
 	std::map<std::string, Handler>			m_vecBridgeCallbacks;
 
 	ConnectionChangedFn						m_connectionChangedCallback;
@@ -143,8 +141,6 @@ private:
 
 	void OnUpdateLights( std::vector<std::string> vecParams );
 
-// ###FS	void OnPause( std::vector<std::string> vecParams );
-
 	void ClearMotionStatus( );
 
 	void OnStartup( std::vector<std::string> vecParams );
@@ -154,8 +150,6 @@ private:
 	void WriteToSerialPort( char* pszData, std::size_t dwSize );
 
 private:
-
-// ###FS	void Pause( bool bPause );
 
     HwMessageHandlerMapType hwMessageHandlers_;
 

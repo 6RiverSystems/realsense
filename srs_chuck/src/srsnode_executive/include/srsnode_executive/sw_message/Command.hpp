@@ -13,6 +13,8 @@ using namespace std;
 
 namespace srs {
 
+class Executive;
+
 class Command
 {
 public:
@@ -20,7 +22,8 @@ public:
     static constexpr int PARAM_1 = 1;
     static constexpr int PARAM_2 = 2;
 
-    Command(int minExpectedArguments = 0) :
+    Command(Executive* owner, int minExpectedArguments = 0) :
+        owner_(owner),
         minExpectedArguments_(minExpectedArguments)
     {}
 
@@ -34,6 +37,11 @@ public:
         return minExpectedArguments_;
     }
 
+    Executive* getOwner() const
+    {
+        return owner_;
+    }
+
     bool getSwitchParam(const vector<string>& params, const int parameter)
     {
         std::string switchParam = params[parameter];
@@ -43,6 +51,8 @@ public:
 
 private:
     int minExpectedArguments_;
+
+    Executive* owner_;
 };
 
 } // namespace srs

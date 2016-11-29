@@ -33,7 +33,7 @@ enum class BRAIN_STEM_MSG
     HARDWARE_INFO = 0x59, // 'Y'
     OPERATIONAL_STATE = 0x47, // 'G'
     SENSOR_FRAME = 0x4F, // 'O'
-	RAW_ODOMETRY = 0x52, // 'R'
+    RAW_ODOMETRY = 0x52, // 'R'
     SYSTEM_VOLTAGE = 0x56, // 'V'
     UNKNOWN
 };

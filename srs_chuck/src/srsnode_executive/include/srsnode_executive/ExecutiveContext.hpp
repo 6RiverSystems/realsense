@@ -26,6 +26,7 @@ struct ExecutiveContext
     Velocity<> commandedVelocity;
 
     bool isRobotMoving;
+    bool isRobotPaused;
 
     MapStack* mapStack;
 

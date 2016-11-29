@@ -23,7 +23,7 @@ void TaskPlayWarningSound::run(ExecutiveContext& context)
             case ExecutiveContext::DirectionEnum::ENTERING:
 
                 ROS_INFO_STREAM_NAMED("executive", "Entering area " << area.label);
-                if (area.note.warning_sound())
+                if (area.note.warning_sound() && context.isRobotMoving && !context.isRobotPaused)
                 {
                     context.resourceSound.request();
                 }
@@ -36,7 +36,7 @@ void TaskPlayWarningSound::run(ExecutiveContext& context)
 
                 if (area.note.warning_sound())
                 {
-                    if (context.isRobotMoving)
+                    if (context.isRobotMoving && !context.isRobotPaused)
                     {
                         context.resourceSound.request();
                     }
@@ -51,7 +51,7 @@ void TaskPlayWarningSound::run(ExecutiveContext& context)
             case ExecutiveContext::DirectionEnum::EXITING:
 
                 ROS_INFO_STREAM_NAMED("executive", "Exiting area " << area.label);
-                if (area.note.warning_sound())
+                if (area.note.warning_sound() && context.isRobotMoving && !context.isRobotPaused)
                 {
                     context.resourceSound.release();
                 }

@@ -16,6 +16,8 @@ Executive::Executive(string name, int argc, char** argv) :
 {
     context_.robotPose = Pose<>::INVALID;
     context_.mapStack = nullptr;
+    context_.isRobotMoving = false;
+    context_.isRobotPaused = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -52,6 +54,8 @@ void Executive::updateContext()
 
     // Determine if the robot is currently moving
     context_.isRobotMoving = !VelocityMath::equal(context_.commandedVelocity, Velocity<>::ZERO);
+
+    // The Pause state is handled by one of the commands
 }
 
 } // namespace srs

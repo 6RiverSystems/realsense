@@ -17,7 +17,8 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 CommandLineHandler::CommandLineHandler(Executive* owner) :
-    SoftwareMessageHandler(owner)
+    SoftwareMessageHandler<Executive>(owner),
+    commandPause_(owner)
 {
     tapCl_.attach(this);
 

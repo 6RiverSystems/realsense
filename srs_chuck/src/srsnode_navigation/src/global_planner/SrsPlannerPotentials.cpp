@@ -164,6 +164,7 @@ bool SrsPlannerPotentials::makePlan(
     searchParams.lethalCost = lethalCost_;
     searchParams.neutralCost = neutralCost_;
     searchParams.weightRatio = weightRatio_;
+    searchParams.logicalCostRatio = logicalCostRatio_;
 
     bool found = astar_->calculatePath(searchParams,
         start.pose.position.x, start.pose.position.y,
@@ -247,7 +248,7 @@ void SrsPlannerPotentials::onConfigChange(srsnode_navigation::SrsPlannerConfig& 
     neutralCost_ = config.neutral_cost;
     publishPotential_ = config.publish_potential;
     weightRatio_ = config.weight_ratio;
-
+    logicalCostRatio_ = config.logical_cost_ratio;
     orientationFilter_->setMode(config.orientation_mode);
 }
 

@@ -10,7 +10,7 @@ set(PROJECT_MAIN src/midbrain_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
     src/Midbrain.cpp
-    src/ObstacleDetector.cpp
+    src/HardStopReflex.cpp
     src/Reflexes.cpp
 )
 
@@ -25,7 +25,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 
 #set(Boost_ADDITIONAL_VERSIONS "1.61" "1.61.0")
 
-find_package(catkin REQUIRED COMPONENTS 
+find_package(catkin REQUIRED COMPONENTS
     roscpp
     dynamic_reconfigure
     srslib_framework
@@ -51,7 +51,7 @@ catkin_package(
     DEPENDS srslib_framework
 )
 
-add_executable(${PROJECT_NODE} 
+add_executable(${PROJECT_NODE}
     ${PROJECT_MAIN}
     ${${PROJECT_NAME}_SOURCES}
 )
@@ -73,16 +73,17 @@ target_link_libraries(${PROJECT_NODE}
 ####################################################################################################
 # Tests
 #
-#if (CATKIN_ENABLE_TESTING)
-#    catkin_add_gtest(Test_Reflexes
-#        test/Test_Reflexes.cpp
-#        src/ObstacleDetector.cpp
-#    )
+if (CATKIN_ENABLE_TESTING)
+    catkin_add_gtest(Test_Reflexes_HardStopReflex
+        test/gtest_main.cpp
+        test/Test_Reflexes_HardStopReflex.cpp
+        ${${PROJECT_NAME}_SOURCES}
+    )
 #    add_dependencies(Test_Reflexes
 #        ${catkin_EXPORTED_TARGETS}
 #        ${srsnode_midbrain_EXPORTED_TARGETS}
 #    )
-#    target_link_libraries(Test_Reflexes
-#        ${srslib_framework_LIBRARIES}
-#    )
-#endif()
+    target_link_libraries(Test_Reflexes_HardStopReflex
+        ${srslib_framework_LIBRARIES}
+    )
+endif()

@@ -33,6 +33,7 @@ namespace driver {
 
 namespace internal {
 
+    static const string DANGER_ZONE = "/internal/state/danger_zone";
     static const string GOAL_ARRIVED = "/internal/state/goal/arrived";
     static const string GOAL_GOAL = "/internal/state/goal/goal";
     static const string GOAL_PATH = "/internal/state/goal/path";
@@ -61,6 +62,7 @@ namespace node {
 } // namespace node
 
 namespace sensor {
+    static const string FILTERED_LIDAR = "/internal/sensors/lidar/scan/filtered";
 
     static const string JOYPAD_STATE = "/internal/sensors/joypad/state";
 

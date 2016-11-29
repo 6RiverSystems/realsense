@@ -15,30 +15,22 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Midbrain::Midbrain(string nodeName) :
-    rosNodeHandle_(nodeName),
-    reflexes_(rosNodeHandle_)
+Midbrain::Midbrain(string name, int argc, char** argv) :
+    RosUnit(name, argc, argv, REFRESH_RATE_HZ)
 {
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Midbrain::run()
+void Midbrain::execute()
 {
-    triggerShutdown_.connectService();
-    triggerPause_.connectService();
+    evaluateTriggers();
+    reflexes_.execute();
+}
 
-    ros::Rate refreshRate(REFRESH_RATE_HZ);
-    while (ros::ok())
-    {
-        ros::spinOnce();
-
-        evaluateTriggers();
-
-        reflexes_.PublishDangerZone();
-
-        refreshRate.sleep();
-    }
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Midbrain::initialize()
+{
+    // Nothing to initialize
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,12 +39,9 @@ void Midbrain::run()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Midbrain::evaluateTriggers()
 {
-//    if (triggerPause_.isTriggerRequested())
-//    {
-//    }
-
     if (triggerShutdown_.isTriggerRequested())
     {
+        ROS_WARN("SHUTDOWN TRIGGER");
         ros::shutdown();
     }
 }

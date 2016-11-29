@@ -182,6 +182,16 @@ struct PoseMath
             p.y + forward * sin(p.theta) + sideway * cos(p.theta),
             p.theta);
     }
+
+    template<typename TYPE = double>
+    inline static Pose<TYPE> multiply(Pose<TYPE> p1, Pose<TYPE> p2)
+    {
+
+        return Pose<TYPE>(
+            p1.x + p2.x * cos(p1.theta) - p2.y * sin(p1.theta),
+            p1.y + p2.x * sin(p1.theta) + p2.y * cos(p1.theta),
+            p1.theta + p2.theta);
+    }
 };
 
 } // namespace srs

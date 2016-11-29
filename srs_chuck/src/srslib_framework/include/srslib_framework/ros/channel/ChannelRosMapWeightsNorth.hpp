@@ -7,6 +7,7 @@
 
 #include <srslib_framework/ros/channel/publisher/PublisherRosCostGrid.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 
 namespace srs {
 
@@ -15,7 +16,8 @@ class ChannelRosMapWeightsNorth :
 {
 public:
     ChannelRosMapWeightsNorth() :
-        PublisherRosCostGrid(ChuckTopics::internal::MAP_ROS_WEIGHTS_NORTH, "map", 1, true)
+        PublisherRosCostGrid(ChuckTopics::internal::MAP_ROS_WEIGHTS_NORTH,
+            ChuckTransforms::MAP, 1, true)
     {}
 };
 

@@ -15,7 +15,7 @@ CommandPause::CommandPause(Executive* owner) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CommandPause::execute(const vector<string>& params)
 {
-    bool pauseState = getSwitchParam(params, PARAM_1);
+    bool pauseState = param2Bool(params, POSITION_PARAM_1);
 
     getOwner()->setPauseState(pauseState);
     freeSpin_.publish(pauseState);

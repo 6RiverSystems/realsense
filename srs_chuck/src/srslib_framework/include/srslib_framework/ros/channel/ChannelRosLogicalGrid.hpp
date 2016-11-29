@@ -7,6 +7,7 @@
 
 #include <srslib_framework/ros/channel/publisher/PublisherRosOccupancyGrid.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 
 namespace srs {
 
@@ -15,7 +16,8 @@ class ChannelRosLogicalGrid :
 {
 public:
     ChannelRosLogicalGrid() :
-        PublisherRosOccupancyGrid(ChuckTopics::internal::MAP_ROS_LOGICAL, "map", 1, true)
+        PublisherRosOccupancyGrid(ChuckTopics::internal::MAP_ROS_LOGICAL,
+            ChuckTransforms::MAP, 1, true)
     {}
 };
 

@@ -17,6 +17,7 @@
 #include <srslib_framework/localization/map/occupancy/OccupancyMap.hpp>
 #include <srslib_framework/ros/message/OccupancyMapMessageFactory.hpp>
 #include <srslib_framework/ros/message/LogicalMapMessageFactory.hpp>
+#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 using namespace srs;
 
 TEST(Test_Map, OccupancyMapReconstruction)
@@ -40,7 +41,8 @@ TEST(Test_Map, RosOccupancyMapReconstruction)
     MapStack* mapStack = MapStackFactory::fromJsonFile("message/data/small-map/small-map.yaml");
     OccupancyMap* correct = mapStack->getOccupancyMap();
 
-    nav_msgs::OccupancyGrid message = OccupancyMapMessageFactory::occupancyMap2RosMsg(correct, "map");
+    nav_msgs::OccupancyGrid message = OccupancyMapMessageFactory::occupancyMap2RosMsg(correct,
+        ChuckTransforms::MAP);
     OccupancyMap* occupancy = OccupancyMapMessageFactory::msg2OccupancyMap(message);
 
     ASSERT_EQ(*correct->getGrid(), *occupancy->getGrid()) << "The marshaled map is not as expected";

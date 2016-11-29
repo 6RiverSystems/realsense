@@ -64,7 +64,7 @@ void CommandLineHandler::processString(const string& message)
 
         if (!commandTokens.empty())
         {
-            const std::string& command = commandTokens[Command::COMMAND];
+            const std::string& command = commandTokens[Command::POSITION_COMMAND];
 
             auto it = commandMap_.find(command);
             if (it != commandMap_.end())

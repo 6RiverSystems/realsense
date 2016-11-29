@@ -18,9 +18,9 @@ class Executive;
 class Command
 {
 public:
-    static constexpr int COMMAND = 0;
-    static constexpr int PARAM_1 = 1;
-    static constexpr int PARAM_2 = 2;
+    static constexpr int POSITION_COMMAND = 0;
+    static constexpr int POSITION_PARAM_1 = 1;
+    static constexpr int POSITION_PARAM_2 = 2;
 
     Command(Executive* owner, int minExpectedArguments = 0) :
         owner_(owner),
@@ -42,11 +42,12 @@ public:
         return owner_;
     }
 
-    bool getSwitchParam(const vector<string>& params, const int parameter)
+    bool param2Bool(const vector<string>& parameters, const int parameter)
     {
-        std::string switchParam = params[parameter];
+        std::string stringValue = parameters[parameter];
 
-        return switchParam == "ON" || switchParam == "on";
+        return stringValue == "on" || stringValue == "ON" ||
+            stringValue == "true" || stringValue == "TRUE";
     }
 
 private:

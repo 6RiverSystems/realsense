@@ -16,6 +16,7 @@ using namespace std;
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/ros/message/OccupancyMapMessageFactory.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 
 namespace srs {
 
@@ -31,7 +32,7 @@ MapServer::MapServer(string name, int argc, char** argv) :
 
     ROS_INFO_STREAM("Target map stack: " << mapStackFilename_);
 
-    rosNodeHandle_.param("/frame_id", frameId_, string("map"));
+    rosNodeHandle_.param("/frame_id", frameId_, ChuckTransforms::MAP);
 
     mapStack_ = MapStackFactory::fromJsonFile(mapStackFilename_);
 

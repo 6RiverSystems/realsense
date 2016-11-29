@@ -11,6 +11,7 @@ using namespace std;
 #include <geometry_msgs/PolygonStamped.h>
 
 #include <srslib_framework/ros/channel/publisher/PublisherStamped.hpp>
+#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 
 namespace srs {
 
@@ -45,7 +46,8 @@ public:
         return message;
     }
 
-    void publish(const vector<Pose<>>& data, const string frameId = "map",
+    void publish(const vector<Pose<>>& data,
+        const string frameId = ChuckTransforms::MAP,
         const ros::Time timestamp = ros::Time::now())
     {
         geometry_msgs::PolygonStamped message = convertData(data, timestamp);

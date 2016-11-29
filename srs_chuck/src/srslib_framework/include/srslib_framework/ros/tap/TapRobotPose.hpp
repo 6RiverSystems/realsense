@@ -11,6 +11,7 @@
 
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/tap/subscriber/SingleDataSource.hpp>
+#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 
 namespace srs {
 
@@ -52,7 +53,8 @@ private:
         try
         {
             tf::StampedTransform robotTransform;
-            tfListener_.lookupTransform("/map", "/base_footprint", ros::Time(0), robotTransform);
+            tfListener_.lookupTransform(ChuckTransforms::MAP, ChuckTransforms::BASE_FOOTPRINT,
+                ros::Time(0), robotTransform);
 
             tf::Vector3 location = robotTransform.getOrigin();
             tf::Quaternion orientation = robotTransform.getRotation();

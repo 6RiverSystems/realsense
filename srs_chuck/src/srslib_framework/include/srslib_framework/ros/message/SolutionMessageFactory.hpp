@@ -11,6 +11,7 @@
 
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
+#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 
 namespace srs {
 
@@ -136,7 +137,7 @@ struct SolutionMessageFactory
         const ros::Time timestamp = ros::Time::now())
     {
         nav_msgs::Path messagePath;
-        messagePath.header.frame_id = "map";
+        messagePath.header.frame_id = ChuckTransforms::MAP;
         messagePath.header.stamp = timestamp;
 
         vector<geometry_msgs::PoseStamped> planPoses;

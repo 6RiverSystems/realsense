@@ -10,6 +10,7 @@
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 
 namespace srs {
 
@@ -145,8 +146,8 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 
 	// Message declarations
 	geometry_msgs::TransformStamped odom_trans;
-	odom_trans.header.frame_id = "odom";
-	odom_trans.child_frame_id = "base_footprint";
+	odom_trans.header.frame_id = ChuckTransforms::ODOMETRY;
+	odom_trans.child_frame_id = ChuckTransforms::BASE_FOOTPRINT;
 
     constexpr static double ANGULAR_VELOCITY_EPSILON = 0.000001; // [rad/s] (0.0573 [deg/s])
 
@@ -184,8 +185,8 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 
 	nav_msgs::Odometry odom;
 	odom.header.stamp = currentTime;
-	odom.header.frame_id = "odom";
-	odom.child_frame_id = "base_footprint";
+	odom.header.frame_id = ChuckTransforms::ODOMETRY;
+	odom.child_frame_id = ChuckTransforms::BASE_FOOTPRINT;
 
 	// Position
 	odom.pose.pose.position.x = pose_.x;

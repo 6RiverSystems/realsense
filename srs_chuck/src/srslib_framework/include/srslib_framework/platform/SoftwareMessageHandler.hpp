@@ -5,29 +5,26 @@
  */
 #pragma once
 
-#include <std_msgs/Bool.h>
-
 namespace srs {
 
-class BrainStemMessageProcessor;
-
+template<class OWNER>
 class SoftwareMessageHandler
 {
 public:
-    SoftwareMessageHandler(BrainStemMessageProcessor* owner) :
+    SoftwareMessageHandler(OWNER* owner) :
         owner_(owner)
     {}
 
     virtual ~SoftwareMessageHandler()
     {}
 
-    BrainStemMessageProcessor* getOwner() const
+    OWNER* getOwner() const
     {
         return owner_;
     }
 
 private:
-    BrainStemMessageProcessor* owner_;
+    OWNER* owner_;
 };
 
 } // namespace srs

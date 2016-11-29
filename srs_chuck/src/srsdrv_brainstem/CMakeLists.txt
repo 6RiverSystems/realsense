@@ -17,6 +17,7 @@ set(${PROJECT_NAME}_SOURCES
     src/hw_message/RawOdometryHandler.cpp
     src/hw_message/HardwareInfoHandler.cpp
 
+    src/sw_message/FreeSpinHandler.cpp
     src/sw_message/SoundHandler.cpp
 )
 

@@ -131,7 +131,7 @@ void BrainStem::OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_
 		", backEStop: " << motionStatus.backEStop <<
 		", wirelessEStop: " << motionStatus.wirelessEStop <<
 		", bumpSensor: " << motionStatus.bumpSensor <<
-		", pause: " << motionStatus.pause <<
+		", free-spin: " << motionStatus.freeSpin <<
 		", hardStop: " << motionStatus.hardStop <<
 		", safetyProcessorFailure: " << failureStatus.safetyProcessorFailure <<
 		", brainstemFailure: " << failureStatus.brainstemFailure <<
@@ -149,7 +149,7 @@ void BrainStem::OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_
 	msg.backEStop = motionStatus.backEStop;
 	msg.wirelessEStop = motionStatus.wirelessEStop;
 	msg.bumpSensor = motionStatus.bumpSensor;
-	msg.pause = motionStatus.pause;
+	msg.pause = motionStatus.freeSpin;
 	msg.hardStop = motionStatus.hardStop;
 	msg.safetyProcessorFailure = failureStatus.safetyProcessorFailure;
 	msg.brainstemFailure = failureStatus.brainstemFailure;

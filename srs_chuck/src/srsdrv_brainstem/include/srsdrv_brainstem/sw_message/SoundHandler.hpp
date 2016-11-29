@@ -7,16 +7,20 @@
 
 #include <srslib_framework/Sound.h>
 
+#include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_Sound.hpp>
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
-#include <srsdrv_brainstem/sw_message/SoftwareMessageHandler.hpp>
 
 namespace srs {
 
-class SoundHandler : public SoftwareMessageHandler, public Observer<Subscriber<srslib_framework::Sound>>
+class BrainStemMessageProcessor;
+
+class SoundHandler :
+    public SoftwareMessageHandler<BrainStemMessageProcessor>,
+    public Observer<Subscriber<srslib_framework::Sound>>
 {
 public:
     SoundHandler(BrainStemMessageProcessor* owner);

@@ -10,6 +10,7 @@ set(PROJECT_MAIN src/executive_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
     src/Executive.cpp
+    src/sw_message/CommandLineHandler.cpp
     src/task/TaskDetectLabeledAreas.cpp
     src/task/TaskPlayWarningSound.cpp
 )

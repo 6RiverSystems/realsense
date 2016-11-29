@@ -21,8 +21,9 @@ using namespace ros;
 
 BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) :
 	m_pIO( pIO ),
-	m_mapMotionStatus( ),
-    soundHandler_(this)
+	// ###FS m_mapMotionStatus( ),
+    soundHandler_(this),
+    freeSpinHandler_(this)
 {
 	m_mapEntityButton[LED_ENTITIES::TOTE0]		= "TOTE0";
 	m_mapEntityButton[LED_ENTITIES::TOTE1]		= "TOTE1";
@@ -48,10 +49,11 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_mapLedMode["SELECT"] 					= LED_MODE::SELECT;
 	m_mapLedMode["RAPID_BLINK"] 			= LED_MODE::RAPID_BLINK;
 
-	m_mapMotionStatus["WIRELESS_E_STOP"]	= MOTION_STATUS::WIRELESS_E_STOP;
-	m_mapMotionStatus["BUMP_SENSOR"]		= MOTION_STATUS::BUMP_SENSOR;
-	m_mapMotionStatus["PAUSE"]				= MOTION_STATUS::PAUSE;
-	m_mapMotionStatus["HARD_STOP"]			= MOTION_STATUS::HARD_STOP;
+	// ###FS
+//	m_mapMotionStatus["WIRELESS_E_STOP"]	= MOTION_STATUS::WIRELESS_E_STOP;
+//	m_mapMotionStatus["BUMP_SENSOR"]		= MOTION_STATUS::BUMP_SENSOR;
+//	m_mapMotionStatus["PAUSE"]				= MOTION_STATUS::FREE_SPIN;
+//	m_mapMotionStatus["HARD_STOP"]			= MOTION_STATUS::HARD_STOP;
 
 	for( auto& kv : m_mapEntityButton )
 	{
@@ -61,7 +63,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	m_vecBridgeCallbacks["UI"] = { std::bind( &BrainStemMessageProcessor::OnUpdateLights, this, std::placeholders::_1 ), 2 };
 	m_vecBridgeCallbacks["STOP"] = { std::bind( &BrainStemMessageProcessor::OnHardStop, this ), 0 };
 	m_vecBridgeCallbacks["STARTUP"] = { std::bind( &BrainStemMessageProcessor::OnStartup, this, std::placeholders::_1 ), 0 };
-	m_vecBridgeCallbacks["PAUSE"] = { std::bind( &BrainStemMessageProcessor::OnPause, this, std::placeholders::_1 ), 1 };
+// ###FS	m_vecBridgeCallbacks["PAUSE"] = { std::bind( &BrainStemMessageProcessor::OnPause, this, std::placeholders::_1 ), 1 };
 	m_vecBridgeCallbacks["CLEAR_MOTION_STATUS"] = { std::bind( &BrainStemMessageProcessor::ClearMotionStatus, this ), 0 };
 
     hwMessageHandlers_[rawOdometryHandler_.getKey()] = &rawOdometryHandler_;
@@ -157,7 +159,7 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 			motionStatusData.backEStop = motionStatusSet.test( MOTION_STATUS::BACK_E_STOP );
 			motionStatusData.wirelessEStop = motionStatusSet.test( MOTION_STATUS::WIRELESS_E_STOP );
 			motionStatusData.bumpSensor = motionStatusSet.test( MOTION_STATUS::BUMP_SENSOR);
-			motionStatusData.pause = motionStatusSet.test( MOTION_STATUS::PAUSE );
+            motionStatusData.freeSpin = motionStatusSet.test(MOTION_STATUS::FREE_SPIN);
 			motionStatusData.hardStop = motionStatusSet.test( MOTION_STATUS::HARD_STOP );
 
 			FAILURE_STATUS_DATA failureStatusData;
@@ -322,8 +324,7 @@ void BrainStemMessageProcessor::processRosMessage(const string& strMessage)
 			}
 			else
 			{
-				ROS_ERROR( "Invalid command %s", strCommand.c_str( ) );
-
+				ROS_WARN( "Unknown command %s", strCommand.c_str( ) );
 			}
 		}
 	}
@@ -370,14 +371,19 @@ void BrainStemMessageProcessor::SetMotionStatus( const std::bitset<8>& motionSta
 	strMotionStatus += motionStatusSet.test( MOTION_STATUS::BACK_E_STOP ) ? "backEStop, " : "";
 	strMotionStatus += motionStatusSet.test( MOTION_STATUS::WIRELESS_E_STOP ) ? "wirelessEStop, " : "";
 	strMotionStatus += motionStatusSet.test( MOTION_STATUS::BUMP_SENSOR ) ? "bumpSensor, " : "";
-	strMotionStatus += motionStatusSet.test( MOTION_STATUS::PAUSE ) ? "pause, " : "";
+	strMotionStatus += motionStatusSet.test( MOTION_STATUS::FREE_SPIN) ? "free-spin, " : "";
 	strMotionStatus += motionStatusSet.test( MOTION_STATUS::HARD_STOP ) ? "hardStop, " : "";
 
 	BRAIN_STEM_CMD command = bSetValues ? BRAIN_STEM_CMD::SET_MOTION_STATUS : BRAIN_STEM_CMD::CLEAR_MOTION_STATUS;
 
-	SET_OPERATIONAL_STATE_DATA msg = { static_cast<uint8_t>( command ), static_cast<uint8_t>( motionStatusSet.to_ulong( ) ) };
+    SET_OPERATIONAL_STATE_DATA msg = {
+        static_cast<uint8_t>(command),
+        static_cast<uint8_t>(motionStatusSet.to_ulong())
+    };
 
-	ROS_DEBUG( "%s motion status for %s", command == BRAIN_STEM_CMD::SET_MOTION_STATUS ? "Setting" : "Clearing", strMotionStatus.c_str( ) );
+	ROS_DEBUG( "%s motion status for %s",
+	    command == BRAIN_STEM_CMD::SET_MOTION_STATUS ? "Setting" : "Clearing",
+	        strMotionStatus.c_str( ) );
 
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof(msg) );
 }
@@ -460,12 +466,13 @@ void BrainStemMessageProcessor::OnStartup( std::vector<std::string> vecParams )
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
 }
 
-void BrainStemMessageProcessor::OnPause( std::vector<std::string> vecParams )
-{
-	std::string& strPaused = vecParams[0];
-
-	Pause( strPaused == "ON" );
-}
+// ###FS
+//void BrainStemMessageProcessor::OnPause( std::vector<std::string> vecParams )
+//{
+//	std::string& strPaused = vecParams[0];
+//
+//	Pause( strPaused == "ON" );
+//}
 
 void BrainStemMessageProcessor::ClearMotionStatus( )
 {
@@ -495,12 +502,13 @@ void BrainStemMessageProcessor::WriteToSerialPort( char* pszData, std::size_t dw
 	}
 }
 
-void BrainStemMessageProcessor::Pause( bool bPaused )
-{
-	std::bitset<8> pauseSet;
-	pauseSet.set( MOTION_STATUS::PAUSE, true );
-
-	SetMotionStatus( pauseSet, bPaused );
-}
+// ###FS
+//void BrainStemMessageProcessor::Pause( bool bPaused )
+//{
+//	std::bitset<8> pauseSet;
+//	pauseSet.set( MOTION_STATUS::PAUSE, true );
+//
+//	SetMotionStatus( pauseSet, bPaused );
+//}
 
 } /* namespace srs */

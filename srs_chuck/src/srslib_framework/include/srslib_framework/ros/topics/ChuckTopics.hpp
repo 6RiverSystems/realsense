@@ -23,6 +23,7 @@ namespace debug {
 
 namespace driver {
 
+    static const string BRAINSTEM_CMD_FREESPIN = "/internal/drivers/brainstem/cmd/freespin";
     static const string BRAINSTEM_CMD_SOUND = "/internal/drivers/brainstem/cmd/sound";
     static const string BRAINSTEM_STATE_CONNECTED = "/internal/drivers/brainstem/state/connected";
 
@@ -52,6 +53,12 @@ namespace internal {
     static const string SWCMD_INITIAL_POSE = "/internal/sw_cmd/initial_pose";
 
 } // namespace internal
+
+namespace node {
+
+    static const string EXECUTIVE_CMD_CL = "/cmd_ll";
+
+} // namespace node
 
 namespace sensor {
 

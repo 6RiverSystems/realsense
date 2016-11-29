@@ -11,6 +11,7 @@
 #include <srslib_framework/ros/unit/RosUnit.hpp>
 
 #include <srsnode_executive/ExecutiveContext.hpp>
+#include <srsnode_executive/sw_message/CommandLineHandler.hpp>
 #include <srsnode_executive/task/TaskDetectLabeledAreas.hpp>
 #include <srsnode_executive/task/TaskPlayWarningSound.hpp>
 
@@ -33,13 +34,14 @@ private:
 
     void updateContext();
 
+    CommandLineHandler commandLineHandler_;
     ExecutiveContext context_;
-    TaskDetectLabeledAreas taskDetectLabeledAreas_;
-    TaskPlayWarningSound taskPlayWarningSound_;
 
+    TapOdometryCmd_Velocity tapCommandedVelocity_;
     TapMapStack tapMapStack_;
     TapRobotPose tapRobotPose_;
-    TapOdometryCmd_Velocity tapCommandedVelocity_;
+    TaskDetectLabeledAreas taskDetectLabeledAreas_;
+    TaskPlayWarningSound taskPlayWarningSound_;
 };
 
 } // namespace srs

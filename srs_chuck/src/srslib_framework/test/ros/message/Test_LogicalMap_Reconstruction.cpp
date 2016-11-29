@@ -23,7 +23,7 @@ TEST(Test_Map, LogicalMapReconstruction)
 {
     ros::Time::init();
 
-    MapStack* mapStack = MapStackFactory::fromJsonFile("data/small-map/small-map.yaml");
+    MapStack* mapStack = MapStackFactory::fromJsonFile("message/data/small-map/small-map.yaml");
     LogicalMap* correct = mapStack->getLogicalMap();
 
     srslib_framework::LogicalMap message = LogicalMapMessageFactory::map2Msg(correct);

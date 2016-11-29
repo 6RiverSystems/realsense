@@ -139,9 +139,7 @@ OccupancyMap* OccupancyMapFactory::fromMetadata(const OccupancyMetadata& metadat
         {
             // Convert the 8 bit cost into an integer cost and store it
             int8_t grayLevel = *occupancyIterator;
-
-            Grid2d::BaseType cost = map->gray2Cost(static_cast<char>(grayLevel));
-            map->setCost(col, row, cost);
+            map->setCost(col, row, static_cast<Grid2d::BaseType>(grayLevel));
 
             occupancyIterator++;
         }

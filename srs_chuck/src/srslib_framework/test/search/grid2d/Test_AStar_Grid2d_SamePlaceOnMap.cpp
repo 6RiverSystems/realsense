@@ -23,7 +23,7 @@ using namespace srs;
 
 using namespace srs;
 
-TEST(Test_AStar, SamePositionOnMap)
+TEST(Test_AStar_Grid2d, SamePositionOnMap)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 
@@ -55,7 +55,7 @@ TEST(Test_AStar, SamePositionOnMap)
     ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
 }
 
-TEST(Test_AStar, SameLocationOnMap)
+TEST(Test_AStar_Grid2d, SameLocationOnMap)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 

@@ -19,7 +19,7 @@ using namespace std;
 #include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 
-TEST(Test_AStar, 6rshq_SmallSearch)
+TEST(Test_AStar_Grid2d, 6rshq_SmallSearch)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 

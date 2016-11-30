@@ -20,7 +20,7 @@ using namespace srs;
 
 constexpr int GRID_SIZE = 5;
 
-TEST(Test_AStar, SmallSearchOnEmptyGrid)
+TEST(Test_AStar_Grid2d, SmallSearchOnEmptyGrid)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
@@ -41,7 +41,7 @@ TEST(Test_AStar, SmallSearchOnEmptyGrid)
         "Unexpected number of closed nodes";
 }
 
-TEST(Test_AStar, Corner2CornerSearchOnEmptyGrid)
+TEST(Test_AStar_Grid2d, Corner2CornerSearchOnEmptyGrid)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
@@ -62,7 +62,7 @@ TEST(Test_AStar, Corner2CornerSearchOnEmptyGrid)
         "Unexpected number of closed nodes";
 }
 
-TEST(Test_AStar, SearchAroundObstacle)
+TEST(Test_AStar_Grid2d, SearchAroundObstacle)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
@@ -85,7 +85,7 @@ TEST(Test_AStar, SearchAroundObstacle)
         "Unexpected number of closed nodes";
 }
 
-TEST(Test_AStar, Clear)
+TEST(Test_AStar_Grid2d, Clear)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
@@ -126,7 +126,7 @@ TEST(Test_AStar, Clear)
     goal->release();
 }
 
-TEST(Test_AStar, MemoryLeaks)
+TEST(Test_AStar_Grid2d, MemoryLeaks)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
 

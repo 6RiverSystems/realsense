@@ -121,15 +121,15 @@ set(TEST_SOURCES_ROS
 )
 
 set(TEST_SOURCES_SEARCH
-#    test/search/grid2d/Test_AStar_Grid2d_6RHQ.cpp
-#    test/search/grid2d/Test_AStar_Grid2d_6rshq_SmallSearch.cpp
-#    test/search/grid2d/Test_AStar_Grid2d_Barrett_BigSearch.cpp
-#    test/search/grid2d/Test_AStar_Grid2d_Basic.cpp
-#    test/search/grid2d/Test_AStar_Grid2d_NoSolution.cpp
-#    test/search/grid2d/Test_AStar_Grid2d_SamePlaceOnMap.cpp
-#    test/search/grid2d/Test_AStar_Grid2d_Weights.cpp
-    test/search/mapstack/Test_AStar_MapStack_Basic.cpp
+    test/search/grid2d/Test_AStar_Grid2d_6rshq_SmallSearch.cpp
+    test/search/grid2d/Test_AStar_Grid2d_6rshq.cpp
+    test/search/grid2d/Test_AStar_Grid2d_Barrett_BigSearch.cpp
+    test/search/grid2d/Test_AStar_Grid2d_Basic.cpp
+    test/search/grid2d/Test_AStar_Grid2d_NoSolution.cpp
+    test/search/grid2d/Test_AStar_Grid2d_SamePlaceOnMap.cpp
+    test/search/grid2d/Test_AStar_Grid2d_Weights.cpp
     test/search/mapstack/Test_AStar_MapStack_Barrett_BigSearch.cpp
+    test/search/mapstack/Test_AStar_MapStack_Basic.cpp
 )
 
 set(TEST_SOURCES_IO

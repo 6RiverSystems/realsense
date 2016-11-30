@@ -63,7 +63,7 @@ TEST(Test_AStar_MapStack, SmallSearchOnEmptyGrid)
 //        "Unexpected number of closed nodes";
 }
 
-TEST(Test_AStar, Corner2CornerSearchOnEmptyGrid)
+TEST(Test_AStar_MapStack, Corner2CornerSearchOnEmptyGrid)
 {
     MapStack* mapStack = generateMapStack();
 
@@ -85,7 +85,7 @@ TEST(Test_AStar, Corner2CornerSearchOnEmptyGrid)
 //        "Unexpected number of closed nodes";
 }
 
-TEST(Test_AStar, SearchAroundObstacle)
+TEST(Test_AStar_MapStack, SearchAroundObstacle)
 {
     MapStack* mapStack = generateMapStack();
 
@@ -107,7 +107,7 @@ TEST(Test_AStar, SearchAroundObstacle)
 //        "Unexpected number of closed nodes";
 }
 
-TEST(Test_AStar, MemoryLeaks)
+TEST(Test_AStar_MapStack, MemoryLeaks)
 {
     MapStack* mapStack = generateMapStack();
 

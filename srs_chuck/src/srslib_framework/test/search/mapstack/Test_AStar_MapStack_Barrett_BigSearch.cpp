@@ -21,7 +21,7 @@ using namespace srs;
 
 static const int TRIALS = 100;
 
-TEST(Test_AStar, Barrett_BigSearch)
+TEST(Test_AStar_MapStack, Barrett_BigSearch)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/barrett/barrett.yaml");
 
@@ -46,7 +46,7 @@ TEST(Test_AStar, Barrett_BigSearch)
         algorithm.search(start, goal);
     }
 
-    float elapsed = timer.elapsed();
+    float elapsed = timer.elapsedMicroseconds();
 
     cout << "Elapsed time: " << elapsed << "us" << endl;
     cout << "Average time: " << elapsed / TRIALS << "us" << endl;

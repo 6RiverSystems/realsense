@@ -23,7 +23,7 @@ using namespace std;
 
 using namespace srs;
 
-TEST(Test_AStar, 6RHQ_NoTrajectory)
+TEST(Test_AStar_Grid2d, 6rshq_NoTrajectory)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 

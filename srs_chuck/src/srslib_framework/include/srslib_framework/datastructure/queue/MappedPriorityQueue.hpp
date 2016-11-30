@@ -96,10 +96,10 @@ public:
     }
 
 private:
-    typedef unordered_set<TYPE, HASH, EQUAL_TO> BucketType;
-    typedef forward_list<BucketType*> BucketPoolType;
-    typedef unordered_map<TYPE, PRIORITY, HASH, EQUAL_TO> IndexType;
-    typedef map<PRIORITY, BucketType*, less<PRIORITY>> QueueType;
+    using BucketType = unordered_set<TYPE, HASH, EQUAL_TO>;
+    using BucketPoolType = forward_list<BucketType*>;
+    using IndexType = unordered_map<TYPE, PRIORITY, HASH, EQUAL_TO>;
+    using QueueType = map<PRIORITY, BucketType*, less<PRIORITY>>;
 
     inline BucketType* getAvailableBucket()
     {

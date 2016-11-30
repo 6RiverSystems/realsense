@@ -22,7 +22,7 @@ set(${PROJECT_NAME}_TEST_SOURCES
 #    test/TestNavigation_OneWay.cpp
 #    test/TestNavigation_WithCostMap.cpp
 #    test/TestNavigation_Barrett_BigSearch.cpp
-#    test/TestNavigation_SmallMap.cpp
+    test/TestNavigation_SmallSearch.cpp
 )
 
 ####################################################################################################

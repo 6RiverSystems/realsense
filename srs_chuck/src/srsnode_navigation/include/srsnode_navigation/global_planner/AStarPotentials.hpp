@@ -24,6 +24,16 @@ class AStarPotentials
 public:
     struct SearchParameters
     {
+        SearchParameters() :
+            useQuadratic(false),
+            useGridPath(true),
+            allowUnknown(false),
+            lethalCost(253),
+            neutralCost(50),
+            weightRatio(100),
+            logicalCostRatio(100)
+        {}
+
         bool useQuadratic;
         bool useGridPath;
         bool allowUnknown;

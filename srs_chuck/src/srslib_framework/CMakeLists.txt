@@ -71,6 +71,7 @@ set(TEST_SOURCES_DATASTRUCTURE
     test/datastructure/queue/Test_MappedPriorityQueue_Basic.cpp
     test/datastructure/queue/Test_MappedPriorityQueue_InnerHashEqual.cpp
     test/datastructure/queue/Test_MappedPriorityQueue_UserDefinedClass.cpp
+    test/datastructure/queue/Test_MappedPriorityQueue_IndexClass.cpp
 )
 
 set(TEST_SOURCES_FILTER

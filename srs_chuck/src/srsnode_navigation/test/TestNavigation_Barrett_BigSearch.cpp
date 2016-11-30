@@ -14,6 +14,8 @@
 #include <srsnode_navigation/global_planner/AStarPotentials.hpp>
 using namespace srs;
 
+static const int TRIALS = 10;
+
 TEST(Test_Navigation, Barrett_BigSearch)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/barrett/barrett.yaml");
@@ -33,11 +35,21 @@ TEST(Test_Navigation, Barrett_BigSearch)
     std::vector<std::pair<float, float>> path;
     float* potentials;
 
+    ASSERT_TRUE(astar.calculatePath(AStarPotentials::SearchParameters(),
+            13.804, 4.478, 32.679, 87.743, path, potentials)) <<
+        "A solution was not found";
+
     StopWatch timer;
 
-    if (!astar.calculatePath(13.804, 4.478, 32.679, 87.743, path, potentials))
+    int trials = TRIALS;
+    while (--trials > 0)
     {
-        cout << "Path not found" << endl;
+        astar.calculatePath(AStarPotentials::SearchParameters(),
+            13.804, 4.478, 32.679, 87.743, path, potentials);
     }
-    cout << "Elapsed time: " << timer.elapsed() << "s" << endl;
+
+    float elapsed = timer.elapsed();
+
+    cout << "Elapsed time: " << elapsed << "s" << endl;
+    cout << "Average time: " << elapsed / TRIALS << "s" << endl;
 }

@@ -17,9 +17,9 @@ using namespace std;
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dSingleGoal.hpp>
-
-#include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
+
+static const int TRIALS = 10;
 
 TEST(Test_AStar, Barrett_BigSearch)
 {
@@ -32,31 +32,24 @@ TEST(Test_AStar, Barrett_BigSearch)
     Grid2d::Position startPosition(148, 47, 90);
     Grid2d::Position goalPosition(332, 522, 90);
 
-    test::MemoryWatch memoryWatch;
-
-    AStar* algorithm = new AStar();
+    AStar algorithm;
     Grid2dNode* start = Grid2dNode::instanceOfStart(mapStack->getLogicalMap()->getGrid(),
         startPosition);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
-    StopWatch timer;
-
-    ASSERT_TRUE(algorithm->search(start, goal)) <<
+    ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A solution was not found";
 
-    cout << "Elapsed time: " << timer.elapsed() << "s" << endl;
+    StopWatch timer;
 
-    ASSERT_EQ(18367, algorithm->getOpenNodeCount()) <<
-        "Unexpected number of open nodes";
+    int trials = TRIALS;
+    while (--trials > 0)
+    {
+        algorithm.search(start, goal);
+    }
 
-    ASSERT_EQ(28141, algorithm->getClosedNodeCount()) <<
-        "Unexpected number of closed nodes";
+    float elapsed = timer.elapsed();
 
-    algorithm->clear();
-
-    start->release();
-    goal->release();
-    delete algorithm;
-
-    ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
+    cout << "Elapsed time: " << elapsed << "s" << endl;
+    cout << "Average time: " << elapsed / TRIALS << "s" << endl;
 }

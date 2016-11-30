@@ -32,7 +32,7 @@ SrsPlannerPotentials::SrsPlannerPotentials() :
     allowUnknown_(true),
     publishPotential_(true),
     lethalCost_(253),
-    neutralCost_(10)
+    neutralCost_(50)
 {
     ROS_WARN("SrsPlannerPotentials::SrsPlannerPotentials() called");
 
@@ -50,7 +50,7 @@ SrsPlannerPotentials::SrsPlannerPotentials(string name, costmap_2d::Costmap2DROS
     allowUnknown_(true),
     publishPotential_(true),
     lethalCost_(253),
-    neutralCost_(10)
+    neutralCost_(50)
 {
     ROS_WARN("SrsPlannerPotentials::SrsPlannerPotentials(...) called");
 

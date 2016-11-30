@@ -21,7 +21,7 @@ public:
         costmap_2d::Costmap2D* costMap,
         PotentialCalculator* pCalculator) :
             lethalCost_(253),
-            neutralCost_(10),
+            neutralCost_(50),
             logicalGrid_(logicalMap->getGrid()),
             costGrid_(costMap->getCharMap()),
             pCalculator_(pCalculator),

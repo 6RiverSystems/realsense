@@ -21,6 +21,8 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(BaseMa
     Solution<Grid2dSolutionItem>* globalSolution =
         Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
 
+    unsigned int exploredNodes = 0;
+
     Pose<> intermediateStart = start;
     for (Pose<> goal : goals)
     {
@@ -31,9 +33,13 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(BaseMa
             break;
         }
 
+        exploredNodes += localSolution->getExploredNodes();
+
         globalSolution->append(localSolution);
         intermediateStart = goal;
     }
+
+    globalSolution->setExploredNodes(exploredNodes);
 
     return globalSolution;
 }
@@ -45,6 +51,8 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(MapSta
     Solution<Grid2dSolutionItem>* globalSolution =
         Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
 
+    unsigned int exploredNodes = 0;
+
     Pose<> intermediateStart = start;
     for (Pose<> goal : goals)
     {
@@ -55,9 +63,13 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(MapSta
             break;
         }
 
+        exploredNodes += localSolution->getExploredNodes();
+
         globalSolution->append(localSolution);
         intermediateStart = goal;
     }
+
+    globalSolution->setExploredNodes(exploredNodes);
 
     return globalSolution;
 }
@@ -83,7 +95,10 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(BaseMap* map
         AStar::SolutionType searchSolution;
         algorithm.getSolution(searchSolution);
 
-        return fromSearch(map, searchSolution);
+        Solution<Grid2dSolutionItem>* solution = fromSearch(map, searchSolution);
+        solution->setExploredNodes(algorithm.getClosedNodeCount() + algorithm.getOpenNodeCount());
+
+        return solution;
     }
 
     return Solution<Grid2dSolutionItem>::instanceOfInvalidEmpty();
@@ -126,7 +141,10 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* st
         AStar::SolutionType searchSolution;
         algorithm.getSolution(searchSolution);
 
-        return fromSearch(stack->getLogicalMap(), searchSolution);
+        Solution<Grid2dSolutionItem>* solution = fromSearch(stack->getLogicalMap(), searchSolution);
+        solution->setExploredNodes(algorithm.getClosedNodeCount() + algorithm.getOpenNodeCount());
+
+        return solution;
     }
 
     return Solution<Grid2dSolutionItem>::instanceOfInvalidEmpty();

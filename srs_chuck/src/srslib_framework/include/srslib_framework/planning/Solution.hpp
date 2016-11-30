@@ -39,6 +39,11 @@ public:
         list<SOLUTION_ITEM>::insert(list<SOLUTION_ITEM>::end(), other->begin(), other->end());
     }
 
+    unsigned int getExploredNodes() const
+    {
+        return exploredNodes_;
+    }
+
     SOLUTION_ITEM getGoal() const
     {
         return list<SOLUTION_ITEM>::back();
@@ -64,6 +69,11 @@ public:
         valid_ = newValue;
     }
 
+    void setExploredNodes(unsigned int newValue)
+    {
+        exploredNodes_ = newValue;
+    }
+
     string toString() const
     {
         stringstream stream;
@@ -71,6 +81,7 @@ public:
         int counter = 0;
 
         stream << "{" << endl;
+        stream << "v: " << valid_ << ", en: " << exploredNodes_ << endl;
         for (auto node : *this)
         {
             stream << setw(4) << counter++ << ": " << node << endl;
@@ -83,10 +94,13 @@ public:
 
 protected:
     Solution(bool valid) :
+        exploredNodes_(0),
         valid_(valid)
     {}
 
 private:
+    unsigned int exploredNodes_;
+
     bool valid_;
 };
 

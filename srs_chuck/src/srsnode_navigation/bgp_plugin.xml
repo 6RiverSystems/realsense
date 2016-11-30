@@ -8,9 +8,9 @@
 -->
 
 <library path="lib/libsrslib_global_planner">
-    <class name="global_planner/SrsPlannerPotentials" type="srs::SrsPlannerPotentials" 
+    <class name="global_planner/SrsPlannerConventional" type="srs::SrsPlannerConventional" 
         base_class_type="nav_core::BaseGlobalPlanner">
-        
+
         <description>
             This is the 6RS global planner plugin.
         </description>

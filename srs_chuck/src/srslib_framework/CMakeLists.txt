@@ -22,8 +22,8 @@ set(${PROJECT_NAME}_SOURCES
     src/localization/map/occupancy/OccupancyMap.cpp
     src/localization/map/occupancy/OccupancyMapFactory.cpp
 
-    src/planning/pathplanning/grid2d/Grid2dSolutionItem.cpp
     src/planning/pathplanning/grid2d/Grid2dSolutionFactory.cpp
+    src/planning/pathplanning/grid2d/Grid2dSolutionItem.cpp
     src/planning/pathplanning/grid2d/Grid2dSolutionUtils.cpp
 
     src/platform/CrashHandler.cpp
@@ -96,15 +96,15 @@ set(TEST_SOURCES_MATH
 )
 
 set(TEST_SOURCES_PLANNING
-    test/planning/pathplanning/grid2d/Test_Solution_Basic.cpp
-    test/planning/pathplanning/grid2d/Test_Solution_Barrett_Aisles.cpp
-    test/planning/pathplanning/grid2d/Test_Solution_Empty_Consecutive.cpp
-    test/planning/pathplanning/grid2d/Test_Trajectory_180ShortTrajectory.cpp
-    test/planning/pathplanning/grid2d/Test_Trajectory_LongStraight.cpp
-    test/planning/pathplanning/grid2d/Test_Trajectory_LongTrajectory.cpp
-    test/planning/pathplanning/grid2d/Test_Trajectory_ShortStraight.cpp
-    test/planning/pathplanning/grid2d/Test_Trajectory_ShortTrajectory.cpp
-    test/planning/pathplanning/grid2d/Test_Trajectory_SingleRotation.cpp
+    test/planning/pathplanning/grid2d/Test_Solution_Grid2d_Basic.cpp
+    test/planning/pathplanning/grid2d/Test_Solution_Grid2d_Empty_Consecutive.cpp
+    test/planning/pathplanning/mapstack/Test_Solution_MapStack_Basic.cpp
+    test/planning/pathplanning/trajectory/Test_Trajectory_180ShortTrajectory.cpp
+    test/planning/pathplanning/trajectory/Test_Trajectory_LongStraight.cpp
+    test/planning/pathplanning/trajectory/Test_Trajectory_LongTrajectory.cpp
+    test/planning/pathplanning/trajectory/Test_Trajectory_ShortStraight.cpp
+    test/planning/pathplanning/trajectory/Test_Trajectory_ShortTrajectory.cpp
+    test/planning/pathplanning/trajectory/Test_Trajectory_SingleRotation.cpp
 )
 
 set(TEST_SOURCES_PLATFORM
@@ -121,14 +121,15 @@ set(TEST_SOURCES_ROS
 )
 
 set(TEST_SOURCES_SEARCH
-    test/search/grid2d/Test_AStar_6RHQ.cpp
-    test/search/grid2d/Test_AStar_6rshq_SmallSearch.cpp
-    test/search/grid2d/Test_AStar_Barrett_BigSearch.cpp
-    test/search/grid2d/Test_AStar_Basic.cpp
-    test/search/grid2d/Test_AStar_NoSolution.cpp
-    test/search/grid2d/Test_AStar_SamePlaceOnMap.cpp
-    test/search/grid2d/Test_AStar_Weights.cpp
+#    test/search/grid2d/Test_AStar_Grid2d_6RHQ.cpp
+#    test/search/grid2d/Test_AStar_Grid2d_6rshq_SmallSearch.cpp
+#    test/search/grid2d/Test_AStar_Grid2d_Barrett_BigSearch.cpp
+#    test/search/grid2d/Test_AStar_Grid2d_Basic.cpp
+#    test/search/grid2d/Test_AStar_Grid2d_NoSolution.cpp
+#    test/search/grid2d/Test_AStar_Grid2d_SamePlaceOnMap.cpp
+#    test/search/grid2d/Test_AStar_Grid2d_Weights.cpp
     test/search/mapstack/Test_AStar_MapStack_Basic.cpp
+    test/search/mapstack/Test_AStar_MapStack_Barrett_BigSearch.cpp
 )
 
 set(TEST_SOURCES_IO
@@ -142,7 +143,7 @@ project(${PROJECT_NAME})
 set(PROJECT_LIBRARY ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
-# set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp

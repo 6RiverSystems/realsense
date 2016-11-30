@@ -19,7 +19,7 @@ using namespace srs;
 
 static constexpr unsigned int GRID_SIZE = 5;
 
-TEST(Test_Solution, BasicEmptyGrid)
+TEST(Test_Solution_Grid2d, BasicEmptyGrid)
 {
     Solution<Grid2dSolutionItem> correctSolution;
     correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(0, 0, 0), Pose<>(1, 0, 0), 1});

@@ -12,8 +12,8 @@ using namespace std;
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/math/VelocityMath.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionUtils.hpp>
+#include <srslib_framework/planning/pathplanning/trajectory/Grid2dTrajectoryGenerator.hpp>
 
 namespace srs {
 

@@ -16,12 +16,12 @@ array<MapStackAction::ActionEnum, 3> MapStackAction::ALLOWED_ACTIONS = {
 };
 
 const int MapStackAction::COMMAND_COSTS[] = {
-    40, // BACKWARD
-    1, // FORWARD
+    0, // BACKWARD
+    0, // FORWARD
     0, // NONE
-    2, // ROTATE_N90
-    2, // ROTATE_P90
-    3, // ROTATE_180
+    0, // ROTATE_N90
+    0, // ROTATE_P90
+    0, // ROTATE_180
     0 // START
 };
 
@@ -69,13 +69,20 @@ bool MapStackAction::addBackward(MapStack* stack, MapStackNode* fromNode,
     {
         // Calculate the motion cost
         int motionCost = COMMAND_COSTS[MapStackAction::BACKWARD];
-        motionCost += stack->getWeight(fromPosition);
-        motionCost += stack->getTotalCost(neighbor);
 
-        if (motionCost < Grid2d::PAYLOAD_MAX)
+        int localCost = stack->getWeight(fromPosition);
+        if (isCostAvailable(localCost))
         {
-            result = ActionResultType(neighbor, fromNode->getG() + motionCost);
-            return true;
+            motionCost += localCost;
+
+            localCost = stack->getTotalCost(neighbor);
+            if (isCostAvailable(localCost))
+            {
+                motionCost += localCost;
+
+                result = ActionResultType(neighbor, fromNode->getG() + motionCost);
+                return true;
+            }
         }
     }
 
@@ -93,13 +100,20 @@ bool MapStackAction::addForward(MapStack* stack, MapStackNode* fromNode,
     {
         // Calculate the motion cost
         int motionCost = COMMAND_COSTS[MapStackAction::FORWARD];
-        motionCost += stack->getWeight(fromPosition);
-        motionCost += stack->getTotalCost(neighbor);
 
-        if (motionCost < Grid2d::PAYLOAD_MAX)
+        int localCost = stack->getWeight(fromPosition);
+        if (isCostAvailable(localCost))
         {
-            result = ActionResultType(neighbor, fromNode->getG() + motionCost);
-            return true;
+            motionCost += localCost;
+
+            localCost = stack->getTotalCost(neighbor);
+            if (isCostAvailable(localCost))
+            {
+                motionCost += localCost;
+
+                result = ActionResultType(neighbor, fromNode->getG() + motionCost);
+                return true;
+            }
         }
     }
 
@@ -115,18 +129,18 @@ bool MapStackAction::addRotation(MapStack* stack, MapStackNode* fromNode, Action
     int newOrientation = AngleMath::normalizeDeg<int>(fromPosition.orientation + angle);
     Grid2d::Position motion = Grid2d::Position(fromPosition.x, fromPosition.y, newOrientation);
 
-    // Calculate the motion cost
-    int motionCost = COMMAND_COSTS[action];
-    motionCost += stack->getWeight(fromPosition);
-    motionCost += stack->getTotalCost(motion);
+    result = ActionResultType(motion, fromNode->getG() + COMMAND_COSTS[action]);
+    return true;
+}
 
-    if (motionCost < Grid2d::PAYLOAD_MAX)
+////////////////////////////////////////////////////////////////////////////////////////////////////
+bool MapStackAction::isCostAvailable(int& cost)
+{
+    if (cost == Grid2d::PAYLOAD_NO_INFORMATION)
     {
-        result = ActionResultType(motion, fromNode->getG() + motionCost);
-        return true;
+        cost = 0;
     }
-
-    return false;
+    return cost < Grid2d::PAYLOAD_MAX;
 }
 
 } // namespace srs

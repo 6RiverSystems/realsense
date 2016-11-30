@@ -70,19 +70,6 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
 
     clear();
 
-    #if DEBUG_ASTAR
-        cout << "OPEN ------------------------------------------------------------------------------------------" << endl;
-        cout << open_ << endl << endl;
-        cout << "-----------------------------------------------------------------------------------------------" << endl;
-
-        cout << "CLOSED ----------------------------------------------------------------------------------------" << endl;
-        for (auto node : closed_)
-        {
-            cout << *node << endl;
-        }
-        cout << "-----------------------------------------------------------------------------------------------" << endl;
-    #endif
-
     // Add the starting node to the open queue
     open_.push(startNode_->getTotalCost(), startNode_);
 

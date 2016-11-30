@@ -15,11 +15,11 @@ using namespace std;
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_framework/platform/StopWatch.hpp>
 #include <srslib_framework/search/AStar.hpp>
-#include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
-#include <srslib_framework/search/graph/grid2d/Grid2dSingleGoal.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
 using namespace srs;
 
-static const int TRIALS = 10;
+static const int TRIALS = 100;
 
 TEST(Test_AStar, Barrett_BigSearch)
 {
@@ -33,14 +33,12 @@ TEST(Test_AStar, Barrett_BigSearch)
     Grid2d::Position goalPosition(332, 522, 90);
 
     AStar algorithm;
-    Grid2dNode* start = Grid2dNode::instanceOfStart(mapStack->getLogicalMap()->getGrid(),
-        startPosition);
-    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
-
-    ASSERT_TRUE(algorithm.search(start, goal)) <<
-        "A solution was not found";
+    MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
+    MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
 
     StopWatch timer;
+    ASSERT_TRUE(algorithm.search(start, goal)) <<
+        "A solution was not found";
 
     int trials = TRIALS;
     while (--trials > 0)
@@ -50,6 +48,6 @@ TEST(Test_AStar, Barrett_BigSearch)
 
     float elapsed = timer.elapsed();
 
-    cout << "Elapsed time: " << elapsed << "s" << endl;
-    cout << "Average time: " << elapsed / TRIALS << "s" << endl;
+    cout << "Elapsed time: " << elapsed << "us" << endl;
+    cout << "Average time: " << elapsed / TRIALS << "us" << endl;
 }

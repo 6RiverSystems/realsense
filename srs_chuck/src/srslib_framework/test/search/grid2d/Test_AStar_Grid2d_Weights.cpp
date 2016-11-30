@@ -12,7 +12,7 @@ using namespace std;
 
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/solution/Grid2dSolutionItem.hpp>
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/AStar.hpp>

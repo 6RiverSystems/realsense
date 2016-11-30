@@ -10,7 +10,7 @@
 
 #include <srslib_framework/MsgSolution.h>
 
-#include <srslib_framework/planning/pathplanning/Solution.hpp>
+#include <srslib_framework/planning/Solution.hpp>
 
 #include <srslib_framework/ros/tap/RosTap.hpp>
 #include <srslib_framework/ros/message/SolutionMessageFactory.hpp>

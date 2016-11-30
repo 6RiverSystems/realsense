@@ -12,8 +12,6 @@ namespace srs {
 
 class StopWatch
 {
-    typedef duration<double, ratio<1>> DurationType;
-
 public:
     StopWatch() :
         time_(high_resolution_clock::now())
@@ -21,7 +19,7 @@ public:
 
     double elapsed() const
     {
-        return duration_cast<DurationType>(high_resolution_clock::now() - time_).count();
+        return duration_cast<microseconds>(high_resolution_clock::now() - time_).count();
     }
 
     void reset()
@@ -34,3 +32,5 @@ private:
 };
 
 } // namespace srs
+
+

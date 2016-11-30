@@ -15,9 +15,9 @@ using namespace std;
 #include <srsnode_motion/MotionConfig.h>
 using namespace srsnode_motion;
 
-#include <srslib_framework/planning/pathplanning/Solution.hpp>
+#include <srslib_framework/planning/Solution.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
-#include <srslib_framework/robotics/Trajectory.hpp>
+#include <srslib_framework/planning/pathplanning/trajectory/Trajectory.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>

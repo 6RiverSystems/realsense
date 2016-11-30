@@ -15,10 +15,6 @@ using namespace std;
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/PoseAdapter.hpp>
-#include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
-#include <srslib_framework/search/AStar.hpp>
 
 using namespace srs;
 
@@ -27,7 +23,7 @@ static constexpr double DEG90 = AngleMath::deg2Rad<double>(90);
 static constexpr double DEG180 = AngleMath::deg2Rad<double>(180);
 static constexpr double DEG270 = AngleMath::deg2Rad<double>(270);
 
-TEST(Test_Trajectory, Empty_Consecutive)
+TEST(Test_Solution_Grid2d, Empty_Consecutive)
 {
     Pose<> robotPose = Pose<>(3, 3, DEG0);
     vector<Pose<>> goals = {
@@ -37,17 +33,8 @@ TEST(Test_Trajectory, Empty_Consecutive)
         Pose<>(3, 3, DEG270)
     };
 
-    MapStack* mapStack = MapStackFactory::fromJsonFile("pathplanning/grid2d/data/empty/empty.yaml");
+    MapStack* mapStack = MapStackFactory::fromJsonFile("pathplanning/data/empty/empty.yaml");
 
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromConsecutiveGoals(
         mapStack->getOccupancyMap(), robotPose, goals);
-
-    Chuck chuck;
-    Trajectory<> trajectory;
-
-    Solution<Grid2dSolutionItem> gridSolution2 = *gridSolution;
-    Grid2dTrajectoryGenerator solutionConverter(chuck);
-
-    solutionConverter.fromSolution(gridSolution2);
-    solutionConverter.getTrajectory(trajectory);
 }

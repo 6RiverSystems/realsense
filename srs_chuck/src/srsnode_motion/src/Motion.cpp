@@ -17,7 +17,7 @@
 #include <srslib_framework/Pose.h>
 
 #include <srslib_framework/math/AngleMath.hpp>
-#include <srslib_framework/planning/pathplanning/Solution.hpp>
+#include <srslib_framework/planning/Solution.hpp>
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>

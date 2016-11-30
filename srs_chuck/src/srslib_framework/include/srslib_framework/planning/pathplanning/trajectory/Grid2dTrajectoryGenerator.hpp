@@ -11,13 +11,11 @@ using namespace std;
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/math/VelocityMath.hpp>
-
-#include <srslib_framework/planning/pathplanning/Solution.hpp>
+#include <srslib_framework/planning/Solution.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
-
+#include <srslib_framework/planning/pathplanning/trajectory/Trajectory.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
-#include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot_profile/RobotProfile.hpp>
 using namespace srs;
 

@@ -1,11 +1,13 @@
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
 
-#include <srslib_framework/planning/pathplanning/grid2d/exception/UnexpectedSearchActionException.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/PoseAdapter.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/UnexpectedSearchActionException.hpp>
 #include <srslib_framework/search/SearchNode.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dAction.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dSingleGoal.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackAction.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
 
 namespace srs {
 
@@ -22,6 +24,28 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(BaseMa
     for (Pose<> goal : goals)
     {
         Solution<Grid2dSolutionItem>* localSolution = fromSingleGoal(map, intermediateStart, goal);
+        if (localSolution->empty())
+        {
+            break;
+        }
+
+        globalSolution->append(localSolution);
+        intermediateStart = goal;
+    }
+
+    return globalSolution;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(MapStack* stack,
+    Pose<> start, vector<Pose<>> goals)
+{
+    Solution<Grid2dSolutionItem>* globalSolution = new Solution<Grid2dSolutionItem>();
+
+    Pose<> intermediateStart = start;
+    for (Pose<> goal : goals)
+    {
+        Solution<Grid2dSolutionItem>* localSolution = fromSingleGoal(stack, intermediateStart, goal);
         if (localSolution->empty())
         {
             break;
@@ -68,12 +92,52 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(BaseMap* map
     }
 
     // Prepare the start position for the search
-    Grid2d::Position start = PoseAdapter::pose2Map(fromPose, map);
+    Grid2d::Position start = pose2Map(map, fromPose);
 
     // Prepare the goal position for the search
-    Grid2d::Position goal = PoseAdapter::pose2Map(toPose, map);
+    Grid2d::Position goal = pose2Map(map, toPose);
 
     return fromSingleGoal(map, start, goal);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* stack,
+    Grid2d::Position& start, Grid2d::Position& goal)
+{
+    if (!stack)
+    {
+        return nullptr;
+    }
+
+    MapStackNode* startNode = MapStackNode::instanceOfStart(stack, start);
+    MapStackSingleGoal* goalNode = MapStackSingleGoal::instanceOf(goal);
+
+    AStar algorithm;
+
+    algorithm.search(startNode, goalNode);
+
+    AStar::SolutionType solution;
+    algorithm.getSolution(solution);
+
+    return fromSearch(stack->getLogicalMap(), solution);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* stack,
+    Pose<> fromPose, Pose<> toPose)
+{
+    if (!stack)
+    {
+        return nullptr;
+    }
+
+    // Prepare the start position for the search
+    Grid2d::Position start = pose2Map(stack->getLogicalMap(), fromPose);
+
+    // Prepare the goal position for the search
+    Grid2d::Position goal = pose2Map(stack->getLogicalMap(), toPose);
+
+    return fromSingleGoal(stack, start, goal);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,6 +241,17 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map,
     }
 
     return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+Grid2d::Position Grid2dSolutionFactory::pose2Map(BaseMap* map, Pose<> pose)
+{
+    unsigned int r = 0;
+    unsigned int c = 0;
+    map->transformM2Cells(pose, c, r);
+
+    int orientation = static_cast<int>(AngleMath::normalizeRad2Deg90(pose.theta));
+    return Grid2d::Position(c, r, orientation);
 }
 
 } // namespace srs

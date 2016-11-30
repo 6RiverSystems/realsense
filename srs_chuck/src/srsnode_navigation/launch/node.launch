@@ -18,7 +18,7 @@
         <remap from="/cmd_vel" to="/internal/sensors/odometry/velocity/cmd"/>
         <remap from="/odom" to="/internal/sensors/odometry/velocity/estimate"/>
 
-        <param name="base_global_planner" value="global_planner/SrsPlannerPotentials"/>
+        <param name="base_global_planner" value="global_planner/SrsPlannerConventional"/>
 
         <!-- Move Base -->
         <rosparam file="$(find srsnode_navigation)/config/move_base_params.yaml" command="load" />

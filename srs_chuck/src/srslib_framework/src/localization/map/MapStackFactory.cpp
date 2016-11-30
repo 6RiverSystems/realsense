@@ -38,7 +38,7 @@ MapStack* MapStackFactory::fromJsonFile(string jsonFilename, double loadingTime)
     OccupancyMap* occupancy = analizeOccupancyNode(
         localDirectory, jsonFilename, loadingTime, mapStackDocument);
 
-    return new MapStack(logical, occupancy);
+    return new MapStack(logical, occupancy, nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -15,6 +15,7 @@ set(${PROJECT_NAME}_SOURCES
     src/localization/map/BaseMap.cpp
     src/localization/map/MapAdapter.cpp
     src/localization/map/MapNote.cpp
+    src/localization/map/MapStack.cpp
     src/localization/map/MapStackFactory.cpp
     src/localization/map/logical/LogicalMap.cpp
     src/localization/map/logical/LogicalMapFactory.cpp
@@ -35,6 +36,8 @@ set(${PROJECT_NAME}_SOURCES
     src/search/AStar.cpp
     src/search/graph/grid2d/Grid2dAction.cpp
     src/search/graph/grid2d/Grid2dNode.cpp
+    src/search/graph/mapstack/MapStackAction.cpp
+    src/search/graph/mapstack/MapStackNode.cpp
 
     src/utils/Logging.cpp
 )
@@ -118,13 +121,14 @@ set(TEST_SOURCES_ROS
 )
 
 set(TEST_SOURCES_SEARCH
-    test/search/Test_AStar_6RHQ.cpp
-    test/search/Test_AStar_6rshq_SmallSearch.cpp
-    test/search/Test_AStar_Barrett_BigSearch.cpp
-    test/search/Test_AStar_Basic.cpp
-    test/search/Test_AStar_NoSolution.cpp
-    test/search/Test_AStar_SamePlaceOnMap.cpp
-    test/search/Test_AStar_Weights.cpp
+    test/search/grid2d/Test_AStar_6RHQ.cpp
+    test/search/grid2d/Test_AStar_6rshq_SmallSearch.cpp
+    test/search/grid2d/Test_AStar_Barrett_BigSearch.cpp
+    test/search/grid2d/Test_AStar_Basic.cpp
+    test/search/grid2d/Test_AStar_NoSolution.cpp
+    test/search/grid2d/Test_AStar_SamePlaceOnMap.cpp
+    test/search/grid2d/Test_AStar_Weights.cpp
+    test/search/mapstack/Test_AStar_MapStack_Basic.cpp
 )
 
 set(TEST_SOURCES_IO

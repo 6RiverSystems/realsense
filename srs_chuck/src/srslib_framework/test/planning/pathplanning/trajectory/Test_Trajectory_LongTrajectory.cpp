@@ -70,23 +70,23 @@ TEST(Test_Trajectory, LongTrajectory)
     Grid2dSolutionItem SOLUTION_15 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(9, 5, DEG90), Pose<>(9, 6, DEG90));
 
-    Solution<Grid2dSolutionItem> solution;
-    solution.push_back(SOLUTION_00);
-    solution.push_back(SOLUTION_01);
-    solution.push_back(SOLUTION_02);
-    solution.push_back(SOLUTION_03);
-    solution.push_back(SOLUTION_04);
-    solution.push_back(SOLUTION_05);
-    solution.push_back(SOLUTION_06);
-    solution.push_back(SOLUTION_07);
-    solution.push_back(SOLUTION_08);
-    solution.push_back(SOLUTION_09);
-    solution.push_back(SOLUTION_10);
-    solution.push_back(SOLUTION_11);
-    solution.push_back(SOLUTION_12);
-    solution.push_back(SOLUTION_13);
-    solution.push_back(SOLUTION_14);
-    solution.push_back(SOLUTION_15);
+    Solution<Grid2dSolutionItem>* solution = Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
+    solution->push_back(SOLUTION_00);
+    solution->push_back(SOLUTION_01);
+    solution->push_back(SOLUTION_02);
+    solution->push_back(SOLUTION_03);
+    solution->push_back(SOLUTION_04);
+    solution->push_back(SOLUTION_05);
+    solution->push_back(SOLUTION_06);
+    solution->push_back(SOLUTION_07);
+    solution->push_back(SOLUTION_08);
+    solution->push_back(SOLUTION_09);
+    solution->push_back(SOLUTION_10);
+    solution->push_back(SOLUTION_11);
+    solution->push_back(SOLUTION_12);
+    solution->push_back(SOLUTION_13);
+    solution->push_back(SOLUTION_14);
+    solution->push_back(SOLUTION_15);
 
     ROS_DEBUG_STREAM(solution);
 

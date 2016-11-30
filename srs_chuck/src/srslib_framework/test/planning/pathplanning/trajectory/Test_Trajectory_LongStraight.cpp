@@ -49,16 +49,16 @@ TEST(Test_Trajectory, LongStraight)
     Grid2dSolutionItem SOLUTION_08 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(0, 8, DEG90), Pose<>(0, 9, DEG90));
 
-    Solution<Grid2dSolutionItem> gridSolution;
-    gridSolution.push_back(SOLUTION_00);
-    gridSolution.push_back(SOLUTION_01);
-    gridSolution.push_back(SOLUTION_02);
-    gridSolution.push_back(SOLUTION_03);
-    gridSolution.push_back(SOLUTION_04);
-    gridSolution.push_back(SOLUTION_05);
-    gridSolution.push_back(SOLUTION_06);
-    gridSolution.push_back(SOLUTION_07);
-    gridSolution.push_back(SOLUTION_08);
+    Solution<Grid2dSolutionItem>* gridSolution = Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
+    gridSolution->push_back(SOLUTION_00);
+    gridSolution->push_back(SOLUTION_01);
+    gridSolution->push_back(SOLUTION_02);
+    gridSolution->push_back(SOLUTION_03);
+    gridSolution->push_back(SOLUTION_04);
+    gridSolution->push_back(SOLUTION_05);
+    gridSolution->push_back(SOLUTION_06);
+    gridSolution->push_back(SOLUTION_07);
+    gridSolution->push_back(SOLUTION_08);
 
     ROS_DEBUG_STREAM(gridSolution);
 

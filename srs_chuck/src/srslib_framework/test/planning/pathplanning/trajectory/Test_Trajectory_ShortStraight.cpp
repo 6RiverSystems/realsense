@@ -20,13 +20,13 @@ using namespace srs;
 
 TEST(Test_Trajectory, ShortStraight)
 {
-    Grid2dSolutionItem SOLUTION_00 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
+    Grid2dSolutionItem SOLUTION_00 = Grid2dSolutionItem(
+        Grid2dSolutionItem::MOVE,
         Pose<>(3, 3, 0), Pose<>(3, 4, 0));
 
-    Solution<Grid2dSolutionItem> solution;
-    solution.push_back(SOLUTION_00);
+    Solution<Grid2dSolutionItem>* solution = Solution<Grid2dSolutionItem>::instanceOfValid(SOLUTION_00);
 
-    ROS_DEBUG_STREAM(solution);
+    ROS_DEBUG_STREAM(*solution);
 
     Chuck chuck;
     Trajectory<> trajectory;

@@ -16,12 +16,22 @@ template<typename SOLUTION_ITEM>
 class Solution : public list<SOLUTION_ITEM>
 {
 public:
-    Solution()
-    {}
-
-    Solution(SOLUTION_ITEM firstNode)
+    static Solution<SOLUTION_ITEM>* instanceOfValidEmpty()
     {
-        list<SOLUTION_ITEM>::push_back(firstNode);
+        return new Solution(true);
+    }
+
+    static Solution<SOLUTION_ITEM>* instanceOfInvalidEmpty()
+    {
+        return new Solution(false);
+    }
+
+    static Solution<SOLUTION_ITEM>* instanceOfValid(SOLUTION_ITEM firstNode)
+    {
+        Solution<SOLUTION_ITEM>* solution = new Solution(true);
+        solution->push_back(firstNode);
+
+        return solution;
     }
 
     void append(Solution<SOLUTION_ITEM>* other)
@@ -39,9 +49,19 @@ public:
         return list<SOLUTION_ITEM>::front();
     }
 
+    bool isValid() const
+    {
+        return valid_;
+    }
+
     friend ostream& operator<<(ostream& stream, const Solution& solution)
     {
         return stream << solution.toString();
+    }
+
+    void setValid(bool newValue)
+    {
+        valid_ = newValue;
     }
 
     string toString() const
@@ -60,6 +80,14 @@ public:
 
         return stream.str();
     }
+
+protected:
+    Solution(bool valid) :
+        valid_(valid)
+    {}
+
+private:
+    bool valid_;
 };
 
 } // namespace srs

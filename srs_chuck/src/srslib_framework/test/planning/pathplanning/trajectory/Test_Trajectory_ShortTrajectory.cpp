@@ -37,12 +37,12 @@ TEST(Test_Trajectory, ShortTrajectory)
     Grid2dSolutionItem SOLUTION_04 = Grid2dSolutionItem(Grid2dSolutionItem::MOVE,
         Pose<>(17, 9, DEG180), Pose<>(16, 9, DEG180));
 
-    Solution<Grid2dSolutionItem> solution;
-    solution.push_back(SOLUTION_00);
-    solution.push_back(SOLUTION_01);
-    solution.push_back(SOLUTION_02);
-    solution.push_back(SOLUTION_03);
-    solution.push_back(SOLUTION_04);
+    Solution<Grid2dSolutionItem>* solution = Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
+    solution->push_back(SOLUTION_00);
+    solution->push_back(SOLUTION_01);
+    solution->push_back(SOLUTION_02);
+    solution->push_back(SOLUTION_03);
+    solution->push_back(SOLUTION_04);
 
     ROS_DEBUG_STREAM(solution);
 

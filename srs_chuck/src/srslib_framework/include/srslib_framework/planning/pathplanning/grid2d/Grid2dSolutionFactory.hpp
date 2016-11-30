@@ -37,7 +37,7 @@ struct Grid2dSolutionFactory
 
 private:
     static Solution<Grid2dSolutionItem>* fromSearch(BaseMap* map,
-        AStar::SolutionType& intermediateSolution);
+        AStar::SolutionType& searchSolution);
 
     static Grid2d::Position pose2Map(BaseMap* map, Pose<> pose);
 };

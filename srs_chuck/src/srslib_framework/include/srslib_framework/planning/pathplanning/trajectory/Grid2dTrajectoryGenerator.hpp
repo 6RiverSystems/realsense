@@ -28,12 +28,12 @@ public:
         robot_(robot)
     {}
 
-    void fromSolution(Solution<Grid2dSolutionItem>& solution)
+    void fromSolution(Solution<Grid2dSolutionItem>* solution)
     {
         trajectory_.clear();
         path_.clear();
 
-        if (solution.empty())
+        if (solution->empty())
         {
             return;
         }
@@ -56,19 +56,19 @@ private:
         return BasicMath::sgn<double>(to - from);
     }
 
-    void extractPath(Solution<Grid2dSolutionItem>& solution, PathType& path)
+    void extractPath(Solution<Grid2dSolutionItem>* solution, PathType& path)
     {
         path.clear();
 
         // Push the first node of the solution as initial waypoint
         // only if it not a rotate
-        if (solution.getStart().actionType != Grid2dSolutionItem::ROTATE)
+        if (solution->getStart().actionType != Grid2dSolutionItem::ROTATE)
         {
-            path.push_back(solution.getStart().fromPose);
+            path.push_back(solution->getStart().fromPose);
         }
 
         // Ignore all but the rotations, which will be used as waypoints
-        for (auto solutionNode : solution)
+        for (auto solutionNode : *solution)
         {
             switch (solutionNode.actionType)
             {
@@ -83,9 +83,9 @@ private:
 
         // Push the last node of the solution as final waypoint
         // only if it is not a rotate
-        if (solution.getGoal().actionType != Grid2dSolutionItem::ROTATE)
+        if (solution->getGoal().actionType != Grid2dSolutionItem::ROTATE)
         {
-            path.push_back(solution.getGoal().toPose);
+            path.push_back(solution->getGoal().toPose);
         }
     }
 

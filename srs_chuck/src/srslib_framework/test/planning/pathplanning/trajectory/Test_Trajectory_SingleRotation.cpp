@@ -26,10 +26,9 @@ TEST(Test_Trajectory, SingleRotation)
     Grid2dSolutionItem SOLUTION_00 = Grid2dSolutionItem(Grid2dSolutionItem::ROTATE,
         Pose<>(18, 9, DEG90), Pose<>(18, 9, DEG180));
 
-    Solution<Grid2dSolutionItem> gridSolution;
-    gridSolution.push_back(SOLUTION_00);
+    Solution<Grid2dSolutionItem>* gridSolution = Solution<Grid2dSolutionItem>::instanceOfValid(SOLUTION_00);
 
-    ROS_DEBUG_STREAM(gridSolution);
+    ROS_DEBUG_STREAM(*gridSolution);
 
     Chuck chuck;
     Trajectory<> trajectory;

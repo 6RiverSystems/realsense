@@ -27,8 +27,10 @@ TEST(Test_AStar_Grid2d, 6rshq_NoTrajectory)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 
-    Pose<> start = Pose<>(181.335, 524.097, 0.0189141);
-    Pose<> goal = Pose<>(181.335, 524.097, 0);
+//    Pose<> start = Pose<>(181.335, 524.097, 0.0189141);
+//    Pose<> goal = Pose<>(181.335, 524.097, 0);
+    Pose<> start = Pose<>(3.000, 3.000, 0.0189141);
+    Pose<> goal = Pose<>(3.000, 3.000, 0);
 
     Solution<Grid2dSolutionItem>* solution = Grid2dSolutionFactory::fromSingleGoal(
         mapStack->getLogicalMap(), start, goal);

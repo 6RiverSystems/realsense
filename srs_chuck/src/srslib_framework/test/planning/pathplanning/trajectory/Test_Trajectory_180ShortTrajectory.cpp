@@ -54,17 +54,17 @@ TEST(Test_Trajectory, 180ShortTrajectory)
     Grid2dSolutionItem SOLUTION_09 = Grid2dSolutionItem(Grid2dSolutionItem::ROTATE,
         Pose<>(25, 7, DEG90), Pose<>(26, 7, DEG0));
 
-    Solution<Grid2dSolutionItem> gridSolution;
-    gridSolution.push_back(SOLUTION_00);
-    gridSolution.push_back(SOLUTION_01);
-    gridSolution.push_back(SOLUTION_02);
-    gridSolution.push_back(SOLUTION_03);
-    gridSolution.push_back(SOLUTION_04);
-    gridSolution.push_back(SOLUTION_05);
-    gridSolution.push_back(SOLUTION_06);
-    gridSolution.push_back(SOLUTION_07);
-    gridSolution.push_back(SOLUTION_08);
-    gridSolution.push_back(SOLUTION_09);
+    Solution<Grid2dSolutionItem>* gridSolution = Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
+    gridSolution->push_back(SOLUTION_00);
+    gridSolution->push_back(SOLUTION_01);
+    gridSolution->push_back(SOLUTION_02);
+    gridSolution->push_back(SOLUTION_03);
+    gridSolution->push_back(SOLUTION_04);
+    gridSolution->push_back(SOLUTION_05);
+    gridSolution->push_back(SOLUTION_06);
+    gridSolution->push_back(SOLUTION_07);
+    gridSolution->push_back(SOLUTION_08);
+    gridSolution->push_back(SOLUTION_09);
 
     ROS_DEBUG_STREAM(gridSolution);
 

@@ -18,14 +18,16 @@ namespace srs {
 Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(BaseMap* map,
     Pose<> start, vector<Pose<>> goals)
 {
-    Solution<Grid2dSolutionItem>* globalSolution = new Solution<Grid2dSolutionItem>();
+    Solution<Grid2dSolutionItem>* globalSolution =
+        Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
 
     Pose<> intermediateStart = start;
     for (Pose<> goal : goals)
     {
         Solution<Grid2dSolutionItem>* localSolution = fromSingleGoal(map, intermediateStart, goal);
-        if (localSolution->empty())
+        if (!localSolution->isValid())
         {
+            globalSolution->setValid(false);
             break;
         }
 
@@ -40,14 +42,16 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(BaseMa
 Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(MapStack* stack,
     Pose<> start, vector<Pose<>> goals)
 {
-    Solution<Grid2dSolutionItem>* globalSolution = new Solution<Grid2dSolutionItem>();
+    Solution<Grid2dSolutionItem>* globalSolution =
+        Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
 
     Pose<> intermediateStart = start;
     for (Pose<> goal : goals)
     {
         Solution<Grid2dSolutionItem>* localSolution = fromSingleGoal(stack, intermediateStart, goal);
-        if (localSolution->empty())
+        if (!localSolution->isValid())
         {
+            globalSolution->setValid(false);
             break;
         }
 
@@ -74,12 +78,15 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(BaseMap* map
 
     AStar algorithm;
 
-    algorithm.search(startNode, goalNode);
+    if (algorithm.search(startNode, goalNode))
+    {
+        AStar::SolutionType searchSolution;
+        algorithm.getSolution(searchSolution);
 
-    AStar::SolutionType solution;
-    algorithm.getSolution(solution);
+        return fromSearch(map, searchSolution);
+    }
 
-    return fromSearch(map, solution);
+    return Solution<Grid2dSolutionItem>::instanceOfInvalidEmpty();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,12 +121,15 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* st
 
     AStar algorithm;
 
-    algorithm.search(startNode, goalNode);
+    if (algorithm.search(startNode, goalNode))
+    {
+        AStar::SolutionType searchSolution;
+        algorithm.getSolution(searchSolution);
 
-    AStar::SolutionType solution;
-    algorithm.getSolution(solution);
+        return fromSearch(stack->getLogicalMap(), searchSolution);
+    }
 
-    return fromSearch(stack->getLogicalMap(), solution);
+    return Solution<Grid2dSolutionItem>::instanceOfInvalidEmpty();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,7 +164,7 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromRotation(
     solutionItem.fromPose.theta = AngleMath::normalizeRad(theta0);
     solutionItem.toPose.theta = AngleMath::normalizeRad(thetaf);
 
-    return new Solution<Grid2dSolutionItem>(solutionItem);
+    return Solution<Grid2dSolutionItem>::instanceOfValid(solutionItem);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,21 +172,14 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromRotation(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map,
-    AStar::SolutionType& intermediateSolution)
+    AStar::SolutionType& searchSolution)
 {
     if (!map)
     {
         return nullptr;
     }
 
-    Solution<Grid2dSolutionItem>* result = new Solution<Grid2dSolutionItem>();
-
-    // If no path was found in the previous search,
-    // exit immediately and return an empty solution
-    if (intermediateSolution.empty())
-    {
-        return result;
-    }
+    Solution<Grid2dSolutionItem>* solution = Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
 
     Grid2dSolutionItem solutionItem;
     Pose<> fromPose;
@@ -190,10 +193,10 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map,
     double toY = 0;
     double toTheta = 0;
 
-    AStar::SolutionType::const_iterator fromCursor = intermediateSolution.begin();
+    AStar::SolutionType::const_iterator fromCursor = searchSolution.begin();
     AStar::SolutionType::const_iterator toCursor = next(fromCursor, 1);
 
-    while (toCursor != intermediateSolution.end())
+    while (toCursor != searchSolution.end())
     {
         Grid2dNode* fromNode = reinterpret_cast<Grid2dNode*>(*fromCursor);
         Grid2dNode* toNode = reinterpret_cast<Grid2dNode*>(*toCursor);
@@ -227,20 +230,20 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map,
 
             default:
                 // It should never see a NONE or START
-                throw UnexpectedSearchActionException(intermediateSolution);
+                throw UnexpectedSearchActionException(searchSolution);
         }
 
         solutionItem.fromPose = fromPose;
         solutionItem.toPose = toPose;
         solutionItem.cost = toNode->getG();
 
-        result->push_back(solutionItem);
+        solution->push_back(solutionItem);
 
         fromCursor++;
         toCursor++;
     }
 
-    return result;
+    return solution;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

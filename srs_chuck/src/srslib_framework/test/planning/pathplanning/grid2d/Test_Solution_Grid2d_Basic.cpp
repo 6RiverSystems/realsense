@@ -21,11 +21,11 @@ static constexpr unsigned int GRID_SIZE = 5;
 
 TEST(Test_Solution_Grid2d, BasicEmptyGrid)
 {
-    Solution<Grid2dSolutionItem> correctSolution;
-    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(0, 0, 0), Pose<>(1, 0, 0), 1});
-    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 0, 0), Pose<>(1, 0, M_PI_2), 3});
-    correctSolution.push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 0, M_PI_2), Pose<>(1, 1, M_PI_2), 4});
-    correctSolution.push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 6});
+    Solution<Grid2dSolutionItem>* correctSolution = Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
+    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(0, 0, 0), Pose<>(1, 0, 0), 1});
+    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 0, 0), Pose<>(1, 0, M_PI_2), 3});
+    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 0, M_PI_2), Pose<>(1, 1, M_PI_2), 4});
+    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 6});
 
     Grid2d grid(GRID_SIZE, GRID_SIZE);
 
@@ -43,6 +43,6 @@ TEST(Test_Solution_Grid2d, BasicEmptyGrid)
         "The solution is not as expected";
 
     // The solution agrees with the correct solution
-    ASSERT_EQ(correctSolution, *gridSolution) <<
+    ASSERT_EQ(*correctSolution, *gridSolution) <<
         "The solution is not as expected";
 }

@@ -58,9 +58,6 @@ bool SrsPlannerConventional::makePlan(
 {
     ROS_WARN("SrsPlanner::makePlan() called");
 
-    // Make sure that we get the latest Map Stack
-    updateMapStack(nullptr);
-
     // Find a suitable solution for the provided goal
     Pose<> robotPose = PoseMessageFactory::poseStamped2Pose(start);
     Pose<> target = PoseMessageFactory::poseStamped2Pose(goal);

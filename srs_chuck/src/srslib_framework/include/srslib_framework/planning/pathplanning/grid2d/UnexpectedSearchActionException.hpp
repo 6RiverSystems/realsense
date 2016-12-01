@@ -7,34 +7,17 @@
 
 #include <srslib_framework/exception/SrsRuntimeErrorException.hpp>
 #include <srslib_framework/search/AStar.hpp>
+#include <srslib_framework/search/Plan.hpp>
 
 namespace srs {
 
 class UnexpectedSearchActionException: public SrsRuntimeErrorException
 {
 public:
-    UnexpectedSearchActionException(AStar::SolutionType& solution) :
-        SrsRuntimeErrorException("Unexpected valid search action in this solution " +
-            toString(solution))
+    UnexpectedSearchActionException(Plan& plan) :
+        SrsRuntimeErrorException("Unexpected valid search action in this plan " +
+            plan.toString())
     {}
-
-private:
-    string toString(AStar::SolutionType& solution)
-    {
-        stringstream stream;
-
-        int counter = 0;
-
-        stream << "{" << endl;
-        for (auto node : solution)
-        {
-            stream << setw(4) << counter++ << ": " << node << endl;
-        }
-
-        stream << "}";
-
-        return stream.str();
-    }
 };
 
 } // namespace srs

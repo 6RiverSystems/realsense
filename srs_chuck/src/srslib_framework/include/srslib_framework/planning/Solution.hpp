@@ -64,14 +64,14 @@ public:
         return stream << solution.toString();
     }
 
-    void setValid(bool newValue)
-    {
-        valid_ = newValue;
-    }
-
     void setExploredNodes(unsigned int newValue)
     {
         exploredNodes_ = newValue;
+    }
+
+    void setValid(bool newValue)
+    {
+        valid_ = newValue;
     }
 
     string toString() const

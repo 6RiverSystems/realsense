@@ -21,7 +21,7 @@ struct MapStackNode : public SearchNode
         return instanceOf(stack,
             nullptr, MapStackAction::START,
             position,
-            stack->getTotalCost(position), 0, nullptr);
+            stack->getTotalCost(position, false), 0, nullptr);
     }
 
     static MapStackNode* instanceOf(MapStack* grid,
@@ -39,12 +39,17 @@ struct MapStackNode : public SearchNode
         return g_;
     }
 
+    SearchGoal* getGoal()
+    {
+        return goal_;
+    }
+
     int getH() const
     {
         return h_;
     }
 
-    void getNeighbors(vector<SearchNode*>& neighbors);
+    void getExploredNodes(vector<SearchNode*>& exploredNodes);
 
     SearchNode* getParent()
     {

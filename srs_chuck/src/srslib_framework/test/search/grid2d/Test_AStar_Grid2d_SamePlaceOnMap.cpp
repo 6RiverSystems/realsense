@@ -38,7 +38,7 @@ TEST(Test_AStar_Grid2d, SamePositionOnMap)
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm->search(start, goal)) <<
-        "A solution was not found";
+        "A plan was not found";
 
     ASSERT_EQ(0, algorithm->getOpenNodeCount()) <<
         "Unexpected number of open nodes";
@@ -70,7 +70,7 @@ TEST(Test_AStar_Grid2d, SameLocationOnMap)
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm->search(start, goal)) <<
-        "A solution was not found";
+        "A plan was not found";
 
     ASSERT_EQ(2, algorithm->getOpenNodeCount()) <<
         "Unexpected number of open nodes";

@@ -29,14 +29,10 @@ public:
         START
     };
 
-    typedef pair<Grid2d::Position, Grid2d::BaseType> ActionResultType;
-
-    static array<ActionEnum, 3> ALLOWED_ACTIONS;
-
-    static bool execute(MapStack* stack, MapStackNode* fromNode, ActionEnum action,
-        ActionResultType& result);
-
-    static bool isCostAvailable(int& cost);
+    static MapStackNode* exploreBackward(MapStack* stack, MapStackNode* fromNode);
+    static MapStackNode* exploreForward(MapStack* stack, MapStackNode* fromNode);
+    static MapStackNode* exploreRotation(MapStack* stack, MapStackNode* fromNode,
+        ActionEnum action, int angle);
 
     friend ostream& operator<<(ostream& stream, const ActionEnum& action)
     {
@@ -48,14 +44,6 @@ private:
 
     static unordered_map<int, string> ENUM_NAMES;
     static const int COMMAND_COSTS[ActionEnum::START + 1];
-
-    static bool addBackward(MapStack* stack, MapStackNode* fromNode,
-        ActionResultType& result);
-    static bool addForward(MapStack* stack, MapStackNode* fromNode,
-        ActionResultType& result);
-    static bool addRotation(MapStack* stack, MapStackNode* fromNode,
-        ActionEnum action, int angle,
-        ActionResultType& result);
 };
 
 } // namespace srs

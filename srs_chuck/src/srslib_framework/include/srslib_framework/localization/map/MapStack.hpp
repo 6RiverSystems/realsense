@@ -30,8 +30,8 @@ public:
     LogicalMap* getLogicalMap() const;
     bool getNeighbor(const Grid2d::Position& position, Grid2d::Position& result) const;
     OccupancyMap* getOccupancyMap() const;
-    int getTotalCost(const Grid2d::Position& position) const;
-    Grid2d::BaseType getWeight(const Grid2d::Position& position) const;
+    int getTotalCost(const Grid2d::Position& position, bool allowUnknown) const;
+    int getWeight(const Grid2d::Position& position) const;
 
 private:
     LogicalMap* logical_;

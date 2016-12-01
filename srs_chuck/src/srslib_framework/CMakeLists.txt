@@ -98,7 +98,7 @@ set(TEST_SOURCES_MATH
 set(TEST_SOURCES_PLANNING
     test/planning/pathplanning/grid2d/Test_Solution_Grid2d_Basic.cpp
     test/planning/pathplanning/grid2d/Test_Solution_Grid2d_Empty_Consecutive.cpp
-    test/planning/pathplanning/mapstack/Test_Solution_MapStack_Basic.cpp
+    test/planning/pathplanning/grid2d/Test_Solution_MapStack_Basic.cpp
     test/planning/pathplanning/trajectory/Test_Trajectory_180ShortTrajectory.cpp
     test/planning/pathplanning/trajectory/Test_Trajectory_LongStraight.cpp
     test/planning/pathplanning/trajectory/Test_Trajectory_LongTrajectory.cpp
@@ -130,6 +130,9 @@ set(TEST_SOURCES_SEARCH
     test/search/grid2d/Test_AStar_Grid2d_Weights.cpp
     test/search/mapstack/Test_AStar_MapStack_Barrett_BigSearch.cpp
     test/search/mapstack/Test_AStar_MapStack_Basic.cpp
+    test/search/mapstack/Test_AStar_MapStack_NoSolution.cpp
+    test/search/mapstack/Test_AStar_MapStack_SamePlaceOnMap.cpp
+    test/search/mapstack/Test_AStar_MapStack_Weights.cpp
 )
 
 set(TEST_SOURCES_IO

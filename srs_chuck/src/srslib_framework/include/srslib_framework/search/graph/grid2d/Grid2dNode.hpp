@@ -53,7 +53,7 @@ struct Grid2dNode : public SearchNode
         return h_;
     }
 
-    void getNeighbors(vector<SearchNode*>& neighbors);
+    void getExploredNodes(vector<SearchNode*>& exploredNodes);
 
     SearchNode* getParent()
     {

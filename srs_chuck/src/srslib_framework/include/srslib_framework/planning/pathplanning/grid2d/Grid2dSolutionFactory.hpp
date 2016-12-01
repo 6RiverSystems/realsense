@@ -15,6 +15,7 @@ using namespace std;
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/search/AStar.hpp>
+#include <srslib_framework/search/Plan.hpp>
 
 namespace srs {
 
@@ -37,7 +38,7 @@ struct Grid2dSolutionFactory
 
 private:
     static Solution<Grid2dSolutionItem>* fromSearch(BaseMap* map,
-        AStar::SolutionType& searchSolution);
+        Plan& plan);
 
     static Grid2d::Position pose2Map(BaseMap* map, Pose<> pose);
 };

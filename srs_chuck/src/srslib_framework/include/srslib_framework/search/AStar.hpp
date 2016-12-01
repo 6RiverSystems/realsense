@@ -12,6 +12,7 @@
 using namespace std;
 
 #include <srslib_framework/datastructure/queue/MappedPriorityQueue.hpp>
+#include <srslib_framework/search/Plan.hpp>
 #include <srslib_framework/search/SearchNode.hpp>
 
 namespace srs {
@@ -19,8 +20,6 @@ namespace srs {
 class AStar
 {
 public:
-    typedef list<SearchNode*> SolutionType;
-
     AStar() :
         lastNode_(nullptr),
         startNode_(nullptr)
@@ -33,17 +32,17 @@ public:
 
     void clear();
 
-    unsigned int getClosedNodeCount() const
+    unsigned int getClosedNodesCount() const
     {
-        return closed_.size();
+        return closedSet_.size();
     }
 
-    unsigned int getOpenNodeCount() const
+    unsigned int getOpenNodesCount() const
     {
-        return open_.size();
+        return openQueue_.size();
     }
 
-    void getSolution(SolutionType& solution);
+    void getPlan(Plan& plan);
 
     bool hasSolution() const
     {
@@ -53,19 +52,18 @@ public:
     bool search(SearchNode* start, SearchGoal* goal);
 
 private:
-    typedef unordered_set<SearchNode*,
-        SearchNode::Hash, SearchNode::EqualTo> ClosedSetType;
-    typedef MappedPriorityQueue<SearchNode*, unsigned int,
-        SearchNode::Hash, SearchNode::EqualTo> OpenSetType;
+    using ClosedSetType = unordered_set<SearchNode*, SearchNode::Hash, SearchNode::EqualTo>;
+    using OpenSetType = MappedPriorityQueue<SearchNode*, unsigned int,
+        SearchNode::Hash, SearchNode::EqualTo>;
 
     void pushNodes(vector<SearchNode*>& nodes);
 
-    ClosedSetType closed_;
+    ClosedSetType closedSet_;
 
     SearchNode* startNode_;
     SearchNode* lastNode_;
 
-    OpenSetType open_;
+    OpenSetType openQueue_;
 };
 
 } // namespace srs

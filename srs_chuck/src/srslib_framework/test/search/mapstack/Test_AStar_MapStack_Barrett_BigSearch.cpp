@@ -19,7 +19,7 @@ using namespace std;
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
 using namespace srs;
 
-static const int TRIALS = 100;
+static const int TRIALS = 10;
 
 TEST(Test_AStar_MapStack, Barrett_BigSearch)
 {
@@ -38,7 +38,7 @@ TEST(Test_AStar_MapStack, Barrett_BigSearch)
 
     StopWatch timer;
     ASSERT_TRUE(algorithm.search(start, goal)) <<
-        "A solution was not found";
+        "A plan was not found";
 
     int trials = TRIALS;
     while (--trials > 0)

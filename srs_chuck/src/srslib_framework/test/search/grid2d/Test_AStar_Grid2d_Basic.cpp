@@ -32,7 +32,7 @@ TEST(Test_AStar_Grid2d, SmallSearchOnEmptyGrid)
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
-        "A solution was not found";
+        "A plan was not found";
 
     ASSERT_EQ(14, algorithm.getOpenNodeCount()) <<
         "Unexpected number of open nodes";
@@ -53,7 +53,7 @@ TEST(Test_AStar_Grid2d, Corner2CornerSearchOnEmptyGrid)
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
-        "A solution was not found";
+        "A plan was not found";
 
     ASSERT_EQ(44, algorithm.getOpenNodeCount()) <<
         "Unexpected number of open nodes";
@@ -76,7 +76,7 @@ TEST(Test_AStar_Grid2d, SearchAroundObstacle)
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
-        "A solution was not found";
+        "A plan was not found";
 
     ASSERT_EQ(17, algorithm.getOpenNodeCount()) <<
         "Unexpected number of open nodes";
@@ -97,7 +97,7 @@ TEST(Test_AStar_Grid2d, Clear)
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
-        "A solution was not found";
+        "A plan was not found";
 
     ASSERT_EQ(14, algorithm.getOpenNodeCount()) <<
         "Unexpected number of open nodes";
@@ -114,7 +114,7 @@ TEST(Test_AStar_Grid2d, Clear)
         "Unexpected number of closed nodes";
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
-        "A solution was not found";
+        "A plan was not found";
 
     ASSERT_EQ(12, algorithm.getOpenNodeCount()) <<
         "Unexpected number of open nodes";
@@ -140,7 +140,7 @@ TEST(Test_AStar_Grid2d, MemoryLeaks)
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm->search(start, goal)) <<
-        "A solution was not found";
+        "A plan was not found";
 
     ASSERT_EQ(14, algorithm->getOpenNodeCount()) <<
         "Unexpected number of open nodes";

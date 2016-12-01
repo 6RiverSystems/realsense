@@ -21,7 +21,7 @@ set(${PROJECT_NAME}_TEST_SOURCES
 
 #    test/TestNavigation_OneWay.cpp
 #    test/TestNavigation_WithCostMap.cpp
-#    test/TestNavigation_Barrett_BigSearch.cpp
+    test/TestNavigation_Barrett_BigSearch.cpp
     test/TestNavigation_SmallSearch.cpp
 )
 
@@ -33,7 +33,7 @@ project(${PROJECT_NAME})
 set(PROJECT_NODE ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
-set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp

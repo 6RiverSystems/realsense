@@ -1,5 +1,7 @@
 #include <srslib_framework/localization/map/MapStack.hpp>
 
+#include <costmap_2d/cost_values.h>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,27 +47,43 @@ OccupancyMap* MapStack::getOccupancyMap() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-int MapStack::getTotalCost(const Grid2d::Position& position) const
+int MapStack::getTotalCost(const Grid2d::Position& position, bool allowUnknown) const
 {
     int cost = 0;
 
     if (logical_)
     {
-        logical_->getGrid()->getPayload(position);
+        cost = logical_->getGrid()->getPayload(position);
+        if (cost == Grid2d::PAYLOAD_NO_INFORMATION)
+        {
+            cost = 0;
+        }
     }
 
+    int costMap2d = 0;
     if (costMap2d_)
     {
-        cost += costMap2d_->getCost(position.x, position.y);
+        costMap2d = costMap2d_->getCost(position.x, position.y);
+        if (!allowUnknown && costMap2d == costmap_2d::NO_INFORMATION)
+        {
+            return Grid2d::PAYLOAD_MAX;
+        }
     }
 
-    return cost;
+    return cost + costMap2d;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2d::BaseType MapStack::getWeight(const Grid2d::Position& position) const
+int MapStack::getWeight(const Grid2d::Position& position) const
 {
-    return logical_->getGrid()->getWeight(position);
+    int cost = logical_->getGrid()->getWeight(position);
+
+    if (cost == Grid2d::WEIGHT_NO_INFORMATION)
+    {
+        cost = 0;
+    }
+
+    return cost;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

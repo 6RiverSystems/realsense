@@ -37,7 +37,7 @@ TEST(Test_Navigation, Barrett_BigSearch)
 
     ASSERT_TRUE(astar.calculatePath(AStarPotentials::SearchParameters(),
             13.804, 4.478, 32.679, 87.743, path, potentials)) <<
-        "A solution was not found";
+        "A plan was not found";
 
     StopWatch timer;
 
@@ -48,8 +48,8 @@ TEST(Test_Navigation, Barrett_BigSearch)
             13.804, 4.478, 32.679, 87.743, path, potentials);
     }
 
-    float elapsed = timer.elapsed();
+    float elapsed = timer.elapsedMicroseconds();
 
-    cout << "Elapsed time: " << elapsed << "s" << endl;
-    cout << "Average time: " << elapsed / TRIALS << "s" << endl;
+    cout << "Elapsed time: " << elapsed << "us" << endl;
+    cout << "Average time: " << elapsed / TRIALS << "us" << endl;
 }

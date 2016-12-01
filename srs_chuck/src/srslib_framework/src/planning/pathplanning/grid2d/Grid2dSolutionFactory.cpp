@@ -92,13 +92,10 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(BaseMap* map
 
     if (algorithm.search(startNode, goalNode))
     {
-        AStar::SolutionType searchSolution;
-        algorithm.getSolution(searchSolution);
+        Plan plan;
+        algorithm.getPlan(plan);
 
-        Solution<Grid2dSolutionItem>* solution = fromSearch(map, searchSolution);
-        solution->setExploredNodes(algorithm.getClosedNodeCount() + algorithm.getOpenNodeCount());
-
-        return solution;
+        return fromSearch(map, plan);
     }
 
     return Solution<Grid2dSolutionItem>::instanceOfInvalidEmpty();
@@ -138,13 +135,10 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* st
 
     if (algorithm.search(startNode, goalNode))
     {
-        AStar::SolutionType searchSolution;
-        algorithm.getSolution(searchSolution);
+        Plan plan;
+        algorithm.getPlan(plan);
 
-        Solution<Grid2dSolutionItem>* solution = fromSearch(stack->getLogicalMap(), searchSolution);
-        solution->setExploredNodes(algorithm.getClosedNodeCount() + algorithm.getOpenNodeCount());
-
-        return solution;
+        return fromSearch(stack->getLogicalMap(), plan);
     }
 
     return Solution<Grid2dSolutionItem>::instanceOfInvalidEmpty();
@@ -189,8 +183,7 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromRotation(
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map,
-    AStar::SolutionType& searchSolution)
+Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map, Plan& plan)
 {
     if (!map)
     {
@@ -198,6 +191,7 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map,
     }
 
     Solution<Grid2dSolutionItem>* solution = Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
+    solution->setExploredNodes(plan.getClosedNodesCount() + plan.getOpenNodesCount());
 
     Grid2dSolutionItem solutionItem;
     Pose<> fromPose;
@@ -211,10 +205,10 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map,
     double toY = 0;
     double toTheta = 0;
 
-    AStar::SolutionType::const_iterator fromCursor = searchSolution.begin();
-    AStar::SolutionType::const_iterator toCursor = next(fromCursor, 1);
+    Plan::const_iterator fromCursor = plan.begin();
+    Plan::const_iterator toCursor = next(fromCursor, 1);
 
-    while (toCursor != searchSolution.end())
+    while (toCursor != plan.end())
     {
         Grid2dNode* fromNode = reinterpret_cast<Grid2dNode*>(*fromCursor);
         Grid2dNode* toNode = reinterpret_cast<Grid2dNode*>(*toCursor);
@@ -248,7 +242,7 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map,
 
             default:
                 // It should never see a NONE or START
-                throw UnexpectedSearchActionException(searchSolution);
+                throw UnexpectedSearchActionException(plan);
         }
 
         solutionItem.fromPose = fromPose;

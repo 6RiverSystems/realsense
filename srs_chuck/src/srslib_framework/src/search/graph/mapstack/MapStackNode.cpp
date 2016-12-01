@@ -18,29 +18,27 @@ MapStackNode* MapStackNode::instanceOf(MapStack* stack,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MapStackNode::getNeighbors(vector<SearchNode*>& neighbors)
+void MapStackNode::getExploredNodes(vector<SearchNode*>& exploredNodes)
 {
-    MapStackAction::ActionResultType actionResult;
-
-    for (MapStackAction::ActionEnum action : MapStackAction::ALLOWED_ACTIONS)
+    // Find if the next action is allowed
+    MapStackNode* neighborNode = MapStackAction::exploreForward(stack_, this);
+    if (neighborNode)
     {
-        // Find if the next action is allowed
-        if (MapStackAction::execute(stack_, this, action, actionResult))
-        {
-            // Create a neighbor node with all the relative data
-            MapStackNode* neighborNode = MapStackNode::instanceOf(
-                stack_,
-                this, action,
-                actionResult.first, static_cast<int>(actionResult.second), 0,
-                goal_);
+        exploredNodes.push_back(neighborNode);
+    }
 
-            // Finally, calculate the heuristic function value
-            // from this node to the goal
-            neighborNode->h_ = goal_->heuristic(neighborNode);
+    // Find if the next action is allowed
+    neighborNode = MapStackAction::exploreRotation(stack_, this, MapStackAction::ROTATE_N90, -90);
+    if (neighborNode)
+    {
+        exploredNodes.push_back(neighborNode);
+    }
 
-            // Store it in the
-            neighbors.push_back(neighborNode);
-        }
+    // Find if the next action is allowed
+    neighborNode = MapStackAction::exploreRotation(stack_, this, MapStackAction::ROTATE_P90, +90);
+    if (neighborNode)
+    {
+        exploredNodes.push_back(neighborNode);
     }
 }
 

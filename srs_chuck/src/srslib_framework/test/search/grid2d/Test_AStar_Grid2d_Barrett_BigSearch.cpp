@@ -19,7 +19,7 @@ using namespace std;
 #include <srslib_framework/search/graph/grid2d/Grid2dSingleGoal.hpp>
 using namespace srs;
 
-static const int TRIALS = 100;
+static const int TRIALS = 10;
 
 TEST(Test_AStar_Grid2d, Barrett_BigSearch)
 {
@@ -38,7 +38,7 @@ TEST(Test_AStar_Grid2d, Barrett_BigSearch)
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
-        "A solution was not found";
+        "A plan was not found";
 
     StopWatch timer;
 

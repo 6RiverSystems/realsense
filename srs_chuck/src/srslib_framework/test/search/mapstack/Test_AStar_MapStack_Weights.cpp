@@ -43,7 +43,7 @@ TEST(Test_AStar_MapStack, SmallSearchWithWeights)
     grid.setWeights(Grid2d::Location(2, 1), 0, 0, 0, 100);
     grid.setWeights(Grid2d::Location(3, 1), 0, 0, 0, 100);
 
-    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, Pose<>::ZERO);
+    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
 
     Grid2d::Position start(3, 1, 0);
     Grid2d::Position goal(1, 1, 0);
@@ -80,7 +80,7 @@ TEST(Test_AStar_MapStack, WeightsAndThisWalls)
     test::Grid2dUtils::addObstacle(grid, 3, 0, 3, 0);
     test::Grid2dUtils::addObstacle(grid, 3, 2, 3, 4);
 
-    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, Pose<>::ZERO);
+    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
 
     Grid2d::Position start(Grid2d::Location(3, 1), 0);
     Grid2d::Position goal(Grid2d::Location(1, 1), 0);
@@ -115,7 +115,7 @@ TEST(Test_AStar_MapStack, WeightsAndThickWalls)
     test::Grid2dUtils::addObstacle(grid, 3, 0, 3, 0);
     test::Grid2dUtils::addObstacle(grid, 3, 2, 3, 4);
 
-    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, Pose<>::ZERO);
+    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
 
     Grid2d::Position start(Grid2d::Location(3, 1), 0);
     Grid2d::Position goal(Grid2d::Location(1, 1), 0);

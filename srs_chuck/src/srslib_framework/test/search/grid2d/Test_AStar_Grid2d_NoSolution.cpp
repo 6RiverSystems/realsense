@@ -36,10 +36,10 @@ TEST(Test_AStar_Grid2d, NoSolution)
     ASSERT_FALSE(algorithm.search(start, goal)) <<
         "A solution was found";
 
-    ASSERT_EQ(0, algorithm.getOpenNodeCount()) <<
+    ASSERT_EQ(0, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(4, algorithm.getClosedNodeCount()) <<
+    ASSERT_EQ(4, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 }
 
@@ -59,10 +59,10 @@ TEST(Test_AStar_Grid2d, ForbiddenGoal)
     ASSERT_FALSE(algorithm.search(start, goal)) <<
         "A solution was found";
 
-    ASSERT_EQ(0, algorithm.getOpenNodeCount()) <<
+    ASSERT_EQ(0, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(20, algorithm.getClosedNodeCount()) <<
+    ASSERT_EQ(20, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 }
 
@@ -82,9 +82,9 @@ TEST(Test_AStar_Grid2d, UnreachableGoal)
     ASSERT_FALSE(algorithm.search(start, goal)) <<
         "A solution was found";
 
-    ASSERT_EQ(0, algorithm.getOpenNodeCount()) <<
+    ASSERT_EQ(0, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(40, algorithm.getClosedNodeCount()) <<
+    ASSERT_EQ(40, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 }

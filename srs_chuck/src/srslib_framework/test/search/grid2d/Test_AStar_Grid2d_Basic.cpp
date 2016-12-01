@@ -34,10 +34,10 @@ TEST(Test_AStar_Grid2d, SmallSearchOnEmptyGrid)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(14, algorithm.getOpenNodeCount()) <<
+    ASSERT_EQ(14, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(16, algorithm.getClosedNodeCount()) <<
+    ASSERT_EQ(16, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 }
 
@@ -55,10 +55,10 @@ TEST(Test_AStar_Grid2d, Corner2CornerSearchOnEmptyGrid)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(44, algorithm.getOpenNodeCount()) <<
+    ASSERT_EQ(44, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(37, algorithm.getClosedNodeCount()) <<
+    ASSERT_EQ(37, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 }
 
@@ -78,10 +78,10 @@ TEST(Test_AStar_Grid2d, SearchAroundObstacle)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(17, algorithm.getOpenNodeCount()) <<
+    ASSERT_EQ(17, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(30, algorithm.getClosedNodeCount()) <<
+    ASSERT_EQ(30, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 }
 
@@ -99,27 +99,27 @@ TEST(Test_AStar_Grid2d, Clear)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(14, algorithm.getOpenNodeCount()) <<
+    ASSERT_EQ(14, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(16, algorithm.getClosedNodeCount()) <<
+    ASSERT_EQ(16, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 
     algorithm.clear();
 
-    ASSERT_EQ(0, algorithm.getOpenNodeCount()) <<
+    ASSERT_EQ(0, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(0, algorithm.getClosedNodeCount()) <<
+    ASSERT_EQ(0, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(12, algorithm.getOpenNodeCount()) <<
+    ASSERT_EQ(12, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(15, algorithm.getClosedNodeCount()) <<
+    ASSERT_EQ(15, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 
     start->release();
@@ -142,10 +142,10 @@ TEST(Test_AStar_Grid2d, MemoryLeaks)
     ASSERT_TRUE(algorithm->search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(14, algorithm->getOpenNodeCount()) <<
+    ASSERT_EQ(14, algorithm->getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(16, algorithm->getClosedNodeCount()) <<
+    ASSERT_EQ(16, algorithm->getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 
     algorithm->clear();

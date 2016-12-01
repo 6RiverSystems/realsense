@@ -27,7 +27,7 @@ class SrsPlannerConventional : public nav_core::BaseGlobalPlanner
 public:
     SrsPlannerConventional();
     SrsPlannerConventional(string name, costmap_2d::Costmap2DROS* rosCostMap);
-    virtual ~SrsPlanner();
+    virtual ~SrsPlannerConventional();
 
     void initialize(string name, costmap_2d::Costmap2DROS* rosCostMap);
 

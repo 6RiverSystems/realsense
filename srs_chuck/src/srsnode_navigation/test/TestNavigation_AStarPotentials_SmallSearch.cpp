@@ -20,7 +20,7 @@ using namespace srs;
 
 constexpr int GRID_SIZE = 15;
 
-TEST(Test_Navigation, SmallSearch)
+TEST(Test_Navigation_AStarPotentials, SmallSearch)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     //test::Grid2dUtils::addObstacle(grid, 4, 7, 8, 7);

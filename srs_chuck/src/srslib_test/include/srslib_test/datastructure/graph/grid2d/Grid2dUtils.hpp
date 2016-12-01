@@ -85,19 +85,18 @@ struct Grid2dUtils
         } while (r != (yf + deltaY));
     }
 
-    static MapStack* grid2d2MapStack(Grid2d* grid, const Pose<> origin)
+    static MapStack* grid2d2MapStack(Grid2d* grid, double resolution, Pose<> origin)
     {
         LogicalMapFactory logicalMapFactory;
-        LogicalMap* logical = logicalMapFactory.fromGrid2d(grid, 1, origin);
+        LogicalMap* logical = logicalMapFactory.fromGrid2d(grid, resolution, origin);
 
         OccupancyMapFactory occupancyMapFactory;
-        OccupancyMap* occupancy = occupancyMapFactory.fromGrid2d(grid, 1, origin);
+        OccupancyMap* occupancy = occupancyMapFactory.fromGrid2d(grid, resolution, origin);
 
         costmap_2d::Costmap2D* costMap2d = MapAdapter::map2CostMap2D(occupancy);
 
         return new MapStack(logical, occupancy, costMap2d);
     }
-
 };
 
 } // namespace test

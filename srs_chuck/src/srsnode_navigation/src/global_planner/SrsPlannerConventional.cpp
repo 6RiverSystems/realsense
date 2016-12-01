@@ -1,12 +1,12 @@
-#include <srsnode_navigation/global_planner/SrsPlanner.hpp>
+#include <srsnode_navigation/global_planner/SrsPlannerConventional.hpp>
 
 #include <pluginlib/class_list_macros.h>
 
 PLUGINLIB_EXPORT_CLASS(srs::SrsPlannerConventional, nav_core::BaseGlobalPlanner)
 
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
-#include <srslib_framework/robotics/Trajectory.hpp>
+#include <srslib_framework/planning/pathplanning/trajectory/SimpleTrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/trajectory/Trajectory.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
@@ -66,23 +66,23 @@ bool SrsPlannerConventional::makePlan(
     Pose<> target = PoseMessageFactory::poseStamped2Pose(goal);
 
     Solution<Grid2dSolutionItem>* solution = Grid2dSolutionFactory::fromSingleGoal(
-        srsMapStack_->getLogicalMap(), robotPose, target);
+        srsMapStack_, robotPose, target);
 
     plan.clear();
 
-    if (solution && !solution->empty())
+    if (solution && solution->isValid())
     {
         ROS_DEBUG_STREAM_NAMED("srs_planner", "Found solution: " << endl << *solution);
-
-        Trajectory<> trajectory;
 
         // Calculate the trajectory from the solution found by A*,
         // using the default Chuck model
 
         // TODO: Remove this assumption
         Chuck chuck;
-        Grid2dTrajectoryGenerator converter(chuck);
-        converter.fromSolution(*solution);
+        SimpleTrajectoryGenerator converter(srsMapStack_);
+        converter.fromSolution(solution);
+
+        Trajectory<> trajectory;
         converter.getTrajectory(trajectory);
 
         ROS_DEBUG_STREAM_NAMED("srs_planner", "Trajectory: " << trajectory);

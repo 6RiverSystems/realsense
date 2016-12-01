@@ -28,7 +28,7 @@ TEST(Test_AStar_MapStack, NoSolution)
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     test::Grid2dUtils::addObstacle(grid, 0, 0, GRID_SIZE - 1, GRID_SIZE - 1);
 
-    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, Pose<>::ZERO);
+    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
 
     AStar algorithm;
 
@@ -52,7 +52,7 @@ TEST(Test_AStar_MapStack, ForbiddenGoal)
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     test::Grid2dUtils::addObstacle(grid, 1, 0, GRID_SIZE - 1, GRID_SIZE - 1);
 
-    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, Pose<>::ZERO);
+    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
 
     AStar algorithm;
 
@@ -76,7 +76,7 @@ TEST(Test_AStar_MapStack, UnreachableGoal)
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     test::Grid2dUtils::addObstacle(grid, 2, 0, 2, GRID_SIZE - 1);
 
-    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, Pose<>::ZERO);
+    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
 
     AStar algorithm;
 

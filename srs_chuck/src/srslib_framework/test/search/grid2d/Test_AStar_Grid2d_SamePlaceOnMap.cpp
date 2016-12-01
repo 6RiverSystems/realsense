@@ -40,10 +40,10 @@ TEST(Test_AStar_Grid2d, SamePositionOnMap)
     ASSERT_TRUE(algorithm->search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(0, algorithm->getOpenNodeCount()) <<
+    ASSERT_EQ(0, algorithm->getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(1, algorithm->getClosedNodeCount()) <<
+    ASSERT_EQ(1, algorithm->getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 
     algorithm->clear();
@@ -72,10 +72,10 @@ TEST(Test_AStar_Grid2d, SameLocationOnMap)
     ASSERT_TRUE(algorithm->search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(2, algorithm->getOpenNodeCount()) <<
+    ASSERT_EQ(2, algorithm->getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(2, algorithm->getClosedNodeCount()) <<
+    ASSERT_EQ(2, algorithm->getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 
     algorithm->clear();

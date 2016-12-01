@@ -18,6 +18,7 @@ using namespace std;
 #include <base_local_planner/costmap_model.h>
 
 #include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/ros/channel/ChannelRosPath.hpp>
 #include <srslib_framework/ros/tap/TapMapStack.hpp>
 
 namespace srs {
@@ -31,15 +32,21 @@ public:
 
     void initialize(string name, costmap_2d::Costmap2DROS* rosCostMap);
 
-    bool makePlan(
-        const geometry_msgs::PoseStamped& start,
+    bool makePlan(const geometry_msgs::PoseStamped& start,
         const geometry_msgs::PoseStamped& goal,
         vector<geometry_msgs::PoseStamped>& plan);
 
 private:
     void initializeParams();
 
+    void populatePath(const geometry_msgs::PoseStamped& start,
+        const Trajectory<>& trajectory,
+        const geometry_msgs::PoseStamped& goal,
+        vector<geometry_msgs::PoseStamped>& plan);
+
     void updateMapStack(costmap_2d::Costmap2DROS* rosCostMap);
+
+    ChannelRosPath channelRosPath_;
 
     MapStack* srsMapStack_;
 

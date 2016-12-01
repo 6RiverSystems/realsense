@@ -87,26 +87,8 @@ bool SrsPlannerConventional::makePlan(
 
         ROS_DEBUG_STREAM_NAMED("srs_planner", "Trajectory: " << trajectory);
 
-        plan.push_back(start);
-        for (auto element : trajectory)
-        {
-            Pose<> currentPose = element.first;
-
-            // Create the stamped pose and the quaternion for the
-            // trajectory step
-            tf::Quaternion quaternion = tf::createQuaternionFromYaw(currentPose.theta);
-            geometry_msgs::PoseStamped step = PoseMessageFactory::pose2PoseStamped(currentPose);
-
-            step.pose.position.x = currentPose.x;
-            step.pose.position.y = currentPose.y;
-            step.pose.orientation.x = quaternion.x();
-            step.pose.orientation.y = quaternion.y();
-            step.pose.orientation.z = quaternion.z();
-            step.pose.orientation.w = quaternion.w();
-
-            plan.push_back(step);
-        }
-        plan.push_back(goal);
+        channelRosPath_.publish(trajectory);
+        populatePath(start, trajectory, goal, plan);
 
         return true;
     }
@@ -122,6 +104,35 @@ void SrsPlannerConventional::initializeParams()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void SrsPlannerConventional::populatePath(const geometry_msgs::PoseStamped& start,
+    const Trajectory<>& trajectory,
+    const geometry_msgs::PoseStamped& goal,
+    vector<geometry_msgs::PoseStamped>& plan)
+{
+    plan.push_back(start);
+
+    for (auto waypoint : trajectory)
+    {
+        Pose<> currentPose = waypoint.first;
+
+        // Create the stamped pose and the quaternion for the
+        // trajectory step
+        tf::Quaternion quaternion = tf::createQuaternionFromYaw(currentPose.theta);
+        geometry_msgs::PoseStamped step = PoseMessageFactory::pose2PoseStamped(currentPose);
+
+        step.pose.position.x = currentPose.x;
+        step.pose.position.y = currentPose.y;
+        step.pose.orientation.x = quaternion.x();
+        step.pose.orientation.y = quaternion.y();
+        step.pose.orientation.z = quaternion.z();
+        step.pose.orientation.w = quaternion.w();
+
+        plan.push_back(step);
+    }
+
+    plan.push_back(goal);
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlannerConventional::updateMapStack(costmap_2d::Costmap2DROS* rosCostMap)
 {

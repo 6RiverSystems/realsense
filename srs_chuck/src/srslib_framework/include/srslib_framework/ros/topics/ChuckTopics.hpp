@@ -44,6 +44,7 @@ namespace internal {
     static const string MAP_ROS_LOGICAL = "/internal/state/map/ros_logical";
     static const string MAP_ROS_METADATA = "/internal/state/map/ros_metadata";
     static const string MAP_ROS_OCCUPANCY = "/internal/state/map/ros_occupancy";
+    static const string MAP_ROS_PATH = "/internal/state/map/ros_path";
     static const string MAP_ROS_WEIGHTS_EAST = "/internal/state/map/weights_east";
     static const string MAP_ROS_WEIGHTS_NORTH = "/internal/state/map/weights_north";
     static const string MAP_ROS_WEIGHTS_SOUTH = "/internal/state/map/weights_south";

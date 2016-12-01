@@ -145,7 +145,11 @@ void SrsPlannerConventional::updateMapStack(costmap_2d::Costmap2DROS* rosCostMap
         srsMapStack_ = tapMapStack_.pop();
     }
 
-    // TODO: Sync the obstruction map in the stack with the new rosCostMap
+    // Include the ROS costmap in the map stack
+    if (rosCostMap && srsMapStack_)
+    {
+        srsMapStack_->setCostMap2d(rosCostMap->getCostmap());
+    }
 }
 
 } // namespace srs

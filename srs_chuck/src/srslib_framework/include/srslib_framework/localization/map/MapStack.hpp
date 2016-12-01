@@ -33,6 +33,8 @@ public:
     int getTotalCost(const Grid2d::Position& position, bool allowUnknown) const;
     int getWeight(const Grid2d::Position& position) const;
 
+    void setCostMap2d(costmap_2d::Costmap2D* costMap2d);
+
 private:
     LogicalMap* logical_;
     OccupancyMap* occupancy_;

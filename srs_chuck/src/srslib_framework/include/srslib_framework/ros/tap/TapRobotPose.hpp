@@ -10,6 +10,7 @@
 #include <tf/transform_listener.h>
 
 #include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 #include <srslib_framework/ros/tap/subscriber/SingleDataSource.hpp>
 #include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 
@@ -56,10 +57,7 @@ private:
             tfListener_.lookupTransform(ChuckTransforms::MAP, ChuckTransforms::BASE_FOOTPRINT,
                 ros::Time(0), robotTransform);
 
-            tf::Vector3 location = robotTransform.getOrigin();
-            tf::Quaternion orientation = robotTransform.getRotation();
-
-            data_ = Pose<>(location.getX(), location.getY(), tf::getYaw(orientation));
+            data_ = PoseMessageFactory::transform2Pose(robotTransform);
 
             ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "tap_robot_pose", "Robot pose" << data_);
         }

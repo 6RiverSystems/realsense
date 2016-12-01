@@ -4,6 +4,7 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #include <gtest/gtest.h>
+#include <ros/ros.h>
 #include <iostream>
 #include <srsnode_midbrain/HardStopReflex.hpp>
 
@@ -11,6 +12,8 @@ namespace srs {
 
 HardStopReflex setUpHSR()
 {
+    // Initialize the time so that throttled debug messages do not throw exceptions
+    ros::Time::init();
     // Create an hsr
     HardStopReflex hrs = HardStopReflex();
     // Set a footprint

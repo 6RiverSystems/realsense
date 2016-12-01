@@ -11,7 +11,7 @@ namespace ChuckTransforms {
 
     static const string BASE_FOOTPRINT = "base_footprint";
 
-    static const string LIDAR = "laser_frame";
+    static const string LIDAR = "sick_lidar";
 
     static const string MAP = "map";
 

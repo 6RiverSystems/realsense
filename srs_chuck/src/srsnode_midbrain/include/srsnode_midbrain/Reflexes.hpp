@@ -8,7 +8,9 @@
 #include <ros/ros.h>
 
 #include <srslib_framework/ros/channel/ChannelDangerZone.hpp>
-#include <srslib_framework/ros/channel/ChannelCmdLL.hpp>
+#include <srslib_framework/ros/channel/ChannelFailedDangerZone.hpp>
+#include <srslib_framework/ros/channel/ChannelFailedLaserScan.hpp>
+#include <srslib_framework/ros/channel/ChannelExecutiveCmd_Cl.hpp>
 
 #include <srslib_framework/ros/tap/TapSensorOdometryPose.hpp>
 #include <srslib_framework/ros/tap/RosTapOperationalState.hpp>
@@ -43,9 +45,13 @@ private:
 	// Channels
 	ChannelExecutiveCmd_Cl cmdClChannel_;
 	ChannelDangerZone dangerZoneChannel_;
+    ChannelFailedDangerZone fdzChannel_;
+    ChannelFailedLaserScan flsChannel_;
 
 	// Reflexes
 	HardStopReflex hardStopReflex_;
+
+    bool enableHardStopDebugPlotting_ = false;
 };
 
 } /* namespace srs */

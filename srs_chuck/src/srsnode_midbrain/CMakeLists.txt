@@ -28,6 +28,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     dynamic_reconfigure
+    polyclipping
     srslib_framework
     srslib_test
 )
@@ -48,7 +49,7 @@ include_directories(include
 # Target
 
 catkin_package(
-    DEPENDS srslib_framework
+    DEPENDS srslib_framework polyclipping
 )
 
 add_executable(${PROJECT_NODE}
@@ -84,6 +85,6 @@ if (CATKIN_ENABLE_TESTING)
 #        ${srsnode_midbrain_EXPORTED_TARGETS}
 #    )
     target_link_libraries(Test_Reflexes_HardStopReflex
-        ${srslib_framework_LIBRARIES}
+        ${catkin_LIBRARIES}
     )
 endif()

@@ -30,31 +30,20 @@ Reflexes::~Reflexes( )
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// New code
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void Reflexes::readParams()
 {
-	ROS_INFO("Getting footprint");
 	// Get the footprint
 	ros::NodeHandle nh("/move_base/local_costmap");
-	std::string nm("foo");
-	nh.searchParam("footprint", nm);
 
-	ROS_INFO("NH Name: %s, Footprint name: %s", nh.getNamespace().c_str(), nm.c_str());
 	std::vector<geometry_msgs::Point> footprint = costmap_2d::makeFootprintFromParams(nh);
 	hardStopReflex_.setFootprint(PolygonMessageFactory::points2Poses(footprint));
-	ROS_INFO("Got footprint?");
 }
 
 void Reflexes::execute()
 {
-	// ROS_INFO("Executing");
 	// Get the sensor position
 	hardStopReflex_.setLidarPose(tapLidarPoseOnRobot_.pop());
 
-	// ROS_INFO("Got lidar pose");
 	// Update robot position
 	hardStopReflex_.setPose(tapRobotPose_.pop());
 
@@ -73,7 +62,7 @@ void Reflexes::execute()
 	// Call for hard stop check.
 	if (hardStopReflex_.checkHardStop())
 	{
-		ROS_INFO("Publishing stop");
+		ROS_WARN("Publishing stop");
 		cmdClChannel_.publish("STOP;");
 	}
 	else if (hardStopReflex_.checkForClear())
@@ -81,11 +70,24 @@ void Reflexes::execute()
 		ROS_INFO("Clearing motion.");
 		cmdClChannel_.publish("CLEAR_MOTION_STATUS;");
 	}
-	// ROS_INFO("ready to get danger zone.");
 
 	// Publish the polygon
 	dangerZoneChannel_.publish(hardStopReflex_.getDangerZoneForDisplay());
-	// ROS_INFO("Finished execute loop");
+
+	// Debugging help
+	if (enableHardStopDebugPlotting_)
+	{
+		auto fdz = hardStopReflex_.getFailedDangerZoneForDisplay();
+		if (fdz.size() > 0)
+		{
+			fdzChannel_.publish(fdz);
+		}
+		auto fls = hardStopReflex_.getFailedLaserScanForDisplay();
+		if (fls.size() > 0)
+		{
+			flsChannel_.publish(fls);
+		}
+	}
 }
 
 } /* namespace srs */

@@ -7,7 +7,6 @@
 #include <srsnode_midbrain/Reflexes.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/math/VelocityMath.hpp>
-#include <boost/geometry/algorithms/union.hpp>
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
@@ -26,25 +25,15 @@ HardStopReflex::~HardStopReflex()
 
 }
 
-void HardStopReflex::setLidarPose(Pose<> pose)
-{
-	lidarPose_ = pose;
-}
-
-void HardStopReflex::setPose(Pose<> pose)
-{
-	latestPose_ = pose;
-}
-
 void HardStopReflex::setLaserScan(const sensor_msgs::LaserScan& scan)
 {
-	if (!(latestPose_.isValid() && lidarPose_.isValid()))
+	if (!latestPose_.isValid())
 	{
 		ROS_WARN("Cannot save the laser scan without valid transforms.");
 		return;
 	}
-	Pose<> lidarToMap = PoseMath::multiply(latestPose_, lidarPose_);
-	ROS_DEBUG("Processing scan at: %f, %f, %f", lidarToMap.x, lidarToMap.y, lidarToMap.theta);
+	tf::Transform lidarToMap = PoseMessageFactory::pose2Transform(latestPose_) * lidarPose_;
+
 	// Iterate over the scan and convert into the map frame.
 	laserScan_.clear();
 	laserScan_.reserve(scan.ranges.size());
@@ -59,72 +48,120 @@ void HardStopReflex::setLaserScan(const sensor_msgs::LaserScan& scan)
 			// Convert the scan data into an x,y point in the map
 			double x = cos(angle) * scanDistance;
 			double y = sin(angle) * scanDistance;
-			Pose<> pt = Pose<>(x, y);
-			Pose<> ptInMap = PoseMath::multiply(lidarToMap, pt);
+			tf::Transform pt = PoseMessageFactory::pose2Transform(Pose<>(x, y));
+			Pose<> ptInMap = PoseMessageFactory::transform2Pose(lidarToMap * pt);
 			ROS_DEBUG("x: %f, y: %f, in map: x: %f, y: %f", x, y, ptInMap.x, ptInMap.y);
 
 			// Now convert the data into a bg point
-			laserScan_.push_back(Point(ptInMap.x, ptInMap.y));
+			laserScan_.push_back(clPoint(ptInMap.x * CL_SCALE_FACTOR, ptInMap.y * CL_SCALE_FACTOR));
 		}
 	}
 }
 
 bool HardStopReflex::checkHardStop()
 {
+	bool dangerZoneViolation = checkForDangerZoneViolation();
+	if (dangerZoneViolation)
+	{
+		numConsecutiveDangerZoneViolations_++;
+	}
+	else
+	{
+		numConsecutiveDangerZoneViolations_ = 0;
+	}
+
+	bool shouldHardStop = numConsecutiveDangerZoneViolations_ > maxConsecutiveDangerZoneViolations_;
+
+	if (shouldHardStop)
+	{
+		waitingForClear_ = true;
+	}
+	return shouldHardStop;
+}
+
+bool HardStopReflex::checkForDangerZoneViolation()
+{
 	if (!updateDangerZone())
 	{
-		ROS_WARN("Could not update danger zone.  Return true for hard stop.");
-		hardStopActivated_ = true;
-		waitingForClear_ = true;
+		ROS_WARN_THROTTLE(1.0, "Could not update danger zone.  Return true for hard stop.");
 		return true;
 	}
 
 	if (VelocityMath::equal(latestVelocity_, Velocity<>::ZERO))
 	{
 		ROS_DEBUG("Velocity is zero, no need to trigger the estop.");
-		hardStopActivated_ = false;
+		return false;
+	}
+
+	if (latestVelocity_.linear < 0 && std::fabs(latestVelocity_.angular) < 1.00)
+	{
+		ROS_DEBUG("Linear velocity is negative, no need to trigger the estop.");
 		return false;
 	}
 
 	// Iterate over the points.
+	int numBadPoints = 0;
 	for (auto pt : laserScan_)
 	{
-		if (boost::geometry::within(pt, dangerZone_))
+		if (ClipperLib::PointInPolygon(pt, dangerZone_))
 		{
-			ROS_WARN("Found a point in the danger zone at [%f, %f].  Robot at [%f, %f, th: %f].",
-				pt.x, pt.y, latestPose_.x, latestPose_.y, latestPose_.theta);
-			hardStopActivated_ = true;
-			waitingForClear_ = true;
-			return true;
+			ROS_INFO("Found a point in the danger zone at [%f, %f].  Robot at [%f, %f, th: %f].",
+				pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, latestPose_.x, latestPose_.y, latestPose_.theta);
+			numBadPoints++;
 		}
 	}
-
-	hardStopActivated_ = false;
-	return false;
+	if (numBadPoints > 0)
+	{
+		ROS_DEBUG("Saw %d bad points of %d max", numBadPoints, badPointsForStop_);
+		failedDangerZone_ = dangerZone_;
+		failedLaserScan_ = laserScan_;
+	}
+	return numBadPoints >= badPointsForStop_;
 }
+
+void HardStopReflex::dumpDataToLog()
+{
+
+	std::cout << "Data dump after hard stop request: " << std::endl;
+	std::cout << "Pose: " << latestPose_.x << ", " << latestPose_.y << ", " << latestPose_.theta << std::endl;
+
+	std::cout << "Danger Zone: " << std::endl;
+	for (auto p : dangerZone_)
+	{
+		std::cout << "  " << p.X << ", " << p.Y << std::endl;
+	}
+
+	std::cout << "Scan on map: " << std::endl;
+	for (auto p : laserScan_)
+	{
+		std::cout << "  " << p.X << ", " << p.Y << std::endl;
+	}
+
+}
+
 
 bool HardStopReflex::updateDangerZone()
 {
 	if (footprint_.size() < 3)
 	{
-		ROS_WARN("Cannot update danger zone without a footprint.");
+		ROS_WARN_THROTTLE(1.0, "Cannot update danger zone without a footprint.");
 		return false;
 	}
 
 	if (!latestVelocity_.isValid())
 	{
-		ROS_WARN("Cannot update danger zone.  Invalid velocity.");
+		ROS_WARN_THROTTLE(1.0, "Cannot update danger zone.  Invalid velocity.");
 		return false;
 	}
 
 	if (!latestPose_.isValid())
 	{
-		ROS_WARN("Cannot update danger zone.  Invalid pose.");
+		ROS_WARN_THROTTLE(1.0, "Cannot update danger zone.  Invalid pose.");
 		return false;
 	}
 
 	// Clear the danger zone
-	dangerZone_ = Polygon();
+	dangerZone_ = clPath();
 
 	// First pose is the current pose.
 	Pose<> currentPose = latestPose_;
@@ -138,7 +175,9 @@ bool HardStopReflex::updateDangerZone()
 	double maxDv = simDt * nominalDecelRate_;
 	double maxDw = simDt * angularDecelRate_;
 
-	addPoseToPolygon(dangerZone_, currentPose, footprint_);
+	std::vector<clPath> footprints;
+	addPoseToPolygonStack(footprints, currentPose, footprint_);
+
 	while (!(BasicMath::equal(v, 0.0, 0.001) && BasicMath::equal(w, 0.0, 0.001)))
 	{
 		// Forward propogate
@@ -177,7 +216,6 @@ bool HardStopReflex::updateDangerZone()
 			dV = dW * std::fabs(v / w);
 		}
 
-
 		dV *= BasicMath::sgn(v);
 		dW *= BasicMath::sgn(w);
 
@@ -188,53 +226,48 @@ bool HardStopReflex::updateDangerZone()
 		if (time - lastSaveTime >= sampleDt)
 		{
 			ROS_DEBUG("Adding a new pose to the polygon.  x: %f, y: %f, the: %f", currentPose.x, currentPose.y, currentPose.theta);
-			addPoseToPolygon(dangerZone_, currentPose, footprint_);
+			addPoseToPolygonStack(footprints, currentPose, footprint_);
 			lastSaveTime = time;
 		}
 	}
 	// Finally, put in the last pose.
-	addPoseToPolygon(dangerZone_, currentPose, footprint_);
+	addPoseToPolygonStack(footprints, currentPose, footprint_);
+	calculateUnion(dangerZone_, footprints);
 	return true;
 }
 
-void HardStopReflex::addPoseToPolygon(Polygon& polygon, Pose<> pose, const std::vector<Pose<>>& footprint)
+void HardStopReflex::addPoseToPolygonStack(std::vector<clPath>& polygons, Pose<> pose, const std::vector<Pose<>>& footprint)
 {
 	// Convert the footprint points to the pose
-	Ring footprintPoints;
+	clPath footprintPolygon;
 
 	// std::cout << "New footprint points: " << std::endl;
 	for (auto p : footprint)
 	{
 		Pose<> point = PoseMath::multiply(pose, p);
-		footprintPoints.push_back({point.x, point.y});
+		footprintPolygon.push_back(clPoint(point.x * 1000, point.y * 1000));
 		// std::cout << "  x: " << point.x << ", y: " << point.y << std::endl;
 	}
+	polygons.push_back(footprintPolygon);
+}
+
+void HardStopReflex::calculateUnion(clPath& output, std::vector<clPath>& polygons)
+{
 	// std::cout << "done" << std::endl;
-
-	Polygon footprintPolygon;
-	boost::geometry::assign_points( footprintPolygon, footprintPoints );
-
-	std::vector<Polygon> combinedZone;
-
-	// Normalize the polygons (if not the union function will not work properly)
-	bg::correct( footprintPolygon );
-	bg::correct( polygon );
-
-	try
+	ClipperLib::Clipper c;
+	for (auto p : polygons)
 	{
-		// Create the combined polygon by creating a union of the pose polygon and the input polygon
-		bg::union_( footprintPolygon, polygon, combinedZone );
+		c.AddPath(p, ClipperLib::ptSubject, true);
 	}
-	catch (...)
+	ClipperLib::Paths paths;
+	c.Execute(ClipperLib::ctUnion, paths, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+	if (paths.size() > 0)
 	{
-		ROS_WARN("Caught exception when calculating new polygon.");
-		return;
+		output = paths[0];
 	}
-	assert( combinedZone.size( ) );
-
-	if ( combinedZone.size( ) )
+	else
 	{
-		polygon = combinedZone[0];
+		ROS_WARN("Did not get a solution to the union of footprint polygons.");
 	}
 }
 
@@ -256,16 +289,45 @@ bool HardStopReflex::checkForClear()
 std::vector<Pose<>> HardStopReflex::getDangerZoneForDisplay() const
 {
 	std::vector<Pose<>> out;
-	if (dangerZone_.outer().size() == 0)
+	if (dangerZone_.size() == 0)
 	{
-		ROS_WARN("No danger zone yet.");
 		return out;
 	}
 
-	out.reserve(dangerZone_.outer().size());
-	for (auto pt : dangerZone_.outer())
+	out.reserve(dangerZone_.size());
+	for (auto pt : dangerZone_)
 	{
-		out.push_back(Pose<>(pt.x, pt.y, 0.0));
+		out.push_back(Pose<>(pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, 0.0));
+	}
+}
+
+std::vector<Pose<>> HardStopReflex::getFailedDangerZoneForDisplay() const
+{
+	std::vector<Pose<>> out;
+	if (failedDangerZone_.size() == 0)
+	{
+		return out;
+	}
+
+	out.reserve(failedDangerZone_.size());
+	for (auto pt : failedDangerZone_)
+	{
+		out.push_back(Pose<>(pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, 0.0));
+	}
+}
+
+std::vector<Pose<>> HardStopReflex::getFailedLaserScanForDisplay() const
+{
+	std::vector<Pose<>> out;
+	if (failedLaserScan_.size() == 0)
+	{
+		return out;
+	}
+
+	out.reserve(failedLaserScan_.size());
+	for (auto pt : failedLaserScan_)
+	{
+		out.push_back(Pose<>(pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, 0.0));
 	}
 }
 

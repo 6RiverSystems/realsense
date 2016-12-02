@@ -21,15 +21,15 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[-10,14.2],
-							[29.45,22.9]
+							[-10,14.15],
+							[29.45,22.95]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
 						"envelope_size": 0.5,
 						"envelope_cost": 70,
-						"is_border": 0
+						"is_border": 1
 					}
 				},
 				{
@@ -38,15 +38,15 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[-10,0.25],
-							[0,14.15]
+							[-10,0.2],
+							[0.1,14.2]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
 						"envelope_size": 0.5,
 						"envelope_cost": 70,
-						"is_border": 0
+						"is_border": 1
 					}
 				},
 				{
@@ -56,14 +56,14 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[-10,-10],
-							[16.1,0.25]
+							[16.2,0.35]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
 						"envelope_size": 0.5,
 						"envelope_cost": 70,
-						"is_border": 0
+						"is_border": 1
 					}
 				},
 				{
@@ -123,15 +123,15 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[9.2,10.15],
-							[19.35,14.15]
+							[9.15,10.1],
+							[19.4,14.2]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
 						"envelope_size": 0.5,
 						"envelope_cost": 70,
-						"is_border": 0
+						"is_border": 1
 					}
 				},
 				{
@@ -140,15 +140,15 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[12.8,9.35],
-							[19.35,10.1]
+							[12.75,9.3],
+							[19.4,10.15]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
 						"envelope_size": 0.5,
 						"envelope_cost": 70,
-						"is_border": 0
+						"is_border": 1
 					}
 				},
 				{
@@ -157,15 +157,15 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.15,-10],
-							[18.05,-2]
+							[16.1,-10],
+							[18.1,-1.9]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
 						"envelope_size": 0.5,
 						"envelope_cost": 70,
-						"is_border": 0
+						"is_border": 1
 					}
 				},
 				{
@@ -174,15 +174,15 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[18.1,-10],
-							[29.45,-5.4]
+							[18.05,-10],
+							[29.45,-5.3]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
 						"envelope_size": 0.5,
 						"envelope_cost": 70,
-						"is_border": 0
+						"is_border": 1
 					}
 				},
 				{
@@ -191,15 +191,15 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[19.4,1.7],
-							[29.45,14.15]
+							[19.35,1.65],
+							[29.45,14.2]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
 						"envelope_size": 0.5,
 						"envelope_cost": 70,
-						"is_border": 0
+						"is_border": 1
 					}
 				},
 				{
@@ -208,15 +208,15 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[20.05,-5.4],
-							[29.45,1.65]
+							[20,-5.45],
+							[29.45,1.7]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
 						"envelope_size": 0.5,
 						"envelope_cost": 70,
-						"is_border": 0
+						"is_border": 1
 					}
 				},
 				{

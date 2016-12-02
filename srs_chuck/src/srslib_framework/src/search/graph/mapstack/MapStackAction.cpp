@@ -107,7 +107,7 @@ MapStackNode* MapStackAction::exploreRotation(MapStack* stack, MapStackNode* fro
         // Create a neighbor node with all the relative data
         MapStackNode* neighborNode = MapStackNode::instanceOf(
             stack,
-            fromNode, MapStackAction::ROTATE_N90,
+            fromNode, action,
             motion,
             fromNode->getG() + motionCost, 0,
             nullptr);

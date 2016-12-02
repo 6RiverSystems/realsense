@@ -18,20 +18,16 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlannerConventional::SrsPlannerConventional() :
-    srsMapStack_(nullptr)
+    srsMapStack_(nullptr),
+    costMap2d_(nullptr)
 {
-    ROS_WARN("SrsPlanner::SrsPlanner() called");
-
-    initializeParams();
-    updateMapStack(nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlannerConventional::SrsPlannerConventional(string name, costmap_2d::Costmap2DROS* rosCostMap) :
-    srsMapStack_(nullptr)
+    srsMapStack_(nullptr),
+    costMap2d_(nullptr)
 {
-    ROS_WARN("SrsPlanner::SrsPlanner(...) called");
-
     initialize(name, rosCostMap);
 }
 
@@ -44,10 +40,8 @@ SrsPlannerConventional::~SrsPlannerConventional()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlannerConventional::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostMap)
 {
-    ROS_WARN("SrsPlanner::initialize() called");
-
-    initializeParams();
-    updateMapStack(rosCostMap);
+    costMap2d_ = rosCostMap->getCostmap();
+    tapMapStack_.attach(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,8 +50,6 @@ bool SrsPlannerConventional::makePlan(
     const geometry_msgs::PoseStamped& goal,
     vector<geometry_msgs::PoseStamped>& plan)
 {
-    ROS_WARN("SrsPlanner::makePlan() called");
-
     // Find a suitable solution for the provided goal
     Pose<> robotPose = PoseMessageFactory::poseStamped2Pose(start);
     Pose<> target = PoseMessageFactory::poseStamped2Pose(goal);
@@ -73,9 +65,6 @@ bool SrsPlannerConventional::makePlan(
 
         // Calculate the trajectory from the solution found by A*,
         // using the default Chuck model
-
-        // TODO: Remove this assumption
-        Chuck chuck;
         SimpleTrajectoryGenerator converter(srsMapStack_);
         converter.fromSolution(solution);
 
@@ -97,8 +86,18 @@ bool SrsPlannerConventional::makePlan(
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerConventional::initializeParams()
+void SrsPlannerConventional::notified(Subscriber<srslib_framework::MapStack>* subject)
 {
+    ROS_DEBUG_STREAM_NAMED("srs_planner", "SrsPlanner notified with a new Map Stack");
+
+    TapMapStack* tapMapStack = static_cast<TapMapStack*>(subject);
+
+    // When the Map Stack is published, make sure to get a fresh copy
+    delete srsMapStack_;
+    srsMapStack_ = tapMapStack_.pop();
+
+    // Include the ROS costmap in the map stack
+    srsMapStack_->setCostMap2d(costMap2d_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,24 +128,6 @@ void SrsPlannerConventional::populatePath(const geometry_msgs::PoseStamped& star
     }
 
     plan.push_back(goal);
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerConventional::updateMapStack(costmap_2d::Costmap2DROS* rosCostMap)
-{
-    // Make sure that the neither the logical not the occupancy maps
-    // have been re-published. In case, destroy what we have and
-    // ask for a new stack
-    if (tapMapStack_.newDataAvailable())
-    {
-        delete srsMapStack_;
-        srsMapStack_ = tapMapStack_.pop();
-    }
-
-    // Include the ROS costmap in the map stack
-    if (rosCostMap && srsMapStack_)
-    {
-        srsMapStack_->setCostMap2d(rosCostMap->getCostmap());
-    }
 }
 
 } // namespace srs

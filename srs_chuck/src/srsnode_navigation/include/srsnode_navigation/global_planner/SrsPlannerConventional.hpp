@@ -23,7 +23,9 @@ using namespace std;
 
 namespace srs {
 
-class SrsPlannerConventional : public nav_core::BaseGlobalPlanner
+class SrsPlannerConventional :
+    public nav_core::BaseGlobalPlanner,
+    public Observer<Subscriber<srslib_framework::MapStack>>
 {
 public:
     SrsPlannerConventional();
@@ -37,16 +39,15 @@ public:
         vector<geometry_msgs::PoseStamped>& plan);
 
 private:
-    void initializeParams();
+    void notified(Subscriber<srslib_framework::MapStack>* subject);
 
     void populatePath(const geometry_msgs::PoseStamped& start,
         const Trajectory<>& trajectory,
         const geometry_msgs::PoseStamped& goal,
         vector<geometry_msgs::PoseStamped>& plan);
 
-    void updateMapStack(costmap_2d::Costmap2DROS* rosCostMap);
-
     ChannelRosPath channelRosPath_;
+    costmap_2d::Costmap2D* costMap2d_;
 
     MapStack* srsMapStack_;
 

@@ -8,8 +8,11 @@ map = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_onewa
     RESOLUTION, ORIGIN);
 showMap(map, 'Obstacles');
 
-% Make sure that the border is marked and sealed
-map = convertToBorderObstacle(map, [1, 2, 3, 7, 8, 9, 10, 11, 12], 1, 1);
+% Make sure that the border is marked and sealed (with Ping pong table)
+% map = convertToBorderObstacle(map, [1, 2, 3, 7, 8, 9, 10, 11, 12], 1, 1);
+
+% Make sure that the border is marked and sealed (without Ping pong table)
+% map = convertToBorderObstacle(map, [1, 2, 3, 6, 7, 8, 9, 10, 11], 1, 1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One-way layer

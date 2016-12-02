@@ -79,7 +79,16 @@ public:
      */
     std::vector<Pose<>> getDangerZoneForDisplay() const;
 
+    /**
+     * Get the latest danger zone that failed
+     * @return the danger zone
+     */
     std::vector<Pose<>> getFailedDangerZoneForDisplay() const;
+
+    /**
+     * Get the laser scan that penetrated the danger zone for display in rviz
+     * @return the laser scan
+     */
     std::vector<Pose<>> getFailedLaserScanForDisplay() const;
 
 
@@ -110,6 +119,23 @@ public:
         angularDecelRate_ = rate;
     };
 
+    /**
+     * Sets the number of times the danger zone must be violated consecutively to trigger a hard stop.
+     * @param val the limit
+     */
+    void setMaxConsecutiveDangerZoneViolations(double val)
+    {
+        maxConsecutiveDangerZoneViolations_ = val;
+    }
+
+    /**
+     * Sets the number of scan points in the danger zone to be considered a violation
+     */
+    void setNumBadPointsForViolation(double val)
+    {
+        numBadPointsForViolation_ = val;
+    }
+
 private:
     /**
      * Determine if the danger zone has been violated
@@ -138,6 +164,16 @@ private:
      */
     void calculateUnion(clPath& output, std::vector<clPath>& polygons);
 
+    /**
+     * Convert a clPath to a vector of poses
+     * @param path the path to convert
+     * @return a vector of poses
+     */
+    std::vector<Pose<>> clPathToPoseVector(const clPath& path) const;
+
+    /**
+     * Write some debug information to std::cout
+     */
     void dumpDataToLog();
 
     Pose<> latestPose_ = Pose<>::INVALID;
@@ -147,7 +183,10 @@ private:
     double nominalDecelRate_ = 0.7;  // m/s^2
     double angularDecelRate_ = 1.0;  // r/s^2
 
-    int badPointsForStop_ = 3;
+    int numBadPointsForViolation_ = 2;
+
+    int maxConsecutiveDangerZoneViolations_ = 1;
+    int numConsecutiveDangerZoneViolations_ = 0;
 
     std::vector<Pose<>> footprint_;
 
@@ -164,8 +203,6 @@ private:
      */
     bool waitingForClear_ = false;
 
-    int maxConsecutiveDangerZoneViolations_ = 1;
-    int numConsecutiveDangerZoneViolations_ = 0;
 
     /**
      * Scale factor for converting meters to polygon coordinates.

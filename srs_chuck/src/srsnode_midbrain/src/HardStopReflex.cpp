@@ -105,18 +105,18 @@ bool HardStopReflex::checkForDangerZoneViolation()
 	{
 		if (ClipperLib::PointInPolygon(pt, dangerZone_))
 		{
-			ROS_INFO("Found a point in the danger zone at [%f, %f].  Robot at [%f, %f, th: %f].",
+			ROS_DEBUG("Found a point in the danger zone at [%f, %f].  Robot at [%f, %f, th: %f].",
 				pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, latestPose_.x, latestPose_.y, latestPose_.theta);
 			numBadPoints++;
 		}
 	}
 	if (numBadPoints > 0)
 	{
-		ROS_DEBUG("Saw %d bad points of %d max", numBadPoints, badPointsForStop_);
+		ROS_DEBUG("Saw %d bad points of %d max", numBadPoints, numBadPointsForViolation_);
 		failedDangerZone_ = dangerZone_;
 		failedLaserScan_ = laserScan_;
 	}
-	return numBadPoints >= badPointsForStop_;
+	return numBadPoints >= numBadPointsForViolation_;
 }
 
 void HardStopReflex::dumpDataToLog()
@@ -138,7 +138,6 @@ void HardStopReflex::dumpDataToLog()
 	}
 
 }
-
 
 bool HardStopReflex::updateDangerZone()
 {
@@ -246,14 +245,12 @@ void HardStopReflex::addPoseToPolygonStack(std::vector<clPath>& polygons, Pose<>
 	{
 		Pose<> point = PoseMath::multiply(pose, p);
 		footprintPolygon.push_back(clPoint(point.x * 1000, point.y * 1000));
-		// std::cout << "  x: " << point.x << ", y: " << point.y << std::endl;
 	}
 	polygons.push_back(footprintPolygon);
 }
 
 void HardStopReflex::calculateUnion(clPath& output, std::vector<clPath>& polygons)
 {
-	// std::cout << "done" << std::endl;
 	ClipperLib::Clipper c;
 	for (auto p : polygons)
 	{
@@ -288,44 +285,29 @@ bool HardStopReflex::checkForClear()
 
 std::vector<Pose<>> HardStopReflex::getDangerZoneForDisplay() const
 {
-	std::vector<Pose<>> out;
-	if (dangerZone_.size() == 0)
-	{
-		return out;
-	}
-
-	out.reserve(dangerZone_.size());
-	for (auto pt : dangerZone_)
-	{
-		out.push_back(Pose<>(pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, 0.0));
-	}
+	return clPathToPoseVector(dangerZone_);
 }
 
 std::vector<Pose<>> HardStopReflex::getFailedDangerZoneForDisplay() const
 {
-	std::vector<Pose<>> out;
-	if (failedDangerZone_.size() == 0)
-	{
-		return out;
-	}
-
-	out.reserve(failedDangerZone_.size());
-	for (auto pt : failedDangerZone_)
-	{
-		out.push_back(Pose<>(pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, 0.0));
-	}
+	return clPathToPoseVector(failedDangerZone_);
 }
 
 std::vector<Pose<>> HardStopReflex::getFailedLaserScanForDisplay() const
 {
+	return clPathToPoseVector(failedLaserScan_);
+}
+
+std::vector<Pose<>> HardStopReflex::clPathToPoseVector(const clPath& path) const
+{
 	std::vector<Pose<>> out;
-	if (failedLaserScan_.size() == 0)
+	if (path.size() == 0)
 	{
 		return out;
 	}
 
-	out.reserve(failedLaserScan_.size());
-	for (auto pt : failedLaserScan_)
+	out.reserve(path.size());
+	for (auto pt : path)
 	{
 		out.push_back(Pose<>(pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, 0.0));
 	}

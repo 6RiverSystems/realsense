@@ -6,6 +6,8 @@
 #include <gtest/gtest.h>
 #include <ros/ros.h>
 #include <iostream>
+
+#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 #include <srsnode_midbrain/HardStopReflex.hpp>
 
 namespace srs {
@@ -15,20 +17,23 @@ HardStopReflex setUpHSR()
     // Initialize the time so that throttled debug messages do not throw exceptions
     ros::Time::init();
     // Create an hsr
-    HardStopReflex hrs = HardStopReflex();
+    HardStopReflex hsr = HardStopReflex();
     // Set a footprint
     std::vector<Pose<>> footprint;
     footprint.push_back(Pose<>(1.0, 1.0, 0.0));
     footprint.push_back(Pose<>(1.0, -1.0, 0.0));
     footprint.push_back(Pose<>(-1.0, -1.0, 0.0));
     footprint.push_back(Pose<>(-1.0, 1.0, 0.0));
-    hrs.setFootprint(footprint);
+    hsr.setFootprint(footprint);
 
-    hrs.setLidarPose(Pose<>(0.5, 0.0, 0.0));
-    hrs.setPose(Pose<>::ZERO);
-    hrs.setVelocity(Velocity<>::ZERO);
+    hsr.setLidarPose(PoseMessageFactory::pose2Transform(Pose<>(0.5, 0.0, 0.0)));
+    hsr.setPose(Pose<>::ZERO);
+    hsr.setVelocity(Velocity<>::ZERO);
 
-    return hrs;
+    // Any violation triggers hard stop (for basic testing)
+    hsr.setMaxConsecutiveDangerZoneViolations(0);
+
+    return hsr;
 }
 
 sensor_msgs::LaserScan createLaserScan(float val)
@@ -79,13 +84,7 @@ TEST(Test_Reflexes_HardStopReflex, ForwardVelocity)
 
     hsr.setVelocity(Velocity<>(1.0, 0.0));
     ASSERT_TRUE(hsr.checkHardStop());
-    // Printouts
-    // std::cout << "Footprint: [" << std::endl;
-    // for (auto pt : hsr.getDangerZoneForDisplay())
-    // {
-    //     std::cout << "  [" << pt.x << "," << pt.y << "]" << std::endl;
-    // }
-    // std::cout << "]" << std::endl;
+
     hsr.setLaserScan(createLaserScan(5.0));
     ASSERT_FALSE(hsr.checkHardStop());
 }
@@ -127,7 +126,7 @@ TEST(Test_Reflexes_HardStopReflex, DifferentPose)
     ASSERT_TRUE(hsr.checkHardStop());
 }
 
-TEST(Test_Reflexes_HardStopReflex, WidelyDifferentPose)
+TEST(Test_Reflexes_HardStopReflex, WildlyDifferentPose)
 {
     HardStopReflex hsr = setUpHSR();
     hsr.setPose(Pose<>(5, 5, -1.5));
@@ -142,9 +141,40 @@ TEST(Test_Reflexes_HardStopReflex, WidelyDifferentPose)
     ASSERT_FALSE(hsr.checkHardStop());
 }
 
+TEST(Test_Reflexes_HardStopReflex, MultipleChecksForTrigger)
+{
+    HardStopReflex hsr = setUpHSR();
+    hsr.setVelocity(Velocity<>(1.0, 0.0));
+    hsr.setLaserScan(createLaserScan(1.3));
+
+    hsr.setMaxConsecutiveDangerZoneViolations(2);
+    // Hard stop should be true on try > 2;
+    ASSERT_FALSE(hsr.checkHardStop());
+    ASSERT_FALSE(hsr.checkHardStop());
+    ASSERT_TRUE(hsr.checkHardStop());
+    ASSERT_TRUE(hsr.checkHardStop());
+}
+
 TEST(Test_Reflexes_HardStopReflex, ClearStopCondition)
 {
-    HardStopReflex hrs = setUpHSR();
+    HardStopReflex hsr = setUpHSR();
+
+    hsr.setVelocity(Velocity<>(1.0, 0.0));
+    hsr.setLaserScan(createLaserScan(1.3));
+
+    // Clearing the hard stop shouldn't happen before a hard stop has been set.
+    ASSERT_FALSE(hsr.checkForClear());
+    ASSERT_TRUE(hsr.checkHardStop());
+
+    // Clearing the hard stop should not happen while the velocity is high.
+    ASSERT_FALSE(hsr.checkForClear());
+
+    // Clearing the hard stop should happen once the velocity is 0.
+    hsr.setVelocity(Velocity<>(0.0, 0.0));
+    ASSERT_TRUE(hsr.checkForClear());
+
+    // Clear the hard stop should not happen twice in a row.
+    ASSERT_FALSE(hsr.checkForClear());
 }
 
 }

@@ -133,7 +133,7 @@ map = addGraph(map, '6rshq_graph', ...
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map
-map = addLayer(map, {layerWarningSound, layerOneway, layerCostArea});
+map = addLayer(map, {layerWarningSound, layerOneway});
 showMap(map, 'Complete map');
 
 saveGeoJsonMap(map, ...

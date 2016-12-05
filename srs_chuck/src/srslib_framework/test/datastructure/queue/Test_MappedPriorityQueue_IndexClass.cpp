@@ -12,7 +12,7 @@
 #include <unordered_set>
 using namespace std;
 
-#include <srslib_framework/datastructure/queue/MappedPriorityQueue.hpp>
+#include <srslib_framework/datastructure/queue/MappedPriorityQueue3.hpp>
 #include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 
@@ -57,8 +57,8 @@ TEST(Test_MappedPriorityQueue_IndexClass, Creation)
 {
     test::MemoryWatch memoryWatch;
 
-    MappedPriorityQueue<Index, float, IndexHash, IndexEqual>* queue =
-        new MappedPriorityQueue<Index, float, IndexHash, IndexEqual>();
+    MappedPriorityQueue3<Index, float, IndexHash, IndexEqual>* queue =
+        new MappedPriorityQueue3<Index, float, IndexHash, IndexEqual>();
 
     queue->push(100.1, Index{6, 10});
     queue->push(500, Index{5, 50});
@@ -77,11 +77,11 @@ TEST(Test_MappedPriorityQueue_IndexClass, Creation)
     ASSERT_EQ(correct, item) << "Unexpected item in the queue";
 
     queue->pop(item);
-    correct = Index{3, 21};
+    correct = Index{2, 20};
     ASSERT_EQ(correct, item) << "Unexpected item in the queue";
 
     queue->pop(item);
-    correct = Index{2, 20};
+    correct = Index{3, 21};
     ASSERT_EQ(correct, item) << "Unexpected item in the queue";
 
     queue->pop(item);
@@ -101,7 +101,7 @@ TEST(Test_MappedPriorityQueue_IndexClass, Creation)
 
 TEST(Test_MappedPriorityQueue_IndexClass, Exist)
 {
-    MappedPriorityQueue<Index, int, IndexHash, IndexEqual> queue;
+    MappedPriorityQueue3<Index, int, IndexHash, IndexEqual> queue;
 
     queue.push(100, Index{6, 10});
     queue.push(500, Index{5, 50});
@@ -116,7 +116,7 @@ TEST(Test_MappedPriorityQueue_IndexClass, Exist)
 
 TEST(Test_MappedPriorityQueue_IndexClass, Erase)
 {
-    MappedPriorityQueue<Index, float, IndexHash, IndexEqual> queue;
+    MappedPriorityQueue3<Index, float, IndexHash, IndexEqual> queue;
 
     queue.push(100, Index{6, 10});
     queue.push(500, Index{5, 50});

@@ -62,8 +62,8 @@ TEST(Test_AStar_MapStack, SameLocationOnMap)
     algorithm.getPlan(plan);
     cout << plan << endl;
 
-    ASSERT_EQ(2, plan.getClosedNodesCount()) <<
+    ASSERT_EQ(3, plan.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
-    ASSERT_EQ(2, plan.getOpenNodesCount()) <<
+    ASSERT_EQ(3, plan.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 }

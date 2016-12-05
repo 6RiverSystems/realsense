@@ -12,7 +12,7 @@
 #include <unordered_set>
 using namespace std;
 
-#include <srslib_framework/datastructure/queue/MappedPriorityQueue.hpp>
+#include <srslib_framework/datastructure/queue/MappedPriorityQueue3.hpp>
 #include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 
@@ -60,8 +60,8 @@ TEST(Test_MappedPriorityQueue_UserDefinedClass, Creation)
 {
     test::MemoryWatch memoryWatch;
 
-    MappedPriorityQueue<Node<int>, int, NodeHash<int>, NodeEqual<int>>* queue =
-        new MappedPriorityQueue<Node<int>, int, NodeHash<int>, NodeEqual<int>>();
+    MappedPriorityQueue3<Node<int>, int, NodeHash<int>, NodeEqual<int>>* queue =
+        new MappedPriorityQueue3<Node<int>, int, NodeHash<int>, NodeEqual<int>>();
 
     queue->push(100, Node<int>{1, 10});
     queue->push(500, Node<int>{5, 50});
@@ -72,19 +72,19 @@ TEST(Test_MappedPriorityQueue_UserDefinedClass, Creation)
     Node<int> item;
 
     queue->pop(item);
-    Node<int> correct = Node<int>{1, 11};
+    Node<int> correct = Node<int>{1, 10};
     ASSERT_EQ(correct, item) << "Unexpected item in the queue";
 
     queue->pop(item);
-    correct = Node<int>{1, 10};
-    ASSERT_EQ(correct, item) << "Unexpected item in the queue";
-
-    queue->pop(item);
-    correct = Node<int>{2, 21};
+    correct = Node<int>{1, 11};
     ASSERT_EQ(correct, item) << "Unexpected item in the queue";
 
     queue->pop(item);
     correct = Node<int>{2, 20};
+    ASSERT_EQ(correct, item) << "Unexpected item in the queue";
+
+    queue->pop(item);
+    correct = Node<int>{2, 21};
     ASSERT_EQ(correct, item) << "Unexpected item in the queue";
 
     queue->pop(item);
@@ -106,8 +106,8 @@ TEST(Test_MappedPriorityQueue_UserDefinedClass, Exist)
 {
     test::MemoryWatch memoryWatch;
 
-    MappedPriorityQueue<Node<int>, int, NodeHash<int>, NodeEqual<int>>* queue =
-        new MappedPriorityQueue<Node<int>, int, NodeHash<int>, NodeEqual<int>>();
+    MappedPriorityQueue3<Node<int>, int, NodeHash<int>, NodeEqual<int>>* queue =
+        new MappedPriorityQueue3<Node<int>, int, NodeHash<int>, NodeEqual<int>>();
 
     queue->push(100, Node<int>{1, 10});
     queue->push(500, Node<int>{5, 50});
@@ -132,8 +132,8 @@ TEST(Test_MappedPriorityQueue_UserDefinedClass, Erase)
 {
     test::MemoryWatch memoryWatch;
 
-    MappedPriorityQueue<Node<int>, int, NodeHash<int>, NodeEqual<int>>* queue =
-        new MappedPriorityQueue<Node<int>, int, NodeHash<int>, NodeEqual<int>>();
+    MappedPriorityQueue3<Node<int>, int, NodeHash<int>, NodeEqual<int>>* queue =
+        new MappedPriorityQueue3<Node<int>, int, NodeHash<int>, NodeEqual<int>>();
 
     queue->push(100, Node<int>{1, 10});
     queue->push(500, Node<int>{5, 50});
@@ -146,7 +146,7 @@ TEST(Test_MappedPriorityQueue_UserDefinedClass, Erase)
     ASSERT_FALSE(queue->exists(Node<int>{5, 50})) << "Item found in the queue";
 
     Node<int> item;
-    Node<int> correct = Node<int>{1, 11};
+    Node<int> correct = Node<int>{1, 10};
     queue->pop(item);
     ASSERT_EQ(correct, item) << "Unexpected item in the queue";
 

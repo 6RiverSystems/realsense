@@ -53,7 +53,7 @@ TEST(Test_AStar_MapStack, SmallSearchOnEmptyGrid)
 
     ASSERT_EQ(13, plan.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
-    ASSERT_EQ(5, plan.getOpenNodesCount()) <<
+    ASSERT_EQ(4, plan.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 }
 
@@ -76,9 +76,9 @@ TEST(Test_AStar_MapStack, Corner2CornerSearchOnEmptyGrid)
     algorithm.getPlan(plan);
     cout << plan << endl;
 
-    ASSERT_EQ(30, plan.getClosedNodesCount()) <<
+    ASSERT_EQ(35, plan.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
-    ASSERT_EQ(17, plan.getOpenNodesCount()) <<
+    ASSERT_EQ(12, plan.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 }
 
@@ -101,9 +101,9 @@ TEST(Test_AStar_MapStack, SearchAroundObstacle)
     algorithm.getPlan(plan);
     cout << plan << endl;
 
-    ASSERT_EQ(58, plan.getClosedNodesCount()) <<
+    ASSERT_EQ(76, plan.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
-    ASSERT_EQ(18, plan.getOpenNodesCount()) <<
+    ASSERT_EQ(8, plan.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 }
 
@@ -125,7 +125,7 @@ TEST(Test_AStar_MapStack, MemoryLeaks)
 
     ASSERT_EQ(13, algorithm->getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
-    ASSERT_EQ(5, algorithm->getOpenNodesCount()) <<
+    ASSERT_EQ(4, algorithm->getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
     algorithm->clear();

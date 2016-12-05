@@ -160,7 +160,7 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
             cout << "Evaluating: " << *node;
         #endif
 
-        if (!closedSet_.count(node))
+        if (closedSet_.find(node) == closedSet_.end())
         {
             SearchNode* inOpenQueue = openQueue_.find(node);
             if (inOpenQueue)

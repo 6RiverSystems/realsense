@@ -11,7 +11,7 @@
 #include <unordered_set>
 using namespace std;
 
-#include <srslib_framework/datastructure/queue/MappedPriorityQueue.hpp>
+#include <srslib_framework/datastructure/queue/MappedPriorityQueue3.hpp>
 #include <srslib_framework/search/Plan.hpp>
 #include <srslib_framework/search/SearchNode.hpp>
 
@@ -53,7 +53,7 @@ public:
 
 private:
     using ClosedSetType = unordered_set<SearchNode*, SearchNode::Hash, SearchNode::EqualTo>;
-    using OpenSetType = MappedPriorityQueue<SearchNode*, unsigned int,
+    using OpenSetType = MappedPriorityQueue3<SearchNode*, unsigned int,
         SearchNode::Hash, SearchNode::EqualTo>;
 
     void pushNodes(vector<SearchNode*>& nodes);

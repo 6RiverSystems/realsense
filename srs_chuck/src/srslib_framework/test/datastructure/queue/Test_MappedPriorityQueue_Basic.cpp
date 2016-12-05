@@ -9,7 +9,7 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/datastructure/queue/MappedPriorityQueue3.hpp>
+#include <srslib_framework/datastructure/queue/MappedPriorityQueue.hpp>
 #include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 
@@ -17,7 +17,7 @@ TEST(Test_MappedPriorityQueue, Creation)
 {
     test::MemoryWatch memoryWatch;
 
-    MappedPriorityQueue3<int>* queue = new MappedPriorityQueue3<int>();
+    MappedPriorityQueue<int>* queue = new MappedPriorityQueue<int>();
 
     queue->push(500, 50);
     queue->push(100, 0);
@@ -65,7 +65,7 @@ TEST(Test_MappedPriorityQueue, Exist)
 {
     test::MemoryWatch memoryWatch;
 
-    MappedPriorityQueue3<int>* queue = new MappedPriorityQueue3<int>();
+    MappedPriorityQueue<int>* queue = new MappedPriorityQueue<int>();
 
     queue->push(500, 50);
     queue->push(100, 0);
@@ -96,7 +96,7 @@ TEST(Test_MappedPriorityQueue, Erase)
 {
     test::MemoryWatch memoryWatch;
 
-    MappedPriorityQueue3<int>* queue = new MappedPriorityQueue3<int>();
+    MappedPriorityQueue<int>* queue = new MappedPriorityQueue<int>();
 
     queue->push(500, 50);
     queue->push(100, 0);
@@ -139,7 +139,7 @@ TEST(Test_MappedPriorityQueue, Clear)
 {
     test::MemoryWatch memoryWatch;
 
-    MappedPriorityQueue3<int>* queue = new MappedPriorityQueue3<int>();
+    MappedPriorityQueue<int>* queue = new MappedPriorityQueue<int>();
 
     queue->push(500, 50);
     queue->push(100, 0);

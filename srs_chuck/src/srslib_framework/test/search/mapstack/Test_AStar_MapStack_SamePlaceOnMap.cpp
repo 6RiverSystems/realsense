@@ -18,7 +18,7 @@ using namespace std;
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
 using namespace srs;
 
-TEST(Test_AStar_MapStack, SamePositionOnMap)
+TEST(Test_AStar_MapStack_SamePlaceOnMap, SamePositionOnMap)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 
@@ -43,7 +43,7 @@ TEST(Test_AStar_MapStack, SamePositionOnMap)
         "Unexpected number of open nodes";
 }
 
-TEST(Test_AStar_MapStack, SameLocationOnMap)
+TEST(Test_AStar_MapStack_SamePlaceOnMap, SameLocationOnMap)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 

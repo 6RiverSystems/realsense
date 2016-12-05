@@ -13,10 +13,45 @@ using namespace std;
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
+#include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
+#include <srslib_framework/search/graph/grid2d/Grid2dSingleGoal.hpp>
 
+#include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 
-TEST(Test_AStar_Grid2d, 6rshq_NoTrajectory)
+TEST(Test_AStar_Grid2d_6rshq, SmallSearch)
+{
+    MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
+
+    Grid2d::Position startPosition(86, 48, 0);
+    Grid2d::Position goalPosition(87, 48, 0);
+
+    test::MemoryWatch memoryWatch;
+
+    AStar* algorithm = new AStar();
+    Grid2dNode* start = Grid2dNode::instanceOfStart(mapStack->getLogicalMap()->getGrid(),
+        startPosition);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
+
+    ASSERT_TRUE(algorithm->search(start, goal)) <<
+        "A plan was not found";
+
+    ASSERT_EQ(2, algorithm->getOpenNodesCount()) <<
+        "Unexpected number of open nodes";
+
+    ASSERT_EQ(2, algorithm->getClosedNodesCount()) <<
+        "Unexpected number of closed nodes";
+
+    algorithm->clear();
+
+    start->release();
+    goal->release();
+    delete algorithm;
+
+    ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
+}
+
+TEST(Test_AStar_Grid2d_6rshq, NoTrajectory)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 

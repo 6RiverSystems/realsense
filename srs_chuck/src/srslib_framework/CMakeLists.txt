@@ -122,14 +122,13 @@ set(TEST_SOURCES_ROS
 )
 
 set(TEST_SOURCES_SEARCH
-    test/search/grid2d/Test_AStar_Grid2d_6rshq_SmallSearch.cpp
     test/search/grid2d/Test_AStar_Grid2d_6rshq.cpp
-    test/search/grid2d/Test_AStar_Grid2d_Barrett_BigSearch.cpp
+    test/search/grid2d/Test_AStar_Grid2d_Barrett.cpp
     test/search/grid2d/Test_AStar_Grid2d_Basic.cpp
     test/search/grid2d/Test_AStar_Grid2d_NoSolution.cpp
     test/search/grid2d/Test_AStar_Grid2d_SamePlaceOnMap.cpp
     test/search/grid2d/Test_AStar_Grid2d_Weights.cpp
-    test/search/mapstack/Test_AStar_MapStack_Barrett_BigSearch.cpp
+    test/search/mapstack/Test_AStar_MapStack_Barrett.cpp
     test/search/mapstack/Test_AStar_MapStack_Basic.cpp
     test/search/mapstack/Test_AStar_MapStack_NoSolution.cpp
     test/search/mapstack/Test_AStar_MapStack_SamePlaceOnMap.cpp
@@ -147,7 +146,7 @@ project(${PROJECT_NAME})
 set(PROJECT_LIBRARY ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
-set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp

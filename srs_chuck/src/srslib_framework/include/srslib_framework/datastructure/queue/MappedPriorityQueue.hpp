@@ -12,9 +12,16 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <forward_list>
+#include <list>
 using namespace std;
 
 namespace srs {
+
+template<typename T>
+T * ptr(T & obj) { return &obj; }
+
+template<typename T>
+T * ptr(T * obj) { return obj; }
 
 template<typename TYPE,
     typename PRIORITY = int,
@@ -96,10 +103,31 @@ public:
     }
 
 private:
-    using BucketType = unordered_set<TYPE, HASH, EQUAL_TO>;
-    using BucketPoolType = forward_list<BucketType*>;
-    using IndexType = unordered_map<TYPE, PRIORITY, HASH, EQUAL_TO>;
+    class Node;
+
+    using BucketType = list<Node>;
     using QueueType = map<PRIORITY, BucketType*, less<PRIORITY>>;
+    using IndexType = unordered_map<TYPE, typename BucketType::iterator, HASH, EQUAL_TO>;
+
+    using BucketPoolType = forward_list<BucketType*>;
+
+    struct Node
+    {
+        PRIORITY priority;
+        TYPE info;
+        BucketType* bucket;
+
+        Node(PRIORITY priority, TYPE info, BucketType* bucket) :
+          priority(priority),
+          info(info),
+          bucket(bucket)
+        {}
+
+        friend ostream& operator<<(ostream& stream, const Node& node)
+        {
+            return stream << "[" << node.priority << "] " << *ptr(node.info);
+        }
+    };
 
     inline BucketType* getAvailableBucket()
     {

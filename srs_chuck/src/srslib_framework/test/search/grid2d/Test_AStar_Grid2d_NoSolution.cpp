@@ -20,7 +20,7 @@ using namespace srs;
 
 constexpr int GRID_SIZE = 5;
 
-TEST(Test_AStar_Grid2d, NoSolution)
+TEST(Test_AStar_Grid2d_NoSolution, NoSolution)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     test::Grid2dUtils::addObstacle(grid, 0, 0, GRID_SIZE - 1, GRID_SIZE - 1);
@@ -43,7 +43,7 @@ TEST(Test_AStar_Grid2d, NoSolution)
         "Unexpected number of closed nodes";
 }
 
-TEST(Test_AStar_Grid2d, ForbiddenGoal)
+TEST(Test_AStar_Grid2d_NoSolution, ForbiddenGoal)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
@@ -66,7 +66,7 @@ TEST(Test_AStar_Grid2d, ForbiddenGoal)
         "Unexpected number of closed nodes";
 }
 
-TEST(Test_AStar_Grid2d, UnreachableGoal)
+TEST(Test_AStar_Grid2d_NoSolution, UnreachableGoal)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;

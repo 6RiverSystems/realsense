@@ -12,7 +12,7 @@
 #include <unordered_set>
 using namespace std;
 
-#include <srslib_framework/datastructure/queue/MappedPriorityQueue3.hpp>
+#include <srslib_framework/datastructure/queue/MappedPriorityQueue.hpp>
 #include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 
@@ -55,8 +55,8 @@ TEST(Test_MappedPriorityQueue_InnerHashEqual, Creation)
 {
     test::MemoryWatch memoryWatch;
 
-    MappedPriorityQueue3<Node<int>, int, Node<int>, Node<int>>* queue =
-        new MappedPriorityQueue3<Node<int>, int, Node<int>, Node<int>>();
+    MappedPriorityQueue<Node<int>, int, Node<int>, Node<int>>* queue =
+        new MappedPriorityQueue<Node<int>, int, Node<int>, Node<int>>();
 
     queue->push(100, Node<int>{1, 10});
     queue->push(500, Node<int>{5, 50});
@@ -101,8 +101,8 @@ TEST(Test_MappedPriorityQueue_InnerHashEqual, Exist)
 {
     test::MemoryWatch memoryWatch;
 
-    MappedPriorityQueue3<Node<int>, int, Node<int>, Node<int>>* queue =
-        new MappedPriorityQueue3<Node<int>, int, Node<int>, Node<int>>();
+    MappedPriorityQueue<Node<int>, int, Node<int>, Node<int>>* queue =
+        new MappedPriorityQueue<Node<int>, int, Node<int>, Node<int>>();
 
     queue->push(100, Node<int>{1, 10});
     queue->push(500, Node<int>{5, 50});
@@ -127,8 +127,8 @@ TEST(Test_MappedPriorityQueue_InnerHashEqual, Erase)
 {
     test::MemoryWatch memoryWatch;
 
-    MappedPriorityQueue3<Node<int>, int, Node<int>, Node<int>>* queue =
-        new MappedPriorityQueue3<Node<int>, int, Node<int>, Node<int>>();
+    MappedPriorityQueue<Node<int>, int, Node<int>, Node<int>>* queue =
+        new MappedPriorityQueue<Node<int>, int, Node<int>, Node<int>>();
 
     queue->push(100, Node<int>{1, 10});
     queue->push(500, Node<int>{5, 50});

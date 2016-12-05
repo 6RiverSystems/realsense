@@ -32,7 +32,7 @@ MapStack* generateMapStack()
     return test::Grid2dUtils::grid2d2MapStack(grid, 1, Pose<>::ZERO);
 }
 
-TEST(Test_AStar_MapStack, SmallSearchOnEmptyGrid)
+TEST(Test_AStar_MapStack_Basic, SmallSearchOnEmptyGrid)
 {
     MapStack* mapStack = generateMapStack();
 
@@ -57,7 +57,7 @@ TEST(Test_AStar_MapStack, SmallSearchOnEmptyGrid)
         "Unexpected number of open nodes";
 }
 
-TEST(Test_AStar_MapStack, Corner2CornerSearchOnEmptyGrid)
+TEST(Test_AStar_MapStack_Basic, Corner2CornerSearchOnEmptyGrid)
 {
     MapStack* mapStack = generateMapStack();
 
@@ -82,7 +82,7 @@ TEST(Test_AStar_MapStack, Corner2CornerSearchOnEmptyGrid)
         "Unexpected number of open nodes";
 }
 
-TEST(Test_AStar_MapStack, SearchAroundObstacle)
+TEST(Test_AStar_MapStack_Basic, SearchAroundObstacle)
 {
     MapStack* mapStack = generateMapStack();
 
@@ -107,7 +107,7 @@ TEST(Test_AStar_MapStack, SearchAroundObstacle)
         "Unexpected number of open nodes";
 }
 
-TEST(Test_AStar_MapStack, MemoryLeaks)
+TEST(Test_AStar_MapStack_Basic, MemoryLeaks)
 {
     MapStack* mapStack = generateMapStack();
 

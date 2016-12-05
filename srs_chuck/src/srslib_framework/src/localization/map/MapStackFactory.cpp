@@ -25,8 +25,12 @@ const string MapStackFactory::TAG_OCCUPANCY_IMAGE = "image";
 
 MapStack* MapStackFactory::fromJsonFile(string jsonFilename, double loadingTime)
 {
-    YAML::Node mapStackDocument = YAML::LoadFile(jsonFilename);
-    if (mapStackDocument.IsNull())
+    YAML::Node mapStackDocument;
+    try
+    {
+        mapStackDocument = YAML::LoadFile(jsonFilename);
+    }
+    catch (exception& e)
     {
         throw FailedToOpenFileException(jsonFilename);
     }

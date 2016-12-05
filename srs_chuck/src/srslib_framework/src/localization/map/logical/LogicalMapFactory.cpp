@@ -96,8 +96,12 @@ LogicalMap* LogicalMapFactory::fromGrid2d(Grid2d* grid, double resolution, Pose<
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename, double loadTime)
 {
-    YAML::Node jsonDocument = YAML::LoadFile(jsonFilename);
-    if (jsonDocument.IsNull())
+    YAML::Node jsonDocument;
+    try
+    {
+        jsonDocument = YAML::LoadFile(jsonFilename);
+    }
+    catch (exception& e)
     {
         throw FailedToOpenFileException(jsonFilename);
     }
@@ -116,8 +120,12 @@ LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename, double loadTime
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 LogicalMap* LogicalMapFactory::fromString(string geoJson, double loadTime)
 {
-    YAML::Node jsonDocument = YAML::Load(geoJson);
-    if (jsonDocument.IsNull())
+    YAML::Node jsonDocument;
+    try
+    {
+        jsonDocument = YAML::LoadFile(geoJson);
+    }
+    catch (exception& e)
     {
         throw FailedToParseJsonException(geoJson);
     }

@@ -20,7 +20,7 @@ using namespace srs;
 
 constexpr int GRID_SIZE = 5;
 
-TEST(Test_AStar_Grid2d, SmallSearchOnEmptyGrid)
+TEST(Test_AStar_Grid2d_Basic, SmallSearchOnEmptyGrid)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
@@ -34,14 +34,14 @@ TEST(Test_AStar_Grid2d, SmallSearchOnEmptyGrid)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(14, algorithm.getOpenNodesCount()) <<
+    ASSERT_EQ(13, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(16, algorithm.getClosedNodesCount()) <<
+    ASSERT_EQ(19, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 }
 
-TEST(Test_AStar_Grid2d, Corner2CornerSearchOnEmptyGrid)
+TEST(Test_AStar_Grid2d_Basic, Corner2CornerSearchOnEmptyGrid)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
@@ -55,14 +55,14 @@ TEST(Test_AStar_Grid2d, Corner2CornerSearchOnEmptyGrid)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(44, algorithm.getOpenNodesCount()) <<
+    ASSERT_EQ(20, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(37, algorithm.getClosedNodesCount()) <<
+    ASSERT_EQ(79, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 }
 
-TEST(Test_AStar_Grid2d, SearchAroundObstacle)
+TEST(Test_AStar_Grid2d_Basic, SearchAroundObstacle)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
@@ -78,14 +78,14 @@ TEST(Test_AStar_Grid2d, SearchAroundObstacle)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(17, algorithm.getOpenNodesCount()) <<
+    ASSERT_EQ(12, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(30, algorithm.getClosedNodesCount()) <<
+    ASSERT_EQ(35, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 }
 
-TEST(Test_AStar_Grid2d, Clear)
+TEST(Test_AStar_Grid2d_Basic, Clear)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
@@ -99,10 +99,10 @@ TEST(Test_AStar_Grid2d, Clear)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(14, algorithm.getOpenNodesCount()) <<
+    ASSERT_EQ(13, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(16, algorithm.getClosedNodesCount()) <<
+    ASSERT_EQ(19, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 
     algorithm.clear();
@@ -116,17 +116,17 @@ TEST(Test_AStar_Grid2d, Clear)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(12, algorithm.getOpenNodesCount()) <<
+    ASSERT_EQ(13, algorithm.getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(15, algorithm.getClosedNodesCount()) <<
+    ASSERT_EQ(19, algorithm.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 
     start->release();
     goal->release();
 }
 
-TEST(Test_AStar_Grid2d, MemoryLeaks)
+TEST(Test_AStar_Grid2d_Basic, MemoryLeaks)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
 
@@ -142,10 +142,10 @@ TEST(Test_AStar_Grid2d, MemoryLeaks)
     ASSERT_TRUE(algorithm->search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(14, algorithm->getOpenNodesCount()) <<
+    ASSERT_EQ(13, algorithm->getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(16, algorithm->getClosedNodesCount()) <<
+    ASSERT_EQ(19, algorithm->getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 
     algorithm->clear();

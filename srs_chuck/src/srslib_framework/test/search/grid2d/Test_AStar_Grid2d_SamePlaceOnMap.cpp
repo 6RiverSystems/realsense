@@ -23,7 +23,7 @@ using namespace srs;
 
 using namespace srs;
 
-TEST(Test_AStar_Grid2d, SamePositionOnMap)
+TEST(Test_AStar_Grid2d_SamePlaceOnMap, SamePositionOnMap)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 
@@ -55,7 +55,7 @@ TEST(Test_AStar_Grid2d, SamePositionOnMap)
     ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
 }
 
-TEST(Test_AStar_Grid2d, SameLocationOnMap)
+TEST(Test_AStar_Grid2d_SamePlaceOnMap, SameLocationOnMap)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 
@@ -72,10 +72,10 @@ TEST(Test_AStar_Grid2d, SameLocationOnMap)
     ASSERT_TRUE(algorithm->search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(2, algorithm->getOpenNodesCount()) <<
+    ASSERT_EQ(5, algorithm->getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(2, algorithm->getClosedNodesCount()) <<
+    ASSERT_EQ(4, algorithm->getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 
     algorithm->clear();

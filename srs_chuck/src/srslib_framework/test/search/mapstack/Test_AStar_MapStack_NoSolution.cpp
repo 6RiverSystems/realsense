@@ -23,7 +23,7 @@ using namespace srs;
 
 constexpr int GRID_SIZE = 5;
 
-TEST(Test_AStar_MapStack, NoSolution)
+TEST(Test_AStar_MapStack_NoSolution, NoSolution)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     test::Grid2dUtils::addObstacle(grid, 0, 0, GRID_SIZE - 1, GRID_SIZE - 1);
@@ -47,7 +47,7 @@ TEST(Test_AStar_MapStack, NoSolution)
         "Unexpected number of open nodes";
 }
 
-TEST(Test_AStar_MapStack, ForbiddenGoal)
+TEST(Test_AStar_MapStack_NoSolution, ForbiddenGoal)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     test::Grid2dUtils::addObstacle(grid, 1, 0, GRID_SIZE - 1, GRID_SIZE - 1);
@@ -71,7 +71,7 @@ TEST(Test_AStar_MapStack, ForbiddenGoal)
         "Unexpected number of open nodes";
 }
 
-TEST(Test_AStar_MapStack, UnreachableGoal)
+TEST(Test_AStar_MapStack_NoSolution, UnreachableGoal)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     test::Grid2dUtils::addObstacle(grid, 2, 0, 2, GRID_SIZE - 1);

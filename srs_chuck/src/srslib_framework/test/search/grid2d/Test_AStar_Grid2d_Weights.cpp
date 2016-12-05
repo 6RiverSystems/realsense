@@ -25,17 +25,17 @@ using namespace srs;
 
 constexpr int GRID_SIZE = 5;
 
-TEST(Test_AStar_Grid2d, SmallSearchWithWeights)
+TEST(Test_AStar_Grid2d_Weights, SmallSearchWithWeights)
 {
     Solution<Grid2dSolutionItem>* correctSolution = Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
-    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 1, 0), Pose<>(3, 1, M_PI_2), 2});
-    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 1, M_PI_2), Pose<>(3, 2, M_PI_2), 3});
-    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 2, M_PI_2), Pose<>(3, 2, -M_PI), 5});
-    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 2, -M_PI), Pose<>(2, 2, -M_PI), 6});
-    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(2, 2, -M_PI), Pose<>(1, 2, -M_PI), 7});
-    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 2, -M_PI), Pose<>(1, 2, -M_PI_2), 9});
-    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 2, -M_PI_2), Pose<>(1, 1, -M_PI_2), 10});
-    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, -M_PI_2), Pose<>(1, 1, 0), 12});
+    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 1, 0), Pose<>(3, 1, -M_PI_2), 2});
+    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 1, -M_PI_2), Pose<>(3, 0, -M_PI_2), 3});
+    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 0, -M_PI_2), Pose<>(3, 0, -M_PI), 5});
+    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 0, -M_PI), Pose<>(2, 0, -M_PI), 6});
+    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(2, 0, -M_PI), Pose<>(1, 0, -M_PI), 7});
+    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 0, -M_PI), Pose<>(1, 0, M_PI_2), 9});
+    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 0, M_PI_2), Pose<>(1, 1, M_PI_2), 10});
+    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 12});
 
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     grid.setWeights(Grid2d::Location(2, 1), 0, 0, 0, 100);
@@ -59,17 +59,17 @@ TEST(Test_AStar_Grid2d, SmallSearchWithWeights)
         "The solution is not as expected";
 }
 
-TEST(Test_AStar_Grid2d, SmallSearchWithMoreWeights)
+TEST(Test_AStar_Grid2d_Weights, SmallSearchWithMoreWeights)
 {
     Solution<Grid2dSolutionItem>* correctSolution = Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
-    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 1, 0), Pose<>(3, 1, M_PI_2), 2});
-    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 1, M_PI_2), Pose<>(3, 2, M_PI_2), 3});
-    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 2, M_PI_2), Pose<>(3, 2, -M_PI), 5});
-    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 2, -M_PI), Pose<>(2, 2, -M_PI), 6});
-    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(2, 2, -M_PI), Pose<>(1, 2, -M_PI), 7});
-    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 2, -M_PI), Pose<>(1, 2, -M_PI_2), 9});
-    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 2, -M_PI_2), Pose<>(1, 1, -M_PI_2), 10});
-    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, -M_PI_2), Pose<>(1, 1, 0), 12});
+    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 1, 0), Pose<>(3, 1, -M_PI_2), 2});
+    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 1, -M_PI_2), Pose<>(3, 0, -M_PI_2), 3});
+    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(3, 0, -M_PI_2), Pose<>(3, 0, -M_PI), 5});
+    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(3, 0, -M_PI), Pose<>(2, 0, -M_PI), 6});
+    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(2, 0, -M_PI), Pose<>(1, 0, -M_PI), 7});
+    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 0, -M_PI), Pose<>(1, 0, M_PI_2), 9});
+    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 0, M_PI_2), Pose<>(1, 1, M_PI_2), 10});
+    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 12});
 
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     grid.setWeights(Grid2d::Location(2, 1), 0, 0, 0, 100);

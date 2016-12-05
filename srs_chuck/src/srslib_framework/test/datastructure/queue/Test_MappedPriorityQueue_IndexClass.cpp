@@ -12,7 +12,7 @@
 #include <unordered_set>
 using namespace std;
 
-#include <srslib_framework/datastructure/queue/MappedPriorityQueue3.hpp>
+#include <srslib_framework/datastructure/queue/MappedPriorityQueue.hpp>
 #include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 
@@ -57,8 +57,8 @@ TEST(Test_MappedPriorityQueue_IndexClass, Creation)
 {
     test::MemoryWatch memoryWatch;
 
-    MappedPriorityQueue3<Index, float, IndexHash, IndexEqual>* queue =
-        new MappedPriorityQueue3<Index, float, IndexHash, IndexEqual>();
+    MappedPriorityQueue<Index, float, IndexHash, IndexEqual>* queue =
+        new MappedPriorityQueue<Index, float, IndexHash, IndexEqual>();
 
     queue->push(100.1, Index{6, 10});
     queue->push(500, Index{5, 50});
@@ -101,7 +101,7 @@ TEST(Test_MappedPriorityQueue_IndexClass, Creation)
 
 TEST(Test_MappedPriorityQueue_IndexClass, Exist)
 {
-    MappedPriorityQueue3<Index, int, IndexHash, IndexEqual> queue;
+    MappedPriorityQueue<Index, int, IndexHash, IndexEqual> queue;
 
     queue.push(100, Index{6, 10});
     queue.push(500, Index{5, 50});
@@ -116,7 +116,7 @@ TEST(Test_MappedPriorityQueue_IndexClass, Exist)
 
 TEST(Test_MappedPriorityQueue_IndexClass, Erase)
 {
-    MappedPriorityQueue3<Index, float, IndexHash, IndexEqual> queue;
+    MappedPriorityQueue<Index, float, IndexHash, IndexEqual> queue;
 
     queue.push(100, Index{6, 10});
     queue.push(500, Index{5, 50});

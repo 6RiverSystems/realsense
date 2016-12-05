@@ -21,7 +21,7 @@ using namespace srs;
 
 static const int TRIALS = 10;
 
-TEST(Test_AStar_MapStack, Barrett_BigSearch)
+TEST(Test_AStar_MapStack_Barrett, BigSearch)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/barrett/barrett.yaml");
 

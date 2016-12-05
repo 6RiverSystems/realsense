@@ -1,4 +1,5 @@
 close all;
+clear variables;
 RESOLUTION = 0.05;
 ORIGIN = [-0.025, -0.025, 0.000];
 

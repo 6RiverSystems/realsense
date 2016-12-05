@@ -5,24 +5,16 @@ ORIGIN = [-10, -10, 0];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Main map layer
-map = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-obstacles.png', ...
+map = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq/src/6rshq-logical-obstacles.png', ...
     RESOLUTION, ORIGIN);
 showMap(map, 'Obstacles');
 
 % Make sure that the border is marked and sealed
 map = convertToBorderObstacle(map, [1, 2, 3, 7, 8, 9, 10, 11, 12], 1, 1);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% One-way layer
-layerOneway = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-oneway.png', ...
-    RESOLUTION, ORIGIN);
-showMap(layerOneway, 'One-ways');
-
-layerOneway = convertToWeightedArea(layerOneway, 1, 0, 0, 0, 100);
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Warning sound layer
-layerWarningSound = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/src/6rshq_oneway-logical-warning_sound.png', ...
+layerWarningSound = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq/src/6rshq-logical-warning_sound.png', ...
     RESOLUTION, ORIGIN);
 showMap(layerWarningSound, 'Warning sound');
 
@@ -130,9 +122,9 @@ map = addGraph(map, '6rshq_graph', ...
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map
-map = addLayer(map, {layerWarningSound, layerOneway, layerCostArea});
+map = addLayer(map, {layerWarningSound});
 showMap(map, 'Complete map');
 
 saveGeoJsonMap(map, ...
-    '/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/map/6rshq_oneway.geojson');
-open('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway/map/6rshq_oneway.geojson');
+    '/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq/map/6rshq.geojson');
+open('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq/map/6rshq.geojson');

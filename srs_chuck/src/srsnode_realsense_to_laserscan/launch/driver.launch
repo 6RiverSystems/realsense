@@ -11,8 +11,10 @@
 
 	<remap from="/camera/depth/points" to="/internal/sensors/rgbd/depth/points"/>
 
+	<param name="$(arg camera)/driver/r200_dc_preset"   type="int"  value="5" />
+
 	<!-- Intel Realsense R200 driver -->
-	<include file="$(find realsense_camera)/launch/r200_nodelet_navigation.launch" >
+	<include file="$(find realsense_camera)/launch/r200_nodelet_modify_params.launch" >
         <arg name="enable_color" value="false" />
         <arg name="enable_tf" value="false" />
     </include>

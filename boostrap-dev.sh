@@ -35,7 +35,7 @@ sudo apt-get install python-rosdep
 sudo rosdep init
 rosdep update
 
-sudo apt-get install ros-indigo-ros-base ros-indigo-rgbd-launch ros-indigo-depthimage-to-laserscan ros-indigo-laser-filters ros-indigo-navigation ros-indigo-robot-model ros-indigo-urdf ros-indigo-urdf ros-indigo-xacro ros-indigo-tf ros-indigo-tf2 ros-indigo-tf2-sensor-msgs ros-indigo-camera-info-manager ros-indigo-joy ros-indigo-rosbridge-server ros-indigo-robot-state-publisher -y
+sudo apt-get install ros-indigo-ros-base ros-indigo-rgbd-launch ros-indigo-depthimage-to-laserscan ros-indigo-laser-filters ros-indigo-navigation ros-indigo-robot-model ros-indigo-urdf ros-indigo-urdf ros-indigo-xacro ros-indigo-tf ros-indigo-tf2 ros-indigo-tf2-sensor-msgs ros-indigo-camera-info-manager ros-indigo-joy ros-indigo-rosbridge-server ros-indigo-robot-state-publisher ros-indigo-pointcloud-to-laserscan -y
 
 echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:${PYTHONPATH}" >> ~/.bashrc
 echo "export PATH=/usr/lib/ccache:$PATH" >> ~/.bashrc

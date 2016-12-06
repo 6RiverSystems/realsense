@@ -5,3 +5,15 @@
 [submodule "srs_chuck/src/navigation"]
 	path = srs_chuck/src/navigation
 	url = git@github.com:6RiverSystems/navigation.git
+
+[submodule "srs_chuck/src/librealsense"]
+	path = srs_chuck/src/librealsense
+	url = git@github.com:6RiverSystems/librealsense.git
+
+[submodule "srs_chuck/src/realsense"]
+	path = srs_chuck/src/realsense
+	url = git@github.com:6RiverSystems/realsense.git
+
+[submodule "srs_chuck/src/sick_tim"]
+	path = srs_chuck/src/sick_tim
+	url = git@github.com:6RiverSystems/sick_tim.git

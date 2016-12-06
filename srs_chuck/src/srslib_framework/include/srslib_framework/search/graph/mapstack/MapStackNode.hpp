@@ -116,7 +116,7 @@ struct MapStackNode : public SearchNode
                 stream << "nullptr";
             }
 
-            return stream << "}"
+            return stream << "}";
     }
 
 protected:

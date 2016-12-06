@@ -19,7 +19,10 @@ void AStar::clear()
     while (!openQueue_.empty())
     {
         openQueue_.pop(node);
-        node->release();
+        if (node != startNode_)
+        {
+            node->release();
+        }
     }
 
     // Release all the nodes in the closed set,

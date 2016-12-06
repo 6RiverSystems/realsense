@@ -6,47 +6,56 @@
 #pragma once
 
 #include <string>
+#include <functional>
+
 using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
 #include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
+#include <srslib_framework/MsgHardwareInfo.h>
 
 namespace srs {
 
 class HardwareInfoHandler : public HardwareMessageHandler
 {
 public:
-    static constexpr char HARDWARE_INFO_KEY = static_cast<char>(BRAIN_STEM_MSG::HARDWARE_INFO);
 
-    static const string TOPIC_HARDWARE_INFO;
+	typedef std::function<void(srslib_framework::MsgHardwareInfo&)> HardwareInfoFn;
 
-    HardwareInfoHandler();
+    HardwareInfoHandler(HardwareInfoFn hardareInfoCallback = [&](srslib_framework::MsgHardwareInfo&) {});
 
-    virtual ~HardwareInfoHandler()
-    {}
+    virtual ~HardwareInfoHandler() {}
 
-    void receiveData(ros::Time currentTime, vector<char>& binaryData);
+    bool receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
 private:
-    HW_MESSAGE_BEGIN(MsgHardwareInfo)
+
+    HW_MESSAGE_BEGIN(HardwareInfoMsg1)
         uint8_t cmd;
         uint16_t uniqueId[8];
         uint8_t chassisGeneration;
         uint8_t brainstemHwVersion;
+        //char brainstemFirmwareVersion* (null terminated string)
     HW_MESSAGE_END
 
-    void publishHardwareInfo();
+    HW_MESSAGE_BEGIN(MsgHardwareInfo2)
+		uint8_t cmd;
+		uint16_t uniqueId[8];
+		uint8_t chassisGeneration;
+		uint8_t brainstemHwVersion;
+        char brainstemFirmwareVersion[64];
+        uint8_t numberOfBatteries;
+    	// MsgBatteryInfo[numberOfBatteries];
+    HW_MESSAGE_END
 
-    unsigned int brainstemHwVersion_;
-    string brainstemSwVersion_;
+    HW_MESSAGE_BEGIN(MsgBatteryInfo)
+    	char manufacturer[13];
+    	char serialNumber[33];
+    HW_MESSAGE_END
 
-    unsigned int chassisGeneration_;
+    srslib_framework::MsgHardwareInfo hardwareInfoMsg_;
 
-    ros::Publisher pubHardwareInfo_;
-
-    string robotName_;
-
-    string uid_;
+    HardwareInfoFn hardwareInfoCallback_;
 };
 
 } // namespace srs

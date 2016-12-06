@@ -6,28 +6,30 @@
 #pragma once
 
 #include <string>
+#include <functional>
+
+using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
 #include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
+#include <srslib_framework/OdometryRPM.h>
+
 
 namespace srs {
 
 class RawOdometryHandler : public HardwareMessageHandler
 {
 public:
-    static constexpr char RAW_ODOMETRY_KEY = static_cast<char>(BRAIN_STEM_MSG::RAW_ODOMETRY);
-
-    static const string TOPIC_RAW_ODOMETRY;
-
     static constexpr int SERIAL_TRANSMIT_DELAY = 3400000;
     static constexpr double OUT_OF_SYNC_TIMEOUT = 0.15;
 
-    RawOdometryHandler();
+	typedef function<void(srslib_framework::OdometryRPM&)> RawOdometryFn;
 
-    virtual ~RawOdometryHandler()
-    {}
+    RawOdometryHandler(RawOdometryFn rawOdometryCallback = [&](srslib_framework::OdometryRPM&) {});
 
-    void receiveData(ros::Time currentTime, vector<char>& binaryData);
+    virtual ~RawOdometryHandler() {}
+
+    bool receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
 private:
     HW_MESSAGE_BEGIN(MsgRawOdometry)
@@ -39,7 +41,7 @@ private:
 
 	void publishOdometry(float leftWheelRPM, float rightWheelRPM);
 
-    ros::Publisher pubOdometry_;
+    RawOdometryFn rawOdometryCallback_;
 
     double lastHwOdometryTime_;
 

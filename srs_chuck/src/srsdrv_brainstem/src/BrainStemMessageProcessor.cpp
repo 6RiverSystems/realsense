@@ -19,11 +19,29 @@ namespace srs {
 
 using namespace ros;
 
+#define PUBLISHER(name, object, msg) std::bind(&name##Publisher::publish##msg, object##Publisher_, std::placeholders::_1)
+
 BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) :
 	m_pIO( pIO ),
     soundHandler_(this),
-    freeSpinHandler_(this)
+    freeSpinHandler_(this),
+	rawOdometryPublisher_(),
+	rawOdometryHandler_(PUBLISHER(RawOdometry, rawOdometry, RawOdometry)),
+	sensorFramePublisher_(),
+	sensorFrameHandler_(PUBLISHER(SensorFrame, sensorFrame, Imu),
+		PUBLISHER(SensorFrame, sensorFrame, Odometry),
+		PUBLISHER(SensorFrame, sensorFrame, SensorFrame)),
+	hardwareInfoPublisher_(),
+	hardwareInfoHandler_(PUBLISHER(HardwareInfo, hardwareInfo, HardwareInfo)),
+	powerStatePublisher_(),
+	powerStateHandler_(PUBLISHER(PowerState, powerState, PowerState))
 {
+
+    hwMessageHandlers_[rawOdometryHandler_.getKey()] = &rawOdometryHandler_;
+    hwMessageHandlers_[sensorFrameHandler_.getKey()] = &sensorFrameHandler_;
+    hwMessageHandlers_[hardwareInfoHandler_.getKey()] = &hardwareInfoHandler_;
+    hwMessageHandlers_[powerStateHandler_.getKey()] = &powerStateHandler_;
+
 	m_mapEntityButton[LED_ENTITIES::TOTE0]		= "TOTE0";
 	m_mapEntityButton[LED_ENTITIES::TOTE1]		= "TOTE1";
 	m_mapEntityButton[LED_ENTITIES::TOTE2]		= "TOTE2";
@@ -61,6 +79,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
     hwMessageHandlers_[rawOdometryHandler_.getKey()] = &rawOdometryHandler_;
     hwMessageHandlers_[sensorFrameHandler_.getKey()] = &sensorFrameHandler_;
     hwMessageHandlers_[hardwareInfoHandler_.getKey()] = &hardwareInfoHandler_;
+    hwMessageHandlers_[powerStateHandler_.getKey()] = &powerStateHandler_;
 }
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor( )
@@ -99,11 +118,9 @@ void BrainStemMessageProcessor::SetVoltageCallback( VoltageCallbackFn voltageCal
 void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 {
     BRAIN_STEM_MSG eCommand = BRAIN_STEM_MSG::UNKNOWN;
-    char messageKey = 0x00;
 
     if (buffer.size() > 0)
     {
-        messageKey = buffer[0];
         eCommand = static_cast<BRAIN_STEM_MSG>(buffer[0]);
     }
 
@@ -179,16 +196,26 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 
     // Go through the registered message handlers and
     // communicate the data if the key matches
-    HwMessageHandlerMapType::iterator handler = hwMessageHandlers_.find(messageKey);
+    HwMessageHandlerMapType::iterator handler = hwMessageHandlers_.find(eCommand);
     if (handler != hwMessageHandlers_.end())
     {
-        handler->second->receiveData(currentTime, buffer);
-        return;
+    	try
+		{
+    		handler->second->receiveData(currentTime, buffer);
+
+    		return;
+		}
+		catch(std::runtime_error& error)
+		{
+			// If it arrives here, the message failed to parse
+			ROS_ERROR_STREAM( "Message from brainstem malformed: " <<
+				static_cast<char>(eCommand) << ", data: " << ToHex(buffer) << ", exception: " << error.what());
+		}
     }
 
     // If it arrives here, the message key is unknown
     ROS_ERROR_STREAM( "Unknown message from brainstem: " <<
-        static_cast<int>(eCommand) << ", data: " << ToHex(buffer));
+        static_cast<char>(eCommand) << ", data: " << ToHex(buffer));
 }
 
 void BrainStemMessageProcessor::GetOperationalState( )

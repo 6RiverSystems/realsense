@@ -6,41 +6,48 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <functional>
+
 using namespace std;
 
 #include <ros/ros.h>
+#include <hw_message/HardwareMessage.hpp>
 
 namespace srs {
 
 class HardwareMessageHandler
 {
 public:
-    HardwareMessageHandler(char messageKey, string nameSpace = "~") :
+    HardwareMessageHandler(BRAIN_STEM_MSG messageKey) :
         messageKey_(messageKey)
     {
-        rosNodeHandle_ = ros::NodeHandle(nameSpace);
     }
 
-    virtual ~HardwareMessageHandler()
-    {}
+    virtual ~HardwareMessageHandler() {}
 
-    char getKey() const
+    BRAIN_STEM_MSG getKey() const
     {
         return messageKey_;
     }
 
-    bool isKeyMatching(char key) const
+    bool isKeyMatching(BRAIN_STEM_MSG key) const
     {
         return key == messageKey_;
     }
 
-    virtual void receiveData(ros::Time currentTime, vector<char>& binaryData) = 0;
+    bool receiveData(ros::Time currentTime, vector<char>& msg)
+    {
+    	HardwareMessage hardwareMessage(msg);
 
-protected:
-    ros::NodeHandle rosNodeHandle_;
+    	return receiveMessage(currentTime, hardwareMessage);
+    }
+
+    virtual bool receiveMessage(ros::Time currentTime, HardwareMessage& msg) = 0;
 
 private:
-    char messageKey_;
+
+    BRAIN_STEM_MSG messageKey_;
 };
 
 } // namespace srs

@@ -19,8 +19,13 @@ using namespace std;
 #include <srsdrv_brainstem/BrainStemMessages.h>
 #include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
 #include <srsdrv_brainstem/hw_message/SensorFrameHandler.hpp>
+#include <srsdrv_brainstem/hw_publisher/SensorFramePublisher.hpp>
 #include <srsdrv_brainstem/hw_message/RawOdometryHandler.hpp>
+#include <srsdrv_brainstem/hw_publisher/RawOdometryPublisher.hpp>
 #include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
+#include <srsdrv_brainstem/hw_publisher/HardwareInfoPublisher.hpp>
+#include <srsdrv_brainstem/hw_message/PowerStateHandler.hpp>
+#include <srsdrv_brainstem/hw_publisher/PowerStatePublisher.hpp>
 
 #include <srsdrv_brainstem/sw_message/SoundHandler.hpp>
 #include <srsdrv_brainstem/sw_message/FreeSpinHandler.hpp>
@@ -43,7 +48,7 @@ public:
     void processHardwareMessage(vector<char> buffer);
     void processRosMessage(const string& strMessage);
 
-    using HwMessageHandlerMapType = map<char, HardwareMessageHandler*>;
+    using HwMessageHandlerMapType = map<BRAIN_STEM_MSG, HardwareMessageHandler*>;
 
 	typedef std::function<void(bool)> ConnectionChangedFn;
 
@@ -153,12 +158,19 @@ private:
 
     HwMessageHandlerMapType hwMessageHandlers_;
 
-    HardwareInfoHandler hardwareInfoHandler_;
     SoundHandler soundHandler_;
     FreeSpinHandler freeSpinHandler_;
 
+    HardwareInfoPublisher hardwareInfoPublisher_;
+    HardwareInfoHandler hardwareInfoHandler_;
+
+    PowerStatePublisher powerStatePublisher_;
+    PowerStateHandler powerStateHandler_;
+
+    SensorFramePublisher sensorFramePublisher_;
     SensorFrameHandler sensorFrameHandler_;
 
+    RawOdometryPublisher rawOdometryPublisher_;
     RawOdometryHandler rawOdometryHandler_;
 };
 

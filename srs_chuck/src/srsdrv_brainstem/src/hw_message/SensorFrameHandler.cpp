@@ -15,27 +15,19 @@
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Constant definitions
-
-const string SensorFrameHandler::TOPIC_ODOMETRY_COUNT = "/internal/sensors/odometry/count";
-const string SensorFrameHandler::TOPIC_IMU = "/internal/sensors/imu/raw";
-const string SensorFrameHandler::TOPIC_SENSOR_FRAME = "/internal/sensors/sensor_frame/raw";
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-SensorFrameHandler::SensorFrameHandler() :
-    HardwareMessageHandler(SENSOR_FRAME_KEY),
+SensorFrameHandler::SensorFrameHandler(ImuCallbackFn imuCallback, OdometryCallbackFn odometryCallback,
+    SensorFrameCallbackFn sensorFrameCallback) :
+    HardwareMessageHandler(BRAIN_STEM_MSG::SENSOR_FRAME),
     lastHwSensorFrameTime_(0),
     lastRosSensorFrameTime_(ros::Time::now()),
-    currentOdometry_(Odometry<>::ZERO)
+    currentOdometry_(Odometry<>::ZERO),
+	imuCallback_(imuCallback),
+	odometryCallback_(odometryCallback),
+	sensorFrameCallback_(sensorFrameCallback)
 {
-    pubOdometryCount_ = rosNodeHandle_.advertise<srslib_framework::Odometry>(
-    	TOPIC_ODOMETRY_COUNT, 10);
-    pubImu_ = rosNodeHandle_.advertise<srslib_framework::Imu>(
-        TOPIC_IMU, 10);
-    pubSensorFrame_ = rosNodeHandle_.advertise<srslib_framework::SensorFrame>(
-        TOPIC_SENSOR_FRAME, 10);
+
 }
 
 int32_t calculateOdometryDiff(uint32_t current, uint32_t& last)
@@ -71,103 +63,96 @@ int32_t calculateOdometryDiff(uint32_t current, uint32_t& last)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SensorFrameHandler::receiveData(ros::Time currentTime, vector<char>& buffer)
+bool SensorFrameHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
 {
-    MsgSensorFrame* sensorData = reinterpret_cast<MsgSensorFrame*>(buffer.data());
+    MsgSensorFrame sensorData = msg.read<MsgSensorFrame>();
 
     ros::Time internalTime = currentTime;
-    bool timeSliceExpired = TimeMath::isTimeElapsed(OUT_OF_SYNC_TIMEOUT,
-        lastRosSensorFrameTime_, internalTime);
+	bool timeSliceExpired = TimeMath::isTimeElapsed(OUT_OF_SYNC_TIMEOUT,
+		lastRosSensorFrameTime_, internalTime);
 
-    if (timeSliceExpired)
-    {
-        ROS_ERROR_STREAM_NAMED("sensor_frame",
-            "Time-stamp out of range: " <<
-            "diff: " << (internalTime.toSec() - lastRosSensorFrameTime_.toSec()) <<
-            " last: " << lastRosSensorFrameTime_.toSec() <<
-            " current: " << internalTime.toSec());
-    }
+	if (timeSliceExpired)
+	{
+		ROS_ERROR_STREAM_NAMED("sensor_frame",
+			"Time-stamp out of range: " <<
+			"diff: " << (internalTime.toSec() - lastRosSensorFrameTime_.toSec()) <<
+			" last: " << lastRosSensorFrameTime_.toSec() <<
+			" current: " << internalTime.toSec());
+	}
 
-    // Produce the current robot velocity from the odometry data
-    Velocity<> odometryVelocity = Velocity<>(
-        sensorData->linear_velocity,
-        sensorData->angular_velocity);
+	// Produce the current robot velocity from the odometry data
+	Velocity<> odometryVelocity = Velocity<>(
+		sensorData.linear_velocity,
+		sensorData.angular_velocity);
 
-    // If the last time the handler received the data is greater than the specified
-    // time-out or the robot is standing still, set the arrival time of the data
-    // to the current time minus the transmission delay (in this case of the serial port)
-    if (timeSliceExpired || VelocityMath::equal<double>(odometryVelocity, Velocity<>::ZERO))
-    {
-        internalTime = currentTime - ros::Duration(0, SERIAL_TRANSMIT_DELAY);
-    }
-    else
-    {
-        // Otherwise calculate the arrival time of the data based on the
-        // ROS time of the last sensor frame plus the difference between
-        // the two hardware time-stamps
-        double deltaTimeSlice = (static_cast<double>(sensorData->timestamp) -
-            lastHwSensorFrameTime_) / 1000.0;
+	// If the last time the handler received the data is greater than the specified
+	// time-out or the robot is standing still, set the arrival time of the data
+	// to the current time minus the transmission delay (in this case of the serial port)
+	if (timeSliceExpired || VelocityMath::equal<double>(odometryVelocity, Velocity<>::ZERO))
+	{
+		internalTime = currentTime - ros::Duration(0, SERIAL_TRANSMIT_DELAY);
+	}
+	else
+	{
+		// Otherwise calculate the arrival time of the data based on the
+		// ROS time of the last sensor frame plus the difference between
+		// the two hardware time-stamps
+		double deltaTimeSlice = (static_cast<double>(sensorData.timestamp) -
+			lastHwSensorFrameTime_) / 1000.0;
 
-        internalTime = lastRosSensorFrameTime_+ ros::Duration(deltaTimeSlice);
-    }
+		internalTime = lastRosSensorFrameTime_+ ros::Duration(deltaTimeSlice);
+	}
 
-    static uint32_t s_leftWheelCount = sensorData->left_wheel_count;
-    static uint32_t s_rightWheelCount = sensorData->right_wheel_count;
+	static uint32_t s_leftWheelCount = sensorData.left_wheel_count;
+	static uint32_t s_rightWheelCount = sensorData.right_wheel_count;
 
-    int32_t s_leftWheelDiff = calculateOdometryDiff(sensorData->left_wheel_count, s_leftWheelCount);
-    int32_t s_rightWheelDiff = calculateOdometryDiff(sensorData->right_wheel_count, s_rightWheelCount);
+	int32_t s_leftWheelDiff = calculateOdometryDiff(sensorData.left_wheel_count, s_leftWheelCount);
+	int32_t s_rightWheelDiff = calculateOdometryDiff(sensorData.right_wheel_count, s_rightWheelCount);
 
-    // Store the time for the next sensor frame
-    lastRosSensorFrameTime_ = internalTime;
-    lastHwSensorFrameTime_ = static_cast<double>(sensorData->timestamp);
+	// Store the time for the next sensor frame
+	lastRosSensorFrameTime_ = internalTime;
+	lastHwSensorFrameTime_ = static_cast<double>(sensorData.timestamp);
 
-    // Generate the current odometry value
-    double currentTimeSec = internalTime.toSec();
-    currentOdometry_ = Odometry<>(Velocity<>(currentTimeSec, odometryVelocity));
-    currentImu_ = Imu<>(currentTimeSec,
-        AngleMath::deg2Rad<double>(sensorData->yaw),
-        AngleMath::deg2Rad<double>(sensorData->pitch),
-        AngleMath::deg2Rad<double>(sensorData->roll),
-        sensorData->yawRot,
-        sensorData->pitchRot,
-        sensorData->rollRot);
+	// Generate the current odometry value
+	double currentTimeSec = internalTime.toSec();
+	currentOdometry_ = Odometry<>(Velocity<>(currentTimeSec, odometryVelocity));
 
-    // Publish all the data
-    publishSensorFrame();
-    publishOdometryCount(s_leftWheelDiff, s_rightWheelDiff);
-    publishImu();
-}
+	srslib_framework::SensorFrame sensorFrameMsg;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// Private methods
+	if (msg.checkBufferSize<MsgImu>())
+	{
+		MsgImu imuData = msg.read<MsgImu>();
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void SensorFrameHandler::publishImu()
-{
-    srslib_framework::Imu message = ImuMessageFactory::imu2Msg(currentImu_);
-    pubImu_.publish(message);
-}
+		currentImu_ = Imu<>(currentTimeSec,
+			AngleMath::deg2Rad<double>(imuData.yaw),
+			AngleMath::deg2Rad<double>(imuData.pitch),
+			AngleMath::deg2Rad<double>(imuData.roll),
+			imuData.yawRot,
+			imuData.pitchRot,
+			imuData.rollRot);
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void SensorFrameHandler::publishOdometryCount(int32_t leftWheelDiff, int32_t rightWheelDiff)
-{
-	srslib_framework::Odometry message;
+		sensorFrameMsg.imu.yaw = imuData.yaw;
+		sensorFrameMsg.imu.pitch = imuData.pitch;
+		sensorFrameMsg.imu.roll = imuData.roll;
+		sensorFrameMsg.imu.yawRot = imuData.yawRot;
+		sensorFrameMsg.imu.pitchRot = imuData.pitchRot;
+		sensorFrameMsg.imu.rollRot = imuData.rollRot;
 
-	message.left_wheel = leftWheelDiff;
-    message.right_wheel = rightWheelDiff;
-    message.header.stamp = lastRosSensorFrameTime_;
+		srslib_framework::Imu imuMsg = ImuMessageFactory::imu2Msg(currentImu_);
+		imuCallback_(imuMsg);
+	}
 
-    pubOdometryCount_.publish(message);
-}
+	sensorFrameMsg.header.stamp = lastRosSensorFrameTime_;
+	sensorFrameMsg.odometry = VelocityMessageFactory::velocity2Msg(currentOdometry_.velocity);
+	sensorFrameCallback_(sensorFrameMsg);
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void SensorFrameHandler::publishSensorFrame()
-{
-    srslib_framework::SensorFrame message;
-    message.header.stamp = lastRosSensorFrameTime_;
-    message.imu = ImuMessageFactory::imu2Msg(currentImu_);
-    message.odometry = VelocityMessageFactory::velocity2Msg(currentOdometry_.velocity);
-    pubSensorFrame_.publish(message);
+	srslib_framework::Odometry odometryMsg;
+	odometryMsg.left_wheel = s_leftWheelDiff;
+	odometryMsg.right_wheel = s_rightWheelDiff;
+	odometryMsg.header.stamp = lastRosSensorFrameTime_;
+	odometryCallback_(odometryMsg);
+
+	return true;
 }
 
 } // namespace srs

@@ -52,6 +52,10 @@ set(${PROJECT_NAME}_MSGS
     MsgOperationalState.msg
     MsgSolution.msg
     MsgSolutionItem.msg
+    MsgBatteryInfo.msg
+    MsgBatteryDescriptor.msg
+    MsgBatteryState.msg
+    MsgPowerState.msg
     OccupancyMap.msg
     OccupancyMetadata.msg
     Pose.msg

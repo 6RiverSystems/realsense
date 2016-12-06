@@ -9,24 +9,22 @@
 
 namespace srs {
 
-const string RawOdometryHandler::TOPIC_RAW_ODOMETRY = "/internal/sensors/odometry/rpm/raw";
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-RawOdometryHandler::RawOdometryHandler() :
-    HardwareMessageHandler(RAW_ODOMETRY_KEY),
+RawOdometryHandler::RawOdometryHandler(RawOdometryFn rawOdometryCallback) :
+    HardwareMessageHandler(BRAIN_STEM_MSG::RAW_ODOMETRY),
     lastHwOdometryTime_(0),
-    lastRosOdometryTime_(ros::Time::now())
+    lastRosOdometryTime_(ros::Time::now()),
+	rawOdometryCallback_(rawOdometryCallback)
 {
-	pubOdometry_ = rosNodeHandle_.advertise<srslib_framework::OdometryRPM>(
-		TOPIC_RAW_ODOMETRY , 100);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void RawOdometryHandler::receiveData(ros::Time currentTime, vector<char>& buffer)
+bool RawOdometryHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
 {
-    MsgRawOdometry* odometryRPMData = reinterpret_cast<MsgRawOdometry*>(buffer.data());
+	MsgRawOdometry odometryRPMData = msg.read<MsgRawOdometry>();
 
 	ros::Time internalTime = currentTime;
 	bool timeSliceExpired = TimeMath::isTimeElapsed(OUT_OF_SYNC_TIMEOUT,
@@ -34,17 +32,17 @@ void RawOdometryHandler::receiveData(ros::Time currentTime, vector<char>& buffer
 
 	if (timeSliceExpired)
 	{
-	    ROS_ERROR_STREAM_NAMED("odometry_frame",
-	        "Time-stamp out of range: " <<
-	        " diff: " << (internalTime.toSec() - lastRosOdometryTime_.toSec()) <<
-	        " last: " << lastRosOdometryTime_.toSec() <<
-	        " current: " << internalTime.toSec());
+		ROS_ERROR_STREAM_NAMED("odometry_frame",
+			"Time-stamp out of range: " <<
+			" diff: " << (internalTime.toSec() - lastRosOdometryTime_.toSec()) <<
+			" last: " << lastRosOdometryTime_.toSec() <<
+			" current: " << internalTime.toSec());
 	}
 
 	constexpr static double RPM_EPSILON = 0.00001;
 
 	bool isRobotStatic = true;
-	if (fabs(odometryRPMData->rpm_left_wheel) > RPM_EPSILON || fabs(odometryRPMData->rpm_right_wheel) > RPM_EPSILON)
+	if (fabs(odometryRPMData.rpm_left_wheel) > RPM_EPSILON || fabs(odometryRPMData.rpm_right_wheel) > RPM_EPSILON)
 	{
 		isRobotStatic = false;
 	}
@@ -54,23 +52,31 @@ void RawOdometryHandler::receiveData(ros::Time currentTime, vector<char>& buffer
 	// to the current time minus the transmission delay (in this case of the serial port)
 	if (timeSliceExpired || isRobotStatic)
 	{
-	    internalTime = currentTime - ros::Duration(0, SERIAL_TRANSMIT_DELAY);
+		internalTime = currentTime - ros::Duration(0, SERIAL_TRANSMIT_DELAY);
 	}
 	else
 	{
-	    // Otherwise calculate the arrival time of the data based on the
-	    // ROS time of the last sensor frame plus the difference between
-	    // the two hardware time-stamps
-	    double deltaTimeSlice = (static_cast<double>(odometryRPMData->timestamp) -
-	        lastHwOdometryTime_) / 1000.0;
+		// Otherwise calculate the arrival time of the data based on the
+		// ROS time of the last sensor frame plus the difference between
+		// the two hardware time-stamps
+		double deltaTimeSlice = (static_cast<double>(odometryRPMData.timestamp) -
+			lastHwOdometryTime_) / 1000.0;
 
-	    internalTime = lastRosOdometryTime_+ ros::Duration(deltaTimeSlice);
+		internalTime = lastRosOdometryTime_+ ros::Duration(deltaTimeSlice);
 	}
 
 	lastRosOdometryTime_ = internalTime;
-	lastHwOdometryTime_ = static_cast<double>(odometryRPMData->timestamp);
+	lastHwOdometryTime_ = static_cast<double>(odometryRPMData.timestamp);
 
-	publishOdometry(odometryRPMData->rpm_left_wheel, odometryRPMData->rpm_right_wheel);
+	srslib_framework::OdometryRPM message;
+	message.header.stamp = lastRosOdometryTime_;
+
+	message.left_wheel_rpm = odometryRPMData.rpm_left_wheel;
+	message.right_wheel_rpm = odometryRPMData.rpm_right_wheel;
+
+	rawOdometryCallback_(message);
+
+	return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,13 +84,7 @@ void RawOdometryHandler::receiveData(ros::Time currentTime, vector<char>& buffer
 
 void RawOdometryHandler::publishOdometry(float leftWheelRPM, float rightWheelRPM)
 {
-	srslib_framework::OdometryRPM message;
-	message.header.stamp = lastRosOdometryTime_;
 
-	message.left_wheel_rpm = leftWheelRPM;
-	message.right_wheel_rpm = rightWheelRPM;
-
-	pubOdometry_.publish(message);
 }
 
 } // namespace srs

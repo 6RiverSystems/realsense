@@ -16,13 +16,23 @@ set(${PROJECT_NAME}_SOURCES
     src/hw_message/SensorFrameHandler.cpp
     src/hw_message/RawOdometryHandler.cpp
     src/hw_message/HardwareInfoHandler.cpp
+    src/hw_message/PowerStateHandler.cpp
+
+    src/hw_publisher/SensorFramePublisher.cpp
+    src/hw_publisher/RawOdometryPublisher.cpp
+    src/hw_publisher/HardwareInfoPublisher.cpp
+    src/hw_publisher/PowerStatePublisher.cpp
 
     src/sw_message/FreeSpinHandler.cpp
     src/sw_message/SoundHandler.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES
-
+    test/Test_HardwareInfoMsg.cpp
+    test/Test_PowerStateMsg.cpp
+    test/Test_RawOdometryMsg.cpp
+    test/Test_SensorFrameMsg.cpp
+    test/TestSuite_Brainstem.cpp
 )
 
 ####################################################################################################
@@ -33,7 +43,6 @@ project(${PROJECT_NAME})
 set(PROJECT_NODE ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
-# set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
@@ -45,8 +54,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Boost REQUIRED)
 
 include_directories(include 
-    include/srsdrv_brainstem/
-    src/
+    include/srsdrv_brainstem
     ${catkin_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
     ${srslib_framework_INCLUDE_DIRS}
@@ -76,7 +84,7 @@ target_link_libraries(${PROJECT_NODE}
 
 if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(TestSuite_Brainstem
-    	test/Test_MessageProcessor.cpp
+        ${${PROJECT_NAME}_TEST_SOURCES}
         ${${PROJECT_NAME}_SOURCES}
     )
     target_link_libraries(TestSuite_Brainstem
@@ -84,4 +92,5 @@ if (CATKIN_ENABLE_TESTING)
         ${boost_LIBRARIES}
         ${srslib_framework_LIBRARIES}
     )
+
 endif()

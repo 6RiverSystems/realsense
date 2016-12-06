@@ -5,13 +5,13 @@
  */
 #pragma once
 
-#include <ros/ros.h>
-
-#include <sensor_msgs/LaserScan.h>
-#include <polyclipping/clipper.hpp>
-#include <fstream>
 #include <iostream>
 
+#include <ros/ros.h>
+#include <tf/tf.h>
+#include <sensor_msgs/LaserScan.h>
+
+#include <polyclipping/clipper.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
@@ -20,6 +20,8 @@ namespace srs
 
 typedef ClipperLib::IntPoint clPoint;
 typedef ClipperLib::Path clPath;
+typedef std::vector<clPath> PathVector;
+typedef std::vector<Pose<>> PoseVector;
 
 class HardStopReflex
 {
@@ -77,26 +79,26 @@ public:
      * Get the danger zone for display in rviz
      * @return the danger zone
      */
-    std::vector<Pose<>> getDangerZoneForDisplay() const;
+    PoseVector getDangerZoneForDisplay() const;
 
     /**
      * Get the latest danger zone that failed
      * @return the danger zone
      */
-    std::vector<Pose<>> getFailedDangerZoneForDisplay() const;
+    PoseVector getFailedDangerZoneForDisplay() const;
 
     /**
      * Get the laser scan that penetrated the danger zone for display in rviz
      * @return the laser scan
      */
-    std::vector<Pose<>> getFailedLaserScanForDisplay() const;
+    PoseVector getFailedLaserScanForDisplay() const;
 
 
     /**
      * Set the robot's footprint
      * @param footprint the footprint
      */
-    void setFootprint(const std::vector<Pose<>> footprint)
+    void setFootprint(const PoseVector footprint)
     {
         footprint_ = footprint;
     };
@@ -123,7 +125,7 @@ public:
      * Sets the number of times the danger zone must be violated consecutively to trigger a hard stop.
      * @param val the limit
      */
-    void setMaxConsecutiveDangerZoneViolations(double val)
+    void setMaxConsecutiveDangerZoneViolations(uint32_t val)
     {
         maxConsecutiveDangerZoneViolations_ = val;
     }
@@ -131,7 +133,7 @@ public:
     /**
      * Sets the number of scan points in the danger zone to be considered a violation
      */
-    void setNumBadPointsForViolation(double val)
+    void setNumBadPointsForViolation(uint32_t val)
     {
         numBadPointsForViolation_ = val;
     }
@@ -155,21 +157,21 @@ private:
      * @param pose the pose to which the footprint should be transformed
      * @param footprint the footprint of the robot
      */
-    void addPoseToPolygonStack(std::vector<clPath>& polygons, Pose<> pose, const std::vector<Pose<>>& footprint);
+    void addPoseToPolygonStack(PathVector& polygons, Pose<> pose, const PoseVector& footprint);
 
     /**
      * Calculates the unions of a stack of polygons
      * @param output the union of the polygons
      * @param polygons all of the polygons to union
      */
-    void calculateUnion(clPath& output, std::vector<clPath>& polygons);
+    void calculateUnion(clPath& output, PathVector& polygons);
 
     /**
      * Convert a clPath to a vector of poses
      * @param path the path to convert
      * @return a vector of poses
      */
-    std::vector<Pose<>> clPathToPoseVector(const clPath& path) const;
+    PoseVector clPathToPoseVector(const clPath& path) const;
 
     /**
      * Write some debug information to std::cout
@@ -183,31 +185,33 @@ private:
     double nominalDecelRate_ = 0.7;  // m/s^2
     double angularDecelRate_ = 1.0;  // r/s^2
 
-    int numBadPointsForViolation_ = 2;
+    uint32_t numBadPointsForViolation_ = 2;
 
-    int maxConsecutiveDangerZoneViolations_ = 1;
-    int numConsecutiveDangerZoneViolations_ = 0;
+    uint32_t maxConsecutiveDangerZoneViolations_ = 1;
+    uint32_t numConsecutiveDangerZoneViolations_ = 0;
 
-    std::vector<Pose<>> footprint_;
+    PoseVector footprint_;
 
     clPath laserScan_;
     clPath dangerZone_;
 
-
     clPath failedDangerZone_;
     clPath failedLaserScan_;
-
 
     /**
      * Flag that is set if a hard stop has happened and the system is waiting for a clear
      */
     bool waitingForClear_ = false;
 
-
     /**
      * Scale factor for converting meters to polygon coordinates.
      */
     constexpr static double CL_SCALE_FACTOR = 1000.0;
+
+    /**
+     * Epsilon to check if velocity is equal to 0
+     */
+    constexpr static double VELOCITY_EPSILON = 0.005;
 };
 
 } /* namespace srs */

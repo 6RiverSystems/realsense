@@ -8,10 +8,14 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srsnode_midbrain)
 set(PROJECT_MAIN src/midbrain_node.cpp)
 set(${PROJECT_NAME}_SOURCES
-
     src/Midbrain.cpp
     src/HardStopReflex.cpp
     src/Reflexes.cpp
+)
+
+set(${PROJECT_NAME}_TEST_SOURCES
+    test/gtest_main.cpp
+    test/Test_Reflexes_HardStopReflex.cpp
 )
 
 ####################################################################################################
@@ -49,7 +53,9 @@ include_directories(include
 # Target
 
 catkin_package(
-    DEPENDS srslib_framework polyclipping
+    DEPENDS
+        srslib_framework
+        polyclipping
 )
 
 add_executable(${PROJECT_NODE}
@@ -76,8 +82,7 @@ target_link_libraries(${PROJECT_NODE}
 #
 if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(Test_Reflexes_HardStopReflex
-        test/gtest_main.cpp
-        test/Test_Reflexes_HardStopReflex.cpp
+        ${${PROJECT_NAME}_TEST_SOURCES}
         ${${PROJECT_NAME}_SOURCES}
     )
 #    add_dependencies(Test_Reflexes

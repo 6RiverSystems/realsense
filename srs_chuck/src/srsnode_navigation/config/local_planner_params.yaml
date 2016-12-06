@@ -40,8 +40,8 @@ DWAPlannerROS:
   oscillation_reset_angle: 0.2  # how far to turn before resetting oscillation flags
 
 # Debugging
-  publish_traj_pc : true
-  publish_cost_grid_pc: true
+  publish_traj_pc : false
+  publish_cost_grid_pc: false
 
 # Differential-drive robot configuration
   holonomic_robot: false

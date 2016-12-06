@@ -32,24 +32,24 @@ public:
     void execute();
 
 private:
-	void readParams();
+    void readParams();
 
-	// Taps
-	TapSensorOdometryPose tapOdometryPose_;
-	RosTapOperationalState tapOperationalState_;
-	TapFilteredLidar tapFilteredLidar_;
+    // Taps
+    TapSensorOdometryPose tapOdometryPose_;
+    RosTapOperationalState tapOperationalState_;
+    TapFilteredLidar tapFilteredLidar_;
 
     TapLidarPoseOnRobot tapLidarPoseOnRobot_;
     TapRobotPose tapRobotPose_;
 
-	// Channels
-	ChannelExecutiveCmd_Cl cmdClChannel_;
-	ChannelDangerZone dangerZoneChannel_;
+    // Channels
+    ChannelExecutiveCmd_Cl cmdClChannel_;
+    ChannelDangerZone dangerZoneChannel_;
     ChannelFailedDangerZone fdzChannel_;
     ChannelFailedLaserScan flsChannel_;
 
-	// Reflexes
-	HardStopReflex hardStopReflex_;
+    // Reflexes
+    HardStopReflex hardStopReflex_;
 
     bool enableHardStopDebugPlotting_ = false;
 };

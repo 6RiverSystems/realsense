@@ -108,8 +108,18 @@ struct Grid2dNode : public SearchNode
             ", pos: " << position_ <<
             ", g: " << g_ <<
             ", h: " << h_ <<
-            ", goal: " << *goal_ <<
-            "}";
+            ", goal: ";
+
+            if (goal_)
+            {
+                stream << *goal_;
+            }
+            else
+            {
+                stream << "nullptr";
+            }
+
+            return stream << "}";
     }
 
 protected:

@@ -31,7 +31,8 @@ struct MapStackNode : public SearchNode
 
     bool equals(SearchNode* const& rhs) const
     {
-        return this == rhs || position_ == reinterpret_cast<const MapStackNode*>(rhs)->getPosition();
+        return this == rhs ||
+            position_ == reinterpret_cast<const MapStackNode*>(rhs)->getPosition();
     }
 
     int getG() const
@@ -98,14 +99,24 @@ struct MapStackNode : public SearchNode
 
     ostream& toString(ostream& stream) const
     {
-        return stream << hex << reinterpret_cast<const void*>(this) << dec << " {" <<
+        stream << hex << reinterpret_cast<const void*>(this) << dec << " {" <<
             "p: " << hex << reinterpret_cast<const void*>(parentNode_) << dec <<
             ", a: " << parentAction_ <<
             ", pos: " << position_ <<
             ", g: " << g_ <<
             ", h: " << h_ <<
-            ", goal: " << *goal_ <<
-            "}";
+            ", goal: ";
+
+            if (goal_)
+            {
+                stream << *goal_;
+            }
+            else
+            {
+                stream << "nullptr";
+            }
+
+            return stream << "}"
     }
 
 protected:

@@ -19,10 +19,10 @@
 #include <boost/geometry/multi/geometries/register/multi_polygon.hpp>
 #include <fstream>
 #include <iostream>
-#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/Pose.h>
 #include <srslib_framework/MsgSolution.h>
 #include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
 
 namespace bg = boost::geometry;
 
@@ -75,7 +75,7 @@ public:
 
 	void SetVelocity( double linear, double angular );
 
-	void SetPose( const srslib_framework::MsgPose::ConstPtr& pose );
+	void SetPose( const srslib_framework::Pose::ConstPtr& pose );
 
 	void SetSolution( const srslib_framework::MsgSolution::ConstPtr& solution );
 
@@ -107,7 +107,7 @@ private:
 
 	Polygon							m_posePolygon;
 
-	Solution<GridSolutionItem>		m_solution;
+	Solution<Grid2dSolutionItem>		m_solution;
 
 	Polygon							m_dangerZone;
 

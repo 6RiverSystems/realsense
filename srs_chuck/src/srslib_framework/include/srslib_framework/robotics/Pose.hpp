@@ -3,24 +3,20 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef POSE_HPP_
-#define POSE_HPP_
+#pragma once
 
 #include <string>
 #include <sstream>
-using namespace std;
 
-#include <opencv2/opencv.hpp>
+using namespace std;
 
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
 
-#include <srslib_framework/platform/Object.hpp>
-
 namespace srs {
 
 template<typename TYPE = double>
-struct Pose : public Object
+struct Pose
 {
     typedef TYPE BaseType;
 
@@ -58,12 +54,12 @@ struct Pose : public Object
     virtual ~Pose()
     {}
 
-    BaseType getThetaDegrees()
+    BaseType getThetaDegrees() const
     {
-        return AngleMath::rad2deg<TYPE>(theta);
+        return AngleMath::rad2Deg<TYPE>(theta);
     }
 
-    bool isValid()
+    bool isValid() const
     {
         return !BasicMath::isNan<TYPE>(x) && !BasicMath::isNan<TYPE>(y) &&
             !BasicMath::isNan<TYPE>(theta);
@@ -81,7 +77,7 @@ struct Pose : public Object
 
     void setThetaDegrees(BaseType deg)
     {
-        theta = AngleMath::deg2rad<TYPE>(deg);
+        theta = AngleMath::deg2Rad<TYPE>(deg);
     }
 
     double arrivalTime;
@@ -101,5 +97,3 @@ template<typename TYPE>
 const Pose<TYPE> Pose<TYPE>::ZERO = Pose<TYPE>(TYPE(), TYPE(), TYPE());
 
 } // namespace srs
-
-#endif // POSE_HPP_

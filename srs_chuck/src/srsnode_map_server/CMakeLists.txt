@@ -6,7 +6,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 
 set(PROJECT_NAME srsnode_map_server)
-set(PROJECT_MAIN src/map_server.cpp)
+set(PROJECT_MAIN src/map_server_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
     src/MapServer.cpp
@@ -20,6 +20,7 @@ project(${PROJECT_NAME})
 set(PROJECT_NODE ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
+# set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp

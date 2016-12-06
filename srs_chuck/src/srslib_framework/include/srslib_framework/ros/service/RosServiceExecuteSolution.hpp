@@ -12,7 +12,7 @@ using namespace std;
 #include <ros/ros.h>
 #include <srslib_framework/ExecuteSolution.h>
 
-#include <srslib_framework/ros/RosService.hpp>
+#include <srslib_framework/ros/service/RosService.hpp>
 #include <srslib_framework/ros/message/SolutionMessageFactory.hpp>
 
 namespace srs {
@@ -29,7 +29,7 @@ public:
     ~RosServiceExecuteSolution()
     {}
 
-    Solution<GridSolutionItem> getRequest()
+    Solution<Grid2dSolutionItem> getRequest()
     {
         setNewRequest(false);
         return serviceValue_;
@@ -46,7 +46,7 @@ protected:
 
 private:
     string triggerName_;
-    Solution<GridSolutionItem> serviceValue_;
+    Solution<Grid2dSolutionItem> serviceValue_;
 
     bool onServiceRequested(srslib_framework::ExecuteSolution::Request& req,
         srslib_framework::ExecuteSolution::Response& resp)

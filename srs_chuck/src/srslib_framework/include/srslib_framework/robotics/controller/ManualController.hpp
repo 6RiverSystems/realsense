@@ -42,7 +42,7 @@ protected:
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
         // The controller never completes its goal. In order to do that,
-        // it must be canceled
+        // it must be terminated
         setGoalReached(false);
 
         double linear = userCommand_.linear * robot_.manualMaxLinearVelocity;

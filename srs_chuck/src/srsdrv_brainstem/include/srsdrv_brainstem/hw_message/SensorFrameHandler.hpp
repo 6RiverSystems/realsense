@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef SENSORFRAMEHANDLER_HPP_
-#define SENSORFRAMEHANDLER_HPP_
+#pragma once
 
 #include <string>
 using namespace std;
@@ -13,12 +12,12 @@ using namespace std;
 #include <srslib_framework/robotics/Imu.hpp>
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
-#include <srsdrv_brainstem/hw_message/BrainstemMessageHandler.hpp>
+#include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
 #include <srsdrv_brainstem/BrainStemMessages.h>
 
 namespace srs {
 
-class SensorFrameHandler : public BrainstemMessageHandler
+class SensorFrameHandler : public HardwareMessageHandler
 {
 public:
     static constexpr char SENSOR_FRAME_KEY = static_cast<char>(BRAIN_STEM_MSG::SENSOR_FRAME);
@@ -39,7 +38,7 @@ public:
     void receiveData(ros::Time currentTime, vector<char>& binaryData);
 
 private:
-    BRAINSTEM_MESSAGE_BEGIN(SensorFrameData)
+    HW_MESSAGE_BEGIN(MsgSensorFrame)
         uint8_t cmd;
         uint32_t timestamp;
         float linear_velocity;
@@ -52,7 +51,7 @@ private:
         float yawRot;
         float pitchRot;
         float rollRot;
-    BRAINSTEM_MESSAGE_END
+    HW_MESSAGE_END
 
     void publishImu();
     void publishOdometryCount(int32_t leftWheelDiff, int32_t rightWheelDiff);
@@ -70,5 +69,3 @@ private:
 };
 
 } // namespace srs
-
-#endif // SENSORFRAMEHANDLER_HPP_

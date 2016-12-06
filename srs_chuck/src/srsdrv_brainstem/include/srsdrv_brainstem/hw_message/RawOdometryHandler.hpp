@@ -3,17 +3,16 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef RAW_ODOMETRY_HANDLER_HPP_
-#define RAW_ODOMETRY_HANDLER_HPP_
+#pragma once
 
 #include <string>
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
-#include <srsdrv_brainstem/hw_message/BrainstemMessageHandler.hpp>
+#include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
 
 namespace srs {
 
-class RawOdometryHandler : public BrainstemMessageHandler
+class RawOdometryHandler : public HardwareMessageHandler
 {
 public:
     static constexpr char RAW_ODOMETRY_KEY = static_cast<char>(BRAIN_STEM_MSG::RAW_ODOMETRY);
@@ -31,12 +30,12 @@ public:
     void receiveData(ros::Time currentTime, vector<char>& binaryData);
 
 private:
-    BRAINSTEM_MESSAGE_BEGIN(RawOdometryData)
+    HW_MESSAGE_BEGIN(MsgRawOdometry)
         uint8_t cmd;
         uint32_t timestamp;
         float rpm_left_wheel;
         float rpm_right_wheel;
-    BRAINSTEM_MESSAGE_END
+    HW_MESSAGE_END
 
 	void publishOdometry(float leftWheelRPM, float rightWheelRPM);
 
@@ -48,5 +47,3 @@ private:
 };
 
 } // namespace srs
-
-#endif // RAW_ODOMETRY_HANDLER_HPP_

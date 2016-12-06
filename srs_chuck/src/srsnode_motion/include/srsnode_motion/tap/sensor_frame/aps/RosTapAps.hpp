@@ -12,10 +12,10 @@ using namespace std;
 #include <ros/ros.h>
 
 #include <srslib_framework/math/TimeMath.hpp>
-#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTap.hpp>
 #include <srsnode_motion/tap/sensor_frame/aps/ApsSensor.hpp>
 
-#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/Pose.h>
 
 namespace srs {
 
@@ -87,7 +87,7 @@ protected:
     }
 
 private:
-    void onAps(const srslib_framework::MsgPoseConstPtr& message)
+    void onAps(const srslib_framework::Pose::ConstPtr& message)
     {
         // ###FS
 //        // If the tap hasn't heard from the physical sensor
@@ -112,7 +112,7 @@ private:
         set(Pose<>(TimeMath::time2number(message->header.stamp),
             static_cast<double>(message->x),
             static_cast<double>(message->y),
-            static_cast<double>(AngleMath::deg2rad<double>(message->theta))));
+            static_cast<double>(AngleMath::deg2Rad<double>(message->theta))));
     }
 
     ApsSensor<STATIC_UKF_STATE_VECTOR_SIZE, STATIC_UKF_CV_TYPE>* sensor_;

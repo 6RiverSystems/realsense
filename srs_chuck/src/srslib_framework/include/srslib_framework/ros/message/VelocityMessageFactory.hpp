@@ -10,6 +10,7 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <srslib_framework/Velocity.h>
 
+#include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
 namespace srs {
@@ -29,7 +30,7 @@ struct VelocityMessageFactory
 
         velocity.arrivalTime = message.header.stamp.toSec();
         velocity.linear = message.linear;
-        velocity.angular = AngleMath::deg2rad<double>(message.angular);
+        velocity.angular = AngleMath::deg2Rad<double>(message.angular);
 
         return velocity;
     }
@@ -53,15 +54,44 @@ struct VelocityMessageFactory
     }
 
     /**
-     * @brief Convert a TwistStampedConstPtr type into a Velocity.
+     * @brief Convert a TwistStamped pointer type into a Velocity.
      *
      * @param message TwistStampedConstPtr to convert
      *
      * @return Velocity generated from the specified TwistStampedConstPtr
      */
-    static Velocity<> msg2Velocity(geometry_msgs::TwistStampedConstPtr message)
+    static Velocity<> msg2Velocity(geometry_msgs::TwistStamped::ConstPtr message)
     {
-        return VelocityMessageFactory::msg2Velocity(*message);
+        return msg2Velocity(*message);
+    }
+
+    /**
+     * @brief Convert a Twist type into a Velocity.
+     *
+     * @param message Twist to convert
+     *
+     * @return Velocity generated from the specified Twist
+     */
+    static Velocity<> msg2Velocity(geometry_msgs::Twist message)
+    {
+        Velocity<> velocity;
+
+        velocity.linear = message.linear.x;
+        velocity.angular = message.angular.z;
+
+        return velocity;
+    }
+
+    /**
+     * @brief Convert a Twist pointer type into a Velocity.
+     *
+     * @param message Twist pointer to convert
+     *
+     * @return Velocity generated from the specified TwistStampedConstPtr
+     */
+    static Velocity<> msg2Velocity(geometry_msgs::Twist::ConstPtr message)
+    {
+        return msg2Velocity(*message);
     }
 
     /**
@@ -77,7 +107,7 @@ struct VelocityMessageFactory
 
         msgVelocity.header.stamp = ros::Time() + ros::Duration(velocity.arrivalTime);
         msgVelocity.linear = velocity.linear;
-        msgVelocity.angular = AngleMath::rad2deg<double>(velocity.angular);
+        msgVelocity.angular = AngleMath::rad2Deg<double>(velocity.angular);
 
         return msgVelocity;
     }

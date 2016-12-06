@@ -1,0 +1,123 @@
+{
+	"type": "FeatureCollection",
+	"features": [
+		{
+			"type": "Feature",
+			"properties": {
+				"object": "map",
+				"version": "1",
+				"origin": [0,0,0],
+				"resolution": 0.1,
+				"width": 20,
+				"height": 10
+			}
+		},
+		{
+			"type": "FeatureCollection",
+			"features": [
+				{
+					"type": "Feature",
+					"id": "1",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[0,0],
+							[2.1,10]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.3,
+						"envelope_cost": 70,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "2",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[1.9,9],
+							[19.5,10]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.3,
+						"envelope_cost": 70,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "3",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[1.9,0],
+							[19.5,1.6]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.3,
+						"envelope_cost": 70,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "4",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[3.6,6.1],
+							[16.7,7.4]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.3,
+						"envelope_cost": 70,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "5",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[6.2,3],
+							[16.7,4.3]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.3,
+						"envelope_cost": 70,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "6",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[19.4,0],
+							[20,10]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.3,
+						"envelope_cost": 70,
+						"is_border": 1
+					}
+				}
+			]
+		}
+	]
+}

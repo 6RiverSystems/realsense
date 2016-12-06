@@ -34,13 +34,25 @@ struct BasicMath
         return value != value;
     }
 
-    inline static unsigned int noOverflowAdd(unsigned int a, unsigned int b)
+    template<typename TYPE = int>
+    inline static TYPE noOverflowAdd(TYPE a, TYPE b)
     {
-        if (a > numeric_limits<unsigned int>::max() - b)
+        if (b > 0)
         {
-            return numeric_limits<unsigned int>::max();
+            if (a > numeric_limits<TYPE>::max() - b)
+            {
+                return numeric_limits<TYPE>::max();
+            }
+            return a + b;
         }
-        return a + b;
+        else
+        {
+            if (a < numeric_limits<TYPE>::min() - b)
+            {
+                return numeric_limits<TYPE>::min();
+            }
+            return a + b;
+        }
     }
 
     template <typename TYPE = double>

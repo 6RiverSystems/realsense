@@ -8,33 +8,55 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srslib_framework)
 
 set(${PROJECT_NAME}_SOURCES
-    src/utils/Logging.cpp
-    src/utils/CrashHandler.cpp
+    src/datastructure/graph/grid2d/Grid2d.cpp
 
     src/io/SerialIO.cpp
 
-    src/planning/pathplanning/grid/GridSolutionItem.cpp
-    src/planning/pathplanning/grid/GridSolutionFactory.cpp
+    src/localization/map/BaseMap.cpp
+    src/localization/map/MapAdapter.cpp
+    src/localization/map/MapNote.cpp
+    src/localization/map/MapStackFactory.cpp
+    src/localization/map/logical/LogicalMap.cpp
+    src/localization/map/logical/LogicalMapFactory.cpp
+    src/localization/map/occupancy/OccupancyMap.cpp
+    src/localization/map/occupancy/OccupancyMapFactory.cpp
+
+    src/planning/pathplanning/grid2d/Grid2dSolutionItem.cpp
+    src/planning/pathplanning/grid2d/Grid2dSolutionFactory.cpp
+    src/planning/pathplanning/grid2d/Grid2dSolutionUtils.cpp
+
+    src/platform/CrashHandler.cpp
 
     src/robotics/controller/BaseController.cpp
     src/robotics/controller/CMUPathController.cpp
 
-    src/localization/Map.cpp
-    src/localization/MapNote.cpp
+    src/ros/message/LogicalMapMessageFactory.cpp
 
-    src/robotics/controller/BaseController.cpp
-    src/robotics/controller/CMUPathController.cpp
+    src/search/AStar.cpp
+    src/search/graph/grid2d/Grid2dAction.cpp
+    src/search/graph/grid2d/Grid2dNode.cpp
+
+    src/utils/Logging.cpp
 )
 
 set(${PROJECT_NAME}_MSGS
     Imu.msg
+    JoypadState.msg
+    LogicalArea.msg
+    LogicalCell.msg
+    LogicalMap.msg
+    LogicalMetadata.msg
+    MapNote.msg
+    MapStack.msg
     MsgHardwareInfo.msg
-    MsgMap.msg
     MsgOperationalState.msg
-    MsgPose.msg
     MsgSolution.msg
     MsgSolutionItem.msg
+    OccupancyMap.msg
+    OccupancyMetadata.msg
+    Pose.msg
     SensorFrame.msg
+    Sound.msg
     Velocity.msg
     Odometry.msg
     OdometryRPM.msg
@@ -45,43 +67,63 @@ set(${PROJECT_NAME}_SRVS
 )
 
 set(TEST_SOURCES_DATASTRUCTURE
-    test/datastructure/Test_MappedPriorityQueue_Basic.cpp
-    test/datastructure/Test_MappedPriorityQueue_UserDefinedKey.cpp
+    test/datastructure/graph/Test_Grid2d_Basic.cpp
+    test/datastructure/queue/Test_MappedPriorityQueue_Basic.cpp
+    test/datastructure/queue/Test_MappedPriorityQueue_InnerHashEqual.cpp
+    test/datastructure/queue/Test_MappedPriorityQueue_UserDefinedClass.cpp
 )
 
 set(TEST_SOURCES_FILTER
     test/filter/ukf/Test_Ukf_Basic.cpp
 )
 
-set(TEST_SOURCES_GRAPH
-    test/graph/Test_Grid2d_Basic.cpp
+set(TEST_SOURCES_LOCALIZATION
+    test/localization/Test_Empty_BasicRead.cpp
+    test/localization/Test_MicroMap_BasicRead.cpp
+    test/localization/Test_MicroMap_MapNote.cpp
+    test/localization/Test_MicroMap_WithAisles.cpp
+    test/localization/Test_SmallMap_BasicRead.cpp
 )
 
-set(TEST_SOURCES_LOCALIZATION
-    test/localization/Test_Map_Reconstruction.cpp
+set(TEST_SOURCES_MATH
+    test/math/Test_AngleMath.cpp
+    test/math/Test_BasicMath.cpp
+    test/math/Test_PoseMath.cpp
 )
 
 set(TEST_SOURCES_PLANNING
-    test/planning/pathplanning/grid/Test_Trajectory_180ShortTrajectory.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_BarrettLongTrajectory.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_BarrettMap.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_LongStraight.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_LongTrajectory.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_Map.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_ShortStraight.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_ShortTrajectory.cpp
-    test/planning/pathplanning/grid/Test_Trajectory_SingleRotation.cpp
+    test/planning/pathplanning/grid2d/Test_Solution_Basic.cpp
+    test/planning/pathplanning/grid2d/Test_Solution_Barrett_Aisles.cpp
+    test/planning/pathplanning/grid2d/Test_Solution_Empty_Consecutive.cpp
+    test/planning/pathplanning/grid2d/Test_Trajectory_180ShortTrajectory.cpp
+    test/planning/pathplanning/grid2d/Test_Trajectory_LongStraight.cpp
+    test/planning/pathplanning/grid2d/Test_Trajectory_LongTrajectory.cpp
+    test/planning/pathplanning/grid2d/Test_Trajectory_ShortStraight.cpp
+    test/planning/pathplanning/grid2d/Test_Trajectory_ShortTrajectory.cpp
+    test/planning/pathplanning/grid2d/Test_Trajectory_SingleRotation.cpp
+)
+
+set(TEST_SOURCES_PLATFORM
+    test/platform/Test_CrashHandler.cpp
 )
 
 set(TEST_SOURCES_ROBOTICS
     test/robotics/robot/Test_Chuck.cpp
-    test/robotics/controller/Test_Yoshizawa.cpp
+)
+
+set(TEST_SOURCES_ROS
+    test/ros/message/Test_LogicalMap_Reconstruction.cpp
+    test/ros/message/Test_OccupancyMap_Reconstruction.cpp
 )
 
 set(TEST_SOURCES_SEARCH
+    test/search/Test_AStar_6RHQ.cpp
+    test/search/Test_AStar_6rshq_SmallSearch.cpp
+    test/search/Test_AStar_Barrett_BigSearch.cpp
     test/search/Test_AStar_Basic.cpp
-    test/search/Test_AStar_Map.cpp
-#    test/search/Test_AStar_SamePlaceOnMap.cpp
+    test/search/Test_AStar_NoSolution.cpp
+    test/search/Test_AStar_SamePlaceOnMap.cpp
+    test/search/Test_AStar_Weights.cpp
 )
 
 set(TEST_SOURCES_IO
@@ -95,12 +137,14 @@ project(${PROJECT_NAME})
 set(PROJECT_LIBRARY ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
+# set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
     message_generation
     std_msgs
     nav_msgs
+    costmap_2d
 )
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED)
@@ -117,6 +161,7 @@ include_directories(
     ${roscpp_INCLUDE_DIRS}
 	${OpenCV_INCLUDE_DIRS} 
     ${srslib_test_INCLUDE_DIRS}
+    ${catkin_INCLUDE_DIRS}
 )
 
 set(PROJECT_LIBRARIES
@@ -141,7 +186,9 @@ add_service_files(
 )
 
 generate_messages(
-    DEPENDENCIES std_msgs nav_msgs
+    DEPENDENCIES 
+        std_msgs 
+        nav_msgs
 )
 
 ####################################################################################################
@@ -151,7 +198,13 @@ generate_messages(
 catkin_package(
     INCLUDE_DIRS src include
     LIBRARIES ${PROJECT_LIBRARY}
-    DEPENDS opencv message_runtime std_msgs nav_msgs srslib_test
+    DEPENDS 
+        opencv 
+        message_runtime 
+        std_msgs 
+        nav_msgs 
+        srslib_test
+        costmap_2d
 )
 
 add_library(${PROJECT_LIBRARY}
@@ -159,13 +212,13 @@ add_library(${PROJECT_LIBRARY}
 )
 
 add_dependencies(${PROJECT_LIBRARY}
-    ${srslib_framework_EXPORTED_TARGETS}
     ${catkin_EXPORTED_TARGETS}
 )
 
 target_link_libraries(${PROJECT_LIBRARY}
     ${PROJECT_LIBRARIES}
     ${UNWIND_LIBRARIES}
+    ${catkin_LIBRARIES}
 )
 
 ####################################################################################################
@@ -173,12 +226,11 @@ target_link_libraries(${PROJECT_LIBRARY}
 
 if (CATKIN_ENABLE_TESTING)
 
-    file(COPY data DESTINATION "/tmp/${PROJECT_NAME}")
-
     catkin_add_gtest(TestSuite_Datastructure
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_DATASTRUCTURE}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/datastructure
     )
     target_link_libraries(TestSuite_Datastructure
         ${PROJECT_LIBRARY}
@@ -188,17 +240,19 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_FILTER}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/filter
     )
     target_link_libraries(TestSuite_Filter
         ${PROJECT_LIBRARY}
     )
 
-    catkin_add_gtest(TestSuite_Graph
+    catkin_add_gtest(TestSuite_Math
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
-        ${TEST_SOURCES_GRAPH}
+        ${TEST_SOURCES_MATH}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/math
     )
-    target_link_libraries(TestSuite_Graph
+    target_link_libraries(TestSuite_Math
         ${PROJECT_LIBRARY}
     )
 
@@ -206,6 +260,7 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_LOCALIZATION}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/localization
     )
     target_link_libraries(TestSuite_Localization
         ${PROJECT_LIBRARY}
@@ -215,8 +270,19 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_PLANNING}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/planning
     )
     target_link_libraries(TestSuite_Planning
+        ${PROJECT_LIBRARY}
+    )
+
+    catkin_add_gtest(TestSuite_Platform
+        test/TestSuite.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_PLATFORM}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/platform
+    )
+    target_link_libraries(TestSuite_Platform
         ${PROJECT_LIBRARY}
     )
 
@@ -224,8 +290,19 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_ROBOTICS}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/robotics
     )
     target_link_libraries(TestSuite_Robotics
+        ${PROJECT_LIBRARY}
+    )
+
+    catkin_add_gtest(TestSuite_Ros
+        test/TestSuite.cpp
+        ${${PROJECT_NAME}_SOURCES}
+        ${TEST_SOURCES_ROS}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/ros
+    )
+    target_link_libraries(TestSuite_Ros
         ${PROJECT_LIBRARY}
     )
 
@@ -233,6 +310,7 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite.cpp
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_SEARCH}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/search
     )
     target_link_libraries(TestSuite_Search
         ${PROJECT_LIBRARY}
@@ -241,6 +319,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(TestSuite_Io
         ${${PROJECT_NAME}_SOURCES}
         ${TEST_SOURCES_IO}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/io
     )
     target_compile_definitions(TestSuite_Io 
         PRIVATE ENABLE_TEST_FIXTURE

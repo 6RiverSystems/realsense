@@ -5,9 +5,12 @@
  */
 
 #include <srsnode_odometry/OdometryPositionEstimator.hpp>
-#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
+
 #include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
+#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 
 namespace srs {
 
@@ -94,10 +97,10 @@ void OdometryPositionEstimator::connect()
 			std::bind( &OdometryPositionEstimator::ResetOdomPose, this, std::placeholders::_1 ));
 
 	// Subscriber to transform velocity command from linear/angular velocity to RPM format
-	rawVelocityCmdSub_ = nodeHandle_.subscribe<geometry_msgs::Twist>(ODOMETRY_RAW_VELOCITY_TOPIC, 10,
+	rawVelocityCmdSub_ = nodeHandle_.subscribe<geometry_msgs::Twist>(ChuckTopics::driver::ODOMETRY_CMD_VELOCITY, 10,
 			std::bind( &OdometryPositionEstimator::TransformVeclocityToRPM, this, std::placeholders::_1 ));
 
-	odometryPosePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_OUTPUT_TOPIC, 10);
+	odometryPosePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ChuckTopics::sensor::ODOMETRY_POSE, 10);
 
     odometryPoseEstimatePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_ESTIMATE_OUTPUT_TOPIC, 10);
 
@@ -143,8 +146,8 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 
 	// Message declarations
 	geometry_msgs::TransformStamped odom_trans;
-	odom_trans.header.frame_id = "odom";
-	odom_trans.child_frame_id = "base_footprint";
+	odom_trans.header.frame_id = ChuckTransforms::ODOMETRY;
+	odom_trans.child_frame_id = ChuckTransforms::BASE_FOOTPRINT;
 
     constexpr static double ANGULAR_VELOCITY_EPSILON = 0.000001; // [rad/s] (0.0573 [deg/s])
 
@@ -155,7 +158,7 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 
         pose_.x = pose_.x + r * sin(pose_.theta + angularVelocity * dfTimeDelta) - r * sin(pose_.theta),
         pose_.y = pose_.y + r * cos(pose_.theta) - r * cos(pose_.theta + angularVelocity * dfTimeDelta),
-		pose_.theta = AngleMath::normalizeAngleRad<>(pose_.theta + angularVelocity * dfTimeDelta);
+		pose_.theta = AngleMath::normalizeRad<>(pose_.theta + angularVelocity * dfTimeDelta);
     }
     else
     {
@@ -182,8 +185,8 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 
 	nav_msgs::Odometry odom;
 	odom.header.stamp = currentTime;
-	odom.header.frame_id = "odom";
-	odom.child_frame_id = "base_footprint";
+	odom.header.frame_id = ChuckTransforms::ODOMETRY;
+	odom.child_frame_id = ChuckTransforms::BASE_FOOTPRINT;
 
 	// Position
 	odom.pose.pose.position.x = pose_.x;

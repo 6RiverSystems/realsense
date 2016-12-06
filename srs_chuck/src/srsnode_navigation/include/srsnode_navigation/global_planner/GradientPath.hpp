@@ -1,0 +1,48 @@
+/*
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
+ *
+ * This is proprietary software, unauthorized distribution is not permitted.
+ */
+#pragma once
+
+#include <cmath>
+using namespace std;
+
+#include <srsnode_navigation/global_planner/Traceback.hpp>
+#include <srsnode_navigation/global_planner/PotentialCalculator.hpp>
+
+namespace srs {
+
+class GradientPath : public Traceback
+{
+    public:
+        GradientPath(PotentialCalculator* p_calc);
+        ~GradientPath();
+
+        void setSize(int xs, int ys);
+
+        //
+        // Path construction
+        // Find gradient at array points, interpolate path
+        // Use step size of pathStep, usually 0.5 pixel
+        //
+        // Some sanity checks:
+        //  1. Stuck at same index position
+        //  2. Doesn't get near goal
+        //  3. Surrounded by high potentials
+        //
+        bool getPath(float* potential, double start_x, double start_y, double end_x, double end_y, std::vector<std::pair<float, float> >& path);
+    private:
+        inline int getNearestPoint(int stc, float dx, float dy)
+        {
+            int pt = stc + (int)round(dx) + (int)(xs_ * round(dy));
+            return std::max(0, std::min(xs_ * ys_ - 1, pt));
+        }
+        float gradCell(float* potential, int n);
+
+        float *gradx_, *grady_; /**< gradient arrays, size of potential array */
+
+        float pathStep_; /**< step size for following gradient */
+};
+
+} //end namespace global_planner

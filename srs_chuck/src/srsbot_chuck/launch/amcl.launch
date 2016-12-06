@@ -6,22 +6,19 @@
   *
 -->
 <launch>
-    <arg name="use_sim_time" default="false"/>
+    <arg name="use_sim_time" default="false" />
     <arg name="start_bridge" default="true" />
+    <arg name="emulation_mode" default="false" />
 
     <!-- Chuck Stack -->
-	<include file="$(find srsbot_chuck)/launch/robot.launch" >
-    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
-    	<arg name="start_bridge" value="$(arg start_bridge)" />
+    <include file="$(find srsbot_chuck)/launch/robot.launch" >
+        <arg name="use_sim_time" value="$(arg use_sim_time)" />
+        <arg name="start_bridge" value="$(arg start_bridge)" />
+        <arg name="emulation_mode" value="$(arg emulation_mode)" />
 	</include>
 
     <!-- Sensors -->
 	<include file="$(find srsbot_chuck)/launch/sensors.launch" >
-    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
-	</include>
-
-    <!-- Navigation Stack -->
-	<include file="$(find srsnode_navigation)/launch/node.launch" >
     	<arg name="use_sim_time" value="$(arg use_sim_time)" />
 	</include>
 

@@ -3,18 +3,14 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef COMMAND_HPP_
-#define COMMAND_HPP_
-
-#include <opencv2/opencv.hpp>
+#pragma once
 
 #include <srslib_framework/math/Ocv2Base.hpp>
-#include <srslib_framework/platform/Object.hpp>
 
 namespace srs {
 
 template<unsigned int COMMAND_SIZE = 2, int TYPE = CV_64F>
-struct Command : public Object
+struct Command
 {
     typedef typename Ocv2Base<TYPE>::BaseType BaseType;
 
@@ -26,5 +22,3 @@ struct Command : public Object
 };
 
 } // namespace srs
-
-#endif // COMMAND_HPP_

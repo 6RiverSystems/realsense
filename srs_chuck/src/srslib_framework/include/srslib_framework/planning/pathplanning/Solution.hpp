@@ -3,51 +3,63 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef SOLUTION_HPP_
-#define SOLUTION_HPP_
+#pragma once
 
+#include <list>
+#include <sstream>
 #include <iomanip>
+using namespace std;
 
 namespace srs {
 
 template<typename SOLUTION_ITEM>
-class Solution : public vector<SOLUTION_ITEM>
+class Solution : public list<SOLUTION_ITEM>
 {
 public:
-    typedef SOLUTION_ITEM NodeType;
-
     Solution()
     {}
 
-    Solution(NodeType firstNode)
+    Solution(SOLUTION_ITEM firstNode)
     {
-        vector<NodeType>::push_back(firstNode);
+        list<SOLUTION_ITEM>::push_back(firstNode);
     }
 
-    NodeType getGoal() const
+    void append(Solution<SOLUTION_ITEM>* other)
     {
-        return *(vector<NodeType>::end() - 1);
+        list<SOLUTION_ITEM>::insert(list<SOLUTION_ITEM>::end(), other->begin(), other->end());
     }
 
-    NodeType getStart() const
+    SOLUTION_ITEM getGoal() const
     {
-        return *vector<NodeType>::begin();
+        return list<SOLUTION_ITEM>::back();
+    }
+
+    SOLUTION_ITEM getStart() const
+    {
+        return list<SOLUTION_ITEM>::front();
     }
 
     friend ostream& operator<<(ostream& stream, const Solution& solution)
     {
+        return stream << solution.toString();
+    }
+
+    string toString() const
+    {
+        stringstream stream;
+
         int counter = 0;
 
-        stream << "Solution {" << endl;
-        for (auto node : solution)
+        stream << "{" << endl;
+        for (auto node : *this)
         {
             stream << setw(4) << counter++ << ": " << node << endl;
         }
 
-        return stream << "}";
+        stream << "}";
+
+        return stream.str();
     }
 };
 
 } // namespace srs
-
-#endif // SOLUTION_HPP_

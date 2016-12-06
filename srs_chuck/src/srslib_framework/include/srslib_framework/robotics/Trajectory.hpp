@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef TRAJECTORY_HPP_
-#define TRAJECTORY_HPP_
+#pragma once
 
 #include <vector>
 #include <limits>
@@ -40,13 +39,12 @@ template<typename TYPE = double>
 class Trajectory : public vector<pair<Pose<TYPE>, TrajectoryAnnotation>>
 {
 public:
-    typedef TYPE BaseType;
-    typedef pair<Pose<BaseType>, TrajectoryAnnotation> NodeType;
+    typedef pair<Pose<TYPE>, TrajectoryAnnotation> TrajectoryElementType;
 
     Trajectory()
     {}
 
-    int findClosestPose(Pose<BaseType> toPose, int fromIndex = 0, double searchDistance = -1)
+    int findClosestPose(Pose<TYPE> toPose, int fromIndex = 0, double searchDistance = -1)
     {
         int toIndex = this->size() - 1;
         if (searchDistance > -1)
@@ -54,13 +52,13 @@ public:
             toIndex = calculateIndexFromDistance(fromIndex, searchDistance);
         }
 
-        BaseType minimum = numeric_limits<double>::max();
+        TYPE minimum = numeric_limits<double>::max();
         int minimumIndex = toIndex;
 
         for (int i = fromIndex; i < toIndex; i++)
         {
-            Pose<BaseType> current = this->at(i).first;
-            BaseType distance = PoseMath::euclidean2(current, toPose);
+            Pose<TYPE> current = this->at(i).first;
+            TYPE distance = PoseMath::euclidean2(current, toPose);
             if (distance < minimum)
             {
                 minimum = distance;
@@ -76,7 +74,7 @@ public:
         return calculateIndexFromDistance(fromIndex, distance);
     }
 
-    Pose<BaseType> getGoal()
+    Pose<TYPE> getGoal()
     {
         // TODO: Implement exception?
         if (!this->empty())
@@ -84,10 +82,10 @@ public:
             return this->back().first;
         }
 
-        return Pose<BaseType>();
+        return Pose<TYPE>();
     }
 
-    Pose<BaseType> getPose(int position)
+    Pose<TYPE> getPose(int position)
     {
         if (position >= 0 && position < this->size())
         {
@@ -95,14 +93,14 @@ public:
         }
 
         // TODO: An exception should be thrown
-        return Pose<BaseType>();
+        return Pose<TYPE>();
     }
 
     TrajectoryAnnotation getAnnotation(int position)
     {
         if (position >= 0 && position < this->size())
         {
-            NodeType node = this->at(position);
+            TrajectoryElementType node = this->at(position);
             return node.second;
         }
 
@@ -110,11 +108,11 @@ public:
         return TrajectoryAnnotation();
     }
 
-    void getWaypoint(int position, Pose<BaseType>& pose, TrajectoryAnnotation& annotation)
+    void getWaypoint(int position, Pose<TYPE>& pose, TrajectoryAnnotation& annotation)
     {
         if (position >= 0 && position < this->size())
         {
-            NodeType node = this[position];
+            TrajectoryElementType node = this[position];
             pose = node.first;
             annotation = node.second;
 
@@ -138,9 +136,9 @@ public:
         return stream << "}";
     }
 
-    void push_back(Pose<BaseType> pose, TrajectoryAnnotation annotation)
+    void push_back(Pose<TYPE> pose, TrajectoryAnnotation annotation)
     {
-        this->vector<NodeType>::push_back(NodeType(pose, annotation));
+        this->vector<TrajectoryElementType>::push_back(TrajectoryElementType(pose, annotation));
     }
 
 private:
@@ -148,10 +146,10 @@ private:
     {
         double distance2 = distance * distance;
 
-        Pose<BaseType> fromPose = this->at(fromIndex).first;
+        Pose<TYPE> fromPose = this->at(fromIndex).first;
         int toIndex = fromIndex;
 
-        BaseType distanceToPose;
+        TYPE distanceToPose;
         do {
             Pose<> toPose = this->at(toIndex).first;
             distanceToPose = PoseMath::euclidean2(fromPose, toPose);
@@ -165,5 +163,3 @@ private:
 };
 
 } // namespace srs
-
-#endif // TRAJECTORY_HPP_

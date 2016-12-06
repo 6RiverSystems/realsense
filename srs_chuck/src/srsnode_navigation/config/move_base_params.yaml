@@ -4,8 +4,12 @@ controller_patience: 1.0
 planner_frequency: 1.0
 planner_patience: 5.0
 
-recovery_behavior_enabled: false
-clearing_rotation_allowed: false
+recovery_behavior_enabled: true
+clearing_rotation_allowed: true
+
+move_backwards_enabled: true
+move_backwards_distance: 0.15
+move_backwards_velocity: -0.05
 
 shutdown_costmaps: false
 

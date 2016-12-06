@@ -29,7 +29,7 @@ protected:
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
         // The controller never completes its goal. In order to complete its
-        // goal, it must be canceled
+        // goal, it must be terminated
         setGoalReached(false);
 
         // Send the command for execution

@@ -12,13 +12,14 @@
 
 #include <dynamic_reconfigure/server.h>
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 
-#include <srslib_framework/ros/tap/RosTapBrainStem.hpp>
+// #include <srslib_framework/ros/channel/ChannelRobotPose.hpp>
+// #include <srslib_framework/ros/tap/RosTapBrainStem.hpp>
 #include <srslib_framework/ros/tap/RosTapInternal_GoalSolution.hpp>
-#include <srslib_framework/ros/tap/RosTapInternal_InitialPose.hpp>
-#include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
-#include <srslib_framework/ros/tap/RosTapMap.hpp>
+#include <srslib_framework/ros/tap/TapInitialPose.hpp>
+#include <srslib_framework/ros/tap/TapJoypad.hpp>
+#include <srslib_framework/ros/tap/TapMapStack.hpp>
 #include <srslib_framework/ros/service/RosServiceExecuteSolution.hpp>
 #include <srslib_framework/ros/service/RosTriggerPause.hpp>
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
@@ -55,12 +56,11 @@ private:
     void disconnectAllTaps();
 
     void evaluateTriggers();
-    void executeSolution(Solution<GridSolutionItem> solution);
+    void executeSolution(Solution<Grid2dSolutionItem> solution);
 
     void onConfigChange(MotionConfig& config, uint32_t level);
 
     void pingCallback(const ros::TimerEvent& event);
-    void publishAccumulatedOdometry();
     void publishArrived();
     void publishGoalLanding();
     void publishImu();
@@ -75,7 +75,7 @@ private:
     void stepNode();
     void stepEmulation();
 
-    AStar<Grid2d> algorithm_;
+    // AStar<Grid2d> algorithm_;
 
     dynamic_reconfigure::Server<MotionConfig> configServer_;
     ros::Time currentTime_;
@@ -94,8 +94,8 @@ private:
     ros::Time previousTime_;
     ros::Publisher pubOdometry_;
     ros::Publisher pubPing_;
-    ros::Publisher pubRobotAccOdometry_;
-    ros::Publisher pubRobotPose_;
+    // PublisherPose pubRobotAccOdometry_;
+    // ChannelRobotPose pubRobotPose_;
     ros::Publisher pubStatusGoalArrived_;
     ros::Publisher pubStatusGoalLanding_;
     ros::Publisher pubRobotLocalized_;
@@ -110,12 +110,12 @@ private:
     double simulatedT_;
 
     RosTapAps tapAps_;
-    RosTapBrainStem tapBrainStem_;
+    // RosTapBrainStem tapBrainStem_;
     RosTapSensorFrame tapSensorFrame_;
     RosTapInternal_GoalSolution tapInternalGoalSolution_;
-    RosTapInternal_InitialPose tapInitialPose_;
-    RosTapJoyAdapter tapJoyAdapter_;
-    RosTapMap tapMap_;
+    TapInitialPose tapInitialPose_;
+    TapJoypad tapJoypad_;
+    TapMapStack tapMapStack_;
 
     RosServiceExecuteSolution triggerExecuteSolution_;
     RosTriggerPause triggerPause_;

@@ -3,30 +3,26 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef FILTERSTATE_HPP_
-#define FILTERSTATE_HPP_
+#pragma once
 
 #include <opencv2/opencv.hpp>
 
-#include <srslib_framework/platform/Object.hpp>
 #include <srslib_framework/math/Ocv2Base.hpp>
 
 namespace srs {
 
 template<unsigned int STATE_SIZE = 5, int TYPE = CV_64F>
-struct FilterState : public Object
+struct FilterState
 {
     typedef typename Ocv2Base<TYPE>::BaseType BaseType;
 
     FilterState()
     {}
 
-    ~FilterState()
+    virtual ~FilterState()
     {}
 
     virtual cv::Mat getVectorForm() = 0;
 };
 
 } // namespace srs
-
-#endif // FILTERSTATE_HPP_

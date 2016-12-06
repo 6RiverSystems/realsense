@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef POSEMATH_HPP_
-#define POSEMATH_HPP_
+#pragma once
 
 #include <cmath>
 #include <limits>
@@ -25,13 +24,34 @@ struct PoseMath
         return Pose<TYPE>(
             p1.x + p2.x,
             p1.y + p2.y,
-            AngleMath::normalizeAngleRad(p1.theta + p2.theta));
+            AngleMath::normalizeRad(p1.theta + p2.theta));
     }
 
     template<typename TYPE = double>
     inline static TYPE dot(Pose<TYPE> p1, Pose<TYPE> p2)
     {
         return p1.x * p2.x + p1.y * p2.y;
+    }
+
+    /**
+     * @brief Return TRUE if the poses are similar. In order to consider them
+     * similar:
+     *
+     * - The difference between the x coordinates must be less than 0.001m
+     * - The difference between the y coordinates must be less than 0.001m
+     * - The difference between angles must be less than 0.005deg (0.001rad)
+     *
+     * @param lhv Left hand pose
+     * @param rhv Right-hand pose
+     *
+     * @return TRUE if the two poses are similar
+     */
+    template<typename TYPE = double>
+    inline static bool equal(const Pose<TYPE>& lhv, const Pose<TYPE>& rhv)
+    {
+        return BasicMath::equal(lhv.x, rhv.x, 0.001) &&
+            BasicMath::equal(lhv.y, rhv.y, 0.001) &&
+            AngleMath::equalRad(lhv.theta, rhv.theta, 0.001);
     }
 
     template<typename TYPE = double>
@@ -72,7 +92,7 @@ struct PoseMath
     template<typename TYPE = double>
     inline static TYPE measureAngle(Pose<TYPE> p1, Pose<TYPE> p2)
     {
-        return AngleMath::normalizeAngleRad(
+        return AngleMath::normalizeRad(
             acos(PoseMath::dot<TYPE>(p1, p2) /
                 (PoseMath::norm<TYPE>(p1) * PoseMath::norm<TYPE>(p2))));
     }
@@ -105,21 +125,19 @@ struct PoseMath
     }
 
     template<typename TYPE = double>
-    static vector<Pose<>> pose2polygon(const Pose<TYPE> center, TYPE offsetX, TYPE offsetY, TYPE width, TYPE depth)
+    static vector<Pose<>> pose2Polygon(const Pose<TYPE> center,
+        TYPE forward, TYPE sideway,
+        TYPE width, TYPE depth)
     {
-        // Pose coordinate system is rotated by -PI relative to the map
-        Pose<> rotatedPose = PoseMath::rotate(center, -M_PI);
-
         // Translate by the offset
-        rotatedPose = PoseMath::translate(rotatedPose, offsetX, offsetY);
+        Pose<> shiftedCenter = PoseMath::translate(center, forward, sideway);
 
-        Pose<> p0 = PoseMath::translate(rotatedPose,  depth / TYPE(2), -width / TYPE(2));
-        Pose<> p1 = PoseMath::translate(rotatedPose,  depth / TYPE(2),  width / TYPE(2));
-        Pose<> p2 = PoseMath::translate(rotatedPose, -depth / TYPE(2),  width / TYPE(2));
-        Pose<> p3 = PoseMath::translate(rotatedPose, -depth / TYPE(2), -width / TYPE(2));
+        Pose<> p0 = PoseMath::translate(shiftedCenter, depth / TYPE(2), -width / TYPE(2));
+        Pose<> p1 = PoseMath::translate(shiftedCenter, depth / TYPE(2), width / TYPE(2));
+        Pose<> p2 = PoseMath::translate(shiftedCenter, -depth / TYPE(2), width / TYPE(2));
+        Pose<> p3 = PoseMath::translate(shiftedCenter, -depth / TYPE(2), -width / TYPE(2));
 
         vector<Pose<>> polygon;
-        polygon.clear();
         polygon.push_back(p0);
         polygon.push_back(p1);
         polygon.push_back(p2);
@@ -144,19 +162,36 @@ struct PoseMath
         return Pose<TYPE>(
             p.x,
             p.y,
-            AngleMath::normalizeAngleRad(p.theta + angle));
+            AngleMath::normalizeRad(p.theta + angle));
     }
 
     template<typename TYPE = double>
-    inline static Pose<TYPE> translate(Pose<TYPE> p, TYPE x, TYPE y)
+    inline static Pose<TYPE> subtract(Pose<TYPE> p1, Pose<TYPE> p2)
     {
         return Pose<TYPE>(
-            p.x + x * cos(p.theta) - y * sin(p.theta),
-            p.y + x * sin(p.theta) + y * cos(p.theta),
+            p1.x - p2.x,
+            p1.y - p2.y,
+            AngleMath::normalizeRad(p1.theta - p2.theta));
+    }
+
+    template<typename TYPE = double>
+    inline static Pose<TYPE> translate(Pose<TYPE> p, TYPE forward, TYPE sideway)
+    {
+        return Pose<TYPE>(
+            p.x + forward * cos(p.theta) - sideway * sin(p.theta),
+            p.y + forward * sin(p.theta) + sideway * cos(p.theta),
             p.theta);
+    }
+
+    template<typename TYPE = double>
+    inline static Pose<TYPE> multiply(Pose<TYPE> p1, Pose<TYPE> p2)
+    {
+
+        return Pose<TYPE>(
+            p1.x + p2.x * cos(p1.theta) - p2.y * sin(p1.theta),
+            p1.y + p2.x * sin(p1.theta) + p2.y * cos(p1.theta),
+            p1.theta + p2.theta);
     }
 };
 
 } // namespace srs
-
-#endif // POSEMATH_HPP_

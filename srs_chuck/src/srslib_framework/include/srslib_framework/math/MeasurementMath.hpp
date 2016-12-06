@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef MEASUREMENTMATH_HPP_
-#define MEASUREMENTMATH_HPP_
+#pragma once
 
 #include <cmath>
 #include <limits>
@@ -21,12 +20,6 @@ struct MeasurementMath
     }
 
     template<typename TYPE = double>
-    constexpr inline static TYPE inch2mm(TYPE inch)
-    {
-        return TYPE(25.4) * inch;
-    }
-
-    template<typename TYPE = double>
     constexpr inline static TYPE mm2inch(TYPE mm)
     {
         return mm / TYPE(25.4);
@@ -34,5 +27,3 @@ struct MeasurementMath
 };
 
 } // namespace srs
-
-#endif // MEASUREMENTMATH_HPP_

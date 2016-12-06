@@ -1,4 +1,4 @@
-<!-- 
+<!--
   *
   * (c) Copyright 2015-2016 River Systems, all rights reserved.
   *
@@ -6,7 +6,12 @@
   *
 -->
 <launch>
+    <arg name="run_in_debugger" default="false"/>
+
+    <arg name="launch-prefix" value="screen -d -m gdb --args" if="$(arg run_in_debugger)"/>
+    <arg name="launch-prefix" value="" unless="$(arg run_in_debugger)"/>
+
     <node name="srsnode_midbrain"
         pkg="srsnode_midbrain" type="srsnode_midbrain"
-        output="screen" />
+        output="screen" launch-prefix="$(arg launch-prefix)"/>
 </launch>

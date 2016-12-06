@@ -3,113 +3,113 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef SOLUTIONMESSAGEFACTORY_HPP_
-#define SOLUTIONMESSAGEFACTORY_HPP_
+#pragma once
 
-#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/Pose.h>
+#include <srslib_framework/MsgSolution.h>
 #include <srslib_framework/MsgSolutionItem.h>
 
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
+#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 
 namespace srs {
 
 struct SolutionMessageFactory
 {
     /**
-     * @brief Convert a GridSolutionItem type into a MsgSolutionItem.
+     * @brief Convert a Grid2dSolutionItem type into a MsgSolutionItem.
      *
-     * @param gridSolutionItem Solution item to convert
+     * @param Grid2dSolutionItem Solution item to convert
      *
-     * @return MsgSolutionItem generated from the specified GridSolutionItem
+     * @return MsgSolutionItem generated from the specified Grid2dSolutionItem
      */
-    static srslib_framework::MsgSolutionItem gridSolutionItem2Msg(GridSolutionItem gridSolutionItem)
+    static srslib_framework::MsgSolutionItem Grid2dSolutionItem2Msg(const Grid2dSolutionItem& Grid2dSolutionItem)
     {
         srslib_framework::MsgSolutionItem msgSolutionItem;
 
-        msgSolutionItem.action = gridSolutionItem.actionType;
-        msgSolutionItem.fromPose = PoseMessageFactory::pose2Msg(gridSolutionItem.fromPose);
-        msgSolutionItem.toPose = PoseMessageFactory::pose2Msg(gridSolutionItem.toPose);
-        msgSolutionItem.cost = gridSolutionItem.cost;
+        msgSolutionItem.action = Grid2dSolutionItem.actionType;
+        msgSolutionItem.fromPose = PoseMessageFactory::pose2Msg(Grid2dSolutionItem.fromPose);
+        msgSolutionItem.toPose = PoseMessageFactory::pose2Msg(Grid2dSolutionItem.toPose);
+        msgSolutionItem.cost = Grid2dSolutionItem.cost;
 
         return msgSolutionItem;
     }
 
     /**
-     * @brief Convert a MsgSolutionItem type into a GridSolutionItem.
+     * @brief Convert a MsgSolutionItem type into a Grid2dSolutionItem.
      *
      * @param message Solution item message to convert
      *
-     * @return GridSolutionItem generated from the specified MsgSolutionItem
+     * @return Grid2dSolutionItem generated from the specified MsgSolutionItem
      */
-    static GridSolutionItem msg2GridSolutionItem(srslib_framework::MsgSolutionItem message)
+    static Grid2dSolutionItem msg2Grid2dSolutionItem(const srslib_framework::MsgSolutionItem& message)
     {
-        GridSolutionItem gridSolutionItem;
+        Grid2dSolutionItem Grid2dSolutionItem;
 
-        gridSolutionItem.actionType = static_cast<GridSolutionItem::ActionEnum>(message.action);
-        gridSolutionItem.fromPose = PoseMessageFactory::msg2Pose(message.fromPose);
-        gridSolutionItem.toPose = PoseMessageFactory::msg2Pose(message.toPose);
-        gridSolutionItem.cost = message.cost;
+        Grid2dSolutionItem.actionType = static_cast<Grid2dSolutionItem::ActionEnum>(message.action);
+        Grid2dSolutionItem.fromPose = PoseMessageFactory::msg2Pose(message.fromPose);
+        Grid2dSolutionItem.toPose = PoseMessageFactory::msg2Pose(message.toPose);
+        Grid2dSolutionItem.cost = message.cost;
 
-        return gridSolutionItem;
+        return Grid2dSolutionItem;
     }
 
     /**
-     * @brief Convert a MsgSolutionItemConstPtr type into a GridSolutionItem.
+     * @brief Convert a MsgSolutionItemConstPtr type into a Grid2dSolutionItem.
      *
      * @param message Solution item message to convert
      *
-     * @return GridSolutionItem generated from the specified MsgSolutionItem
+     * @return Grid2dSolutionItem generated from the specified MsgSolutionItem
      */
-    static GridSolutionItem msg2GridSolutionItem(srslib_framework::MsgSolutionItemConstPtr message)
+    static Grid2dSolutionItem msg2Grid2dSolutionItem(srslib_framework::MsgSolutionItem::ConstPtr message)
     {
-        return SolutionMessageFactory::msg2GridSolutionItem(*message);
+        return msg2Grid2dSolutionItem(*message);
     }
 
     /**
-     * @brief Convert a MsgSolution type into a Solution of GridSolutionItem.
+     * @brief Convert a MsgSolution type into a Solution of Grid2dSolutionItem.
      *
      * @param message Solution message to convert
      *
-     * @return Solution of GridSolutionItem generated from the specified MsgSolution
+     * @return Solution of Grid2dSolutionItem generated from the specified MsgSolution
      */
-    static Solution<GridSolutionItem> msg2Solution(srslib_framework::MsgSolution message)
+    static Solution<Grid2dSolutionItem> msg2Solution(const srslib_framework::MsgSolution& message)
     {
-        Solution<GridSolutionItem> solution;
+        Solution<Grid2dSolutionItem> solution;
 
         for (auto solutionItem : message.items)
         {
-            GridSolutionItem gridSolutionItem = SolutionMessageFactory::msg2GridSolutionItem(
-                solutionItem);
+            Grid2dSolutionItem grid2dSolutionItem = msg2Grid2dSolutionItem(solutionItem);
 
-            solution.push_back(gridSolutionItem);
+            solution.push_back(grid2dSolutionItem);
         }
 
         return solution;
     }
 
     /**
-     * @brief Convert a MsgSolutionConstPtr type into a Solution of GridSolutionItem.
+     * @brief Convert a MsgSolutionConstPtr type into a Solution of Grid2dSolutionItem.
      *
      * @param message Solution message to convert
      *
-     * @return Solution of GridSolutionItem generated from the specified MsgSolutionConstPtr
+     * @return Solution of Grid2dSolutionItem generated from the specified MsgSolutionConstPtr
      */
-    static Solution<GridSolutionItem> msg2Solution(srslib_framework::MsgSolutionConstPtr message)
+    static Solution<Grid2dSolutionItem> msg2Solution(srslib_framework::MsgSolution::ConstPtr message)
     {
-        return SolutionMessageFactory::msg2Solution(*message);
+        return msg2Solution(*message);
     }
 
     /**
-     * @brief Convert a Solution of GridSolutionItem into a MsgSolution.
+     * @brief Convert a Solution of Grid2dSolutionItem into a MsgSolution.
      *
      * @param solution Solution to convert
      * @param timestamp ROS time stamp for the message
      *
-     * @return MsgSolution generated from the specified Solution of GridSolutionItem
+     * @return MsgSolution generated from the specified Solution of Grid2dSolutionItem
      */
-    static srslib_framework::MsgSolution gridSolution2Msg(Solution<GridSolutionItem>& solution,
-        ros::Time timestamp = ros::Time::now())
+    static srslib_framework::MsgSolution gridSolution2Msg(const Solution<Grid2dSolutionItem>& solution,
+        const ros::Time timestamp = ros::Time::now())
     {
         srslib_framework::MsgSolution msgSolution;
         msgSolution.header.stamp = timestamp;
@@ -118,7 +118,7 @@ struct SolutionMessageFactory
 
         for (auto solutionItem : solution)
         {
-            items.push_back(SolutionMessageFactory::gridSolutionItem2Msg(solutionItem));
+            items.push_back(Grid2dSolutionItem2Msg(solutionItem));
         }
         msgSolution.items = items;
 
@@ -126,18 +126,18 @@ struct SolutionMessageFactory
     }
 
     /**
-     * @brief Convert a Solution of GridSolutionItem into a nav_msgs::Path.
+     * @brief Convert a Solution of Grid2dSolutionItem into a nav_msgs::Path.
      *
      * @param solution Solution to convert
      * @param timestamp ROS time stamp for the message
      *
-     * @return nav_msgs::Path generated from the specified Solution of GridSolutionItem
+     * @return nav_msgs::Path generated from the specified Solution of Grid2dSolutionItem
      */
-    static nav_msgs::Path gridSolution2PathMsg(Solution<GridSolutionItem>& solution,
-        ros::Time timestamp = ros::Time::now())
+    static nav_msgs::Path gridSolution2PathMsg(const Solution<Grid2dSolutionItem>& solution,
+        const ros::Time timestamp = ros::Time::now())
     {
         nav_msgs::Path messagePath;
-        messagePath.header.frame_id = "map";
+        messagePath.header.frame_id = ChuckTransforms::MAP;
         messagePath.header.stamp = timestamp;
 
         vector<geometry_msgs::PoseStamped> planPoses;
@@ -165,5 +165,3 @@ struct SolutionMessageFactory
 };
 
 } // namespace srs
-
-#endif // SOLUTIONMESSAGEFACTORY_HPP_

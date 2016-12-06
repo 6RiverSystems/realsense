@@ -3,22 +3,18 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ODOMETRY_HPP_
-#define ODOMETRY_HPP_
+#pragma once
 
 #include <string>
 #include <sstream>
 using namespace std;
 
-#include <opencv2/opencv.hpp>
-
-#include <srslib_framework/platform/Object.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
 namespace srs {
 
 template<typename TYPE = double>
-struct Odometry : public Object
+struct Odometry
 {
     typedef TYPE BaseType;
 
@@ -51,5 +47,3 @@ template<typename TYPE>
 const Odometry<TYPE> Odometry<TYPE>::ZERO = Odometry<TYPE>(Velocity<TYPE>::ZERO);
 
 } // namespace srs
-
-#endif // ODOMETRY_HPP_

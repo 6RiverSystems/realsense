@@ -10,44 +10,79 @@ using namespace std;
 
 #include <ros/ros.h>
 
-#include <srslib_framework/math/AngleMath.hpp>
-
-#include <srslib_framework/localization/Map.hpp>
-
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
-#include <srslib_framework/planning/pathplanning/grid/PoseAdapter.hpp>
-
-#include <srslib_framework/robotics/robot/Chuck.hpp>
-
+#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_framework/search/AStar.hpp>
+#include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
+#include <srslib_framework/search/graph/grid2d/Grid2dSingleGoal.hpp>
+
+#include <srslib_test/utils/MemoryWatch.hpp>
+using namespace srs;
+
 
 using namespace srs;
 
-// Path not found between Pose {@: 0, x: 18.1335, y: 5.24097, t: 0.0189141} (181,52,0) and
-// Pose {@: 1.46645e+09, x: 18.1335, y: 5.24097, t: 0} (181,52,0)
-
-TEST(Test_AStar, SamePlaceOnMap)
+TEST(Test_AStar, SamePositionOnMap)
 {
-    Pose<> robotPose = Pose<>(18.1335, 5.24097, 0.0189141);
-    Pose<> goalPose = Pose<>(18.1335, 5.24097, 0);
+    MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 
-    Map* map = new Map();
-    map->load("/tmp/srslib_framework/data/6rhq.yaml");
+    Grid2d::Position startPosition(181, 52, 0);
+    Grid2d::Position goalPosition(181, 52, 0);
 
-    // Prepare the start position for the search
-    Grid2d::LocationType internalStart;
-    int startAngle;
-    PoseAdapter::pose2Map(robotPose, map, internalStart, startAngle);
+    test::MemoryWatch memoryWatch;
 
-    // Prepare the goal position for the search
-    Grid2d::LocationType internalGoal;
-    int goalAngle;
-    PoseAdapter::pose2Map(goalPose, map, internalGoal, goalAngle);
+    AStar* algorithm = new AStar();
+    Grid2dNode* start = Grid2dNode::instanceOfStart(mapStack->getLogicalMap()->getGrid(),
+        startPosition);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
-    AStar<Grid2d>* algorithm = new AStar<Grid2d>(map->getGrid());
-    ROS_DEBUG_STREAM("Found: " <<
-        algorithm->search(SearchPosition<Grid2d>(internalStart, startAngle),
-            SearchPosition<Grid2d>(internalGoal, goalAngle)));
+    ASSERT_TRUE(algorithm->search(start, goal)) <<
+        "A solution was not found";
+
+    ASSERT_EQ(0, algorithm->getOpenNodeCount()) <<
+        "Unexpected number of open nodes";
+
+    ASSERT_EQ(1, algorithm->getClosedNodeCount()) <<
+        "Unexpected number of closed nodes";
+
+    algorithm->clear();
+
+    start->release();
+    goal->release();
+    delete algorithm;
+
+    ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
+}
+
+TEST(Test_AStar, SameLocationOnMap)
+{
+    MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
+
+    Grid2d::Position startPosition(181, 52, 0);
+    Grid2d::Position goalPosition(181, 52, 90);
+
+    test::MemoryWatch memoryWatch;
+
+    AStar* algorithm = new AStar();
+    Grid2dNode* start = Grid2dNode::instanceOfStart(mapStack->getLogicalMap()->getGrid(),
+        startPosition);
+    Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
+
+    ASSERT_TRUE(algorithm->search(start, goal)) <<
+        "A solution was not found";
+
+    ASSERT_EQ(2, algorithm->getOpenNodeCount()) <<
+        "Unexpected number of open nodes";
+
+    ASSERT_EQ(2, algorithm->getClosedNodeCount()) <<
+        "Unexpected number of closed nodes";
+
+    algorithm->clear();
+
+    start->release();
+    goal->release();
+    delete algorithm;
+
+    ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
 }

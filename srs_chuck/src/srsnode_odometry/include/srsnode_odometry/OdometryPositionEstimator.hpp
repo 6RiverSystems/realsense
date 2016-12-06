@@ -17,7 +17,6 @@
 #include <dynamic_reconfigure/server.h>
 #include <srsnode_odometry/RobotSetupConfig.h>
 #include <srslib_framework/OdometryRPM.h>
-#include <srslib_framework/ros/RosTap.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
@@ -63,8 +62,6 @@ private:
     static constexpr double MAX_ALLOWED_ODOM_DELAY = 0.02; // 20ms
 
 	static constexpr auto ODOMETRY_RPM_RAW_TOPIC = "/internal/sensors/odometry/rpm/raw";
-
-	static constexpr auto ODOMETRY_RAW_VELOCITY_TOPIC = "/internal/sensors/odometry/velocity/cmd";
 
 	static constexpr auto ODOMETRY_RPM_COMMAND_TOPIC = "/internal/sensors/odometry/rpm/cmd";
 

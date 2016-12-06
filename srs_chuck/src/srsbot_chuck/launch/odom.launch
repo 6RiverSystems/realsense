@@ -1,0 +1,48 @@
+<!-- 
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+<launch>
+    <arg name="use_sim_time" default="true"/>
+    <arg name="start_bridge" default="false" />
+    <arg name="emulation_mode" default="true" />
+
+    <!-- Fixed /odom frame to /map frame TF -->
+    <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
+
+    <!-- Chuck Stack -->
+    <include file="$(find srsbot_chuck)/launch/robot.launch">
+        <arg name="use_sim_time" value="$(arg use_sim_time)" />
+        <arg name="start_bridge" value="$(arg start_bridge)" />
+        <arg name="emulation_mode" value="$(arg emulation_mode)" />
+    </include>
+
+    <!-- Map server -->
+    <include file="$(find srsnode_map_server)/launch/node.launch">
+        <arg name="map_stack" value="$(find srsc_6rshq_oneway)/map/6rshq_oneway.yaml" />
+    </include>
+
+<!--
+    <include file="$(find srsnode_map_server)/launch/node.launch">
+        <arg name="map_stack" value="$(find srsc_barrett)/map/barrett.yaml" />
+    </include>
+
+    <include file="$(find srsnode_map_server)/launch/node.launch">
+        <arg name="map_stack" value="$(find srsc_empty)/map/empty.yaml" />
+    </include>
+
+    <include file="$(find srsnode_map_server)/launch/node.launch">
+        <arg name="map_stack" value="$(find srsnode_navigation)/test/data/one-way/one-way.yaml" />
+    </include>
+
+
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_empty)/map/empty.yaml" >
+        <remap from="map" to="/internal/state/map/ros_occupancy"/>
+        <remap from="map_metadata" to="/internal/state/map/info"/>
+    </node>
+-->
+
+</launch>

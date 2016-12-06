@@ -112,7 +112,7 @@ function restartChuck() {
 logChuck() {
   getChuckDirectory &&
 
-  tail -n 1000 -f "$logFile" -f ~/mfp_bridge/log/bridge.log
+  sudo tail -n 1000 -f "$logFile" -f /var/log/upstart/mfp-bridge.log
 }
 
 recordChuck() {

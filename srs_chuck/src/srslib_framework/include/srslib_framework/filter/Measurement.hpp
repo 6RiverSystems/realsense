@@ -3,21 +3,18 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef MEASUREMENT_HPP_
-#define MEASUREMENT_HPP_
+#pragma once
 
 #include <opencv2/opencv.hpp>
 
 #include <srslib_framework/math/Ocv2Base.hpp>
-#include <srslib_framework/platform/Object.hpp>
 
 namespace srs {
 
-class Measurement : public Object
+class Measurement
 {
 public:
-    Measurement() :
-            Object()
+    Measurement()
     {}
 
     virtual ~Measurement()
@@ -25,5 +22,3 @@ public:
 };
 
 } // namespace srs
-
-#endif // MEASUREMENT_HPP_

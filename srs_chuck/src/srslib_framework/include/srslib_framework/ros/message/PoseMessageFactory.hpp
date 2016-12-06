@@ -223,6 +223,22 @@ struct PoseMessageFactory
 
         return pose;
     }
+
+    static tf::Transform pose2Transform(const Pose<> pose)
+    {
+        tf::Transform transform;
+        transform.setOrigin(tf::Point(pose.x, pose.y, 0.0));
+        transform.setRotation(tf::createQuaternionFromYaw(pose.theta));
+        return transform;
+    }
+
+    static Pose<> transform2Pose(const tf::Transform transform)
+    {
+        tf::Vector3 location = transform.getOrigin();
+        tf::Quaternion orientation = transform.getRotation();
+
+        return Pose<>(location.getX(), location.getY(), tf::getYaw(orientation));
+    }
 };
 
 } // namespace srs

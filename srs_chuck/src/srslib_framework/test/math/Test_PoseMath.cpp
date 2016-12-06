@@ -61,3 +61,13 @@ TEST(Test_PoseMath, Pose2Polygon45)
     testPose(polygon[2], Pose<>(0.292, 1.707, 0.785));
     testPose(polygon[3], Pose<>(1.707, 0.292, 0.785));
 }
+
+TEST(Test_PoseMath, PoseMultiply)
+{
+    Pose<> robotInMap(1, 1, 0);
+    Pose<> lidarOnRobot(1, 0, 0);
+    testPose(PoseMath::multiply(robotInMap, lidarOnRobot), Pose<>(2, 1, 0));
+
+    robotInMap = Pose<>(0, 0, M_PI/2);
+    testPose(PoseMath::multiply(robotInMap, lidarOnRobot), Pose<>(0, 1, M_PI/2));
+}

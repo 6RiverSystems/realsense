@@ -35,6 +35,9 @@
         <arg name="use_sim_time" value="$(arg use_sim_time)"/>
     </include>
 
+    <!-- Midbrain -->
+    <include file="$(find srsnode_midbrain)/launch/node.launch" />
+
     <!-- Raw Odometry -->
     <include file="$(find srsnode_odometry)/launch/node.launch">
         <arg name="emulation_mode" value="$(arg emulation_mode)"/>

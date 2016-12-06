@@ -4,19 +4,12 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 
-#include <ros/ros.h>
-
 #include <srsnode_midbrain/Midbrain.hpp>
 
 int main(int argc, char** argv)
 {
-    static const string NODE_NAME = "srsnode_midbrain";
-
-    // Initialize ROS
-    ros::init(argc, argv, NODE_NAME);
-    ROS_INFO_STREAM(NODE_NAME << " started");
-
-    srs::Midbrain midbrain(NODE_NAME);
+    // Create the midbrian and run it
+    srs::Midbrain midbrain("srsnode_midbrain", argc, argv);
     midbrain.run();
 
     return 0;

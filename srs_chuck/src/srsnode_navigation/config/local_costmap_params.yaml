@@ -9,7 +9,3 @@ local_costmap:
   height: 6.0
   transform_tolerance: 0.5
   resolution: 0.05
-  plugin:
-  - {name: obstacles_laser, type: "costmap_2d::VoxelLayer"}
-  - {name: obstacles_lidar, type: "costmap_2d::VoxelLayer"}
-  - {name: inflation_layer, type: "costmap_2d::InflationLayer"}

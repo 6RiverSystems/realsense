@@ -132,6 +132,7 @@ set(TEST_SOURCES_SEARCH
     test/search/mapstack/Test_AStar_MapStack_Basic.cpp
     test/search/mapstack/Test_AStar_MapStack_NoSolution.cpp
     test/search/mapstack/Test_AStar_MapStack_SamePlaceOnMap.cpp
+    test/search/mapstack/Test_AStar_MapStack_Unknown.cpp
     test/search/mapstack/Test_AStar_MapStack_Weights.cpp
 )
 

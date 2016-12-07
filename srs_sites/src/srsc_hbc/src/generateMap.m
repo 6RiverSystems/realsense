@@ -38,11 +38,11 @@ layerOneWayEastWest = convertToWeightedArea(layerOneWayEastWest, 'all', 0, 100, 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One way North-South
-layerMeeting = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-one_way_meeting.png', ...
+layerMeeting = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-meeting_area.png', ...
     RESOLUTION, ORIGIN);
 showMap(layerMeeting, 'Meeting area');
 
-layerMeeting = convertToCostArea(layerMeeting, 'all', 100);
+layerMeeting = convertToCostArea(layerMeeting, 'all', 50);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map

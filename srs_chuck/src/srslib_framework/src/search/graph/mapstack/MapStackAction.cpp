@@ -29,10 +29,14 @@ MapStackNode* MapStackAction::exploreBackward(MapStack* stack, MapStackNode* fro
     Grid2d::Position neighbor;
     if (stack->getNeighbor(motion, neighbor))
     {
+        MapStackNode::SearchParameters searchParameters = fromNode->getSearchParameters();
+
         // Calculate the motion cost
         int motionCost = COMMAND_COSTS[MapStackAction::BACKWARD];
         motionCost += stack->getWeight(fromPosition);
-        motionCost += stack->getTotalCost(neighbor, false);
+        motionCost += stack->getTotalCost(neighbor,
+            searchParameters.allowUnknown,
+            searchParameters.costMapRatio);
 
         if (motionCost < Grid2d::PAYLOAD_MAX)
         {
@@ -42,7 +46,8 @@ MapStackNode* MapStackAction::exploreBackward(MapStack* stack, MapStackNode* fro
                 fromNode, MapStackAction::BACKWARD,
                 motion,
                 fromNode->getG() + motionCost, 0,
-                nullptr);
+                nullptr,
+                searchParameters);
 
             // Finally, calculate the heuristic function value
             // from this node to the goal
@@ -63,10 +68,14 @@ MapStackNode* MapStackAction::exploreForward(MapStack* stack, MapStackNode* from
     Grid2d::Position motion;
     if (stack->getNeighbor(fromPosition, motion))
     {
+        MapStackNode::SearchParameters searchParameters = fromNode->getSearchParameters();
+
         // Calculate the motion cost
         int motionCost = COMMAND_COSTS[MapStackAction::FORWARD];
         motionCost += stack->getWeight(fromPosition);
-        motionCost += stack->getTotalCost(motion, false);
+        motionCost += stack->getTotalCost(motion,
+            searchParameters.allowUnknown,
+            searchParameters.costMapRatio);
 
         if (motionCost < Grid2d::PAYLOAD_MAX)
         {
@@ -76,7 +85,8 @@ MapStackNode* MapStackAction::exploreForward(MapStack* stack, MapStackNode* from
                 fromNode, MapStackAction::FORWARD,
                 motion,
                 fromNode->getG() + motionCost, 0,
-                nullptr);
+                nullptr,
+                searchParameters);
 
             // Finally, calculate the heuristic function value
             // from this node to the goal
@@ -98,9 +108,13 @@ MapStackNode* MapStackAction::exploreRotation(MapStack* stack, MapStackNode* fro
     int newOrientation = AngleMath::normalizeDeg<int>(fromPosition.orientation + angle);
     Grid2d::Position motion = Grid2d::Position(fromPosition.x, fromPosition.y, newOrientation);
 
+    MapStackNode::SearchParameters searchParameters = fromNode->getSearchParameters();
+
     // Calculate the motion cost
     int motionCost = COMMAND_COSTS[action];
-    motionCost += stack->getTotalCost(motion, false);
+    motionCost += stack->getTotalCost(motion,
+        searchParameters.allowUnknown,
+        searchParameters.costMapRatio);
 
     if (motionCost < Grid2d::PAYLOAD_MAX)
     {
@@ -110,7 +124,8 @@ MapStackNode* MapStackAction::exploreRotation(MapStack* stack, MapStackNode* fro
             fromNode, action,
             motion,
             fromNode->getG() + motionCost, 0,
-            nullptr);
+            nullptr,
+            searchParameters);
 
         // Finally, calculate the heuristic function value
         // from this node to the goal

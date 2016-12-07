@@ -9,12 +9,14 @@ namespace srs {
 MapStackNode* MapStackNode::instanceOf(MapStack* stack,
     MapStackNode* parentNode, MapStackAction::ActionEnum parentAction,
     Grid2d::Position position, int g, int h,
-    SearchGoal* goal)
+    SearchGoal* goal,
+    SearchParameters searchParameters)
 {
     return new MapStackNode(stack,
         parentNode, parentAction,
         position,
-        g, h, goal);
+        g, h, goal,
+        searchParameters);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,7 @@
 #include <srsnode_navigation/global_planner/SrsPlannerConventional.hpp>
 
+#include <pthread.h>
+
 #include <pluginlib/class_list_macros.h>
 
 PLUGINLIB_EXPORT_CLASS(srs::SrsPlannerConventional, nav_core::BaseGlobalPlanner)
@@ -7,9 +9,16 @@ PLUGINLIB_EXPORT_CLASS(srs::SrsPlannerConventional, nav_core::BaseGlobalPlanner)
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/trajectory/SimpleTrajectoryGenerator.hpp>
 #include <srslib_framework/planning/pathplanning/trajectory/Trajectory.hpp>
+#include <srslib_framework/platform/StopWatch.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
+
+//#include <sys/types.h>
+//#include <unistd.h>
+//#include <sys/syscall.h>
+//#include <sys/time.h>
+//#include <sys/resource.h>
 
 namespace srs {
 
@@ -40,8 +49,13 @@ SrsPlannerConventional::~SrsPlannerConventional()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlannerConventional::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostMap)
 {
+    ros::NodeHandle privateNh("~/" + name);
+
     costMap2d_ = rosCostMap->getCostmap();
     tapMapStack_.attach(this);
+
+    configServer_ = new dynamic_reconfigure::Server<srsnode_navigation::SrsPlannerConfig>(privateNh);
+    configServer_->setCallback(boost::bind(&SrsPlannerConventional::onConfigChange, this, _1, _2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,12 +64,39 @@ bool SrsPlannerConventional::makePlan(
     const geometry_msgs::PoseStamped& goal,
     vector<geometry_msgs::PoseStamped>& plan)
 {
+//    sched_param sch;
+//    int policy;
+//
+//    pthread_getschedparam(pthread_self(), &policy, &sch);
+//
+//    pid_t tid = syscall(SYS_gettid);
+//    printf("tid %d , %d\n",tid , getpriority(PRIO_PROCESS, tid));
+//
+//    int ret = setpriority(PRIO_PROCESS, tid, 10);
+//    cout << "ret: " << ret << endl;
+//
+//    printf("tid thread %d , %d\n", tid, getpriority(PRIO_PROCESS, tid));
+
+//    ROS_WARN_STREAM("priority: " << sch.sched_priority);
+//    ROS_WARN_STREAM("policy: " << policy);
+
+    //    sch.sched_priority = 20;
+//    if (pthread_setschedparam(t1.native_handle(), SCHED_FIFO, &sch)) {
+//        std::cout << "Failed to setschedparam: " << std::strerror(errno) << '\n';
+//    }
+
+//    pthread_setschedprio(pthread_self(), 2);
+
     // Find a suitable solution for the provided goal
     Pose<> robotPose = PoseMessageFactory::poseStamped2Pose(start);
     Pose<> target = PoseMessageFactory::poseStamped2Pose(goal);
 
+    StopWatch watch;
     Solution<Grid2dSolutionItem>* solution = Grid2dSolutionFactory::fromSingleGoal(
-        srsMapStack_, robotPose, target);
+        srsMapStack_, robotPose, target, astarConfigParameters_, nodeSearchParameters_);
+
+    ROS_INFO_STREAM_NAMED("srs_planner", "Global planner elpased time: " <<
+        watch.elapsedMilliseconds() << "ms");
 
     plan.clear();
 
@@ -98,6 +139,16 @@ void SrsPlannerConventional::notified(Subscriber<srslib_framework::MapStack>* su
 
     // Include the ROS costmap in the map stack
     srsMapStack_->setCostMap2d(costMap2d_);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void SrsPlannerConventional::onConfigChange(srsnode_navigation::SrsPlannerConfig& config, uint32_t level)
+{
+    astarConfigParameters_.useYield = config.use_yield;
+    astarConfigParameters_.yieldFrequency = config.yield_frequency;
+
+    nodeSearchParameters_.allowUnknown = config.allow_unknown;
+    nodeSearchParameters_.costMapRatio = config.cost_map_ratio;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

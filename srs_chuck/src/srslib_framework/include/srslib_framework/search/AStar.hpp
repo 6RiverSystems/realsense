@@ -20,9 +20,21 @@ namespace srs {
 class AStar
 {
 public:
+    struct ConfigParameters
+    {
+        ConfigParameters() :
+            useYield(true),
+            yieldFrequency(2000)
+        {}
+
+        bool useYield;
+        unsigned int yieldFrequency;
+    };
+
     AStar() :
         lastNode_(nullptr),
-        startNode_(nullptr)
+        startNode_(nullptr),
+        yieldCounter_(0)
     {}
 
     ~AStar()
@@ -49,7 +61,8 @@ public:
         return lastNode_;
     }
 
-    bool search(SearchNode* start, SearchGoal* goal);
+    bool search(SearchNode* start, SearchGoal* goal,
+        ConfigParameters parameters = ConfigParameters());
 
 private:
     using ClosedSetType = unordered_set<SearchNode*, SearchNode::Hash, SearchNode::EqualTo>;
@@ -60,10 +73,13 @@ private:
 
     ClosedSetType closedSet_;
 
-    SearchNode* startNode_;
     SearchNode* lastNode_;
 
     OpenSetType openQueue_;
+
+    SearchNode* startNode_;
+
+    unsigned int yieldCounter_;
 };
 
 } // namespace srs

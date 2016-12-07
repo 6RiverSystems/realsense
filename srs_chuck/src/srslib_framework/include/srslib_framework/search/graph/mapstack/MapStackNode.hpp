@@ -16,18 +16,35 @@ namespace srs {
 
 struct MapStackNode : public SearchNode
 {
-    static MapStackNode* instanceOfStart(MapStack* stack, Grid2d::Position position)
+    struct SearchParameters
+    {
+        SearchParameters() :
+            allowUnknown(false),
+            costMapRatio(1.0)
+        {}
+
+        bool allowUnknown;
+        float costMapRatio;
+    };
+
+    static MapStackNode* instanceOfStart(MapStack* stack,
+        Grid2d::Position position,
+        SearchParameters searchParameters = SearchParameters())
     {
         return instanceOf(stack,
             nullptr, MapStackAction::START,
             position,
-            stack->getTotalCost(position, false), 0, nullptr);
+            stack->getTotalCost(position,
+                searchParameters.allowUnknown, searchParameters.costMapRatio),
+            0, nullptr,
+            searchParameters);
     }
 
     static MapStackNode* instanceOf(MapStack* grid,
         MapStackNode* parentNode, MapStackAction::ActionEnum parentAction,
         Grid2d::Position position, int g, int h,
-        SearchGoal* goal);
+        SearchGoal* goal,
+        SearchParameters searchParameters);
 
     bool equals(SearchNode* const& rhs) const
     {
@@ -65,6 +82,11 @@ struct MapStackNode : public SearchNode
     Grid2d::Position getPosition() const
     {
         return position_;
+    }
+
+    SearchParameters getSearchParameters() const
+    {
+        return searchParameters_;
     }
 
     int getTotalCost() const
@@ -123,14 +145,16 @@ protected:
     MapStackNode(MapStack* stack,
         MapStackNode* parentNode, MapStackAction::ActionEnum parentAction,
             Grid2d::Position position, int g, int h,
-            SearchGoal* goal) :
+            SearchGoal* goal,
+            SearchParameters searchParameters) :
         stack_(stack),
         parentAction_(parentAction),
         parentNode_(parentNode),
         position_(position),
         g_(g),
         goal_(goal),
-        h_(h)
+        h_(h),
+        searchParameters_(searchParameters)
     {}
 
     ~MapStackNode()
@@ -146,6 +170,8 @@ private:
     MapStackAction::ActionEnum parentAction_;
     MapStackNode* parentNode_;
     Grid2d::Position position_;
+
+    SearchParameters searchParameters_;
 };
 
 } // namespace srs

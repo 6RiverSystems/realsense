@@ -47,7 +47,9 @@ OccupancyMap* MapStack::getOccupancyMap() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-int MapStack::getTotalCost(const Grid2d::Position& position, bool allowUnknown) const
+int MapStack::getTotalCost(const Grid2d::Position& position,
+    bool allowUnknown,
+    float costMapRatio) const
 {
     int cost = 0;
 
@@ -60,17 +62,17 @@ int MapStack::getTotalCost(const Grid2d::Position& position, bool allowUnknown) 
         }
     }
 
-    int costMap2d = 0;
+    float costMap2d = 0;
     if (costMap2d_)
     {
-        costMap2d = costMap2d_->getCost(position.x, position.y);
+        costMap2d = costMap2d_->getCost(position.x, position.y) * costMapRatio;
         if (!allowUnknown && costMap2d == costmap_2d::NO_INFORMATION)
         {
             return Grid2d::PAYLOAD_MAX;
         }
     }
 
-    return cost + costMap2d;
+    return cost + static_cast<int>(costMap2d);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

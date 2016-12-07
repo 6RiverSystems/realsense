@@ -1,9 +1,15 @@
 #include <srslib_framework/search/AStar.hpp>
 
-#include <iostream>
-using namespace std;
-
 #define DEBUG_ASTAR 0
+#define YIELD_ENABLED 1
+
+#include <iostream>
+
+#ifdef YIELD_ENABLED
+    #include <thread>
+#endif
+
+using namespace std;
 
 namespace srs {
 
@@ -37,8 +43,9 @@ void AStar::clear()
     }
     closedSet_.clear();
 
-    // Clear the last search
+    // Clear the last search and the yield counter
     lastNode_ = nullptr;
+    yieldCounter_ = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +68,7 @@ void AStar::getPlan(Plan& plan)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool AStar::search(SearchNode* start, SearchGoal* goal)
+bool AStar::search(SearchNode* start, SearchGoal* goal, ConfigParameters parameters)
 {
     // Do not execute any search without complete information
     if (!start || !goal)
@@ -132,6 +139,16 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
 
         // Try to push the neighbors in the open queue
         pushNodes(nextSearchNodes);
+
+        // If the yield property has been set
+        #ifdef YIELD_ENABLED
+            yieldCounter_++;
+            if (parameters.useYield && yieldCounter_ > parameters.yieldFrequency)
+            {
+                yieldCounter_ = 0;
+                this_thread::yield();
+            }
+        #endif
     }
 
     return false;

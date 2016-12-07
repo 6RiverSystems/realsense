@@ -16,10 +16,15 @@ using namespace std;
 #include <angles/angles.h>
 #include <base_local_planner/world_model.h>
 #include <base_local_planner/costmap_model.h>
+#include <dynamic_reconfigure/server.h>
+
+#include <srsnode_navigation/SrsPlannerConfig.h>
 
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/ros/channel/ChannelRosPath.hpp>
 #include <srslib_framework/ros/tap/TapMapStack.hpp>
+#include <srslib_framework/search/AStar.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
 
 namespace srs {
 
@@ -41,13 +46,20 @@ public:
 private:
     void notified(Subscriber<srslib_framework::MapStack>* subject);
 
+    void onConfigChange(srsnode_navigation::SrsPlannerConfig& config, uint32_t level);
+
     void populatePath(const geometry_msgs::PoseStamped& start,
         const Trajectory<>& trajectory,
         const geometry_msgs::PoseStamped& goal,
         vector<geometry_msgs::PoseStamped>& plan);
 
+    AStar::ConfigParameters astarConfigParameters_;
+
     ChannelRosPath channelRosPath_;
+    dynamic_reconfigure::Server<srsnode_navigation::SrsPlannerConfig>* configServer_;
     costmap_2d::Costmap2D* costMap2d_;
+
+    MapStackNode::SearchParameters nodeSearchParameters_;
 
     MapStack* srsMapStack_;
 

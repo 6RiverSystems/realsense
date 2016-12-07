@@ -85,6 +85,10 @@ add_library(
     ${${PROJECT_NAME}_SOURCES}
 )
 
+add_dependencies(srslib_global_planner
+    ${PROJECT_NAME}_gencfg
+)
+
 target_link_libraries(srslib_global_planner
     ${catkin_LIBRARIES}
     ${srslib_framework_LIBRARIES}

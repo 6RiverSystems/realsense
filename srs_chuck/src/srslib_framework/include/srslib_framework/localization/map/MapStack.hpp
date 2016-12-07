@@ -30,7 +30,9 @@ public:
     LogicalMap* getLogicalMap() const;
     bool getNeighbor(const Grid2d::Position& position, Grid2d::Position& result) const;
     OccupancyMap* getOccupancyMap() const;
-    int getTotalCost(const Grid2d::Position& position, bool allowUnknown) const;
+    int getTotalCost(const Grid2d::Position& position,
+        bool allowUnknown,
+        float costMapRatio) const;
     int getWeight(const Grid2d::Position& position) const;
 
     void setCostMap2d(costmap_2d::Costmap2D* costMap2d);

@@ -3,10 +3,9 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef MIDBRAIN_HPP_
-#define MIDBRAIN_HPP_
+#pragma once
 
-#include <ros/ros.h>
+#include <srslib_framework/ros/unit/RosUnit.hpp>
 
 #include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
 #include <srslib_framework/ros/service/RosTriggerPause.hpp>
@@ -14,32 +13,27 @@
 
 namespace srs {
 
-class Midbrain
+class Midbrain : public RosUnit<Midbrain>
 {
 public:
-    Midbrain(string nodeName);
+    Midbrain(string name, int argc, char** argv);
 
     ~Midbrain()
     {}
 
-    void run();
+protected:
+    void execute();
+
+    void initialize();
 
 private:
-    constexpr static double REFRESH_RATE_HZ = 200;
-
     void evaluateTriggers();
 
-    void createSubscribers();
+    constexpr static double REFRESH_RATE_HZ = 50;
 
-    void createPublishers();
-
-    ros::NodeHandle rosNodeHandle_;
+    Reflexes reflexes_;
 
     RosTriggerShutdown triggerShutdown_;
-    RosTriggerPause triggerPause_;
-    Reflexes reflexes_;
 };
 
 } // namespace srs
-
-#endif  // MIDBRAIN_HPP_

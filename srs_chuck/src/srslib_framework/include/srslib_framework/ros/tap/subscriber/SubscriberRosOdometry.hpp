@@ -47,6 +47,7 @@ public:
     void receiveData(const nav_msgs::Odometry::ConstPtr message)
     {
         set(PoseMessageFactory::msg2Pose(message));
+        velocity_ = Velocity<>(message->twist.twist.linear.x, message->twist.twist.angular.z);
     }
 
     void reset()

@@ -12,6 +12,8 @@ using namespace std;
 
 #include <srslib_framework/ros/channel/publisher/PublisherStamped.hpp>
 #include <srslib_framework/ros/topics/ChuckTransforms.hpp>
+#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/ros/message/PolygonMessageFactory.hpp>
 
 namespace srs {
 
@@ -28,22 +30,7 @@ public:
 
     geometry_msgs::PolygonStamped convertData(const vector<Pose<>>& data, const ros::Time timestamp)
     {
-        geometry_msgs::PolygonStamped message;
-        message.header.stamp = timestamp;
-
-        vector<geometry_msgs::Point32> polygon;
-        for (auto pose : data)
-        {
-            geometry_msgs::Point32 corner;
-            corner.x = pose.x;
-            corner.y = pose.y;
-            corner.z = 0.0;
-
-            polygon.push_back(corner);
-        }
-        message.polygon.points = polygon;
-
-        return message;
+        return PolygonMessageFactory::poses2PolygonStamped(data, timestamp);
     }
 
     void publish(const vector<Pose<>>& data,

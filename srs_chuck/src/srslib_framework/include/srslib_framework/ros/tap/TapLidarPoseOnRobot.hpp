@@ -10,28 +10,27 @@
 #include <tf/transform_listener.h>
 
 #include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 #include <srslib_framework/ros/tap/subscriber/SingleDataSource.hpp>
 #include <srslib_framework/ros/topics/ChuckTransforms.hpp>
 
 namespace srs {
 
-class TapRobotPose :
-    public SingleDataSource<Pose<>>
+class TapLidarPoseOnRobot :
+    public SingleDataSource<tf::Transform>
 {
 public:
-    TapRobotPose()
+    TapLidarPoseOnRobot()
     {}
 
-    virtual ~TapRobotPose()
+    virtual ~TapLidarPoseOnRobot()
     {}
 
-    virtual Pose<> peek() const
+    virtual tf::Transform peek() const
     {
         return data_;
     }
 
-    virtual Pose<> pop()
+    virtual tf::Transform pop()
     {
         updatePose();
 
@@ -40,10 +39,10 @@ public:
 
     virtual void reset()
     {
-        data_ = Pose<>::INVALID;
+        data_ = tf::Transform::getIdentity();
     }
 
-    virtual void set(Pose<> data)
+    virtual void set(tf::Transform data)
     {
         // Nothing to do
     }
@@ -54,20 +53,18 @@ private:
         try
         {
             tf::StampedTransform robotTransform;
-            tfListener_.lookupTransform(ChuckTransforms::MAP, ChuckTransforms::BASE_FOOTPRINT,
+            tfListener_.lookupTransform(ChuckTransforms::BASE_FOOTPRINT, ChuckTransforms::LIDAR,
                 ros::Time(0), robotTransform);
 
-            data_ = PoseMessageFactory::transform2Pose(robotTransform);
-
-            ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "tap_robot_pose", "Robot pose" << data_);
+            data_ = robotTransform;
         }
         catch(const tf::TransformException& e)
         {
-            ROS_ERROR_STREAM_THROTTLE_NAMED(1.0, "tap_robot_pose", "TF Exception: " << e.what());
+            ROS_ERROR_STREAM_THROTTLE_NAMED(1.0, "tap_lidar_pose_on_robot", "TF Exception: " << e.what());
         }
     }
 
-    Pose<> data_;
+    tf::Transform data_;
 
     tf::TransformListener tfListener_;
 };

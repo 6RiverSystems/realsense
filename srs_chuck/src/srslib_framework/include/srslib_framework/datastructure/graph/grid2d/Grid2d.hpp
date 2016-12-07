@@ -45,7 +45,7 @@ public:
             y(y)
         {}
 
-        std::size_t hash() const
+        size_t hash() const
         {
             return (401 + x) * 401 + y;
         }

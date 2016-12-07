@@ -7,6 +7,7 @@
 
 #include <string>
 #include <sstream>
+#include <unordered_map>
 using namespace std;
 
 namespace srs {
@@ -15,7 +16,6 @@ class MapNote
 {
 public:
     static const MapNote WARNING_SOUND;
-
     static MapNote* instanceOf(const MapNote& note);
 
     MapNote() :
@@ -55,7 +55,6 @@ public:
     }
 
 private:
-
     bool warningSound_;
 };
 

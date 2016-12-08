@@ -10,32 +10,28 @@ using namespace std;
 
 #include <srslib_framework/TimingData.h>
 
+#include <srslib_framework/platform/timing/TimingData.hpp>
 #include <srslib_framework/ros/channel/publisher/Publisher.hpp>
 
 namespace srs {
 
 class PublisherTimingData :
-    public Publisher<const srslib_framework::TimingData&, srslib_framework::TimingData>
+    public Publisher<const TimingData&, srslib_framework::TimingData>
 {
 public:
     PublisherTimingData(string topic,
-        string id,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
-            Publisher(topic, buffer, latched, nameSpace),
-            id_(id)
+            Publisher(topic, buffer, latched, nameSpace)
     {}
 
-    srslib_framework::TimingData convertData(const srslib_framework::TimingData& data)
+    srslib_framework::TimingData convertData(const TimingData& data)
     {
-        srslib_framework::TimingData out = data;
-        out.id = id_;
-        return out;
+        return TimingDataMessageFactory::data2Msg(data);
     }
 
 private:
-    string id_;
 };
 
 } // namespace srs

@@ -12,30 +12,26 @@
 #include <ros/ros.h>
 #include <srslib_framework/TimingData.h>
 #include <srslib_framework/TimingDataSample.h>
+#include <srslib_framework/platform/timing/TimingData.hpp>
 
 namespace srs {
 
 struct TimingDataMessageFactory
 {
-    /**
-     * @brief Convert a Imu message type into a Imu.
-     *
-     * @param message Imu to convert
-     *
-     * @return Imu generated from the specified Imu message
-     */
-    static srslib_framework::TimingData buildMessage( double startTime,
-        double stopTime, const std::vector<std::pair<double, double>>& samples)
+
+    static srslib_framework::TimingData data2Msg(const TimingData& data)
     {
         srslib_framework::TimingData td;
-        td.start_time = ros::Time(startTime);
-        td.start_time = ros::Time(stopTime);
+        td.id = data.getId();
+        td.start_time = ros::Time(data.getStartTime());
+        td.end_time = ros::Time(data.getEndTime());
+        auto samples = data.getSamples();
         td.samples.reserve(samples.size());
         for (auto s : samples)
         {
             srslib_framework::TimingDataSample tds;
-            tds.duration = s.first;
-            tds.sample_end_time = ros::Time(s.second);
+            tds.duration = s.duration_;
+            tds.sample_end_time = ros::Time(s.endTime_);
             td.samples.push_back(tds);
         }
         return td;

@@ -14,8 +14,8 @@ class ChannelTimingData :
     public PublisherTimingData
 {
 public:
-    ChannelTimingData(std::string id = "none") :
-        PublisherTimingData(ChuckTopics::monitoring::TIMING_DATA, id)
+    ChannelTimingData() :
+        PublisherTimingData(ChuckTopics::monitoring::TIMING_DATA)
     {}
 };
 

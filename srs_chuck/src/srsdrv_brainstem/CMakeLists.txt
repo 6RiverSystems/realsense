@@ -13,18 +13,18 @@ set(${PROJECT_NAME}_SOURCES
     src/BrainStem.cpp
     src/BrainStemEmulator.cpp
 
+    src/hw_message/ButtonPressedHandler.cpp
     src/hw_message/SensorFrameHandler.cpp
-    src/hw_message/RawOdometryHandler.cpp
+    src/hw_message/OdometryRpmHandler.cpp
     src/hw_message/HardwareInfoHandler.cpp
     src/hw_message/PowerStateHandler.cpp
 
-    src/hw_publisher/SensorFramePublisher.cpp
-    src/hw_publisher/RawOdometryPublisher.cpp
-    src/hw_publisher/HardwareInfoPublisher.cpp
-    src/hw_publisher/PowerStatePublisher.cpp
-
     src/sw_message/FreeSpinHandler.cpp
     src/sw_message/SoundHandler.cpp
+    src/sw_message/SetMotionStateHandler.cpp
+    src/sw_message/ClearMotionStateHandler.cpp
+    src/sw_message/PingHandler.cpp
+    src/sw_message/UpdateUIHandler.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES

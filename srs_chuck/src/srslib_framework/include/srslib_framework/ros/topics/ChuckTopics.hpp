@@ -29,17 +29,20 @@ namespace driver {
 
     static const string BRAINSTEM_CMD_FREESPIN = "/internal/drivers/brainstem/cmd/freespin";
     static const string BRAINSTEM_CMD_SOUND = "/internal/drivers/brainstem/cmd/sound";
+    static const string BRAINSTEM_CMD_UPDATE_LIGHTS = "/internal/drivers/brainstem/cmd/update_ui";
+    static const string BRAINSTEM_CMD_PING = "/internal/drivers/brainstem/cmd/ping";
+    static const string BRAINSTEM_CMD_SET_MOTION_STATE = "/internal/drivers/brainstem/cmd/set_motion_state";
+    static const string BRAINSTEM_CMD_CLEAR_MOTION_STATE = "/internal/drivers/brainstem/cmd/set_motion_state";
     static const string BRAINSTEM_STATE_CONNECTED = "/internal/drivers/brainstem/state/connected";
     static const string BRAINSTEM_STATE_POWER = "/internal/drivers/brainstem/state/power";
-    static const string BRAINSTEM_HARDWARE_INFO = "/info/hardware";
+    static const string BRAINSTEM_BUTTON_PRESSED = "/internal/drivers/brainstem/button_pressed";
     static const string BRAINSTEM_ODOMETRY_COUNT = "/internal/sensors/odometry/count";
-    static const string BRAINSTEM_RAW_ODOMETRY = "/internal/sensors/odometry/rpm/raw";
+    static const string BRAINSTEM_ODOMETRY_RPM = "/internal/sensors/odometry/rpm/raw";
+    static const string ODOMETRY_CMD_VELOCITY = "/internal/sensors/odometry/velocity/cmd";
     static const string BRAINSTEM_SENSOR_FRAME = "/internal/sensors/sensor_frame/raw";
     static const string BRAINSTEM_IMU = "/internal/sensors/imu/raw";
-    static const string BRAINSTEM_TOPIC_SENSOR_FRAME = "/internal/sensors/sensor_frame/raw";
-
-    static const string ODOMETRY_CMD_VELOCITY = "/internal/sensors/odometry/velocity/cmd";
-
+    static const string BRAINSTEM_HARDWARE_INFO = "/info/hardware";
+    static const string BRAINSTEM_OPERATIONAL_STATE = "/info/operational_state";
 } // namespace debug
 
 namespace internal {

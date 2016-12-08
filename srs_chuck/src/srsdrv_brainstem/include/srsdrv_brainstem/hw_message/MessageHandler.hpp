@@ -6,30 +6,26 @@
 #pragma once
 
 #include <string>
+#include <functional>
+
 using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
 #include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
-#include <srslib_framework/MsgHardwareInfo.h>
+
 
 namespace srs {
 
-class HardwareInfoPublisher
+class MessageHandler : public HardwareMessageHandler
 {
 public:
 
-    HardwareInfoPublisher(string nameSpace = "~");
+    MessageHandler();
 
-    virtual ~HardwareInfoPublisher()
-    {}
+    virtual ~MessageHandler() {}
 
-    void publishHardwareInfo(srslib_framework::MsgHardwareInfo& hardwareInfoMsg);
+    void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
-private:
-
-    ros::NodeHandle rosNodeHandle_;
-
-    ros::Publisher publisher_;
 };
 
 } // namespace srs

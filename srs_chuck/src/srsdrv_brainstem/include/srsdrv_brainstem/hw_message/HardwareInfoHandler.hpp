@@ -12,7 +12,7 @@ using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
 #include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
-#include <srslib_framework/MsgHardwareInfo.h>
+#include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 
 namespace srs {
 
@@ -22,11 +22,11 @@ public:
 
 	typedef std::function<void(srslib_framework::MsgHardwareInfo&)> HardwareInfoFn;
 
-    HardwareInfoHandler(HardwareInfoFn hardareInfoCallback = [&](srslib_framework::MsgHardwareInfo&) {});
+    HardwareInfoHandler(ChannelBrainstemHardwareInfo channel);
 
     virtual ~HardwareInfoHandler() {}
 
-    bool receiveMessage(ros::Time currentTime, HardwareMessage& msg);
+    void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
 private:
 
@@ -55,7 +55,7 @@ private:
 
     srslib_framework::MsgHardwareInfo hardwareInfoMsg_;
 
-    HardwareInfoFn hardwareInfoCallback_;
+    ChannelBrainstemHardwareInfo channel_;
 };
 
 } // namespace srs

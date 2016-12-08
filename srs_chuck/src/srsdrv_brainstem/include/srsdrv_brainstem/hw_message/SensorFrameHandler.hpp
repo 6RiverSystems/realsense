@@ -18,6 +18,8 @@ using namespace std;
 #include <srslib_framework/Imu.h>
 #include <srslib_framework/SensorFrame.h>
 #include <srslib_framework/Odometry.h>
+#include <srslib_framework/ros/channel/ChannelBrainstemSensorFrame.hpp>
+
 
 namespace srs {
 
@@ -27,17 +29,11 @@ public:
     static constexpr int SERIAL_TRANSMIT_DELAY = 3400000;
     static constexpr double OUT_OF_SYNC_TIMEOUT = 0.15;
 
-	typedef function<void(srslib_framework::Imu&)> ImuCallbackFn;
-	typedef function<void(srslib_framework::Odometry&)> OdometryCallbackFn;
-	typedef function<void(srslib_framework::SensorFrame&)> SensorFrameCallbackFn;
-
-    SensorFrameHandler(ImuCallbackFn imuCallback = [&](srslib_framework::Imu&) {},
-    	OdometryCallbackFn odometryCallback = [&](srslib_framework::Odometry&) {},
-    	SensorFrameCallbackFn sensorFrameCallback = [&](srslib_framework::SensorFrame&) {});
+    SensorFrameHandler(ChannelBrainstemSensorFrame channel);
 
     virtual ~SensorFrameHandler() {}
 
-    bool receiveMessage(ros::Time currentTime, HardwareMessage& msg);
+    void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
 private:
     HW_MESSAGE_BEGIN(MsgSensorFrame)
@@ -61,9 +57,7 @@ private:
     double lastHwSensorFrameTime_;
     ros::Time lastRosSensorFrameTime_;
 
-    ImuCallbackFn imuCallback_;
-    OdometryCallbackFn odometryCallback_;
-    SensorFrameCallbackFn sensorFrameCallback_;
+    ChannelBrainstemSensorFrame channel_;
 
     Odometry<> currentOdometry_;
     Imu<> currentImu_;

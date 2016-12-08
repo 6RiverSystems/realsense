@@ -12,24 +12,21 @@ using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
 #include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
-#include <srslib_framework/OdometryRPM.h>
-
+#include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
 
 namespace srs {
 
-class RawOdometryHandler : public HardwareMessageHandler
+class OdometryRpmHandler : public HardwareMessageHandler
 {
 public:
     static constexpr int SERIAL_TRANSMIT_DELAY = 3400000;
     static constexpr double OUT_OF_SYNC_TIMEOUT = 0.15;
 
-	typedef function<void(srslib_framework::OdometryRPM&)> RawOdometryFn;
+    OdometryRpmHandler(ChannelBrainstemOdometryRpm channel);
 
-    RawOdometryHandler(RawOdometryFn rawOdometryCallback = [&](srslib_framework::OdometryRPM&) {});
+    virtual ~OdometryRpmHandler() {}
 
-    virtual ~RawOdometryHandler() {}
-
-    bool receiveMessage(ros::Time currentTime, HardwareMessage& msg);
+    void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
 private:
     HW_MESSAGE_BEGIN(MsgRawOdometry)
@@ -41,7 +38,7 @@ private:
 
 	void publishOdometry(float leftWheelRPM, float rightWheelRPM);
 
-    RawOdometryFn rawOdometryCallback_;
+    ChannelBrainstemOdometryRpm channel_;
 
     double lastHwOdometryTime_;
 

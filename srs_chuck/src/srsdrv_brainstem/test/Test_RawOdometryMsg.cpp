@@ -13,7 +13,7 @@ using namespace srs;
 
 #include <srslib_test/utils/Compare.hpp>
 
-#include <hw_message/RawOdometryHandler.hpp>
+#include "../include/srsdrv_brainstem/hw_message/OdometryRpmHandler.hpp"
 
 using namespace srslib_framework;
 
@@ -59,14 +59,14 @@ namespace srslib_framework
 
 TEST(Test_RawOdometryMsg, Key)
 {
-	RawOdometryHandler RawOdometryHandler;
+	OdometryRpmHandler RawOdometryHandler;
 
     ASSERT_EQ(RawOdometryHandler.getKey(), BRAIN_STEM_MSG::RAW_ODOMETRY);
 }
 
 TEST(Test_RawOdometryMsg, EmptyPacket)
 {
-	RawOdometryHandler RawOdometryHandler;
+	OdometryRpmHandler RawOdometryHandler;
 
 	vector<char> messageBuffer;
 
@@ -82,7 +82,7 @@ TEST(Test_RawOdometryMsg, EmptyPacket)
 
 TEST(Test_RawOdometryMsg, BadPacket)
 {
-	RawOdometryHandler RawOdometryHandler;
+	OdometryRpmHandler RawOdometryHandler;
 
 	vector<OdometryRPM>& testMsgs = getRawOdometryTestMsgs();
 
@@ -103,7 +103,7 @@ TEST(Test_RawOdometryMsg, ValidMessages)
 {
 	OdometryRPM RawOdometryMsg;
 
-	RawOdometryHandler RawOdometryHandler([&](OdometryRPM& msg) {
+	OdometryRpmHandler RawOdometryHandler([&](OdometryRPM& msg) {
 		RawOdometryMsg = msg;
 	});
 

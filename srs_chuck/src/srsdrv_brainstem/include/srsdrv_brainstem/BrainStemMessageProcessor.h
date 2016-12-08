@@ -12,23 +12,30 @@
 #include <functional>
 #include <memory>
 #include <bitset>
+
 using namespace std;
 
 #include <srslib_framework/io/IO.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemPowerState.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemSensorFrame.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemButtonPressed.hpp>
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
+
 #include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
 #include <srsdrv_brainstem/hw_message/SensorFrameHandler.hpp>
-#include <srsdrv_brainstem/hw_publisher/SensorFramePublisher.hpp>
-#include <srsdrv_brainstem/hw_message/RawOdometryHandler.hpp>
-#include <srsdrv_brainstem/hw_publisher/RawOdometryPublisher.hpp>
 #include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
-#include <srsdrv_brainstem/hw_publisher/HardwareInfoPublisher.hpp>
 #include <srsdrv_brainstem/hw_message/PowerStateHandler.hpp>
-#include <srsdrv_brainstem/hw_publisher/PowerStatePublisher.hpp>
+#include <srsdrv_brainstem/hw_message/OdometryRpmHandler.hpp>
+#include <srsdrv_brainstem/hw_message/ButtonPressedHandler.hpp>
 
 #include <srsdrv_brainstem/sw_message/SoundHandler.hpp>
 #include <srsdrv_brainstem/sw_message/FreeSpinHandler.hpp>
+#include <srsdrv_brainstem/sw_message/SetMotionStateHandler.hpp>
+#include <srsdrv_brainstem/sw_message/ClearMotionStateHandler.hpp>
+#include <srsdrv_brainstem/sw_message/PingHandler.hpp>
 
 namespace srs {
 
@@ -46,43 +53,8 @@ class BrainStemMessageProcessor
 {
 public:
     void processHardwareMessage(vector<char> buffer);
-    void processRosMessage(const string& strMessage);
 
     using HwMessageHandlerMapType = map<BRAIN_STEM_MSG, HardwareMessageHandler*>;
-
-	typedef std::function<void(bool)> ConnectionChangedFn;
-
-	typedef std::function<void(LED_ENTITIES)> ButtonCallbackFn;
-
-	typedef std::function<void(uint32_t, float, float)> OdometryCallbackFn;
-
-	typedef std::function<void(uint32_t[4], uint8_t,
-		uint8_t, const std::string&)> HardwareInfoCallbackFn;
-
-	typedef std::function<void(uint32_t, const MOTION_STATUS_DATA&,
-		const FAILURE_STATUS_DATA&)> OperationalStateCallbackFn;
-
-	typedef std::function<void(float)> VoltageCallbackFn;
-
-private:
-
-	std::shared_ptr<IO>						m_pIO;
-
-	std::map<LED_ENTITIES, std::string>		m_mapEntityButton;
-
-	std::map<std::string, LED_ENTITIES>		m_mapButtonEntity;
-
-	std::map<std::string, LED_MODE>			m_mapLedMode;
-
-	std::map<std::string, Handler>			m_vecBridgeCallbacks;
-
-	ConnectionChangedFn						m_connectionChangedCallback;
-
-	ButtonCallbackFn						m_buttonCallback;
-
-	OperationalStateCallbackFn				m_operationalStateCallback;
-
-	VoltageCallbackFn						m_voltageCallback;
 
 public:
 
@@ -99,16 +71,6 @@ public:
     {
         SetMotionStatus(motionStatusSet, bSetValues);
     }
-
-    // Message Callbacks
-
-	void SetConnectionChangedCallback( ConnectionChangedFn connectionChangedCallback );
-
-	void SetButtonCallback( ButtonCallbackFn buttonCallback );
-
-	void SetOperationalStateCallback( OperationalStateCallbackFn operationalStateCallback );
-
-	void SetVoltageCallback( VoltageCallbackFn voltageCallback );
 
 // Message Processing
 
@@ -156,22 +118,27 @@ private:
 
 private:
 
-    HwMessageHandlerMapType hwMessageHandlers_;
+	std::shared_ptr<IO>				m_pIO;
 
-    SoundHandler soundHandler_;
-    FreeSpinHandler freeSpinHandler_;
+    HwMessageHandlerMapType			hwMessageHandlers_;
 
-    HardwareInfoPublisher hardwareInfoPublisher_;
-    HardwareInfoHandler hardwareInfoHandler_;
+    ChannelBrainstemHardwareInfo	hardwareInfoChannel_;
+    ChannelBrainstemPowerState		powerStateChannel_;
+    ChannelBrainstemSensorFrame		sensorFrameChannel_;
+    ChannelBrainstemOdometryRpm		odometryRpmChannel_;
+    ChannelBrainstemButtonPressed	buttonPressedChannel_;
 
-    PowerStatePublisher powerStatePublisher_;
-    PowerStateHandler powerStateHandler_;
+    HardwareInfoHandler				hardwareInfoHandler_;
+    PowerStateHandler				powerStateHandler_;
+    SensorFrameHandler				sensorFrameHandler_;
+    OdometryRpmHandler				odometryRpmHandler_;
+    ButtonPressedHandler			buttonPressedHandler_;
 
-    SensorFramePublisher sensorFramePublisher_;
-    SensorFrameHandler sensorFrameHandler_;
-
-    RawOdometryPublisher rawOdometryPublisher_;
-    RawOdometryHandler rawOdometryHandler_;
+    SoundHandler					soundHandler_;
+    FreeSpinHandler					freeSpinHandler_;
+    SetMotionStateHandler			setMotionStateHandler_;
+    ClearMotionStateHandler			clearMotionStateHandler_;
+    PingHandler						pingHandler_;
 };
 
 } /* namespace srs */

@@ -56,6 +56,8 @@ set(${PROJECT_NAME}_MSGS
     MsgBatteryDescriptor.msg
     MsgBatteryState.msg
     MsgPowerState.msg
+    MsgUpdateUI.msg
+    MsgUIState.msg
     OccupancyMap.msg
     OccupancyMetadata.msg
     Pose.msg
@@ -63,7 +65,7 @@ set(${PROJECT_NAME}_MSGS
     Sound.msg
     Velocity.msg
     Odometry.msg
-    OdometryRPM.msg
+    OdometryRpm.msg
 )
 
 set(${PROJECT_NAME}_SRVS

@@ -26,6 +26,7 @@
 
 namespace srs {
 
+// Brainstem => Brain
 enum class BRAIN_STEM_MSG : char
 {
     MESSAGE = 0x3C, // '<'
@@ -33,12 +34,12 @@ enum class BRAIN_STEM_MSG : char
     HARDWARE_INFO = 0x59, // 'Y'
     OPERATIONAL_STATE = 0x47, // 'G'
     SENSOR_FRAME = 0x4F, // 'O'
-    RAW_ODOMETRY = 0x52, // 'R'
-    SYSTEM_VOLTAGE = 0x56, // 'V'
     POWER_STATE = 0x41, // 'A'
+    RAW_ODOMETRY = 0x52, // 'R'
     UNKNOWN
 };
 
+// Brain => Brainstem
 enum class BRAIN_STEM_CMD : char
 {
     CLEAR_MOTION_STATUS     = 0x31, // '1'
@@ -134,13 +135,6 @@ struct COMMAND_DATA
 	uint8_t cmd;
 };
 
-struct LIGHT_UPDATE_DATA
-{
-	uint8_t 	cmd;
-	uint8_t 	entitiy; 				// Light identifier - see LED_ENTITIES
-	uint8_t 	mode;   				// Light mode - see LED_MODE
-};
-
 struct MOTION_STATUS_DATA
 {
     bool frontEStop; //< Front eStop state
@@ -158,16 +152,6 @@ struct FAILURE_STATUS_DATA
 	bool		brainTimeoutFailure; 	// brainstem timeout failure
 	bool		rightMotorFailure; 		// right motor failure
 	bool		leftMotorFailure; 		// left motor failure
-};
-
-
-struct OPERATIONAL_STATE_DATA
-{
-	uint8_t 	cmd;
-	uint32_t	upTime;					// Hardware up time in seconds
-	uint8_t		motionStatus;			// Motion status
-	uint8_t 	failureStatus;			// Failure status
-	uint8_t		suspendState; 			// 0 = unsuspended, suspended otherwise
 };
 
 struct SET_OPERATIONAL_STATE_DATA

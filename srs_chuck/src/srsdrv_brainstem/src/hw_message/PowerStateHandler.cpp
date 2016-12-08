@@ -6,9 +6,9 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-PowerStateHandler::PowerStateHandler(PowerStateFn powerStateCallback) :
+PowerStateHandler::PowerStateHandler(ChannelBrainstemPowerState channel) :
 	HardwareMessageHandler(BRAIN_STEM_MSG::POWER_STATE),
-	powerStateCallback_(powerStateCallback)
+	channel_(channel)
 {
 	validDescriptors_.insert(BATTERY_DESCRIPTOR::TEMPERATURE);
 	validDescriptors_.insert(BATTERY_DESCRIPTOR::VOLTAGE);
@@ -42,7 +42,7 @@ void PowerStateHandler::readBatteryDescriptorInfo(HardwareMessage& msg,
 	}
 }
 
-bool PowerStateHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
+void PowerStateHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
 {
 	PowerStateMsg powerState = msg.read<PowerStateMsg>();
 
@@ -61,9 +61,7 @@ bool PowerStateHandler::receiveMessage(ros::Time currentTime, HardwareMessage& m
 	}
 
 	// Publish the power State
-	powerStateCallback_(powerStateMsg);
-
-	return true;
+	channel_.publish(powerStateMsg);
 }
 
 } // namespace srs

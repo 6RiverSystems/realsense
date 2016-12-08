@@ -12,7 +12,7 @@ using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
 #include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
-#include <srslib_framework/MsgPowerState.h>
+#include <srslib_framework/ros/channel/ChannelBrainstemPowerState.hpp>
 
 namespace srs {
 
@@ -20,13 +20,11 @@ class PowerStateHandler : public HardwareMessageHandler
 {
 public:
 
-	typedef function<void(srslib_framework::MsgPowerState&)> PowerStateFn;
-
-	PowerStateHandler(PowerStateFn powerStateCallback = [&](srslib_framework::MsgPowerState&) {});
+	PowerStateHandler(ChannelBrainstemPowerState channel);
 
     virtual ~PowerStateHandler() {}
 
-    bool receiveMessage(ros::Time currentTime, HardwareMessage& msg);
+    void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
 private:
 
@@ -46,7 +44,7 @@ private:
 
     void publishPowerState(const srslib_framework::MsgPowerState& powerState);
 
-    PowerStateFn powerStateCallback_;
+    ChannelBrainstemPowerState channel_;
 
     set<BATTERY_DESCRIPTOR> validDescriptors_;
 };

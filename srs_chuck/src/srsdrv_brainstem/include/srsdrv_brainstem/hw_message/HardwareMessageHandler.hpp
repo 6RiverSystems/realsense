@@ -36,14 +36,14 @@ public:
         return key == messageKey_;
     }
 
-    bool receiveData(ros::Time currentTime, vector<char>& msg)
+    void receiveData(ros::Time currentTime, vector<char>& msg)
     {
     	HardwareMessage hardwareMessage(msg);
 
-    	return receiveMessage(currentTime, hardwareMessage);
+    	receiveMessage(currentTime, hardwareMessage);
     }
 
-    virtual bool receiveMessage(ros::Time currentTime, HardwareMessage& msg) = 0;
+    virtual void receiveMessage(ros::Time currentTime, HardwareMessage& msg) = 0;
 
 private:
 

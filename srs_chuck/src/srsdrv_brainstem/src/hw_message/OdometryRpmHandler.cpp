@@ -1,6 +1,6 @@
-#include <srsdrv_brainstem/hw_message/RawOdometryHandler.hpp>
+#include "../../include/srsdrv_brainstem/hw_message/OdometryRpmHandler.hpp"
 
-#include <srslib_framework/OdometryRPM.h>
+#include <srslib_framework/OdometryRpm.h>
 
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
@@ -12,17 +12,17 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-RawOdometryHandler::RawOdometryHandler(RawOdometryFn rawOdometryCallback) :
+OdometryRpmHandler::OdometryRpmHandler(ChannelBrainstemOdometryRpm channel) :
     HardwareMessageHandler(BRAIN_STEM_MSG::RAW_ODOMETRY),
     lastHwOdometryTime_(0),
     lastRosOdometryTime_(ros::Time::now()),
-	rawOdometryCallback_(rawOdometryCallback)
+	channel_(channel)
 {
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool RawOdometryHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
+void OdometryRpmHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
 {
 	MsgRawOdometry odometryRPMData = msg.read<MsgRawOdometry>();
 
@@ -74,15 +74,13 @@ bool RawOdometryHandler::receiveMessage(ros::Time currentTime, HardwareMessage& 
 	message.left_wheel_rpm = odometryRPMData.rpm_left_wheel;
 	message.right_wheel_rpm = odometryRPMData.rpm_right_wheel;
 
-	rawOdometryCallback_(message);
-
-	return true;
+	channel_.publish(message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
-void RawOdometryHandler::publishOdometry(float leftWheelRPM, float rightWheelRPM)
+void OdometryRpmHandler::publishOdometry(float leftWheelRPM, float rightWheelRPM)
 {
 
 }

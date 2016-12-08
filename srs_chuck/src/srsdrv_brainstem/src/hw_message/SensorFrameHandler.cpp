@@ -17,15 +17,12 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-SensorFrameHandler::SensorFrameHandler(ImuCallbackFn imuCallback, OdometryCallbackFn odometryCallback,
-    SensorFrameCallbackFn sensorFrameCallback) :
+SensorFrameHandler::SensorFrameHandler(ChannelBrainstemSensorFrame channel) :
     HardwareMessageHandler(BRAIN_STEM_MSG::SENSOR_FRAME),
     lastHwSensorFrameTime_(0),
     lastRosSensorFrameTime_(ros::Time::now()),
     currentOdometry_(Odometry<>::ZERO),
-	imuCallback_(imuCallback),
-	odometryCallback_(odometryCallback),
-	sensorFrameCallback_(sensorFrameCallback)
+	channel_(channel)
 {
 
 }
@@ -63,7 +60,7 @@ int32_t calculateOdometryDiff(uint32_t current, uint32_t& last)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool SensorFrameHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
+void SensorFrameHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
 {
     MsgSensorFrame sensorData = msg.read<MsgSensorFrame>();
 
@@ -138,21 +135,19 @@ bool SensorFrameHandler::receiveMessage(ros::Time currentTime, HardwareMessage& 
 		sensorFrameMsg.imu.pitchRot = imuData.pitchRot;
 		sensorFrameMsg.imu.rollRot = imuData.rollRot;
 
-		srslib_framework::Imu imuMsg = ImuMessageFactory::imu2Msg(currentImu_);
-		imuCallback_(imuMsg);
+//		srslib_framework::Imu imuMsg = ImuMessageFactory::imu2Msg(currentImu_);
+//		imuCallback_(imuMsg);
 	}
 
 	sensorFrameMsg.header.stamp = lastRosSensorFrameTime_;
 	sensorFrameMsg.odometry = VelocityMessageFactory::velocity2Msg(currentOdometry_.velocity);
-	sensorFrameCallback_(sensorFrameMsg);
+	channel_.publish(sensorFrameMsg);
 
-	srslib_framework::Odometry odometryMsg;
-	odometryMsg.left_wheel = s_leftWheelDiff;
-	odometryMsg.right_wheel = s_rightWheelDiff;
-	odometryMsg.header.stamp = lastRosSensorFrameTime_;
-	odometryCallback_(odometryMsg);
-
-	return true;
+//	srslib_framework::Odometry odometryMsg;
+//	odometryMsg.left_wheel = s_leftWheelDiff;
+//	odometryMsg.right_wheel = s_rightWheelDiff;
+//	odometryMsg.header.stamp = lastRosSensorFrameTime_;
+//	odometryCallback_(odometryMsg);
 }
 
 } // namespace srs

@@ -5,9 +5,9 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-HardwareInfoHandler::HardwareInfoHandler(HardwareInfoFn hardareInfoCallback) :
+HardwareInfoHandler::HardwareInfoHandler(ChannelBrainstemHardwareInfo channel) :
     HardwareMessageHandler(BRAIN_STEM_MSG::HARDWARE_INFO),
-	hardwareInfoCallback_(hardareInfoCallback)
+	channel_()
 {
 	hardwareInfoMsg_.name = "";
     char* robotName = getenv("ROBOT_NAME");
@@ -18,7 +18,7 @@ HardwareInfoHandler::HardwareInfoHandler(HardwareInfoFn hardareInfoCallback) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool HardwareInfoHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
+void HardwareInfoHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
 {
 	std::stringstream batteryStream;
 
@@ -87,7 +87,7 @@ bool HardwareInfoHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 
 
 	// Publish the hardware info
-	hardwareInfoCallback_(hardwareInfoMsg_);
+	channel_.publish(hardwareInfoMsg_);
 }
 
 } // namespace srs

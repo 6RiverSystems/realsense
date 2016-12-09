@@ -44,6 +44,7 @@ set(${PROJECT_NAME}_SOURCES
     src/utils/Logging.cpp
 )
 
+
 set(${PROJECT_NAME}_MSGS
     Imu.msg
     JoypadState.msg
@@ -63,6 +64,8 @@ set(${PROJECT_NAME}_MSGS
     Pose.msg
     SensorFrame.msg
     Sound.msg
+    TimingData.msg
+    TimingDataSample.msg
     Velocity.msg
     Odometry.msg
     OdometryRPM.msg
@@ -153,7 +156,7 @@ set(PROJECT_LIBRARY ${PROJECT_NAME})
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
 # set(CMAKE_BUILD_TYPE Debug)
 
-find_package(catkin REQUIRED COMPONENTS 
+find_package(catkin REQUIRED COMPONENTS
     roscpp
     message_generation
     std_msgs
@@ -173,7 +176,7 @@ include_directories(
     src/
     test/
     ${roscpp_INCLUDE_DIRS}
-	${OpenCV_INCLUDE_DIRS} 
+	${OpenCV_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
 )
@@ -200,8 +203,8 @@ add_service_files(
 )
 
 generate_messages(
-    DEPENDENCIES 
-        std_msgs 
+    DEPENDENCIES
+        std_msgs
         nav_msgs
 )
 
@@ -212,11 +215,11 @@ generate_messages(
 catkin_package(
     INCLUDE_DIRS src include
     LIBRARIES ${PROJECT_LIBRARY}
-    DEPENDS 
-        opencv 
-        message_runtime 
-        std_msgs 
-        nav_msgs 
+    DEPENDS
+        opencv
+        message_runtime
+        std_msgs
+        nav_msgs
         srslib_test
         costmap_2d
 )
@@ -335,7 +338,7 @@ if (CATKIN_ENABLE_TESTING)
         ${TEST_SOURCES_IO}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/io
     )
-    target_compile_definitions(TestSuite_Io 
+    target_compile_definitions(TestSuite_Io
         PRIVATE ENABLE_TEST_FIXTURE
     )
     target_link_libraries(TestSuite_Io

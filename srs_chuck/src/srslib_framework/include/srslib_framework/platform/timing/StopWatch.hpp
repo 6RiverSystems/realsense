@@ -12,7 +12,7 @@ namespace srs {
 
 class StopWatch
 {
-    typedef duration<double, ratio<1>> DurationType;
+    typedef duration<double, std::ratio<1>> DurationType;
 
 public:
     StopWatch() :

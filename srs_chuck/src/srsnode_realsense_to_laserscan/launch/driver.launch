@@ -29,29 +29,17 @@
         </include>
 	
         <!-- Point cloud to laser scan conversion -->
-	<node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+	<node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan">
 
-        <remap from="cloud_in" to="/internal/sensors/rgbd/depth/points/filtered"/>
+        <remap from="image" to="/internal/sensors/rgbd/depth/image_raw"/>
+        <remap from="camera_info" to="/internal/sensors/rgbd/depth/camera_info"/>
         <remap from="scan" to="/internal/sensors/rgbd/scan"/>
         <rosparam>
-            target_frame: laser_frame # Leave disabled to output scan in pointcloud frame
-            transform_tolerance: 0.05
-            min_height: 0.03
-            max_height: 3.0
-
-            angle_min: -1.5708 # -M_PI/2
-            angle_max: 1.5708 # M_PI/2
-            angle_increment: 0.008 # M_PI/360.0
-            scan_time: 0.3333
+            output_frame_id: laser_frame
+            transform_tolerance: 0.1
+            scan_time: 0.333
             range_min: 0.3
-            range_max: 8.0
-            use_inf: true
-
-            # Concurrency level, affects number of pointclouds queued for processing, thread number governed by nodelet manager
-            # 0 : Detect number of cores
-            # 1 : Single threaded
-            # 2->inf : Parallelism level
-            concurrency_level: 0
+            range_max: 4.0
         </rosparam>
         </node>
 

@@ -10,7 +10,7 @@
 #include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
-#include <srslib_framework/ros/tap/TapBrainstemCmd_Ping.hpp>
+#include <srslib_framework/ros/tap/TapBrainstemCmd_Startup.hpp>
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
 
@@ -18,19 +18,19 @@ namespace srs {
 
 class BrainStemMessageProcessor;
 
-class PingHandler :
+class StartupHandler :
     public SoftwareMessageHandler<BrainStemMessageProcessor>,
     public Observer<Subscriber<std_msgs::Bool>>
 {
 public:
-    PingHandler(BrainStemMessageProcessor* owner);
+    StartupHandler(BrainStemMessageProcessor* owner);
 
-    virtual ~PingHandler()
+    virtual ~StartupHandler()
     {}
 
     void notified(Subscriber<std_msgs::Bool>* subject);
 
-    TapBrainstemCmd_Ping	tapPing_;
+    TapBrainstemCmd_Startup	tapStartup_;
 };
 
 } // namespace srs

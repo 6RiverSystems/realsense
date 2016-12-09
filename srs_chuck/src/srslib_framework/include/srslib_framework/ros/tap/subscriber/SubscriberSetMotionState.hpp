@@ -9,14 +9,14 @@
 using namespace std;
 
 #include <ros/ros.h>
-#include <srslib_framework/MsgOperationalState.h>
+#include <srslib_framework/MsgSetOperationalState.h>
 
 #include <srslib_framework/ros/tap/subscriber/SubscriberSingleData.hpp>
 
 namespace srs {
 
 class SubscriberSetMotionState :
-    public SubscriberSingleData<srslib_framework::MsgOperationalState, srslib_framework::MsgOperationalState>
+    public SubscriberSingleData<srslib_framework::MsgSetOperationalState, srslib_framework::MsgSetOperationalState>
 {
 public:
     SubscriberSetMotionState(string topic,
@@ -30,7 +30,7 @@ public:
     ~SubscriberSetMotionState()
     {}
 
-    void receiveData(const srslib_framework::MsgOperationalState::ConstPtr message)
+    void receiveData(const srslib_framework::MsgSetOperationalState::ConstPtr message)
     {
         set(*message);
     }

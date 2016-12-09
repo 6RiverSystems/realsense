@@ -27,12 +27,13 @@ namespace debug {
 
 namespace driver {
 
-    static const string BRAINSTEM_CMD_FREESPIN = "/internal/drivers/brainstem/cmd/freespin";
+	static const string BRAINSTEM_CMD_STARTUP = "/internal/drivers/brainstem/cmd/startup";
+	static const string BRAINSTEM_CMD_SHUTDOWN = "/internal/drivers/brainstem/cmd/shutdown";
+	static const string BRAINSTEM_CMD_FREESPIN = "/internal/drivers/brainstem/cmd/freespin";
     static const string BRAINSTEM_CMD_SOUND = "/internal/drivers/brainstem/cmd/sound";
     static const string BRAINSTEM_CMD_UPDATE_LIGHTS = "/internal/drivers/brainstem/cmd/update_ui";
     static const string BRAINSTEM_CMD_PING = "/internal/drivers/brainstem/cmd/ping";
-    static const string BRAINSTEM_CMD_SET_MOTION_STATE = "/internal/drivers/brainstem/cmd/set_motion_state";
-    static const string BRAINSTEM_CMD_CLEAR_MOTION_STATE = "/internal/drivers/brainstem/cmd/set_motion_state";
+    static const string BRAINSTEM_CMD_MOTION_STATE = "/internal/drivers/brainstem/cmd/motion_state";
     static const string BRAINSTEM_STATE_CONNECTED = "/internal/drivers/brainstem/state/connected";
     static const string BRAINSTEM_STATE_POWER = "/internal/drivers/brainstem/state/power";
     static const string BRAINSTEM_BUTTON_PRESSED = "/internal/drivers/brainstem/button_pressed";

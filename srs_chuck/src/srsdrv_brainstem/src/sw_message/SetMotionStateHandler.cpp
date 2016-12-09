@@ -17,21 +17,22 @@ SetMotionStateHandler::SetMotionStateHandler(BrainStemMessageProcessor* owner) :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SetMotionStateHandler::notified(Subscriber<srslib_framework::MsgOperationalState>* subject)
+void SetMotionStateHandler::notified(Subscriber<srslib_framework::MsgSetOperationalState>* subject)
 {
 	TapBrainstemCmd_SetMotionState* tap = static_cast<TapBrainstemCmd_SetMotionState*>(subject);
 
-	srslib_framework::MsgOperationalState operationalState = tap->pop();
+	srslib_framework::MsgSetOperationalState setOpState = tap->pop();
 
 	std::bitset<8> hardStopSet;
-	hardStopSet.set( MOTION_STATUS::FRONT_E_STOP, operationalState.frontEStop );
-	hardStopSet.set( MOTION_STATUS::HARD_STOP, operationalState.hardStop );
-	hardStopSet.set( MOTION_STATUS::BACK_E_STOP, operationalState.backEStop );
-	hardStopSet.set( MOTION_STATUS::WIRELESS_E_STOP, operationalState.wirelessEStop );
-	hardStopSet.set( MOTION_STATUS::BUMP_SENSOR, operationalState.bumpSensor );
-	hardStopSet.set( MOTION_STATUS::FREE_SPIN, operationalState.pause );
+	hardStopSet.set( MOTION_STATUS::FRONT_E_STOP, setOpState.operationalState.frontEStop );
+	hardStopSet.set( MOTION_STATUS::HARD_STOP, setOpState.operationalState.hardStop );
+	hardStopSet.set( MOTION_STATUS::BACK_E_STOP, setOpState.operationalState.backEStop );
+	hardStopSet.set( MOTION_STATUS::WIRELESS_E_STOP, setOpState.operationalState.wirelessEStop );
+	hardStopSet.set( MOTION_STATUS::BUMP_SENSOR, setOpState.operationalState.bumpSensor );
+	hardStopSet.set( MOTION_STATUS::FREE_SPIN, setOpState.operationalState.pause );
 
-	getOwner()->SetMotionStatus(hardStopSet, true);}
+	getOwner()->SetMotionStatus(hardStopSet, setOpState.state);
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods

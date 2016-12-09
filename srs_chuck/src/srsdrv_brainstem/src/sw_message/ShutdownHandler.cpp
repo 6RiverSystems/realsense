@@ -1,4 +1,4 @@
-#include <srsdrv_brainstem/sw_message/PingHandler.hpp>
+#include <srsdrv_brainstem/sw_message/ShutdownHandler.hpp>
 
 #include <srsdrv_brainstem/BrainStemMessageProcessor.h>
 
@@ -9,17 +9,17 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-PingHandler::PingHandler(BrainStemMessageProcessor* owner) :
+////////////////////////////////////////////////////////////////////////////////////////////////////TapBrainstemCmd_Startup
+ShutdownHandler::ShutdownHandler(BrainStemMessageProcessor* owner) :
     SoftwareMessageHandler(owner)
 {
-	tapPing_.attach(this);
+	tapShutdown_.attach(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void PingHandler::notified(Subscriber<std_msgs::Bool>* subject)
+void ShutdownHandler::notified(Subscriber<std_msgs::Bool>* subject)
 {
-	uint8_t cMessage = static_cast<uint8_t>(BRAIN_STEM_CMD::PING);
+	uint8_t cMessage = static_cast<uint8_t>(BRAIN_STEM_CMD::SHUTDOWN);
 
 	getOwner()->sendCommand(reinterpret_cast<char*>(&cMessage), 1);
 }

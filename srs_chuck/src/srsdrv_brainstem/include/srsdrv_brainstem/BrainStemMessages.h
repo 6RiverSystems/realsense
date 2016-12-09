@@ -36,6 +36,7 @@ enum class BRAIN_STEM_MSG : char
     SENSOR_FRAME = 0x4F, // 'O'
     POWER_STATE = 0x41, // 'A'
     RAW_ODOMETRY = 0x52, // 'R'
+    SYSTEM_VOLTAGE = 0x56, // 'V'
     UNKNOWN
 };
 

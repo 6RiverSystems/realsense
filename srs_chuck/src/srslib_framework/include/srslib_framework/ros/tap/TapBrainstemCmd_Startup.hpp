@@ -5,17 +5,17 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/tap/subscriber/SubscriberSetMotionState.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberBoolean.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
-class TapBrainstemCmd_SetMotionState :
-    public SubscriberSetMotionState
+class TapBrainstemCmd_Startup :
+    public SubscriberBoolean
 {
 public:
-	TapBrainstemCmd_SetMotionState() :
-        SubscriberSetMotionState(ChuckTopics::driver::BRAINSTEM_CMD_MOTION_STATE)
+    TapBrainstemCmd_Startup() :
+        SubscriberBoolean(ChuckTopics::driver::BRAINSTEM_CMD_STARTUP)
     {}
 };
 

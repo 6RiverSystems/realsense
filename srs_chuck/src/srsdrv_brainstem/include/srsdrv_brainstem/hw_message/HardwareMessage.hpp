@@ -67,7 +67,7 @@ public:
 
     		iter_ += value.length() + 1;
 
-    		return value;
+    		return std::move(value);
     	}
     	else
     	{
@@ -99,7 +99,7 @@ private:
 
     vector<char>::iterator iter_;
 
-    vector<char>& buffer_;
+    vector<char> buffer_;
 };
 
 } // namespace srs

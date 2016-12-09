@@ -1,4 +1,4 @@
-#include <srsdrv_brainstem/sw_message/PingHandler.hpp>
+#include <srsdrv_brainstem/sw_message/StartupHandler.hpp>
 
 #include <srsdrv_brainstem/BrainStemMessageProcessor.h>
 
@@ -10,16 +10,16 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-PingHandler::PingHandler(BrainStemMessageProcessor* owner) :
+StartupHandler::StartupHandler(BrainStemMessageProcessor* owner) :
     SoftwareMessageHandler(owner)
 {
-	tapPing_.attach(this);
+	tapStartup_.attach(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void PingHandler::notified(Subscriber<std_msgs::Bool>* subject)
+void StartupHandler::notified(Subscriber<std_msgs::Bool>* subject)
 {
-	uint8_t cMessage = static_cast<uint8_t>(BRAIN_STEM_CMD::PING);
+	uint8_t cMessage = static_cast<uint8_t>(BRAIN_STEM_CMD::STARTUP);
 
 	getOwner()->sendCommand(reinterpret_cast<char*>(&cMessage), 1);
 }

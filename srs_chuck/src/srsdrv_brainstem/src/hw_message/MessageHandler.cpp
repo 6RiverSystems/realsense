@@ -22,7 +22,7 @@ void MessageHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
 	}
 	else
 	{
-		ROS_DEBUG_STREAM_NAMED( "firmware", "Message: <" << strMessage << ">" );
+		ROS_INFO_STREAM_NAMED( "firmware", "Message: <" << strMessage << ">" );
 	}
 }
 

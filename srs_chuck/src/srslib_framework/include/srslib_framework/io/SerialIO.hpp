@@ -124,11 +124,11 @@ private:
 
     std::vector<char>						m_writeBuffer;
 
+    std::vector<char>						message_;
+
 	READ_STATE								m_readState;
 
 	uint8_t									m_cCRC;
-
-    std::vector<char>						m_readPartialData;
 
     ConnectionCallbackFn					m_connectionCallback;
 

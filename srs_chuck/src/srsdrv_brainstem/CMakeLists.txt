@@ -13,17 +13,20 @@ set(${PROJECT_NAME}_SOURCES
     src/BrainStem.cpp
     src/BrainStemEmulator.cpp
 
+    src/hw_message/MessageHandler.cpp
     src/hw_message/ButtonPressedHandler.cpp
     src/hw_message/SensorFrameHandler.cpp
     src/hw_message/OdometryRpmHandler.cpp
     src/hw_message/HardwareInfoHandler.cpp
     src/hw_message/PowerStateHandler.cpp
 
+    src/sw_message/StartupHandler.cpp
+    src/sw_message/ShutdownHandler.cpp
+    src/sw_message/PingHandler.cpp
     src/sw_message/FreeSpinHandler.cpp
+    src/sw_message/SetOdometryRpmHandler.cpp
     src/sw_message/SoundHandler.cpp
     src/sw_message/SetMotionStateHandler.cpp
-    src/sw_message/ClearMotionStateHandler.cpp
-    src/sw_message/PingHandler.cpp
     src/sw_message/UpdateUIHandler.cpp
 )
 

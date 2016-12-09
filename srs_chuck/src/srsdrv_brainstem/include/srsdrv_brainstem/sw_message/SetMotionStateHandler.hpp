@@ -5,7 +5,7 @@ SetMotionStateHandler.hpp * (c) Copyright 2015-2016 River Systems, all rights re
  */
 #pragma once
 
-#include <srslib_framework/MsgOperationalState.h>
+#include <srslib_framework/MsgSetOperationalState.h>
 
 #include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
@@ -20,7 +20,7 @@ class BrainStemMessageProcessor;
 
 class SetMotionStateHandler :
     public SoftwareMessageHandler<BrainStemMessageProcessor>,
-    public Observer<Subscriber<srslib_framework::MsgOperationalState>>
+    public Observer<Subscriber<srslib_framework::MsgSetOperationalState>>
 {
 public:
     SetMotionStateHandler(BrainStemMessageProcessor* owner);
@@ -28,7 +28,7 @@ public:
     virtual ~SetMotionStateHandler()
     {}
 
-    void notified(Subscriber<srslib_framework::MsgOperationalState>* subject);
+    void notified(Subscriber<srslib_framework::MsgSetOperationalState>* subject);
 
     TapBrainstemCmd_SetMotionState	tapSetMotionState_;
 };

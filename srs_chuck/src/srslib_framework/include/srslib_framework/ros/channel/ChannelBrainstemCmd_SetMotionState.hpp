@@ -15,7 +15,7 @@ class ChannelBrainstemCmd_SetMotionState :
 {
 public:
     ChannelBrainstemCmd_SetMotionState() :
-        PublisherSound(ChuckTopics::driver::BRAINSTEM_CMD_SET_MOTION_STATE)
+        PublisherSetOperationalState(ChuckTopics::driver::BRAINSTEM_CMD_SET_MOTION_STATE)
     {}
 };
 

@@ -24,12 +24,12 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
     soundHandler_(this),
     freeSpinHandler_(this),
 	setMotionStateHandler_(this),
-	clearMotionStateHandler_(this),
 	pingHandler_(this),
 	odometryRpmChannel_(),
 	sensorFrameChannel_(),
 	hardwareInfoChannel_(),
 	powerStateChannel_(),
+	messageHandler_(),
 	odometryRpmHandler_(odometryRpmChannel_),
 	sensorFrameHandler_(sensorFrameChannel_),
 	hardwareInfoHandler_(hardwareInfoChannel_),
@@ -40,6 +40,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
     hwMessageHandlers_[sensorFrameHandler_.getKey()] = &sensorFrameHandler_;
     hwMessageHandlers_[hardwareInfoHandler_.getKey()] = &hardwareInfoHandler_;
     hwMessageHandlers_[powerStateHandler_.getKey()] = &powerStateHandler_;
+    hwMessageHandlers_[messageHandler_.getKey()] = &messageHandler_;
 }
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor( )
@@ -78,8 +79,11 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 		}
 		else
 		{
-		    ROS_ERROR_STREAM( "Unknown message from brainstem: " <<
-		        static_cast<char>(eCommand) << ", data: " << ToHex(buffer));
+			if (eCommand != BRAIN_STEM_MSG::SYSTEM_VOLTAGE)
+			{
+			    ROS_ERROR_STREAM( "Unknown message from brainstem: " <<
+			        static_cast<char>(eCommand) << ", data: " << ToHex(buffer));
+			}
 		}
     }
 }
@@ -102,11 +106,6 @@ void BrainStemMessageProcessor::GetHardwareInformation( )
 
 	// Get the hardware information (version, configuration, etc.)
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
-}
-
-void BrainStemMessageProcessor::SetRPM( double leftWheelRPM, double rightWheelRPM )
-{
-
 }
 
 void BrainStemMessageProcessor::Shutdown( )

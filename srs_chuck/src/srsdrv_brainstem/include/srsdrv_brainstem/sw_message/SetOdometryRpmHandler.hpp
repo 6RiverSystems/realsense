@@ -18,14 +18,14 @@ namespace srs {
 
 class BrainStemMessageProcessor;
 
-class OdometryRpmHandler :
+class SetOdometryRpmHandler :
     public SoftwareMessageHandler<BrainStemMessageProcessor>,
     public Observer<Subscriber<srslib_framework::OdometryRpm>>
 {
 public:
-    OdometryRpmHandler(BrainStemMessageProcessor* owner);
+    SetOdometryRpmHandler(BrainStemMessageProcessor* owner);
 
-    virtual ~OdometryRpmHandler()
+    virtual ~SetOdometryRpmHandler()
     {}
 
     void notified(Subscriber<srslib_framework::OdometryRpm>* subject);

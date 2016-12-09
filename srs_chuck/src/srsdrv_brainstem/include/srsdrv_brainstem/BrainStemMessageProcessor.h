@@ -24,6 +24,7 @@ using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
 
+#include <srsdrv_brainstem/hw_message/MessageHandler.hpp>
 #include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
 #include <srsdrv_brainstem/hw_message/SensorFrameHandler.hpp>
 #include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
@@ -34,7 +35,6 @@ using namespace std;
 #include <srsdrv_brainstem/sw_message/SoundHandler.hpp>
 #include <srsdrv_brainstem/sw_message/FreeSpinHandler.hpp>
 #include <srsdrv_brainstem/sw_message/SetMotionStateHandler.hpp>
-#include <srsdrv_brainstem/sw_message/ClearMotionStateHandler.hpp>
 #include <srsdrv_brainstem/sw_message/PingHandler.hpp>
 
 namespace srs {
@@ -77,12 +77,6 @@ public:
 	void GetOperationalState( );
 
 	void GetHardwareInformation( );
-
-	void SendPing( );
-
-	void SetRPM( double leftWheelRPM, double rightWheelRPM );
-
-	void SetVelocity( double dfLinear, double dfAngular );
 
 	void SetConnected( bool bIsConnected );
 
@@ -128,6 +122,7 @@ private:
     ChannelBrainstemOdometryRpm		odometryRpmChannel_;
     ChannelBrainstemButtonPressed	buttonPressedChannel_;
 
+    MessageHandler					messageHandler_;
     HardwareInfoHandler				hardwareInfoHandler_;
     PowerStateHandler				powerStateHandler_;
     SensorFrameHandler				sensorFrameHandler_;
@@ -137,7 +132,6 @@ private:
     SoundHandler					soundHandler_;
     FreeSpinHandler					freeSpinHandler_;
     SetMotionStateHandler			setMotionStateHandler_;
-    ClearMotionStateHandler			clearMotionStateHandler_;
     PingHandler						pingHandler_;
 };
 

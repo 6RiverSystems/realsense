@@ -16,7 +16,7 @@
 #include <tf/transform_datatypes.h>
 #include <dynamic_reconfigure/server.h>
 #include <srsnode_odometry/RobotSetupConfig.h>
-#include <srslib_framework/OdometryRPM.h>
+#include <srslib_framework/OdometryRpm.h>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
@@ -37,7 +37,7 @@ public:
 private:
     void readParams();
 
-    void CalculateRobotPose( const srslib_framework::OdometryRPM::ConstPtr& wheelRPM );
+    void CalculateRobotPose( const srslib_framework::OdometryRpm::ConstPtr& wheelRPM );
 
     void GetRawOdometryVelocity(const float leftWheelCount, const float rightWheelCount, double& v, double& w);
 
@@ -85,7 +85,7 @@ private:
 
 	dynamic_reconfigure::Server<srsnode_odometry::RobotSetupConfig> configServer_;
 
-	ros::Subscriber rawOdometryRPMSub_;
+	ros::Subscriber rawOdometryRpmSub_;
 
 	ros::Subscriber rawVelocityCmdSub_;
 

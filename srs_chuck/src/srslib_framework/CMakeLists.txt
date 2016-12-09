@@ -50,6 +50,7 @@ set(${PROJECT_NAME}_MSGS
     MapStack.msg
     MsgHardwareInfo.msg
     MsgOperationalState.msg
+    MsgSetOperationalState.msg
     MsgSolution.msg
     MsgSolutionItem.msg
     MsgBatteryInfo.msg

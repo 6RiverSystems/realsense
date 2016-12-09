@@ -22,7 +22,7 @@ OdometryPositionEstimator::OdometryPositionEstimator(std::string nodeName) :
 	broadcaster_(),
 	resetPoseSub_(),
 	rawVelocityCmdSub_(),
-	rawOdometryRPMSub_(),
+	rawOdometryRpmSub_(),
 	rpmVelocityCmdPub_(),
 	odometryPosePub_(),
 	odometryPoseEstimatePub_(),
@@ -89,7 +89,7 @@ void OdometryPositionEstimator::readParams()
 void OdometryPositionEstimator::connect()
 {
 	// Subscriber to get odometry reading (in rpm) and calculates the robot pose
-	rawOdometryRPMSub_ = nodeHandle_.subscribe<srslib_framework::OdometryRPM>(ODOMETRY_RPM_RAW_TOPIC, 10,
+	rawOdometryRpmSub_ = nodeHandle_.subscribe<srslib_framework::OdometryRpm>(ODOMETRY_RPM_RAW_TOPIC, 10,
 		std::bind( &OdometryPositionEstimator::CalculateRobotPose, this, std::placeholders::_1 ));
 
 	// Subscriber to reset robot pose when necessary
@@ -104,7 +104,7 @@ void OdometryPositionEstimator::connect()
 
     odometryPoseEstimatePub_ = nodeHandle_.advertise<nav_msgs::Odometry>(ODOMETRY_ESTIMATE_OUTPUT_TOPIC, 10);
 
-    rpmVelocityCmdPub_ = nodeHandle_.advertise<srslib_framework::OdometryRPM>(ODOMETRY_RPM_COMMAND_TOPIC, 10);
+    rpmVelocityCmdPub_ = nodeHandle_.advertise<srslib_framework::OdometryRpm>(ODOMETRY_RPM_COMMAND_TOPIC, 10);
 
 	pingPub_ = nodeHandle_.advertise<std_msgs::Bool>(PING_COMMAND_TOPIC, 1);
 
@@ -122,7 +122,7 @@ void OdometryPositionEstimator::disconnect()
 	rpmVelocityCmdPub_.shutdown();
 }
 
-void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::OdometryRPM::ConstPtr& wheelRPM )
+void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::OdometryRpm::ConstPtr& wheelRPM )
 {
 	// If no initial pose is provided, return immediately without any calculation
 	if(pose_.x == (-1.0) && pose_.y == (-1.0) && pose_.theta == (-1.0))
@@ -301,8 +301,8 @@ void OdometryPositionEstimator::TransformVeclocityToRPM(const geometry_msgs::Twi
 	double leftMotorRPM = leftMotorSpeed * 60.0 / 2.0 / M_PI / leftWheelRadius_;
 	double rightMotorRPM = rightMotorSpeed * 60.0 / 2.0 / M_PI / rightWheelRadius_;
 
-	// Publish OdometryRPM message
-	srslib_framework::OdometryRPM rpmVelocity;
+	// Publish OdometryRpm message
+	srslib_framework::OdometryRpm rpmVelocity;
 	rpmVelocity.left_wheel_rpm = leftMotorRPM;
 	rpmVelocity.right_wheel_rpm = rightMotorRPM;
 	rpmVelocityCmdPub_.publish(rpmVelocity);

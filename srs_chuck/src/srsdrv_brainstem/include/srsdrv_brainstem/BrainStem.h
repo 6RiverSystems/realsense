@@ -33,7 +33,7 @@ public:
 
 private:
 
-	static constexpr auto REFRESH_RATE_HZ = 100;
+	static constexpr auto REFRESH_RATE_HZ = 10;
 
 	std::shared_ptr<IO>					m_pSerialIO;
 

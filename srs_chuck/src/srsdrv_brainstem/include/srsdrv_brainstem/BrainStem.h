@@ -37,8 +37,6 @@ private:
 
 	std::shared_ptr<IO>					m_pSerialIO;
 
-	ChannelBrainstemConnected			connectedChannel_;
-
 	std::shared_ptr<BrainStemEmulator>	m_brainstemEmulator;
 
 	BrainStemMessageProcessor			m_messageProcessor;

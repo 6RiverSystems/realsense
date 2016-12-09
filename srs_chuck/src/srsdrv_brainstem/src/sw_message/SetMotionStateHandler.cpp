@@ -31,7 +31,7 @@ void SetMotionStateHandler::notified(Subscriber<srslib_framework::MsgSetOperatio
 	hardStopSet.set( MOTION_STATUS::BUMP_SENSOR, setOpState.operationalState.bumpSensor );
 	hardStopSet.set( MOTION_STATUS::FREE_SPIN, setOpState.operationalState.pause );
 
-	getOwner()->SetMotionStatus(hardStopSet, setOpState.state);
+	getOwner()->setMotionStatus(hardStopSet, setOpState.state);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

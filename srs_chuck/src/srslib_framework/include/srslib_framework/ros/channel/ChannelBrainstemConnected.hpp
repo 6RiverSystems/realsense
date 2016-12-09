@@ -15,7 +15,7 @@ class ChannelBrainstemConnected :
 {
 public:
 	ChannelBrainstemConnected() :
-		PublisherBoolean(ChuckTopics::driver::BRAINSTEM_STATE_CONNECTED)
+		PublisherBoolean(ChuckTopics::driver::BRAINSTEM_STATE_CONNECTED, 1, true)
     {}
 };
 

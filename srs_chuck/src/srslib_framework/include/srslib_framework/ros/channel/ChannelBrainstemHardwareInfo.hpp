@@ -15,7 +15,7 @@ class ChannelBrainstemHardwareInfo :
 {
 public:
 	ChannelBrainstemHardwareInfo() :
-		PublisherHardwareInfo(ChuckTopics::driver::BRAINSTEM_HARDWARE_INFO)
+		PublisherHardwareInfo(ChuckTopics::driver::BRAINSTEM_HARDWARE_INFO, 1, true)
     {}
 };
 

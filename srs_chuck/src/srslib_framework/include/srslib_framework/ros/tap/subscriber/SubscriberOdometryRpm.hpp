@@ -34,9 +34,6 @@ public:
     {
         set(*message);
     }
-
-private:
-    Velocity<> velocity_;
 };
 
 } // namespace srs

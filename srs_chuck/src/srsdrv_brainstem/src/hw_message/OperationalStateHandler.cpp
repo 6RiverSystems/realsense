@@ -1,4 +1,5 @@
 #include <srsdrv_brainstem/hw_message/OperationalStateHandler.hpp>
+#include <bitset>
 
 namespace srs {
 

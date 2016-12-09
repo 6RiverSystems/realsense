@@ -15,9 +15,9 @@ set(${PROJECT_NAME}_SOURCES
 
     src/hw_message/MessageHandler.cpp
     src/hw_message/ButtonPressedHandler.cpp
-    src/hw_message/SensorFrameHandler.cpp
     src/hw_message/OdometryRpmHandler.cpp
     src/hw_message/HardwareInfoHandler.cpp
+    src/hw_message/OperationalStateHandler.cpp
     src/hw_message/PowerStateHandler.cpp
 
     src/sw_message/StartupHandler.cpp
@@ -34,7 +34,6 @@ set(${PROJECT_NAME}_TEST_SOURCES
     test/Test_HardwareInfoMsg.cpp
     test/Test_PowerStateMsg.cpp
     test/Test_RawOdometryMsg.cpp
-    test/Test_SensorFrameMsg.cpp
     test/TestSuite_Brainstem.cpp
 )
 

@@ -16,9 +16,9 @@
 using namespace std;
 
 #include <srslib_framework/io/IO.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemConnected.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemPowerState.hpp>
-#include <srslib_framework/ros/channel/ChannelBrainstemSensorFrame.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemButtonPressed.hpp>
 
@@ -26,8 +26,8 @@ using namespace std;
 
 #include <srsdrv_brainstem/hw_message/MessageHandler.hpp>
 #include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
-#include <srsdrv_brainstem/hw_message/SensorFrameHandler.hpp>
 #include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
+#include <srsdrv_brainstem/hw_message/OperationalStateHandler.hpp>
 #include <srsdrv_brainstem/hw_message/PowerStateHandler.hpp>
 #include <srsdrv_brainstem/hw_message/OdometryRpmHandler.hpp>
 #include <srsdrv_brainstem/hw_message/ButtonPressedHandler.hpp>
@@ -41,13 +41,6 @@ namespace srs {
 
 class IO;
 class MessageProcessor;
-
-struct Handler
-{
-	std::function<void(std::vector<std::string>)>	callback;
-
-	uint32_t										dwNumParams;
-};
 
 class BrainStemMessageProcessor
 {
@@ -67,30 +60,33 @@ public:
         WriteToSerialPort(command, size);
     }
 
-    void setMotionStatus(const std::bitset<8>& motionStatusSet, bool bSetValues)
-    {
-        SetMotionStatus(motionStatusSet, bSetValues);
-    }
-
 // Message Processing
 
-	void GetOperationalState( );
+	void setConnected( bool bIsConnected );
 
-	void GetHardwareInformation( );
+	void getOperationalState( );
 
-	void SetConnected( bool bIsConnected );
+	void getHardwareInformation( );
 
-    void SetMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues );
+    void setMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues );
 
-    void OnHardStop( );
+    void onHardStop( );
 
-    void Shutdown( );
+    void shutdown( );
 
 // Helper
 
-	std::string GetButtonName( LED_ENTITIES eButtonId ) const;
+	std::string getButtonName( LED_ENTITIES eButtonId ) const;
 
 private:
+
+	bool isSetupComplete() const;
+
+	void checkSetupComplete();
+
+	void getHardwareInfo(const ros::Time& now);
+
+	void getOperationalState(const ros::Time& now);
 
 // Bridge Callbacks
 
@@ -112,27 +108,36 @@ private:
 
 private:
 
-	std::shared_ptr<IO>				m_pIO;
+	std::shared_ptr<IO>					m_pIO;
 
-    HwMessageHandlerMapType			hwMessageHandlers_;
+	bool								isConnected_;
 
-    ChannelBrainstemHardwareInfo	hardwareInfoChannel_;
-    ChannelBrainstemPowerState		powerStateChannel_;
-    ChannelBrainstemSensorFrame		sensorFrameChannel_;
-    ChannelBrainstemOdometryRpm		odometryRpmChannel_;
-    ChannelBrainstemButtonPressed	buttonPressedChannel_;
+	bool								hasValidHardareInfo_;
+	ros::Time							lastHardareInfoRequestTime_;
 
-    MessageHandler					messageHandler_;
-    HardwareInfoHandler				hardwareInfoHandler_;
-    PowerStateHandler				powerStateHandler_;
-    SensorFrameHandler				sensorFrameHandler_;
-    OdometryRpmHandler				odometryRpmHandler_;
-    ButtonPressedHandler			buttonPressedHandler_;
+	bool								hasValidOperationalState_;
+	ros::Time							lastOperationalStateRequestTime_;
 
-    SoundHandler					soundHandler_;
-    FreeSpinHandler					freeSpinHandler_;
-    SetMotionStateHandler			setMotionStateHandler_;
-    PingHandler						pingHandler_;
+    HwMessageHandlerMapType				hwMessageHandlers_;
+
+	ChannelBrainstemConnected			connectedChannel_;
+    ChannelBrainstemHardwareInfo		hardwareInfoChannel_;
+    ChannelBrainstemOperationalState	operationalStateChannel_;
+    ChannelBrainstemPowerState			powerStateChannel_;
+    ChannelBrainstemOdometryRpm			odometryRpmChannel_;
+    ChannelBrainstemButtonPressed		buttonPressedChannel_;
+
+    MessageHandler						messageHandler_;
+    HardwareInfoHandler					hardwareInfoHandler_;
+    OperationalStateHandler				operationalStateHandler_;
+    PowerStateHandler					powerStateHandler_;
+    OdometryRpmHandler					odometryRpmHandler_;
+    ButtonPressedHandler				buttonPressedHandler_;
+
+    SoundHandler						soundHandler_;
+    FreeSpinHandler						freeSpinHandler_;
+    SetMotionStateHandler				setMotionStateHandler_;
+    PingHandler							pingHandler_;
 };
 
 } /* namespace srs */

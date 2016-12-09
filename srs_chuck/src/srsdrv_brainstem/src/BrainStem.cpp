@@ -21,7 +21,6 @@ namespace srs
 {
 
 BrainStem::BrainStem( const std::string& strSerialPort ) :
-	connectedChannel_( ),
 	m_pSerialIO( new SerialIO( "brainstem" ) ),
 	m_messageProcessor( m_pSerialIO )
 {
@@ -66,7 +65,7 @@ void BrainStem::Run( )
 
 void BrainStem::OnConnectionChanged( bool bIsConnected )
 {
-	connectedChannel_.publish( bIsConnected );
+	m_messageProcessor.setConnected(bIsConnected);
 
 	if( !bIsConnected )
 	{

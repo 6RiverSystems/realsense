@@ -85,7 +85,6 @@ void HardwareInfoHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 		", brainstem sw version: " << hardwareInfoMsg_.brainstemSwVersion <<
 		batteryStream.str() << "}");
 
-
 	// Publish the hardware info
 	channel_.publish(hardwareInfoMsg_);
 }

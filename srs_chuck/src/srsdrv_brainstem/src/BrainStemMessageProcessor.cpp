@@ -21,24 +21,30 @@ using namespace ros;
 
 BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) :
 	m_pIO( pIO ),
+	isConnected_(false),
+	hasValidHardareInfo_(false),
+	lastHardareInfoRequestTime_(),
+	hasValidOperationalState_(false),
+	lastOperationalStateRequestTime_(),
+	connectedChannel_( ),
     soundHandler_(this),
     freeSpinHandler_(this),
 	setMotionStateHandler_(this),
 	pingHandler_(this),
 	odometryRpmChannel_(),
-	sensorFrameChannel_(),
 	hardwareInfoChannel_(),
+	operationalStateChannel_(),
 	powerStateChannel_(),
 	messageHandler_(),
 	odometryRpmHandler_(odometryRpmChannel_),
-	sensorFrameHandler_(sensorFrameChannel_),
 	hardwareInfoHandler_(hardwareInfoChannel_),
+	operationalStateHandler_(operationalStateChannel_),
 	powerStateHandler_(powerStateChannel_),
 	buttonPressedHandler_(buttonPressedChannel_)
 {
     hwMessageHandlers_[odometryRpmHandler_.getKey()] = &odometryRpmHandler_;
-    hwMessageHandlers_[sensorFrameHandler_.getKey()] = &sensorFrameHandler_;
     hwMessageHandlers_[hardwareInfoHandler_.getKey()] = &hardwareInfoHandler_;
+    hwMessageHandlers_[operationalStateHandler_.getKey()] = &operationalStateHandler_;
     hwMessageHandlers_[powerStateHandler_.getKey()] = &powerStateHandler_;
     hwMessageHandlers_[messageHandler_.getKey()] = &messageHandler_;
 }
@@ -69,6 +75,10 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 			try
 			{
 				handler->second->receiveData(currentTime, buffer);
+
+				getHardwareInfo(currentTime);
+
+				getOperationalState(currentTime);
 			}
 			catch(std::runtime_error& error)
 			{
@@ -79,7 +89,8 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 		}
 		else
 		{
-			if (eCommand != BRAIN_STEM_MSG::SYSTEM_VOLTAGE)
+			if (eCommand != BRAIN_STEM_MSG::SYSTEM_VOLTAGE  &&
+				eCommand != BRAIN_STEM_MSG::SENSOR_FRAME)
 			{
 			    ROS_ERROR_STREAM( "Unknown message from brainstem: " <<
 			        static_cast<char>(eCommand) << ", data: " << ToHex(buffer));
@@ -88,7 +99,7 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
     }
 }
 
-void BrainStemMessageProcessor::GetOperationalState( )
+void BrainStemMessageProcessor::getOperationalState( )
 {
 	ROS_DEBUG( "GetOperationalState" );
 
@@ -98,7 +109,7 @@ void BrainStemMessageProcessor::GetOperationalState( )
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 
-void BrainStemMessageProcessor::GetHardwareInformation( )
+void BrainStemMessageProcessor::getHardwareInformation( )
 {
 	ROS_DEBUG( "GetHardwareInformation" );
 
@@ -108,7 +119,7 @@ void BrainStemMessageProcessor::GetHardwareInformation( )
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 
-void BrainStemMessageProcessor::Shutdown( )
+void BrainStemMessageProcessor::shutdown( )
 {
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::SHUTDOWN );
 
@@ -119,7 +130,7 @@ void BrainStemMessageProcessor::Shutdown( )
 // Bridge Callbacks
 //////////////////////////////////////////////////////////////////////////
 
-void BrainStemMessageProcessor::SetMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues )
+void BrainStemMessageProcessor::setMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues )
 {
 	std::string strMotionStatus;
 	strMotionStatus += motionStatusSet.test( MOTION_STATUS::FRONT_E_STOP ) ? "frontEStop, " : "";
@@ -143,11 +154,64 @@ void BrainStemMessageProcessor::SetMotionStatus( const std::bitset<8>& motionSta
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof(msg) );
 }
 
-void BrainStemMessageProcessor::OnHardStop( )
+void BrainStemMessageProcessor::onHardStop( )
 {
     std::bitset<8> hardStopSet;
     hardStopSet.set( MOTION_STATUS::HARD_STOP, true );
-    SetMotionStatus( hardStopSet, true );
+    setMotionStatus( hardStopSet, true );
+}
+
+void BrainStemMessageProcessor::setConnected( bool isConnected )
+{
+	isConnected_ = isConnected;
+
+	checkSetupComplete();
+}
+
+void BrainStemMessageProcessor::getHardwareInfo(const ros::Time& now)
+{
+	if (!hasValidHardareInfo_)
+	{
+		ros::Duration duration = now - lastHardareInfoRequestTime_;
+		if (duration.toSec() > 1.0f)
+		{
+			// Send another request
+			getHardwareInformation();
+		}
+
+		hasValidHardareInfo_ = true;
+
+		checkSetupComplete();
+	}
+}
+
+void BrainStemMessageProcessor::getOperationalState(const ros::Time& now)
+{
+	if (!hasValidOperationalState_)
+	{
+		ros::Duration duration = now - lastOperationalStateRequestTime_;
+		if (duration.toSec() > 1.0f)
+		{
+			// Send another request
+			getOperationalState();
+		}
+
+		hasValidOperationalState_ = true;
+
+		checkSetupComplete();
+	}
+}
+
+bool BrainStemMessageProcessor::isSetupComplete() const
+{
+	return isConnected_ &&
+		hasValidHardareInfo_ &&
+		hasValidOperationalState_;
+}
+
+void BrainStemMessageProcessor::checkSetupComplete()
+{
+	connectedChannel_.publish(isSetupComplete());
 }
 
 void BrainStemMessageProcessor::OnResetBatteryHours( )
@@ -180,7 +244,7 @@ void BrainStemMessageProcessor::ClearMotionStatus( )
 	clearSet.set( MOTION_STATUS::BUMP_SENSOR, true );
 	clearSet.set( MOTION_STATUS::HARD_STOP, true );
 
-	SetMotionStatus( clearSet, false );
+	setMotionStatus( clearSet, false );
 }
 
 //////////////////////////////////////////////////////////////////////////

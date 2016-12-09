@@ -98,6 +98,8 @@ private:
 
 	std::string								m_strName;
 
+	bool									m_isSynced;
+
 	std::string								m_strDebug;
 
     std::shared_ptr<std::thread>			m_Thread;

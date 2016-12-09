@@ -16,6 +16,7 @@ namespace srs
 
 SerialIO::SerialIO( const char* pszName ) :
 	m_strName( pszName ),
+	m_isSynced(false),
 	m_strDebug( "serial-io." + m_strName ),
 	m_Thread( ),
 	m_serialThreadId( ),
@@ -74,6 +75,8 @@ void SerialIO::Open( const char* pszName, ConnectionCallbackFn connectionCallbac
 {
 	if( !IsOpen( ) )
 	{
+		m_isSynced = false;
+
 		std::condition_variable condition;
 
 		std::mutex mutex;
@@ -115,6 +118,8 @@ void SerialIO::Close( )
 	if( m_SerialPort.is_open( ) )
 	{
 		m_SerialPort.close( );
+
+		m_isSynced = false;
 	}
 }
 
@@ -452,6 +457,8 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 
 							m_readCallback(message_);
 
+							m_isSynced = true;
+
 							message_ = std::vector<char>();
 						}
 						else
@@ -461,9 +468,12 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					}
 					else
 					{
-						ROS_ERROR_STREAM_NAMED( m_strDebug, "Invalid CRC (" << message_.size() << "): " <<
-							ToHex( std::vector<char>( message_.begin( ), message_.begin( ) + message_.size() ) ) <<
-							"(CRC: " << ToHex( std::vector<char>( { (char)m_cCRC } ) ) << ")" );
+						if (m_isSynced)
+						{
+							ROS_ERROR_STREAM_NAMED( m_strDebug, "Invalid CRC (" << message_.size() << "): " <<
+								ToHex( std::vector<char>( message_.begin( ), message_.begin( ) + message_.size() ) ) <<
+								"(CRC: " << ToHex( std::vector<char>( { (char)m_cCRC } ) ) << ")" );
+						}
 					}
 				}
 				else

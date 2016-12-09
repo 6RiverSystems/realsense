@@ -29,7 +29,7 @@ struct SensorFrameMessageFactory
      *
      * @return SensorFrame generated from the specified SensorFrame message
      */
-    static SensorFrame<> msg2SensorFrame(srslib_framework::SensorFrame message)
+    static SensorFrame<> msg2SensorFrame(const srslib_framework::SensorFrame& message)
     {
         SensorFrame<> sensorFrame;
 
@@ -47,9 +47,9 @@ struct SensorFrameMessageFactory
      *
      * @return SensorFrame generated from the specified SensorFrameConstPtr message
      */
-    static SensorFrame<> msg2SensorFrame(srslib_framework::SensorFrameConstPtr message)
+    static SensorFrame<> msg2SensorFrame(srslib_framework::SensorFrame::ConstPtr message)
     {
-        return SensorFrameMessageFactory::msg2SensorFrame(*message);
+        return msg2SensorFrame(*message);
     }
 
     /**
@@ -59,11 +59,11 @@ struct SensorFrameMessageFactory
      *
      * @return SensorFrame message generated from the specified SensorFrame
      */
-    static srslib_framework::SensorFrame imu2Msg(SensorFrame<> sensorFrame)
+    static srslib_framework::SensorFrame imu2Msg(const SensorFrame<>& sensorFrame)
     {
         srslib_framework::SensorFrame msgSensorFrame;
 
-        msgSensorFrame.header.stamp = ros::Time() + ros::Duration(sensorFrame.arrivalTime);
+        msgSensorFrame.header.stamp = ros::Time(sensorFrame.arrivalTime);
         msgSensorFrame.odometry = VelocityMessageFactory::velocity2Msg(sensorFrame.odometry);
         msgSensorFrame.imu = ImuMessageFactory::imu2Msg(sensorFrame.imu);
 

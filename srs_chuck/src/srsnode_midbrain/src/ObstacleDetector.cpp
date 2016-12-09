@@ -82,7 +82,7 @@ void ObstacleDetector::SetVelocity( double linearVelocity, double angularVelocit
 	m_angularVelocity = angularVelocity;
 }
 
-void ObstacleDetector::SetPose( const srslib_framework::MsgPose::ConstPtr& pose )
+void ObstacleDetector::SetPose( const srslib_framework::Pose::ConstPtr& pose )
 {
 	m_pose = PoseMessageFactory::msg2Pose(*pose);
 
@@ -205,7 +205,7 @@ double ObstacleDetector::GetSafeDistance( double linearVelocity, double angularV
 
 		safeDistance = std::max( calculatedSafeDistance, 0.75 );
 
-		ROS_DEBUG_THROTTLE_NAMED( 1.0f, "obstacle_detection", "calculatedSafeDistance: %0.2f, safeDistance: %0.2f", calculatedSafeDistance, safeDistance ); 
+		ROS_DEBUG_THROTTLE_NAMED( 1.0f, "obstacle_detection", "calculatedSafeDistance: %0.2f, safeDistance: %0.2f", calculatedSafeDistance, safeDistance );
 	}
 
 	return safeDistance;
@@ -228,7 +228,7 @@ Ring ObstacleDetector::GetDangerZone( ) const
 
 void ObstacleDetector::AddPoseToPolygon( const Pose<>& pose, Polygon& polygon, double width, double length ) const
 {
-	std::vector<Pose<>> posePoly = PoseMath::pose2polygon(pose, 0.0, 0.0, width, length );
+	std::vector<Pose<>> posePoly = PoseMath::pose2Polygon(pose, 0.0, 0.0, width, length);
 
 	Ring footprintPoints;
 

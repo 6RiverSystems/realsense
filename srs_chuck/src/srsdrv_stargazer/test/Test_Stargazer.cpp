@@ -5,13 +5,16 @@
  */
 
 #include <StarGazerPointTransformer.h>
-#include <srslib_framework/math/AngleMath.hpp>
+
 #include "gtest/gtest.h"
 #include <tf/tf.h>
 #include <yaml-cpp/yaml.h>
 #include <sys/stat.h>
 #include <math.h>
 #include <boost/filesystem.hpp>
+
+#include <srslib_framework/math/AngleMath.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
@@ -93,7 +96,7 @@ public:
 
 		double chuckToMarkerRotation = chuckToCameraRotation + cameraToMarkerRotation;
 
-		double combinedAngle = AngleMath::normalizeAngleRad( markerToMapRotation + chuckToMarkerRotation );
+		double combinedAngle = AngleMath::normalizeRad<double>( markerToMapRotation + chuckToMarkerRotation );
 
 		tf::Vector3 anchorOrigin = anchorTransform.getOrigin( );
 
@@ -130,7 +133,7 @@ public:
 
 	double GetLeftHandAngle( double dfRightHandDegrees )
 	{
-		double dfLeftHandAngleInRadians = m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( dfRightHandDegrees ) );
+		double dfLeftHandAngleInRadians = m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2Rad<double>( dfRightHandDegrees ) );
 
 		return AngleMath::normalizeRad2Deg( dfLeftHandAngleInRadians );
 	}
@@ -141,7 +144,7 @@ TEST_F( StargazerTest, TestAverageAngle )
 {
 	tf::Transform stargazerTransform( tf::Quaternion::getIdentity( ), tf::Vector3( 0.0, 0.0, 0.0) );
 
-	m_pointTransformer.Load( "/internal/state/map/grid", stargazerTransform,
+	m_pointTransformer.Load(ChuckTopics::internal::MAP_ROS_OCCUPANCY, stargazerTransform,
 		m_footprintTransform, m_strAnchorFile );
 
 	double fourtyFive = 45.0;
@@ -166,7 +169,7 @@ TEST_F( StargazerTest, TestCameraAngleCalibration )
 {
 	tf::Transform stargazerTransform( tf::Quaternion::getIdentity( ), tf::Vector3( 0.0, 0.0, 0.0) );
 
-	m_pointTransformer.Load( "/internal/state/map/grid", stargazerTransform,
+	m_pointTransformer.Load(ChuckTopics::internal::MAP_ROS_OCCUPANCY, stargazerTransform,
 		m_footprintTransform, m_strAnchorFile );
 
 	tf::Pose pose( tf::createIdentityQuaternion( ) );
@@ -175,15 +178,15 @@ TEST_F( StargazerTest, TestCameraAngleCalibration )
 
 TEST_F( StargazerTest, TestRightHandRuleConverstion )
 {
-	double df0Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 0.0f ) ) );
-	double df1Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 1.0f ) ) );
-	double df45Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 45.0f ) ) );
-	double df90Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 90.0f ) ) );
-	double df135Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 135.0f ) ) );
-	double df180Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 180.0f ) ) );
-	double df225Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 225.0f ) ) );
-	double df270Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 270.0f ) ) );
-	double df315Degrees = AngleMath::normalizeRad2Deg( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2rad( 315.0f ) ) );
+	double df0Degrees = AngleMath::normalizeRad2Deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2Rad<double>( 0.0) ) );
+	double df1Degrees = AngleMath::normalizeRad2Deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2Rad<double>( 1.0) ) );
+	double df45Degrees = AngleMath::normalizeRad2Deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2Rad<double>( 45.0) ) );
+	double df90Degrees = AngleMath::normalizeRad2Deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2Rad<double>( 90.0) ) );
+	double df135Degrees = AngleMath::normalizeRad2Deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2Rad<double>( 135.0) ) );
+	double df180Degrees = AngleMath::normalizeRad2Deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2Rad<double>( 180.0) ) );
+	double df225Degrees = AngleMath::normalizeRad2Deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2Rad<double>( 225.0) ) );
+	double df270Degrees = AngleMath::normalizeRad2Deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2Rad<double>( 270.0) ) );
+	double df315Degrees = AngleMath::normalizeRad2Deg<double>( m_pointTransformer.ConvertToRightHandRule( AngleMath::deg2Rad<double>( 315.0) ) );
 
 	EXPECT_NEAR( df0Degrees, 0.0f, 0.001 );
 	EXPECT_NEAR( df1Degrees, 359.0f, 0.001 );
@@ -204,7 +207,7 @@ TEST_F( StargazerTest, TestTransforms )
 			AngleMath::normalizeDeg2Rad( stargazerOffset.angle ) ),
 			tf::Vector3( stargazerOffset.x, stargazerOffset.y, stargazerOffset.z) );
 
-		m_pointTransformer.Load( "/internal/state/map/grid", stargazerTransform,
+		m_pointTransformer.Load(ChuckTopics::internal::MAP_ROS_OCCUPANCY, stargazerTransform,
 			m_footprintTransform, m_strAnchorFile );
 
 		std::map<int, tf::Transform> mapAnchorTransforms = m_pointTransformer.GetAnchorTransforms( );

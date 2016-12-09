@@ -11,9 +11,9 @@ using namespace std;
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/math/VelocityMath.hpp>
-
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridTrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionUtils.hpp>
 
 namespace srs {
 
@@ -39,8 +39,8 @@ MotionController::MotionController(double dT) :
     activeController_(nullptr),
     rosNodeHandle_()
 {
-    pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>(
-        "/internal/drivers/brainstem/cmd_velocity", 100);
+//    pubCmdVel_ = rosNodeHandle_.advertise<geometry_msgs::Twist>(
+//        "/internal/cmd_velocity", 100);
 
     pubLookAheadDistance_ = rosNodeHandle_.advertise<std_msgs::Float64>(
         "/internal/motion/look_ahead_distance", 1);
@@ -63,7 +63,7 @@ void MotionController::emergencyStop()
     executeCommand(true, CommandEnum::BRAKE);
 
     // Cancel the current activity and clear the work queue
-    activeController_->cancel();
+    activeController_->terminate();
     cleanWorkQueue();
 
     pushWorkItem(TaskEnum::EMERGENCY_STOP);
@@ -91,14 +91,34 @@ void MotionController::execute(SolutionType solution)
         pushWorkItem(TaskEnum::NORMAL_STOP);
 
         // Cancel the work in the controller
-        activeController_->cancel();
+        activeController_->terminate();
     }
 
     if (!solution.empty())
     {
-        // Decompose the solution in work items and
-        // push them in the queue
-        pushWorkSolution(solution);
+        if (robot_.singleCommandMode)
+        {
+            currentFinalGoal_ = currentPose_;
+
+            // Go through every portion of the solution and
+            // ask the motion controller to execute it, one
+            // homogeneous command at the time
+            vector<Solution<Grid2dSolutionItem>*> fragments = Grid2dSolutionUtils::splitSolution(solution);
+
+            for (auto fragment : fragments)
+            {
+                // Decompose the solution in work items and
+                // push them in the queue
+                currentFinalGoal_ = pushWorkSolution(currentFinalGoal_, *fragment);
+
+                delete fragment;
+            }
+        }
+        else
+        {
+            // Decompose the solution in work items and push them in the queue
+            currentFinalGoal_ = pushWorkSolution(currentPose_, solution);
+        }
     }
     else
     {
@@ -107,6 +127,14 @@ void MotionController::execute(SolutionType solution)
     }
 
     setHasArrived(false);
+
+    // If the stand controller is currently active and there is work in
+    // the queue, cancel work in the controller and pump work from the queue
+    if (isStandControllerActive() && isWorkPending())
+    {
+        ROS_DEBUG_NAMED("motion_controller", "Abandoned STAND");
+        activeController_->terminate();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,7 +148,7 @@ void MotionController::normalStop()
     }
 
     // Cancel the current activity and clear the work queue
-    activeController_->cancel();
+    activeController_->terminate();
     cleanWorkQueue();
 
     pushWorkItem(TaskEnum::NORMAL_STOP);
@@ -142,14 +170,14 @@ void MotionController::reset()
     standController_->reset();
     emergencyController_->reset();
 
-    // No controller is active
-    currentTask_ = TaskEnum::NONE;
-    selectController(TaskEnum::NONE);
-
     currentOdometry_ = Odometry<>::ZERO;
 
     hasArrived_ = true;
     hasArrivedChanged_ = false;
+
+    // No task is currently being executed
+    currentTask_ = TaskEnum::NONE;
+    selectController(TaskEnum::NONE);
 
     cleanWorkQueue();
     pushWorkItem(TaskEnum::STAND);
@@ -213,7 +241,7 @@ void MotionController::switchToManual()
         // Cancel the current activity and clear the work queue
         if (activeController_)
         {
-            activeController_->cancel();
+            activeController_->terminate();
         }
         cleanWorkQueue();
 
@@ -236,7 +264,7 @@ void MotionController::switchToAutonomous()
     if (isManualControllerActive())
     {
         // Cancel the current manual controller activity
-        activeController_->cancel();
+        activeController_->terminate();
     }
 }
 
@@ -255,8 +283,8 @@ void MotionController::aggregateInitialRotations(Pose<> pose,
 
     // Check if the solution starts with a rotation. If that is the case
     // replace it with rotation that takes in account the specified initial pose
-    GridSolutionItem node = solution->getStart();
-    if (node.actionType != GridSolutionItem::ROTATE)
+    Grid2dSolutionItem node = solution->getStart();
+    if (node.actionType != Grid2dSolutionItem::ROTATE)
     {
         return;
     }
@@ -266,7 +294,7 @@ void MotionController::aggregateInitialRotations(Pose<> pose,
     // Remove all the ROTATE nodes at the beginning of the solution. Check
     // if the solution is empty while doing that in case it was composed exclusively by
     // ROTATE commands
-    while (node.actionType == GridSolutionItem::ROTATE && !solution->empty())
+    while (node.actionType == Grid2dSolutionItem::ROTATE && !solution->empty())
     {
         // Remove the rotation from the original solution
         solution->erase(solution->begin());
@@ -276,9 +304,9 @@ void MotionController::aggregateInitialRotations(Pose<> pose,
     }
 
     double theta = node.toPose.theta;
-    Pose<> toPose = Pose<>(fromPose.x, fromPose.y, AngleMath::normalizeAngleRad<double>(theta));
+    Pose<> toPose = Pose<>(fromPose.x, fromPose.y, AngleMath::normalizeRad<double>(theta));
 
-    node = GridSolutionItem(GridSolutionItem::ROTATE, fromPose, toPose);
+    node = Grid2dSolutionItem(Grid2dSolutionItem::ROTATE, fromPose, toPose);
     rotation = new SolutionType(node);
 }
 
@@ -292,8 +320,8 @@ void MotionController::aggregateFinalRotations(SolutionType*& solution, Solution
     }
 
     // Check if the solution ends with a rotation
-    GridSolutionItem node = solution->getGoal();
-    if (node.actionType != GridSolutionItem::ROTATE)
+    Grid2dSolutionItem node = solution->getGoal();
+    if (node.actionType != Grid2dSolutionItem::ROTATE)
     {
         return;
     }
@@ -301,19 +329,19 @@ void MotionController::aggregateFinalRotations(SolutionType*& solution, Solution
     Pose<> toPose = node.toPose;
 
     // Remove all the ROTATE nodes at the end of the solution
-    while (node.actionType == GridSolutionItem::ROTATE)
+    while (node.actionType == Grid2dSolutionItem::ROTATE)
     {
         // Remove the rotation from the original solution
-        solution->erase(solution->end() - 1);
+        solution->pop_back();
 
         // Try the next solution node
         node = solution->getGoal();
     }
 
     double theta = node.fromPose.theta;
-    Pose<> fromPose = Pose<>(toPose.x, toPose.y, AngleMath::normalizeAngleRad<double>(theta));
+    Pose<> fromPose = Pose<>(toPose.x, toPose.y, AngleMath::normalizeRad<double>(theta));
 
-    node = GridSolutionItem(GridSolutionItem::ROTATE, fromPose, toPose);
+    node = Grid2dSolutionItem(Grid2dSolutionItem::ROTATE, fromPose, toPose);
     rotation = new SolutionType(node);
 }
 
@@ -385,10 +413,10 @@ void MotionController::executeFinalRotation()
         robot_.rotationGoalReachedAngle))
     {
         ROS_DEBUG_STREAM_NAMED("motion_controller", "Rotation needed from: " <<
-            AngleMath::rad2deg<double>(currentPose_.theta) << "deg to: " <<
-            AngleMath::rad2deg<double>(finalTheta) << "deg");
+            AngleMath::rad2Deg<double>(currentPose_.theta) << "deg to: " <<
+            AngleMath::rad2Deg<double>(finalTheta) << "deg");
 
-        SolutionType* solution = GridSolutionFactory::fromRotation(
+        SolutionType* solution = Grid2dSolutionFactory::fromRotation(
             currentPose_,
             currentPose_.theta, finalTheta);
 
@@ -399,19 +427,13 @@ void MotionController::executeFinalRotation()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::checkMotionStatus()
 {
-    // If the stand controller is currently active and there is work in
-    // the queue, cancel work in the controller and pump work from the queue
-    if (isStandControllerActive() && isWorkPending() && !isScheduledNext(TaskEnum::STAND))
-    {
-        ROS_DEBUG_NAMED("motion_controller", "Abandoned STAND");
-        activeController_->cancel();
-    }
+    bool currentWorkCompleted = false;
 
-    // If the controller says that the goal has been reached, and
-    // the work has not been canceled for some reason
-    if (activeController_->isGoalReached())
+    if (!activeController_->isTerminated())
     {
-        if (!activeController_->isCanceled())
+        // If the controller says that the goal has been reached, and
+        // the work has not been canceled for some reason
+        if (activeController_->isGoalReached())
         {
             ROS_DEBUG_STREAM_NAMED("motion_controller", "Controller " <<
                 activeController_->getName() << " reached its goal");
@@ -432,26 +454,32 @@ void MotionController::checkMotionStatus()
             {
                 setHasArrived(true);
             }
+
+            currentWorkCompleted = true;
         }
-        else
+    }
+    else
+    {
+        ROS_DEBUG_STREAM_NAMED("motion_controller", "Controller " <<
+            activeController_->getName() << " terminated");
+
+        currentWorkCompleted = true;
+    }
+
+    // If the controller says that the goal has been reached or it has been
+    // terminated, and no emergency has been declared
+    // the work has not been canceled for some reason
+    if (currentWorkCompleted && !isEmergencyDeclared())
+    {
+        // If there is nothing else to do, simply stand still
+        if (!isWorkPending())
         {
-            ROS_DEBUG_STREAM_NAMED("motion_controller", "Controller " <<
-                activeController_->getName() << " goal canceled");
+            ROS_DEBUG_NAMED("motion_controller", "No work was found");
+            pushWorkItem(TaskEnum::STAND);
         }
 
-        // If no emergency has been declared, consider more work
-        if (!isEmergencyDeclared())
-        {
-            // If there is nothing else to do, simply stand still
-            if (!isWorkPending())
-            {
-                ROS_DEBUG_NAMED("motion_controller", "No work was found");
-                pushWorkItem(TaskEnum::STAND);
-            }
-
-            // Look in the queue to see if there is work to do
-            pumpWorkFromQueue();
-        }
+        // Look in the queue to see if there is work to do
+        pumpWorkFromQueue();
     }
 }
 
@@ -500,6 +528,8 @@ void MotionController::popWorkItem(TaskEnum& task, SolutionType& solution)
 {
     if (!work_.empty())
     {
+        ROS_DEBUG_STREAM_NAMED("motion_controller", printWorkToString());
+
         // First, find the work to do
         WorkType work = work_.front();
         work_.pop_front();
@@ -529,8 +559,6 @@ void MotionController::popWorkItem(TaskEnum& task, SolutionType& solution)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::prependWorkItem(TaskEnum task, SolutionType* solution)
 {
-    ROS_DEBUG_STREAM_NAMED("motion_controller", printWorkToString());
-
     ROS_DEBUG_STREAM_NAMED("motion_controller", "Pushing task: " << TASK_NAMES[task]);
     if (solution)
     {
@@ -541,7 +569,9 @@ void MotionController::prependWorkItem(TaskEnum task, SolutionType* solution)
         ROS_DEBUG_STREAM_NAMED("motion_controller", "Pushing solution: (null)");
     }
 
-    work_.push_back(WorkType(task, solution));
+    work_.push_front(WorkType(task, solution));
+
+    ROS_DEBUG_STREAM_NAMED("motion_controller", printWorkToString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -599,8 +629,6 @@ void MotionController::pumpWorkFromQueue()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MotionController::pushWorkItem(TaskEnum task, SolutionType* solution)
 {
-    ROS_DEBUG_STREAM_NAMED("motion_controller", printWorkToString());
-
     ROS_DEBUG_STREAM_NAMED("motion_controller", "Pushing task: " << TASK_NAMES[task]);
     if (solution)
     {
@@ -612,25 +640,29 @@ void MotionController::pushWorkItem(TaskEnum task, SolutionType* solution)
     }
 
     work_.push_back(WorkType(task, solution));
+
+    ROS_DEBUG_STREAM_NAMED("motion_controller", printWorkToString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MotionController::pushWorkSolution(SolutionType& solution)
+Pose<> MotionController::pushWorkSolution(Pose<> initialPose, SolutionType& solution)
 {
     // Create a copy of the specified solution
     SolutionType* pathSolution = new SolutionType(solution);
 
     SolutionType* initialRotationSolution = nullptr;
-    aggregateInitialRotations(currentPose_, pathSolution, initialRotationSolution);
+    aggregateInitialRotations(initialPose, pathSolution, initialRotationSolution);
 
     SolutionType* finalRotationSolution = nullptr;
     aggregateFinalRotations(pathSolution, finalRotationSolution);
+
+    Pose<> finalPose;
 
     // Push the solutions into the work queue
     if (initialRotationSolution)
     {
         pushWorkItem(TaskEnum::ROTATE, initialRotationSolution);
-        currentFinalGoal_ = initialRotationSolution->getGoal().toPose;
+        finalPose = initialRotationSolution->getGoal().toPose;
     }
 
     // If the path solution is not empty, push it into
@@ -638,7 +670,7 @@ void MotionController::pushWorkSolution(SolutionType& solution)
     if (!pathSolution->empty())
     {
         pushWorkItem(TaskEnum::PATH_FOLLOW, pathSolution);
-        currentFinalGoal_ = pathSolution->getGoal().toPose;
+        finalPose = pathSolution->getGoal().toPose;
     }
     else
     {
@@ -649,8 +681,10 @@ void MotionController::pushWorkSolution(SolutionType& solution)
     if (finalRotationSolution)
     {
         pushWorkItem(TaskEnum::ROTATE, finalRotationSolution);
-        currentFinalGoal_ = finalRotationSolution->getGoal().toPose;
+        finalPose = finalRotationSolution->getGoal().toPose;
     }
+
+    return finalPose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -740,7 +774,7 @@ void MotionController::taskPathFollow()
         currentShortTermGoal_ = currentSolution_.getGoal().toPose;
 
         // Calculate the trajectory
-        GridTrajectoryGenerator converter(robot_);
+        Grid2dTrajectoryGenerator converter(robot_);
 
         converter.fromSolution(currentSolution_);
         converter.getTrajectory(trajectory);

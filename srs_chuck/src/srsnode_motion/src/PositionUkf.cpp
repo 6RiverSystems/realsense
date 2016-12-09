@@ -34,7 +34,7 @@ cv::Mat PositionUkf::addWeighted(const cv::Mat W, const cv::Mat X)
     }
 
     // ###FS Fixed range issues of atan2
-    R.at<BaseType>(StatePe<>::STATE_THETA) = AngleMath::normalizeAngleRad(
+    R.at<BaseType>(StatePe<>::STATE_THETA) = AngleMath::normalizeRad(
         atan2(totalSine, totalCosine));
 
     return R;
@@ -45,7 +45,7 @@ cv::Mat PositionUkf::residual(const cv::Mat A, const cv::Mat B)
 {
     cv::Mat R = A - B;
 
-    R.at<BaseType>(StatePe<>::STATE_THETA) = AngleMath::normalizeAngleRad(
+    R.at<BaseType>(StatePe<>::STATE_THETA) = AngleMath::normalizeRad(
         R.at<BaseType>(StatePe<>::STATE_THETA));
 
     return R;

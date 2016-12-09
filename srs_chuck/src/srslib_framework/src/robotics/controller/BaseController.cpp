@@ -10,7 +10,7 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void BaseController::reset()
 {
-    canceled_ = false;
+    terminated_ = false;
 
     firstRun_ = true;
 
@@ -44,6 +44,15 @@ bool BaseController::checkGoalReached(Pose<> currentPose)
     double distanceToGoal = PoseMath::euclidean(currentPose, getGoal());
     ROS_DEBUG_STREAM_NAMED("base_controller", "Distance to goal line: " << distanceToGoal);
 
+    // If the distance to the goal line is less than
+    // the minimum tolerance, respond right away
+    if (distanceToGoal < robot_.physicalMinDistanceToGoal)
+    {
+        return true;
+    }
+
+    // Otherwise, check the intersection of the current pose with
+    // the polygon of the goal landing
     bool isIntersecting = PoseMath::intersection(goalLanding_, currentPose);
     ROS_DEBUG_STREAM_NAMED("base_controller", "Inside landing zone: " << isIntersecting);
 

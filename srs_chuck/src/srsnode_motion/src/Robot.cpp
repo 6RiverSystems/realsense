@@ -1,4 +1,4 @@
-#include <srslib_framework/robotics/robot/Chuck.hpp>
+#include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 
 #include <srslib_framework/math/PoseMath.hpp>
 

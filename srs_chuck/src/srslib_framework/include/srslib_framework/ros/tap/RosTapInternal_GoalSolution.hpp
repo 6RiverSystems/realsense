@@ -12,7 +12,7 @@
 
 #include <srslib_framework/planning/pathplanning/Solution.hpp>
 
-#include <srslib_framework/ros/RosTap.hpp>
+#include <srslib_framework/ros/tap/RosTap.hpp>
 #include <srslib_framework/ros/message/SolutionMessageFactory.hpp>
 
 namespace srs {
@@ -30,7 +30,7 @@ public:
         disconnectTap();
     }
 
-    Solution<GridSolutionItem> getSolution()
+    Solution<Grid2dSolutionItem> getSolution()
     {
         setNewData(false);
         return currentSolution_;
@@ -40,11 +40,11 @@ public:
     {
         RosTap::reset();
 
-        Solution<GridSolutionItem> solution;
+        Solution<Grid2dSolutionItem> solution;
         set(solution);
     }
 
-    void set(Solution<GridSolutionItem>& solution)
+    void set(Solution<Grid2dSolutionItem>& solution)
     {
         currentSolution_ = solution;
         setNewData(true);
@@ -61,11 +61,11 @@ protected:
 private:
     void onSolution(const srslib_framework::MsgSolutionConstPtr message)
     {
-        Solution<GridSolutionItem> solution = SolutionMessageFactory::msg2Solution(message);
+        Solution<Grid2dSolutionItem> solution = SolutionMessageFactory::msg2Solution(message);
         set(solution);
     }
 
-    Solution<GridSolutionItem> currentSolution_;
+    Solution<Grid2dSolutionItem> currentSolution_;
 };
 
 } // namespace srs

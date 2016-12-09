@@ -3,111 +3,50 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef EXECUTIVE_HPP_
-#define EXECUTIVE_HPP_
+#pragma once
 
-#include <srslib_framework/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/ros/tap/TapOdometryCmd_Velocity.hpp>
+#include <srslib_framework/ros/tap/TapRobotPose.hpp>
+#include <srslib_framework/ros/tap/TapMapStack.hpp>
+#include <srslib_framework/ros/unit/RosUnit.hpp>
 
-#include <srslib_framework/planning/pathplanning/Solution.hpp>
-#include <srslib_framework/planning/pathplanning/grid/GridSolutionItem.hpp>
-
-#include <srslib_framework/robotics/Pose.hpp>
-
-#include <srslib_framework/ros/tap/RosTapMap.hpp>
-#include <srslib_framework/ros/tap/RosTapInternal_GoalArrived.hpp>
-#include <srslib_framework/ros/tap/RosTapInternal_RobotPose.hpp>
-#include <srslib_framework/ros/tap/RosTapJoyAdapter.hpp>
-#include <srslib_framework/ros/tap/RosTapOperationalState.hpp>
-
-#include <srslib_framework/search/AStar.hpp>
-
-#include <srsnode_executive/tap/RosTapCmd_Goal.hpp>
-#include <srsnode_executive/tap/RosTapCmd_InitialPose.hpp>
-#include <srsnode_executive/tap/RosTapCmd_Move.hpp>
-#include <srsnode_executive/tap/RosTapCmd_Pause.hpp>
-#include <srsnode_executive/tap/RosTapCmd_Shutdown.hpp>
+#include <srsnode_executive/ExecutiveContext.hpp>
+#include <srsnode_executive/sw_message/CommandLineHandler.hpp>
+#include <srsnode_executive/task/TaskDetectLabeledAreas.hpp>
+#include <srsnode_executive/task/TaskPlayWarningSound.hpp>
 
 namespace srs {
 
-class Executive
+class Executive : public RosUnit<Executive>
 {
 public:
-    Executive(string nodeName);
-
+    Executive(string name, int argc, char** argv);
     ~Executive()
+    {}
+
+    void setPauseState(bool newState)
     {
-        disconnectAllTaps();
+        context_.isRobotPaused = newState;
     }
 
-    void run();
+protected:
+    void execute();
+
+    void initialize();
 
 private:
-    constexpr static double REFRESH_RATE_HZ = 5;
-    constexpr static int GRID_SIZE = 60;
-    constexpr static double MAX_RELOCATION_THRESHOLD = 0.2;
+    constexpr static double REFRESH_RATE_HZ = 5; // [Hz]
 
-    void connectAllTaps();
+    void updateContext();
 
-    void disconnectAllTaps();
+    CommandLineHandler commandLineHandler_;
+    ExecutiveContext context_;
 
-    void findActiveNodes(vector<string>& nodes);
-
-    void executeArrived();
-    void executeInitialPose();
-    void executePause();
-    void executePlanToGoal();
-    void executePlanToMove();
-    void executeShutdown();
-    void executeUnpause();
-
-    bool isExecutingSolution()
-    {
-        return !isJoystickLatched_ && !arrived_;
-    }
-
-    void publishInternalInitialPose(Pose<> initialPose);
-    void publishInternalGoalSolution(Solution<GridSolutionItem>* solution);
-    void publishGoalTarget(Pose<> goalTargetArea);
-
-    void stepChecks();
-    void stepExecutiveFunctions();
-
-    void taskCustomAction();
-    void taskPauseChange();
-    void taskPlanToGoal();
-
-    AStar<Grid2d> algorithm_;
-	bool arrived_;
-
-    Pose<> currentRobotPose_;
-    Pose<> currentGoal_;
-    Solution<GridSolutionItem>* currentSolution_;
-    Pose<> currentTarget_;
-
-    bool isJoystickLatched_;
-
-    ros::Publisher pubExternalArrived_;
-    ros::Publisher pubInternalInitialPose_;
-    ros::Publisher pubInternalGoalSolution_;
-    ros::Publisher pubStatusGoalPlan_;
-    ros::Publisher pubStatusGoal_;
-    ros::Publisher pubStatusGoalTarget_;
-
-    Pose<> robotInitialPose_;
-    ros::NodeHandle rosNodeHandle_;
-
-    RosTapCmd_Goal tapCmdGoal_;
-    RosTapCmd_InitialPose tapCmdInitialPose_;
-    RosTapCmd_Move tapCmdMove_;
-    RosTapCmd_Shutdown tapCmdShutdown_;
-    RosTapInternal_GoalArrived tapInternal_GoalArrived_;
-    RosTapInternal_RobotPose tapInternal_RobotPose_;
-    RosTapOperationalState tapOperationalState_;
-	RosTapJoyAdapter tapJoyAdapter_;
-
-    RosTapMap tapMap_;
+    TapOdometryCmd_Velocity tapCommandedVelocity_;
+    TapMapStack tapMapStack_;
+    TapRobotPose tapRobotPose_;
+    TaskDetectLabeledAreas taskDetectLabeledAreas_;
+    TaskPlayWarningSound taskPlayWarningSound_;
 };
 
 } // namespace srs
-
-#endif  // EXECUTIVE_HPP_

@@ -112,7 +112,7 @@ function restartChuck() {
 logChuck() {
   getChuckDirectory &&
 
-  tail -n 1000 -f "$logFile" -f ~/mfp_bridge/log/bridge.log
+  sudo tail -n 1000 -f "$logFile" -f /var/log/upstart/mfp-bridge.log
 }
 
 recordChuck() {
@@ -122,7 +122,7 @@ rosbag record -O slam-lidar-rs /scan /internal/sensors/odometry/velocity /tf /ca
 
 recordChuckNav() {
   #rosbag record --split --buffsize=0 --duration=5m /camera/color/camera_info /camera/color/image_raw /camera/depth/camera_info /camera/depth/image_raw /camera/infrared1/camera_info /camera/infrared1/image_raw /camera/infrared2/camera_info /camera/infrared2/image_raw
-rosbag record -O nav-data /internal/sensors/lidar/scan/raw /internal/sensors/odometry/velocity/cmd /internal/sensors/odometry/velocity/estimate /internal/sensors/odometry/velocity/pose /internal/sensors/odometry/rpm/raw /internal/sensors/odometry/rpm/cmd /tf
+rosbag record -O nav-data /internal/sensors/lidar/scan/raw /internal/sensors/odometry/velocity/cmd /internal/sensors/odometry/velocity/estimate /internal/sensors/odometry/pose /internal/sensors/odometry/rpm/raw /internal/sensors/odometry/rpm/cmd /tf /monitoring/timing_data
 }
 
 

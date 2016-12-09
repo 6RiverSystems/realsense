@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef CMDVELOCITY_HPP_
-#define CMDVELOCITY_HPP_
+#pragma once
 
 #include <string>
 using namespace std;
@@ -13,7 +12,6 @@ using namespace std;
 
 #include <srslib_framework/filter/Command.hpp>
 #include <srslib_framework/math/Ocv2Base.hpp>
-#include <srslib_framework/platform/Object.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
 #include <srsnode_motion/Configuration.hpp>
@@ -47,5 +45,3 @@ struct CmdVelocity : public Command<STATIC_UKF_COMMAND_VECTOR_SIZE, TYPE>
 };
 
 } // namespace srs
-
-#endif // CMDVELOCITY_HPP_

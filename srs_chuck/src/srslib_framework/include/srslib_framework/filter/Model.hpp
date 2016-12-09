@@ -3,30 +3,26 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef MODEL_HPP_
-#define MODEL_HPP_
+#pragma once
 
 #include <opencv2/opencv.hpp>
 
 #include <srslib_framework/math/Ocv2Base.hpp>
-#include <srslib_framework/platform/Object.hpp>
 
 namespace srs {
 
 template<unsigned int STATE_SIZE, int TYPE = CV_64F>
-class Model : public Object
+class Model
 {
 public:
     typedef typename Ocv2Base<TYPE>::BaseType BaseType;
 
-    Model(BaseType noiseValue = BaseType(1)) :
-            Object()
+    Model(BaseType noiseValue = BaseType(1))
     {
         setNoiseMatrix(cv::Mat::eye(STATE_SIZE, STATE_SIZE, TYPE) * noiseValue);
     }
 
-    Model(cv::Mat noiseMatrix) :
-            Object()
+    Model(cv::Mat noiseMatrix)
     {
         setNoiseMatrix(noiseMatrix);
     }
@@ -50,5 +46,3 @@ private:
 };
 
 } // namespace srs
-
-#endif // MODEL_HPP_

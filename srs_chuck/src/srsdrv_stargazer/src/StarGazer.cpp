@@ -5,9 +5,7 @@
  */
 
 #include <StarGazer.h>
-#include <srslib_framework/io/SerialIO.hpp>
-#include <srslib_framework/platform/Thread.hpp>
-#include <srslib_framework/robotics/Pose.hpp>
+
 #include <string>
 #include <iostream>
 
@@ -15,7 +13,12 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <yaml-cpp/yaml.h>
 
-#include <srslib_framework/MsgPose.h>
+#include <srslib_framework/Pose.h>
+
+#include <srslib_framework/io/SerialIO.hpp>
+#include <srslib_framework/platform/Thread.hpp>
+#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs
 {
@@ -28,7 +31,7 @@ namespace srs
 
 StarGazer::StarGazer( const std::string& strNodeName, const std::string& strSerialPort, const std::string& strApsTopic ) :
 	m_rosNodeHandle( strNodeName ),
-    m_rosApsPublisher(m_rosNodeHandle.advertise<srslib_framework::MsgPose>(strApsTopic, 1000)),
+    m_rosApsPublisher(m_rosNodeHandle.advertise<srslib_framework::Pose>(strApsTopic, 1000)),
 	m_pSerialIO( new SerialIO( "stargazer" ) ),
 	m_messageProcessor( m_pSerialIO ),
 	m_sleeper( REFRESH_RATE_HZ / 1000.0 ),
@@ -176,12 +179,12 @@ void StarGazer::OdometryCallback( int nTagId, float fX, float fY, float fZ, floa
         poseStampedTFToMsg(stampedPose, msg);
 
         // Create our internal message
-        srslib_framework::MsgPose message;
+        srslib_framework::Pose message;
 
         message.header = msg.header;
         message.x = msg.pose.position.x;
         message.y = msg.pose.position.y;
-        message.theta = AngleMath::rad2deg<double>(tf::getYaw(msg.pose.orientation));
+        message.theta = AngleMath::rad2Deg<double>(tf::getYaw(msg.pose.orientation));
 
         m_rosApsPublisher.publish(message);
     }
@@ -200,7 +203,7 @@ void StarGazer::LoadTransforms( )
 
 	if( !strTargetFrame.length( ) )
 	{
-		strTargetFrame = "/internal/state/map/grid";
+		strTargetFrame = ChuckTopics::internal::MAP_ROS_OCCUPANCY;
 	}
 
 	ROS_INFO_STREAM( "Stargazer: Target frame: " << strTargetFrame );

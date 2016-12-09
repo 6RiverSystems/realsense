@@ -5,8 +5,7 @@
  */
 
 #include <StarGazerPointTransformer.h>
-#include <srslib_framework/localization/Anchor.hpp>
-#include <srslib_framework/math/AngleMath.hpp>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
@@ -14,6 +13,10 @@
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 #include <yaml-cpp/yaml.h>
+
+#include <srsdrv_stargazer/Anchor.hpp>
+#include <srslib_framework/math/AngleMath.hpp>
+#include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 using namespace boost::accumulators;
 
@@ -51,7 +54,7 @@ auto constexpr DEFAULT_OFFSET_Y = -0.0697303969746;
 
 StarGazerPointTransformer::StarGazerPointTransformer( ) :
 	m_filter( 2.6, 5.0, 70 ),
-	m_strAnchorFrame( "/internal/state/map/grid" ),
+	m_strAnchorFrame(ChuckTopics::internal::MAP_ROS_OCCUPANCY),
 	m_strTargetFrame(),
 	m_mapTransforms( ),
 	m_stargazerTransform( tf::Quaternion::getIdentity( ), tf::Vector3( DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y, 0.0f ) ),
@@ -95,7 +98,7 @@ bool StarGazerPointTransformer::Load( const std::string& strTargetFrame,
 
 tf::Quaternion StarGazerPointTransformer::ConvertAngle( double fLeftHandAngleInDegrees ) const
 {
-	double dfLeftHandAngleInRadians = AngleMath::deg2rad( fLeftHandAngleInDegrees );
+	double dfLeftHandAngleInRadians = AngleMath::deg2Rad( fLeftHandAngleInDegrees );
 
 	// Transform to map coordinate system (right hand rule)
 	return tf::createQuaternionFromYaw( ConvertToRightHandRule( dfLeftHandAngleInRadians ) );
@@ -168,7 +171,7 @@ bool StarGazerPointTransformer::TransformPoint( int nTagId, double fX, double fY
 
 			double dfAnchorGlobal = tf::getYaw(anchorGlobal.getRotation( ) );
 			double dfTotalCameraRotation = tf::getYaw( totalCameraRotation );
-			double dfMapRotation = AngleMath::normalizeAngleRad( dfAnchorGlobal + dfTotalCameraRotation );
+			double dfMapRotation = AngleMath::normalizeRad<double>(dfAnchorGlobal + dfTotalCameraRotation);
 
 			tf::Quaternion chuckOrientation( tf::createQuaternionFromYaw( dfMapRotation ) );
 			pose = tf::Pose( chuckOrientation, chuckOrigin);
@@ -328,7 +331,8 @@ bool StarGazerPointTransformer::LoadAnchors( const std::string& strAnchorsFile )
 					int32_t anchorId = boost::lexical_cast < int32_t > (anchor.id);
 
 					tf::Vector3 origin( anchor.x, anchor.y, -anchor.z );
-					tf::Quaternion orientation = tf::createQuaternionFromYaw( AngleMath::normalizeDeg2Rad( anchor.orientation ) );
+					tf::Quaternion orientation = tf::createQuaternionFromYaw(
+					    AngleMath::normalizeDeg2Rad<double>(anchor.orientation));
 
 					tf::Transform transform( orientation, origin );
 

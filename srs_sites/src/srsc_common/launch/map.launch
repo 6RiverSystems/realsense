@@ -6,11 +6,13 @@
   *
 -->
 <launch>
-	<arg name="customer_site" value="$(optenv CUSTOMER_SITE empty)" />
+    <arg name="customer_site" value="$(optenv CUSTOMER_SITE empty)" />
     <arg name="customer_map" value="$(optenv CUSTOMER_MAP empty)" />
 
-	<node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_common)/../srsc_$(arg customer_site)/map/$(arg customer_map).yaml" output="screen">
-    	<remap from="map" to="/internal/state/map/grid"/>
-    	<remap from="map_metadata" to="/internal/state/map/info"/>
-    </node>
+    <include file="$(find srsnode_map_server)/launch/node.launch">
+        <arg name="map_stack" value="$(find srsc_common)/../srsc_$(arg customer_site)/map/$(arg customer_map).yaml" />
+        <remap from="map" to="/internal/state/map/ros_occupancy"/>
+        <remap from="map_metadata" to="/internal/state/map/ros_metadata"/>
+    </include>
+
 </launch>

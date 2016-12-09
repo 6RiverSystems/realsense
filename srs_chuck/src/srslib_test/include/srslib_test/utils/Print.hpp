@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef PRINT_HPP_
-#define PRINT_HPP_
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -22,7 +21,7 @@ struct Print
     template<unsigned int PRECISION = 6, typename TYPE = double>
     static void print(cv::Mat matrix, string name = "")
     {
-        cout << printToString(matrix, name) << endl;
+        cout << printToString<PRECISION, TYPE>(matrix, name) << endl;
     }
 
     template<unsigned int PRECISION = 6, typename TYPE = double>
@@ -58,9 +57,45 @@ struct Print
 
         return output.str();
     }
+
+    template<unsigned int PRECISION = 9, typename TYPE = float>
+    static string printToString(TYPE* matrix,
+        unsigned int columns, unsigned int rows,
+        TYPE threshold = 1e10)
+    {
+        ostringstream output;
+
+        output << setw(PRECISION + 1) << "  ";
+        for (int col = 0; col < columns; ++col)
+        {
+            output << setw(PRECISION + 1) << col;
+        }
+
+        output << endl;
+        for (int row = rows - 1; row >= 0; row--)
+        {
+            output << setw(PRECISION + 1) << row;
+            for (int col = 0; col < columns; ++col)
+            {
+                TYPE value = *(matrix + (row * columns) + col);
+
+                if (value < threshold)
+                {
+                    output << setfill(' ') << setw(PRECISION + 1) << scientific <<
+                        setprecision(PRECISION - 7) << value;
+                }
+                else
+                {
+                    output << setw(PRECISION + 1) << ".";
+                }
+            }
+
+            output << endl;
+        }
+
+        return output.str();
+    }
 };
 
 } // namespace test
 } // namespace srs
-
-#endif // PRINT_HPP_

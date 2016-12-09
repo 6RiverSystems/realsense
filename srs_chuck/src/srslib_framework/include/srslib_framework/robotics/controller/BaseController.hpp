@@ -16,7 +16,7 @@ using namespace std;
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Odometry.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
-#include <srslib_framework/robotics/RobotProfile.hpp>
+#include <srslib_framework/robotics/robot_profile/RobotProfile.hpp>
 
 namespace srs {
 
@@ -24,7 +24,7 @@ class BaseController
 {
 public:
     BaseController(string name) :
-        canceled_(false),
+        terminated_(false),
         executingCommand_(Velocity<>::ZERO),
         firstRun_(true),
         goal_(Pose<>::ZERO),
@@ -38,12 +38,6 @@ public:
 
     virtual ~BaseController()
     {}
-
-    void cancel()
-    {
-        canceled_ = true;
-        goalReached_ = true;
-    }
 
     Velocity<> getExecutingCommand() const
     {
@@ -65,9 +59,9 @@ public:
         return name_;
     }
 
-    bool isCanceled() const
+    bool isTerminated() const
     {
-        return canceled_;
+        return terminated_;
     }
 
     bool isFirstRun() const
@@ -101,6 +95,13 @@ public:
     void step(double dT, Pose<> currentPose, Odometry<> currentOdometry);
     virtual void setRobotProfile(RobotProfile robotProfile) = 0;
 
+    void terminate()
+    {
+        terminated_ = true;
+
+        ROS_DEBUG_STREAM_NAMED("base_controller", name_ << " terminated");
+    }
+
 protected:
     virtual void calculateLanding(Pose<> goal)
     {}
@@ -124,7 +125,7 @@ protected:
     vector<Pose<>> goalLanding_;
 
 private:
-    bool canceled_;
+    bool terminated_;
 
     Velocity<> executingCommand_;
 

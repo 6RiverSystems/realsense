@@ -1,6 +1,4 @@
-GlobalPlanner:
-  allow_unknown: false
-  use_dijkstra: true
-  use_quadratic: true
-  use_grid_path: false
-  default_tolerance: 0.5
+allow_unknown: false
+use_quadratic: true
+use_grid_path: true
+neutral_cost: 50

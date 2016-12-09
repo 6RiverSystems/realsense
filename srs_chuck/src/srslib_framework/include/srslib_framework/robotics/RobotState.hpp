@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROBOTSTATE_HPP_
-#define ROBOTSTATE_HPP_
+#pragma once
 
 namespace srs {
 
@@ -59,5 +58,3 @@ struct RobotState
 };
 
 } // namespace srs
-
-#endif // ROBOTSTATE_HPP_

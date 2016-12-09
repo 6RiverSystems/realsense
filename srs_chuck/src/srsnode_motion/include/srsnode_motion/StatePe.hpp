@@ -3,14 +3,12 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef STATEPE_HPP_
-#define STATEPE_HPP_
+#pragma once
 
 #include <opencv2/opencv.hpp>
 
 #include <srslib_framework/filter/FilterState.hpp>
 #include <srslib_framework/math/Ocv2Base.hpp>
-#include <srslib_framework/platform/Object.hpp>
 
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
@@ -105,5 +103,3 @@ struct StatePe : public FilterState<STATIC_UKF_STATE_VECTOR_SIZE, TYPE>
 };
 
 } // namespace srs
-
-#endif // STATEPE_HPP_

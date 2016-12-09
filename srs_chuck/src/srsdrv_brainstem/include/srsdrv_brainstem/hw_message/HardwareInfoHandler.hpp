@@ -9,11 +9,11 @@
 using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
-#include <srsdrv_brainstem/hw_message/BrainstemMessageHandler.hpp>
+#include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
 
 namespace srs {
 
-class HardwareInfoHandler : public BrainstemMessageHandler
+class HardwareInfoHandler : public HardwareMessageHandler
 {
 public:
     static constexpr char HARDWARE_INFO_KEY = static_cast<char>(BRAIN_STEM_MSG::HARDWARE_INFO);
@@ -28,12 +28,12 @@ public:
     void receiveData(ros::Time currentTime, vector<char>& binaryData);
 
 private:
-    BRAINSTEM_MESSAGE_BEGIN(HardwareInfoData)
+    HW_MESSAGE_BEGIN(MsgHardwareInfo)
         uint8_t cmd;
         uint16_t uniqueId[8];
         uint8_t chassisGeneration;
         uint8_t brainstemHwVersion;
-    BRAINSTEM_MESSAGE_END
+    HW_MESSAGE_END
 
     void publishHardwareInfo();
 

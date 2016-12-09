@@ -25,7 +25,7 @@ const string SensorFrameHandler::TOPIC_SENSOR_FRAME = "/internal/sensors/sensor_
 // Public methods
 
 SensorFrameHandler::SensorFrameHandler() :
-    BrainstemMessageHandler(SENSOR_FRAME_KEY),
+    HardwareMessageHandler(SENSOR_FRAME_KEY),
     lastHwSensorFrameTime_(0),
     lastRosSensorFrameTime_(ros::Time::now()),
     currentOdometry_(Odometry<>::ZERO)
@@ -73,7 +73,7 @@ int32_t calculateOdometryDiff(uint32_t current, uint32_t& last)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SensorFrameHandler::receiveData(ros::Time currentTime, vector<char>& buffer)
 {
-    SensorFrameData* sensorData = reinterpret_cast<SensorFrameData*>(buffer.data());
+    MsgSensorFrame* sensorData = reinterpret_cast<MsgSensorFrame*>(buffer.data());
 
     ros::Time internalTime = currentTime;
     bool timeSliceExpired = TimeMath::isTimeElapsed(OUT_OF_SYNC_TIMEOUT,
@@ -125,9 +125,9 @@ void SensorFrameHandler::receiveData(ros::Time currentTime, vector<char>& buffer
     double currentTimeSec = internalTime.toSec();
     currentOdometry_ = Odometry<>(Velocity<>(currentTimeSec, odometryVelocity));
     currentImu_ = Imu<>(currentTimeSec,
-        AngleMath::deg2rad<double>(sensorData->yaw),
-        AngleMath::deg2rad<double>(sensorData->pitch),
-        AngleMath::deg2rad<double>(sensorData->roll),
+        AngleMath::deg2Rad<double>(sensorData->yaw),
+        AngleMath::deg2Rad<double>(sensorData->pitch),
+        AngleMath::deg2Rad<double>(sensorData->roll),
         sensorData->yawRot,
         sensorData->pitchRot,
         sensorData->rollRot);

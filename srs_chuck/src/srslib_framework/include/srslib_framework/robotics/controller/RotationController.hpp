@@ -41,12 +41,12 @@ public:
 protected:
     void stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
     {
-        // The rotation controller ignores the canceled signal
+        // The rotation controller ignores the termination signal
         // so that the rotation can be completed
 
         // Calculate the difference between what has been requested and
         // the current pose
-        double error = AngleMath::normalizeAngleRad<double>(getGoal().theta - currentPose.theta);
+        double error = AngleMath::normalizeRad<double>(getGoal().theta - currentPose.theta);
 
         if (!isRobotMoving() &&
             AngleMath::equalRad<double>(getGoal().theta, currentPose.theta,

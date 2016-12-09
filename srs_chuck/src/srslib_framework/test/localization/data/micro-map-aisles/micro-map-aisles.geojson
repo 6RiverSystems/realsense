@@ -1,0 +1,131 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "object": "map",
+                "version": "1",
+                "origin": [0.0, 0.0, 0.0],
+                "resolution": 0.100,
+                "width": 0.300,
+                "height": 0.300
+            }
+        },
+        {
+           "type": "FeatureCollection",
+           "features": [
+               {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "MultiPoint",
+                      "coordinates": [[0.000, 0.000], [0.100, 0.100]]
+                  },
+                  "properties": {
+                       "object": "obstacle",
+                       "envelope_size": 0.100,
+                       "envelope_cost": 12
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "MultiPoint",
+                      "coordinates": [[0.200, 0.200], [0.200, 0.200]]
+                  },
+                  "properties": {
+                       "object": "cost_area",
+                       "cost": 28
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "Point",
+                      "coordinates": [0.200, 0.000]
+                  },
+                  "properties": {
+                       "object": "weighted_area",
+                       "north": "max",
+                       "east": 77,
+                       "south": 22,
+                       "west": 11
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "id": "2",
+                  "geometry": {
+                      "type": "Point",
+                      "coordinates": [0.000, 0.000, 0.0]
+                  },
+                  "properties": {
+                       "object": "vertex",
+                       "name" : "SamInduct",
+                       "labels": ["induct", "packout"],
+                       "mfp_ids": ["sam"],
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "id": "3",
+                  "geometry": {
+                      "type": "Point",
+                      "coordinates": [0.200, 0.200]
+                  },
+                  "properties": {
+                       "object": "vertex",
+                       "name" : "F01T"
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "id": "4",
+                  "geometry": {
+                      "type": "Point",
+                      "coordinates": [0.000, 0.200]
+                  },
+                  "properties": {
+                       "object": "vertex",
+                       "name" : "A01T"
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "id": "5",
+                  "geometry": "null",
+                  "properties": {
+                       "object": "edge",
+                       "name": "F01T_SamInduct",
+                       "from": "F01T",
+                       "to": "SamInduct",
+                       "direction": "none"
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "id": "6",
+                  "geometry": "null",
+                  "properties": {
+                       "object": "edge",
+                       "name": "F01T_A01T",
+                       "from": "F01T",
+                       "to": "A01T",
+                       "direction": "from_to"
+                   }
+               },
+               {
+                  "type": "Feature",
+                  "id": "7",
+                  "geometry": "null",
+                  "properties": {
+                       "object": "graph",
+                       "name": "graph1",
+                       "vertices": ["F01T", "A01T", "SamInduct"],
+                       "edges": ["F01T_SamInduct", "F01T_A01T"]
+                   }
+               }
+           ]
+       }
+   ]
+}

@@ -10,6 +10,6 @@ uint8 SOLUTION_ITEM_MOVE = 1
 uint8 SOLUTION_ITEM_ROTATE = 2
 
 uint8 action
-MsgPose fromPose
-MsgPose toPose
+srslib_framework/Pose fromPose
+srslib_framework/Pose toPose
 float32 cost

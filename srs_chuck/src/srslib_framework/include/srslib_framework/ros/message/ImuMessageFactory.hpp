@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef IMUMESSAGEFACTORY_HPP_
-#define IMUMESSAGEFACTORY_HPP_
+#pragma once
 
 #include <ros/ros.h>
 #include <srslib_framework/Imu.h>
@@ -22,17 +21,17 @@ struct ImuMessageFactory
      *
      * @return Imu generated from the specified Imu message
      */
-    static Imu<> msg2Imu(srslib_framework::Imu message)
+    static Imu<> msg2Imu(const srslib_framework::Imu& message)
     {
         Imu<> imu;
 
         imu.arrivalTime = message.header.stamp.toSec();
-        imu.yaw = AngleMath::deg2rad<double>(message.yaw);
-        imu.pitch = AngleMath::deg2rad<double>(message.pitch);
-        imu.roll = AngleMath::deg2rad<double>(message.roll);
-        imu.yawRot = AngleMath::deg2rad<double>(message.yawRot);
-        imu.pitchRot = AngleMath::deg2rad<double>(message.pitchRot);
-        imu.rollRot = AngleMath::deg2rad<double>(message.rollRot);
+        imu.yaw = AngleMath::deg2Rad<double>(message.yaw);
+        imu.pitch = AngleMath::deg2Rad<double>(message.pitch);
+        imu.roll = AngleMath::deg2Rad<double>(message.roll);
+        imu.yawRot = AngleMath::deg2Rad<double>(message.yawRot);
+        imu.pitchRot = AngleMath::deg2Rad<double>(message.pitchRot);
+        imu.rollRot = AngleMath::deg2Rad<double>(message.rollRot);
 
         return imu;
     }
@@ -44,9 +43,9 @@ struct ImuMessageFactory
      *
      * @return Imu generated from the specified ImuConstPtr message
      */
-    static Imu<> msg2Imu(srslib_framework::ImuConstPtr message)
+    static Imu<> msg2Imu(srslib_framework::Imu::ConstPtr message)
     {
-        return ImuMessageFactory::msg2Imu(*message);
+        return msg2Imu(*message);
     }
 
     /**
@@ -56,22 +55,20 @@ struct ImuMessageFactory
      *
      * @return Imu message generated from the specified Imu
      */
-    static srslib_framework::Imu imu2Msg(Imu<> imu)
+    static srslib_framework::Imu imu2Msg(const Imu<>& imu)
     {
         srslib_framework::Imu msgImu;
 
         msgImu.header.stamp = ros::Time() + ros::Duration(imu.arrivalTime);
-        msgImu.yaw = AngleMath::rad2deg<double>(imu.yaw);
-        msgImu.pitch = AngleMath::rad2deg<double>(imu.pitch);
-        msgImu.roll = AngleMath::rad2deg<double>(imu.roll);
-        msgImu.yawRot = AngleMath::rad2deg<double>(imu.yawRot);
-        msgImu.pitchRot = AngleMath::rad2deg<double>(imu.pitchRot);
-        msgImu.rollRot = AngleMath::rad2deg<double>(imu.rollRot);
+        msgImu.yaw = AngleMath::rad2Deg<double>(imu.yaw);
+        msgImu.pitch = AngleMath::rad2Deg<double>(imu.pitch);
+        msgImu.roll = AngleMath::rad2Deg<double>(imu.roll);
+        msgImu.yawRot = AngleMath::rad2Deg<double>(imu.yawRot);
+        msgImu.pitchRot = AngleMath::rad2Deg<double>(imu.pitchRot);
+        msgImu.rollRot = AngleMath::rad2Deg<double>(imu.rollRot);
 
         return msgImu;
     }
 };
 
 } // namespace srs
-
-#endif // IMUMESSAGEFACTORY_HPP_

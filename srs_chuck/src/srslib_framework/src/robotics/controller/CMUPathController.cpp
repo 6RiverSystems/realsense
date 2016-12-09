@@ -63,8 +63,8 @@ void CMUPathController::setTrajectory(Pose<> robotPose, Trajectory<> trajectory,
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CMUPathController::calculateLanding(Pose<> goal)
 {
-    goalLanding_ = PoseMath::pose2polygon(goal,
-        robot_.pathFollowGoalReachedDistance, 0.0,
+    goalLanding_ = PoseMath::pose2Polygon(goal,
+        (robot_.pathFollowLandingDepth / 2) + robot_.pathFollowGoalReachedDistance, 0.0,
         robot_.pathFollowLandingWidth, robot_.pathFollowLandingDepth);
 }
 
@@ -72,10 +72,8 @@ void CMUPathController::calculateLanding(Pose<> goal)
 void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<> currentOdometry)
 {
     // If the controller has received a cancel signal exit right away
-    if (isCanceled())
+    if (isTerminated())
     {
-        ROS_DEBUG_STREAM_NAMED("cmu_path_controller", "CMU Controller canceled");
-
         setGoalReached(true);
         return;
     }
@@ -155,7 +153,7 @@ void CMUPathController::stepController(double dT, Pose<> currentPose, Odometry<>
 
     // Calculate the angular portion of the command
     double slope = atan2(referencePose_.y - currentPose.y, referencePose_.x - currentPose.x);
-    double alpha = AngleMath::normalizeAngleRad<double>(slope - currentPose.theta);
+    double alpha = AngleMath::normalizeRad<double>(slope - currentPose.theta);
 
     double angular = 2 * sin(alpha) / lookAheadDistance_;
 

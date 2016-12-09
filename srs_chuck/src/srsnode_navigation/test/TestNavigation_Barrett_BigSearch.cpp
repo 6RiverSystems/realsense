@@ -9,7 +9,7 @@
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMap.hpp>
-#include <srslib_framework/platform/StopWatch.hpp>
+#include <srslib_framework/platform/timing/StopWatch.hpp>
 
 #include <srsnode_navigation/global_planner/AStarPotentials.hpp>
 using namespace srs;

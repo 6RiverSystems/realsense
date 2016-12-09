@@ -64,6 +64,11 @@ public:
         }
     }
 
+    std::string getId()
+    {
+        return timingData_.getId();
+    }
+
 private:
     StopWatch stopWatch_;
     TimingData timingData_;

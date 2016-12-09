@@ -41,16 +41,15 @@ public:
      */
     void stopSample()
     {
-        if (tdr_ != nullptr && !stopped_)
+        if (tdr_ != nullptr)
         {
             tdr_->stopSample();
-            stopped_ = true;
+            tdr_ = nullptr;
         }
     };
 
 private:
     TimingDataRecorder* tdr_ = nullptr;
-    bool stopped_ = false;
 };
 
 } // namespace srs

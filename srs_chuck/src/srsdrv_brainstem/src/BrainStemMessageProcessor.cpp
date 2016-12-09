@@ -46,6 +46,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
     hwMessageHandlers_[hardwareInfoHandler_.getKey()] = &hardwareInfoHandler_;
     hwMessageHandlers_[operationalStateHandler_.getKey()] = &operationalStateHandler_;
     hwMessageHandlers_[powerStateHandler_.getKey()] = &powerStateHandler_;
+    hwMessageHandlers_[buttonPressedHandler_.getKey()] = &buttonPressedHandler_;
     hwMessageHandlers_[messageHandler_.getKey()] = &messageHandler_;
 }
 
@@ -89,11 +90,12 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 		}
 		else
 		{
-			if (eCommand != BRAIN_STEM_MSG::SYSTEM_VOLTAGE  &&
+			if (isSetupComplete() &&
+				eCommand != BRAIN_STEM_MSG::SYSTEM_VOLTAGE  &&
 				eCommand != BRAIN_STEM_MSG::SENSOR_FRAME)
 			{
 			    ROS_ERROR_STREAM( "Unknown message from brainstem: " <<
-			        static_cast<char>(eCommand) << ", data: " << ToHex(buffer));
+			        static_cast<int>(eCommand) << ", data: " << ToHex(buffer));
 			}
 		}
     }
@@ -211,7 +213,15 @@ bool BrainStemMessageProcessor::isSetupComplete() const
 
 void BrainStemMessageProcessor::checkSetupComplete()
 {
-	connectedChannel_.publish(isSetupComplete());
+	bool setupComplete = isSetupComplete();
+	if (setupComplete)
+	{
+		ROS_INFO( "Setup complete (received hardware info and operational state message." );
+
+		m_pIO->SetSynced(true);
+	}
+
+	connectedChannel_.publish(setupComplete);
 }
 
 void BrainStemMessageProcessor::OnResetBatteryHours( )

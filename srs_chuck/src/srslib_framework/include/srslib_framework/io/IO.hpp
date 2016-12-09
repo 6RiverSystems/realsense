@@ -53,6 +53,9 @@ public:
 	*/
 	virtual void Write( const std::vector<char>& buffer ) = 0;
 
+
+	virtual void SetSynced(bool synced) = 0;
+
 };
 
 } /* namespace srs */

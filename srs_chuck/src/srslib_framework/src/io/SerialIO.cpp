@@ -127,6 +127,11 @@ void SerialIO::Close( )
 // Serial IO Configuration
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+void SerialIO::SetSynced(bool synced)
+{
+	m_isSynced = synced;
+}
+
 void SerialIO::SetRetryTimeout( float fRetryTimeout )
 {
 	m_fRetryTimeout = fRetryTimeout;
@@ -456,8 +461,6 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 //								ToHex( std::vector<char>( message_.begin( ), message_.begin( ) + messageSize_ ) ) );
 
 							m_readCallback(message_);
-
-							m_isSynced = true;
 
 							message_ = std::vector<char>();
 						}

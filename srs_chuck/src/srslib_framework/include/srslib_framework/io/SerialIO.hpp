@@ -47,6 +47,8 @@ public:
 
 // Serial IO Configuration
 
+	void SetSynced(bool synced);
+
 	void SetRetryTimeout( float fRetryTimeout );
 
 	void EnableCRC( bool bEnableCRC );

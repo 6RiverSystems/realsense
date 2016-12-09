@@ -672,9 +672,9 @@
 					"properties": {
 						"object": "labeled_area",
 						"label": "ws1",
-						"notes": [
-							"warning_sound"
-						]
+						"notes": {
+							"sound": "warning"
+						}
 					}
 				},
 				{
@@ -690,9 +690,9 @@
 					"properties": {
 						"object": "labeled_area",
 						"label": "ws2",
-						"notes": [
-							"warning_sound"
-						]
+						"notes": {
+							"sound": "warning"
+						}
 					}
 				},
 				{
@@ -708,9 +708,9 @@
 					"properties": {
 						"object": "labeled_area",
 						"label": "ws3",
-						"notes": [
-							"warning_sound"
-						]
+						"notes": {
+							"sound": "warning"
+						}
 					}
 				}
 			]

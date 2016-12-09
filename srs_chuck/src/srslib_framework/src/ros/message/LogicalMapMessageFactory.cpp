@@ -19,7 +19,7 @@ void LogicalMapMessageFactory::areas2Vector(const LogicalMap* map,
         msgArea.riCells = area.second.ri;
         msgArea.cfCells = area.second.cf;
         msgArea.rfCells = area.second.rf;
-        msgArea.note = note2Msg(area.second.note);
+        msgArea.notes = notes2Msg(area.second.notes);
 
         areas.push_back(msgArea);
     }
@@ -61,26 +61,33 @@ void LogicalMapMessageFactory::map2Vector(const LogicalMap* map,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-MapNote LogicalMapMessageFactory::msg2Note(srslib_framework::MapNote message)
+shared_ptr<MapNotes> LogicalMapMessageFactory::msg2Notes(srslib_framework::MapNotes message)
 {
-    MapNote note;
+    shared_ptr<MapNotes> notes = shared_ptr<MapNotes>(new MapNotes());
 
-    if (message.warning_sound)
+    for (auto note : message.notes)
     {
-        note.join(MapNote::WARNING_SOUND);
+        notes->add(note.note, note.value);
     }
 
-    return note;
+    return notes;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-srslib_framework::MapNote LogicalMapMessageFactory::note2Msg(MapNote note)
+srslib_framework::MapNotes LogicalMapMessageFactory::notes2Msg(shared_ptr<MapNotes> notes)
 {
-    srslib_framework::MapNote msgNote;
+    srslib_framework::MapNotes msgNotes;
 
-    msgNote.warning_sound = note.warning_sound();
+    for (auto note : *notes)
+    {
+        srslib_framework::MapNote msgSingleNote;
+        msgSingleNote.note = note.second->getTypeString();
+        msgSingleNote.value = note.second->getValueString();
 
-    return msgNote;
+        msgNotes.notes.push_back(msgSingleNote);
+    }
+
+    return msgNotes;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,9 +96,9 @@ void LogicalMapMessageFactory::vector2Areas(const vector<srslib_framework::Logic
 {
     for (auto area : areas)
     {
-        MapNote note = msg2Note(area.note);
+        shared_ptr<MapNotes> notes = msg2Notes(area.notes);
         logical->addLabeledArea(area.ciCells, area.riCells, area.cfCells, area.rfCells,
-            area.label, note);
+            area.label, notes);
     }
 }
 

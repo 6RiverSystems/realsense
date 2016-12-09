@@ -9,26 +9,34 @@
 #include <sstream>
 using namespace std;
 
-#include <srslib_framework/localization/map/mapnote/MapNote2.hpp>
+#include <srslib_framework/localization/map/mapnote/MapNote.hpp>
 
 namespace srs {
 
-class MaxVelocity : public MapNote2
+class MaxVelocity : public MapNote
 {
 public:
-    static const MaxVelocity MAX_VELOCITY;
-
     MaxVelocity(float maxVelocity) :
-        MapNote2(MapNote2::MAX_VELOCITY, true),
+        MapNote(MapNote::MAX_VELOCITY),
         maxVelocity_(maxVelocity)
+    {}
+
+    MaxVelocity(string maxVelocity) :
+        MapNote(MapNote::MAX_VELOCITY),
+        maxVelocity_(stof(maxVelocity))
     {}
 
     virtual ~MaxVelocity()
     {}
 
-    friend ostream& operator<<(ostream& stream, const MaxVelocity& note)
+    string getValueString() const
     {
-        return stream << ", maxV: " << note.maxVelocity_;
+        return to_string(maxVelocity_);
+    }
+
+    ostream& toString(ostream& stream) const
+    {
+        return MapNote::toString(stream) << ", mV: " << maxVelocity_;
     }
 
     float getMaxVelocity() const

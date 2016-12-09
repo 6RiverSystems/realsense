@@ -49,7 +49,7 @@ LogicalMap::LogicalMap(LogicalMetadata metadata) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::addLabeledArea(unsigned int ciCells, unsigned int riCells,
     unsigned int cfCells, unsigned int rfCells,
-    string label, MapNote note)
+    string label, shared_ptr<MapNotes> notes)
 {
     LabeledArea area;
     area.ci = ciCells;
@@ -57,7 +57,7 @@ void LogicalMap::addLabeledArea(unsigned int ciCells, unsigned int riCells,
     area.cf = cfCells;
     area.rf = rfCells;
     area.label = label;
-    area.note = note;
+    area.notes = notes;
 
     labeledAreas_[label] = area;
 }

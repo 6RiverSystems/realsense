@@ -14,12 +14,11 @@ set(${PROJECT_NAME}_SOURCES
 
     src/localization/map/BaseMap.cpp
     src/localization/map/MapAdapter.cpp
-    src/localization/map/MapNote.cpp
     src/localization/map/MapStack.cpp
     src/localization/map/MapStackFactory.cpp
-    src/localization/map/mapnote/MapNote2.cpp
+    src/localization/map/mapnote/MapNote.cpp
     src/localization/map/mapnote/MapNotes.cpp
-    src/localization/map/mapnote/WarningSound.cpp
+    src/localization/map/mapnote/Sound.cpp
     src/localization/map/logical/LogicalMap.cpp
     src/localization/map/logical/LogicalMapFactory.cpp
     src/localization/map/occupancy/OccupancyMap.cpp
@@ -53,6 +52,7 @@ set(${PROJECT_NAME}_MSGS
     LogicalMap.msg
     LogicalMetadata.msg
     MapNote.msg
+    MapNotes.msg
     MapStack.msg
     MsgHardwareInfo.msg
     MsgOperationalState.msg
@@ -87,7 +87,7 @@ set(TEST_SOURCES_FILTER
 
 set(TEST_SOURCES_LOCALIZATION
     test/localization/Test_Empty_BasicRead.cpp
-    test/localization/Test_MapNote_Basic.cpp
+    test/localization/Test_MapNotes_Basic.cpp
     test/localization/Test_MicroMap_BasicRead.cpp
     test/localization/Test_MicroMap_MapNote.cpp
     test/localization/Test_MicroMap_WithAisles.cpp

@@ -4,12 +4,4 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 
-string label
-
-uint16 ciCells
-uint16 riCells
-
-uint16 cfCells
-uint16 rfCells
-
-srslib_framework/MapNotes notes
+srslib_framework/MapNote[] notes

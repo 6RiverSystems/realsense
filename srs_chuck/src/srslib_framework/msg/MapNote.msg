@@ -4,4 +4,5 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 
-bool warning_sound
+string note
+string value

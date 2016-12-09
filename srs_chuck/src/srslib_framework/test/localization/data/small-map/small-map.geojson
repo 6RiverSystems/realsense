@@ -28,9 +28,9 @@
 					"properties": {
 						"object": "labeled_area",
 						"label": "test1",
-						"notes": [
-							"warning_sound"
-						]
+						"notes": {
+							"sound": "warning"
+						}
 					}
 				},
 				{

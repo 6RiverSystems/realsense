@@ -29,7 +29,8 @@ layerWarningSound = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/sr
     RESOLUTION, ORIGIN);
 showMap(layerWarningSound, 'Warning sound');
 
-layerWarningSound = convertToLabeledArea(layerWarningSound, 'all', 'ws', {'warning_sound'});
+layerWarningSound = convertToLabeledArea(layerWarningSound, 'all', 'ws', ...
+        struct('sound', 'warning', 'max_velocity', 0.3));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One-way layer

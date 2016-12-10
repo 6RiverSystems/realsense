@@ -16,16 +16,22 @@ using namespace std;
 
 namespace srs {
 
-class MessageHandler : public HardwareMessageHandler
+class LogHandler : public HardwareMessageHandler
 {
 public:
 
-    MessageHandler();
+    LogHandler();
 
-    virtual ~MessageHandler() {}
+    virtual ~LogHandler() {}
 
     void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
+private:
+
+    HW_MESSAGE_BEGIN(LogData)
+        uint8_t cmd;
+    	uint8_t level;
+    HW_MESSAGE_END
 };
 
 } // namespace srs

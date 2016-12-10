@@ -13,7 +13,7 @@ set(${PROJECT_NAME}_SOURCES
     src/BrainStem.cpp
     src/BrainStemEmulator.cpp
 
-    src/hw_message/MessageHandler.cpp
+    src/hw_message/LogHandler.cpp
     src/hw_message/ButtonPressedHandler.cpp
     src/hw_message/OdometryRpmHandler.cpp
     src/hw_message/HardwareInfoHandler.cpp

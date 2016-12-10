@@ -24,7 +24,7 @@ using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
 
-#include <srsdrv_brainstem/hw_message/MessageHandler.hpp>
+#include <srsdrv_brainstem/hw_message/LogHandler.hpp>
 #include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
 #include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
 #include <srsdrv_brainstem/hw_message/OperationalStateHandler.hpp>
@@ -127,7 +127,7 @@ private:
     ChannelBrainstemOdometryRpm			odometryRpmChannel_;
     ChannelBrainstemButtonPressed		buttonPressedChannel_;
 
-    MessageHandler						messageHandler_;
+    LogHandler							logHandler_;
     HardwareInfoHandler					hardwareInfoHandler_;
     OperationalStateHandler				operationalStateHandler_;
     PowerStateHandler					powerStateHandler_;

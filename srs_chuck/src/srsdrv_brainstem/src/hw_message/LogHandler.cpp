@@ -1,28 +1,42 @@
-#include <srsdrv_brainstem/hw_message/MessageHandler.hpp>
+#include "../../include/srsdrv_brainstem/hw_message/LogHandler.hpp"
 
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-MessageHandler::MessageHandler() :
-    HardwareMessageHandler(BRAIN_STEM_MSG::MESSAGE)
+LogHandler::LogHandler() :
+    HardwareMessageHandler(BRAIN_STEM_MSG::LOG)
 {
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MessageHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
+void LogHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
 {
-	std::string strMessage = msg.readString();
+	LogData log = msg.read<LogData>();
 
-	if( strMessage.find( "<MSG Error" ) != -1 )
+	std::string message = msg.readString();
+
+	switch (log.level)
 	{
-		ROS_ERROR_NAMED( "firmware", "Fatal Error: %s", strMessage.c_str( ) );
-	}
-	else
-	{
-		ROS_INFO_STREAM_NAMED( "firmware", "Message: <" << strMessage << ">" );
+		case 0:
+		{
+			ROS_DEBUG_NAMED( "firmware", "Firmware: %s", message.c_str( ) );
+		}
+		break;
+
+		case 1:
+		{
+			ROS_INFO_NAMED( "firmware", "Firmware: %s", message.c_str( ) );
+		}
+		break;
+
+		case 2:
+		{
+			ROS_ERROR_NAMED( "firmware", "Firmware: %s", message.c_str( ) );
+		}
+		break;
 	}
 }
 

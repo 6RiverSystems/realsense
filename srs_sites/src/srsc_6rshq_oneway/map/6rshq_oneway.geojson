@@ -673,8 +673,8 @@
 						"object": "labeled_area",
 						"label": "ws1",
 						"notes": {
-							"sound": "warning",
-							"max_velocity": 0.3
+							"play_sound": "warning",
+							"set_max_velocity": 0.3
 						}
 					}
 				},
@@ -692,8 +692,8 @@
 						"object": "labeled_area",
 						"label": "ws2",
 						"notes": {
-							"sound": "warning",
-							"max_velocity": 0.3
+							"play_sound": "warning",
+							"set_max_velocity": 0.3
 						}
 					}
 				},
@@ -711,8 +711,8 @@
 						"object": "labeled_area",
 						"label": "ws3",
 						"notes": {
-							"sound": "warning",
-							"max_velocity": 0.3
+							"play_sound": "warning",
+							"set_max_velocity": 0.3
 						}
 					}
 				},

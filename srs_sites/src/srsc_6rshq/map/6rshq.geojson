@@ -673,7 +673,7 @@
 						"object": "labeled_area",
 						"label": "ws1",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -691,7 +691,7 @@
 						"object": "labeled_area",
 						"label": "ws2",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -709,7 +709,7 @@
 						"object": "labeled_area",
 						"label": "ws3",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				}

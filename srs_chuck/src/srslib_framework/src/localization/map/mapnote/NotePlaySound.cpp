@@ -1,12 +1,12 @@
-#include <srslib_framework/localization/map/mapnote/Sound.hpp>
+#include <srslib_framework/localization/map/mapnote/NotePlaySound.hpp>
 
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Constant declaration
 
-const string Sound::SOUND_NONE = "none";
-const string Sound::SOUND_WARNING = "warning";
+const string NotePlaySound::SOUND_NONE = "none";
+const string NotePlaySound::SOUND_WARNING = "warning";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
@@ -15,15 +15,15 @@ const string Sound::SOUND_WARNING = "warning";
 // Private methods
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-unordered_map<string, int> Sound::STRING_2_SOUND_TYPE = {
-    {Sound::SOUND_NONE, Sound::NONE},
-    {Sound::SOUND_WARNING, Sound::WARNING}
+unordered_map<string, int> NotePlaySound::STRING_2_SOUND_TYPE = {
+    {NotePlaySound::SOUND_NONE, NotePlaySound::NONE},
+    {NotePlaySound::SOUND_WARNING, NotePlaySound::WARNING}
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-unordered_map<int, string> Sound::SOUND_TYPE_2_STRING = {
-    {Sound::NONE, Sound::SOUND_NONE},
-    {Sound::WARNING, Sound::SOUND_WARNING}
+unordered_map<int, string> NotePlaySound::SOUND_TYPE_2_STRING = {
+    {NotePlaySound::NONE, NotePlaySound::SOUND_NONE},
+    {NotePlaySound::WARNING, NotePlaySound::SOUND_WARNING}
 };
 
 } // namespace srs

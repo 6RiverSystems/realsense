@@ -33,7 +33,7 @@ TEST(Test_MicroMap, MapNotes)
     ASSERT_EQ(2, area1.ri) << "The 'test1' area initial Y coordinate is not as expected";
     ASSERT_EQ(2, area1.cf) << "The 'test1' area final X coordinate is not as expected";
     ASSERT_EQ(2, area1.rf) << "The 'test1' area final Y coordinate is not as expected";
-    ASSERT_TRUE(area1.notes->has(MapNote::SOUND)) << "The map notes doesn't contain SOUND";
+    ASSERT_TRUE(area1.notes->has(MapNote::PLAY_SOUND)) << "The map notes doesn't contain PLAY_SOUND";
     ASSERT_FALSE(area1.notes->has(MapNote::NONE)) << "The map notes does contain NONE";
 
     ASSERT_EQ(1, areas.count("test2")) << "The 'test2' area was not defined";
@@ -43,7 +43,7 @@ TEST(Test_MicroMap, MapNotes)
     ASSERT_EQ(0, area2.ri) << "The 'test2' area initial Y coordinate is not as expected";
     ASSERT_EQ(2, area2.cf) << "The 'test2' area final X coordinate is not as expected";
     ASSERT_EQ(1, area2.rf) << "The 'test2' area final Y coordinate is not as expected";
-    ASSERT_TRUE(area2.notes->has(MapNote::SOUND)) << "The map notes doesn't contain SOUND";
-    ASSERT_TRUE(area2.notes->has(MapNote::MAX_VELOCITY)) << "The map notes doesn't contain MAX_VELOCITY";
+    ASSERT_TRUE(area2.notes->has(MapNote::PLAY_SOUND)) << "The map notes doesn't contain PLAY_SOUND";
+    ASSERT_TRUE(area2.notes->has(MapNote::SET_MAX_VELOCITY)) << "The map notes doesn't contain SET_MAX_VELOCITY";
     ASSERT_FALSE(area2.notes->has(MapNote::NONE)) << "The map notes does contain NONE";
 }

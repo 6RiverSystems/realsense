@@ -22,7 +22,7 @@
 
     <!-- Map server -->
     <include file="$(find srsnode_map_server)/launch/node.launch">
-        <arg name="map_stack" value="$(find srsc_hbc)/map/hbc.yaml" />
+        <arg name="map_stack" value="$(find srsc_6rshq_oneway)/map/6rshq_oneway.yaml" />
     </include>
 
 <!--

@@ -13,20 +13,20 @@ using namespace std;
 
 namespace srs {
 
-class MaxVelocity : public MapNote
+class NoteSetMaxVelocity : public MapNote
 {
 public:
-    MaxVelocity(float maxVelocity) :
-        MapNote(MapNote::MAX_VELOCITY),
+    NoteSetMaxVelocity(float maxVelocity) :
+        MapNote(MapNote::SET_MAX_VELOCITY),
         maxVelocity_(maxVelocity)
     {}
 
-    MaxVelocity(string maxVelocity) :
-        MapNote(MapNote::MAX_VELOCITY),
+    NoteSetMaxVelocity(string maxVelocity) :
+        MapNote(MapNote::SET_MAX_VELOCITY),
         maxVelocity_(stof(maxVelocity))
     {}
 
-    virtual ~MaxVelocity()
+    virtual ~NoteSetMaxVelocity()
     {}
 
     string getValueString() const

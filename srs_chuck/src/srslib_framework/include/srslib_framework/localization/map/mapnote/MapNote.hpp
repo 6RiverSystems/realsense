@@ -20,8 +20,8 @@ class MapNote
 public:
     enum NoteTypeEnum {
         NONE = 0,
-        MAX_VELOCITY,
-        SOUND
+        SET_MAX_VELOCITY,
+        PLAY_SOUND
     };
 
     using BaseMapNoteType = shared_ptr<MapNote>;
@@ -35,6 +35,11 @@ public:
 
     virtual ~MapNote()
     {}
+
+    virtual bool equals(const MapNote& rhs) const
+    {
+        return noteType_ == rhs.noteType_;
+    }
 
     NoteTypeEnum getType() const
     {
@@ -63,9 +68,9 @@ public:
 private:
     friend class MapNotes;
 
-    static const string NOTE_MAX_VELOCITY;
+    static const string NOTE_SET_MAX_VELOCITY;
     static const string NOTE_NONE;
-    static const string NOTE_SOUND;
+    static const string NOTE_PLAY_SOUND;
 
     static unordered_map<int, string> NOTE_TYPE_2_STRING;
 

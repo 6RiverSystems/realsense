@@ -25,7 +25,7 @@
                         "object": "labeled_area",
                         "label": "test1",
                         "notes": {
-                            "sound": "warning"
+                            "play_sound": "warning"
                         }
                     }
                 },
@@ -39,8 +39,8 @@
                         "object": "labeled_area",
                         "label": "test2",
                         "notes": {
-                            "sound": "warning",
-                            "max_velocity": 12
+                            "play_sound": "warning",
+                            "set_max_velocity": 12
                         }
                     }
                 }

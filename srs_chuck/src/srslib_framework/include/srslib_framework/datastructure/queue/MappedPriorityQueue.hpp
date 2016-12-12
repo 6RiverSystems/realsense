@@ -15,13 +15,9 @@
 #include <list>
 using namespace std;
 
+#include <srslib_framework/platform/Template.hpp>
+
 namespace srs {
-
-template<typename T>
-T * ptr(T & obj) { return &obj; }
-
-template<typename T>
-T * ptr(T * obj) { return obj; }
 
 template<typename TYPE,
     typename PRIORITY = int,
@@ -125,7 +121,7 @@ private:
 
         friend ostream& operator<<(ostream& stream, const Node& node)
         {
-            return stream << "[" << node.priority << "] " << *ptr(node.info);
+            return stream << "[" << node.priority << "] " << *Template::ptr(node.info);
         }
     };
 

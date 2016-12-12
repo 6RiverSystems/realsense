@@ -13,7 +13,7 @@ using namespace std;
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
-#include <srslib_framework/platform/StopWatch.hpp>
+#include <srslib_framework/platform/timing/StopWatch.hpp>
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>

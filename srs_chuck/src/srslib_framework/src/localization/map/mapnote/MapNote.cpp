@@ -2,17 +2,17 @@
 
 #include <memory>
 
-#include <srslib_framework/localization/map/mapnote/Sound.hpp>
-#include <srslib_framework/localization/map/mapnote/MaxVelocity.hpp>
+#include <srslib_framework/localization/map/mapnote/NotePlaySound.hpp>
+#include <srslib_framework/localization/map/mapnote/NoteSetMaxVelocity.hpp>
 
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Constant declaration
 
-const string MapNote::NOTE_MAX_VELOCITY = "max_velocity";
+const string MapNote::NOTE_SET_MAX_VELOCITY = "set_max_velocity";
 const string MapNote::NOTE_NONE = "none";
-const string MapNote::NOTE_SOUND = "sound";
+const string MapNote::NOTE_PLAY_SOUND = "play_sound";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
@@ -34,13 +34,13 @@ MapNote::BaseMapNoteType MapNote::instanceOf(const string& field, string value)
 {
     shared_ptr<MapNote> note = nullptr;
 
-    if (field == NOTE_MAX_VELOCITY)
+    if (field == NOTE_SET_MAX_VELOCITY)
     {
-        note = shared_ptr<MaxVelocity>(new MaxVelocity(value));
+        note = shared_ptr<NoteSetMaxVelocity>(new NoteSetMaxVelocity(value));
     }
-    else if (field == NOTE_SOUND)
+    else if (field == NOTE_PLAY_SOUND)
     {
-        note = shared_ptr<Sound>(new Sound(value));
+        note = shared_ptr<NotePlaySound>(new NotePlaySound(value));
     }
 
     return note;
@@ -49,11 +49,11 @@ MapNote::BaseMapNoteType MapNote::instanceOf(const string& field, string value)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 unordered_map<int, string> MapNote::NOTE_TYPE_2_STRING = {
     {MapNote::NONE, MapNote::NOTE_NONE},
-    {MapNote::MAX_VELOCITY, MapNote::NOTE_MAX_VELOCITY},
-    {MapNote::SOUND, MapNote::NOTE_SOUND}
+    {MapNote::SET_MAX_VELOCITY, MapNote::NOTE_SET_MAX_VELOCITY},
+    {MapNote::PLAY_SOUND, MapNote::NOTE_PLAY_SOUND}
 };
 
 } // namespace srs

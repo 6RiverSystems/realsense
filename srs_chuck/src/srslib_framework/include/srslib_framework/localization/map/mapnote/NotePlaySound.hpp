@@ -13,7 +13,7 @@ using namespace std;
 
 namespace srs {
 
-class Sound : public MapNote
+class NotePlaySound : public MapNote
 {
 public:
     enum SoundTypeEnum {
@@ -21,17 +21,22 @@ public:
         WARNING
     };
 
-    Sound(SoundTypeEnum sound) :
-        MapNote(MapNote::SOUND),
+    NotePlaySound() :
+        MapNote(MapNote::PLAY_SOUND),
+        soundType_(NONE)
+    {}
+
+    NotePlaySound(SoundTypeEnum sound) :
+        MapNote(MapNote::PLAY_SOUND),
         soundType_(sound)
     {}
 
-    Sound(string sound) :
-        MapNote(MapNote::SOUND),
+    NotePlaySound(string sound) :
+        MapNote(MapNote::PLAY_SOUND),
         soundType_(static_cast<SoundTypeEnum>(STRING_2_SOUND_TYPE[sound]))
     {}
 
-    virtual ~Sound()
+    virtual ~NotePlaySound()
     {}
 
     string getValueString() const

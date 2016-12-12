@@ -1,6 +1,9 @@
 #include <srsnode_executive/Executive.hpp>
 
 #include <ros/ros.h>
+#include <dynamic_reconfigure/DoubleParameter.h>
+#include <dynamic_reconfigure/Reconfigure.h>
+#include <dynamic_reconfigure/Config.h>
 
 #include <srslib_framework/math/VelocityMath.hpp>
 
@@ -18,6 +21,8 @@ Executive::Executive(string name, int argc, char** argv) :
     context_.mapStack = nullptr;
     context_.isRobotMoving = false;
     context_.isRobotPaused = true;
+
+    context_.maxVelocity = 1.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +31,8 @@ void Executive::execute()
     updateContext();
 
     taskDetectLabeledAreas_.run(context_);
-    taskPlayWarningSound_.run(context_);
+    taskSetMaxVelocity_.run(context_);
+    taskPlaySound_.run(context_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +62,13 @@ void Executive::updateContext()
     context_.isRobotMoving = !VelocityMath::equal(context_.commandedVelocity, Velocity<>::ZERO);
 
     // The Pause state is handled by one of the commands
+
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void Executive::readConfigurationParameters()
+{
 }
 
 } // namespace srs

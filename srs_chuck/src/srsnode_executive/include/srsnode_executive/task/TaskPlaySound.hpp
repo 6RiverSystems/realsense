@@ -12,18 +12,18 @@
 
 namespace srs {
 
-class TaskPlayWarningSound : public Task
+class TaskPlaySound : public Task
 {
 public:
     static const Sound SOUND_OFF;
-    static const Sound WARNING_SOUND;
+    static const Sound SOUND_WARNING;
 
-    TaskPlayWarningSound()
+    TaskPlaySound()
     {
         channelSound_.publish(SOUND_OFF);
     }
 
-    virtual ~TaskPlayWarningSound()
+    virtual ~TaskPlaySound()
     {}
 
     void run(ExecutiveContext& context);

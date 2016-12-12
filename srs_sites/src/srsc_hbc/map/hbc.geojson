@@ -1678,7 +1678,7 @@
 						"object": "labeled_area",
 						"label": "ws1",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1696,7 +1696,7 @@
 						"object": "labeled_area",
 						"label": "ws2",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1714,7 +1714,7 @@
 						"object": "labeled_area",
 						"label": "ws3",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1732,7 +1732,7 @@
 						"object": "labeled_area",
 						"label": "ws4",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1750,7 +1750,7 @@
 						"object": "labeled_area",
 						"label": "ws5",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1768,7 +1768,7 @@
 						"object": "labeled_area",
 						"label": "ws6",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1786,7 +1786,7 @@
 						"object": "labeled_area",
 						"label": "ws7",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1804,7 +1804,7 @@
 						"object": "labeled_area",
 						"label": "ws8",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1822,7 +1822,7 @@
 						"object": "labeled_area",
 						"label": "ws9",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1840,7 +1840,7 @@
 						"object": "labeled_area",
 						"label": "ws10",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1858,7 +1858,7 @@
 						"object": "labeled_area",
 						"label": "ws11",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1876,7 +1876,7 @@
 						"object": "labeled_area",
 						"label": "ws12",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1894,7 +1894,7 @@
 						"object": "labeled_area",
 						"label": "ws13",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1912,7 +1912,7 @@
 						"object": "labeled_area",
 						"label": "ws14",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1930,7 +1930,7 @@
 						"object": "labeled_area",
 						"label": "ws15",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1948,7 +1948,7 @@
 						"object": "labeled_area",
 						"label": "ws16",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1966,7 +1966,7 @@
 						"object": "labeled_area",
 						"label": "ws17",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -1984,7 +1984,7 @@
 						"object": "labeled_area",
 						"label": "ws18",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2002,7 +2002,7 @@
 						"object": "labeled_area",
 						"label": "ws19",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2020,7 +2020,7 @@
 						"object": "labeled_area",
 						"label": "ws20",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2038,7 +2038,7 @@
 						"object": "labeled_area",
 						"label": "ws21",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2056,7 +2056,7 @@
 						"object": "labeled_area",
 						"label": "ws22",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2074,7 +2074,7 @@
 						"object": "labeled_area",
 						"label": "ws23",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2092,7 +2092,7 @@
 						"object": "labeled_area",
 						"label": "ws24",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2110,7 +2110,7 @@
 						"object": "labeled_area",
 						"label": "ws25",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2128,7 +2128,7 @@
 						"object": "labeled_area",
 						"label": "ws26",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2146,7 +2146,7 @@
 						"object": "labeled_area",
 						"label": "ws27",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2164,7 +2164,7 @@
 						"object": "labeled_area",
 						"label": "ws28",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2182,7 +2182,7 @@
 						"object": "labeled_area",
 						"label": "ws29",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2200,7 +2200,7 @@
 						"object": "labeled_area",
 						"label": "ws30",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2218,7 +2218,7 @@
 						"object": "labeled_area",
 						"label": "ws31",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2236,7 +2236,7 @@
 						"object": "labeled_area",
 						"label": "ws32",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2254,7 +2254,7 @@
 						"object": "labeled_area",
 						"label": "ws33",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2272,7 +2272,7 @@
 						"object": "labeled_area",
 						"label": "ws34",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2290,7 +2290,7 @@
 						"object": "labeled_area",
 						"label": "ws35",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2308,7 +2308,7 @@
 						"object": "labeled_area",
 						"label": "ws36",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2326,7 +2326,7 @@
 						"object": "labeled_area",
 						"label": "ws37",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2344,7 +2344,7 @@
 						"object": "labeled_area",
 						"label": "ws38",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2362,7 +2362,7 @@
 						"object": "labeled_area",
 						"label": "ws39",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2380,7 +2380,7 @@
 						"object": "labeled_area",
 						"label": "ws40",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2398,7 +2398,7 @@
 						"object": "labeled_area",
 						"label": "ws41",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2416,7 +2416,7 @@
 						"object": "labeled_area",
 						"label": "ws42",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2434,7 +2434,7 @@
 						"object": "labeled_area",
 						"label": "ws43",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2452,7 +2452,7 @@
 						"object": "labeled_area",
 						"label": "ws44",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2470,7 +2470,7 @@
 						"object": "labeled_area",
 						"label": "ws45",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2488,7 +2488,7 @@
 						"object": "labeled_area",
 						"label": "ws46",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2506,7 +2506,7 @@
 						"object": "labeled_area",
 						"label": "ws47",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2524,7 +2524,7 @@
 						"object": "labeled_area",
 						"label": "ws48",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2542,7 +2542,7 @@
 						"object": "labeled_area",
 						"label": "ws49",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2560,7 +2560,7 @@
 						"object": "labeled_area",
 						"label": "ws50",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2578,7 +2578,7 @@
 						"object": "labeled_area",
 						"label": "ws51",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2596,7 +2596,7 @@
 						"object": "labeled_area",
 						"label": "ws52",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2614,7 +2614,7 @@
 						"object": "labeled_area",
 						"label": "ws53",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2632,7 +2632,7 @@
 						"object": "labeled_area",
 						"label": "ws54",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2650,7 +2650,7 @@
 						"object": "labeled_area",
 						"label": "ws55",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2668,7 +2668,7 @@
 						"object": "labeled_area",
 						"label": "ws56",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2686,7 +2686,7 @@
 						"object": "labeled_area",
 						"label": "ws57",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2704,7 +2704,7 @@
 						"object": "labeled_area",
 						"label": "ws58",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2722,7 +2722,7 @@
 						"object": "labeled_area",
 						"label": "ws59",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2740,7 +2740,7 @@
 						"object": "labeled_area",
 						"label": "ws60",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2758,7 +2758,7 @@
 						"object": "labeled_area",
 						"label": "ws61",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2776,7 +2776,7 @@
 						"object": "labeled_area",
 						"label": "ws62",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2794,7 +2794,7 @@
 						"object": "labeled_area",
 						"label": "ws63",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2812,7 +2812,7 @@
 						"object": "labeled_area",
 						"label": "ws64",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2830,7 +2830,7 @@
 						"object": "labeled_area",
 						"label": "ws65",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2848,7 +2848,7 @@
 						"object": "labeled_area",
 						"label": "ws66",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2866,7 +2866,7 @@
 						"object": "labeled_area",
 						"label": "ws67",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -2884,7 +2884,7 @@
 						"object": "labeled_area",
 						"label": "ws68",
 						"notes": {
-							"sound": "warning"
+							"play_sound": "warning"
 						}
 					}
 				},

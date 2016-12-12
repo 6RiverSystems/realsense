@@ -18,7 +18,7 @@ set(${PROJECT_NAME}_SOURCES
     src/localization/map/MapStackFactory.cpp
     src/localization/map/mapnote/MapNote.cpp
     src/localization/map/mapnote/MapNotes.cpp
-    src/localization/map/mapnote/Sound.cpp
+    src/localization/map/mapnote/NotePlaySound.cpp
     src/localization/map/logical/LogicalMap.cpp
     src/localization/map/logical/LogicalMapFactory.cpp
     src/localization/map/occupancy/OccupancyMap.cpp

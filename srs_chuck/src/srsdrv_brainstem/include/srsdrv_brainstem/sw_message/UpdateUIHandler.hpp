@@ -12,32 +12,35 @@ UpdateUIHandler.hpp * (c) Copyright 2015-2016 River Systems, all rights reserved
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_UpdateUI.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessages.h>
+#include "../BrainStemMessages.hpp"
 
 namespace srs {
 
-class BrainStemMessageProcessor;
+class BrainStemMessageProcessorInterface;
 
 class UpdateUIHandler :
-    public SoftwareMessageHandler<BrainStemMessageProcessor>,
+    public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
     public Observer<Subscriber<srslib_framework::MsgUpdateUI>>
 {
 public:
-    UpdateUIHandler(BrainStemMessageProcessor* owner);
+    UpdateUIHandler(BrainStemMessageProcessorInterface* owner);
 
-    virtual ~UpdateUIHandler()
-    {}
+    virtual ~UpdateUIHandler() {}
 
-    void notified(Subscriber<srslib_framework::MsgUpdateUI>* subject);
+    virtual void attach();
+
+	void notified(Subscriber<srslib_framework::MsgUpdateUI>* subject);
+
+    void encodeData(const srslib_framework::MsgUpdateUI& value);
 
 private:
     HW_MESSAGE_BEGIN(UpdateUIData)
         uint8_t cmd;
         uint8_t entity;
-        uint16_t mode;
+        uint8_t mode;
     HW_MESSAGE_END
 
-	TapBrainstemCmd_UpdateUI 					tapUpdateUI_;
+	std::shared_ptr<TapBrainstemCmd_UpdateUI>	tapUpdateUI_;
 
 	std::set<LED_ENTITIES>						setValidEntities_;
 

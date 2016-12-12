@@ -13,7 +13,7 @@
 #include <srslib_framework/io/IO.hpp>
 #include <srslib_framework/utils/Logging.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessages.h>
+#include "../include/srsdrv_brainstem/BrainStemMessages.hpp"
 
 namespace srs {
 
@@ -126,30 +126,6 @@ void BrainStemMessageProcessor::shutdown( )
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::SHUTDOWN );
 
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
-}
-
-void BrainStemMessageProcessor::setMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues )
-{
-	std::string strMotionStatus;
-	strMotionStatus += motionStatusSet.test( MOTION_STATUS::FRONT_E_STOP ) ? "frontEStop, " : "";
-	strMotionStatus += motionStatusSet.test( MOTION_STATUS::BACK_E_STOP ) ? "backEStop, " : "";
-	strMotionStatus += motionStatusSet.test( MOTION_STATUS::WIRELESS_E_STOP ) ? "wirelessEStop, " : "";
-	strMotionStatus += motionStatusSet.test( MOTION_STATUS::BUMP_SENSOR ) ? "bumpSensor, " : "";
-	strMotionStatus += motionStatusSet.test( MOTION_STATUS::FREE_SPIN) ? "free-spin, " : "";
-	strMotionStatus += motionStatusSet.test( MOTION_STATUS::HARD_STOP ) ? "hardStop, " : "";
-
-	BRAIN_STEM_CMD command = bSetValues ? BRAIN_STEM_CMD::SET_MOTION_STATUS : BRAIN_STEM_CMD::CLEAR_MOTION_STATUS;
-
-	OperationalStateData msg = {
-        static_cast<uint8_t>(command),
-        static_cast<uint8_t>(motionStatusSet.to_ulong())
-    };
-
-	ROS_DEBUG( "%s motion status for %s",
-	    command == BRAIN_STEM_CMD::SET_MOTION_STATUS ? "Setting" : "Clearing",
-	        strMotionStatus.c_str( ) );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof(msg) );
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -11,7 +11,6 @@
 #include <map>
 #include <functional>
 #include <memory>
-#include <bitset>
 
 using namespace std;
 
@@ -22,7 +21,8 @@ using namespace std;
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemButtonPressed.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessages.h>
+#include "BrainStemMessages.hpp"
+#include <srsdrv_brainstem/BrainStemMessageProcessorInterface.h>
 #include <srsdrv_brainstem/HardwareMessageHandler.hpp>
 
 #include <srsdrv_brainstem/hw_message/LogHandler.hpp>
@@ -41,7 +41,7 @@ namespace srs {
 class IO;
 class MessageProcessor;
 
-class BrainStemMessageProcessor
+class BrainStemMessageProcessor : public BrainStemMessageProcessorInterface
 {
 public:
     void processHardwareMessage(vector<char> buffer);

@@ -12,23 +12,26 @@
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_OdometryRpm.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessages.h>
+#include "../BrainStemMessages.hpp"
 
 namespace srs {
 
-class BrainStemMessageProcessor;
+class BrainStemMessageProcessorInterface;
 
 class SetOdometryRpmHandler :
-    public SoftwareMessageHandler<BrainStemMessageProcessor>,
+    public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
     public Observer<Subscriber<srslib_framework::OdometryRpm>>
 {
 public:
-    SetOdometryRpmHandler(BrainStemMessageProcessor* owner);
+    SetOdometryRpmHandler(BrainStemMessageProcessorInterface* owner);
 
-    virtual ~SetOdometryRpmHandler()
-    {}
+    virtual ~SetOdometryRpmHandler() {}
+
+    virtual void attach();
 
     void notified(Subscriber<srslib_framework::OdometryRpm>* subject);
+
+    void encodeData(const srslib_framework::OdometryRpm& value);
 
 private:
     HW_MESSAGE_BEGIN(RawOdometryData)
@@ -37,7 +40,7 @@ private:
 		float rpm_right_wheel;
 	HW_MESSAGE_END
 
-	TapBrainstemCmd_OdometryRpm	tapOdometryRpm_;
+	std::shared_ptr<TapBrainstemCmd_OdometryRpm>	tapOdometryRpm_;
 };
 
 } // namespace srs

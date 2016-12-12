@@ -12,25 +12,29 @@
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_Shutdown.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessages.h>
+#include "../BrainStemMessages.hpp"
 
 namespace srs {
 
-class BrainStemMessageProcessor;
+class BrainStemMessageProcessorInterface;
 
 class ShutdownHandler :
-    public SoftwareMessageHandler<BrainStemMessageProcessor>,
+    public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
     public Observer<Subscriber<std_msgs::Bool>>
 {
 public:
-    ShutdownHandler(BrainStemMessageProcessor* owner);
+    ShutdownHandler(BrainStemMessageProcessorInterface* owner);
 
     virtual ~ShutdownHandler()
     {}
 
+    virtual void attach();
+
     void notified(Subscriber<std_msgs::Bool>* subject);
 
-    TapBrainstemCmd_Shutdown	tapShutdown_;
+    void encodeData(const bool& value);
+
+    std::shared_ptr<TapBrainstemCmd_Shutdown>	tapShutdown_;
 };
 
 } // namespace srs

@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <srsdrv_brainstem/BrainStemMessages.h>
+#include "../../include/srsdrv_brainstem/BrainStemMessages.hpp"
 
 using namespace std;
 using namespace srs;

@@ -1,7 +1,14 @@
-#include <srsdrv_brainstem/BrainStemMessageProcessor.h>
+/*
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
+ *
+ * This is proprietary software, unauthorized distribution is not permitted.
+ */
+
+#include <sw_message/UpdateUIHandler.hpp>
+
+#include <srsdrv_brainstem/BrainStemMessageProcessorInterface.h>
 
 #include <ros/ros.h>
-#include <sw_message/UpdateUIHandler.hpp>
 
 namespace srs {
 
@@ -9,7 +16,7 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-UpdateUIHandler::UpdateUIHandler(BrainStemMessageProcessor* owner) :
+UpdateUIHandler::UpdateUIHandler(BrainStemMessageProcessorInterface* owner) :
     SoftwareMessageHandler(owner)
 {
 	setValidEntities_.insert(LED_ENTITIES::TOTE0);
@@ -47,17 +54,27 @@ UpdateUIHandler::UpdateUIHandler(BrainStemMessageProcessor* owner) :
 	mapValidModes_[LED_ENTITIES::TAIL_RIGHT] = toteModes;
 
 	mapValidModes_[LED_ENTITIES::SCANNER] = toteModes;
-
-	tapUpdateUI_.attach(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void UpdateUIHandler::attach()
+{
+	tapUpdateUI_.reset(new TapBrainstemCmd_UpdateUI());
+
+	tapUpdateUI_->attach(this);
+}
+
 void UpdateUIHandler::notified(Subscriber<srslib_framework::MsgUpdateUI>* subject)
 {
 	TapBrainstemCmd_UpdateUI* tap = static_cast<TapBrainstemCmd_UpdateUI*>(subject);
 
 	srslib_framework::MsgUpdateUI updateUI = tap->pop();
 
+	encodeData(updateUI);
+}
+
+void UpdateUIHandler::encodeData(const srslib_framework::MsgUpdateUI& updateUI)
+{
 	for (auto uiElement : updateUI.uiUpdates)
 	{
 		UpdateUIData msg = {

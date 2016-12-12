@@ -12,25 +12,35 @@ SetMotionStateHandler.hpp * (c) Copyright 2015-2016 River Systems, all rights re
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_SetMotionState.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessages.h>
+#include "../BrainStemMessages.hpp"
 
 namespace srs {
 
-class BrainStemMessageProcessor;
+class BrainStemMessageProcessorInterface;
 
 class SetMotionStateHandler :
-    public SoftwareMessageHandler<BrainStemMessageProcessor>,
+    public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
     public Observer<Subscriber<srslib_framework::MsgSetOperationalState>>
 {
 public:
-    SetMotionStateHandler(BrainStemMessageProcessor* owner);
+    SetMotionStateHandler(BrainStemMessageProcessorInterface* owner);
 
-    virtual ~SetMotionStateHandler()
-    {}
+    virtual ~SetMotionStateHandler() {}
+
+    virtual void attach();
 
     void notified(Subscriber<srslib_framework::MsgSetOperationalState>* subject);
 
-    TapBrainstemCmd_SetMotionState	tapSetMotionState_;
+    void encodeData(const srslib_framework::MsgSetOperationalState& value);
+
+private:
+
+    HW_MESSAGE_BEGIN(OperationalStateData)
+    	uint8_t cmd;
+		uint8_t motionStatus;
+	HW_MESSAGE_END
+
+    std::shared_ptr<TapBrainstemCmd_SetMotionState>	tapSetMotionState_;
 };
 
 } // namespace srs

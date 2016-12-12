@@ -1,8 +1,12 @@
+/*
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
+ *
+ * This is proprietary software, unauthorized distribution is not permitted.
+ */
+
 #include <srsdrv_brainstem/sw_message/SoundHandler.hpp>
 
-#include <srslib_framework/robotics/device/Sound.hpp>
-
-#include <srsdrv_brainstem/BrainStemMessageProcessor.h>
+#include <srsdrv_brainstem/BrainStemMessageProcessorInterface.h>
 
 #include <ros/ros.h>
 
@@ -12,18 +16,29 @@ namespace srs {
 // Public methodsi
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-SoundHandler::SoundHandler(BrainStemMessageProcessor* owner) :
+SoundHandler::SoundHandler(BrainStemMessageProcessorInterface* owner) :
     SoftwareMessageHandler(owner)
 {
-    tapSound_.attach(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void SoundHandler::attach()
+{
+	tapSound_.reset(new TapBrainstemCmd_Sound());
+
+	tapSound_->attach(this);
+}
+
 void SoundHandler::notified(Subscriber<srslib_framework::Sound>* subject)
 {
     TapBrainstemCmd_Sound* tap = static_cast<TapBrainstemCmd_Sound*>(subject);
     Sound sound = tap->pop();
 
+    encodeData(sound);
+}
+
+void SoundHandler::encodeData(const Sound& sound)
+{
     SoundData msgSound = {
         static_cast<uint8_t>(BRAIN_STEM_CMD::SOUND_BUZZER),
         static_cast<uint8_t>(sound.volume),

@@ -10,7 +10,7 @@
 
 using namespace std;
 
-#include <srsdrv_brainstem/BrainStemMessages.h>
+#include "../BrainStemMessages.hpp"
 #include <srsdrv_brainstem/HardwareMessageHandler.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemPowerState.hpp>
 

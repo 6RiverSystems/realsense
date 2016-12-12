@@ -36,6 +36,15 @@ set(${PROJECT_NAME}_TEST_SOURCES
     test/hw_message/Test_HardwareInfo.cpp
     test/hw_message/Test_OperationalState.cpp
     test/hw_message/Test_PowerState.cpp
+    
+	test/sw_message/Test_Ping.cpp
+	test/sw_message/Test_SetMotionState.cpp
+	test/sw_message/Test_SetOdometryRpm.cpp
+	test/sw_message/Test_Startup.cpp
+	test/sw_message/Test_Shutdown.cpp
+	test/sw_message/Test_Sound.cpp
+	test/sw_message/Test_UpdateUI.cpp
+    
     test/TestSuite_Brainstem.cpp
 )
 

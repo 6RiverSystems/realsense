@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include <memory>
 #include <std_msgs/Bool.h>
 
 #include <srslib_framework/platform/SoftwareMessageHandler.hpp>
@@ -12,25 +13,28 @@
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_Ping.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessages.h>
+#include "../BrainStemMessages.hpp"
 
 namespace srs {
 
-class BrainStemMessageProcessor;
+class BrainStemMessageProcessorInterface;
 
 class PingHandler :
-    public SoftwareMessageHandler<BrainStemMessageProcessor>,
+    public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
     public Observer<Subscriber<std_msgs::Bool>>
 {
 public:
-    PingHandler(BrainStemMessageProcessor* owner);
+    PingHandler(BrainStemMessageProcessorInterface* owner);
 
-    virtual ~PingHandler()
-    {}
+    virtual ~PingHandler() {}
 
-    void notified(Subscriber<std_msgs::Bool>* subject);
+    virtual void attach();
 
-    TapBrainstemCmd_Ping	tapPing_;
+    virtual void notified(Subscriber<std_msgs::Bool>* subject);
+
+    void encodeData(const bool& value);
+
+    std::shared_ptr<TapBrainstemCmd_Ping>	tapPing_;
 };
 
 } // namespace srs

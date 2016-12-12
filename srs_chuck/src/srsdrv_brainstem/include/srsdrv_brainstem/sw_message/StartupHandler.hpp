@@ -12,25 +12,28 @@
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_Startup.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessages.h>
+#include "../BrainStemMessages.hpp"
 
 namespace srs {
 
-class BrainStemMessageProcessor;
+class BrainStemMessageProcessorInterface;
 
 class StartupHandler :
-    public SoftwareMessageHandler<BrainStemMessageProcessor>,
+    public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
     public Observer<Subscriber<std_msgs::Bool>>
 {
 public:
-    StartupHandler(BrainStemMessageProcessor* owner);
+    StartupHandler(BrainStemMessageProcessorInterface* owner);
 
-    virtual ~StartupHandler()
-    {}
+    virtual ~StartupHandler() {}
+
+    virtual void attach();
 
     void notified(Subscriber<std_msgs::Bool>* subject);
 
-    TapBrainstemCmd_Startup	tapStartup_;
+    void encodeData(const bool& value);
+
+    std::shared_ptr<TapBrainstemCmd_Startup>	tapStartup_;
 };
 
 } // namespace srs

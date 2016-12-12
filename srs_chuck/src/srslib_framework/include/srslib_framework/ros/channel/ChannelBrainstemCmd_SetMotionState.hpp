@@ -5,13 +5,13 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/channel/publisher/PublisherOperationalState.hpp>
+#include <srslib_framework/ros/channel/publisher/PublisherSetOperationalState.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
 
 namespace srs {
 
 class ChannelBrainstemCmd_SetMotionState :
-    public PublisherOperationalState
+    public PublisherSetOperationalState
 {
 public:
     ChannelBrainstemCmd_SetMotionState() :

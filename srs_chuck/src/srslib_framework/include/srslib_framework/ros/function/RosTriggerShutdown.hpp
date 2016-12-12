@@ -9,7 +9,7 @@
 #include <string>
 using namespace std;
 
-#include <srslib_framework/ros/service/RosServiceTrigger.hpp>
+#include <srslib_framework/ros/function/RosServiceTrigger.hpp>
 
 namespace srs {
 

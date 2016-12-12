@@ -41,6 +41,21 @@ void RosUnit<T>::run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+template<class T>
+void RosUnit<T>::getParamFromServer(string service, string parameter,
+    float& value, float defaultValue)
+{
+    rosNodeHandle_.param(service + "/" + parameter, value, defaultValue);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+template<class T>
+void RosUnit<T>::getParamFromEnv(string parameter, string& value, string defaultValue)
+{
+    rosNodeHandle_.param(parameter, value, defaultValue);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
 } // namespace srs

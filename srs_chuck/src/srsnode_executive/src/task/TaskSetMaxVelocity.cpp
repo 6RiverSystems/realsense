@@ -1,10 +1,8 @@
 #include <srsnode_executive/task/TaskSetMaxVelocity.hpp>
 
-#include <dynamic_reconfigure/DoubleParameter.h>
-#include <dynamic_reconfigure/Reconfigure.h>
-#include <dynamic_reconfigure/Config.h>
-
 #include <srslib_framework/localization/map/mapnote/NoteSetMaxVelocity.hpp>
+#include <srslib_framework/ros/function/service_call/ServiceCallConfig.hpp>
+#include <srslib_framework/ros/topics/ChuckConfig.hpp>
 
 namespace srs {
 
@@ -53,18 +51,8 @@ void TaskSetMaxVelocity::run(ExecutiveContext& context)
     {
         ROS_INFO_STREAM_NAMED("executive", "Setting velocity to " << newMaxVelocity << "m/s");
 
-        dynamic_reconfigure::ReconfigureRequest request;
-        dynamic_reconfigure::Config configuration;
-
-        dynamic_reconfigure::DoubleParameter doubleParameter;
-        doubleParameter.name = "max_vel_x";
-        doubleParameter.value = newMaxVelocity;
-        configuration.doubles.push_back(doubleParameter);
-
-        request.config = configuration;
-
-        dynamic_reconfigure::ReconfigureResponse response;
-        ros::service::call("/move_base/DWAPlannerROS/set_parameters", request, response);
+        ServiceCallConfig<double>::call(ChuckConfig::Entities::LOCAL_PLANNER,
+            ChuckConfig::Parameters::MAX_VELOCITY, newMaxVelocity);
     }
 
     context.maxVelocity = newMaxVelocity;

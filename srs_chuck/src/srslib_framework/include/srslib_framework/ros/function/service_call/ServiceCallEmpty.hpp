@@ -3,8 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#ifndef ROSCALLEMPTY_HPP_
-#define ROSCALLEMPTY_HPP_
+#pragma once
 
 #include <string>
 using namespace std;
@@ -14,34 +13,31 @@ using namespace std;
 
 namespace srs {
 
-struct RosCallEmpty
+struct ServiceCallEmpty
 {
 public:
-    static bool call(string node, string trigger)
+    static bool call(string node, string serviceName)
     {
         ros::NodeHandle rosNodeHandle;
 
-        string fullServiceName = node + trigger;
+        string fullServiceName = node + serviceName;
 
-        ros::ServiceClient client = rosNodeHandle.serviceClient<std_srvs::Empty>(fullServiceName);
-        std_srvs::Empty::Request req;
-        std_srvs::Empty::Response resp;
+        std_srvs::Empty::Request request;
+        std_srvs::Empty::Response response;
 
-        if (client.call(req, resp))
+        if (ros::service::call(fullServiceName, request, response))
         {
             ROS_DEBUG_STREAM_NAMED("ros_service_call", "The node " << node <<
-                " responded to a " << trigger << " request.");
+                " responded to a " << serviceName << " request.");
 
             return true;
         }
 
         ROS_DEBUG_STREAM_NAMED("ros_service_call", "The node " << node <<
-            " did not respond to a " << trigger << " request.");
+            " did not respond to a " << serviceName << " request.");
 
         return false;
     }
 };
 
 } // namespace srs
-
-#endif // ROSCALLEMPTY_HPP_

@@ -16,7 +16,7 @@ using namespace std;
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/ros/message/OccupancyMapMessageFactory.hpp>
 #include <srslib_framework/ros/topics/ChuckTopics.hpp>
-#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
+#include <srslib_framework/ros/topics/ChuckConfig.hpp>
 
 namespace srs {
 
@@ -28,16 +28,13 @@ MapServer::MapServer(string name, int argc, char** argv) :
     RosUnit(name, argc, argv, REFRESH_RATE_HZ),
     mapStack_(nullptr)
 {
-    rosNodeHandle_.param("map_stack", mapStackFilename_, string(""));
-
+    getParamFromEnv(ChuckConfig::Parameters::MAP_STACK, mapStackFilename_, string(""));
     ROS_INFO_STREAM("Target map stack: " << mapStackFilename_);
 
-    rosNodeHandle_.param("/frame_id", frameId_, ChuckTransforms::MAP);
+    getParamFromEnv(ChuckConfig::Parameters::FRAME_ID, frameId_, ChuckConfig::Transforms::MAP);
+    ROS_INFO_STREAM("Frame id: " << frameId_);
 
     mapStack_ = MapStackFactory::fromJsonFile(mapStackFilename_);
-
-    serviceMapRequest_ = rosNodeHandle_.advertiseService(ChuckTopics::service::GET_MAP_OCCUPANCY,
-        &MapServer::callbackMapRequest, this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,22 +51,6 @@ void MapServer::initialize()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-bool MapServer::callbackMapRequest(nav_msgs::GetMap::Request &req, nav_msgs::GetMap::Response &res)
-{
-    ROS_INFO("Map request service: Sending map");
-
-    vector<int8_t> occupancy;
-    MapAdapter::baseMap2Vector(mapStack_->getOccupancyMap(), occupancy);
-
-    res.map.header.stamp = ros::Time::now();
-    res.map.info = OccupancyMapMessageFactory::metadata2RosMsg(
-        mapStack_->getOccupancyMap()->getMetadata());
-    res.map.data = occupancy;
-
-    return true;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void MapServer::evaluateTriggers()

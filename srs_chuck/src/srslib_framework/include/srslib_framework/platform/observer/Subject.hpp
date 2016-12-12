@@ -8,7 +8,7 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/ros/tap/subscriber/Observer.hpp>
+#include <srslib_framework/platform/observer/Observer.hpp>
 
 namespace srs {
 

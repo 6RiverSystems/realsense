@@ -7,8 +7,7 @@
 
 #include <srslib_framework/ros/unit/RosUnit.hpp>
 
-#include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
-#include <srslib_framework/ros/service/RosTriggerPause.hpp>
+#include <srslib_framework/ros/function/RosTriggerShutdown.hpp>
 #include <srsnode_midbrain/Reflexes.hpp>
 
 namespace srs {

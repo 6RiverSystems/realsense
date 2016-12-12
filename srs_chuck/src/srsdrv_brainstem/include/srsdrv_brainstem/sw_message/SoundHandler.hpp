@@ -31,7 +31,7 @@ public:
     void notified(Subscriber<srslib_framework::Sound>* subject);
 
 private:
-    HW_MESSAGE_BEGIN(MsgSound)
+    HW_MESSAGE_BEGIN(SoundData)
         uint8_t cmd;
         uint8_t volume;
         uint16_t baseFrequency;

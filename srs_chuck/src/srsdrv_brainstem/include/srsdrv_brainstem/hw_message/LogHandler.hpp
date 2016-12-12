@@ -20,6 +20,14 @@ class LogHandler : public HardwareMessageHandler
 {
 public:
 
+	enum LOG_LEVEL : uint8_t
+	{
+		DEBUG	= 0,
+		INFO	= 1,
+		ERROR	= 2,
+		UNKNOWN
+	};
+
 	typedef std::function<void(LOG_LEVEL level, std::string message)> LogCallbackFn;
 
     LogHandler(LogCallbackFn logCallback = [&](LOG_LEVEL, std::string) {});

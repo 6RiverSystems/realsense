@@ -19,7 +19,7 @@ public:
 
 	Test_Log() :
 		Test_HardwareMessage(),
-		level_(LOG_LEVEL::UNKNOWN),
+		level_(LogHandler::LOG_LEVEL::UNKNOWN),
 		message_()
 	{
 		logCallback_ = std::bind(&Test_Log::logCallback, this, std::placeholders::_1,
@@ -56,7 +56,7 @@ public:
 		return std::move(messageBuffer);
 	}
 
-	void logCallback(LOG_LEVEL level, std::string message)
+	void logCallback(LogHandler::LOG_LEVEL level, std::string message)
 	{
 		level_ = level;
 
@@ -64,7 +64,7 @@ public:
 	}
 
 
-	LOG_LEVEL level_;
+	LogHandler::LOG_LEVEL level_;
 
 	std::string message_;
 

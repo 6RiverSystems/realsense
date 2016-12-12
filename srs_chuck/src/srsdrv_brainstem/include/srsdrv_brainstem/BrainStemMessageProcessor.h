@@ -33,7 +33,6 @@ using namespace std;
 #include <srsdrv_brainstem/hw_message/ButtonPressedHandler.hpp>
 
 #include <srsdrv_brainstem/sw_message/SoundHandler.hpp>
-#include <srsdrv_brainstem/sw_message/FreeSpinHandler.hpp>
 #include <srsdrv_brainstem/sw_message/SetMotionStateHandler.hpp>
 #include <srsdrv_brainstem/sw_message/PingHandler.hpp>
 
@@ -70,8 +69,6 @@ public:
 
     void setMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues );
 
-    void onHardStop( );
-
     void shutdown( );
 
 // Helper
@@ -88,25 +85,20 @@ private:
 
 	void getOperationalState(const ros::Time& now);
 
-// Bridge Callbacks
-
-	void OnResetBatteryHours( );
-
-	void OnResetWheelMeters( );
-
-	void OnSetConfiguration( uint32_t configuration );
-
-	void OnUpdateLights( std::vector<std::string> vecParams );
-
-	void ClearMotionStatus( );
-
-	void OnStartup( std::vector<std::string> vecParams );
-
 // Helper Methods
 
 	void WriteToSerialPort( char* pszData, std::size_t dwSize );
 
 private:
+
+    HW_MESSAGE_BEGIN(CommandData)
+        uint8_t cmd;
+    HW_MESSAGE_END
+
+    HW_MESSAGE_BEGIN(OperationalStateData)
+    	uint8_t cmd;
+		uint8_t motionStatus;
+    HW_MESSAGE_END
 
 	std::shared_ptr<IO>					m_pIO;
 
@@ -119,6 +111,8 @@ private:
 	ros::Time							lastOperationalStateRequestTime_;
 
     HwMessageHandlerMapType				hwMessageHandlers_;
+
+    // TODO: Move these all to the constructor or some sort of initialization method (no need to have members)
 
 	ChannelBrainstemConnected			connectedChannel_;
     ChannelBrainstemHardwareInfo		hardwareInfoChannel_;
@@ -135,7 +129,6 @@ private:
     ButtonPressedHandler				buttonPressedHandler_;
 
     SoundHandler						soundHandler_;
-    FreeSpinHandler						freeSpinHandler_;
     SetMotionStateHandler				setMotionStateHandler_;
     PingHandler							pingHandler_;
 };

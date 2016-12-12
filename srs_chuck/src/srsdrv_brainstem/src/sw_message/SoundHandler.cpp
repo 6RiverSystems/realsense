@@ -24,7 +24,7 @@ void SoundHandler::notified(Subscriber<srslib_framework::Sound>* subject)
     TapBrainstemCmd_Sound* tap = static_cast<TapBrainstemCmd_Sound*>(subject);
     Sound sound = tap->pop();
 
-    MsgSound msgSound = {
+    SoundData msgSound = {
         static_cast<uint8_t>(BRAIN_STEM_CMD::SOUND_BUZZER),
         static_cast<uint8_t>(sound.volume),
         static_cast<uint16_t>(sound.baseFrequency),

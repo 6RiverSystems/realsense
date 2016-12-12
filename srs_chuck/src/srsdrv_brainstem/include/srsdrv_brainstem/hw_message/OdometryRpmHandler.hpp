@@ -31,12 +31,12 @@ public:
     void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
 private:
-    HW_MESSAGE_BEGIN(MsgRawOdometry)
-        uint8_t cmd;
-        uint32_t timestamp;
-        float rpm_left_wheel;
-        float rpm_right_wheel;
-    HW_MESSAGE_END
+    HW_MESSAGE_BEGIN(OdometryRpmData)
+		uint8_t cmd;
+		uint32_t timestamp;
+		float rpm_left_wheel;
+		float rpm_right_wheel;
+	HW_MESSAGE_END
 
 	ChannelBrainstemOdometryRpm::Interface& publisher_;
 

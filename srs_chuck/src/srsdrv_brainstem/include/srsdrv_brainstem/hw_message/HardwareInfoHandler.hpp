@@ -30,7 +30,7 @@ public:
 
 private:
 
-    HW_MESSAGE_BEGIN(HardwareInfoMsg)
+    HW_MESSAGE_BEGIN(HardwareInfoData)
         uint8_t cmd;
         uint16_t uniqueId[8];
         uint8_t chassisGeneration;

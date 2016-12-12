@@ -30,7 +30,14 @@ public:
 
     void notified(Subscriber<srslib_framework::OdometryRpm>* subject);
 
-    TapBrainstemCmd_OdometryRpm	tapOdometryRpm_;
+private:
+    HW_MESSAGE_BEGIN(RawOdometryData)
+		uint8_t cmd;
+		float rpm_left_wheel;
+		float rpm_right_wheel;
+	HW_MESSAGE_END
+
+	TapBrainstemCmd_OdometryRpm	tapOdometryRpm_;
 };
 
 } // namespace srs

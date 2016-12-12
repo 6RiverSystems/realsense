@@ -23,7 +23,6 @@ set(${PROJECT_NAME}_SOURCES
     src/sw_message/StartupHandler.cpp
     src/sw_message/ShutdownHandler.cpp
     src/sw_message/PingHandler.cpp
-    src/sw_message/FreeSpinHandler.cpp
     src/sw_message/SetOdometryRpmHandler.cpp
     src/sw_message/SoundHandler.cpp
     src/sw_message/SetMotionStateHandler.cpp

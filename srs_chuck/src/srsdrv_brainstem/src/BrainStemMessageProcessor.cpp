@@ -28,7 +28,6 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	lastOperationalStateRequestTime_(),
 	connectedChannel_( ),
     soundHandler_(this),
-    freeSpinHandler_(this),
 	setMotionStateHandler_(this),
 	pingHandler_(this),
 	odometryRpmChannel_(),
@@ -106,7 +105,7 @@ void BrainStemMessageProcessor::getOperationalState( )
 {
 	ROS_DEBUG( "GetOperationalState" );
 
-	COMMAND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_OPERATIONAL_STATE) };
+	CommandData msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_OPERATIONAL_STATE) };
 
 	// Get the operational state
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
@@ -116,7 +115,7 @@ void BrainStemMessageProcessor::getHardwareInformation( )
 {
 	ROS_DEBUG( "GetHardwareInformation" );
 
-	COMMAND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_HARDWARE_INFO ) };
+	CommandData msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_HARDWARE_INFO ) };
 
 	// Get the hardware information (version, configuration, etc.)
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
@@ -128,10 +127,6 @@ void BrainStemMessageProcessor::shutdown( )
 
 	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
 }
-
-//////////////////////////////////////////////////////////////////////////
-// Bridge Callbacks
-//////////////////////////////////////////////////////////////////////////
 
 void BrainStemMessageProcessor::setMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues )
 {
@@ -145,7 +140,7 @@ void BrainStemMessageProcessor::setMotionStatus( const std::bitset<8>& motionSta
 
 	BRAIN_STEM_CMD command = bSetValues ? BRAIN_STEM_CMD::SET_MOTION_STATUS : BRAIN_STEM_CMD::CLEAR_MOTION_STATUS;
 
-    SET_OPERATIONAL_STATE_DATA msg = {
+	OperationalStateData msg = {
         static_cast<uint8_t>(command),
         static_cast<uint8_t>(motionStatusSet.to_ulong())
     };
@@ -157,12 +152,9 @@ void BrainStemMessageProcessor::setMotionStatus( const std::bitset<8>& motionSta
 	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof(msg) );
 }
 
-void BrainStemMessageProcessor::onHardStop( )
-{
-    std::bitset<8> hardStopSet;
-    hardStopSet.set( MOTION_STATUS::HARD_STOP, true );
-    setMotionStatus( hardStopSet, true );
-}
+//////////////////////////////////////////////////////////////////////////
+// Bridge Callbacks
+//////////////////////////////////////////////////////////////////////////
 
 void BrainStemMessageProcessor::setConnected( bool isConnected )
 {
@@ -223,39 +215,6 @@ void BrainStemMessageProcessor::checkSetupComplete()
 	}
 
 	connectedChannel_.publish(setupComplete);
-}
-
-void BrainStemMessageProcessor::OnResetBatteryHours( )
-{
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::RESET_BATTERY_HOURS );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
-}
-
-void BrainStemMessageProcessor::OnResetWheelMeters( )
-{
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::RESET_WHEEL_METERS );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
-}
-
-void BrainStemMessageProcessor::OnStartup( std::vector<std::string> vecParams )
-{
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::STARTUP );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
-}
-
-void BrainStemMessageProcessor::ClearMotionStatus( )
-{
-	ROS_DEBUG( "Clearing motion status." );
-
-	std::bitset<8> clearSet;
-	clearSet.set( MOTION_STATUS::WIRELESS_E_STOP, true );
-	clearSet.set( MOTION_STATUS::BUMP_SENSOR, true );
-	clearSet.set( MOTION_STATUS::HARD_STOP, true );
-
-	setMotionStatus( clearSet, false );
 }
 
 //////////////////////////////////////////////////////////////////////////

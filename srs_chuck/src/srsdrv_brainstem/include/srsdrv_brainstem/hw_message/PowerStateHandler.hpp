@@ -34,7 +34,7 @@ private:
         uint8_t numberOfBatteryDescriptors;
     HW_MESSAGE_END
 
-    HW_MESSAGE_BEGIN(BatteryDescriptorMsg)
+    HW_MESSAGE_BEGIN(BatteryDescriptorData)
         uint8_t id;
         uint16_t value;
     HW_MESSAGE_END

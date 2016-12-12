@@ -81,6 +81,7 @@ enum class LED_ENTITIES
 	TOTE7 		= 7,
 	ACTION 		= 100,
 	PAUSE  		= 101,
+	SOFT_POWER	= 102,
 	TAIL_LEFT  	= 201,
 	TAIL_RIGHT 	= 202,
 	SCANNER 	= 203,
@@ -128,85 +129,6 @@ enum BATTERY_DESCRIPTOR : uint8_t
 	CHARGED_PERCENTAGE		= 0xD,
 	AVERAGE_TIME_TO_EMPTY	= 0x12
 };
-
-
-enum LOG_LEVEL : uint8_t
-{
-	DEBUG	= 0,
-	INFO	= 1,
-	ERROR	= 2,
-	UNKNOWN
-};
-
-// We need to make sure that these are byte packed
-#pragma pack(push, 1)
-
-struct COMMAND_DATA
-{
-	uint8_t cmd;
-};
-
-struct MOTION_STATUS_DATA
-{
-    bool frontEStop; //< Front eStop state
-    bool backEStop; //< Back eStop state
-    bool wirelessEStop; //< Wireless eStop state
-    bool bumpSensor; //< Bump sensor state
-    bool freeSpin; //< Free-spin state
-    bool hardStop; //< hard stop state
-};
-
-struct FAILURE_STATUS_DATA
-{
-	bool		safetyProcessorFailure; // safety processor failure
-	bool		brainstemFailure; 		// brainstem failure
-	bool		brainTimeoutFailure; 	// brainstem timeout failure
-	bool		rightMotorFailure; 		// right motor failure
-	bool		leftMotorFailure; 		// left motor failure
-};
-
-struct SET_OPERATIONAL_STATE_DATA
-{
-	uint8_t 	cmd;
-	uint8_t		motionStatus;			// Motion status
-};
-
-struct VOLTAGE_DATA
-{
-	uint8_t		cmd;
-	float		voltage;				// Voltage from 0V => 24V
-};
-
-struct SUSPEND_DATA
-{
-	uint8_t 	cmd;
-	uint8_t 	isSuspended;			// 0 or '0' = unsuspended, suspended otherwise
-};
-
-struct VELOCITY_DATA
-{
-	uint8_t		cmd;
-	float		linear_velocity;
-	float		angular_velocity;
-};
-
-struct ODOMETRY_DATA
-{
-	uint8_t		cmd;
-	uint32_t	timestamp;
-	float		linear_velocity;
-	float		angular_velocity;
-};
-
-struct ODOMETRY_RPM_DATA
-{
-	uint8_t		cmd;
-	float		left_wheel_rpm;
-	float		right_wheel_rpm;
-};
-
-// Back to normal packing
-#pragma pack(pop)
 
 }
 

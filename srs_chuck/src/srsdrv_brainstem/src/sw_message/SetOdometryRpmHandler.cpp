@@ -26,7 +26,7 @@ void SetOdometryRpmHandler::notified(Subscriber<srslib_framework::OdometryRpm>* 
 	float& leftWheelRpm = odometryRpm.left_wheel_rpm;
 	float& rightWheelRpm = odometryRpm.right_wheel_rpm;
 
-	ODOMETRY_RPM_DATA msg = {
+	RawOdometryData msg = {
 	    static_cast<uint8_t>( BRAIN_STEM_CMD::SET_VELOCITY_RPM ),
 	    static_cast<float>( leftWheelRpm ),
 	    static_cast<float>( rightWheelRpm )

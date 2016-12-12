@@ -22,9 +22,9 @@ void HardwareInfoHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 {
 	std::stringstream batteryStream;
 
-	if (msg.checkBufferSize<HardwareInfoMsg>())
+	if (msg.checkBufferSize<HardwareInfoData>())
 	{
-		HardwareInfoMsg hwInfo = msg.read<HardwareInfoMsg>();
+		HardwareInfoData hwInfo = msg.read<HardwareInfoData>();
 
 		char rawUid[255];
 		sprintf(rawUid, "%04X%04X-%04X-%04X-%04X-%04X%04X%04X",

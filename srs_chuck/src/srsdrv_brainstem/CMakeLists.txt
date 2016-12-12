@@ -31,9 +31,12 @@ set(${PROJECT_NAME}_SOURCES
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES
-    test/Test_HardwareInfoMsg.cpp
-    test/Test_PowerStateMsg.cpp
-    test/Test_RawOdometryMsg.cpp
+	test/hw_message/Test_Log.cpp
+    test/hw_message/Test_ButtonPressed.cpp
+    test/hw_message/Test_OdometryRpm.cpp
+    test/hw_message/Test_HardwareInfo.cpp
+    test/hw_message/Test_OperationalState.cpp
+    test/hw_message/Test_PowerState.cpp
     test/TestSuite_Brainstem.cpp
 )
 
@@ -85,6 +88,9 @@ target_link_libraries(${PROJECT_NODE}
 # Tests
 
 if (CATKIN_ENABLE_TESTING)
+	include_directories(test 
+	)
+
     catkin_add_gtest(TestSuite_Brainstem
         ${${PROJECT_NAME}_TEST_SOURCES}
         ${${PROJECT_NAME}_SOURCES}

@@ -11,7 +11,7 @@
 using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
-#include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
+#include <srsdrv_brainstem/HardwareMessageHandler.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemButtonPressed.hpp>
 
 namespace srs {
@@ -20,7 +20,7 @@ class ButtonPressedHandler : public HardwareMessageHandler
 {
 public:
 
-    ButtonPressedHandler(ChannelBrainstemButtonPressed channel);
+    ButtonPressedHandler(ChannelBrainstemButtonPressed::Interface& publisher);
 
     virtual ~ButtonPressedHandler() {}
 
@@ -32,7 +32,7 @@ private:
     	uint8_t buttonId;
     HW_MESSAGE_END
 
-	ChannelBrainstemButtonPressed channel_;
+	ChannelBrainstemButtonPressed::Interface& publisher_;
 };
 
 } // namespace srs

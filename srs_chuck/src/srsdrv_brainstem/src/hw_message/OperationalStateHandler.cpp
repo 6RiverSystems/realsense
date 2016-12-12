@@ -6,9 +6,9 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-OperationalStateHandler::OperationalStateHandler(ChannelBrainstemOperationalState channel) :
+OperationalStateHandler::OperationalStateHandler(ChannelBrainstemOperationalState::Interface& publisher) :
     HardwareMessageHandler(BRAIN_STEM_MSG::OPERATIONAL_STATE),
-	channel_(channel)
+	publisher_(publisher)
 {
 
 }
@@ -40,25 +40,25 @@ void OperationalStateHandler::receiveMessage(ros::Time currentTime, HardwareMess
 
 	std::ostringstream stream;
 
-	stream << "Operational State => uptime:" << operationalStateMsg.upTime <<
-		", frontEStop: " << operationalStateMsg.frontEStop <<
-		", backEStop: " << operationalStateMsg.backEStop <<
-		", wirelessEStop: " << operationalStateMsg.wirelessEStop <<
-		", bumpSensor: " << operationalStateMsg.bumpSensor <<
-		", free-spin: " << operationalStateMsg.pause <<
-		", hardStop: " << operationalStateMsg.hardStop <<
-		", safetyProcessorFailure: " << operationalStateMsg.safetyProcessorFailure <<
-		", brainstemFailure: " << operationalStateMsg.brainstemFailure <<
-		", brainTimeoutFailure: " << operationalStateMsg.brainTimeoutFailure <<
-		", rightMotorFailure: " << operationalStateMsg.rightMotorFailure <<
-		", leftMotorFailure: " << operationalStateMsg.leftMotorFailure <<
+	stream << "Operational State => uptime: " << operationalStateMsg.upTime <<
+		", frontEStop: " << (operationalStateMsg.frontEStop ? "true" : "false")  <<
+		", backEStop: " << (operationalStateMsg.backEStop ? "true" : "false")  <<
+		", wirelessEStop: " << (operationalStateMsg.wirelessEStop ? "true" : "false")  <<
+		", bumpSensor: " << (operationalStateMsg.bumpSensor ? "true" : "false")  <<
+		", free-spin: " << (operationalStateMsg.pause ? "true" : "false")  <<
+		", hardStop: " << (operationalStateMsg.hardStop ? "true" : "false")  <<
+		", safetyProcessorFailure: " << (operationalStateMsg.safetyProcessorFailure ? "true" : "false")  <<
+		", brainstemFailure: " << (operationalStateMsg.brainstemFailure ? "true" : "false")  <<
+		", brainTimeoutFailure: " << (operationalStateMsg.brainTimeoutFailure ? "true" : "false")  <<
+		", rightMotorFailure: " << (operationalStateMsg.rightMotorFailure ? "true" : "false")  <<
+		", leftMotorFailure: " << (operationalStateMsg.leftMotorFailure ? "true" : "false")  <<
 		std::endl;
 
 	std::string strData =  stream.str( );
 
 	ROS_INFO_STREAM( strData );
 
-	channel_.publish(operationalStateMsg);
+	publisher_.publish(operationalStateMsg);
 }
 
 } // namespace srs

@@ -11,7 +11,7 @@
 using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
-#include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
+#include <srsdrv_brainstem/HardwareMessageHandler.hpp>
 
 
 namespace srs {
@@ -20,7 +20,9 @@ class LogHandler : public HardwareMessageHandler
 {
 public:
 
-    LogHandler();
+	typedef std::function<void(LOG_LEVEL level, std::string message)> LogCallbackFn;
+
+    LogHandler(LogCallbackFn logCallback = [&](LOG_LEVEL, std::string) {});
 
     virtual ~LogHandler() {}
 
@@ -32,6 +34,8 @@ private:
         uint8_t cmd;
     	uint8_t level;
     HW_MESSAGE_END
+
+	LogCallbackFn logCallback_;
 };
 
 } // namespace srs

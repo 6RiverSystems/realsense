@@ -11,7 +11,7 @@
 using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
-#include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
+#include <srsdrv_brainstem/HardwareMessageHandler.hpp>
 #include <srslib_framework/MsgOperationalState.h>
 #include <srslib_framework/ros/channel/ChannelBrainstemOperationalState.hpp>
 
@@ -21,7 +21,7 @@ class OperationalStateHandler : public HardwareMessageHandler
 {
 public:
 
-	OperationalStateHandler(ChannelBrainstemOperationalState channel);
+	OperationalStateHandler(ChannelBrainstemOperationalState::Interface& channel);
 
     virtual ~OperationalStateHandler() {}
 
@@ -36,7 +36,7 @@ private:
     	uint8_t 	failureStatus;
     HW_MESSAGE_END
 
-    ChannelBrainstemOperationalState channel_;
+    ChannelBrainstemOperationalState::Interface& publisher_;
 };
 
 } // namespace srs

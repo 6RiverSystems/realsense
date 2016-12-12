@@ -99,7 +99,7 @@ private:
 
     vector<char>::iterator iter_;
 
-    vector<char> buffer_;
+    vector<char>& buffer_;
 };
 
 } // namespace srs

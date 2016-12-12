@@ -11,7 +11,9 @@
 using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
-#include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
+#include <srsdrv_brainstem/HardwareMessageHandler.hpp>
+
+#include <srslib_framework/OdometryRpm.h>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
 
 namespace srs {
@@ -22,7 +24,7 @@ public:
     static constexpr int SERIAL_TRANSMIT_DELAY = 3400000;
     static constexpr double OUT_OF_SYNC_TIMEOUT = 0.15;
 
-    OdometryRpmHandler(ChannelBrainstemOdometryRpm channel);
+    OdometryRpmHandler(ChannelBrainstemOdometryRpm::Interface& publisher);
 
     virtual ~OdometryRpmHandler() {}
 
@@ -36,9 +38,7 @@ private:
         float rpm_right_wheel;
     HW_MESSAGE_END
 
-	void publishOdometry(float leftWheelRPM, float rightWheelRPM);
-
-    ChannelBrainstemOdometryRpm channel_;
+	ChannelBrainstemOdometryRpm::Interface& publisher_;
 
     double lastHwOdometryTime_;
 

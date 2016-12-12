@@ -27,7 +27,7 @@
 namespace srs {
 
 // Brainstem => Brain
-enum class BRAIN_STEM_MSG : char
+enum class BRAIN_STEM_MSG : uint8_t
 {
     MESSAGE = 0x3C, // '<'
     BUTTON_PRESSED = 0x42, // 'B'
@@ -42,7 +42,7 @@ enum class BRAIN_STEM_MSG : char
 };
 
 // Brain => Brainstem
-enum class BRAIN_STEM_CMD : char
+enum class BRAIN_STEM_CMD : uint8_t
 {
     CLEAR_MOTION_STATUS     = 0x31, // '1'
 
@@ -87,7 +87,7 @@ enum class LED_ENTITIES
 	UNKNOWN
 };
 
-enum class LED_MODE : char
+enum class LED_MODE : uint8_t
 {
 	OFF 		= 0,
 	ON 			= 1,
@@ -101,7 +101,7 @@ enum class LED_MODE : char
 	UNKNOWN
 };
 
-enum MOTION_STATUS : char
+enum MOTION_STATUS : uint8_t
 {
     FRONT_E_STOP = 0,
     BACK_E_STOP = 1,
@@ -111,7 +111,7 @@ enum MOTION_STATUS : char
     HARD_STOP = 5
 };
 
-enum FAILURE_STATUS : char
+enum FAILURE_STATUS : uint8_t
 {
 	SAFETY_PROCESSOR	= 0,
 	BRAINSTEM			= 1,
@@ -120,13 +120,22 @@ enum FAILURE_STATUS : char
 	LEFT_MOTOR			= 4
 };
 
-enum BATTERY_DESCRIPTOR : char
+enum BATTERY_DESCRIPTOR : uint8_t
 {
 	TEMPERATURE				= 0x08,
 	VOLTAGE					= 0x9,
 	AVERAGE_CURRENT			= 0xB,
 	CHARGED_PERCENTAGE		= 0xD,
 	AVERAGE_TIME_TO_EMPTY	= 0x12
+};
+
+
+enum LOG_LEVEL : uint8_t
+{
+	DEBUG	= 0,
+	INFO	= 1,
+	ERROR	= 2,
+	UNKNOWN
 };
 
 // We need to make sure that these are byte packed

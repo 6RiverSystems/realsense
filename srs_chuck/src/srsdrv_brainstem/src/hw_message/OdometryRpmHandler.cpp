@@ -12,11 +12,11 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-OdometryRpmHandler::OdometryRpmHandler(ChannelBrainstemOdometryRpm channel) :
+OdometryRpmHandler::OdometryRpmHandler(ChannelBrainstemOdometryRpm::Interface& publisher) :
     HardwareMessageHandler(BRAIN_STEM_MSG::RAW_ODOMETRY),
     lastHwOdometryTime_(0),
     lastRosOdometryTime_(ros::Time::now()),
-	channel_(channel)
+	publisher_(publisher)
 {
 
 }
@@ -74,15 +74,7 @@ void OdometryRpmHandler::receiveMessage(ros::Time currentTime, HardwareMessage& 
 	message.left_wheel_rpm = OdometryRpmData.rpm_left_wheel;
 	message.right_wheel_rpm = OdometryRpmData.rpm_right_wheel;
 
-	channel_.publish(message);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// Private methods
-
-void OdometryRpmHandler::publishOdometry(float leftWheelRPM, float rightWheelRPM)
-{
-
+	publisher_.publish(message);
 }
 
 } // namespace srs

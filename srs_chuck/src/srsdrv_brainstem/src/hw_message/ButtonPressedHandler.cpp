@@ -5,9 +5,9 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-ButtonPressedHandler::ButtonPressedHandler(ChannelBrainstemButtonPressed channel) :
+ButtonPressedHandler::ButtonPressedHandler(ChannelBrainstemButtonPressed::Interface& publisher) :
     HardwareMessageHandler(BRAIN_STEM_MSG::BUTTON_PRESSED),
-	channel_(channel)
+	publisher_(publisher)
 {
 
 }
@@ -21,7 +21,7 @@ void ButtonPressedHandler::receiveMessage(ros::Time currentTime, HardwareMessage
 
 	ROS_INFO_STREAM("Button Pressed: " << buttonPressedData.buttonId);
 
-	channel_.publish(buttonPressedData.buttonId);
+	publisher_.publish(buttonPressedData.buttonId);
 }
 
 } // namespace srs

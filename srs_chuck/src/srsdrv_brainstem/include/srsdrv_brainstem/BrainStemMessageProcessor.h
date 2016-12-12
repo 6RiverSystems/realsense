@@ -23,9 +23,9 @@ using namespace std;
 #include <srslib_framework/ros/channel/ChannelBrainstemButtonPressed.hpp>
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
+#include <srsdrv_brainstem/HardwareMessageHandler.hpp>
 
 #include <srsdrv_brainstem/hw_message/LogHandler.hpp>
-#include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
 #include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
 #include <srsdrv_brainstem/hw_message/OperationalStateHandler.hpp>
 #include <srsdrv_brainstem/hw_message/PowerStateHandler.hpp>

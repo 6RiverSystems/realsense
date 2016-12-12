@@ -15,7 +15,7 @@ class TapBrainstemCmd_SetMotionState :
 {
 public:
 	TapBrainstemCmd_SetMotionState() :
-        SubscriberSetMotionState(ChuckTopics::driver::BRAINSTEM_CMD_MOTION_STATE)
+        SubscriberSetMotionState(ChuckTopics::driver::BRAINSTEM_CMD_SET_MOTION_STATE)
     {}
 };
 

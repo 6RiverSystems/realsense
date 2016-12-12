@@ -5,21 +5,22 @@
  */
 #pragma once
 
-#include <string>
-using namespace std;
+#include <srslib_framework/ros/channel/publisher/PublisherInterface.hpp>
 
 #include <ros/ros.h>
 
 namespace srs {
 
 template<typename TYPE, typename MESSAGE>
-class Publisher
+class Publisher : public PublisherInterface<TYPE, MESSAGE>
 {
 public:
-    Publisher(string topic,
+	typedef PublisherInterface<TYPE, MESSAGE> Interface;
+
+	Publisher(string topic,
             unsigned int queueLength,
             bool latched,
-            string nameSpace) :
+            std::string nameSpace) :
         topic_(topic)
     {
         rosNodeHandle_ = ros::NodeHandle(nameSpace);
@@ -29,7 +30,7 @@ public:
     virtual ~Publisher()
     {}
 
-    string getTopic() const
+    std::string getTopic() const
     {
         return topic_;
     }
@@ -52,7 +53,7 @@ private:
 
     ros::NodeHandle rosNodeHandle_;
 
-    string topic_;
+    std::string topic_;
 };
 
 } // namespace srs

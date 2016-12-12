@@ -14,6 +14,7 @@ class ChannelBrainstemOdometryRpm :
     public PublisherOdometryRpm
 {
 public:
+
 	ChannelBrainstemOdometryRpm() :
 		PublisherOdometryRpm(ChuckTopics::driver::BRAINSTEM_ODOMETRY_RPM)
     {}

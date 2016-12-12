@@ -11,7 +11,7 @@
 using namespace std;
 
 #include <srsdrv_brainstem/BrainStemMessages.h>
-#include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
+#include <srsdrv_brainstem/HardwareMessageHandler.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 
 namespace srs {
@@ -22,7 +22,7 @@ public:
 
 	typedef std::function<void(srslib_framework::MsgHardwareInfo&)> HardwareInfoFn;
 
-    HardwareInfoHandler(ChannelBrainstemHardwareInfo channel);
+    HardwareInfoHandler(ChannelBrainstemHardwareInfo::Interface& publisher);
 
     virtual ~HardwareInfoHandler() {}
 
@@ -30,12 +30,12 @@ public:
 
 private:
 
-    HW_MESSAGE_BEGIN(HardwareInfoMsg1)
+    HW_MESSAGE_BEGIN(HardwareInfoMsg)
         uint8_t cmd;
         uint16_t uniqueId[8];
         uint8_t chassisGeneration;
         uint8_t brainstemHwVersion;
-        //char brainstemFirmwareVersion* (null terminated string)
+        // char brainstemFirmwareVersion* (null terminated string)
     HW_MESSAGE_END
 
     HW_MESSAGE_BEGIN(MsgHardwareInfo2)
@@ -43,8 +43,8 @@ private:
 		uint16_t uniqueId[8];
 		uint8_t chassisGeneration;
 		uint8_t brainstemHwVersion;
-        char brainstemFirmwareVersion[64];
-        uint8_t numberOfBatteries;
+        // char brainstemFirmwareVersion* (null terminated string)
+        // uint8_t numberOfBatteries;
     	// MsgBatteryInfo[numberOfBatteries];
     HW_MESSAGE_END
 
@@ -55,7 +55,7 @@ private:
 
     srslib_framework::MsgHardwareInfo hardwareInfoMsg_;
 
-    ChannelBrainstemHardwareInfo channel_;
+    ChannelBrainstemHardwareInfo::Interface& publisher_;
 };
 
 } // namespace srs

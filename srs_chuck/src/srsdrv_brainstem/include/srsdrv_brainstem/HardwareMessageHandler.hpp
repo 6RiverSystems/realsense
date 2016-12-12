@@ -12,7 +12,7 @@
 using namespace std;
 
 #include <ros/ros.h>
-#include <hw_message/HardwareMessage.hpp>
+#include <HardwareMessage.hpp>
 
 namespace srs {
 
@@ -47,7 +47,7 @@ public:
 
 private:
 
-    BRAIN_STEM_MSG messageKey_;
+    BRAIN_STEM_MSG		messageKey_;
 };
 
 } // namespace srs

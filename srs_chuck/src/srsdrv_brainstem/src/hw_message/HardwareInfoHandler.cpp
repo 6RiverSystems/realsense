@@ -5,9 +5,9 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-HardwareInfoHandler::HardwareInfoHandler(ChannelBrainstemHardwareInfo channel) :
+HardwareInfoHandler::HardwareInfoHandler(ChannelBrainstemHardwareInfo::Interface& publisher) :
     HardwareMessageHandler(BRAIN_STEM_MSG::HARDWARE_INFO),
-	channel_()
+	publisher_(publisher)
 {
 	hardwareInfoMsg_.name = "";
     char* robotName = getenv("ROBOT_NAME");
@@ -22,9 +22,9 @@ void HardwareInfoHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 {
 	std::stringstream batteryStream;
 
-	if (msg.checkBufferSize<MsgHardwareInfo2>())
+	if (msg.checkBufferSize<HardwareInfoMsg>())
 	{
-		MsgHardwareInfo2 hwInfo = msg.read<MsgHardwareInfo2>();
+		HardwareInfoMsg hwInfo = msg.read<HardwareInfoMsg>();
 
 		char rawUid[255];
 		sprintf(rawUid, "%04X%04X-%04X-%04X-%04X-%04X%04X%04X",
@@ -38,9 +38,12 @@ void HardwareInfoHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 		hardwareInfoMsg_.chassisGeneration = hwInfo.chassisGeneration;
 		hardwareInfoMsg_.brainstemHwVersion = hwInfo.brainstemHwVersion;
 
-		hardwareInfoMsg_.brainstemSwVersion = hwInfo.brainstemFirmwareVersion;
+		hardwareInfoMsg_.brainstemSwVersion = msg.readString();
+	}
 
-		uint8_t numberOfBatteries = hwInfo.numberOfBatteries;
+	if (msg.checkBufferSize<uint8_t>())
+	{
+		uint8_t numberOfBatteries = msg.read<uint8_t>();
 
 		ROS_INFO_STREAM("Number of batteries: " << (int)numberOfBatteries);
 
@@ -58,24 +61,6 @@ void HardwareInfoHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 				", serial#=" << batteryInfoMsg.serialNumber;
 		}
 	}
-	else
-	{
-		HardwareInfoMsg1 hwInfo = msg.read<HardwareInfoMsg1>();
-
-		char rawUid[255];
-		sprintf(rawUid, "%04X%04X-%04X-%04X-%04X-%04X%04X%04X",
-			hwInfo.uniqueId[0], hwInfo.uniqueId[1],
-			hwInfo.uniqueId[2],
-			hwInfo.uniqueId[3],
-			hwInfo.uniqueId[4],
-			hwInfo.uniqueId[5], hwInfo.uniqueId[6], hwInfo.uniqueId[7]);
-		hardwareInfoMsg_.uid = string(rawUid);
-
-		hardwareInfoMsg_.chassisGeneration = hwInfo.chassisGeneration;
-		hardwareInfoMsg_.brainstemHwVersion = hwInfo.brainstemHwVersion;
-
-		hardwareInfoMsg_.brainstemSwVersion = msg.readString();
-	}
 
 	ROS_INFO_STREAM("Hardware Info {" <<
 		"name: " << hardwareInfoMsg_.name <<
@@ -86,7 +71,7 @@ void HardwareInfoHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 		batteryStream.str() << "}");
 
 	// Publish the hardware info
-	channel_.publish(hardwareInfoMsg_);
+	publisher_.publish(hardwareInfoMsg_);
 }
 
 } // namespace srs

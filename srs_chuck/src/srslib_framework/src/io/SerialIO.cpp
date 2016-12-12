@@ -383,7 +383,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 		{
 			#if defined( ENABLE_TEST_FIXTURE )
 
-				ROS_DEBUG_NAMED( m_strDebug, "Time between reads %d: %d ", messageData.size( ), std::chrono::duration_cast<std::chrono::microseconds>(now - m_lastTime).count( ) );
+				ROS_DEBUG_NAMED( m_strDebug, "Time between reads %zu: %zu ", message_.size(), std::chrono::duration_cast<std::chrono::microseconds>(now - m_lastTime).count( ) );
 
 				m_messageTiming.push_back( std::chrono::duration_cast<std::chrono::microseconds>(now - m_lastTime) );
 

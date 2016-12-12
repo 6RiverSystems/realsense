@@ -58,7 +58,7 @@ void UpdateUIHandler::notified(Subscriber<srslib_framework::MsgUpdateUI>* subjec
 
 	srslib_framework::MsgUpdateUI updateUI = tap->pop();
 
-	for (auto uiElement : updateUI.elements)
+	for (auto uiElement : updateUI.uiUpdates)
 	{
 		UpdateUIData msg = {
 			static_cast<uint8_t>( BRAIN_STEM_CMD::UPDATE_LIGHT ),

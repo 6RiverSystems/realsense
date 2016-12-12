@@ -5,8 +5,9 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-LogHandler::LogHandler() :
-    HardwareMessageHandler(BRAIN_STEM_MSG::LOG)
+LogHandler::LogHandler(LogCallbackFn logCallback) :
+    HardwareMessageHandler(BRAIN_STEM_MSG::LOG),
+	logCallback_(logCallback)
 {
 
 }
@@ -38,6 +39,8 @@ void LogHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
 		}
 		break;
 	}
+
+	logCallback_(static_cast<LOG_LEVEL>(log.level), message);
 }
 
 } // namespace srs

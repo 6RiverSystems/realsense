@@ -3,4 +3,4 @@
 #
 # This is proprietary software, unauthorized distribution is not permitted.
 #
-MsgUIState[] elements
+MsgUIState[] uiUpdates

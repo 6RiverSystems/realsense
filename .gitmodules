@@ -17,3 +17,6 @@
 [submodule "srs_chuck/src/sick_tim"]
 	path = srs_chuck/src/sick_tim
 	url = git@github.com:6RiverSystems/sick_tim.git
+[submodule "srs_chuck/src/depthimage_to_laserscan"]
+	path = srs_chuck/src/depthimage_to_laserscan
+	url = https://github.com/6RiverSystems/depthimage_to_laserscan

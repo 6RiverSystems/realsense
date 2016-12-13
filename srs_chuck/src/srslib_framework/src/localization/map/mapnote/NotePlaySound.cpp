@@ -5,6 +5,8 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Constant declaration
 
+const string NotePlaySound::TYPE = "play_sound";
+
 const string NotePlaySound::SOUND_NONE = "none";
 const string NotePlaySound::SOUND_WARNING = "warning";
 
@@ -16,14 +18,14 @@ const string NotePlaySound::SOUND_WARNING = "warning";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 unordered_map<string, int> NotePlaySound::STRING_2_SOUND_TYPE = {
-    {NotePlaySound::SOUND_NONE, NotePlaySound::NONE},
-    {NotePlaySound::SOUND_WARNING, NotePlaySound::WARNING}
+    {NotePlaySound::SOUND_NONE, static_cast<int>(NotePlaySound::SoundType::NONE)},
+    {NotePlaySound::SOUND_WARNING, static_cast<int>(NotePlaySound::SoundType::WARNING)}
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 unordered_map<int, string> NotePlaySound::SOUND_TYPE_2_STRING = {
-    {NotePlaySound::NONE, NotePlaySound::SOUND_NONE},
-    {NotePlaySound::WARNING, NotePlaySound::SOUND_WARNING}
+    {static_cast<int>(NotePlaySound::SoundType::NONE), NotePlaySound::SOUND_NONE},
+    {static_cast<int>(NotePlaySound::SoundType::WARNING), NotePlaySound::SOUND_WARNING}
 };
 
 } // namespace srs

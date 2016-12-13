@@ -19,8 +19,9 @@ void TaskPlaySound::run(ExecutiveContext& context)
     for (auto detectedArea : context.activeLabeledAreas)
     {
         LogicalMap::LabeledArea area = detectedArea.first;
+        shared_ptr<NotePlaySound> note = area.notes->get<NotePlaySound>(NotePlaySound::TYPE);
 
-        if (area.notes->has(MapNote::PLAY_SOUND))
+        if (note)
         {
             switch (detectedArea.second)
             {

@@ -12,14 +12,15 @@
 using namespace std;
 
 #include <srslib_framework/localization/map/mapnote/MapNote.hpp>
+#include <srslib_framework/localization/map/mapnote/MapNoteFactory.hpp>
 
 namespace srs {
 
-class MapNotes : public unordered_map<int, MapNote::BaseMapNoteType>
+class MapNotes : public unordered_map<string, MapNote::BaseMapNoteType>
 {
 public:
     using BaseMapNoteType = MapNote::BaseMapNoteType;
-    using MapBaseType = unordered_map<int, BaseMapNoteType>;
+    using MapBaseType = unordered_map<string, BaseMapNoteType>;
 
     MapNotes()
     {}
@@ -29,11 +30,10 @@ public:
 
     // TODO: The add method should throw an exception instead of returning a boolean
     bool add(BaseMapNoteType note);
-    bool add(const MapNote::NoteTypeEnum nodeType, string value);
-    bool add(const string& field, string value);
+    bool add(const string& noteType, const string& value);
 
     template<typename TYPE>
-    shared_ptr<TYPE> get(const MapNote::NoteTypeEnum nodeType) const
+    shared_ptr<TYPE> get(const string& nodeType) const
     {
         auto note = MapBaseType::find(nodeType);
         if (note == MapBaseType::end())
@@ -44,7 +44,7 @@ public:
         return static_pointer_cast<TYPE>(note->second);
     }
 
-    bool has(const MapNote::NoteTypeEnum nodeType) const;
+    bool has(const string& nodeType) const;
 
     friend bool operator==(const MapNotes& lhs, const MapNotes& rhs)
     {
@@ -60,7 +60,7 @@ public:
 
         for (auto note : lhs)
         {
-            if (!rhs.has(static_cast<MapNote::NoteTypeEnum>(note.first)))
+            if (!rhs.has(note.first))
             {
                 return false;
             }
@@ -68,7 +68,7 @@ public:
 
         for (auto note : rhs)
         {
-            if (!lhs.has(static_cast<MapNote::NoteTypeEnum>(note.first)))
+            if (!lhs.has(note.first))
             {
                 return false;
             }

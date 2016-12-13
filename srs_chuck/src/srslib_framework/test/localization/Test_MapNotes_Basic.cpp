@@ -11,6 +11,7 @@ using namespace std;
 #include <ros/ros.h>
 
 #include <srslib_framework/localization/map/mapnote/MapNote.hpp>
+#include <srslib_framework/localization/map/mapnote/MapNoteFactory.hpp>
 #include <srslib_framework/localization/map/mapnote/MapNotes.hpp>
 #include <srslib_framework/localization/map/mapnote/NotePlaySound.hpp>
 #include <srslib_framework/localization/map/mapnote/NoteSetMaxVelocity.hpp>
@@ -20,24 +21,21 @@ using namespace srs;
 TEST(Test_MapNotes, Basic)
 {
     MapNotes notes;
-    notes.add(MapNote::PLAY_SOUND, "warning");
-    notes.add(MapNote::instanceOf(MapNote::SET_MAX_VELOCITY, "22"));
+    notes.add(NotePlaySound::TYPE, "warning");
+    notes.add(MapNoteFactory::instanceOf(NoteSetMaxVelocity::TYPE, "22"));
 
     cout << notes << endl;
 
-    ASSERT_FALSE(notes.add(MapNote::SET_MAX_VELOCITY, "33")) <<
+    ASSERT_FALSE(notes.add(NoteSetMaxVelocity::TYPE, "33")) <<
         "The note was added regardless being a duplicate";
 
-    ASSERT_TRUE(notes.has(MapNote::PLAY_SOUND)) <<
+    ASSERT_TRUE(notes.has(NotePlaySound::TYPE)) <<
         "The sound note was not found";
 
-    ASSERT_TRUE(notes.has(MapNote::SET_MAX_VELOCITY)) <<
+    ASSERT_TRUE(notes.has(NoteSetMaxVelocity::TYPE)) <<
         "The max_velocity note was not found";
 
-    ASSERT_FALSE(notes.has(MapNote::NONE)) <<
-        "The none note was found";
-
-    shared_ptr<NoteSetMaxVelocity> maxVelocity = notes.get<NoteSetMaxVelocity>(MapNote::SET_MAX_VELOCITY);
+    shared_ptr<NoteSetMaxVelocity> maxVelocity = notes.get<NoteSetMaxVelocity>(NoteSetMaxVelocity::TYPE);
 
     ASSERT_FLOAT_EQ(22.0, maxVelocity->getMaxVelocity()) <<
         "The max velocity is not as expected";
@@ -46,18 +44,18 @@ TEST(Test_MapNotes, Basic)
 TEST(Test_MapNotes, Equal)
 {
     MapNotes notes1;
-    notes1.add(MapNote::PLAY_SOUND, "warning");
-    notes1.add(MapNote::instanceOf(MapNote::SET_MAX_VELOCITY, "22"));
+    notes1.add(NotePlaySound::TYPE, "warning");
+    notes1.add(MapNoteFactory::instanceOf(NoteSetMaxVelocity::TYPE, "22"));
 
     MapNotes notes2;
-    notes2.add(MapNote::PLAY_SOUND, "warning");
-    notes2.add(MapNote::instanceOf(MapNote::SET_MAX_VELOCITY, "22"));
+    notes2.add(NotePlaySound::TYPE, "warning");
+    notes2.add(MapNoteFactory::instanceOf(NoteSetMaxVelocity::TYPE, "22"));
 
     ASSERT_EQ(notes1, notes2) <<
         "The notes are expected to be equal";
 
     MapNotes notes3;
-    notes3.add(MapNote::PLAY_SOUND, "warning");
+    notes3.add(NotePlaySound::TYPE, "warning");
 
     ASSERT_NE(notes1, notes3) <<
         "The notes are not expected to be equal";

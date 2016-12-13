@@ -16,27 +16,34 @@ namespace srs {
 class NoteSetMaxVelocity : public MapNote
 {
 public:
+    static const string TYPE;
+
     NoteSetMaxVelocity(float maxVelocity) :
-        MapNote(MapNote::SET_MAX_VELOCITY),
+        MapNote(),
         maxVelocity_(maxVelocity)
     {}
 
     NoteSetMaxVelocity(string maxVelocity) :
-        MapNote(MapNote::SET_MAX_VELOCITY),
+        MapNote(),
         maxVelocity_(stof(maxVelocity))
     {}
 
     virtual ~NoteSetMaxVelocity()
     {}
 
-    string getValueString() const
+    string getType() const
+    {
+        return TYPE;
+    }
+
+    string getValue() const
     {
         return to_string(maxVelocity_);
     }
 
     ostream& toString(ostream& stream) const
     {
-        return MapNote::toString(stream) << ", mV: " << maxVelocity_;
+        return stream << "type: " << getType() << ", maxVelocity: " << getValue();
     }
 
     float getMaxVelocity() const

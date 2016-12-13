@@ -63,7 +63,7 @@ void Executive::updateContext()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::readConfigurationParameters()
 {
-    getParamFromServer(ChuckConfig::Entities::LOCAL_PLANNER, ChuckConfig::Parameters::MAX_VELOCITY,
+    getGlobalParameter(ChuckConfig::Entities::LOCAL_PLANNER, ChuckConfig::Parameters::MAX_VELOCITY,
         context_.maxVelocity, 1.0f);
 
     taskSetMaxVelocity_.setDefaultMaxVelocity(context_.maxVelocity);

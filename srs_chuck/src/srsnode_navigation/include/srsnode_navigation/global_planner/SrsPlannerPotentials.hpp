@@ -26,8 +26,8 @@ using namespace std;
 
 #include <srsnode_navigation/SrsPlannerConfig.h>
 
-#include <srsnode_navigation/global_planner/AStarPotentials.hpp>
-#include <srsnode_navigation/global_planner/OrientationFilter.hpp>
+#include <srsnode_navigation/global_planner/potentials/AStarPotentials.hpp>
+#include <srsnode_navigation/global_planner/potentials/OrientationFilter.hpp>
 using namespace srs;
 
 namespace srs {

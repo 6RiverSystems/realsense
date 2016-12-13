@@ -20,7 +20,8 @@ using namespace std;
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
-#include <srsnode_navigation/global_planner/AStarPotentials.hpp>
+
+#include <srsnode_navigation/global_planner/potentials/AStarPotentials.hpp>
 
 #include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
 using namespace srs;
@@ -31,59 +32,17 @@ TEST(Test_Navigation_AStarConventional, SmallSearch)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     test::Grid2dUtils::addRectanglePayload(grid, 0, 0, GRID_SIZE - 1, GRID_SIZE - 1, 0);
-//    test::Grid2dUtils::addCObstacle(grid, 0, 0, GRID_SIZE - 1, GRID_SIZE - 1);
 
     MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 0.05, Pose<>::ZERO);
 
     AStar algorithm;
 
-    Grid2d::Position start(0, 0, 0);
+    Grid2d::Position start(1, 1, 0);
     Grid2d::Position goal(5, 5, 0);
 
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromSingleGoal(
         mapStack, start, goal);
 
-    cout << *gridSolution << endl;
-
-    Trajectory<> trajectory;
-
-    SimpleTrajectoryGenerator solutionConverter(mapStack);
-    solutionConverter.fromSolution(gridSolution);
-    solutionConverter.getTrajectory(trajectory);
-
-    cout << trajectory << endl;
-
-//    Grid2d grid(GRID_SIZE, GRID_SIZE);
-//    //test::Grid2dUtils::addObstacle(grid, 4, 7, 8, 7);
-//    test::Grid2dUtils::addRectanglePayload(grid, 0, 0, GRID_SIZE - 1, GRID_SIZE - 1, 0);
-//    //test::Grid2dUtils::addWeights(grid, 4, 8, 8, 12, 0, 0, 0, Grid2d::PAYLOAD_MAX);
-//
-//    LogicalMapFactory logicalMapFactory;
-//    LogicalMap* logical = logicalMapFactory.fromGrid2d(&grid, 1, Pose<>::ZERO);
-//
-//    OccupancyMapFactory occupancyMapFactory;
-//    OccupancyMap* occupancy = occupancyMapFactory.fromGrid2d(&grid, 1, Pose<>::ZERO);
-//    costmap_2d::Costmap2D* cost2d = MapAdapter::map2CostMap2D(occupancy);
-//
-//    cout << *logical << endl;
-//    cout << *occupancy << endl;
-//
-//    AStarPotentials astar(logical, cost2d);
-//    std::vector<std::pair<float, float>> path;
-//    float* potentials;
-//
-//    if (astar.calculatePath(AStarPotentials::SearchParameters(), 0, 0, 0, 3, path, potentials))
-//    {
-//        for (auto step : path)
-//        {
-//            cout << step.first << " - " << step.second << endl;
-//        }
-//
-//        cout << test::Print::printToString(potentials, GRID_SIZE, GRID_SIZE);
-//    }
-//    else
-//    {
-//        cout << "Path not found" << endl;
-//    }
-//    cout << test::Print::printToString(potentials, GRID_SIZE, GRID_SIZE);
+    ASSERT_TRUE(gridSolution->isValid()) << "No valid solution was found";
+    ASSERT_EQ(121, gridSolution->getExploredNodes()) << "The solution is not as expected";
 }

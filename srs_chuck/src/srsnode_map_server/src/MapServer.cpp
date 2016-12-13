@@ -28,10 +28,10 @@ MapServer::MapServer(string name, int argc, char** argv) :
     RosUnit(name, argc, argv, REFRESH_RATE_HZ),
     mapStack_(nullptr)
 {
-    getParamFromEnv(ChuckConfig::Parameters::MAP_STACK, mapStackFilename_, string(""));
+    getLocalParameter(ChuckConfig::Parameters::MAP_STACK, mapStackFilename_, string(""));
     ROS_INFO_STREAM("Target map stack: " << mapStackFilename_);
 
-    getParamFromEnv(ChuckConfig::Parameters::FRAME_ID, frameId_, ChuckConfig::Transforms::MAP);
+    getLocalParameter(ChuckConfig::Parameters::FRAME_ID, frameId_, ChuckConfig::Transforms::MAP);
     ROS_INFO_STREAM("Frame id: " << frameId_);
 
     mapStack_ = MapStackFactory::fromJsonFile(mapStackFilename_);

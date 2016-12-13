@@ -8,23 +8,24 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srsnode_navigation)
 
 set(${PROJECT_NAME}_SOURCES
-#    src/global_planner/AStarConventional.cpp
-#    src/global_planner/AStarPotentials.cpp
-#    src/global_planner/QuadraticCalculator.cpp
-#    src/global_planner/OrientationFilter.cpp
-#    src/global_planner/AStarExpansion.cpp
-#    src/global_planner/PotentialCalculator.cpp
-#    src/global_planner/GradientPath.cpp
-#    src/global_planner/GridPath.cpp
+    src/global_planner/SrsPlannerConventional.cpp
+    src/global_planner/SrsPlannerPotentials.cpp
+    src/global_planner/potentials/AStarPotentials.cpp
+    src/global_planner/potentials/AStarPotentials.cpp
+    src/global_planner/potentials/QuadraticCalculator.cpp
+    src/global_planner/potentials/OrientationFilter.cpp
+    src/global_planner/potentials/AStarExpansion.cpp
+    src/global_planner/potentials/PotentialCalculator.cpp
+    src/global_planner/potentials/GradientPath.cpp
+    src/global_planner/potentials/GridPath.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES
 
-#    test/TestNavigation_OneWay.cpp
-#    test/TestNavigation_WithCostMap.cpp
-#    test/TestNavigation_Barrett_BigSearch.cpp
     test/TestNavigation_AStarConventional_SmallSearch.cpp
-#    test/TestNavigation_AStarPotentials_SmallSearch.cpp
+    test/TestNavigation_AStarPotentials_Barrett_BigSearch.cpp
+    test/TestNavigation_AStarPotentials_SmallSearch.cpp
+    test/TestNavigation_AStarPotentials_OneWay.cpp
 )
 
 ####################################################################################################
@@ -35,7 +36,7 @@ project(${PROJECT_NAME})
 set(PROJECT_NODE ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
-# set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp

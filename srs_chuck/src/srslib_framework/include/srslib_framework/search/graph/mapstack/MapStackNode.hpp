@@ -91,7 +91,7 @@ struct MapStackNode : public SearchNode
 
     int getTotalCost() const
     {
-        return BasicMath::noOverflowAdd(g_, h_);
+        return g_ + h_;
     }
 
     bool goalReached() const

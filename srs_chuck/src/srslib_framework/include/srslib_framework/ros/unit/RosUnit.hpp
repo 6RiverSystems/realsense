@@ -25,8 +25,8 @@ protected:
     virtual void initialize()
     {}
 
-    void getParamFromServer(string service, string parameter, float& value, float defaultValue);
-    void getParamFromEnv(string parameter, string& value, string defaultValue);
+    void getGlobalParameter(string service, string parameter, float& value, float defaultValue);
+    void getLocalParameter(string parameter, string& value, string defaultValue);
 
 private:
     ros::Time currentTime_;

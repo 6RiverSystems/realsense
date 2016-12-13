@@ -81,8 +81,8 @@ srslib_framework::MapNotes LogicalMapMessageFactory::notes2Msg(shared_ptr<MapNot
     for (auto note : *notes)
     {
         srslib_framework::MapNote msgSingleNote;
-        msgSingleNote.note = note.second->getTypeString();
-        msgSingleNote.value = note.second->getValueString();
+        msgSingleNote.note = note.second->getType();
+        msgSingleNote.value = note.second->getValue();
 
         msgNotes.notes.push_back(msgSingleNote);
     }

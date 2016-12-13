@@ -16,40 +16,47 @@ namespace srs {
 class NotePlaySound : public MapNote
 {
 public:
-    enum SoundTypeEnum {
+    static const string TYPE;
+
+    enum class SoundType : unsigned char {
         NONE = 0,
-        WARNING
+        WARNING = 1
     };
 
     NotePlaySound() :
-        MapNote(MapNote::PLAY_SOUND),
-        soundType_(NONE)
+        MapNote(),
+        soundType_(SoundType::NONE)
     {}
 
-    NotePlaySound(SoundTypeEnum sound) :
-        MapNote(MapNote::PLAY_SOUND),
+    NotePlaySound(SoundType sound) :
+        MapNote(),
         soundType_(sound)
     {}
 
     NotePlaySound(string sound) :
-        MapNote(MapNote::PLAY_SOUND),
-        soundType_(static_cast<SoundTypeEnum>(STRING_2_SOUND_TYPE[sound]))
+        MapNote(),
+        soundType_(static_cast<SoundType>(STRING_2_SOUND_TYPE[sound]))
     {}
 
     virtual ~NotePlaySound()
     {}
 
-    string getValueString() const
+    string getType() const
     {
-        return SOUND_TYPE_2_STRING[soundType_];
+        return TYPE;
+    }
+
+    string getValue() const
+    {
+        return SOUND_TYPE_2_STRING[static_cast<int>(soundType_)];
     }
 
     ostream& toString(ostream& stream) const
     {
-        return MapNote::toString(stream) << ", s: " << soundType_;
+        return stream << "type: " << getType() << ", soundType: " << getValue();
     }
 
-    SoundTypeEnum getSoundType() const
+    SoundType getSoundType() const
     {
         return soundType_;
     }
@@ -61,7 +68,7 @@ private:
     static unordered_map<int, string> SOUND_TYPE_2_STRING;
     static unordered_map<string, int> STRING_2_SOUND_TYPE;
 
-    SoundTypeEnum soundType_;
+    SoundType soundType_;
 };
 
 } // namespace srs

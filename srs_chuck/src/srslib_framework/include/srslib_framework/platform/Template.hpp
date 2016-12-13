@@ -12,19 +12,19 @@ namespace srs {
 struct Template
 {
     template<typename T>
-    T* ptr(T& objectReference)
+    static T* ptr(T& objectReference)
     {
         return &objectReference;
     }
 
     template<typename T>
-    T* ptr(T* objectPointer)
+    static T* ptr(T* objectPointer)
     {
         return objectPointer;
     }
 
     template<typename T>
-    T* ptr(shared_ptr<T>& objectSharedPointer)
+    static T* ptr(shared_ptr<T>& objectSharedPointer)
     {
         return objectSharedPointer->get();
     }

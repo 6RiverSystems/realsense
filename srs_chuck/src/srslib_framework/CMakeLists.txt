@@ -16,9 +16,10 @@ set(${PROJECT_NAME}_SOURCES
     src/localization/map/MapAdapter.cpp
     src/localization/map/MapStack.cpp
     src/localization/map/MapStackFactory.cpp
-    src/localization/map/mapnote/MapNote.cpp
+    src/localization/map/mapnote/MapNoteFactory.cpp
     src/localization/map/mapnote/MapNotes.cpp
     src/localization/map/mapnote/NotePlaySound.cpp
+    src/localization/map/mapnote/NoteSetMaxVelocity.cpp
     src/localization/map/logical/LogicalMap.cpp
     src/localization/map/logical/LogicalMapFactory.cpp
     src/localization/map/occupancy/OccupancyMap.cpp

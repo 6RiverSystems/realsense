@@ -4,8 +4,6 @@
 
 #include <pluginlib/class_list_macros.h>
 
-PLUGINLIB_EXPORT_CLASS(srs::SrsPlannerConventional, nav_core::BaseGlobalPlanner)
-
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/trajectory/SimpleTrajectoryGenerator.hpp>
 #include <srslib_framework/planning/pathplanning/trajectory/Trajectory.hpp>
@@ -14,11 +12,7 @@ PLUGINLIB_EXPORT_CLASS(srs::SrsPlannerConventional, nav_core::BaseGlobalPlanner)
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
-//#include <sys/types.h>
-//#include <unistd.h>
-//#include <sys/syscall.h>
-//#include <sys/time.h>
-//#include <sys/resource.h>
+PLUGINLIB_EXPORT_CLASS(srs::SrsPlannerConventional, nav_core::BaseGlobalPlanner)
 
 namespace srs {
 
@@ -64,29 +58,6 @@ bool SrsPlannerConventional::makePlan(
     const geometry_msgs::PoseStamped& goal,
     vector<geometry_msgs::PoseStamped>& plan)
 {
-//    sched_param sch;
-//    int policy;
-//
-//    pthread_getschedparam(pthread_self(), &policy, &sch);
-//
-//    pid_t tid = syscall(SYS_gettid);
-//    printf("tid %d , %d\n",tid , getpriority(PRIO_PROCESS, tid));
-//
-//    int ret = setpriority(PRIO_PROCESS, tid, 10);
-//    cout << "ret: " << ret << endl;
-//
-//    printf("tid thread %d , %d\n", tid, getpriority(PRIO_PROCESS, tid));
-
-//    ROS_WARN_STREAM("priority: " << sch.sched_priority);
-//    ROS_WARN_STREAM("policy: " << policy);
-
-    //    sch.sched_priority = 20;
-//    if (pthread_setschedparam(t1.native_handle(), SCHED_FIFO, &sch)) {
-//        std::cout << "Failed to setschedparam: " << std::strerror(errno) << '\n';
-//    }
-
-//    pthread_setschedprio(pthread_self(), 2);
-
     // Find a suitable solution for the provided goal
     Pose<> robotPose = PoseMessageFactory::poseStamped2Pose(start);
     Pose<> target = PoseMessageFactory::poseStamped2Pose(goal);

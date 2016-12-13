@@ -18,7 +18,8 @@ void TaskSetMaxVelocity::run(ExecutiveContext& context)
     for (auto detectedArea : context.activeLabeledAreas)
     {
         LogicalMap::LabeledArea area = detectedArea.first;
-        shared_ptr<NoteSetMaxVelocity> note = area.notes->get<NoteSetMaxVelocity>(MapNote::SET_MAX_VELOCITY);
+        shared_ptr<NoteSetMaxVelocity> note = area.notes->get<NoteSetMaxVelocity>(
+            NoteSetMaxVelocity::TYPE);
 
         if (note)
         {

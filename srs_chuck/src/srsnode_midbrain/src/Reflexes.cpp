@@ -18,10 +18,12 @@
 #include <srslib_framework/ros/message/PolygonMessageFactory.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
+#include <srslib_framework/platform/timing/ScopedTimingSampleRecorder.hpp>
+
 namespace srs
 {
 
-Reflexes::Reflexes()
+Reflexes::Reflexes() : tdr_("Reflexes")
 {
     readParams();
 }
@@ -65,6 +67,8 @@ void Reflexes::readParams()
 
 void Reflexes::execute()
 {
+    srs::ScopedTimingSampleRecorder stsr(tdr_.getRecorder("-Loop"));
+
     // Get the sensor position
     hardStopReflex_.setLidarPose(tapLidarPoseOnRobot_.pop());
 

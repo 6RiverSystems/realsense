@@ -35,10 +35,13 @@
         <remap from="camera_info" to="/internal/sensors/rgbd/depth/camera_info"/>
         <remap from="scan" to="/internal/sensors/rgbd/scan"/>
         <rosparam>
-            scan_height: 150
+            output_frame_id: laser_frame
+            scan_height: 400
             scan_time: 0.333
             range_min: 0.3
-            range_max: 4.0
+            range_max: 8.0
+            height_min: 0.1
+            height_max: 5.0
         </rosparam>
         </node>
 

@@ -11,7 +11,6 @@
 #include <srslib_framework/ros/unit/RosUnit.hpp>
 
 #include <srsnode_executive/ExecutiveContext.hpp>
-#include <srsnode_executive/sw_message/CommandLineHandler.hpp>
 #include <srsnode_executive/task/TaskDetectLabeledAreas.hpp>
 #include <srsnode_executive/task/TaskPlayWarningSound.hpp>
 
@@ -39,7 +38,6 @@ private:
 
     void updateContext();
 
-    CommandLineHandler commandLineHandler_;
     ExecutiveContext context_;
 
     TapOdometryCmd_Velocity tapCommandedVelocity_;

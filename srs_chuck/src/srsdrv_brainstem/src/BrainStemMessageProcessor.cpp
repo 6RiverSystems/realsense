@@ -27,9 +27,12 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	hasValidOperationalState_(false),
 	lastOperationalStateRequestTime_(),
 	connectedChannel_( ),
-    soundHandler_(this),
+    pingHandler_(this),
 	setMotionStateHandler_(this),
-	pingHandler_(this),
+	setOdometryRpmHandler_(this),
+	shutdownHandler_(this),
+	soundHandler_(this),
+	updateUIHandler_(this),
 	odometryRpmChannel_(),
 	hardwareInfoChannel_(),
 	operationalStateChannel_(),
@@ -47,6 +50,13 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
     hwMessageHandlers_[powerStateHandler_.getKey()] = &powerStateHandler_;
     hwMessageHandlers_[buttonPressedHandler_.getKey()] = &buttonPressedHandler_;
     hwMessageHandlers_[logHandler_.getKey()] = &logHandler_;
+
+    pingHandler_.attach();
+    setMotionStateHandler_.attach();
+    setOdometryRpmHandler_.attach();
+    shutdownHandler_.attach();
+    soundHandler_.attach();
+    updateUIHandler_.attach();
 }
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor( )

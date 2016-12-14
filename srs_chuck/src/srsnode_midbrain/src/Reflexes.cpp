@@ -86,14 +86,22 @@ void Reflexes::execute()
     // Call for hard stop check.
     if (hardStopReflex_.checkHardStop())
     {
-        ROS_WARN("Publishing stop");
-        cmdClChannel_.publish("STOP;");
+    	srslib_framework::MsgSetOperationalState setOperationalState;
+    	setOperationalState.state = true;
+    	setOperationalState.operationalState.hardStop = true;
+
+        ROS_WARN_THROTTLE(1.0f, "Publishing stop");
+        setMotionStateChannel_.publish(setOperationalState);
     }
     else if (hardStopReflex_.checkForClear())
     {
-        ROS_INFO("Clearing motion.");
-        cmdClChannel_.publish("CLEAR_MOTION_STATUS;");
-    }
+       	srslib_framework::MsgSetOperationalState setOperationalState;
+		setOperationalState.state = false;
+		setOperationalState.operationalState.hardStop = true;
+
+		ROS_WARN_THROTTLE(1.0f, "Clearing motion status stop");
+		setMotionStateChannel_.publish(setOperationalState);
+   }
 
     // Publish the polygon
     dangerZoneChannel_.publish(hardStopReflex_.getDangerZoneForDisplay());

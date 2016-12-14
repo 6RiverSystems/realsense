@@ -27,7 +27,6 @@ namespace debug {
 
 namespace driver {
 
-	static const string BRAINSTEM_CMD_STARTUP = "/internal/drivers/brainstem/cmd/startup";
 	static const string BRAINSTEM_CMD_SHUTDOWN = "/internal/drivers/brainstem/cmd/shutdown";
     static const string BRAINSTEM_CMD_SOUND = "/internal/drivers/brainstem/cmd/sound";
     static const string BRAINSTEM_CMD_UPDATE_LIGHTS = "/internal/drivers/brainstem/cmd/update_ui";
@@ -36,11 +35,9 @@ namespace driver {
     static const string BRAINSTEM_STATE_CONNECTED = "/internal/drivers/brainstem/state/connected";
     static const string BRAINSTEM_STATE_POWER = "/internal/drivers/brainstem/state/power";
     static const string BRAINSTEM_BUTTON_PRESSED = "/internal/drivers/brainstem/button_pressed";
-    static const string BRAINSTEM_ODOMETRY_COUNT = "/internal/sensors/odometry/count";
     static const string BRAINSTEM_ODOMETRY_RPM = "/internal/sensors/odometry/rpm/raw";
+    static const string BRAINSTEM_ODOMETRY_RPM_CMD = "/internal/sensors/odometry/rpm/cmd";
     static const string ODOMETRY_CMD_VELOCITY = "/internal/sensors/odometry/velocity/cmd";
-    static const string BRAINSTEM_SENSOR_FRAME = "/internal/sensors/sensor_frame/raw";
-    static const string BRAINSTEM_IMU = "/internal/sensors/imu/raw";
     static const string BRAINSTEM_HARDWARE_INFO = "/info/hardware";
     static const string BRAINSTEM_OPERATIONAL_STATE = "/info/operational_state";
 } // namespace debug
@@ -69,6 +66,9 @@ namespace internal {
     static const string MAP_ROS_WEIGHTS_WEST = "/internal/state/map/weights_west";
     static const string MAP_STACK = "/internal/state/map/stack";
 
+    static const string ODOMETRY_VELOCITY_ESTIMATE = "/internal/sensors/odometry/velocity/estimate";
+
+    static const string ODOMETRY_INITIAL_POSE = "/request/odometry/initial_pose";
     static const string SWCMD_INITIAL_POSE = "/internal/sw_cmd/initial_pose";
 
 } // namespace internal
@@ -78,13 +78,6 @@ namespace monitoring {
     static const string TIMING_DATA = "/monitoring/timing_data";
 
 } // namespace monitoring
-
-
-namespace node {
-
-    static const string EXECUTIVE_CMD_CL = "/cmd_ll";
-
-} // namespace node
 
 namespace sensor {
     static const string FILTERED_LIDAR = "/internal/sensors/lidar/scan/filtered";

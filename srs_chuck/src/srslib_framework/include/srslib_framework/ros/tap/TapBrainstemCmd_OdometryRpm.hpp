@@ -15,7 +15,7 @@ class TapBrainstemCmd_OdometryRpm :
 {
 public:
     TapBrainstemCmd_OdometryRpm() :
-        SubscriberOdometryRpm(ChuckTopics::driver::BRAINSTEM_CMD_UPDATE_LIGHTS)
+        SubscriberOdometryRpm(ChuckTopics::driver::BRAINSTEM_ODOMETRY_RPM_CMD)
     {}
 };
 

@@ -32,9 +32,12 @@ using namespace std;
 #include <srsdrv_brainstem/hw_message/OdometryRpmHandler.hpp>
 #include <srsdrv_brainstem/hw_message/ButtonPressedHandler.hpp>
 
-#include <srsdrv_brainstem/sw_message/SoundHandler.hpp>
-#include <srsdrv_brainstem/sw_message/SetMotionStateHandler.hpp>
 #include <srsdrv_brainstem/sw_message/PingHandler.hpp>
+#include <srsdrv_brainstem/sw_message/SetMotionStateHandler.hpp>
+#include <srsdrv_brainstem/sw_message/SetOdometryRpmHandler.hpp>
+#include <srsdrv_brainstem/sw_message/ShutdownHandler.hpp>
+#include <srsdrv_brainstem/sw_message/SoundHandler.hpp>
+#include <srsdrv_brainstem/sw_message/UpdateUIHandler.hpp>
 
 namespace srs {
 
@@ -128,9 +131,12 @@ private:
     OdometryRpmHandler					odometryRpmHandler_;
     ButtonPressedHandler				buttonPressedHandler_;
 
-    SoundHandler						soundHandler_;
-    SetMotionStateHandler				setMotionStateHandler_;
     PingHandler							pingHandler_;
+    SetMotionStateHandler				setMotionStateHandler_;
+    SetOdometryRpmHandler				setOdometryRpmHandler_;
+    ShutdownHandler						shutdownHandler_;
+    SoundHandler						soundHandler_;
+    UpdateUIHandler						updateUIHandler_;
 };
 
 } /* namespace srs */

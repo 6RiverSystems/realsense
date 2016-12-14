@@ -61,18 +61,6 @@ private:
 
     static constexpr double MAX_ALLOWED_ODOM_DELAY = 0.02; // 20ms
 
-	static constexpr auto ODOMETRY_RPM_RAW_TOPIC = "/internal/sensors/odometry/rpm/raw";
-
-	static constexpr auto ODOMETRY_RPM_COMMAND_TOPIC = "/internal/sensors/odometry/rpm/cmd";
-
-	static constexpr auto ODOMETRY_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity/pose";
-
-	static constexpr auto ODOMETRY_ESTIMATE_OUTPUT_TOPIC = "/internal/sensors/odometry/velocity/estimate";
-
-	static constexpr auto INITIAL_POSE_TOPIC = "/request/odometry/initial_pose";
-
-	static constexpr auto PING_COMMAND_TOPIC = "/internal/state/ping";
-
     ros::NodeHandle nodeHandle_;
 
     Pose<> pose_;
@@ -105,19 +93,19 @@ private:
 
 	double rightWheelRadius_;
 
-  double  cmd_vel_timeout_ = 0.5;
+	double  cmd_vel_timeout_ = 0.5;
 
-  double linear_acceleration_rate_ = 0.7; // m/s^2 (from the firmware)
+	double linear_acceleration_rate_ = 0.7; // m/s^2 (from the firmware)
 
-  double angular_acceleration_rate_ = 2.63; // rad/s^2 (from the firmware)
+	double angular_acceleration_rate_ = 2.63; // rad/s^2 (from the firmware)
 
-  double velocity_loop_delays_ = 0.1;  // Time lag between sending command and getting back velocities (from measurements)
+	double velocity_loop_delays_ = 0.1;  // Time lag between sending command and getting back velocities (from measurements)
 
-  boost::mutex cmd_vel_mutex_;
+	boost::mutex cmd_vel_mutex_;
 
-  geometry_msgs::Twist cmd_vel_;
+	geometry_msgs::Twist cmd_vel_;
 
-  double cmd_vel_time_ = 0;
+	double cmd_vel_time_ = 0;
 };
 
 } // namespace srs

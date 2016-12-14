@@ -20,7 +20,6 @@ set(${PROJECT_NAME}_SOURCES
     src/hw_message/OperationalStateHandler.cpp
     src/hw_message/PowerStateHandler.cpp
 
-    src/sw_message/StartupHandler.cpp
     src/sw_message/ShutdownHandler.cpp
     src/sw_message/PingHandler.cpp
     src/sw_message/SetOdometryRpmHandler.cpp
@@ -40,7 +39,6 @@ set(${PROJECT_NAME}_TEST_SOURCES
 	test/sw_message/Test_Ping.cpp
 	test/sw_message/Test_SetMotionState.cpp
 	test/sw_message/Test_SetOdometryRpm.cpp
-	test/sw_message/Test_Startup.cpp
 	test/sw_message/Test_Shutdown.cpp
 	test/sw_message/Test_Sound.cpp
 	test/sw_message/Test_UpdateUI.cpp

@@ -11,8 +11,7 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Executive::Executive(string name, int argc, char** argv) :
-    RosUnit(name, argc, argv, REFRESH_RATE_HZ),
-    commandLineHandler_(this)
+    RosUnit(name, argc, argv, REFRESH_RATE_HZ)
 {
     context_.robotPose = Pose<>::INVALID;
     context_.mapStack = nullptr;

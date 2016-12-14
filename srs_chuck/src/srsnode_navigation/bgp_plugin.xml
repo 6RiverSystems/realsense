@@ -15,4 +15,12 @@
             This is the 6RS global planner plugin.
         </description>
     </class>
+
+    <class name="global_planner/SrsPlannerPotentials" type="srs::SrsPlannerPotentials" 
+        base_class_type="nav_core::BaseGlobalPlanner">
+
+        <description>
+            This is the adapted ROS global planner plugin.
+        </description>
+    </class>
  </library>

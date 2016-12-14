@@ -59,6 +59,13 @@ namespace internal {
 
 } // namespace internal
 
+namespace monitoring {
+
+    static const string TIMING_DATA = "/monitoring/timing_data";
+
+} // namespace monitoring
+
+
 namespace node {
 
     static const string EXECUTIVE_CMD_CL = "/cmd_ll";

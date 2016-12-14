@@ -26,11 +26,11 @@ TEST(Test_AStar_Grid2d_Barrett, BigSearch)
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/barrett/barrett.yaml");
 
     // Looking for a path between
-    // Pose {@: 1.4686e+09, x: 14.7855, y: 4.65954, t: 1.53943} (148, 47, 90)
+    // Pose {@: 1.4686e+09, x: 14.0, y: 10.0, t: 1.53943} (140, 100, 90)
     // and
-    // Pose {@: 1.4686e+09, x: 33.215, y: 51.703, t: 1.5708} (332, 522, 90)
-    Grid2d::Position startPosition(148, 47, 90);
-    Grid2d::Position goalPosition(332, 522, 90);
+    // Pose {@: 1.4686e+09, x: 73.0, y: 178.0, t: 1.5708} (730, 1780, 90)
+    Grid2d::Position startPosition(140, 100, 90);
+    Grid2d::Position goalPosition(730, 1780, 90);
 
     AStar algorithm;
     Grid2dNode* start = Grid2dNode::instanceOfStart(mapStack->getLogicalMap()->getGrid(),
@@ -48,8 +48,8 @@ TEST(Test_AStar_Grid2d_Barrett, BigSearch)
         algorithm.search(start, goal);
     }
 
-    float elapsed = timer.elapsedMicroseconds();
+    float elapsed = timer.elapsedMilliseconds();
 
-    cout << "Elapsed time: " << elapsed << "us" << endl;
-    cout << "Average time: " << elapsed / TRIALS << "us" << endl;
+    cout << "Elapsed time: " << elapsed << "ms" << endl;
+    cout << "Average time: " << elapsed / TRIALS << "ms" << endl;
 }

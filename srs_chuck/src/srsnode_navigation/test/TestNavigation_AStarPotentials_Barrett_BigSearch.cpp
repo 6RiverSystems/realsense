@@ -16,40 +16,38 @@ using namespace srs;
 
 static const int TRIALS = 10;
 
-//TEST(Test_Navigation_AStarPotentials, Barrett_BigSearch)
-//{
-//    MapStack* mapStack = MapStackFactory::fromJsonFile("data/barrett/barrett.yaml");
-//
-//    // Looking for a path between
-//    // Pose {@: 1.4686e+09, x: 14.7855, y: 4.65954, t: 1.53943} (148, 47, 90)
-//    // and
-//    // Pose {@: 1.4686e+09, x: 33.215, y: 51.703, t: 1.5708} (332, 522, 90)
-//    Grid2d::Position startPosition(148, 47, 90);
-//    Grid2d::Position goalPosition(332, 522, 90);
-//
-//    LogicalMap* logical = mapStack->getLogicalMap();
-//
-//    costmap_2d::Costmap2D* cost2d = MapAdapter::map2CostMap2D(mapStack->getOccupancyMap());
-//
-//    AStarPotentials astar(logical, cost2d);
-//    std::vector<std::pair<float, float>> path;
-//    float* potentials;
-//
-//    ASSERT_TRUE(astar.calculatePath(AStarPotentials::SearchParameters(),
-//            13.804, 4.478, 32.679, 87.743, path, potentials)) <<
-//        "A plan was not found";
-//
-//    StopWatch timer;
-//
-//    int trials = TRIALS;
-//    while (--trials > 0)
-//    {
-//        astar.calculatePath(AStarPotentials::SearchParameters(),
-//            13.804, 4.478, 32.679, 87.743, path, potentials);
-//    }
-//
-//    float elapsed = timer.elapsedMicroseconds();
-//
-//    cout << "Elapsed time: " << elapsed << "us" << endl;
-//    cout << "Average time: " << elapsed / TRIALS << "us" << endl;
-//}
+TEST(Test_Navigation_AStarPotentials, Barrett_BigSearch)
+{
+    MapStack* mapStack = MapStackFactory::fromJsonFile("data/barrett/barrett.yaml");
+
+    // Looking for a path between
+    // Pose {@: 1.4686e+09, x: 14.0, y: 10.0, t: 1.53943} (140, 100, 90)
+    // and
+    // Pose {@: 1.4686e+09, x: 73.0, y: 178.0, t: 1.5708} (730, 1780, 90)
+
+    LogicalMap* logical = mapStack->getLogicalMap();
+
+    costmap_2d::Costmap2D* cost2d = MapAdapter::map2CostMap2D(mapStack->getOccupancyMap());
+
+    AStarPotentials astar(logical, cost2d);
+    std::vector<std::pair<float, float>> path;
+    float* potentials;
+
+    ASSERT_TRUE(astar.calculatePath(AStarPotentials::SearchParameters(),
+        14.000, 10.000, 73.000, 178.000, path, potentials)) <<
+        "A plan was not found";
+
+    StopWatch timer;
+
+    int trials = TRIALS;
+    while (--trials > 0)
+    {
+        astar.calculatePath(AStarPotentials::SearchParameters(),
+            14.000, 10.000, 73.000, 178.000, path, potentials);
+    }
+
+    float elapsed = timer.elapsedMilliseconds();
+
+    cout << "Elapsed time: " << elapsed << "ms" << endl;
+    cout << "Average time: " << elapsed / TRIALS << "ms" << endl;
+}

@@ -24,10 +24,10 @@ TEST(Test_AStar_MapStack_SamePlaceOnMap, SamePositionOnMap)
 
     AStar algorithm;
 
-    Grid2d::Position startPosition(181, 52, 0);
+    Grid2d::Position startPosition(220, 260, 0);
     MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
 
-    Grid2d::Position goalPosition(181, 52, 0);
+    Grid2d::Position goalPosition(220, 260, 0);
     MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
@@ -37,6 +37,8 @@ TEST(Test_AStar_MapStack_SamePlaceOnMap, SamePositionOnMap)
     algorithm.getPlan(plan);
     cout << plan << endl;
 
+    ASSERT_EQ(0, plan.getTotalCost()) <<
+        "Unexpected cost of the path";
     ASSERT_EQ(1, plan.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
     ASSERT_EQ(0, plan.getOpenNodesCount()) <<
@@ -49,10 +51,10 @@ TEST(Test_AStar_MapStack_SamePlaceOnMap, SameLocationOnMap)
 
     AStar algorithm;
 
-    Grid2d::Position startPosition(181, 52, 0);
+    Grid2d::Position startPosition(220, 260, 0);
     MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
 
-    Grid2d::Position goalPosition(181, 52, 90);
+    Grid2d::Position goalPosition(220, 260, 90);
     MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
@@ -62,6 +64,8 @@ TEST(Test_AStar_MapStack_SamePlaceOnMap, SameLocationOnMap)
     algorithm.getPlan(plan);
     cout << plan << endl;
 
+    ASSERT_EQ(1, plan.getTotalCost()) <<
+        "Unexpected cost of the path";
     ASSERT_EQ(3, plan.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
     ASSERT_EQ(3, plan.getOpenNodesCount()) <<

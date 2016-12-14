@@ -56,6 +56,7 @@ void AStar::getPlan(Plan& plan)
     plan.setValid(lastNode_ != nullptr);
     plan.setClosedNodesCount(closedSet_.size());
     plan.setOpenNodesCount(openQueue_.size());
+    plan.setTotalCost(lastNode_->getLocalCost());
 
     // Explore the tree backward to
     // reconstruct the solution

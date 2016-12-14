@@ -27,6 +27,7 @@ constexpr int GRID_SIZE = 5;
 MapStack* generateMapStack()
 {
     Grid2d* grid = new Grid2d(GRID_SIZE, GRID_SIZE);
+    test::Grid2dUtils::addEmptySpace(*grid);
     test::Grid2dUtils::addObstacle(*grid, 2, 0, 2, 3);
 
     return test::Grid2dUtils::grid2d2MapStack(grid, 1, Pose<>::ZERO);

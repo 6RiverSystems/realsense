@@ -63,8 +63,6 @@ TEST(Test_AStar_MapStack_Unknown, NotAllowUnknown)
 {
     MapStack* mapStack = generateMapStackWithUnknown();
 
-    cout << *mapStack->getOccupancyMap() << endl;
-
     AStar algorithm;
 
     MapStackNode::SearchParameters searchParams;

@@ -17,70 +17,60 @@ using namespace std;
 #include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dSingleGoal.hpp>
 
-#include <srslib_test/utils/MemoryWatch.hpp>
-
 using namespace srs;
 
 TEST(Test_AStar_Grid2d_SamePlaceOnMap, SamePositionOnMap)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 
-    Grid2d::Position startPosition(181, 52, 0);
-    Grid2d::Position goalPosition(181, 52, 0);
+    AStar algorithm;
 
-    test::MemoryWatch memoryWatch;
-
-    AStar* algorithm = new AStar();
+    Grid2d::Position startPosition(220, 260, 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(mapStack->getLogicalMap()->getGrid(),
         startPosition);
+
+    Grid2d::Position goalPosition(220, 260, 0);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
-    ASSERT_TRUE(algorithm->search(start, goal)) <<
+    ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(0, algorithm->getOpenNodesCount()) <<
-        "Unexpected number of open nodes";
+    Plan plan;
+    algorithm.getPlan(plan);
+    cout << plan << endl;
 
-    ASSERT_EQ(1, algorithm->getClosedNodesCount()) <<
+    ASSERT_EQ(0, plan.getTotalCost()) <<
+        "Unexpected cost of the path";
+    ASSERT_EQ(1, plan.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
-
-    algorithm->clear();
-
-    start->release();
-    goal->release();
-    delete algorithm;
-
-    ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
+    ASSERT_EQ(0, plan.getOpenNodesCount()) <<
+        "Unexpected number of open nodes";
 }
 
 TEST(Test_AStar_Grid2d_SamePlaceOnMap, SameLocationOnMap)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 
-    Grid2d::Position startPosition(181, 52, 0);
-    Grid2d::Position goalPosition(181, 52, 90);
+    AStar algorithm;
 
-    test::MemoryWatch memoryWatch;
-
-    AStar* algorithm = new AStar();
+    Grid2d::Position startPosition(220, 260, 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(mapStack->getLogicalMap()->getGrid(),
         startPosition);
+
+    Grid2d::Position goalPosition(220, 260, 90);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
-    ASSERT_TRUE(algorithm->search(start, goal)) <<
+    ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(5, algorithm->getOpenNodesCount()) <<
-        "Unexpected number of open nodes";
+    Plan plan;
+    algorithm.getPlan(plan);
+    cout << plan << endl;
 
-    ASSERT_EQ(4, algorithm->getClosedNodesCount()) <<
+    ASSERT_EQ(2, plan.getTotalCost()) <<
+        "Unexpected cost of the path";
+    ASSERT_EQ(4, plan.getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
-
-    algorithm->clear();
-
-    start->release();
-    goal->release();
-    delete algorithm;
-
-    ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";
+    ASSERT_EQ(5, plan.getOpenNodesCount()) <<
+        "Unexpected number of open nodes";
 }

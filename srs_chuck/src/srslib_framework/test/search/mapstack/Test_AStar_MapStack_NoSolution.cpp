@@ -26,6 +26,7 @@ constexpr int GRID_SIZE = 5;
 TEST(Test_AStar_MapStack_NoSolution, NoSolution)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
+    test::Grid2dUtils::addEmptySpace(grid);
     test::Grid2dUtils::addObstacle(grid, 0, 0, GRID_SIZE - 1, GRID_SIZE - 1);
 
     MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
@@ -50,6 +51,7 @@ TEST(Test_AStar_MapStack_NoSolution, NoSolution)
 TEST(Test_AStar_MapStack_NoSolution, ForbiddenGoal)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
+    test::Grid2dUtils::addEmptySpace(grid);
     test::Grid2dUtils::addObstacle(grid, 1, 0, GRID_SIZE - 1, GRID_SIZE - 1);
 
     MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
@@ -74,6 +76,7 @@ TEST(Test_AStar_MapStack_NoSolution, ForbiddenGoal)
 TEST(Test_AStar_MapStack_NoSolution, UnreachableGoal)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
+    test::Grid2dUtils::addEmptySpace(grid);
     test::Grid2dUtils::addObstacle(grid, 2, 0, 2, GRID_SIZE - 1);
 
     MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);

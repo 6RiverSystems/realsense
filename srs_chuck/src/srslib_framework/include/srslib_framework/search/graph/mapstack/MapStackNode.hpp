@@ -52,11 +52,6 @@ struct MapStackNode : public SearchNode
             position_ == reinterpret_cast<const MapStackNode*>(rhs)->getPosition();
     }
 
-    int getG() const
-    {
-        return g_;
-    }
-
     SearchGoal* getGoal()
     {
         return goal_;
@@ -68,6 +63,11 @@ struct MapStackNode : public SearchNode
     }
 
     void getExploredNodes(vector<SearchNode*>& exploredNodes);
+
+    int getLocalCost() const
+    {
+        return g_;
+    }
 
     SearchNode* getParent()
     {

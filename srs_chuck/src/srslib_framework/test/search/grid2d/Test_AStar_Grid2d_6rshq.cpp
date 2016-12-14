@@ -23,8 +23,8 @@ TEST(Test_AStar_Grid2d_6rshq, SmallSearch)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 
-    Grid2d::Position startPosition(86, 48, 0);
-    Grid2d::Position goalPosition(87, 48, 0);
+    Grid2d::Position startPosition(220, 260, 0);
+    Grid2d::Position goalPosition(222, 260, 0);
 
     test::MemoryWatch memoryWatch;
 
@@ -36,10 +36,10 @@ TEST(Test_AStar_Grid2d_6rshq, SmallSearch)
     ASSERT_TRUE(algorithm->search(start, goal)) <<
         "A plan was not found";
 
-    ASSERT_EQ(2, algorithm->getOpenNodesCount()) <<
+    ASSERT_EQ(4, algorithm->getOpenNodesCount()) <<
         "Unexpected number of open nodes";
 
-    ASSERT_EQ(2, algorithm->getClosedNodesCount()) <<
+    ASSERT_EQ(3, algorithm->getClosedNodesCount()) <<
         "Unexpected number of closed nodes";
 
     algorithm->clear();
@@ -55,8 +55,8 @@ TEST(Test_AStar_Grid2d_6rshq, NoTrajectory)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 
-    Pose<> start = Pose<>(3.000, 3.000, 0.0189141);
-    Pose<> goal = Pose<>(3.000, 3.000, 0);
+    Pose<> start = Pose<>(22.000, 26.000, 0.0189141);
+    Pose<> goal = Pose<>(22.000, 26.000, 0);
 
     Solution<Grid2dSolutionItem>* solution = Grid2dSolutionFactory::fromSingleGoal(
         mapStack->getLogicalMap(), start, goal);

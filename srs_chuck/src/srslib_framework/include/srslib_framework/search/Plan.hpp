@@ -21,6 +21,7 @@ public:
         list<SearchNode*>(),
         closedNodesCount_(0),
         openNodesCount_(0),
+        totalCost_(0),
         valid_(false)
     {}
 
@@ -53,6 +54,11 @@ public:
         return list<SearchNode*>::front();
     }
 
+    int getTotalCost() const
+    {
+        return totalCost_;
+    }
+
     bool isValid() const
     {
         return valid_;
@@ -71,6 +77,11 @@ public:
     void setOpenNodesCount(unsigned int newValue)
     {
         openNodesCount_ = newValue;
+    }
+
+    void setTotalCost(int newValue)
+    {
+        totalCost_ = newValue;
     }
 
     void setValid(bool newValue)
@@ -102,6 +113,8 @@ private:
     unsigned int closedNodesCount_;
 
     unsigned int openNodesCount_;
+
+    int totalCost_;
 
     bool valid_;
 };

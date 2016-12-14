@@ -15,7 +15,6 @@ using namespace std;
 #include <srslib_framework/search/graph/grid2d/Grid2dSingleGoal.hpp>
 
 #include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
-#include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 
 constexpr int GRID_SIZE = 5;

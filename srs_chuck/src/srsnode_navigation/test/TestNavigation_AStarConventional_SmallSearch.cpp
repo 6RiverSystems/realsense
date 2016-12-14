@@ -43,6 +43,12 @@ TEST(Test_Navigation_AStarConventional, SmallSearch)
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromSingleGoal(
         mapStack, start, goal);
 
-    ASSERT_TRUE(gridSolution->isValid()) << "No valid solution was found";
-    ASSERT_EQ(121, gridSolution->getExploredNodes()) << "The solution is not as expected";
+    cout << *gridSolution << endl;
+
+    ASSERT_TRUE(gridSolution->isValid()) <<
+        "No valid solution was found";
+    ASSERT_EQ(121, gridSolution->getExploredNodes()) <<
+        "The solution is not as expected";
+    ASSERT_EQ(10, gridSolution->getTotalCost()) <<
+        "The total cost of the solution is not as expected";
 }

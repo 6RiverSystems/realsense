@@ -203,6 +203,7 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map, Pl
 
     Solution<Grid2dSolutionItem>* solution = Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
     solution->setExploredNodes(plan.getClosedNodesCount() + plan.getOpenNodesCount());
+    solution->setTotalCost(plan.getTotalCost());
 
     Grid2dSolutionItem solutionItem;
     Pose<> fromPose;
@@ -258,7 +259,7 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map, Pl
 
         solutionItem.fromPose = fromPose;
         solutionItem.toPose = toPose;
-        solutionItem.cost = toNode->getG();
+        solutionItem.cost = toNode->getLocalCost();
 
         solution->push_back(solutionItem);
 

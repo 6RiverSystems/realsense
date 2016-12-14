@@ -54,6 +54,11 @@ public:
         return list<SOLUTION_ITEM>::front();
     }
 
+    int getTotalCost() const
+    {
+        return totalCost_;
+    }
+
     bool isValid() const
     {
         return valid_;
@@ -69,6 +74,11 @@ public:
         exploredNodes_ = newValue;
     }
 
+    void setTotalCost(unsigned int newValue)
+    {
+        totalCost_ = newValue;
+    }
+
     void setValid(bool newValue)
     {
         valid_ = newValue;
@@ -81,7 +91,7 @@ public:
         int counter = 0;
 
         stream << "{" << endl;
-        stream << "v: " << valid_ << ", en: " << exploredNodes_ << endl;
+        stream << "v: " << valid_ << ", en: " << exploredNodes_ << ", tc: " << totalCost_ << endl;
         for (auto node : *this)
         {
             stream << setw(4) << counter++ << ": " << node << endl;
@@ -95,11 +105,13 @@ public:
 protected:
     Solution(bool valid) :
         exploredNodes_(0),
+        totalCost_(0),
         valid_(valid)
     {}
 
 private:
     unsigned int exploredNodes_;
+    int totalCost_;
 
     bool valid_;
 };

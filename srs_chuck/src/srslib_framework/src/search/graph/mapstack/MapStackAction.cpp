@@ -45,7 +45,7 @@ MapStackNode* MapStackAction::exploreBackward(MapStack* stack, MapStackNode* fro
                 stack,
                 fromNode, MapStackAction::BACKWARD,
                 motion,
-                fromNode->getG() + motionCost, 0,
+                fromNode->getLocalCost() + motionCost, 0,
                 nullptr,
                 searchParameters);
 
@@ -84,7 +84,7 @@ MapStackNode* MapStackAction::exploreForward(MapStack* stack, MapStackNode* from
                 stack,
                 fromNode, MapStackAction::FORWARD,
                 motion,
-                fromNode->getG() + motionCost, 0,
+                fromNode->getLocalCost() + motionCost, 0,
                 nullptr,
                 searchParameters);
 
@@ -123,7 +123,7 @@ MapStackNode* MapStackAction::exploreRotation(MapStack* stack, MapStackNode* fro
             stack,
             fromNode, action,
             motion,
-            fromNode->getG() + motionCost, 0,
+            fromNode->getLocalCost() + motionCost, 0,
             nullptr,
             searchParameters);
 

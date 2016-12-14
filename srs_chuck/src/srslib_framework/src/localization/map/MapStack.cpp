@@ -66,9 +66,13 @@ int MapStack::getTotalCost(const Grid2d::Position& position,
     if (costMap2d_)
     {
         costMap2d = costMap2d_->getCost(position.x, position.y) * costMapRatio;
-        if (!allowUnknown && costMap2d == costmap_2d::NO_INFORMATION)
+        if (costMap2d == costmap_2d::NO_INFORMATION)
         {
-            return Grid2d::PAYLOAD_MAX;
+            if (!allowUnknown)
+            {
+                return Grid2d::PAYLOAD_MAX;
+            }
+            costMap2d = 0;
         }
     }
 

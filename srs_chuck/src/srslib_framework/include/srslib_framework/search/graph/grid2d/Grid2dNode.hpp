@@ -43,11 +43,6 @@ struct Grid2dNode : public SearchNode
         return this == rhs || position_ == reinterpret_cast<const Grid2dNode*>(rhs)->getPosition();
     }
 
-    int getG() const
-    {
-        return g_;
-    }
-
     int getH() const
     {
         return h_;
@@ -58,6 +53,11 @@ struct Grid2dNode : public SearchNode
     SearchNode* getParent()
     {
         return parentNode_;
+    }
+
+    int getLocalCost() const
+    {
+        return g_;
     }
 
     Grid2dAction::ActionEnum getParentAction()

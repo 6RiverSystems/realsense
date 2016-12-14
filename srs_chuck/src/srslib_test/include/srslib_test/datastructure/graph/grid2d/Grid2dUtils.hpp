@@ -42,6 +42,11 @@ struct Grid2dUtils
         } while (r != (yf + deltaY));
     }
 
+    static void addEmptySpace(Grid2d& grid)
+    {
+        addRectanglePayload(grid, 0, 0, grid.getWidth() - 1, grid.getHeight() - 1, 0);
+    }
+
     static void addObstacle(Grid2d& grid,
         unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
         int sizeEnvelopeCells = 0, Grid2d::BaseType costEnvelope = 0)

@@ -3,7 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#include <srsdrv_brainstem/BrainStemMessageProcessor.h>
+#include "../include/srsdrv_brainstem/BrainStemMessageProcessor.hpp"
 
 #include <chrono>
 #include <boost/tokenizer.hpp>
@@ -26,6 +26,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
 	lastHardareInfoRequestTime_(),
 	hasValidOperationalState_(false),
 	lastOperationalStateRequestTime_(),
+	lastMessageTime_(),
 	connectedChannel_( ),
     pingHandler_(this),
 	setMotionStateHandler_(this),
@@ -89,6 +90,8 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 				getHardwareInfo(currentTime);
 
 				getOperationalState(currentTime);
+
+				lastMessageTime_ = currentTime;
 			}
 			catch(std::runtime_error& error)
 			{
@@ -181,6 +184,22 @@ void BrainStemMessageProcessor::getOperationalState(const ros::Time& now)
 
 		checkSetupComplete();
 	}
+}
+
+
+void BrainStemMessageProcessor::checkForBrainstemFaultTimer(const ros::TimerEvent& event)
+{
+	bool brainstemTimeout = false;
+
+	if (isSetupComplete())
+	{
+		if ((event.current_expected - lastMessageTime_).toSec() > FAULT_TIMEOUT)
+		{
+			brainstemTimeout = true;
+		}
+	}
+
+	operationalStateHandler_.setBrainstemTimeout(brainstemTimeout);
 }
 
 bool BrainStemMessageProcessor::isSetupComplete() const

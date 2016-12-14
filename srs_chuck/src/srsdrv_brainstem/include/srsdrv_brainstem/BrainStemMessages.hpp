@@ -3,13 +3,11 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
+#pragma once
 
 #include <stdint.h>
 #include <limits>
 #include <uuid/uuid.h>
-
-#ifndef _MESSAGES_H_
-#define _MESSAGES_H_
 
 // Define the macros for the beginning and end of a
 // brainstem message. The macro automatically define the
@@ -131,5 +129,3 @@ enum BATTERY_DESCRIPTOR : uint8_t
 };
 
 }
-
-#endif /* _MESSAGES_H_ */

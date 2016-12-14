@@ -1,18 +1,16 @@
 /*
-UpdateUIHandler.hpp * (c) Copyright 2015-2016 River Systems, all rights reserved.
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 #pragma once
 
-#include <srslib_framework/MsgUpdateUI.h>
+#include <BrainStemMessages.hpp>
 
 #include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_UpdateUI.hpp>
-
-#include "../BrainStemMessages.hpp"
 
 namespace srs {
 

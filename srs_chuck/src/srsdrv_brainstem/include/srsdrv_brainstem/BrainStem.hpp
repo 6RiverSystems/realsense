@@ -8,12 +8,11 @@
 #define BRAINSTEM_HPP_
 
 #include <ros/ros.h>
-#include <std_msgs/String.h>
-#include <std_msgs/Bool.h>
+
 #include <srslib_framework/io/IO.hpp>
-#include <srslib_framework/ros/channel/ChannelBrainstemConnected.hpp>
-#include <BrainStemEmulator.h>
-#include <BrainStemMessageProcessor.h>
+
+#include <BrainStemEmulator.hpp>
+#include <BrainStemMessageProcessor.hpp>
 
 namespace srs
 {
@@ -31,15 +30,25 @@ public:
 
 	void OnConnectionChanged( bool bIsConnected );
 
+    void checkForBrainstemFaultTimer(const ros::TimerEvent& event);
+
 private:
 
-	static constexpr auto REFRESH_RATE_HZ = 10;
+    void startFaultTimer();
+
+    void stopFaultTimer();
+
+	static constexpr auto REFRESH_RATE_HZ = 10.0f;
 
 	std::shared_ptr<IO>					m_pSerialIO;
 
 	std::shared_ptr<BrainStemEmulator>	m_brainstemEmulator;
 
 	BrainStemMessageProcessor			m_messageProcessor;
+
+	ros::NodeHandle						nodeHandle_;
+
+	ros::Timer							brainstemFaultTimer_;
 };
 
 } // namespace srs

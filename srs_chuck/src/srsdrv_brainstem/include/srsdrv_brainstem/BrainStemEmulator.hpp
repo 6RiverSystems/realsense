@@ -3,12 +3,11 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
+#pragma once
 
-#ifndef BRAINSTEM_EMULATOR_HPP_
-#define BRAINSTEM_EMULATOR_HPP_
+#include <ros/ros.h>
 
 #include <srslib_framework/OdometryRpm.h>
-#include <ros/ros.h>
 
 namespace srs
 {
@@ -40,6 +39,7 @@ private:
 
 	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/rpm/raw";
 
+	// TODO: Replace with framework classes
 	ros::NodeHandle 					m_rosNodeHandle;
 
 	ros::Timer							m_odometryTimer;
@@ -54,4 +54,3 @@ private:
 
 } // namespace srs
 
-#endif  // BRAINSTEM_EMULATOR_HPP_

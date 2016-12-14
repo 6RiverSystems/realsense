@@ -19,7 +19,7 @@ void ButtonPressedHandler::receiveMessage(ros::Time currentTime, HardwareMessage
 
 	// TODO: Validate button ID
 
-	ROS_INFO_STREAM("Button Pressed: " << (int)buttonPressedData.buttonId);
+	ROS_DEBUG_STREAM("Button Pressed: " << (int)buttonPressedData.buttonId);
 
 	publisher_.publish(buttonPressedData.buttonId);
 }

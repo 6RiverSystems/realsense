@@ -3,9 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-
-#ifndef BRAINSTEM_MESSAGEPROCESSOR_H_
-#define BRAINSTEM_MESSAGEPROCESSOR_H_
+#pragma once
 
 #include <vector>
 #include <map>
@@ -21,8 +19,8 @@ using namespace std;
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemButtonPressed.hpp>
 
-#include "BrainStemMessages.hpp"
-#include <srsdrv_brainstem/BrainStemMessageProcessorInterface.h>
+#include <BrainStemMessages.hpp>
+#include <BrainStemMessageProcessorInterface.hpp>
 #include <srsdrv_brainstem/HardwareMessageHandler.hpp>
 
 #include <srsdrv_brainstem/hw_message/LogHandler.hpp>
@@ -56,6 +54,8 @@ public:
 	BrainStemMessageProcessor( std::shared_ptr<IO> pIO );
 
 	virtual ~BrainStemMessageProcessor( );
+
+	void checkForBrainstemFaultTimer(const ros::TimerEvent& event);
 
     void sendCommand(char* command, std::size_t size)
     {
@@ -103,6 +103,8 @@ private:
 		uint8_t motionStatus;
     HW_MESSAGE_END
 
+	static constexpr auto FAULT_TIMEOUT = 0.2f;
+
 	std::shared_ptr<IO>					m_pIO;
 
 	bool								isConnected_;
@@ -112,6 +114,8 @@ private:
 
 	bool								hasValidOperationalState_;
 	ros::Time							lastOperationalStateRequestTime_;
+
+	ros::Time							lastMessageTime_;
 
     HwMessageHandlerMapType				hwMessageHandlers_;
 
@@ -140,5 +144,3 @@ private:
 };
 
 } /* namespace srs */
-
-#endif /* BRAINSTEM_MBRAINSTEM_MESSAGEPROCESSOR_H_ESSAGEPROCESSOR_H_ */

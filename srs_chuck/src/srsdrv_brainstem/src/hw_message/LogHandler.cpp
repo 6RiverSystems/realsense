@@ -21,19 +21,19 @@ void LogHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
 
 	switch (log.level)
 	{
-		case 0:
+		case LOG_LEVEL::DEBUG:
 		{
 			ROS_DEBUG_NAMED( "firmware", "Firmware: %s", message.c_str( ) );
 		}
 		break;
 
-		case 1:
+		case LOG_LEVEL::INFO:
 		{
 			ROS_INFO_NAMED( "firmware", "Firmware: %s", message.c_str( ) );
 		}
 		break;
 
-		case 2:
+		case LOG_LEVEL::ERROR:
 		{
 			ROS_ERROR_NAMED( "firmware", "Firmware: %s", message.c_str( ) );
 		}

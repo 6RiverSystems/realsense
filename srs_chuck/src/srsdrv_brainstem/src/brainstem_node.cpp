@@ -5,7 +5,8 @@
  */
 
 #include <ros/ros.h>
-#include <BrainStem.h>
+
+#include "../include/srsdrv_brainstem/BrainStem.hpp"
 
 const std::string g_SerialPort( "/dev/malg" );
 

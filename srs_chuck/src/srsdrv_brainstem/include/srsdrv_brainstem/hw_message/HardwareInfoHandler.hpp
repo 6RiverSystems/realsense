@@ -5,13 +5,8 @@
  */
 #pragma once
 
-#include <string>
-#include <functional>
-
-using namespace std;
-
-#include "../BrainStemMessages.hpp"
-#include <srsdrv_brainstem/HardwareMessageHandler.hpp>
+#include <BrainStemMessages.hpp>
+#include <HardwareMessageHandler.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 
 namespace srs {

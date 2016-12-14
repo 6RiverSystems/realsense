@@ -10,8 +10,8 @@
 #include <srslib_test/utils/Compare.hpp>
 
 #include <srsdrv_brainstem/HardwareMessage.hpp>
-#include <srsdrv_brainstem/BrainStemMessageProcessorInterface.h>
 #include <srsdrv_brainstem/BrainStemMessages.hpp>
+#include "../../include/srsdrv_brainstem/BrainStemMessageProcessorInterface.hpp"
 
 namespace srs {
 

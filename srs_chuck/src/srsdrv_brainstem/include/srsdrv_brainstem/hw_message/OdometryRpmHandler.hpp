@@ -5,15 +5,9 @@
  */
 #pragma once
 
-#include <string>
-#include <functional>
+#include <BrainStemMessages.hpp>
+#include <HardwareMessageHandler.hpp>
 
-using namespace std;
-
-#include "../BrainStemMessages.hpp"
-#include <srsdrv_brainstem/HardwareMessageHandler.hpp>
-
-#include <srslib_framework/OdometryRpm.h>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
 
 namespace srs {

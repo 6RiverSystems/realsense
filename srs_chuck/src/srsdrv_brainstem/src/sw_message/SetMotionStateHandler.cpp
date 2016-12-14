@@ -7,9 +7,8 @@
 #include <bitset>
 
 #include <srsdrv_brainstem/sw_message/SetMotionStateHandler.hpp>
-#include <srsdrv_brainstem/BrainStemMessageProcessorInterface.h>
-
 #include <ros/ros.h>
+#include "../../include/srsdrv_brainstem/BrainStemMessageProcessorInterface.hpp"
 
 namespace srs {
 

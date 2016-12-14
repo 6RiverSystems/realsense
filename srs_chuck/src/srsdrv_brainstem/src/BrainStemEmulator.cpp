@@ -1,9 +1,10 @@
+#include "../include/srsdrv_brainstem/BrainStemEmulator.hpp"
+
 #include <string>
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
-#include <srsdrv_brainstem/BrainStemEmulator.h>
 
 namespace srs {
 

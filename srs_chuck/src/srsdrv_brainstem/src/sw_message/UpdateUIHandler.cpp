@@ -6,9 +6,8 @@
 
 #include <sw_message/UpdateUIHandler.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessageProcessorInterface.h>
-
 #include <ros/ros.h>
+#include "../../include/srsdrv_brainstem/BrainStemMessageProcessorInterface.hpp"
 
 namespace srs {
 

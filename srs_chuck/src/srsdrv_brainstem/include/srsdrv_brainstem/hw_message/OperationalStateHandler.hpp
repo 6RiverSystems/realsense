@@ -5,14 +5,9 @@
  */
 #pragma once
 
-#include <string>
-#include <functional>
+#include <BrainStemMessages.hpp>
+#include <HardwareMessageHandler.hpp>
 
-using namespace std;
-
-#include "../BrainStemMessages.hpp"
-#include <srsdrv_brainstem/HardwareMessageHandler.hpp>
-#include <srslib_framework/MsgOperationalState.h>
 #include <srslib_framework/ros/channel/ChannelBrainstemOperationalState.hpp>
 
 namespace srs {
@@ -27,6 +22,8 @@ public:
 
     void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
+    void setBrainstemTimeout(bool brainstemTimeout);
+
 private:
 
     HW_MESSAGE_BEGIN(OperationalStateData)
@@ -35,6 +32,8 @@ private:
     	uint8_t		motionStatus;
     	uint8_t 	failureStatus;
     HW_MESSAGE_END
+
+	srslib_framework::MsgOperationalState operationalState_;
 
     ChannelBrainstemOperationalState::Interface& publisher_;
 };

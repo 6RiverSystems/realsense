@@ -4,7 +4,8 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 
-#include <BrainStem.h>
+#include "../include/srsdrv_brainstem/BrainStem.hpp"
+
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Float32.h>
@@ -22,7 +23,9 @@ namespace srs
 
 BrainStem::BrainStem( const std::string& strSerialPort ) :
 	m_pSerialIO( new SerialIO( "brainstem" ) ),
-	m_messageProcessor( m_pSerialIO )
+	m_messageProcessor( m_pSerialIO ),
+	brainstemFaultTimer_(),
+	nodeHandle_("~")
 {
 	OnConnectionChanged( false );
 
@@ -45,6 +48,12 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
 	};
 
 	pSerialIO->Open( strSerialPort.c_str( ), connectionChanged, processMessage );
+
+
+    // Check for hardware faults
+	brainstemFaultTimer_ = nodeHandle_.createTimer(ros::Duration(1.0f / REFRESH_RATE_HZ),
+        boost::bind(&BrainStemMessageProcessor::checkForBrainstemFaultTimer,
+        	&m_messageProcessor, _1));
 }
 
 BrainStem::~BrainStem( )

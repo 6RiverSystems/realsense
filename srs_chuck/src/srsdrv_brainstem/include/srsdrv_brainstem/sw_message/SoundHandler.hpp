@@ -5,14 +5,12 @@
  */
 #pragma once
 
-#include <srslib_framework/Sound.h>
+#include <BrainStemMessages.hpp>
 
 #include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/ros/tap/subscriber/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_Sound.hpp>
-
-#include <BrainStemMessages.hpp>
 
 namespace srs {
 

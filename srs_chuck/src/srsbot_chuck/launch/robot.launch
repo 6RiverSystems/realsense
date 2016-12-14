@@ -33,6 +33,7 @@
     <!-- Navigation -->
     <include file="$(find srsnode_navigation)/launch/node.launch">
         <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+        <arg name="emulation_mode" value="$(arg emulation_mode)"/>
     </include>
 
     <!-- Midbrain -->

@@ -110,9 +110,39 @@ ostream& operator<<(ostream& stream, const LogicalMap& map)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 bool operator==(const LogicalMap& lhs, const LogicalMap& rhs)
 {
-    return lhs.metadata_ == rhs.metadata_ &&
-        operator==(static_cast<const BaseMap&>(lhs), static_cast<const BaseMap&>(rhs)) &&
-        lhs.labeledAreas_ == rhs.labeledAreas_;
+    if (&lhs == &rhs)
+    {
+        return true;
+    }
+
+    if (lhs.metadata_ == rhs.metadata_ &&
+        operator==(static_cast<const BaseMap&>(lhs), static_cast<const BaseMap&>(rhs)))
+    {
+        if (lhs.labeledAreas_.size() != rhs.labeledAreas_.size())
+        {
+            return false;
+        }
+
+        for (auto area : lhs.labeledAreas_)
+        {
+            if (rhs.labeledAreas_.find(area.first) == rhs.labeledAreas_.end())
+            {
+                return false;
+            }
+        }
+
+        for (auto area : rhs.labeledAreas_)
+        {
+            if (lhs.labeledAreas_.find(area.first) == lhs.labeledAreas_.end())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -6,7 +6,7 @@
 #ifndef EMERGENCYCONTROLLER_HPP_
 #define EMERGENCYCONTROLLER_HPP_
 
-#include <srslib_framework/robotics/Trajectory.hpp>
+#include <srslib_framework/planning/pathplanning/trajectory/Trajectory.hpp>
 #include <srslib_framework/robotics/controller/BaseController.hpp>
 
 namespace srs {

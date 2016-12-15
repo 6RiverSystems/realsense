@@ -11,7 +11,7 @@ using namespace std;
 #include <yaml-cpp/yaml.h>
 #include <costmap_2d/costmap_2d_ros.h>
 
-#include <srslib_framework/localization/map/MapNote.hpp>
+#include <srslib_framework/localization/map/mapnote/MapNotes.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMap.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMetadata.hpp>
 
@@ -52,7 +52,6 @@ private:
     static const string KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE;
     static const string KEYWORD_PROPERTY_FEATURE_OBJECT;
     static const string KEYWORD_PROPERTY_LABEL_AREA_LABEL;
-    static const string KEYWORD_PROPERTY_LABEL_AREA_WARNING_SOUND;
     static const string KEYWORD_PROPERTY_LABEL_AREA_NOTES;
     static const string KEYWORD_PROPERTY_MAP_HEIGHT;
     static const string KEYWORD_PROPERTY_MAP_ORIGIN;
@@ -73,7 +72,7 @@ private:
     void addCostArea(Pose<> origin, double widthM, double heightM,
         Grid2d::BaseType cost);
     void addLabelArea(Pose<> origin, double widthM, double heightM,
-        string label, MapNote note);
+        string label, shared_ptr<MapNotes> notes);
     void addObstacleArea(Pose<> origin, double widthM, double heightM,
         double sizeEnvelopeM = 0.0, Grid2d::BaseType costEnvelope = 0);
     void addWeightArea(Pose<> origin, double widthM, double heightM,
@@ -106,7 +105,7 @@ private:
 
     Grid2d::BaseType ntValueCost(YAML::Node root, bool required);
     double ntValueDouble(YAML::Node root, bool required);
-    MapNote ntValueMapNote(YAML::Node root, bool required);
+    shared_ptr<MapNotes> ntValueMapNotes(YAML::Node root, bool required);
     vector<Pose<>> ntValueMultiPoint(YAML::Node root, bool required);
     Pose<> ntValuePoint(YAML::Node root, bool required);
     string ntValueString(YAML::Node root, bool required);

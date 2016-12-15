@@ -26,7 +26,6 @@ TEST(Test_MappedPriorityQueue, Creation)
     queue->push(500, 52);
     queue->push(300, 30);
     queue->push(100, 1);
-    queue->push(400, 40);
     queue->push(500, 50);
     queue->push(500, 51);
     queue->push(500, 52);
@@ -34,10 +33,10 @@ TEST(Test_MappedPriorityQueue, Creation)
 
     int item;
     queue->pop(item);
-    ASSERT_EQ(1, item) << "Unexpected item in the queue";
+    ASSERT_EQ(0, item) << "Unexpected item in the queue";
 
     queue->pop(item);
-    ASSERT_EQ(0, item) << "Unexpected item in the queue";
+    ASSERT_EQ(1, item) << "Unexpected item in the queue";
 
     queue->pop(item);
     ASSERT_EQ(20, item) << "Unexpected item in the queue";
@@ -51,7 +50,7 @@ TEST(Test_MappedPriorityQueue, Creation)
     queue->push(500, 53);
 
     queue->pop(item);
-    ASSERT_EQ(53, item) << "Unexpected item in the queue";
+    ASSERT_EQ(50, item) << "Unexpected item in the queue";
 
     ASSERT_EQ(1, queue->sizeOccuppiedBuckets()) << "Unexpected number of occupied buckets";
     ASSERT_EQ(queue->sizeInitialBuckets() - 1, queue->sizeEmptyBuckets()) <<
@@ -76,7 +75,6 @@ TEST(Test_MappedPriorityQueue, Exist)
     queue->push(500, 51);
     queue->push(500, 52);
     queue->push(300, 30);
-    queue->push(400, 40);
     queue->push(500, 50);
     queue->push(500, 51);
     queue->push(500, 52);
@@ -104,11 +102,11 @@ TEST(Test_MappedPriorityQueue, Erase)
     queue->push(100, 0);
     queue->push(100, 1);
     queue->push(400, 40);
+    queue->push(400, 41);
     queue->push(200, 20);
     queue->push(500, 51);
     queue->push(500, 52);
     queue->push(300, 30);
-    queue->push(400, 40);
     queue->push(500, 50);
     queue->push(500, 51);
     queue->push(500, 52);
@@ -128,8 +126,8 @@ TEST(Test_MappedPriorityQueue, Erase)
     queue->pop(item);
     ASSERT_EQ(20, item) << "Unexpected item in the queue";
 
-    ASSERT_EQ(2, queue->sizeOccuppiedBuckets()) << "Unexpected number of occupied buckets";
-    ASSERT_EQ(queue->sizeInitialBuckets() - 2, queue->sizeEmptyBuckets()) <<
+    ASSERT_EQ(3, queue->sizeOccuppiedBuckets()) << "Unexpected number of occupied buckets";
+    ASSERT_EQ(queue->sizeInitialBuckets() - 3, queue->sizeEmptyBuckets()) <<
         "Unexpected number of empty buckets";
 
     delete queue;
@@ -151,7 +149,6 @@ TEST(Test_MappedPriorityQueue, Clear)
     queue->push(500, 51);
     queue->push(500, 52);
     queue->push(300, 30);
-    queue->push(400, 40);
     queue->push(500, 50);
     queue->push(500, 51);
     queue->push(500, 52);

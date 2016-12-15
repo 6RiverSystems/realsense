@@ -67,19 +67,19 @@ TEST(Test_MappedPriorityQueue_InnerHashEqual, Creation)
     Node<int> item;
 
     queue->pop(item);
-    Node<int> correct = Node<int>{1, 11};
+    Node<int> correct = Node<int>{1, 10};
     ASSERT_EQ(correct, item) << "Unexpected item in the queue";
 
     queue->pop(item);
-    correct = Node<int>{1, 10};
-    ASSERT_EQ(correct, item) << "Unexpected item in the queue";
-
-    queue->pop(item);
-    correct = Node<int>{2, 21};
+    correct = Node<int>{1, 11};
     ASSERT_EQ(correct, item) << "Unexpected item in the queue";
 
     queue->pop(item);
     correct = Node<int>{2, 20};
+    ASSERT_EQ(correct, item) << "Unexpected item in the queue";
+
+    queue->pop(item);
+    correct = Node<int>{2, 21};
     ASSERT_EQ(correct, item) << "Unexpected item in the queue";
 
     queue->pop(item);
@@ -141,7 +141,7 @@ TEST(Test_MappedPriorityQueue_InnerHashEqual, Erase)
     ASSERT_FALSE(queue->exists(Node<int>{5, 50})) << "Item found in the queue";
 
     Node<int> item;
-    Node<int> correct = Node<int>{1, 11};
+    Node<int> correct = Node<int>{1, 10};
     queue->pop(item);
     ASSERT_EQ(correct, item) << "Unexpected item in the queue";
 

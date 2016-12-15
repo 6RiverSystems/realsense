@@ -1,9 +1,15 @@
 #include <srslib_framework/search/AStar.hpp>
 
-#include <iostream>
-using namespace std;
-
 #define DEBUG_ASTAR 0
+#define YIELD_ENABLED 1
+
+#include <iostream>
+
+#ifdef YIELD_ENABLED
+    #include <thread>
+#endif
+
+using namespace std;
 
 namespace srs {
 
@@ -16,45 +22,54 @@ void AStar::clear()
     // Pop all the nodes out of the priority queue and
     // release them
     SearchNode* node = nullptr;
-    while (!open_.empty())
+    while (!openQueue_.empty())
     {
-        open_.pop(node);
-        node->release();
+        openQueue_.pop(node);
+        if (node != startNode_)
+        {
+            node->release();
+        }
     }
 
     // Release all the nodes in the closed set,
     // except for the start node, which is responsibility
     // of the user
-    for (auto node : closed_)
+    for (auto node : closedSet_)
     {
         if (node != startNode_)
         {
             node->release();
         }
     }
-    closed_.clear();
+    closedSet_.clear();
 
-    // Clear the last search
+    // Clear the last search and the yield counter
     lastNode_ = nullptr;
+    yieldCounter_ = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void AStar::getSolution(list<SearchNode*>& solution)
+void AStar::getPlan(Plan& plan)
 {
-    solution.clear();
+    plan.clear();
+
+    plan.setValid(lastNode_ != nullptr);
+    plan.setClosedNodesCount(closedSet_.size());
+    plan.setOpenNodesCount(openQueue_.size());
+    plan.setTotalCost(lastNode_->getLocalCost());
 
     // Explore the tree backward to
     // reconstruct the solution
     SearchNode* node = lastNode_;
     while (node)
     {
-        solution.push_front(node);
+        plan.push_front(node);
         node = node->getParent();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool AStar::search(SearchNode* start, SearchGoal* goal)
+bool AStar::search(SearchNode* start, SearchGoal* goal, ConfigParameters parameters)
 {
     // Do not execute any search without complete information
     if (!start || !goal)
@@ -70,34 +85,21 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
 
     clear();
 
-    #if DEBUG_ASTAR
-        cout << "OPEN ------------------------------------------------------------------------------------------" << endl;
-        cout << open_ << endl << endl;
-        cout << "-----------------------------------------------------------------------------------------------" << endl;
-
-        cout << "CLOSED ----------------------------------------------------------------------------------------" << endl;
-        for (auto node : closed_)
-        {
-            cout << *node << endl;
-        }
-        cout << "-----------------------------------------------------------------------------------------------" << endl;
-    #endif
-
     // Add the starting node to the open queue
-    open_.push(startNode_->getTotalCost(), startNode_);
+    openQueue_.push(startNode_->getTotalCost(), startNode_);
 
     vector<SearchNode*> nextSearchNodes;
 
     SearchNode* currentNode = nullptr;
-    while (!open_.empty())
+    while (!openQueue_.empty())
     {
         #if DEBUG_ASTAR
             cout << "OPEN ------------------------------------------------------------------------------------------" << endl;
-            cout << open_ << endl << endl;
+            cout << openQueue_ << endl << endl;
             cout << "-----------------------------------------------------------------------------------------------" << endl;
 
             cout << "CLOSED ----------------------------------------------------------------------------------------" << endl;
-            for (auto node : closed_)
+            for (auto node : closedSet_)
             {
                 cout << *node << endl;
             }
@@ -106,8 +108,8 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
 
         // The current node is popped from the priority queue and
         // immediately declared closed
-        open_.pop(currentNode);
-        closed_.insert(currentNode);
+        openQueue_.pop(currentNode);
+        closedSet_.insert(currentNode);
 
         #if DEBUG_ASTAR
             cout << "===============================================================================================" << endl;
@@ -125,7 +127,7 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
 
         // Collect all the valid next states from
         // from the current node
-        currentNode->getNeighbors(nextSearchNodes);
+        currentNode->getExploredNodes(nextSearchNodes);
 
         #if DEBUG_ASTAR
             cout << "NEXT ------------------------------------------------------------------------------------------" << endl;
@@ -138,6 +140,16 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
 
         // Try to push the neighbors in the open queue
         pushNodes(nextSearchNodes);
+
+        // If the yield property has been set
+        #ifdef YIELD_ENABLED
+            yieldCounter_++;
+            if (parameters.useYield && yieldCounter_ > parameters.yieldFrequency)
+            {
+                yieldCounter_ = 0;
+                this_thread::yield();
+            }
+        #endif
     }
 
     return false;
@@ -151,11 +163,11 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
 {
     #if DEBUG_ASTAR
         cout << "OPEN ------------------------------------------------------------------------------------------" << endl;
-        cout << open_ << endl << endl;
+        cout << openQueue_ << endl << endl;
         cout << "-----------------------------------------------------------------------------------------------" << endl;
 
         cout << "CLOSED ----------------------------------------------------------------------------------------" << endl;
-        for (auto node : closed_)
+        for (auto node : closedSet_)
         {
             cout << *node << endl;
         }
@@ -169,9 +181,9 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
             cout << "Evaluating: " << *node;
         #endif
 
-        if (!closed_.count(node))
+        if (closedSet_.find(node) == closedSet_.end())
         {
-            SearchNode* inOpenQueue = open_.find(node);
+            SearchNode* inOpenQueue = openQueue_.find(node);
             if (inOpenQueue)
             {
                 // If the total cost of the node is greater than the
@@ -179,10 +191,10 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
                 // the new one
                 if (inOpenQueue->getTotalCost() > node->getTotalCost())
                 {
-                    open_.erase(inOpenQueue);
+                    openQueue_.erase(inOpenQueue);
                     inOpenQueue->release();
 
-                    open_.push(node->getTotalCost(), node);
+                    openQueue_.push(node->getTotalCost(), node);
 
                     #if DEBUG_ASTAR
                         cout << endl << "Better solution: pushed" << endl;
@@ -204,7 +216,7 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
             {
                 // If the node is not in the open list
                 // add it right away
-                open_.push(node->getTotalCost(), node);
+                openQueue_.push(node->getTotalCost(), node);
 
                 #if DEBUG_ASTAR
                     cout << endl << "Inserted" << endl;

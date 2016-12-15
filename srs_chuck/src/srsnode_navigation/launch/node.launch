@@ -33,6 +33,8 @@
         <rosparam unless="$(arg use_sim_time)" file="$(find srsnode_navigation)/config/costmap_sensors.yaml" command="load" ns="local_costmap" />
         <rosparam file="$(find srsnode_navigation)/config/local_costmap_params.yaml" command="load" />
         <rosparam file="$(find srsnode_navigation)/config/global_costmap_params.yaml" command="load" />
+
+        <!-- Local Planner -->
         <rosparam file="$(find srsnode_navigation)/config/local_planner_params.yaml" command="load" />
 
         <!-- Global Planner -->

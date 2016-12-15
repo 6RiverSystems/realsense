@@ -12,4 +12,4 @@ uint16 riCells
 uint16 cfCells
 uint16 rfCells
 
-srslib_framework/MapNote note
+srslib_framework/MapNotes notes

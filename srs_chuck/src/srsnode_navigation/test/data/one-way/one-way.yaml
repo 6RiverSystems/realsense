@@ -6,7 +6,7 @@
 {
     occupancy: {
         image: one-way.pgm,
-        resolution: 0.100,
+        resolution: 1,
         origin: [0, 0, 0],
         negate: 0,
         occupied_thresh: 0.65,

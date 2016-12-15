@@ -36,6 +36,8 @@ void PingHandler::encodeData(const bool& value)
 {
 	uint8_t cMessage = static_cast<uint8_t>(BRAIN_STEM_CMD::PING);
 
+//	ROS_INFO_NAMED("ping", "Sending ping to brainstem");
+
 	getOwner()->sendCommand(reinterpret_cast<char*>(&cMessage), 1);
 }
 

@@ -15,23 +15,23 @@ CommandPause::CommandPause(Executive* owner) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CommandPause::execute(const vector<string>& params)
 {
-	bool pauseState = param2Bool(params, POSITION_PARAM_1);
-
-	srslib_framework::MsgSetOperationalState operationalState;
-
-	operationalState.operationalState.frontEStop = false;
-	operationalState.operationalState.hardStop = false;
-	operationalState.operationalState.backEStop = false;
-	operationalState.operationalState.wirelessEStop = false;
-	operationalState.operationalState.bumpSensor = false;
-	operationalState.operationalState.pause = pauseState;
-
-	operationalState.state = true;
-
-    getOwner()->setPauseState(pauseState);
-
-
-    setMotionState_.publish(operationalState);
+//	bool pauseState = param2Bool(params, POSITION_PARAM_1);
+//
+//	srslib_framework::MsgSetOperationalState operationalState;
+//
+//	operationalState.operationalState.frontEStop = false;
+//	operationalState.operationalState.hardStop = false;
+//	operationalState.operationalState.backEStop = false;
+//	operationalState.operationalState.wirelessEStop = false;
+//	operationalState.operationalState.bumpSensor = false;
+//	operationalState.operationalState.pause = pauseState;
+//
+//	operationalState.state = true;
+//
+//    getOwner()->setPauseState(pauseState);
+//
+//
+//    setMotionState_.publish(operationalState);
 
     return true;
 }

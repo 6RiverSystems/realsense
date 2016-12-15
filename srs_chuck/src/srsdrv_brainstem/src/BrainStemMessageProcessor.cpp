@@ -188,17 +188,17 @@ void BrainStemMessageProcessor::getOperationalState(const ros::Time& now)
 
 void BrainStemMessageProcessor::checkForBrainstemFaultTimer(const ros::TimerEvent& event)
 {
-	bool brainstemTimeout = false;
-
-	if (isSetupComplete())
-	{
-		if ((event.current_expected - lastMessageTime_).toSec() > FAULT_TIMEOUT)
-		{
-			brainstemTimeout = true;
-		}
-	}
-
-	operationalStateHandler_.setBrainstemTimeout(brainstemTimeout);
+//	bool brainstemTimeout = false;
+//
+//	if (isSetupComplete())
+//	{
+//		if ((event.current_expected - lastMessageTime_).toSec() > FAULT_TIMEOUT)
+//		{
+//			brainstemTimeout = true;
+//		}
+//	}
+//
+//	operationalStateHandler_.setBrainstemTimeout(brainstemTimeout);
 }
 
 bool BrainStemMessageProcessor::isSetupComplete() const

@@ -673,7 +673,7 @@
 						"object": "labeled_area",
 						"label": "ws1",
 						"notes": {
-							"set_max_velocity": 0.4
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -691,7 +691,7 @@
 						"object": "labeled_area",
 						"label": "ws2",
 						"notes": {
-							"set_max_velocity": 0.4
+							"play_sound": "warning"
 						}
 					}
 				},
@@ -709,13 +709,13 @@
 						"object": "labeled_area",
 						"label": "ws3",
 						"notes": {
-							"set_max_velocity": 0.4
+							"play_sound": "warning"
 						}
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "1",
+					"id": 47,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
@@ -724,15 +724,16 @@
 						]
 					},
 					"properties": {
-						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"object": "labeled_area",
+						"label": "ws1",
+						"notes": {
+							"set_max_velocity": 0.4
+						}
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "2",
+					"id": 48,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
@@ -741,10 +742,11 @@
 						]
 					},
 					"properties": {
-						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"object": "labeled_area",
+						"label": "ws2",
+						"notes": {
+							"set_max_velocity": 0.4
+						}
 					}
 				}
 			]

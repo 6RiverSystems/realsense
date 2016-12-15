@@ -5,12 +5,27 @@ ORIGIN = [-0.025, -0.025, 0.000];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Main map layer
-map = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-obstacles.png', ...
+map = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-border.png', ...
     RESOLUTION, ORIGIN);
-showMap(map, 'Obstacles');
+showMap(map, 'Border');
 
 % Make sure that the border is marked and sealed
-map = convertToBorderObstacle(map, [1, 2, 3, 4, 5, 6, 7, 8, 9, 63, 92, 96, 97], 1, 1);
+map = convertToBorderObstacle(map, 'all', 1, 1);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Obstacles
+layerObstacles = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-obstacles.png', ...
+    RESOLUTION, ORIGIN);
+showMap(layerObstacles, 'Obstacles');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Reduced speed layer
+layerReducedSpeed = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-reduced_speed.png', ...
+    RESOLUTION, ORIGIN);
+showMap(layerReducedSpeed, 'Reduced speed');
+
+layerReducedSpeed = convertToLabeledArea(layerReducedSpeed, 'all', 'ws', ...
+    struct('set_max_velocity', 0.4));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Warning sound layer
@@ -25,7 +40,7 @@ layerWarningSound = convertToLabeledArea(layerWarningSound, 'all', 'ws', ...
 % One way West
 layerOneWayWestEast = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-one_way_west-east.png', ...
     RESOLUTION, ORIGIN);
-showMap(layerOneWayWestEast, 'West weight');
+showMap(layerOneWayWestEast, 'One way: allowed West-East');
 
 layerOneWayWestEast = convertToWeightedArea(layerOneWayWestEast, 'all', 0, 0, 0, 100);
 
@@ -33,7 +48,7 @@ layerOneWayWestEast = convertToWeightedArea(layerOneWayWestEast, 'all', 0, 0, 0,
 % One way East
 layerOneWayEastWest = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-one_way_east-west.png', ...
     RESOLUTION, ORIGIN);
-showMap(layerOneWayEastWest, 'East weight');
+showMap(layerOneWayEastWest, 'One way: allowed East-West');
 
 layerOneWayEastWest = convertToWeightedArea(layerOneWayEastWest, 'all', 0, 100, 0, 0);
 
@@ -47,7 +62,13 @@ layerMeeting = convertToCostArea(layerMeeting, 'all', 50);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map
-map = addLayer(map, {layerWarningSound, layerOneWayWestEast, layerOneWayEastWest, layerMeeting});
+map = addLayer(map, {...
+    layerObstacles, ...
+    layerReducedSpeed, ...
+    layerWarningSound, ...
+    layerOneWayWestEast, ...
+    layerOneWayEastWest, ...
+    layerMeeting});
 showMap(map, 'Total map');
 
 saveGeoJsonMap(map, ...

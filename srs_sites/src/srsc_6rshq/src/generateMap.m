@@ -33,7 +33,7 @@ layerReducedSpeed = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/sr
     RESOLUTION, ORIGIN);
 showMap(layerReducedSpeed, 'Reduced speed');
 
-layerWarningSound = convertToLabeledArea(layerWarningSound, 'all', 'ws', ...
+layerReducedSpeed = convertToLabeledArea(layerReducedSpeed, 'all', 'ws', ...
     struct('set_max_velocity', 0.4));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

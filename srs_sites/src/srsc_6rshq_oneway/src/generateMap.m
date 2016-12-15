@@ -8,15 +8,18 @@ OUTPUT_DIR = '/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq_oneway
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Main map layer
-map = png2Map(sprintf('%s%s', INPUT_DIR, '6rshq_oneway-logical-obstacles.png'), ...
+map = png2Map(sprintf('%s%s', INPUT_DIR, '6rshq_oneway-logical-border.png'), ...
     RESOLUTION, ORIGIN);
 showMap(map, 'Obstacles');
 
-% Make sure that the border is marked and sealed (with Ping pong table)
-map = convertToBorderObstacle(map, [1, 2, 3, 7, 8, 9, 10, 11, 12], 1, 1);
+% Make sure that the border is marked and sealed
+map = convertToBorderObstacle(map, 'all', 1, 1);
 
-% Make sure that the border is marked and sealed (without Ping pong table)
-% map = convertToBorderObstacle(map, [1, 2, 3, 6, 7, 8, 9, 10, 11], 1, 1);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Obstacles
+layerObstacles = png2Map(sprintf('%s%s', INPUT_DIR, '6rshq_oneway-logical-obstacles.png'), ...
+    RESOLUTION, ORIGIN);
+showMap(layerObstacles, 'Obstacles');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One-way layer
@@ -36,7 +39,16 @@ layerWarningSound = convertToLabeledArea(layerWarningSound, 'all', 'ws', ...
         struct('play_sound', 'warning', 'set_max_velocity', 0.3));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% One-way layer
+% Reduced speed layer
+layerReducedSpeed = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq/src/6rshq-logical-reduced_speed.png', ...
+    RESOLUTION, ORIGIN);
+showMap(layerReducedSpeed, 'Reduced speed');
+
+layerReducedSpeed = convertToLabeledArea(layerReducedSpeed, 'all', 'ws', ...
+    struct('set_max_velocity', 0.4));
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Graph layer
 
 % AA-------------------------------------BB
 % |                                       |
@@ -137,8 +149,11 @@ map = addGraph(map, '6rshq_graph', ...
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map
-map = addLayer(map, {layerWarningSound, layerOneway});
+map = addLayer(map, {...
+    layerObstacles, ...
+    layerWarningSound, ...
+    layerOneway});
 showMap(map, 'Complete map');
-
 saveGeoJsonMap(map, sprintf('%s%s', OUTPUT_DIR, '6rshq_oneway.geojson'));
+
 open(sprintf('%s%s', OUTPUT_DIR, '6rshq_oneway.geojson'));

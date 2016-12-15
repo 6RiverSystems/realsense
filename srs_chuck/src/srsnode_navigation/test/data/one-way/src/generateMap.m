@@ -20,8 +20,8 @@ layerOneWayWestEast = convertToWeightedArea(layerOneWayWestEast, 'all', 0, 0, 0,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map
 map = addLayer(map, {layerOneWayWestEast});
-showMap(map, 'Total map');
-
+showMap(map, 'Complete map');
 saveGeoJsonMap(map, ...
     '/Users/fsantini/Projects/repos/ros/srs_chuck/src/srsnode_navigation/test/data/one-way/one-way.geojson');
+
 open('/Users/fsantini/Projects/repos/ros/srs_chuck/src/srsnode_navigation/test/data/one-way/one-way.geojson');

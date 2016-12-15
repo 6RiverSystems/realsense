@@ -18,7 +18,7 @@ Grid2dNode* Grid2dNode::instanceOf(Grid2d* graph,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2dNode::getNeighbors(vector<SearchNode*>& neighbors)
+void Grid2dNode::getExploredNodes(vector<SearchNode*>& exploredNodes)
 {
     Grid2dAction::ActionResultType actionResult;
 
@@ -39,7 +39,7 @@ void Grid2dNode::getNeighbors(vector<SearchNode*>& neighbors)
             neighborNode->h_ = goal_->heuristic(neighborNode);
 
             // Store it in the
-            neighbors.push_back(neighborNode);
+            exploredNodes.push_back(neighborNode);
         }
     }
 }

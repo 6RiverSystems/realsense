@@ -75,22 +75,18 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
         return;
     }
 
-    // Find the bucket which contains the item
-    auto bucketIterator = queue_.find(itemIterator->second);
+    PRIORITY key = itemIterator->second->priority;
+    BucketType* bucket = itemIterator->second->bucket;
+    auto it = itemIterator->second;
+    bucket->erase(it);
 
-    // Remove the item from the bucket
-    bucketIterator->second->erase(itemIterator->first);
-
-    // Recycle the bucket if it becomes empty
-    if (bucketIterator->second->empty())
+    if (bucket->empty())
     {
-        queue_.erase(bucketIterator);
-        recycleBucket(bucketIterator->second);
+        queue_.erase(key);
+        recycleBucket(bucket);
     }
 
-    // Remove the item from the general index
-    index_.erase(itemIterator->first);
-
+    index_.erase(itemIterator);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,12 +123,11 @@ bool MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
     PRIORITY key = lowestBucketIterator->first;
 
     // Find the first element of the bucket and return it
-    auto firstItemIterator = bucket->begin();
-    item = *firstItemIterator;
+    item = bucket->begin()->info;
 
     // Remove the item from the bucket
     // and recycle it if empty
-    bucket->erase(firstItemIterator);
+    bucket->pop_front();
     if (bucket->empty())
     {
         queue_.erase(key);
@@ -170,8 +165,8 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
     }
 
     // Add the item to the bucket and to the map index
-    bucket->insert(item);
-    index_[item] = priority;
+    auto it = bucket->insert(bucket->end(), Node(priority, item, bucket));
+    index_[item] = it;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,7 +207,7 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
     for (auto itemIterator : index_)
     {
         stream << setw(4) << counter++ << ": [" <<
-            setw(10) << itemIterator.second << "] " <<
+            setw(10) << itemIterator.second->priority << "] " <<
             itemIterator.first << endl;
     }
     stream << "}";

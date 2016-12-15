@@ -5,12 +5,18 @@ ORIGIN = [-10, -10, 0];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Main map layer
-map = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq/src/6rshq-logical-obstacles.png', ...
+map = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq/src/6rshq-logical-border.png', ...
     RESOLUTION, ORIGIN);
 showMap(map, 'Obstacles');
 
 % Make sure that the border is marked and sealed
-map = convertToBorderObstacle(map, [1, 2, 3, 7, 8, 9, 10, 11, 12], 1, 1);
+map = convertToBorderObstacle(map, 'all', 1, 1);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Obstacles
+layerObstacles = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq/src/6rshq-logical-obstacles.png', ...
+    RESOLUTION, ORIGIN);
+showMap(layerObstacles, 'Obstacles');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Warning sound layer
@@ -18,10 +24,20 @@ layerWarningSound = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/sr
     RESOLUTION, ORIGIN);
 showMap(layerWarningSound, 'Warning sound');
 
-layerWarningSound = convertToLabeledArea(layerWarningSound, 'all', 'ws', {'warning_sound'});
+layerWarningSound = convertToLabeledArea(layerWarningSound, 'all', 'ws', ...
+    struct('play_sound', 'warning'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% One-way layer
+% Reduced speed layer
+layerReducedSpeed = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq/src/6rshq-logical-reduced_speed.png', ...
+    RESOLUTION, ORIGIN);
+showMap(layerReducedSpeed, 'Reduced speed');
+
+layerReducedSpeed = convertToLabeledArea(layerReducedSpeed, 'all', 'ws', ...
+    struct('set_max_velocity', 0.4));
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Graph layer
 
 % AA-------------------------------------BB
 % |                                       |
@@ -122,9 +138,12 @@ map = addGraph(map, '6rshq_graph', ...
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map
-map = addLayer(map, {layerWarningSound});
+map = addLayer(map, {...
+    layerObstacles, ...
+    layerWarningSound, ...
+    layerReducedSpeed});
 showMap(map, 'Complete map');
-
 saveGeoJsonMap(map, ...
     '/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq/map/6rshq.geojson');
+
 open('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_6rshq/map/6rshq.geojson');

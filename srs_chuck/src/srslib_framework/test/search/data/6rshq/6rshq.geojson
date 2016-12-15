@@ -6,10 +6,10 @@
 			"properties": {
 				"object": "map",
 				"version": "1",
-				"origin": [0,0,0],
-				"resolution": 0.1,
-				"width": 20,
-				"height": 10
+				"origin": [-10,-10,0],
+				"resolution": 0.05,
+				"width": 39.45,
+				"height": 32.95
 			}
 		},
 		{
@@ -21,13 +21,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[0,0],
-							[2.1,10]
+							[-10,14.15],
+							[29.45,22.95]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.3,
+						"envelope_size": 0.5,
 						"envelope_cost": 70,
 						"is_border": 1
 					}
@@ -38,13 +38,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[1.9,9],
-							[19.5,10]
+							[-10,0.2],
+							[0.1,14.2]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.3,
+						"envelope_size": 0.5,
 						"envelope_cost": 70,
 						"is_border": 1
 					}
@@ -55,13 +55,13 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[1.9,0],
-							[19.5,1.6]
+							[-10,-10],
+							[16.2,0.35]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.3,
+						"envelope_size": 0.5,
 						"envelope_cost": 70,
 						"is_border": 1
 					}
@@ -72,15 +72,15 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[3.6,6.1],
-							[16.7,7.4]
+							[9.15,10.1],
+							[19.4,14.2]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.3,
+						"envelope_size": 0.5,
 						"envelope_cost": 70,
-						"is_border": 0
+						"is_border": 1
 					}
 				},
 				{
@@ -89,15 +89,15 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[6.2,3],
-							[16.7,4.3]
+							[12.75,9.3],
+							[19.4,10.15]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.3,
+						"envelope_size": 0.5,
 						"envelope_cost": 70,
-						"is_border": 0
+						"is_border": 1
 					}
 				},
 				{
@@ -106,15 +106,647 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[19.4,0],
-							[20,10]
+							[16.1,-10],
+							[18.1,-1.9]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.3,
+						"envelope_size": 0.5,
 						"envelope_cost": 70,
 						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "7",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[18.05,-10],
+							[29.45,-5.3]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.5,
+						"envelope_cost": 70,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "8",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[19.35,1.65],
+							[29.45,14.2]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.5,
+						"envelope_cost": 70,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "9",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[20,-5.45],
+							[29.45,1.7]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.5,
+						"envelope_cost": 70,
+						"is_border": 1
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 10,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [2.7,8.3]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "A"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 11,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [17.6,8.3]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "B"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 12,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [2.7,5.3]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "C"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 13,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [5.3,5.3]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "D"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 14,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [17.6,5.3]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "E"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 15,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [2.7,2.25]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "F"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 16,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [5.3,2.25]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "G"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 17,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [17.6,2.25]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "H"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 18,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [2.7,8.85]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "AA"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 19,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [17.6,8.85]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "BB"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 20,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [2.7,1.6]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "FF"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 21,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [17.6,1.6]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "HH"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 22,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [9.7,8.65]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "rockyInduct",
+						"orientation": 0,
+						"labels": "induct",
+						"mfp_ids": "rocky"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 23,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [5,2.25]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "borisInduct",
+						"orientation": 0,
+						"labels": "induct",
+						"mfp_ids": "boris"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 24,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [13.7,8.65]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "bullInduct",
+						"orientation": 0,
+						"labels": "induct",
+						"mfp_ids": "bullwinkle"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 25,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [17.6,5.3]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "picking1",
+						"orientation": 180,
+						"labels": "picking",
+						"mfp_ids": "rocky"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 26,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [2.7,5.3]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "picking2",
+						"orientation": 0,
+						"labels": "picking"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 27,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [14.6,2.1]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "picking3",
+						"orientation": 180,
+						"labels": "picking"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 28,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [3.15,10]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "rockyPackout",
+						"orientation": 270,
+						"labels": "packout",
+						"mfp_ids": "rocky"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 29,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [2,3]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "borisPackout",
+						"orientation": 270,
+						"labels": "packout",
+						"mfp_ids": "boris"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 30,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [5.6,10]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "bullPackout",
+						"orientation": 270,
+						"labels": "packout",
+						"mfp_ids": "bullwinkle"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 31,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [2.15,3.15]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "lblInduct",
+						"orientation": 90,
+						"labels": "induct",
+						"mfp_ids": "leah"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 32,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [2.15,3.15]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "ahInduct",
+						"orientation": 90,
+						"labels": "induct",
+						"mfp_ids": "arroway"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 33,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [5,2.25]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "lblPackout",
+						"orientation": 180,
+						"labels": "packout",
+						"mfp_ids": "leah"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 34,
+					"geometry": {
+						"type": "Point",
+						"coordinates": [5,2.25]
+					},
+					"properties": {
+						"object": "vertex",
+						"name": "ahPackout",
+						"orientation": 180,
+						"labels": "packout",
+						"mfp_ids": "arroway"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 35,
+					"geometry": "null",
+					"properties": {
+						"object": "edge",
+						"name": "AB",
+						"from": "A",
+						"to": "B",
+						"direction": "none"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 36,
+					"geometry": "null",
+					"properties": {
+						"object": "edge",
+						"name": "CE",
+						"from": "C",
+						"to": "E",
+						"direction": "none"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 37,
+					"geometry": "null",
+					"properties": {
+						"object": "edge",
+						"name": "FH",
+						"from": "F",
+						"to": "H",
+						"direction": "none"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 38,
+					"geometry": "null",
+					"properties": {
+						"object": "edge",
+						"name": "AABB",
+						"from": "AA",
+						"to": "BB",
+						"direction": "none"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 39,
+					"geometry": "null",
+					"properties": {
+						"object": "edge",
+						"name": "FFHH",
+						"from": "FF",
+						"to": "HH",
+						"direction": "none"
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 40,
+					"geometry": "null",
+					"properties": {
+						"object": "graph",
+						"name": "6rshq_graph",
+						"vertices": [
+							"A",
+							"B",
+							"C",
+							"D",
+							"E",
+							"F",
+							"G",
+							"H",
+							"AA",
+							"BB",
+							"FF",
+							"HH",
+							"rockyInduct",
+							"borisInduct",
+							"bullInduct",
+							"picking1",
+							"picking2",
+							"picking3",
+							"rockyPackout",
+							"borisPackout",
+							"bullPackout",
+							"lblInduct",
+							"ahInduct",
+							"lblPackout",
+							"ahPackout"
+						],
+						"edges": [
+							"AB",
+							"CE",
+							"FH",
+							"AABB",
+							"FFHH"
+						]
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "1",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[3.6,6.25],
+							[16.95,7.55]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.5,
+						"envelope_cost": 70,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "2",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[3.7,10.75],
+							[6.8,12.45]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.5,
+						"envelope_cost": 70,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "3",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[6.25,3.2],
+							[16.95,4.5]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.5,
+						"envelope_cost": 70,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 44,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[3.6,3.2],
+							[6.25,6.25]
+						]
+					},
+					"properties": {
+						"object": "labeled_area",
+						"label": "ws1",
+						"notes": {
+							"play_sound": "warning"
+						}
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 45,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[14.7,4.5],
+							[16.95,6.25]
+						]
+					},
+					"properties": {
+						"object": "labeled_area",
+						"label": "ws2",
+						"notes": {
+							"play_sound": "warning"
+						}
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 46,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[17,1.75],
+							[18.5,9.25]
+						]
+					},
+					"properties": {
+						"object": "labeled_area",
+						"label": "ws3",
+						"notes": {
+							"play_sound": "warning"
+						}
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 47,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[3.6,3.2],
+							[6.25,6.25]
+						]
+					},
+					"properties": {
+						"object": "labeled_area",
+						"label": "ws1",
+						"notes": {
+							"set_max_velocity": 0.4
+						}
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 48,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[14.7,4.5],
+							[18.5,6.25]
+						]
+					},
+					"properties": {
+						"object": "labeled_area",
+						"label": "ws2",
+						"notes": {
+							"set_max_velocity": 0.4
+						}
 					}
 				}
 			]

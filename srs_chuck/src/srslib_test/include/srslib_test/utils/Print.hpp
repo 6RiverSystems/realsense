@@ -86,7 +86,7 @@ struct Print
                 }
                 else
                 {
-                    output << setw(PRECISION + 1) << ".";
+                    output << setw(PRECISION + 1) << "~";
                 }
             }
 

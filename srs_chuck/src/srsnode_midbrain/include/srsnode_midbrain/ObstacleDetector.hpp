@@ -107,7 +107,7 @@ private:
 
 	Polygon							m_posePolygon;
 
-	Solution<Grid2dSolutionItem>		m_solution;
+	Solution<Grid2dSolutionItem>*		m_solution;
 
 	Polygon							m_dangerZone;
 

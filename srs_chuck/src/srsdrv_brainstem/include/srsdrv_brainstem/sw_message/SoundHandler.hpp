@@ -9,7 +9,7 @@
 
 #include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
-#include <srslib_framework/ros/tap/subscriber/Observer.hpp>
+#include <srslib_framework/platform/observer/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_Sound.hpp>
 
 #include <srsdrv_brainstem/BrainStemMessages.h>

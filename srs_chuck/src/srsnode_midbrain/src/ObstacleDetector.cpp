@@ -95,7 +95,7 @@ void ObstacleDetector::SetPose( const srslib_framework::Pose::ConstPtr& pose )
 
 void ObstacleDetector::SetSolution( const srslib_framework::MsgSolution::ConstPtr& solution )
 {
-	m_solution = SolutionMessageFactory::msg2Solution(*solution);
+	m_solution = SolutionMessageFactory::msg2Solution(solution);
 
 	UpdateDangerZone( );
 }
@@ -261,10 +261,10 @@ void ObstacleDetector::UpdateDangerZone( )
 {
 	Polygon dangerZone;
 
-	if( m_solution.size( ) )
+	if( m_solution->size( ) )
 	{
 		// Build the danger zone from the solution
-		for( auto solutionItem : m_solution )
+		for( auto solutionItem : *m_solution )
 		{
 			AddPoseToPolygon( solutionItem.toPose, dangerZone, m_footprintWidth, m_footprintWidth );
 		}

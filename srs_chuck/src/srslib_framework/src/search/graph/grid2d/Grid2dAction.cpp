@@ -78,7 +78,7 @@ bool Grid2dAction::addBackward(Grid2d* graph, Grid2dNode* fromNode,
             {
                 motionCost += localCost;
 
-                result = ActionResultType(neighbor, fromNode->getG() + motionCost);
+                result = ActionResultType(neighbor, fromNode->getLocalCost() + motionCost);
                 return true;
             }
         }
@@ -109,7 +109,7 @@ bool Grid2dAction::addForward(Grid2d* graph, Grid2dNode* fromNode,
             {
                 motionCost += localCost;
 
-                result = ActionResultType(neighbor, fromNode->getG() + motionCost);
+                result = ActionResultType(neighbor, fromNode->getLocalCost() + motionCost);
                 return true;
             }
         }
@@ -127,7 +127,7 @@ bool Grid2dAction::addRotation(Grid2d* graph, Grid2dNode* fromNode, ActionEnum a
     int newOrientation = AngleMath::normalizeDeg<int>(fromPosition.orientation + angle);
     Grid2d::Position motion = Grid2d::Position(fromPosition.x, fromPosition.y, newOrientation);
 
-    result = ActionResultType(motion, fromNode->getG() + COMMAND_COSTS[action]);
+    result = ActionResultType(motion, fromNode->getLocalCost() + COMMAND_COSTS[action]);
     return true;
 }
 

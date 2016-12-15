@@ -43,21 +43,21 @@ struct Grid2dNode : public SearchNode
         return this == rhs || position_ == reinterpret_cast<const Grid2dNode*>(rhs)->getPosition();
     }
 
-    int getG() const
-    {
-        return g_;
-    }
-
     int getH() const
     {
         return h_;
     }
 
-    void getNeighbors(vector<SearchNode*>& neighbors);
+    void getExploredNodes(vector<SearchNode*>& exploredNodes);
 
     SearchNode* getParent()
     {
         return parentNode_;
+    }
+
+    int getLocalCost() const
+    {
+        return g_;
     }
 
     Grid2dAction::ActionEnum getParentAction()
@@ -108,8 +108,18 @@ struct Grid2dNode : public SearchNode
             ", pos: " << position_ <<
             ", g: " << g_ <<
             ", h: " << h_ <<
-            ", goal: " << *goal_ <<
-            "}";
+            ", goal: ";
+
+            if (goal_)
+            {
+                stream << *goal_;
+            }
+            else
+            {
+                stream << "nullptr";
+            }
+
+            return stream << "}";
     }
 
 protected:

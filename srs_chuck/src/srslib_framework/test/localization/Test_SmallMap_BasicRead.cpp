@@ -12,6 +12,7 @@ using namespace std;
 
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
+#include <srslib_framework/localization/map/mapnote/NotePlaySound.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMap.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMap.hpp>
 
@@ -79,6 +80,6 @@ TEST(Test_SmallMap, BasicRead)
     ASSERT_EQ(24, area1.ri) << "The 'test1' area initial Y coordinate is not as expected";
     ASSERT_EQ(32, area1.cf) << "The 'test1' area final X coordinate is not as expected";
     ASSERT_EQ(31, area1.rf) << "The 'test1' area final Y coordinate is not as expected";
-    ASSERT_EQ(MapNote::WARNING_SOUND, area1.note) << "The map note is not as expected";
+    ASSERT_TRUE(area1.notes->has(NotePlaySound::TYPE)) << "The map note does not contain PLAY_SOUND";
 
 }

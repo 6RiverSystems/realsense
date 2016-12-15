@@ -36,10 +36,10 @@
         <remap from="scan" to="/internal/sensors/rgbd/scan"/>
         <rosparam>
             output_frame_id: laser_frame
-            scan_height: 400
+            scan_height: 150
             scan_time: 0.333
             range_min: 0.3
-            range_max: 8.0
+            range_max: 4.0
             height_min: 0.1
             height_max: 5.0
         </rosparam>
@@ -48,7 +48,7 @@
         <node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="rgbd_laser_filter">
 	<remap from="scan" to="/internal/sensors/rgbd/scan" />
 	<remap from="scan_filtered" to="/internal/sensors/rgbd/scan/filtered" />
-	<rosparam command="load" file="$(find srsnode_laser_filters)/config/laser_filter.yaml" />
+	<rosparam command="load" file="$(find srsnode_laser_filters)/config/rgbd_laser_filter.yaml" />
 	</node>
         
 

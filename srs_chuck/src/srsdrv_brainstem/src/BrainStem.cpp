@@ -22,14 +22,14 @@ namespace srs
 {
 
 BrainStem::BrainStem( const std::string& strSerialPort ) :
-	m_pSerialIO( new SerialIO( "brainstem" ) ),
-	m_messageProcessor( m_pSerialIO ),
+	serialIO_( new SerialIO( "brainstem" ) ),
+	messageProcessor_( serialIO_ ),
 	brainstemFaultTimer_(),
 	nodeHandle_("~")
 {
-	OnConnectionChanged( false );
+	connectionChanged( false );
 
-	std::shared_ptr<SerialIO> pSerialIO = std::dynamic_pointer_cast<SerialIO>( m_pSerialIO );
+	std::shared_ptr<SerialIO> pSerialIO = std::dynamic_pointer_cast<SerialIO>( serialIO_ );
 
 	pSerialIO->EnableCRC( true );
 	pSerialIO->SetTerminatingCharacter( '\n' );
@@ -38,12 +38,12 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
     auto processMessage = [&]( std::vector<char> buffer )
     {
         ExecuteInRosThread( std::bind( &BrainStemMessageProcessor::processHardwareMessage,
-            &m_messageProcessor, buffer));
+            &messageProcessor_, buffer));
 	};
 
 	auto connectionChanged = [&]( bool bIsConnected )
 	{
-		ExecuteInRosThread( std::bind( &BrainStem::OnConnectionChanged, this,
+		ExecuteInRosThread( std::bind( &BrainStem::connectionChanged, this,
 				bIsConnected ) );
 	};
 
@@ -53,7 +53,7 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
     // Check for hardware faults
 	brainstemFaultTimer_ = nodeHandle_.createTimer(ros::Duration(1.0f / REFRESH_RATE_HZ),
         boost::bind(&BrainStemMessageProcessor::checkForBrainstemFaultTimer,
-        	&m_messageProcessor, _1));
+        	&messageProcessor_, _1));
 }
 
 BrainStem::~BrainStem( )
@@ -61,7 +61,7 @@ BrainStem::~BrainStem( )
 
 }
 
-void BrainStem::Run( )
+void BrainStem::run( )
 {
 	ros::Rate refreshRate( REFRESH_RATE_HZ );
 
@@ -72,17 +72,17 @@ void BrainStem::Run( )
 // Callbacks
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void BrainStem::OnConnectionChanged( bool bIsConnected )
+void BrainStem::connectionChanged( bool bIsConnected )
 {
-	m_messageProcessor.setConnected(bIsConnected);
+	messageProcessor_.setConnected(bIsConnected);
 
 	if( !bIsConnected )
 	{
-		m_brainstemEmulator.reset( new BrainStemEmulator( ) );
+		brainstemEmulator_.reset( new BrainStemEmulator( ) );
 	}
 	else
 	{
-		m_brainstemEmulator.reset( );
+		brainstemEmulator_.reset( );
 	}
 }
 

@@ -49,7 +49,7 @@ void HardwareInfoHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 
 		for (int i = 0; i < numberOfBatteries; i++)
 		{
-			MsgBatteryInfo batteryInfo = msg.read<MsgBatteryInfo>();
+			BatteryInfoData batteryInfo = msg.read<BatteryInfoData>();
 
 			srslib_framework::MsgBatteryInfo batteryInfoMsg;
 			batteryInfoMsg.manufacturer = batteryInfo.manufacturer;

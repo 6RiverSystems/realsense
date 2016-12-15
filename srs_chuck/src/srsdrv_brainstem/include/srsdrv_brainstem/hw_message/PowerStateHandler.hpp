@@ -24,6 +24,11 @@ public:
 
 private:
 
+	void readBatteryDescriptorInfo(HardwareMessage& msg, int descriptorIndex,
+		srslib_framework::MsgPowerState& batteryState);
+
+    void publishPowerState(const srslib_framework::MsgPowerState& powerState);
+
     HW_MESSAGE_BEGIN(PowerStateMsg)
         uint8_t cmd;
         uint8_t numberOfBatteries;
@@ -34,11 +39,6 @@ private:
         uint8_t id;
         uint16_t value;
     HW_MESSAGE_END
-
-	void readBatteryDescriptorInfo(HardwareMessage& msg, int descriptorIndex,
-		srslib_framework::MsgPowerState& batteryState);
-
-    void publishPowerState(const srslib_framework::MsgPowerState& powerState);
 
     ChannelBrainstemPowerState::Interface& publisher_;
 

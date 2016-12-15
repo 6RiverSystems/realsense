@@ -31,6 +31,8 @@ public:
 
     void encodeData(const bool& value);
 
+private:
+
     std::shared_ptr<TapBrainstemCmd_Ping>	tapPing_;
 };
 

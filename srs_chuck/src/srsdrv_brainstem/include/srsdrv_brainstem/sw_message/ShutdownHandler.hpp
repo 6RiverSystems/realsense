@@ -23,14 +23,15 @@ class ShutdownHandler :
 public:
     ShutdownHandler(BrainStemMessageProcessorInterface* owner);
 
-    virtual ~ShutdownHandler()
-    {}
+    virtual ~ShutdownHandler() {}
 
     virtual void attach();
 
     void notified(Subscriber<std_msgs::Bool>* subject);
 
     void encodeData(const bool& value);
+
+private:
 
     std::shared_ptr<TapBrainstemCmd_Shutdown>	tapShutdown_;
 };

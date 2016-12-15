@@ -3,9 +3,7 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-
-#ifndef BRAINSTEM_HPP_
-#define BRAINSTEM_HPP_
+#pragma once
 
 #include <ros/ros.h>
 
@@ -22,13 +20,13 @@ class BrainStem
 
 public:
 
-	BrainStem( const std::string& strSerialPort );
+	BrainStem(const std::string& strSerialPort);
 
-	virtual ~BrainStem( );
+	virtual ~BrainStem();
 
-	void Run( );
+	void run();
 
-	void OnConnectionChanged( bool bIsConnected );
+	void connectionChanged(bool bIsConnected);
 
     void checkForBrainstemFaultTimer(const ros::TimerEvent& event);
 
@@ -40,11 +38,11 @@ private:
 
 	static constexpr auto REFRESH_RATE_HZ = 10.0f;
 
-	std::shared_ptr<IO>					m_pSerialIO;
+	std::shared_ptr<IO>					serialIO_;
 
-	std::shared_ptr<BrainStemEmulator>	m_brainstemEmulator;
+	std::shared_ptr<BrainStemEmulator>	brainstemEmulator_;
 
-	BrainStemMessageProcessor			m_messageProcessor;
+	BrainStemMessageProcessor			messageProcessor_;
 
 	ros::NodeHandle						nodeHandle_;
 
@@ -52,5 +50,3 @@ private:
 };
 
 } // namespace srs
-
-#endif  // BRAINSTEM_HPP_

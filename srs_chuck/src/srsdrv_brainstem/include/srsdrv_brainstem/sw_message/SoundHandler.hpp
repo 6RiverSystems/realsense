@@ -32,6 +32,7 @@ public:
     void encodeData(const Sound& value);
 
 private:
+
     HW_MESSAGE_BEGIN(SoundData)
         uint8_t cmd;
         uint8_t volume;

@@ -59,24 +59,20 @@ public:
 
     void sendCommand(char* command, std::size_t size)
     {
-        WriteToSerialPort(command, size);
+        writeToSerialPort(command, size);
     }
 
 // Message Processing
 
-	void setConnected( bool bIsConnected );
+	void setConnected( bool isConnected );
 
 	void getOperationalState( );
 
 	void getHardwareInformation( );
 
-    void setMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues );
+    void setMotionStatus( const std::bitset<8>& motionStatusSet, bool setValue );
 
     void shutdown( );
-
-// Helper
-
-	std::string getButtonName( LED_ENTITIES eButtonId ) const;
 
 private:
 
@@ -90,7 +86,7 @@ private:
 
 // Helper Methods
 
-	void WriteToSerialPort( char* pszData, std::size_t dwSize );
+	void writeToSerialPort( char* data, std::size_t size );
 
 private:
 
@@ -105,7 +101,7 @@ private:
 
 	static constexpr auto FAULT_TIMEOUT = 0.2f;
 
-	std::shared_ptr<IO>					m_pIO;
+	std::shared_ptr<IO>					io_;
 
 	bool								isConnected_;
 
@@ -118,8 +114,6 @@ private:
 	ros::Time							lastMessageTime_;
 
     HwMessageHandlerMapType				hwMessageHandlers_;
-
-    // TODO: Move these all to the constructor or some sort of initialization method (no need to have members)
 
 	ChannelBrainstemConnected			connectedChannel_;
     ChannelBrainstemHardwareInfo		hardwareInfoChannel_;

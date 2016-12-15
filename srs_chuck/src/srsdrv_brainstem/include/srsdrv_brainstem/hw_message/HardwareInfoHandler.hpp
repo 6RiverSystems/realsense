@@ -7,6 +7,7 @@
 
 #include <BrainStemMessages.hpp>
 #include <HardwareMessageHandler.hpp>
+
 #include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 
 namespace srs {
@@ -14,8 +15,6 @@ namespace srs {
 class HardwareInfoHandler : public HardwareMessageHandler
 {
 public:
-
-	typedef std::function<void(srslib_framework::MsgHardwareInfo&)> HardwareInfoFn;
 
     HardwareInfoHandler(ChannelBrainstemHardwareInfo::Interface& publisher);
 
@@ -33,7 +32,7 @@ private:
         // char brainstemFirmwareVersion* (null terminated string)
     HW_MESSAGE_END
 
-    HW_MESSAGE_BEGIN(MsgHardwareInfo2)
+    HW_MESSAGE_BEGIN(HardwareInfoData2)
 		uint8_t cmd;
 		uint16_t uniqueId[8];
 		uint8_t chassisGeneration;
@@ -43,7 +42,7 @@ private:
     	// MsgBatteryInfo[numberOfBatteries];
     HW_MESSAGE_END
 
-    HW_MESSAGE_BEGIN(MsgBatteryInfo)
+    HW_MESSAGE_BEGIN(BatteryInfoData)
     	char manufacturer[13];
     	char serialNumber[33];
     HW_MESSAGE_END

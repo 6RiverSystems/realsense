@@ -4,11 +4,9 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 
-#include <bitset>
+#include <BrainStemMessageProcessorInterface.hpp>
 
-#include <srsdrv_brainstem/sw_message/SetMotionStateHandler.hpp>
-#include <ros/ros.h>
-#include "../../include/srsdrv_brainstem/BrainStemMessageProcessorInterface.hpp"
+#include <sw_message/SetMotionStateHandler.hpp>
 
 namespace srs {
 

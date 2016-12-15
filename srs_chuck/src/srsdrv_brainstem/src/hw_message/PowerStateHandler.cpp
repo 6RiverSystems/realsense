@@ -60,6 +60,32 @@ void PowerStateHandler::receiveMessage(ros::Time currentTime, HardwareMessage& m
 		readBatteryDescriptorInfo(msg, i, powerStateMsg);
 	}
 
+	std::ostringstream stream;
+	stream << "Power state: ";
+
+	int i = 1;
+	for (const auto& battery : powerStateMsg.batteries)
+	{
+		stream << "Battery " << i << ": ";
+
+		stream << "[";
+
+		for (const auto& descriptor : battery.descriptors)
+		{
+			stream << descriptor.id << ": " << descriptor.value << " ";
+		}
+
+		stream << "]";
+
+		i++;
+	}
+
+	stream << std::endl;
+
+	std::string strData =  stream.str( );
+
+	ROS_INFO_STREAM( strData );
+
 	// Publish the power State
 	publisher_.publish(powerStateMsg);
 }

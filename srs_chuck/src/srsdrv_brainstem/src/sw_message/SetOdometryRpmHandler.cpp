@@ -4,10 +4,9 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 
-#include <sw_message/SetOdometryRpmHandler.hpp>
+#include <BrainStemMessageProcessorInterface.hpp>
 
-#include <ros/ros.h>
-#include "../../include/srsdrv_brainstem/BrainStemMessageProcessorInterface.hpp"
+#include <sw_message/SetOdometryRpmHandler.hpp>
 
 namespace srs {
 

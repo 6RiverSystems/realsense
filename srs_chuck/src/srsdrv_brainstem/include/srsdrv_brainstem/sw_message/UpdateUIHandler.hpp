@@ -32,6 +32,7 @@ public:
     void encodeData(const srslib_framework::MsgUpdateUI& value);
 
 private:
+
     HW_MESSAGE_BEGIN(UpdateUIData)
         uint8_t cmd;
         uint8_t entity;

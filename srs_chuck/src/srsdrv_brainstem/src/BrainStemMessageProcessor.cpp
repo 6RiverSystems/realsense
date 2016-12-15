@@ -3,24 +3,21 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#include "../include/srsdrv_brainstem/BrainStemMessageProcessor.hpp"
-
-#include <chrono>
-#include <boost/tokenizer.hpp>
 
 #include <ros/ros.h>
 
 #include <srslib_framework/io/IO.hpp>
 #include <srslib_framework/utils/Logging.hpp>
 
-#include "../include/srsdrv_brainstem/BrainStemMessages.hpp"
+#include <BrainStemMessages.hpp>
+#include <BrainStemMessageProcessor.hpp>
 
 namespace srs {
 
 using namespace ros;
 
 BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) :
-	m_pIO( pIO ),
+	io_( pIO ),
 	isConnected_(false),
 	hasValidHardareInfo_(false),
 	lastHardareInfoRequestTime_(),
@@ -96,7 +93,7 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 			catch(std::runtime_error& error)
 			{
 				// If it arrives here, the message failed to parse
-				ROS_ERROR_STREAM( "Message from brainstem malformed: " <<
+				ROS_ERROR_STREAM( "Brainstem driver: Message from brainstem malformed: " <<
 					static_cast<char>(eCommand) << ", data: " << ToHex(buffer) << ", exception: " << error.what());
 			}
 		}
@@ -107,7 +104,7 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 				eCommand != BRAIN_STEM_MSG::SENSOR_FRAME &&
 				eCommand != BRAIN_STEM_MSG::MESSAGE)
 			{
-			    ROS_ERROR_STREAM( "Unknown message from brainstem: " <<
+			    ROS_ERROR_STREAM( "Brainstem driver: Unknown message from brainstem: " <<
 			        static_cast<int>(eCommand) << ", data: " << ToHex(buffer));
 			}
 		}
@@ -116,29 +113,31 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 
 void BrainStemMessageProcessor::getOperationalState( )
 {
-	ROS_DEBUG( "GetOperationalState" );
+	ROS_DEBUG( "Brainstem driver: GetOperationalState" );
 
 	CommandData msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_OPERATIONAL_STATE) };
 
 	// Get the operational state
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+	writeToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 
 void BrainStemMessageProcessor::getHardwareInformation( )
 {
-	ROS_DEBUG( "GetHardwareInformation" );
+	ROS_DEBUG( "Brainstem driver: GetHardwareInformation" );
 
 	CommandData msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_HARDWARE_INFO ) };
 
 	// Get the hardware information (version, configuration, etc.)
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+	writeToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 
 void BrainStemMessageProcessor::shutdown( )
 {
+	ROS_INFO( "Brainstem driver: Shutdown" );
+
 	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::SHUTDOWN );
 
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
+	writeToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -214,9 +213,9 @@ void BrainStemMessageProcessor::checkSetupComplete()
 	bool setupComplete = isSetupComplete();
 	if (setupComplete)
 	{
-		ROS_INFO( "Setup complete (received hardware info and operational state message." );
+		ROS_INFO( "Brainstem driver: Setup complete (received hardware info and operational state message." );
 
-		m_pIO->SetSynced(true);
+		io_->SetSynced(true);
 	}
 
 	connectedChannel_.publish(setupComplete);
@@ -226,15 +225,15 @@ void BrainStemMessageProcessor::checkSetupComplete()
 // Helper Methods
 //////////////////////////////////////////////////////////////////////////
 
-void BrainStemMessageProcessor::WriteToSerialPort( char* pszData, std::size_t dwSize )
+void BrainStemMessageProcessor::writeToSerialPort( char* pszData, std::size_t dwSize )
 {
-	if( m_pIO->IsOpen( ) )
+	if( io_->IsOpen( ) )
 	{
-		m_pIO->Write( std::vector<char>( pszData, pszData + dwSize ) );
+		io_->Write( std::vector<char>( pszData, pszData + dwSize ) );
 	}
 	else
 	{
-		ROS_ERROR_THROTTLE_NAMED( 60, "BrainStem", "Attempt to write to the brain stem, but the serial port is not open!" );
+		ROS_ERROR_THROTTLE( 60, "Brainstem driver: Attempt to write to the brain stem, but the serial port is not open!" );
 	}
 }
 

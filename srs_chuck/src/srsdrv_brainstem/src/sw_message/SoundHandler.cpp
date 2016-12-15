@@ -4,10 +4,9 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 
-#include <srsdrv_brainstem/sw_message/SoundHandler.hpp>
+#include <BrainStemMessageProcessorInterface.hpp>
 
-#include <ros/ros.h>
-#include "../../include/srsdrv_brainstem/BrainStemMessageProcessorInterface.hpp"
+#include <sw_message/SoundHandler.hpp>
 
 namespace srs {
 

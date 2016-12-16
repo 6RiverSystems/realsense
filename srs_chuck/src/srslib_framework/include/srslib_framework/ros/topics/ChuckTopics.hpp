@@ -56,6 +56,7 @@ namespace internal {
 
     static const string GOTO_GOAL = "/move_base_simple/goal";
 
+    static const string MAP_STACK = "/internal/state/map/stack";
     static const string MAP_ROS_AMCL_OCCUPANCY = "/internal/state/map/ros_amcl_occupancy";
     static const string MAP_ROS_LOGICAL = "/internal/state/map/ros_logical";
     static const string MAP_ROS_METADATA = "/internal/state/map/ros_metadata";
@@ -65,7 +66,6 @@ namespace internal {
     static const string MAP_ROS_WEIGHTS_NORTH = "/internal/state/map/weights_north";
     static const string MAP_ROS_WEIGHTS_SOUTH = "/internal/state/map/weights_south";
     static const string MAP_ROS_WEIGHTS_WEST = "/internal/state/map/weights_west";
-    static const string MAP_STACK = "/internal/state/map/stack";
 
     static const string ODOMETRY_VELOCITY_ESTIMATE = "/internal/sensors/odometry/velocity/estimate";
 

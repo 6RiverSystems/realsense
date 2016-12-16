@@ -36,6 +36,8 @@ void ShutdownHandler::encodeData(const bool& shutdown)
 {
 	uint8_t cMessage = static_cast<uint8_t>(BRAIN_STEM_CMD::SHUTDOWN);
 
+	ROS_INFO( "Brain => Brainstem: SHUTDOWN");
+
 	getOwner()->sendCommand(reinterpret_cast<char*>(&cMessage), 1);
 }
 

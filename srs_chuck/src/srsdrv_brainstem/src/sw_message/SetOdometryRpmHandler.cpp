@@ -51,7 +51,7 @@ void SetOdometryRpmHandler::encodeData(const srslib_framework::OdometryRpm& odom
 	if( odometryRpm.left_wheel_rpm != s_leftWheelRPM ||
 		odometryRpm.right_wheel_rpm != s_rightWheelRPM )
 	{
-		ROS_DEBUG_NAMED( "velocity_rpm", "Odometry: SetRPM: %f, %f",
+		ROS_DEBUG_NAMED( "velocity_rpm", "Brain => Brainstem: SET_VELOCITY_RPM: %f, %f",
 			odometryRpm.left_wheel_rpm, odometryRpm.right_wheel_rpm );
 
 		s_leftWheelRPM = odometryRpm.left_wheel_rpm;

@@ -25,6 +25,7 @@ set(${PROJECT_NAME}_SOURCES
     src/sw_message/SetOdometryRpmHandler.cpp
     src/sw_message/SoundHandler.cpp
     src/sw_message/SetMotionStateHandler.cpp
+    src/sw_message/SetVelocity.cpp
     src/sw_message/UpdateUIHandler.cpp
 )
 

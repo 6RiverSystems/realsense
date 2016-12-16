@@ -61,9 +61,9 @@ void SetMotionStateHandler::encodeData(const srslib_framework::MsgSetOperational
         static_cast<uint8_t>(motionStateSet.to_ulong())
     };
 
-	ROS_INFO( "%s motion status for %s",
-	    command == BRAIN_STEM_CMD::SET_MOTION_STATUS ? "Setting" : "Clearing",
-	        strMotionStatus.c_str( ) );
+	ROS_INFO( "Brain => Brainstem: %s: %s",
+	    command == BRAIN_STEM_CMD::SET_MOTION_STATUS ? "SET_MOTION_STATUS" : "CLEAR_MOTION_STATUS",
+	    strMotionStatus.c_str( ) );
 
 	getOwner()->sendCommand( reinterpret_cast<char*>( &msg ), sizeof(msg) );
 }

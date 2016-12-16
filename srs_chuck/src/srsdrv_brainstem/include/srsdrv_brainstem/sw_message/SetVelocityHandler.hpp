@@ -18,7 +18,7 @@ class BrainStemMessageProcessorInterface;
 
 class SetVelocityHandler :
     public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
-    public SubscriberRosTwist
+    public SubscriberRosTwist<ChuckTopics::driver::ODOMETRY_CMD_VELOCITY>
 {
 public:
     SetVelocityHandler(BrainStemMessageProcessorInterface* owner);

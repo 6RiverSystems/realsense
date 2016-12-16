@@ -33,6 +33,9 @@ void SetVelocityHandler::receiveData(const geometry_msgs::Twist::ConstPtr data)
 		static_cast<float>( data->angular.y )
 	};
 
+	ROS_INFO_NAMED("velocity", "Brain => Brainstem: Set velocity: linear=%f, angular=%f",
+		data->linear.x, data->angular.y);
+
 	getOwner()->sendCommand( reinterpret_cast<char*>( &msg ), sizeof(msg) );
 }
 

@@ -95,6 +95,7 @@ add_dependencies(${PROJECT_NODE}
     ${catkin_EXPORTED_TARGETS}
     ${PROJECT_NAME}_gencfg
 )
+
 target_link_libraries(${PROJECT_NODE}
     ${catkin_LIBRARIES}
     ${boost_LIBRARIES}
@@ -111,6 +112,12 @@ if (CATKIN_ENABLE_TESTING)
         ${${PROJECT_NAME}_TEST_SOURCES}
         ${${PROJECT_NAME}_SOURCES}
     )
+
+	add_dependencies(TestSuite_Brainstem
+	    ${catkin_EXPORTED_TARGETS}
+	    ${PROJECT_NAME}_gencfg
+	) 
+   
     target_link_libraries(TestSuite_Brainstem
         ${catkin_LIBRARIES}
         ${boost_LIBRARIES}

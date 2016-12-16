@@ -245,7 +245,7 @@ geometry_msgs::Twist OdometryPositionEstimator::getEstimatedRobotVel(double repo
     	if (cmd_vel_time)
     	{
     		// It's been too long since a cmd vel was sent.  Use the reported velocity.
-    		ROS_DEBUG("cmd vel has a timeout: %f", (current_time - cmd_vel_time));
+    		ROS_DEBUG_THROTTLE(1.0f, "cmd vel has a timeout: %f", (current_time - cmd_vel_time));
     	}
 
     	estimated_vel.linear.x = reported_linear_vel;

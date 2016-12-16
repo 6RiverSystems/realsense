@@ -28,6 +28,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
     pingHandler_(this),
 	setMotionStateHandler_(this),
 	setOdometryRpmHandler_(this),
+	setVelocityHandler_(this),
 	shutdownHandler_(this),
 	soundHandler_(this),
 	updateUIHandler_(this),

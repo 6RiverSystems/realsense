@@ -81,7 +81,7 @@ void UpdateUIHandler::encodeData(const srslib_framework::MsgUpdateUI& updateUI)
 			reinterpret_cast<uint8_t>( uiElement.mode )
 		};
 
-		ROS_INFO( "Brain => Brainstem: UPDATE_LIGHT: linear=%f, angular=%f",
+		ROS_INFO( "Brain => Brainstem: UPDATE_LIGHT: element=%d, mode=%d",
 			uiElement.element, uiElement.mode);
 
 		getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));

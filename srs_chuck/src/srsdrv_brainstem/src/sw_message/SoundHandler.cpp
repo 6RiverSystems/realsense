@@ -46,8 +46,8 @@ void SoundHandler::encodeData(const Sound& sound)
         static_cast<uint16_t>(sound.numberOfCycles)
     };
 
-	ROS_INFO( "Brain => Brainstem: SOUND_BUZZER: volume=%d, baseFrequency=%f, cycleRate=%d, \
-		dutyCycle=%d, numberOfCycles=%d", sound.volume, sound.baseFrequency, sound.cycleRate,
+	ROS_INFO( "Brain => Brainstem: SOUND_BUZZER: volume=%d, baseFrequency=%d,"
+		" cycleRate=%d, dutyCycle=%d, numberOfCycles=%d", sound.volume, sound.baseFrequency, sound.cycleRate,
 		sound.dutyCycle, sound.numberOfCycles);
 
     getOwner()->sendCommand(reinterpret_cast<char*>(&msgSound), sizeof(msgSound));

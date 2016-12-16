@@ -33,6 +33,7 @@ using namespace std;
 #include <srsdrv_brainstem/sw_message/PingHandler.hpp>
 #include <srsdrv_brainstem/sw_message/SetMotionStateHandler.hpp>
 #include <srsdrv_brainstem/sw_message/SetOdometryRpmHandler.hpp>
+#include <srsdrv_brainstem/sw_message/SetVelocityHandler.hpp>
 #include <srsdrv_brainstem/sw_message/ShutdownHandler.hpp>
 #include <srsdrv_brainstem/sw_message/SoundHandler.hpp>
 #include <srsdrv_brainstem/sw_message/UpdateUIHandler.hpp>
@@ -146,6 +147,7 @@ private:
     PingHandler							pingHandler_;
     SetMotionStateHandler				setMotionStateHandler_;
     SetOdometryRpmHandler				setOdometryRpmHandler_;
+    SetVelocityHandler					setVelocityHandler_;
     ShutdownHandler						shutdownHandler_;
     SoundHandler						soundHandler_;
     UpdateUIHandler						updateUIHandler_;

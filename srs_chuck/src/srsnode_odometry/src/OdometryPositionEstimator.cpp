@@ -42,7 +42,7 @@ void OdometryPositionEstimator::run()
 {
 	ros::Rate refreshRate(REFRESH_RATE_HZ);
 
-  readParams();
+	readParams();
 	connect();
 
 	char* pszLeftWheelRadius = getenv("ROBOT_LEFT_WHEEL_RADIUS");

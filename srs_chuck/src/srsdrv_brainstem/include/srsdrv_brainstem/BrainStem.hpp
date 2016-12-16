@@ -6,11 +6,14 @@
 #pragma once
 
 #include <ros/ros.h>
+#include <dynamic_reconfigure/server.h>
 
 #include <srslib_framework/io/IO.hpp>
 
 #include <BrainStemEmulator.hpp>
 #include <BrainStemMessageProcessor.hpp>
+
+#include <srsdrv_brainstem/RobotSetupConfig.h>
 
 namespace srs
 {
@@ -28,15 +31,13 @@ public:
 
 	void connectionChanged(bool bIsConnected);
 
-    void checkForBrainstemFaultTimer(const ros::TimerEvent& event);
-
 private:
 
-    void startFaultTimer();
-
-    void stopFaultTimer();
+    void cfgCallback(srsdrv_brainstem::RobotSetupConfig &config, uint32_t level);
 
 	static constexpr auto REFRESH_RATE_HZ = 10.0f;
+
+	dynamic_reconfigure::Server<srsdrv_brainstem::RobotSetupConfig> configServer_;
 
 	std::shared_ptr<IO>					serialIO_;
 

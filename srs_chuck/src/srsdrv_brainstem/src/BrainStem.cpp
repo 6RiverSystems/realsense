@@ -27,6 +27,9 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
 	brainstemFaultTimer_(),
 	nodeHandle_("~")
 {
+	// Register dynamic configuration callback
+	configServer_.setCallback(boost::bind(&BrainStem::cfgCallback, this, _1, _2));
+
 	connectionChanged( false );
 
 	std::shared_ptr<SerialIO> pSerialIO = std::dynamic_pointer_cast<SerialIO>( serialIO_ );
@@ -48,7 +51,6 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
 	};
 
 	pSerialIO->Open( strSerialPort.c_str( ), connectionChanged, processMessage );
-
 
     // Check for hardware faults
 	brainstemFaultTimer_ = nodeHandle_.createTimer(ros::Duration(1.0f / REFRESH_RATE_HZ),
@@ -84,6 +86,19 @@ void BrainStem::connectionChanged( bool bIsConnected )
 	{
 		brainstemEmulator_.reset( );
 	}
+}
+
+void BrainStem::cfgCallback(srsdrv_brainstem::RobotSetupConfig &config,
+	uint32_t level)
+{
+	messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::WHEEL_BASE_LENGTH,
+		static_cast<float>(config.robot_wheelbase_length));
+
+	messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::LEFT_WHEEL_RADIUS,
+		static_cast<float>(config.robot_leftwheel_radius));
+
+	messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::RIGHT_WHEEL_RADIUS,
+		static_cast<float>(config.robot_rightwheel_radius));
 }
 
 }// namespace srs

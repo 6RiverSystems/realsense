@@ -70,6 +70,8 @@ public:
 
 // Message Processing
 
+    void setDimension(DIMENSION dimension, float value);
+
 	void setConnected( bool isConnected );
 
 	void getOperationalState( );
@@ -89,8 +91,6 @@ private:
 	void getHardwareInfo(const ros::Time& now);
 
 	void getOperationalState(const ros::Time& now);
-
-	void setDimension(DIMENSION dimension, float value);
 
 // Helper Methods
 

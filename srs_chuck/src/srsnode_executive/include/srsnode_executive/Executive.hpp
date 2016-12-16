@@ -12,7 +12,8 @@
 
 #include <srsnode_executive/ExecutiveContext.hpp>
 #include <srsnode_executive/task/TaskDetectLabeledAreas.hpp>
-#include <srsnode_executive/task/TaskPlayWarningSound.hpp>
+#include <srsnode_executive/task/TaskPlaySound.hpp>
+#include <srsnode_executive/task/TaskSetMaxVelocity.hpp>
 
 namespace srs {
 
@@ -36,6 +37,8 @@ protected:
 private:
     constexpr static double REFRESH_RATE_HZ = 5; // [Hz]
 
+    void readConfigurationParameters();
+
     void updateContext();
 
     ExecutiveContext context_;
@@ -44,7 +47,8 @@ private:
     TapMapStack tapMapStack_;
     TapRobotPose tapRobotPose_;
     TaskDetectLabeledAreas taskDetectLabeledAreas_;
-    TaskPlayWarningSound taskPlayWarningSound_;
+    TaskPlaySound taskPlaySound_;
+    TaskSetMaxVelocity taskSetMaxVelocity_;
 };
 
 } // namespace srs

@@ -3,6 +3,7 @@
 #include <limits>
 
 #include <yaml-cpp/yaml.h>
+#include <costmap_2d/cost_values.h>
 
 #include <srslib_framework/exception/io/FailedToOpenFileException.hpp>
 #include <srslib_framework/localization/map/occupancy/exception/InvalidChannelNumberException.hpp>
@@ -60,7 +61,7 @@ costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(OccupancyMap* map)
         for (int col = 0; col < columns; col++)
         {
             Grid2d::BaseType cost = map->getCost(col, row);
-            cost = cost == Grid2d::PAYLOAD_NO_INFORMATION ? 0 : cost;
+            cost = cost == Grid2d::PAYLOAD_NO_INFORMATION ? costmap_2d::NO_INFORMATION : cost;
 
             costMap->setCost(col, row, cost);
         }

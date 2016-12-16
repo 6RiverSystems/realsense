@@ -12,7 +12,8 @@ set(${PROJECT_NAME}_SOURCES
     src/Executive.cpp
     src/sw_message/CommandPause.cpp
     src/task/TaskDetectLabeledAreas.cpp
-    src/task/TaskPlayWarningSound.cpp
+    src/task/TaskPlaySound.cpp
+    src/task/TaskSetMaxVelocity.cpp
 )
 
 ####################################################################################################

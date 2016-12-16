@@ -9,6 +9,10 @@
 using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/localization/map/MapAdapter.hpp>
+#include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
+#include <srslib_framework/localization/map/occupancy/OccupancyMapFactory.hpp>
 
 namespace srs {
 namespace test {
@@ -36,6 +40,11 @@ struct Grid2dUtils
 
             r += deltaY;
         } while (r != (yf + deltaY));
+    }
+
+    static void addEmptySpace(Grid2d& grid)
+    {
+        addRectanglePayload(grid, 0, 0, grid.getWidth() - 1, grid.getHeight() - 1, 0);
     }
 
     static void addObstacle(Grid2d& grid,
@@ -79,6 +88,19 @@ struct Grid2dUtils
 
             r += deltaY;
         } while (r != (yf + deltaY));
+    }
+
+    static MapStack* grid2d2MapStack(Grid2d* grid, double resolution, Pose<> origin)
+    {
+        LogicalMapFactory logicalMapFactory;
+        LogicalMap* logical = logicalMapFactory.fromGrid2d(grid, resolution, origin);
+
+        OccupancyMapFactory occupancyMapFactory;
+        OccupancyMap* occupancy = occupancyMapFactory.fromGrid2d(grid, resolution, origin);
+
+        costmap_2d::Costmap2D* costMap2d = MapAdapter::map2CostMap2D(occupancy);
+
+        return new MapStack(logical, occupancy, costMap2d);
     }
 };
 

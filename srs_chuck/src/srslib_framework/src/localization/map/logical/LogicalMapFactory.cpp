@@ -47,7 +47,6 @@ const string LogicalMapFactory::KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_COST = "envel
 const string LogicalMapFactory::KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE = "envelope_size";
 const string LogicalMapFactory::KEYWORD_PROPERTY_FEATURE_OBJECT = "object";
 const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_LABEL = "label";
-const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_WARNING_SOUND = "warning_sound";
 const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_NOTES = "notes";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_HEIGHT = "height";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_ORIGIN = "origin";
@@ -96,8 +95,12 @@ LogicalMap* LogicalMapFactory::fromGrid2d(Grid2d* grid, double resolution, Pose<
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename, double loadTime)
 {
-    YAML::Node jsonDocument = YAML::LoadFile(jsonFilename);
-    if (jsonDocument.IsNull())
+    YAML::Node jsonDocument;
+    try
+    {
+        jsonDocument = YAML::LoadFile(jsonFilename);
+    }
+    catch (exception& e)
     {
         throw FailedToOpenFileException(jsonFilename);
     }
@@ -116,8 +119,12 @@ LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename, double loadTime
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 LogicalMap* LogicalMapFactory::fromString(string geoJson, double loadTime)
 {
-    YAML::Node jsonDocument = YAML::Load(geoJson);
-    if (jsonDocument.IsNull())
+    YAML::Node jsonDocument;
+    try
+    {
+        jsonDocument = YAML::LoadFile(geoJson);
+    }
+    catch (exception& e)
     {
         throw FailedToParseJsonException(geoJson);
     }
@@ -164,7 +171,7 @@ void LogicalMapFactory::addCostArea(Pose<> origin, double widthM, double heightM
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::addLabelArea(Pose<> origin, double widthM, double heightM,
-    string label, MapNote note)
+    string label, shared_ptr<MapNotes> notes)
 {
     unsigned int c0;
     unsigned int r0;
@@ -174,7 +181,7 @@ void LogicalMapFactory::addLabelArea(Pose<> origin, double widthM, double height
 
     calculateArea(origin, widthM, heightM, c0, r0, widthCells, heightCells);
 
-    map_->addLabeledArea(c0, r0, c0 + widthCells, r0 + heightCells, label, note);
+    map_->addLabeledArea(c0, r0, c0 + widthCells, r0 + heightCells, label, notes);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -432,7 +439,7 @@ void LogicalMapFactory::ntEntityLabelArea(YAML::Node root)
     YAML::Node properties = ntProperties(root);
 
     string label = ntValueString(properties[KEYWORD_PROPERTY_LABEL_AREA_LABEL], true);
-    MapNote note = ntValueMapNote(properties[KEYWORD_PROPERTY_LABEL_AREA_NOTES], true);
+    shared_ptr<MapNotes> notes = ntValueMapNotes(properties[KEYWORD_PROPERTY_LABEL_AREA_NOTES], true);
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
@@ -440,7 +447,7 @@ void LogicalMapFactory::ntEntityLabelArea(YAML::Node root)
     Pose<> p2 = coordinates[1];
 
     // Add the label area
-    addLabelArea(p1, abs(p1.x - p2.x), abs(p1.y - p2.y), label, note);
+    addLabelArea(p1, abs(p1.x - p2.x), abs(p1.y - p2.y), label, notes);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -675,23 +682,19 @@ double LogicalMapFactory::ntValueDouble(YAML::Node root, bool required)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-MapNote LogicalMapFactory::ntValueMapNote(YAML::Node root, bool required)
+shared_ptr<MapNotes> LogicalMapFactory::ntValueMapNotes(YAML::Node root, bool required)
 {
-    MapNote value = MapNote();
+    shared_ptr<MapNotes> value = shared_ptr<MapNotes>(new MapNotes());
 
     if (root)
     {
-        for (auto flag : root)
+        for (YAML::const_iterator flag = root.begin(); flag != root.end(); ++flag)
         {
-            string flagValue = flag.as<string>();
-
-            if (flagValue == KEYWORD_PROPERTY_LABEL_AREA_WARNING_SOUND)
+            string noteType = flag->first.as<string>();
+            string noteValue = flag->second.as<string>();
+            if (!value->add(noteType, noteValue))
             {
-                value.join(MapNote::WARNING_SOUND);
-            }
-            else
-            {
-                throw InvalidMapNoteFlagException(metadata_, flagValue);
+                throw InvalidMapNoteFlagException(metadata_, noteType, noteValue);
             }
         }
     }

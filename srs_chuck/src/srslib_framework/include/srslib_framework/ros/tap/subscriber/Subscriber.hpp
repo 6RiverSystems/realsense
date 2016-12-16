@@ -10,7 +10,7 @@ using namespace std;
 
 #include <ros/ros.h>
 
-#include <srslib_framework/ros/tap/subscriber/Subject.hpp>
+#include <srslib_framework/platform/observer/Subject.hpp>
 
 namespace srs {
 

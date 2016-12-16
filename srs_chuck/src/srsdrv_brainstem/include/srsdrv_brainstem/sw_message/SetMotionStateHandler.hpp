@@ -9,7 +9,7 @@ SetMotionStateHandler.hpp * (c) Copyright 2015-2016 River Systems, all rights re
 
 #include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
-#include <srslib_framework/ros/tap/subscriber/Observer.hpp>
+#include <srslib_framework/platform/observer/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_SetMotionState.hpp>
 
 namespace srs {

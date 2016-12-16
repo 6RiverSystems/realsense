@@ -19,22 +19,23 @@ public:
     void run();
 
 protected:
-    ros::NodeHandle rosNodeHandle_;
-
     virtual void execute()
     {}
 
     virtual void initialize()
     {}
 
+    void getGlobalParameter(string service, string parameter, float& value, float defaultValue);
+    void getLocalParameter(string parameter, string& value, string defaultValue);
+
 private:
     ros::Time currentTime_;
 
     ros::Time previousTime_;
 
-    double refreshRateFrequency_;
-
     ros::Rate rate_;
+    double refreshRateFrequency_;
+    ros::NodeHandle rosNodeHandle_;
 };
 
 } // namespace srs

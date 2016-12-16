@@ -47,7 +47,7 @@ public:
         }
 
         double currentTime = ros::Time::now().toSec();
-        timingData_.addSample(currentTime, stopWatch_.elapsed());
+        timingData_.addSample(currentTime, stopWatch_.elapsedMilliseconds());
         activeSample_ = false;
 
         if (currentTime - timingData_.getStartTime() >= sampleSetLength_)

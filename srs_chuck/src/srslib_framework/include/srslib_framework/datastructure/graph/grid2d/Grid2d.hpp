@@ -45,9 +45,9 @@ public:
             y(y)
         {}
 
-        std::size_t hash() const
+        size_t hash() const
         {
-            return x + 1812433253 * y;
+            return (401 + x) * 401 + y;
         }
 
         friend bool operator==(const Location& lhs, const Location& rhs)
@@ -95,7 +95,7 @@ public:
 
         std::size_t hash() const
         {
-            return x + 1812433253 * y + orientation;
+            return ((401 + x) * 401 + y) * 401 + orientation;
         }
 
         friend bool operator==(const Position& lhs, const Position& rhs)

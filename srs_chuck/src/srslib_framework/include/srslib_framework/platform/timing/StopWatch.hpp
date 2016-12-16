@@ -6,31 +6,38 @@
 #pragma once
 
 #include <chrono>
-using namespace std::chrono;
+using namespace std;
 
 namespace srs {
 
 class StopWatch
 {
-    typedef duration<double, std::ratio<1>> DurationType;
-
 public:
     StopWatch() :
-        time_(high_resolution_clock::now())
+        time_(chrono::high_resolution_clock::now())
     {}
 
-    double elapsed() const
+    double elapsedMicroseconds() const
     {
-        return duration_cast<DurationType>(high_resolution_clock::now() - time_).count();
+        return chrono::duration_cast<chrono::microseconds>(
+            chrono::high_resolution_clock::now() - time_).count();
+    }
+
+    double elapsedMilliseconds() const
+    {
+        return chrono::duration_cast<chrono::milliseconds>(
+            chrono::high_resolution_clock::now() - time_).count();
     }
 
     void reset()
     {
-        time_ = high_resolution_clock::now();
+        time_ = chrono::high_resolution_clock::now();
     }
 
 private:
-    time_point<high_resolution_clock> time_;
+    chrono::time_point<chrono::high_resolution_clock> time_;
 };
 
 } // namespace srs
+
+

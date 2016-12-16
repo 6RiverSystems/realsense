@@ -45,11 +45,17 @@ class MessageProcessor;
 class BrainStemMessageProcessor : public BrainStemMessageProcessorInterface
 {
 public:
-    void processHardwareMessage(vector<char> buffer);
+
+	enum class DIMENSION
+	{
+		WHEEL_BASE_LENGTH = 0,
+		LEFT_WHEEL_RADIUS = 1,
+		RIGHT_WHEEL_RADIUS = 2
+	};
+
+	void processHardwareMessage(vector<char> buffer);
 
     using HwMessageHandlerMapType = map<BRAIN_STEM_MSG, HardwareMessageHandler*>;
-
-public:
 
 	BrainStemMessageProcessor( std::shared_ptr<IO> pIO );
 
@@ -84,6 +90,8 @@ private:
 
 	void getOperationalState(const ros::Time& now);
 
+	void setDimension(DIMENSION dimension, float value);
+
 // Helper Methods
 
 	void writeToSerialPort( char* data, std::size_t size );
@@ -97,6 +105,12 @@ private:
     HW_MESSAGE_BEGIN(OperationalStateData)
     	uint8_t cmd;
 		uint8_t motionStatus;
+    HW_MESSAGE_END
+
+    HW_MESSAGE_BEGIN(DimensionData)
+    	uint8_t cmd;
+		uint8_t id;
+		float value;
     HW_MESSAGE_END
 
 	static constexpr auto FAULT_TIMEOUT = 0.2f;

@@ -188,17 +188,17 @@ void BrainStemMessageProcessor::getOperationalState(const ros::Time& now)
 
 void BrainStemMessageProcessor::checkForBrainstemFaultTimer(const ros::TimerEvent& event)
 {
-//	bool brainstemTimeout = false;
-//
-//	if (isSetupComplete())
-//	{
-//		if ((event.current_expected - lastMessageTime_).toSec() > FAULT_TIMEOUT)
-//		{
-//			brainstemTimeout = true;
-//		}
-//	}
-//
-//	operationalStateHandler_.setBrainstemTimeout(brainstemTimeout);
+	bool brainstemTimeout = false;
+
+	if (isSetupComplete())
+	{
+		if ((event.current_expected - lastMessageTime_).toSec() > FAULT_TIMEOUT)
+		{
+			brainstemTimeout = true;
+		}
+	}
+
+	operationalStateHandler_.setBrainstemTimeout(brainstemTimeout);
 }
 
 bool BrainStemMessageProcessor::isSetupComplete() const
@@ -219,6 +219,30 @@ void BrainStemMessageProcessor::checkSetupComplete()
 	}
 
 	connectedChannel_.publish(setupComplete);
+}
+
+void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
+{
+	static std::map<DIMENSION, std::string> mapDimensionName;
+
+	if (!mapDimensionName.size())
+	{
+		mapDimensionName[DIMENSION::WHEEL_BASE_LENGTH] = "wheel_base_length";
+		mapDimensionName[DIMENSION::LEFT_WHEEL_RADIUS] = "left_wheel_radius";
+		mapDimensionName[DIMENSION::RIGHT_WHEEL_RADIUS] = "right_whee_radius";
+	};
+
+	DimensionData msg = {
+		static_cast<uint8_t>( BRAIN_STEM_CMD::SET_DIMENSION ),
+		static_cast<uint8_t>( dimension ),
+		static_cast<float>( value )
+	};
+
+	ROS_DEBUG( "Brainstem driver: Setting dimension: %s => %f",
+		mapDimensionName[dimension].c_str(), value);
+
+	// Get the hardware information (version, configuration, etc.)
+	writeToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
 }
 
 //////////////////////////////////////////////////////////////////////////

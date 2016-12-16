@@ -59,6 +59,7 @@ enum class BRAIN_STEM_CMD : uint8_t
     SET_TOTE_LIGHTS         = 0x39, // '9'
     SET_VELOCITY            = 0x76, // 'v'
     SET_VELOCITY_RPM        = 0x72, // 'r'
+    SET_DIMENSION			= 0x64, // 'd'
     SHUTDOWN                = 0x78, // 'x'
     SOUND_BUZZER            = 0x73, // 's'
     STARTUP                 = 0x38, // '8'

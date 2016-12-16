@@ -10,36 +10,32 @@
 #include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/platform/observer/Observer.hpp>
-#include <srslib_framework/ros/tap/TapBrainstemCmd_OdometryRpm.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberRosTwist.hpp>
 
 namespace srs {
 
 class BrainStemMessageProcessorInterface;
 
-class SetOdometryRpmHandler :
+class SetVelocityHandler :
     public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
-    public Observer<Subscriber<srslib_framework::OdometryRpm>>
+    public SubscriberRosTwist
 {
 public:
-    SetOdometryRpmHandler(BrainStemMessageProcessorInterface* owner);
+    SetVelocityHandler(BrainStemMessageProcessorInterface* owner);
 
-    virtual ~SetOdometryRpmHandler() {}
+    virtual ~SetVelocityHandler() {}
 
-    virtual void attach();
+    void attach();
 
-    void notified(Subscriber<srslib_framework::OdometryRpm>* subject);
-
-    void encodeData(const srslib_framework::OdometryRpm& value);
+    virtual void receiveData(const geometry_msgs::Twist::ConstPtr data);
 
 private:
 
-    HW_MESSAGE_BEGIN(RawOdometryData)
+    HW_MESSAGE_BEGIN(SetVelocityData)
 		uint8_t cmd;
-		float rpm_left_wheel;
-		float rpm_right_wheel;
+		float linearVelocity;
+		float angularVelocity;
 	HW_MESSAGE_END
-
-	std::shared_ptr<TapBrainstemCmd_OdometryRpm>	tapOdometryRpm_;
 };
 
 } // namespace srs

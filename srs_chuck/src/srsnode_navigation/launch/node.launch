@@ -7,13 +7,16 @@
 -->
 <launch>
     <arg name="use_sim_time" />
-
+    <arg name="emulation_mode" />
     <remap from="/scan" to="/internal/sensors/lidar/scan/filtered"/>
     <remap from="/map" to="/internal/state/map/ros_occupancy"/>
     <remap from="/initialpose" to="/request/initial_pose"/>
 
+    <arg name="launch-prefix" value="" if="$(arg emulation_mode)"/>
+    <arg name="launch-prefix" value="taskset -c 3 " unless="$(arg emulation_mode)"/>
+
     <!--- Move Base -->
-    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" launch-prefix="taskset -c 3">
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" launch-prefix="$(arg launch-prefix)">
         <remap from="/move_base_simple/goal" to="/request/goal"/>
         <remap from="/cmd_vel" to="/internal/sensors/odometry/velocity/cmd"/>
         <remap from="/odom" to="/internal/sensors/odometry/velocity/estimate"/>
@@ -30,6 +33,8 @@
         <rosparam unless="$(arg use_sim_time)" file="$(find srsnode_navigation)/config/costmap_sensors.yaml" command="load" ns="local_costmap" />
         <rosparam file="$(find srsnode_navigation)/config/local_costmap_params.yaml" command="load" />
         <rosparam file="$(find srsnode_navigation)/config/global_costmap_params.yaml" command="load" />
+
+        <!-- Local Planner -->
         <rosparam file="$(find srsnode_navigation)/config/local_planner_params.yaml" command="load" />
 
         <!-- Global Planner -->

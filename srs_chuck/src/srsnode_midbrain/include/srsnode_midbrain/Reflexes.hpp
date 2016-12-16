@@ -18,6 +18,8 @@
 #include <srslib_framework/ros/tap/TapRobotPose.hpp>
 #include <srslib_framework/ros/tap/TapLidarPoseOnRobot.hpp>
 
+#include <srslib_framework/platform/timing/MasterTimingDataRecorder.hpp>
+
 #include <srsnode_midbrain/HardStopReflex.hpp>
 
 namespace srs
@@ -47,6 +49,8 @@ private:
     ChannelDangerZone dangerZoneChannel_;
     ChannelFailedDangerZone fdzChannel_;
     ChannelFailedLaserScan flsChannel_;
+
+    srs::MasterTimingDataRecorder tdr_;
 
     // Reflexes
     HardStopReflex hardStopReflex_;

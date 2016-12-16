@@ -15,9 +15,9 @@ namespace srs {
 class InvalidMapNoteFlagException: public LogicalMapException
 {
 public:
-    InvalidMapNoteFlagException(const LogicalMetadata& metadata, string flag) :
+    InvalidMapNoteFlagException(const LogicalMetadata& metadata, string flag, string value) :
         LogicalMapException(metadata,
-            "Invalid Map Note flag {" + flag + "}")
+            "Invalid Map Note flag {" + flag + ": " + value + "}")
     {}
 };
 

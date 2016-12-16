@@ -112,9 +112,9 @@ private:
 
     static void map2Vector(const LogicalMap* map,
         vector<srslib_framework::LogicalCell>& logical);
-    static MapNote msg2Note(srslib_framework::MapNote message);
+    static shared_ptr<MapNotes> msg2Notes(srslib_framework::MapNotes message);
 
-    static srslib_framework::MapNote note2Msg(MapNote note);
+    static srslib_framework::MapNotes notes2Msg(shared_ptr<MapNotes> notes);
 
     static LogicalMap* vector2Map(const LogicalMetadata& metadata,
         const vector<srslib_framework::LogicalCell>& logical);

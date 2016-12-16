@@ -10,7 +10,7 @@ using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
-#include <srslib_framework/planning/pathplanning/Solution.hpp>
+#include <srslib_framework/planning/pathplanning/solution/Solution.hpp>
 #include <srslib_framework/robotics/Trajectory.hpp>
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/robotics/Pose.hpp>

@@ -15,7 +15,7 @@ using namespace std;
 
 #include <srslib_framework/robotics/device/JoypadState.hpp>
 #include <srslib_framework/ros/channel/ChannelJoypad.hpp>
-#include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
+#include <srslib_framework/ros/function/RosTriggerShutdown.hpp>
 #include <srslib_framework/ros/tap/TapJoy.hpp>
 
 namespace srs {

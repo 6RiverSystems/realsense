@@ -6,10 +6,9 @@ global_costmap:
   static_map: true
   rolling_window: false
   transform_tolerance: 0.5
+  map_update_thread_affinity: 2
   plugins:
    - {name: static_layer, type: "costmap_2d::StaticLayer"}
    - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}
    - {name: obstacle_realsense_layer, type: "costmap_2d::ObstacleLayer"}
    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
-  map_update_thread_affinity: 2
-

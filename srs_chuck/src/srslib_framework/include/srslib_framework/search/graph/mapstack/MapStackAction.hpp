@@ -1,0 +1,49 @@
+/*
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
+ *
+ * This is proprietary software, unauthorized distribution is not permitted.
+ */
+#pragma once
+
+#include <array>
+#include <string>
+#include <unordered_map>
+#include <limits>
+using namespace std;
+
+#include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/search/SearchGoal.hpp>
+
+namespace srs {
+
+class MapStackNode;
+
+class MapStackAction
+{
+public:
+    enum ActionEnum {
+        BACKWARD = 0,
+        FORWARD,
+        NONE,
+        ROTATE_N90, ROTATE_P90, ROTATE_180,
+        START
+    };
+
+    static MapStackNode* exploreBackward(MapStack* stack, MapStackNode* fromNode);
+    static MapStackNode* exploreForward(MapStack* stack, MapStackNode* fromNode);
+    static MapStackNode* exploreRotation(MapStack* stack, MapStackNode* fromNode,
+        ActionEnum action, int angle);
+
+    friend ostream& operator<<(ostream& stream, const ActionEnum& action)
+    {
+        return stream << ENUM_NAMES[action];
+    }
+
+private:
+    static constexpr int COMMAND_COSTS_LENGTH = 8;
+
+    static unordered_map<int, string> ENUM_NAMES;
+    static const int COMMAND_COSTS[ActionEnum::START + 1];
+};
+
+} // namespace srs

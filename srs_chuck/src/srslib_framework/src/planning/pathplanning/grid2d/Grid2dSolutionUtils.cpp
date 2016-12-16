@@ -21,7 +21,8 @@ vector<Solution<Grid2dSolutionItem>*> Grid2dSolutionUtils::splitSolution(
         return result;
     }
 
-    Solution<Grid2dSolutionItem>* currentSolution = new Solution<Grid2dSolutionItem>();
+    Solution<Grid2dSolutionItem>* currentSolution =
+        Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
     result.push_back(currentSolution);
 
     Grid2dSolutionItem::ActionEnum currentAction = solution.getStart().actionType;
@@ -30,7 +31,7 @@ vector<Solution<Grid2dSolutionItem>*> Grid2dSolutionUtils::splitSolution(
     {
         if (solutionItem.actionType != currentAction)
         {
-            currentSolution = new Solution<Grid2dSolutionItem>();
+            currentSolution = Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
             result.push_back(currentSolution);
         }
 

@@ -34,6 +34,7 @@ enum class BRAIN_STEM_MSG : uint8_t
     SENSOR_FRAME = 0x4F, // 'O'
     POWER_STATE = 0x41, // 'A'
     RAW_ODOMETRY = 0x52, // 'R'
+    ODOMETRY_POSE = 0x50, // 'P'
     SYSTEM_VOLTAGE = 0x56, // 'V'
     LOG = 0x4C, // 'L'
     UNKNOWN

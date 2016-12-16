@@ -19,6 +19,7 @@ set(${PROJECT_NAME}_SOURCES
     src/hw_message/HardwareInfoHandler.cpp
     src/hw_message/OperationalStateHandler.cpp
     src/hw_message/PowerStateHandler.cpp
+    src/hw_message/OdometryPoseHandler.cpp
 
     src/sw_message/ShutdownHandler.cpp
     src/sw_message/PingHandler.cpp

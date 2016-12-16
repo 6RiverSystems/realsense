@@ -17,6 +17,7 @@ using namespace std;
 #include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemPowerState.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemOdometryPose.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemButtonPressed.hpp>
 
 #include <BrainStemMessages.hpp>
@@ -28,6 +29,7 @@ using namespace std;
 #include <srsdrv_brainstem/hw_message/OperationalStateHandler.hpp>
 #include <srsdrv_brainstem/hw_message/PowerStateHandler.hpp>
 #include <srsdrv_brainstem/hw_message/OdometryRpmHandler.hpp>
+#include <srsdrv_brainstem/hw_message/OdometryPoseHandler.hpp>
 #include <srsdrv_brainstem/hw_message/ButtonPressedHandler.hpp>
 
 #include <srsdrv_brainstem/sw_message/PingHandler.hpp>
@@ -135,6 +137,7 @@ private:
     ChannelBrainstemOperationalState	operationalStateChannel_;
     ChannelBrainstemPowerState			powerStateChannel_;
     ChannelBrainstemOdometryRpm			odometryRpmChannel_;
+    ChannelBrainstemOdometryPose		odometryPoseChannel_;
     ChannelBrainstemButtonPressed		buttonPressedChannel_;
 
     LogHandler							logHandler_;
@@ -142,6 +145,7 @@ private:
     OperationalStateHandler				operationalStateHandler_;
     PowerStateHandler					powerStateHandler_;
     OdometryRpmHandler					odometryRpmHandler_;
+    OdometryPoseHandler					odometryPoseHandler_;
     ButtonPressedHandler				buttonPressedHandler_;
 
     PingHandler							pingHandler_;

@@ -6,6 +6,8 @@
 #pragma once
 
 #include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/localization/map/mapnote/MapNotes.hpp>
+#include <srslib_framework/localization/map/mapnote/NotePlaySound.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
 
@@ -29,6 +31,7 @@ struct ExecutiveContext
     bool isRobotPaused;
 
     MapStack* mapStack;
+    float maxVelocity;
 
     vector<ActiveLabelType> previousLabeledAreas;
 

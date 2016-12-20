@@ -8,11 +8,12 @@
 #include <string>
 #include <sstream>
 #include <unordered_map>
+#include <memory>
 using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/localization/map/BaseMap.hpp>
-#include <srslib_framework/localization/map/MapNote.hpp>
+#include <srslib_framework/localization/map/mapnote/MapNotes.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMetadata.hpp>
 
 namespace srs {
@@ -28,14 +29,14 @@ public:
                 "l: '" << labeledArea.label <<
                 "', a: [" << labeledArea.ci << ", " << labeledArea.ri << ", " <<
                     labeledArea.cf << ", " << labeledArea.rf <<
-                "], n: " << labeledArea.note <<
+                "], n: " << *labeledArea.notes <<
                 "}";
         }
 
         friend bool operator==(const LabeledArea& lhs, const LabeledArea& rhs)
         {
             return lhs.label == rhs.label &&
-                lhs.note == rhs.note &&
+                lhs.notes == rhs.notes &&
                 lhs.ci == rhs.ci &&
                 lhs.ri == rhs.ri &&
                 lhs.cf == rhs.cf &&
@@ -44,7 +45,7 @@ public:
 
         string label;
 
-        MapNote note;
+        shared_ptr<MapNotes> notes;
 
         unsigned int cf;
         unsigned int ci;
@@ -63,7 +64,7 @@ public:
 
     void addLabeledArea(unsigned int ciCells, unsigned int riCells,
         unsigned int cfCells, unsigned int rfCells,
-        string label, MapNote note);
+        string label, shared_ptr<MapNotes> notes);
 
     void checkAreas(unsigned int cCells, unsigned int rCells, LabeledAreaMapType& areas) const;
     void checkAreas(double xM, double yM, LabeledAreaMapType& areas) const;

@@ -41,6 +41,22 @@ void RosUnit<T>::run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+template<class T>
+void RosUnit<T>::getGlobalParameter(string service, string parameter,
+    float& value, float defaultValue)
+{
+    // TODO Make this method more intelligent (i.e. detect additional "/", etc)
+    rosNodeHandle_.param(service + "/" + parameter, value, defaultValue);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+template<class T>
+void RosUnit<T>::getLocalParameter(string parameter, string& value, string defaultValue)
+{
+    rosNodeHandle_.param(parameter, value, defaultValue);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
 } // namespace srs

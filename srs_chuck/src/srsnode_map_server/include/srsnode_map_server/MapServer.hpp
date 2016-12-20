@@ -22,7 +22,7 @@ using namespace std;
 #include <srslib_framework/ros/channel/ChannelRosMapWeightsSouth.hpp>
 #include <srslib_framework/ros/channel/ChannelRosMapWeightsWest.hpp>
 #include <srslib_framework/ros/channel/publisher/PublisherRosCostGrid.hpp>
-#include <srslib_framework/ros/service/RosTriggerShutdown.hpp>
+#include <srslib_framework/ros/function/RosTriggerShutdown.hpp>
 #include <srslib_framework/ros/unit/RosUnit.hpp>
 
 namespace srs {
@@ -41,8 +41,6 @@ protected:
 
 private:
     constexpr static double REFRESH_RATE_HZ = 1.0 / 10.0; // [Hz]
-
-    bool callbackMapRequest(nav_msgs::GetMap::Request &req, nav_msgs::GetMap::Response &res);
 
     void evaluateTriggers();
 
@@ -63,8 +61,6 @@ private:
     ChannelRosMapWeightsEast channelEastWeightsGrid_;
     ChannelRosMapWeightsSouth channelSouthWeightsGrid_;
     ChannelRosMapWeightsWest channelWestWeightsGrid_;
-
-    ros::ServiceServer serviceMapRequest_;
 
     RosTriggerShutdown triggerShutdown_;
 };

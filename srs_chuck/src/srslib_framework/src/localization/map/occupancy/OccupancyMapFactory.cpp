@@ -56,7 +56,16 @@ OccupancyMap* OccupancyMapFactory::fromMetadata(const OccupancyMetadata& metadat
     map_ = nullptr;
     metadata_ = metadata;
 
-    SDL_Surface* image = IMG_Load(metadata.occupancyFilename.c_str());
+    SDL_Surface* image = nullptr;
+    try
+    {
+        image = IMG_Load(metadata.occupancyFilename.c_str());
+    }
+    catch (exception& e)
+    {
+        throw FailedToOpenFileException(metadata.occupancyFilename);
+    }
+
     if (!image)
     {
         throw FailedToOpenFileException(metadata.occupancyFilename);

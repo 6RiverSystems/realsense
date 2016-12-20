@@ -14,15 +14,19 @@ set(${PROJECT_NAME}_SOURCES
 
     src/localization/map/BaseMap.cpp
     src/localization/map/MapAdapter.cpp
-    src/localization/map/MapNote.cpp
+    src/localization/map/MapStack.cpp
     src/localization/map/MapStackFactory.cpp
+    src/localization/map/mapnote/MapNoteFactory.cpp
+    src/localization/map/mapnote/MapNotes.cpp
+    src/localization/map/mapnote/NotePlaySound.cpp
+    src/localization/map/mapnote/NoteSetMaxVelocity.cpp
     src/localization/map/logical/LogicalMap.cpp
     src/localization/map/logical/LogicalMapFactory.cpp
     src/localization/map/occupancy/OccupancyMap.cpp
     src/localization/map/occupancy/OccupancyMapFactory.cpp
 
-    src/planning/pathplanning/grid2d/Grid2dSolutionItem.cpp
     src/planning/pathplanning/grid2d/Grid2dSolutionFactory.cpp
+    src/planning/pathplanning/grid2d/Grid2dSolutionItem.cpp
     src/planning/pathplanning/grid2d/Grid2dSolutionUtils.cpp
 
     src/platform/CrashHandler.cpp
@@ -35,6 +39,8 @@ set(${PROJECT_NAME}_SOURCES
     src/search/AStar.cpp
     src/search/graph/grid2d/Grid2dAction.cpp
     src/search/graph/grid2d/Grid2dNode.cpp
+    src/search/graph/mapstack/MapStackAction.cpp
+    src/search/graph/mapstack/MapStackNode.cpp
 
     src/utils/Logging.cpp
 )
@@ -48,6 +54,7 @@ set(${PROJECT_NAME}_MSGS
     LogicalMap.msg
     LogicalMetadata.msg
     MapNote.msg
+    MapNotes.msg
     MapStack.msg
     MsgHardwareInfo.msg
     MsgOperationalState.msg
@@ -72,7 +79,9 @@ set(${PROJECT_NAME}_SRVS
 set(TEST_SOURCES_DATASTRUCTURE
     test/datastructure/graph/Test_Grid2d_Basic.cpp
     test/datastructure/queue/Test_MappedPriorityQueue_Basic.cpp
+    test/datastructure/queue/Test_MappedPriorityQueue_IndexClass.cpp
     test/datastructure/queue/Test_MappedPriorityQueue_InnerHashEqual.cpp
+    test/datastructure/queue/Test_MappedPriorityQueue_PtrIndexClass.cpp
     test/datastructure/queue/Test_MappedPriorityQueue_UserDefinedClass.cpp
 )
 
@@ -82,6 +91,7 @@ set(TEST_SOURCES_FILTER
 
 set(TEST_SOURCES_LOCALIZATION
     test/localization/Test_Empty_BasicRead.cpp
+    test/localization/Test_MapNotes_Basic.cpp
     test/localization/Test_MicroMap_BasicRead.cpp
     test/localization/Test_MicroMap_MapNote.cpp
     test/localization/Test_MicroMap_WithAisles.cpp
@@ -95,15 +105,15 @@ set(TEST_SOURCES_MATH
 )
 
 set(TEST_SOURCES_PLANNING
-    test/planning/pathplanning/grid2d/Test_Solution_Basic.cpp
-    test/planning/pathplanning/grid2d/Test_Solution_Barrett_Aisles.cpp
-    test/planning/pathplanning/grid2d/Test_Solution_Empty_Consecutive.cpp
-    test/planning/pathplanning/grid2d/Test_Trajectory_180ShortTrajectory.cpp
-    test/planning/pathplanning/grid2d/Test_Trajectory_LongStraight.cpp
-    test/planning/pathplanning/grid2d/Test_Trajectory_LongTrajectory.cpp
-    test/planning/pathplanning/grid2d/Test_Trajectory_ShortStraight.cpp
-    test/planning/pathplanning/grid2d/Test_Trajectory_ShortTrajectory.cpp
-    test/planning/pathplanning/grid2d/Test_Trajectory_SingleRotation.cpp
+    test/planning/pathplanning/grid2d/Test_Solution_Grid2d_Basic.cpp
+    test/planning/pathplanning/grid2d/Test_Solution_Grid2d_Empty_Consecutive.cpp
+    test/planning/pathplanning/grid2d/Test_Solution_MapStack_Basic.cpp
+    test/planning/pathplanning/trajectory/Test_Trajectory_180ShortTrajectory.cpp
+    test/planning/pathplanning/trajectory/Test_Trajectory_LongStraight.cpp
+    test/planning/pathplanning/trajectory/Test_Trajectory_LongTrajectory.cpp
+    test/planning/pathplanning/trajectory/Test_Trajectory_ShortStraight.cpp
+    test/planning/pathplanning/trajectory/Test_Trajectory_ShortTrajectory.cpp
+    test/planning/pathplanning/trajectory/Test_Trajectory_SingleRotation.cpp
 )
 
 set(TEST_SOURCES_PLATFORM
@@ -120,13 +130,18 @@ set(TEST_SOURCES_ROS
 )
 
 set(TEST_SOURCES_SEARCH
-    test/search/Test_AStar_6RHQ.cpp
-    test/search/Test_AStar_6rshq_SmallSearch.cpp
-    test/search/Test_AStar_Barrett_BigSearch.cpp
-    test/search/Test_AStar_Basic.cpp
-    test/search/Test_AStar_NoSolution.cpp
-    test/search/Test_AStar_SamePlaceOnMap.cpp
-    test/search/Test_AStar_Weights.cpp
+    test/search/grid2d/Test_AStar_Grid2d_6rshq.cpp
+    test/search/grid2d/Test_AStar_Grid2d_Barrett.cpp
+    test/search/grid2d/Test_AStar_Grid2d_Basic.cpp
+    test/search/grid2d/Test_AStar_Grid2d_NoSolution.cpp
+    test/search/grid2d/Test_AStar_Grid2d_SamePlaceOnMap.cpp
+    test/search/grid2d/Test_AStar_Grid2d_Weights.cpp
+    test/search/mapstack/Test_AStar_MapStack_Barrett.cpp
+    test/search/mapstack/Test_AStar_MapStack_Basic.cpp
+    test/search/mapstack/Test_AStar_MapStack_NoSolution.cpp
+    test/search/mapstack/Test_AStar_MapStack_SamePlaceOnMap.cpp
+    test/search/mapstack/Test_AStar_MapStack_Unknown.cpp
+    test/search/mapstack/Test_AStar_MapStack_Weights.cpp
 )
 
 set(TEST_SOURCES_IO

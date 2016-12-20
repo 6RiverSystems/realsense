@@ -2,19 +2,19 @@
 
 #include <pluginlib/class_list_macros.h>
 
-PLUGINLIB_EXPORT_CLASS(srs::SrsPlannerPotentials, nav_core::BaseGlobalPlanner)
-
 #include <global_planner/planner_core.h>
 #include <pluginlib/class_list_macros.h>
 #include <tf/transform_listener.h>
 #include <costmap_2d/cost_values.h>
 #include <costmap_2d/costmap_2d.h>
 
-#include <srsnode_navigation/global_planner/QuadraticCalculator.hpp>
-#include <srsnode_navigation/global_planner/GradientPath.hpp>
-#include <srsnode_navigation/global_planner/AStarExpansion.hpp>
-
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
+
+#include <srsnode_navigation/global_planner/potentials/QuadraticCalculator.hpp>
+#include <srsnode_navigation/global_planner/potentials/GradientPath.hpp>
+#include <srsnode_navigation/global_planner/potentials/AStarExpansion.hpp>
+
+PLUGINLIB_EXPORT_CLASS(srs::SrsPlannerPotentials, nav_core::BaseGlobalPlanner)
 
 namespace srs {
 
@@ -32,7 +32,7 @@ SrsPlannerPotentials::SrsPlannerPotentials() :
     allowUnknown_(true),
     publishPotential_(true),
     lethalCost_(253),
-    neutralCost_(10)
+    neutralCost_(50)
 {
     ROS_WARN("SrsPlannerPotentials::SrsPlannerPotentials() called");
 
@@ -50,7 +50,7 @@ SrsPlannerPotentials::SrsPlannerPotentials(string name, costmap_2d::Costmap2DROS
     allowUnknown_(true),
     publishPotential_(true),
     lethalCost_(253),
-    neutralCost_(10)
+    neutralCost_(50)
 {
     ROS_WARN("SrsPlannerPotentials::SrsPlannerPotentials(...) called");
 

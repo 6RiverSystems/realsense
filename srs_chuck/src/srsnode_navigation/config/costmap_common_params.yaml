@@ -1,9 +1,9 @@
 # Obstacle cost shapping
 footprint: [[-0.5, -0.3], [-0.5, 0.3], [0.55, 0.3], [0.55,-0.3]]
 footprint_padding: 0.01
-inflation_radius: 0.75
+inflation_radius: 0.50
 resolution: 0.1
 cost_scaling_factor: 2.0
 obstacle_range: 3.0
-raytrace_range: 4.0
+raytrace_range: 25.0
 transform_tolerance: 0.25

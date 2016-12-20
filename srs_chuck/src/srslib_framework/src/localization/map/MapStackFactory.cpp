@@ -25,8 +25,12 @@ const string MapStackFactory::TAG_OCCUPANCY_IMAGE = "image";
 
 MapStack* MapStackFactory::fromJsonFile(string jsonFilename, double loadingTime)
 {
-    YAML::Node mapStackDocument = YAML::LoadFile(jsonFilename);
-    if (mapStackDocument.IsNull())
+    YAML::Node mapStackDocument;
+    try
+    {
+        mapStackDocument = YAML::LoadFile(jsonFilename);
+    }
+    catch (exception& e)
     {
         throw FailedToOpenFileException(jsonFilename);
     }
@@ -38,7 +42,7 @@ MapStack* MapStackFactory::fromJsonFile(string jsonFilename, double loadingTime)
     OccupancyMap* occupancy = analizeOccupancyNode(
         localDirectory, jsonFilename, loadingTime, mapStackDocument);
 
-    return new MapStack(logical, occupancy);
+    return new MapStack(logical, occupancy, nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

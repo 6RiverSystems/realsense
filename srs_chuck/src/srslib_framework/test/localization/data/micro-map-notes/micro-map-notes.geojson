@@ -13,37 +13,38 @@
             }
         },
         {
-           "type": "FeatureCollection",
-           "features": [
-               {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "MultiPoint",
-                      "coordinates": [[0.200, 0.200], [0.200, 0.200]]
-                  },
-                  "properties": {
-                       "object": "labeled_area",
-                       "label": "test1",
-                       "notes": [
-                            "warning_sound"
-                       ]
-                   }
-               },
-               {
-                  "type": "Feature",
-                  "geometry": {
-                      "type": "MultiPoint",
-                      "coordinates": [[0.000, 0.000], [0.200, 0.100]]
-                  },
-                  "properties": {
-                       "object": "labeled_area",
-                       "label": "test2",
-                       "notes": [
-                            "warning_sound"
-                       ]
-                   }
-               }
-           ]
-       }
-   ]
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "MultiPoint",
+                        "coordinates": [[0.200, 0.200], [0.200, 0.200]]
+                    },
+                    "properties": {
+                        "object": "labeled_area",
+                        "label": "test1",
+                        "notes": {
+                            "play_sound": "warning"
+                        }
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "MultiPoint",
+                        "coordinates": [[0.000, 0.000], [0.200, 0.100]]
+                    },
+                    "properties": {
+                        "object": "labeled_area",
+                        "label": "test2",
+                        "notes": {
+                            "play_sound": "warning",
+                            "set_max_velocity": 12
+                        }
+                    }
+                }
+            ]
+        }
+    ]
 }

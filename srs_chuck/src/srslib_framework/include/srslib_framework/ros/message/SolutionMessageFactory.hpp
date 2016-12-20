@@ -74,15 +74,15 @@ struct SolutionMessageFactory
      *
      * @return Solution of Grid2dSolutionItem generated from the specified MsgSolution
      */
-    static Solution<Grid2dSolutionItem> msg2Solution(const srslib_framework::MsgSolution& message)
+    static Solution<Grid2dSolutionItem>* msg2Solution(const srslib_framework::MsgSolution& message)
     {
-        Solution<Grid2dSolutionItem> solution;
+        Solution<Grid2dSolutionItem>* solution = Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
 
         for (auto solutionItem : message.items)
         {
             Grid2dSolutionItem grid2dSolutionItem = msg2Grid2dSolutionItem(solutionItem);
 
-            solution.push_back(grid2dSolutionItem);
+            solution->push_back(grid2dSolutionItem);
         }
 
         return solution;
@@ -95,7 +95,7 @@ struct SolutionMessageFactory
      *
      * @return Solution of Grid2dSolutionItem generated from the specified MsgSolutionConstPtr
      */
-    static Solution<Grid2dSolutionItem> msg2Solution(srslib_framework::MsgSolution::ConstPtr message)
+    static Solution<Grid2dSolutionItem>* msg2Solution(srslib_framework::MsgSolution::ConstPtr message)
     {
         return msg2Solution(*message);
     }

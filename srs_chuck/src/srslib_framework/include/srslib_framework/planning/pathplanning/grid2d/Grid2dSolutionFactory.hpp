@@ -9,32 +9,50 @@
 using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
-
 #include <srslib_framework/localization/map/BaseMap.hpp>
-
-#include <srslib_framework/planning/pathplanning/Solution.hpp>
+#include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/planning/Solution.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
-
 #include <srslib_framework/robotics/Pose.hpp>
-
 #include <srslib_framework/search/AStar.hpp>
+#include <srslib_framework/search/Plan.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
 
 namespace srs {
 
 struct Grid2dSolutionFactory
 {
     static Solution<Grid2dSolutionItem>* fromConsecutiveGoals(BaseMap* map,
-        Pose<> start, vector<Pose<>> goals);
+        Pose<> start, vector<Pose<>> goals,
+        AStar::ConfigParameters configParameters = AStar::ConfigParameters());
+    static Solution<Grid2dSolutionItem>* fromConsecutiveGoals(MapStack* stack,
+        Pose<> start, vector<Pose<>> goals,
+        AStar::ConfigParameters configParameters = AStar::ConfigParameters(),
+        MapStackNode::SearchParameters searchParameters = MapStackNode::SearchParameters());
+
     static Solution<Grid2dSolutionItem>* fromSingleGoal(BaseMap* map,
-        Grid2d::Position& start, Grid2d::Position& goal);
+        Grid2d::Position& start, Grid2d::Position& goal,
+        AStar::ConfigParameters configParameters = AStar::ConfigParameters());
     static Solution<Grid2dSolutionItem>* fromSingleGoal(BaseMap* map,
-        Pose<> start, Pose<> goal);
+        Pose<> start, Pose<> goal,
+        AStar::ConfigParameters configParameters = AStar::ConfigParameters());
+    static Solution<Grid2dSolutionItem>* fromSingleGoal(MapStack* stack,
+        Grid2d::Position& start, Grid2d::Position& goal,
+        AStar::ConfigParameters configParameters = AStar::ConfigParameters(),
+        MapStackNode::SearchParameters searchParameters = MapStackNode::SearchParameters());
+    static Solution<Grid2dSolutionItem>* fromSingleGoal(MapStack* stack,
+        Pose<> start, Pose<> goal,
+        AStar::ConfigParameters configParameters = AStar::ConfigParameters(),
+        MapStackNode::SearchParameters searchParameters = MapStackNode::SearchParameters());
+
     static Solution<Grid2dSolutionItem>* fromRotation(Pose<> pose,
         double theta0, double thetaf);
 
 private:
     static Solution<Grid2dSolutionItem>* fromSearch(BaseMap* map,
-        AStar::SolutionType& intermediateSolution);
+        Plan& plan);
+
+    static Grid2d::Position pose2Map(BaseMap* map, Pose<> pose);
 };
 
 } // namespace srs

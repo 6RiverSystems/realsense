@@ -1,15 +1,18 @@
-#include <srsnode_navigation/global_planner/SrsPlanner.hpp>
+#include <srsnode_navigation/global_planner/SrsPlannerConventional.hpp>
+
+#include <pthread.h>
 
 #include <pluginlib/class_list_macros.h>
 
-PLUGINLIB_EXPORT_CLASS(srs::SrsPlannerConventional, nav_core::BaseGlobalPlanner)
-
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
-#include <srslib_framework/robotics/Trajectory.hpp>
+#include <srslib_framework/planning/pathplanning/trajectory/SimpleTrajectoryGenerator.hpp>
+#include <srslib_framework/planning/pathplanning/trajectory/Trajectory.hpp>
+#include <srslib_framework/platform/timing/StopWatch.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
+
+PLUGINLIB_EXPORT_CLASS(srs::SrsPlannerConventional, nav_core::BaseGlobalPlanner)
 
 namespace srs {
 
@@ -18,20 +21,16 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlannerConventional::SrsPlannerConventional() :
-    srsMapStack_(nullptr)
+    srsMapStack_(nullptr),
+    costMap2d_(nullptr)
 {
-    ROS_WARN("SrsPlanner::SrsPlanner() called");
-
-    initializeParams();
-    updateMapStack(nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlannerConventional::SrsPlannerConventional(string name, costmap_2d::Costmap2DROS* rosCostMap) :
-    srsMapStack_(nullptr)
+    srsMapStack_(nullptr),
+    costMap2d_(nullptr)
 {
-    ROS_WARN("SrsPlanner::SrsPlanner(...) called");
-
     initialize(name, rosCostMap);
 }
 
@@ -44,10 +43,13 @@ SrsPlannerConventional::~SrsPlannerConventional()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlannerConventional::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostMap)
 {
-    ROS_WARN("SrsPlanner::initialize() called");
+    ros::NodeHandle privateNh("~/" + name);
 
-    initializeParams();
-    updateMapStack(rosCostMap);
+    costMap2d_ = rosCostMap->getCostmap();
+    tapMapStack_.attach(this);
+
+    configServer_ = new dynamic_reconfigure::Server<srsnode_navigation::SrsPlannerConfig>(privateNh);
+    configServer_->setCallback(boost::bind(&SrsPlannerConventional::onConfigChange, this, _1, _2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,57 +58,35 @@ bool SrsPlannerConventional::makePlan(
     const geometry_msgs::PoseStamped& goal,
     vector<geometry_msgs::PoseStamped>& plan)
 {
-    ROS_WARN("SrsPlanner::makePlan() called");
-
-    // Make sure that we get the latest Map Stack
-    updateMapStack(nullptr);
-
     // Find a suitable solution for the provided goal
     Pose<> robotPose = PoseMessageFactory::poseStamped2Pose(start);
     Pose<> target = PoseMessageFactory::poseStamped2Pose(goal);
 
+    StopWatch watch;
     Solution<Grid2dSolutionItem>* solution = Grid2dSolutionFactory::fromSingleGoal(
-        srsMapStack_->getLogicalMap(), robotPose, target);
+        srsMapStack_, robotPose, target, astarConfigParameters_, nodeSearchParameters_);
+
+    ROS_INFO_STREAM_NAMED("srs_planner", "Global planner elpased time: " <<
+        watch.elapsedMilliseconds() << "ms");
 
     plan.clear();
 
-    if (solution && !solution->empty())
+    if (solution && solution->isValid())
     {
         ROS_DEBUG_STREAM_NAMED("srs_planner", "Found solution: " << endl << *solution);
 
-        Trajectory<> trajectory;
-
         // Calculate the trajectory from the solution found by A*,
         // using the default Chuck model
+        SimpleTrajectoryGenerator converter(srsMapStack_);
+        converter.fromSolution(solution);
 
-        // TODO: Remove this assumption
-        Chuck chuck;
-        Grid2dTrajectoryGenerator converter(chuck);
-        converter.fromSolution(*solution);
+        Trajectory<> trajectory;
         converter.getTrajectory(trajectory);
 
         ROS_DEBUG_STREAM_NAMED("srs_planner", "Trajectory: " << trajectory);
 
-        plan.push_back(start);
-        for (auto element : trajectory)
-        {
-            Pose<> currentPose = element.first;
-
-            // Create the stamped pose and the quaternion for the
-            // trajectory step
-            tf::Quaternion quaternion = tf::createQuaternionFromYaw(currentPose.theta);
-            geometry_msgs::PoseStamped step = PoseMessageFactory::pose2PoseStamped(currentPose);
-
-            step.pose.position.x = currentPose.x;
-            step.pose.position.y = currentPose.y;
-            step.pose.orientation.x = quaternion.x();
-            step.pose.orientation.y = quaternion.y();
-            step.pose.orientation.z = quaternion.z();
-            step.pose.orientation.w = quaternion.w();
-
-            plan.push_back(step);
-        }
-        plan.push_back(goal);
+        channelRosPath_.publish(trajectory);
+        populatePath(start, trajectory, goal, plan);
 
         return true;
     }
@@ -118,23 +98,58 @@ bool SrsPlannerConventional::makePlan(
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerConventional::initializeParams()
+void SrsPlannerConventional::notified(Subscriber<srslib_framework::MapStack>* subject)
 {
+    ROS_DEBUG_STREAM_NAMED("srs_planner", "SrsPlanner notified with a new Map Stack");
+
+    TapMapStack* tapMapStack = static_cast<TapMapStack*>(subject);
+
+    // When the Map Stack is published, make sure to get a fresh copy
+    delete srsMapStack_;
+    srsMapStack_ = tapMapStack_.pop();
+
+    // Include the ROS costmap in the map stack
+    srsMapStack_->setCostMap2d(costMap2d_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerConventional::updateMapStack(costmap_2d::Costmap2DROS* rosCostMap)
+void SrsPlannerConventional::onConfigChange(srsnode_navigation::SrsPlannerConfig& config, uint32_t level)
 {
-    // Make sure that the neither the logical not the occupancy maps
-    // have been re-published. In case, destroy what we have and
-    // ask for a new stack
-    if (tapMapStack_.newDataAvailable())
+    astarConfigParameters_.useYield = config.use_yield;
+    astarConfigParameters_.yieldFrequency = config.yield_frequency;
+
+    nodeSearchParameters_.allowUnknown = config.allow_unknown;
+    nodeSearchParameters_.costMapRatio = config.cost_map_ratio;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void SrsPlannerConventional::populatePath(const geometry_msgs::PoseStamped& start,
+    const Trajectory<>& trajectory,
+    const geometry_msgs::PoseStamped& goal,
+    vector<geometry_msgs::PoseStamped>& plan)
+{
+    plan.push_back(start);
+
+    for (auto waypoint : trajectory)
     {
-        delete srsMapStack_;
-        srsMapStack_ = tapMapStack_.pop();
+        Pose<> currentPose = waypoint.first;
+
+        // Create the stamped pose and the quaternion for the
+        // trajectory step
+        tf::Quaternion quaternion = tf::createQuaternionFromYaw(currentPose.theta);
+        geometry_msgs::PoseStamped step = PoseMessageFactory::pose2PoseStamped(currentPose);
+
+        step.pose.position.x = currentPose.x;
+        step.pose.position.y = currentPose.y;
+        step.pose.orientation.x = quaternion.x();
+        step.pose.orientation.y = quaternion.y();
+        step.pose.orientation.z = quaternion.z();
+        step.pose.orientation.w = quaternion.w();
+
+        plan.push_back(step);
     }
 
-    // TODO: Sync the obstruction map in the stack with the new rosCostMap
+    plan.push_back(goal);
 }
 
 } // namespace srs

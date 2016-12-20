@@ -7,7 +7,10 @@
 -->
 <launch>
     <arg name="emulation_mode"/>
-    
+
+    <arg name="launch-prefix" value="" if="$(arg emulation_mode)"/>
+    <arg name="launch-prefix" value="taskset -c 3 " unless="$(arg emulation_mode)"/>
+
     <remap from="/request/odometry/initial_pose" to="/request/initial_pose" if="$(arg emulation_mode)"/>
-    <node name="srsnode_odometry" pkg="srsnode_odometry" type="srsnode_odometry"  output="screen"/>
+    <node name="srsnode_odometry" pkg="srsnode_odometry" type="srsnode_odometry"  output="screen" launch-prefix="$(arg launch-prefix)"/>
 </launch>

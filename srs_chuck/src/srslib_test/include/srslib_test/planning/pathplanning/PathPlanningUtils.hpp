@@ -11,9 +11,8 @@
 using namespace std;
 
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
+#include <srslib_framework/planning/pathplanning/solution/Grid2dSolutionItem.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dTrajectoryGenerator.hpp>
-#include <srslib_framework/planning/pathplanning/grid2d/PoseAdapter.hpp>
 
 namespace srs {
 namespace test {

@@ -7,9 +7,9 @@
 				"object": "map",
 				"version": "1",
 				"origin": [0,0,0],
-				"resolution": 0.1,
-				"width": 15,
-				"height": 10
+				"resolution": 1,
+				"width": 150,
+				"height": 100
 			}
 		},
 		{
@@ -17,20 +17,54 @@
 			"features": [
 				{
 					"type": "Feature",
-					"id": 1,
+					"id": "1",
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[0.2,0.8],
-							[15,2.4]
+							[0,0],
+							[150,10]
 						]
 					},
 					"properties": {
-						"object": "labeled_area",
-						"label": "test1",
-						"notes": [
-							"honk"
+						"object": "obstacle",
+						"envelope_size": 0.5,
+						"envelope_cost": 70,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "2",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[19,72],
+							[132,85]
 						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.5,
+						"envelope_cost": 70,
+						"is_border": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 3,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[0,9],
+							[150,23]
+						]
+					},
+					"properties": {
+						"object": "weighted_area",
+						"north": 0,
+						"east": 0,
+						"south": 0,
+						"west": 100
 					}
 				}
 			]

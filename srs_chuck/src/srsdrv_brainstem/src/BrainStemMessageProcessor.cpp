@@ -262,7 +262,7 @@ void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
 	writeToSerialPort(reinterpret_cast<char*>(&msg), sizeof(msg));
 }
 
-void BrainStemMessageProcessor::sentPing()
+void BrainStemMessageProcessor::ping()
 {
 	if (!sentPing_)
 	{

@@ -27,6 +27,8 @@ public:
     	command_ = std::vector<char>(command, command + size);
     };
 
+    void ping() { }
+
     std::vector<char> command_;
 };
 

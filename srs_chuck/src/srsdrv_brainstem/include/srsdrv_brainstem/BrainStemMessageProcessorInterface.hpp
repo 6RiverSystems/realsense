@@ -19,7 +19,7 @@ public:
 
     virtual void sendCommand(char* command, std::size_t size) = 0;
 
-    virtual void sentPing() = 0;
+    virtual void ping() = 0;
 };
 
 } /* namespace srs */

@@ -72,7 +72,7 @@ public:
         writeToSerialPort(command, size);
     }
 
-    void sentPing();
+    void ping();
 
 // Message Processing
 

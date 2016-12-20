@@ -40,7 +40,7 @@ void PingHandler::encodeData(const bool& value)
 
 	getOwner()->sendCommand(reinterpret_cast<char*>(&cMessage), 1);
 
-	getOwner()->sentPing();
+	getOwner()->ping();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

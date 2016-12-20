@@ -33,11 +33,11 @@ namespace driver {
     static const string BRAINSTEM_CMD_PING = "/internal/drivers/brainstem/cmd/ping";
     static const string BRAINSTEM_CMD_SET_MOTION_STATE = "/internal/drivers/brainstem/cmd/set_motion_state";
     static const string BRAINSTEM_STATE_CONNECTED = "/internal/drivers/brainstem/state/connected";
-    static const string BRAINSTEM_STATE_POWER = "/internal/drivers/brainstem/state/power";
     static const string BRAINSTEM_BUTTON_PRESSED = "/internal/drivers/brainstem/button_pressed";
     static const string BRAINSTEM_ODOMETRY_RPM = "/internal/sensors/odometry/rpm/raw";
     static const string BRAINSTEM_ODOMETRY_RPM_CMD = "/internal/sensors/odometry/rpm/cmd";
     static const string ODOMETRY_CMD_VELOCITY = "/internal/sensors/odometry/velocity/cmd";
+    static const string BRAINSTEM_STATE_POWER = "/info/power";
     static const string BRAINSTEM_HARDWARE_INFO = "/info/hardware";
     static const string BRAINSTEM_OPERATIONAL_STATE = "/info/operational_state";
 } // namespace debug

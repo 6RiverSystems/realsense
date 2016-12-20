@@ -8,7 +8,8 @@ namespace srs {
 
 OperationalStateHandler::OperationalStateHandler(ChannelBrainstemOperationalState::Interface& publisher) :
     HardwareMessageHandler(BRAIN_STEM_MSG::OPERATIONAL_STATE),
-	publisher_(publisher)
+	publisher_(publisher),
+	hasValidMessage_(false)
 {
 
 }
@@ -57,6 +58,8 @@ void OperationalStateHandler::receiveMessage(ros::Time currentTime, HardwareMess
 	ROS_INFO_STREAM( strData );
 
 	publisher_.publish(operationalState_);
+
+	hasValidMessage_ = true;
 }
 
 void OperationalStateHandler::setBrainstemTimeout(bool brainstemTimeout)

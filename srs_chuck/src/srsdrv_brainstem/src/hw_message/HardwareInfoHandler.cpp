@@ -7,7 +7,8 @@ namespace srs {
 
 HardwareInfoHandler::HardwareInfoHandler(ChannelBrainstemHardwareInfo::Interface& publisher) :
     HardwareMessageHandler(BRAIN_STEM_MSG::HARDWARE_INFO),
-	publisher_(publisher)
+	publisher_(publisher),
+	hasValidMessage_(false)
 {
 	hardwareInfoMsg_.name = "";
     char* robotName = getenv("ROBOT_NAME");
@@ -72,6 +73,8 @@ void HardwareInfoHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 
 	// Publish the hardware info
 	publisher_.publish(hardwareInfoMsg_);
+
+	hasValidMessage_ = true;
 }
 
 } // namespace srs

@@ -1,4 +1,4 @@
-#include "../include/srsdrv_brainstem/BrainStemEmulator.hpp"
+#include <BrainStemEmulator.hpp>
 
 #include <string>
 #include <ros/ros.h>

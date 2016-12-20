@@ -4,6 +4,8 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 
+#include <bitset>
+
 #include <BrainStemMessageProcessorInterface.hpp>
 
 #include <sw_message/SetMotionStateHandler.hpp>

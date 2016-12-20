@@ -5,12 +5,6 @@
  */
 #pragma once
 
-#include <string>
-#include <vector>
-#include <functional>
-
-using namespace std;
-
 #include <ros/ros.h>
 #include <HardwareMessage.hpp>
 

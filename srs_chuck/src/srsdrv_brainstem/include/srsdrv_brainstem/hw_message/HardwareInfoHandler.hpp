@@ -22,6 +22,8 @@ public:
 
     void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
+    bool hasValidMessage() const { return hasValidMessage_; };
+
 private:
 
     HW_MESSAGE_BEGIN(HardwareInfoData)
@@ -46,6 +48,8 @@ private:
     	char manufacturer[13];
     	char serialNumber[33];
     HW_MESSAGE_END
+
+	bool hasValidMessage_;
 
     srslib_framework::MsgHardwareInfo hardwareInfoMsg_;
 

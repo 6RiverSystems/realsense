@@ -5,11 +5,7 @@
  */
 #pragma once
 
-#include <vector>
-#include <map>
-#include <functional>
 #include <memory>
-#include <bitset>
 
 using namespace std;
 
@@ -22,6 +18,8 @@ public:
 	virtual ~BrainStemMessageProcessorInterface() {};
 
     virtual void sendCommand(char* command, std::size_t size) = 0;
+
+    virtual void sentPing() = 0;
 };
 
 } /* namespace srs */

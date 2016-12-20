@@ -32,11 +32,11 @@ set(${PROJECT_NAME}_SOURCES
 
 set(${PROJECT_NAME}_TEST_SOURCES
 	test/hw_message/Test_Log.cpp
-    test/hw_message/Test_ButtonPressed.cpp
-    test/hw_message/Test_OdometryRpm.cpp
-    test/hw_message/Test_HardwareInfo.cpp
-    test/hw_message/Test_OperationalState.cpp
-    test/hw_message/Test_PowerState.cpp
+	test/hw_message/Test_ButtonPressed.cpp
+	test/hw_message/Test_OdometryRpm.cpp
+	test/hw_message/Test_HardwareInfo.cpp
+	test/hw_message/Test_OperationalState.cpp
+	test/hw_message/Test_PowerState.cpp
     
 	test/sw_message/Test_Ping.cpp
 	test/sw_message/Test_SetMotionState.cpp
@@ -45,7 +45,7 @@ set(${PROJECT_NAME}_TEST_SOURCES
 	test/sw_message/Test_Sound.cpp
 	test/sw_message/Test_UpdateUI.cpp
     
-    test/TestSuite_Brainstem.cpp
+	test/TestSuite_Brainstem.cpp
 )
 
 ####################################################################################################

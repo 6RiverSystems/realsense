@@ -4,7 +4,7 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 
-#include "../include/srsdrv_brainstem/BrainStem.hpp"
+#include <BrainStem.hpp>
 
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>

@@ -16,15 +16,17 @@ namespace srs {
 
 using namespace ros;
 
-BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) :
-	io_( pIO ),
+BrainStemMessageProcessor::BrainStemMessageProcessor(std::shared_ptr<IO> pIO) :
+	io_(pIO),
+	setupComplete_(false),
+	sentPing_(false),
 	isConnected_(false),
 	hasValidHardareInfo_(false),
 	lastHardareInfoRequestTime_(),
 	hasValidOperationalState_(false),
 	lastOperationalStateRequestTime_(),
 	lastMessageTime_(),
-	connectedChannel_( ),
+	connectedChannel_(),
     pingHandler_(this),
 	setMotionStateHandler_(this),
 	setOdometryRpmHandler_(this),
@@ -61,7 +63,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) 
     updateUIHandler_.attach();
 }
 
-BrainStemMessageProcessor::~BrainStemMessageProcessor( )
+BrainStemMessageProcessor::~BrainStemMessageProcessor()
 {
 
 }
@@ -88,16 +90,14 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 			{
 				handler->second->receiveData(currentTime, buffer);
 
-				getHardwareInfo(currentTime);
-
-				getOperationalState(currentTime);
+				checkSetupComplete();
 
 				lastMessageTime_ = currentTime;
 			}
 			catch(std::runtime_error& error)
 			{
 				// If it arrives here, the message failed to parse
-				ROS_ERROR_STREAM( "Brainstem driver: Message from brainstem malformed: " <<
+				ROS_ERROR_STREAM("Brainstem driver: Message from brainstem malformed: " <<
 					static_cast<char>(eCommand) << ", data: " << ToHex(buffer) << ", exception: " << error.what());
 			}
 		}
@@ -108,47 +108,53 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 				eCommand != BRAIN_STEM_MSG::SENSOR_FRAME &&
 				eCommand != BRAIN_STEM_MSG::MESSAGE)
 			{
-			    ROS_ERROR_STREAM( "Brainstem driver: Unknown message from brainstem: " <<
+			    ROS_ERROR_STREAM("Brainstem driver: Unknown message from brainstem: " <<
 			        static_cast<int>(eCommand) << ", data: " << ToHex(buffer));
 			}
 		}
     }
 }
 
-void BrainStemMessageProcessor::getOperationalState( )
+void BrainStemMessageProcessor::getOperationalState()
 {
-	ROS_DEBUG( "Brainstem driver: GetOperationalState" );
+	if (sentPing_)
+	{
+		ROS_DEBUG("Brainstem driver: GetOperationalState");
 
-	CommandData msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_OPERATIONAL_STATE) };
+		CommandData msg = { static_cast<uint8_t>(BRAIN_STEM_CMD::GET_OPERATIONAL_STATE) };
 
-	// Get the operational state
-	writeToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+		// Get the operational state
+		writeToSerialPort(reinterpret_cast<char*>(&msg), sizeof(msg));
+	}
 }
 
-void BrainStemMessageProcessor::getHardwareInformation( )
+void BrainStemMessageProcessor::getHardwareInformation()
 {
-	ROS_DEBUG( "Brainstem driver: GetHardwareInformation" );
+	if (sentPing_)
+	{
+		ROS_DEBUG("Brainstem driver: GetHardwareInformation");
 
-	CommandData msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_HARDWARE_INFO ) };
+		CommandData msg = { static_cast<uint8_t>(BRAIN_STEM_CMD::GET_HARDWARE_INFO) };
 
-	// Get the hardware information (version, configuration, etc.)
-	writeToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+		// Get the hardware information (version, configuration, etc.)
+		writeToSerialPort(reinterpret_cast<char*>(&msg), sizeof(msg));
+	}
 }
 
-void BrainStemMessageProcessor::shutdown( )
+void BrainStemMessageProcessor::shutdown()
 {
-	ROS_INFO( "Brainstem driver: Shutdown" );
+	ROS_INFO("Brainstem driver: Shutdown");
 
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::SHUTDOWN );
+	uint8_t cMessage = static_cast<uint8_t>(BRAIN_STEM_CMD::SHUTDOWN);
 
-	writeToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
+	writeToSerialPort(reinterpret_cast<char*>(&cMessage), 1);
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Bridge Callbacks
 //////////////////////////////////////////////////////////////////////////
 
-void BrainStemMessageProcessor::setConnected( bool isConnected )
+void BrainStemMessageProcessor::setConnected(bool isConnected)
 {
 	isConnected_ = isConnected;
 
@@ -157,7 +163,7 @@ void BrainStemMessageProcessor::setConnected( bool isConnected )
 
 void BrainStemMessageProcessor::getHardwareInfo(const ros::Time& now)
 {
-	if (!hasValidHardareInfo_)
+	if (!this->hardwareInfoHandler_.hasValidMessage())
 	{
 		ros::Duration duration = now - lastHardareInfoRequestTime_;
 		if (duration.toSec() > 1.0f)
@@ -165,16 +171,12 @@ void BrainStemMessageProcessor::getHardwareInfo(const ros::Time& now)
 			// Send another request
 			getHardwareInformation();
 		}
-
-		hasValidHardareInfo_ = true;
-
-		checkSetupComplete();
 	}
 }
 
 void BrainStemMessageProcessor::getOperationalState(const ros::Time& now)
 {
-	if (!hasValidOperationalState_)
+	if (!this->operationalStateHandler_.hasValidMessage())
 	{
 		ros::Duration duration = now - lastOperationalStateRequestTime_;
 		if (duration.toSec() > 1.0f)
@@ -182,10 +184,6 @@ void BrainStemMessageProcessor::getOperationalState(const ros::Time& now)
 			// Send another request
 			getOperationalState();
 		}
-
-		hasValidOperationalState_ = true;
-
-		checkSetupComplete();
 	}
 }
 
@@ -207,22 +205,37 @@ void BrainStemMessageProcessor::checkForBrainstemFaultTimer(const ros::TimerEven
 
 bool BrainStemMessageProcessor::isSetupComplete() const
 {
-	return isConnected_ &&
-		hasValidHardareInfo_ &&
-		hasValidOperationalState_;
+	return setupComplete_;
 }
 
 void BrainStemMessageProcessor::checkSetupComplete()
 {
-	bool setupComplete = isSetupComplete();
-	if (setupComplete)
+	if (!setupComplete_)
 	{
-		ROS_INFO( "Brainstem driver: Setup complete (received hardware info and operational state message." );
+		if (hardwareInfoHandler_.hasValidMessage() &&
+			operationalStateHandler_.hasValidMessage() &&
+			isConnected_)
+		{
+			ROS_INFO("Brainstem driver: Setup complete (received hardware info and operational state messages.");
 
-		io_->SetSynced(true);
+			io_->SetSynced(true);
+
+			setupComplete_ = true;
+
+			connectedChannel_.publish(setupComplete_);
+		}
+		else
+		{
+			if (sentPing_)
+			{
+				ros::Time currentTime = ros::Time::now();
+
+				getHardwareInfo(currentTime);
+
+				getOperationalState(currentTime);
+			}
+		}
 	}
-
-	connectedChannel_.publish(setupComplete);
 }
 
 void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
@@ -237,31 +250,43 @@ void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
 	};
 
 	DimensionData msg = {
-		static_cast<uint8_t>( BRAIN_STEM_CMD::SET_DIMENSION ),
-		static_cast<uint8_t>( dimension ),
-		static_cast<float>( value )
+		static_cast<uint8_t>(BRAIN_STEM_CMD::SET_DIMENSION),
+		static_cast<uint8_t>(dimension),
+		static_cast<float>(value)
 	};
 
-	ROS_DEBUG( "Brainstem driver: Setting dimension: %s => %f",
+	ROS_DEBUG("Brainstem driver: Setting dimension: %s => %f",
 		mapDimensionName[dimension].c_str(), value);
 
 	// Get the hardware information (version, configuration, etc.)
-	writeToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+	writeToSerialPort(reinterpret_cast<char*>(&msg), sizeof(msg));
+}
+
+void BrainStemMessageProcessor::sentPing()
+{
+	if (!sentPing_)
+	{
+		sentPing_ = true;
+
+		getHardwareInformation();
+
+		getOperationalState();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Helper Methods
 //////////////////////////////////////////////////////////////////////////
 
-void BrainStemMessageProcessor::writeToSerialPort( char* pszData, std::size_t dwSize )
+void BrainStemMessageProcessor::writeToSerialPort(char* pszData, std::size_t dwSize)
 {
-	if( io_->IsOpen( ) )
+	if(io_->IsOpen())
 	{
-		io_->Write( std::vector<char>( pszData, pszData + dwSize ) );
+		io_->Write(std::vector<char>(pszData, pszData + dwSize));
 	}
 	else
 	{
-		ROS_ERROR_THROTTLE( 60, "Brainstem driver: Attempt to write to the brain stem, but the serial port is not open!" );
+		ROS_ERROR_THROTTLE(60, "Brainstem driver: Attempt to write to the brain stem, but the serial port is not open!");
 	}
 }
 

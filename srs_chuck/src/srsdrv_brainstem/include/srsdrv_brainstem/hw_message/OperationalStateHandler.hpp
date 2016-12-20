@@ -24,6 +24,8 @@ public:
 
     void setBrainstemTimeout(bool brainstemTimeout);
 
+    bool hasValidMessage() const { return hasValidMessage_; };
+
 private:
 
     HW_MESSAGE_BEGIN(OperationalStateData)
@@ -32,6 +34,8 @@ private:
     	uint8_t		motionStatus;
     	uint8_t 	failureStatus;
     HW_MESSAGE_END
+
+	bool hasValidMessage_;
 
 	srslib_framework::MsgOperationalState operationalState_;
 

@@ -17,6 +17,7 @@
 #include <srslib_framework/ros/tap/TapFilteredLidar.hpp>
 #include <srslib_framework/ros/tap/TapRobotPose.hpp>
 #include <srslib_framework/ros/tap/TapLidarPoseOnRobot.hpp>
+#include <srslib_framework/ros/tap/TapBrainstem_Connected.hpp>
 
 #include <srslib_framework/platform/timing/MasterTimingDataRecorder.hpp>
 
@@ -43,6 +44,7 @@ private:
 
     TapLidarPoseOnRobot tapLidarPoseOnRobot_;
     TapRobotPose tapRobotPose_;
+    TapBrainstem_Connected tapBrainstemConnected_;
 
     // Channels
     ChannelBrainstemCmd_SetMotionState setMotionStateChannel_;
@@ -54,6 +56,8 @@ private:
 
     // Reflexes
     HardStopReflex hardStopReflex_;
+
+    bool brainstemConnected_ = false;
 
     bool enableHardStopDebugPlotting_ = false;
 };

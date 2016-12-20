@@ -63,7 +63,7 @@ private:
         }
         catch(const tf::TransformException& e)
         {
-            ROS_ERROR_STREAM_THROTTLE_NAMED(1.0, "tap_robot_pose", "TF Exception: " << e.what());
+            ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "tap_robot_pose", "TF Exception: " << e.what());
         }
     }
 

@@ -39,6 +39,8 @@ void PingHandler::encodeData(const bool& value)
 	ROS_DEBUG_NAMED("ping", "Brain => Brainstem: Ping");
 
 	getOwner()->sendCommand(reinterpret_cast<char*>(&cMessage), 1);
+
+	getOwner()->sentPing();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

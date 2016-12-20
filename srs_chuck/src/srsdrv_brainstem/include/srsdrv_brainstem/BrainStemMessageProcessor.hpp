@@ -22,23 +22,24 @@ using namespace std;
 
 #include <BrainStemMessages.hpp>
 #include <BrainStemMessageProcessorInterface.hpp>
-#include <srsdrv_brainstem/HardwareMessageHandler.hpp>
 
-#include <srsdrv_brainstem/hw_message/LogHandler.hpp>
-#include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
-#include <srsdrv_brainstem/hw_message/OperationalStateHandler.hpp>
-#include <srsdrv_brainstem/hw_message/PowerStateHandler.hpp>
-#include <srsdrv_brainstem/hw_message/OdometryRpmHandler.hpp>
-#include <srsdrv_brainstem/hw_message/OdometryPoseHandler.hpp>
-#include <srsdrv_brainstem/hw_message/ButtonPressedHandler.hpp>
+#include <HardwareMessageHandler.hpp>
 
-#include <srsdrv_brainstem/sw_message/PingHandler.hpp>
-#include <srsdrv_brainstem/sw_message/SetMotionStateHandler.hpp>
-#include <srsdrv_brainstem/sw_message/SetOdometryRpmHandler.hpp>
-#include <srsdrv_brainstem/sw_message/SetVelocityHandler.hpp>
-#include <srsdrv_brainstem/sw_message/ShutdownHandler.hpp>
-#include <srsdrv_brainstem/sw_message/SoundHandler.hpp>
-#include <srsdrv_brainstem/sw_message/UpdateUIHandler.hpp>
+#include <hw_message/LogHandler.hpp>
+#include <hw_message/HardwareInfoHandler.hpp>
+#include <hw_message/OperationalStateHandler.hpp>
+#include <hw_message/PowerStateHandler.hpp>
+#include <hw_message/OdometryRpmHandler.hpp>
+#include <hw_message/OdometryPoseHandler.hpp>
+#include <hw_message/ButtonPressedHandler.hpp>
+
+#include <sw_message/PingHandler.hpp>
+#include <sw_message/SetMotionStateHandler.hpp>
+#include <sw_message/SetOdometryRpmHandler.hpp>
+#include <sw_message/SetVelocityHandler.hpp>
+#include <sw_message/ShutdownHandler.hpp>
+#include <sw_message/SoundHandler.hpp>
+#include <sw_message/UpdateUIHandler.hpp>
 
 namespace srs {
 
@@ -70,6 +71,8 @@ public:
     {
         writeToSerialPort(command, size);
     }
+
+    void sentPing();
 
 // Message Processing
 
@@ -119,6 +122,10 @@ private:
 	static constexpr auto FAULT_TIMEOUT = 0.2f;
 
 	std::shared_ptr<IO>					io_;
+
+	bool								setupComplete_;
+
+	bool								sentPing_;
 
 	bool								isConnected_;
 

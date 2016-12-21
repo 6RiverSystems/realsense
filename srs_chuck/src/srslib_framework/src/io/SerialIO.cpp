@@ -16,6 +16,7 @@ namespace srs
 
 SerialIO::SerialIO( const char* pszName ) :
 	m_strName( pszName ),
+	m_isSynced(false),
 	m_strDebug( "serial-io." + m_strName ),
 	m_Thread( ),
 	m_serialThreadId( ),
@@ -27,9 +28,9 @@ SerialIO::SerialIO( const char* pszName ) :
 	m_bIsWriting( false ),
 	m_readBuffer( 1024 ),
 	m_writeBuffer( ),
+	message_( ),
 	m_readState( READ_STATE::DEFAULT ),
 	m_cCRC( 0 ),
-	m_readPartialData( ),
 	m_readCallback( ),
 	m_bEnableCRC( false ),
 	m_bHasLeading( false ),
@@ -74,6 +75,8 @@ void SerialIO::Open( const char* pszName, ConnectionCallbackFn connectionCallbac
 {
 	if( !IsOpen( ) )
 	{
+		m_isSynced = false;
+
 		std::condition_variable condition;
 
 		std::mutex mutex;
@@ -115,12 +118,19 @@ void SerialIO::Close( )
 	if( m_SerialPort.is_open( ) )
 	{
 		m_SerialPort.close( );
+
+		m_isSynced = false;
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Serial IO Configuration
 ////////////////////////////////////////////////////////////////////////////////////////////
+
+void SerialIO::SetSynced(bool synced)
+{
+	m_isSynced = synced;
+}
 
 void SerialIO::SetRetryTimeout( float fRetryTimeout )
 {
@@ -338,10 +348,11 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 
 	if( !error )
 	{
-		// Start with the partially parsed message
-		std::vector<char> messageData( m_readPartialData.begin( ), m_readPartialData.end( ) );
+		// Start with the last parsed message
+		// Add room for the new data
+		message_.reserve(message_.size() + size);
 
-//		ROS_DEBUG_STREAM_NAMED( m_strDebug, "Left over read data: " << ToHex( messageData ) );
+		size_t messageStart = 0;
 
 		auto changeState =
 			[&]( const READ_STATE& eNewState )
@@ -363,16 +374,16 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 		auto addCharacter =
 			[&]( const char& cChar )
 			{
-				messageData.push_back( cChar );
+				message_.push_back(cChar);
 
 				m_cCRC += cChar;
 			};
 
-		for( auto iter = m_readBuffer.begin( ); iter < m_readBuffer.begin( ) + size; iter++ )
+		for( int i = 0; i < size; i++ )
 		{
 			#if defined( ENABLE_TEST_FIXTURE )
 
-//				ROS_DEBUG_NAMED( m_strDebug, "Time between reads %d: %d ", messageData.size( ), std::chrono::duration_cast<std::chrono::microseconds>(now - m_lastTime).count( ) );
+				ROS_DEBUG_NAMED( m_strDebug, "Time between reads %zu: %zu ", message_.size(), std::chrono::duration_cast<std::chrono::microseconds>(now - m_lastTime).count( ) );
 
 				m_messageTiming.push_back( std::chrono::duration_cast<std::chrono::microseconds>(now - m_lastTime) );
 
@@ -386,14 +397,14 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				changeState( READ_STATE::IN_MESSAGE );
 			}
 
-//			ROS_ERROR_NAMED( m_strDebug, "Char: %02x", (unsigned char)*iter );
+//			ROS_ERROR_NAMED( m_strDebug, "Char: %02x", (unsigned char)m_readBuffer[i] );
 
 			if( m_bHasEscape &&
-				*iter == m_cEscape )
+				m_readBuffer[i] == m_cEscape )
 			{
 				if( m_readState == READ_STATE::IN_MESSAGE_ESCAPED )
 				{
-					addCharacter( *iter );
+					addCharacter( m_readBuffer[i] );
 
 					changeState( READ_STATE::IN_MESSAGE );
 				}
@@ -408,27 +419,24 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				assert( m_bHasLeading );
 
 				// Only start a message when we encounter a leading character
-				if( *iter == m_cLeading )
+				if( m_readBuffer[i] == m_cLeading )
 				{
 					changeState( READ_STATE::IN_MESSAGE );
 				}
 			}
 			else if( m_readState == READ_STATE::IN_MESSAGE_ESCAPED ||
-				*iter != m_cTerminating )
+					m_readBuffer[i] != m_cTerminating )
 			{
-				addCharacter( *iter );
+				addCharacter( m_readBuffer[i] );
 
 				changeState( READ_STATE::IN_MESSAGE );
 			}
 			else
 			{
-				if( messageData.size( ) > 0 )
+				if( message_.size() > 0 )
 				{
-					if( messageData[0] == '<' )
+					if( message_[0] == '<' )
 					{
-						ROS_DEBUG_STREAM_NAMED( m_strDebug, "ReadData: " <<
-							ToHex( std::vector<char>( messageData.begin( ), messageData.end( ) ) ) );
-
 						m_cCRC = 0;
 					}
 					else if( m_bEnableCRC )
@@ -436,7 +444,7 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 						// Don't remove the crc if we failed
 						if( m_cCRC == 0 )
 						{
-							messageData.pop_back( );
+							message_.pop_back( );
 						}
 					}
 					else
@@ -449,10 +457,12 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					{
 						if( m_readCallback )
 						{
-							ROS_DEBUG_STREAM_NAMED( m_strDebug, "ReadData (" << messageData.size( ) << "): " <<
-								ToHex( std::vector<char>( messageData.begin( ), messageData.end( ) ) ) );
+//							ROS_DEBUG_STREAM_NAMED( m_strDebug, "ReadData (" << messageSize_ << "): " <<
+//								ToHex( std::vector<char>( message_.begin( ), message_.begin( ) + messageSize_ ) ) );
 
-							m_readCallback( messageData );
+							m_readCallback(message_);
+
+							message_ = std::vector<char>();
 						}
 						else
 						{
@@ -461,16 +471,18 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 					}
 					else
 					{
-						ROS_ERROR_STREAM_NAMED( m_strDebug, "Invalid CRC (" << messageData.size( ) << "): " << ToHex( messageData ) <<
-							"(CRC: " << ToHex( std::vector<char>( { (char)m_cCRC } ) ) << ")" );
+						if (m_isSynced)
+						{
+							ROS_ERROR_STREAM_NAMED( m_strDebug, "Invalid CRC (" << message_.size() << "): " <<
+								ToHex( std::vector<char>( message_.begin( ), message_.begin( ) + message_.size() ) ) <<
+								"(CRC: " << ToHex( std::vector<char>( { (char)m_cCRC } ) ) << ")" );
+						}
 					}
 				}
 				else
 				{
 					ROS_ERROR_STREAM_NAMED( m_strDebug, "Empty Message" );
 				}
-
-				messageData.clear( );
 
 				m_cCRC = 0;
 
@@ -485,11 +497,6 @@ void SerialIO::OnReadComplete( const boost::system::error_code& error, std::size
 				#endif
 			}
 		}
-
-//		ROS_DEBUG_STREAM_NAMED( m_strDebug, "Left over read data: " << ToHex( m_readPartialData ) );
-
-		// Left over partial message
-		m_readPartialData = messageData;
 	}
 	else
 	{

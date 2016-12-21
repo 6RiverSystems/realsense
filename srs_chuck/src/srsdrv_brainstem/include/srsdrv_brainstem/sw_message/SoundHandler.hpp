@@ -5,33 +5,35 @@
  */
 #pragma once
 
-#include <srslib_framework/Sound.h>
+#include <BrainStemMessages.hpp>
 
 #include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/platform/observer/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_Sound.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessages.h>
-
 namespace srs {
 
-class BrainStemMessageProcessor;
+class BrainStemMessageProcessorInterface;
 
 class SoundHandler :
-    public SoftwareMessageHandler<BrainStemMessageProcessor>,
+    public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
     public Observer<Subscriber<srslib_framework::Sound>>
 {
 public:
-    SoundHandler(BrainStemMessageProcessor* owner);
+    SoundHandler(BrainStemMessageProcessorInterface* owner);
 
-    virtual ~SoundHandler()
-    {}
+    virtual ~SoundHandler() {}
+
+    virtual void attach();
 
     void notified(Subscriber<srslib_framework::Sound>* subject);
 
+    void encodeData(const Sound& value);
+
 private:
-    HW_MESSAGE_BEGIN(MsgSound)
+
+    HW_MESSAGE_BEGIN(SoundData)
         uint8_t cmd;
         uint8_t volume;
         uint16_t baseFrequency;
@@ -40,7 +42,7 @@ private:
         uint16_t numberOfCycles;
     HW_MESSAGE_END
 
-    TapBrainstemCmd_Sound tapSound_;
+	std::shared_ptr<TapBrainstemCmd_Sound> tapSound_;
 };
 
 } // namespace srs

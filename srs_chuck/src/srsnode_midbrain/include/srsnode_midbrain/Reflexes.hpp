@@ -10,13 +10,14 @@
 #include <srslib_framework/ros/channel/ChannelDangerZone.hpp>
 #include <srslib_framework/ros/channel/ChannelFailedDangerZone.hpp>
 #include <srslib_framework/ros/channel/ChannelFailedLaserScan.hpp>
-#include <srslib_framework/ros/channel/ChannelExecutiveCmd_Cl.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemCmd_SetMotionState.hpp>
 
 #include <srslib_framework/ros/tap/TapSensorOdometryPose.hpp>
 #include <srslib_framework/ros/tap/RosTapOperationalState.hpp>
 #include <srslib_framework/ros/tap/TapFilteredLidar.hpp>
 #include <srslib_framework/ros/tap/TapRobotPose.hpp>
 #include <srslib_framework/ros/tap/TapLidarPoseOnRobot.hpp>
+#include <srslib_framework/ros/tap/TapBrainstem_Connected.hpp>
 
 #include <srslib_framework/platform/timing/MasterTimingDataRecorder.hpp>
 
@@ -43,9 +44,10 @@ private:
 
     TapLidarPoseOnRobot tapLidarPoseOnRobot_;
     TapRobotPose tapRobotPose_;
+    TapBrainstem_Connected tapBrainstemConnected_;
 
     // Channels
-    ChannelExecutiveCmd_Cl cmdClChannel_;
+    ChannelBrainstemCmd_SetMotionState setMotionStateChannel_;
     ChannelDangerZone dangerZoneChannel_;
     ChannelFailedDangerZone fdzChannel_;
     ChannelFailedLaserScan flsChannel_;
@@ -54,6 +56,8 @@ private:
 
     // Reflexes
     HardStopReflex hardStopReflex_;
+
+    bool brainstemConnected_ = false;
 
     bool enableHardStopDebugPlotting_ = false;
 };

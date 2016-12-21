@@ -8,3 +8,4 @@ string uid
 uint8 chassisGeneration
 uint8 brainstemHwVersion
 string brainstemSwVersion
+MsgBatteryInfo[] batteryInfo

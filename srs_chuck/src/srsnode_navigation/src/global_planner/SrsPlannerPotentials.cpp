@@ -113,7 +113,7 @@ bool SrsPlannerPotentials::makePlan(
     const geometry_msgs::PoseStamped& goal,
     vector<geometry_msgs::PoseStamped>& plan)
 {
-    ROS_WARN("SrsPlanner::makePlan() called");
+    ROS_DEBUG("SrsPlanner::makePlan() called");
 
     // Make sure that we get the latest Map Stack
     updateMapStack(nullptr);

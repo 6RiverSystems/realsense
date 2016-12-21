@@ -16,6 +16,8 @@ template<typename TYPE>
 class SingleDataSource
 {
 public:
+    virtual ~SingleDataSource() {}
+
     virtual TYPE peek() const = 0;
     virtual TYPE pop() = 0;
 

@@ -1,9 +1,10 @@
+#include <BrainStemEmulator.hpp>
+
 #include <string>
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
-#include <srsdrv_brainstem/BrainStemEmulator.h>
 
 namespace srs {
 
@@ -27,16 +28,16 @@ BrainStemEmulator::~BrainStemEmulator( )
 
 void BrainStemEmulator::CreateSubscribers( )
 {
-	m_velocitySubscriber = m_rosNodeHandle.subscribe<srslib_framework::OdometryRPM>(VELOCITY_TOPIC, 10,
+	m_velocitySubscriber = m_rosNodeHandle.subscribe<srslib_framework::OdometryRpm>(VELOCITY_TOPIC, 10,
 		std::bind( &BrainStemEmulator::OnChangeVelocity, this, std::placeholders::_1 ) );
 }
 
 void BrainStemEmulator::CreatePublishers( )
 {
-	m_odometryPublisher = m_rosNodeHandle.advertise<srslib_framework::OdometryRPM>(ODOMETRY_TOPIC, 20);
+	m_odometryPublisher = m_rosNodeHandle.advertise<srslib_framework::OdometryRpm>(ODOMETRY_TOPIC, 20);
 }
 
-void BrainStemEmulator::OnChangeVelocity( const srslib_framework::OdometryRPM::ConstPtr& velocity )
+void BrainStemEmulator::OnChangeVelocity( const srslib_framework::OdometryRpm::ConstPtr& velocity )
 {
 	// Change the current velocity
 	m_velocity = *velocity;
@@ -44,7 +45,7 @@ void BrainStemEmulator::OnChangeVelocity( const srslib_framework::OdometryRPM::C
 
 void BrainStemEmulator::PublishOdometry(const ros::TimerEvent& event)
 {
-	srslib_framework::OdometryRPM msg;
+	srslib_framework::OdometryRpm msg;
 
     msg.header.stamp = ros::Time::now( );
     msg.left_wheel_rpm = m_velocity.left_wheel_rpm;

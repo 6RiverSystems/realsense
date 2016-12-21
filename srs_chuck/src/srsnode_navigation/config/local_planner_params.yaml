@@ -54,4 +54,4 @@ DWAPlannerROS:
 # topics
 #  odom_topic: /internal/sensors/odometry/velocity/estimate
 
-  use_dwa: true
+  use_dwa: false

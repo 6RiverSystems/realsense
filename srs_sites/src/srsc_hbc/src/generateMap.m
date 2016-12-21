@@ -1,12 +1,30 @@
 close all;
 clear variables;
+
 RESOLUTION = 0.05;
 ORIGIN = [-0.025, -0.025, 0.000];
 
+IN_IMAGE_MAIN = './hbc-logical-border.png';
+IN_IMAGE_OBSTACLES = './hbc-logical-obstacles.png';
+
+IN_IMAGE_REDUCED_SPEED = './hbc-logical-reduced_speed.png';
+MAX_VELOCITY = 0.4;
+
+IN_IMAGE_WARNING_SOUND = './hbc-logical-warning_sound.png';
+IN_IMAGE_ONEWAY_WEST_EAST = './hbc-logical-one_way_west-east.png';
+COST_ONEWAY_WEST_EAST = 100;
+
+IN_IMAGE_ONEWAY_EAST_WEST = './hbc-logical-one_way_east-west.png';
+COST_ONEWAY_EAST_WEST = 100;
+
+IN_IMAGE_COST_MEETING_AREA = './hbc-logical-meeting_area.png';
+COST_MEETING_AREA = 10;
+
+OUT_GEOJSON = '../map/hbc.geojson';
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Main map layer
-map = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-border.png', ...
-    RESOLUTION, ORIGIN);
+map = png2Map(IN_IMAGE_MAIN, RESOLUTION, ORIGIN);
 showMap(map, 'Border');
 
 % Make sure that the border is marked and sealed
@@ -14,51 +32,47 @@ map = convertToBorderObstacle(map, 'all', 1, 1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Obstacles
-layerObstacles = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-obstacles.png', ...
-    RESOLUTION, ORIGIN);
+layerObstacles = png2Map(IN_IMAGE_OBSTACLES, RESOLUTION, ORIGIN);
 showMap(layerObstacles, 'Obstacles');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Reduced speed layer
-layerReducedSpeed = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-reduced_speed.png', ...
-    RESOLUTION, ORIGIN);
+layerReducedSpeed = png2Map(IN_IMAGE_REDUCED_SPEED, RESOLUTION, ORIGIN);
 showMap(layerReducedSpeed, 'Reduced speed');
 
-layerReducedSpeed = convertToLabeledArea(layerReducedSpeed, 'all', 'ws', ...
-    struct('set_max_velocity', 0.4));
+layerReducedSpeed = convertToLabeledArea(layerReducedSpeed, 'all', 'rs', ...
+    struct('set_max_velocity', MAX_VELOCITY, 'play_sound', 'warning'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Warning sound layer
-layerWarningSound = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-warning_sound.png', ...
-    RESOLUTION, ORIGIN);
+layerWarningSound = png2Map(IN_IMAGE_WARNING_SOUND, RESOLUTION, ORIGIN);
 showMap(layerWarningSound, 'Warning sound');
 
 layerWarningSound = convertToLabeledArea(layerWarningSound, 'all', 'ws', ...
     struct('play_sound', 'warning'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% One way West
-layerOneWayWestEast = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-one_way_west-east.png', ...
-    RESOLUTION, ORIGIN);
+% One way West/East
+layerOneWayWestEast = png2Map(IN_IMAGE_ONEWAY_WEST_EAST, RESOLUTION, ORIGIN);
 showMap(layerOneWayWestEast, 'One way: allowed West-East');
 
-layerOneWayWestEast = convertToWeightedArea(layerOneWayWestEast, 'all', 0, 0, 0, 100);
+layerOneWayWestEast = convertToWeightedArea(layerOneWayWestEast, 'all', ...
+    0, 0, 0, COST_ONEWAY_WEST_EAST);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% One way East
-layerOneWayEastWest = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-one_way_east-west.png', ...
-    RESOLUTION, ORIGIN);
+% One way East/West
+layerOneWayEastWest = png2Map(IN_IMAGE_ONEWAY_EAST_WEST, RESOLUTION, ORIGIN);
 showMap(layerOneWayEastWest, 'One way: allowed East-West');
 
-layerOneWayEastWest = convertToWeightedArea(layerOneWayEastWest, 'all', 0, 100, 0, 0);
+layerOneWayEastWest = convertToWeightedArea(layerOneWayEastWest, 'all', ...
+    0, COST_ONEWAY_EAST_WEST, 0, 0);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One way North-South
-layerMeeting = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/src/hbc-logical-meeting_area.png', ...
-    RESOLUTION, ORIGIN);
+layerMeeting = png2Map(IN_IMAGE_COST_MEETING_AREA, RESOLUTION, ORIGIN);
 showMap(layerMeeting, 'Meeting area');
 
-layerMeeting = convertToCostArea(layerMeeting, 'all', 50);
+layerMeeting = convertToCostArea(layerMeeting, 'all', COST_MEETING_AREA);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map
@@ -69,8 +83,7 @@ map = addLayer(map, {...
     layerOneWayWestEast, ...
     layerOneWayEastWest, ...
     layerMeeting});
-showMap(map, 'Total map');
+showMap(map, 'Complete map');
+saveGeoJsonMap(map, OUT_GEOJSON);
 
-saveGeoJsonMap(map, ...
-    '/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/map/hbc.geojson');
-open('/Users/fsantini/Projects/repos/ros/srs_sites/src/srsc_hbc/map/hbc.geojson');
+open(OUT_GEOJSON);

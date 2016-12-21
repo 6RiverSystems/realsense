@@ -35,7 +35,7 @@ public:
 		if (!testMessages.size())
 		{
 			LogData log;
-			log.level = 0;
+			log.level = (int)0;
 			log.message = "Debug message";
 			testMessages.push_back(log);
 		}
@@ -120,7 +120,7 @@ TEST_F(Test_Log, ValidMessages)
 		// Setup test expectations
 		logHandler.receiveData(ros::Time(), messageBuffer);
 
-		EXPECT_EQ(level_, msg.level);
+		EXPECT_EQ((int)level_, msg.level);
 		EXPECT_EQ(message_, msg.message);
 	}
 }

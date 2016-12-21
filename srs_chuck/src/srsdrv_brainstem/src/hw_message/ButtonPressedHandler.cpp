@@ -17,7 +17,7 @@ void ButtonPressedHandler::receiveMessage(ros::Time currentTime, HardwareMessage
 {
 	ButtonPressedData buttonPressedData = msg.read<ButtonPressedData>();
 
-	// TODO: Validate button ID
+	// TODO (danw): Validate button ID
 
 	ROS_DEBUG_STREAM("Button Pressed: " << (int)buttonPressedData.buttonId);
 

@@ -18,7 +18,7 @@ class LogHandler : public HardwareMessageHandler
 {
 public:
 
-	enum LOG_LEVEL : uint8_t
+	enum class LOG_LEVEL : uint8_t
 	{
 		DEBUG	= 0,
 		INFO	= 1,

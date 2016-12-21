@@ -10,7 +10,6 @@ set(PROJECT_MAIN src/executive_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
     src/Executive.cpp
-    src/sw_message/CommandPause.cpp
     src/task/TaskDetectLabeledAreas.cpp
     src/task/TaskPlaySound.cpp
     src/task/TaskSetMaxVelocity.cpp

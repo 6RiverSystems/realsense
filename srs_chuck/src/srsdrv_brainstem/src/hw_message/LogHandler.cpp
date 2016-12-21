@@ -19,7 +19,7 @@ void LogHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
 
 	std::string message = msg.readString();
 
-	switch (log.level)
+	switch (static_cast<LOG_LEVEL>(log.level))
 	{
 		case LOG_LEVEL::DEBUG:
 		{
@@ -36,6 +36,12 @@ void LogHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
 		case LOG_LEVEL::ERROR:
 		{
 			ROS_ERROR_NAMED( "firmware", "Firmware: %s", message.c_str( ) );
+		}
+		break;
+
+		default:
+		{
+			ROS_ERROR_NAMED( "firmware", "Unknown log level: %d", log.level);
 		}
 		break;
 	}

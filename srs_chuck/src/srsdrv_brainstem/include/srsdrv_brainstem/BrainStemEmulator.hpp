@@ -17,17 +17,17 @@ class BrainStemEmulator
 
 public:
 
-	BrainStemEmulator( );
+	BrainStemEmulator();
 
-	virtual ~BrainStemEmulator( );
+	virtual ~BrainStemEmulator();
 
 private:
 
-	void CreateSubscribers( );
+	void CreateSubscribers();
 
-	void CreatePublishers( );
+	void CreatePublishers();
 
-	void OnChangeVelocity( const srslib_framework::OdometryRpm::ConstPtr& velocity );
+	void OnChangeVelocity(const srslib_framework::OdometryRpm::ConstPtr& velocity);
 
 	void PublishOdometry(const ros::TimerEvent& event);
 

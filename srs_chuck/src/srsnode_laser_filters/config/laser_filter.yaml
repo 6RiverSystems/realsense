@@ -13,16 +13,16 @@ scan_filter_chain:
 # median filter makes laser worse while the robot is moving
 #- type: laser_filters/LaserArrayFilter
 #  name: laser_median_filter
-#  params: 
+#  params:
 #    range_filter_chain:
 #      - name: median_3
-#        type: filters/MultiChannelMedianFilterFloat 
+#        type: filters/MultiChannelMedianFilterFloat
 #        params:
 #          number_of_observations: 11
 #          unused: 0
 #    intensity_filter_chain:
 #      - name: median_3
-#        type: filters/MultiChannelMedianFilterFloat 
+#        type: filters/MultiChannelMedianFilterFloat
 #        params:
 #          number_of_observations: 11
 #          unused: 0
@@ -40,14 +40,16 @@ scan_filter_chain:
 # threshold radius- distance for considering nearby point
 - name: srs_radius_search_filter
   type: laser_filters/RadiusSearchFilter
-  params: 
+  params:
     neighbor_number: 3
     threshold_number: 2
     threshold_radius: 0.2
-# intensity filter generally filters out only correct readings with low intensity 
+- name: clean_up
+  type: laser_filters/LaserScanRangeCleanUpFilter
+# intensity filter generally filters out only correct readings with low intensity
 #- name: dark_shadows
 #  type: laser_filters/LaserScanIntensityFilter
-#  params: 
+#  params:
 #    lower_threshold: 50
 #    upper_threshold: 10000
-#    disp_histogram: 0   
+#    disp_histogram: 0

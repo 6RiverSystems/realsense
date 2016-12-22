@@ -32,7 +32,7 @@ namespace srs
 StarGazer::StarGazer( const std::string& strNodeName, const std::string& strSerialPort, const std::string& strApsTopic ) :
 	m_rosNodeHandle( strNodeName ),
     m_rosApsPublisher(m_rosNodeHandle.advertise<srslib_framework::Pose>(strApsTopic, 1000)),
-	m_pSerialIO( new SerialIO( "stargazer" ) ),
+	m_pSerialIO( new SerialIO( "stargazer", strSerialPort.c_str() ) ),
 	m_messageProcessor( m_pSerialIO ),
 	m_sleeper( REFRESH_RATE_HZ / 1000.0 ),
 	m_mapTransformSenders( ),
@@ -66,7 +66,7 @@ StarGazer::StarGazer( const std::string& strNodeName, const std::string& strSeri
 				bIsConnected ) );
 	};
 
-	pSerialIO->Open( strSerialPort.c_str( ), connectionChanged, processMessage );
+	pSerialIO->Open( connectionChanged, processMessage );
 }
 
 StarGazer::~StarGazer( )

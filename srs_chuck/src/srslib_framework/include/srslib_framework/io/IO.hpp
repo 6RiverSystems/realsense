@@ -25,11 +25,10 @@ public:
 	/**
 	    Opens the serial port
 
-	    @pszName - serial port name (e.g. /dev/malg, /dev/ttyS0, etc.)
 	    @connectionCallback - called when the connection state has changed
 	    @readCallback - called when data is read from the port (called from io thread)
 	*/
-	virtual void Open( const char* pszName, ConnectionCallbackFn connectionCallback,
+	virtual void Open( ConnectionCallbackFn connectionCallback,
 		ReadCallbackFn readCallback ) = 0;
 
 	/**
@@ -53,8 +52,7 @@ public:
 	*/
 	virtual void Write( const std::vector<char>& buffer ) = 0;
 
-
-	virtual void SetSynced(bool synced) = 0;
+	virtual void SetSynced(bool synced) {};
 
 };
 

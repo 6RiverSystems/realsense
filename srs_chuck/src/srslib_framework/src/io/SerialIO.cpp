@@ -14,15 +14,15 @@
 namespace srs
 {
 
-SerialIO::SerialIO( const char* pszName ) :
+SerialIO::SerialIO( const char* pszName, const char* pszSerialPort ) :
 	m_strName( pszName ),
+	m_strSerialPort(pszSerialPort),
 	m_isSynced(false),
 	m_strDebug( "serial-io." + m_strName ),
 	m_Thread( ),
 	m_serialThreadId( ),
 	m_oWork( m_IOService ),
 	m_SerialPort( m_IOService ),
-	m_strSerialPort( ),
 	m_bIsSerialOpen( false ),
 	m_fRetryTimeout( 1.0 ),
 	m_bIsWriting( false ),
@@ -70,7 +70,7 @@ SerialIO::~SerialIO( )
 	m_Thread->join( );
 }
 
-void SerialIO::Open( const char* pszName, ConnectionCallbackFn connectionCallback,
+void SerialIO::Open(ConnectionCallbackFn connectionCallback,
 	ReadCallbackFn readCallback )
 {
 	if( !IsOpen( ) )
@@ -83,8 +83,6 @@ void SerialIO::Open( const char* pszName, ConnectionCallbackFn connectionCallbac
 
 		m_IOService.post( [&]( )
 			{
-				m_strSerialPort = pszName;
-
 				m_connectionCallback = connectionCallback;
 
 				m_readCallback = readCallback;

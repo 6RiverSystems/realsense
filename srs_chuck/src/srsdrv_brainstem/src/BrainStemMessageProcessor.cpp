@@ -170,6 +170,8 @@ void BrainStemMessageProcessor::getHardwareInfo(const ros::Time& now)
 		{
 			// Send another request
 			getHardwareInformation();
+
+			lastHardareInfoRequestTime_ = now;
 		}
 	}
 }
@@ -183,6 +185,8 @@ void BrainStemMessageProcessor::getOperationalState(const ros::Time& now)
 		{
 			// Send another request
 			getOperationalState();
+
+			lastOperationalStateRequestTime_ = now;
 		}
 	}
 }

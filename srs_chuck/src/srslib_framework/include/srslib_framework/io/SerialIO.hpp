@@ -14,8 +14,8 @@
 
 #include <srslib_framework/io/IO.hpp>
 
-#ifndef SRC_SerialIO_H_
-#define SRC_SerialIO_H_
+#ifndef SRS_SERIAL_IO_H
+#define SRS_SERIAL_IO_H
 
 namespace srs {
 
@@ -34,11 +34,11 @@ class SerialIO :
 
 public:
 
-	SerialIO( const char* pszName );
+	SerialIO( const char* pszName, const char* pszSerialPort );
 
 	virtual ~SerialIO( );
 
-	void Open( const char* pszName, ConnectionCallbackFn connectionCallback,
+	void Open( ConnectionCallbackFn connectionCallback,
 		ReadCallbackFn readCallback );
 
 	bool IsOpen( ) const;
@@ -174,4 +174,4 @@ private:
 
 } /* namespace srs */
 
-#endif /* SRC_SerialIO_H_ */
+#endif /* SRS_SERIAL_IO_H */

@@ -17,6 +17,9 @@ COST_ONEWAY_WEST_EAST = 100;
 IN_IMAGE_ONEWAY_EAST_WEST = './hbc-logical-one_way_east-west.png';
 COST_ONEWAY_EAST_WEST = 100;
 
+IN_IMAGE_ONEWAY_NORTH_SOUTH = './hbc-logical-one_way_north-south.png';
+COST_ONEWAY_NORTH_SOUTH = 100;
+
 IN_IMAGE_COST_MEETING_AREA = './hbc-logical-meeting_area.png';
 COST_MEETING_AREA = 10;
 
@@ -68,6 +71,14 @@ layerOneWayEastWest = convertToWeightedArea(layerOneWayEastWest, 'all', ...
     0, COST_ONEWAY_EAST_WEST, 0, 0);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% One way North/South
+layerOneWayNorthSouth = png2Map(IN_IMAGE_ONEWAY_NORTH_SOUTH, RESOLUTION, ORIGIN);
+showMap(layerOneWayNorthSouth, 'One way: allowed North-South');
+
+layerOneWayNorthSouth = convertToWeightedArea(layerOneWayNorthSouth, 'all', ...
+    0, COST_ONEWAY_NORTH_SOUTH, 0, 0);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One way North-South
 layerMeeting = png2Map(IN_IMAGE_COST_MEETING_AREA, RESOLUTION, ORIGIN);
 showMap(layerMeeting, 'Meeting area');
@@ -82,6 +93,7 @@ map = addLayer(map, {...
     layerWarningSound, ...
     layerOneWayWestEast, ...
     layerOneWayEastWest, ...
+    layerOneWayNorthSouth,...
     layerMeeting});
 showMap(map, 'Complete map');
 saveGeoJsonMap(map, OUT_GEOJSON);

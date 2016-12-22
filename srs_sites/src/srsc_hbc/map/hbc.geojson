@@ -4413,8 +4413,8 @@
 					},
 					"properties": {
 						"object": "weighted_area",
-						"north": 0,
-						"east": 100,
+						"north": 100,
+						"east": 0,
 						"south": 0,
 						"west": 0
 					}

@@ -4371,8 +4371,8 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[10.575,11.775],
-							[11.625,29.675]
+							[5.625,11.775],
+							[11.625,26.425]
 						]
 					},
 					"properties": {
@@ -4386,6 +4386,24 @@
 				{
 					"type": "Feature",
 					"id": 245,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[10.625,26.475],
+							[11.625,29.675]
+						]
+					},
+					"properties": {
+						"object": "weighted_area",
+						"north": 0,
+						"east": 100,
+						"south": 0,
+						"west": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 246,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [

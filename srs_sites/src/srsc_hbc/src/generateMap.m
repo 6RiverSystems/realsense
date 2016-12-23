@@ -76,7 +76,7 @@ layerOneWayNorthSouth = png2Map(IN_IMAGE_ONEWAY_NORTH_SOUTH, RESOLUTION, ORIGIN)
 showMap(layerOneWayNorthSouth, 'One way: allowed North-South');
 
 layerOneWayNorthSouth = convertToWeightedArea(layerOneWayNorthSouth, 'all', ...
-    0, COST_ONEWAY_NORTH_SOUTH, 0, 0);
+    COST_ONEWAY_NORTH_SOUTH, 0, 0, 0);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % One way North-South

@@ -9,11 +9,11 @@
   <!-- These 'arg' tags are just place-holders for passing values from test files.
   The recommended way is to pass the values directly into the 'param' tags. -->
   <arg name="enable_depth"      default="true" />
-  <arg name="enable_ir"         default="false" />
-  <arg name="enable_ir2"        default="false" />
-  <arg name="enable_color"      default="false" />
-  <arg name="enable_pointcloud" default="false" />
-  <arg name="enable_tf"         default="false" />
+  <arg name="enable_ir"         default="true" />
+  <arg name="enable_ir2"        default="true" />
+  <arg name="enable_color"      default="true" />
+  <arg name="enable_pointcloud" default="true" />
+  <arg name="enable_tf"         default="true" />
   <arg name="mode"              default="manual" />
   <arg name="depth_width"       default="640" />
   <arg name="depth_height"      default="480" />

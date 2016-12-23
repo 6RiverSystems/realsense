@@ -782,7 +782,11 @@ namespace realsense_camera
 
         duplicate_depth_color_ = false;
 
-        publishTopics();
+        // use a boolean flag to make the publish rate down to 15 HZ for now
+        if(publish_flag_){
+          publishTopics();
+        }
+        publish_flag_ = !publish_flag_ ;
 
         if (pointcloud_publisher_.getNumSubscribers() > 0 &&
             rs_is_stream_enabled(rs_device_, RS_STREAM_DEPTH, 0) == 1 && enable_pointcloud_ == true &&
@@ -848,7 +852,9 @@ namespace realsense_camera
             image_[stream_index]).toImageMsg();
 
         msg->header.frame_id = optical_frame_id_[stream_index];
-        msg->header.stamp = ros::Time(camera_start_ts_) + ros::Duration(frame_ts * 0.001); // Publish timestamp to synchronize frames.
+        //msg->header.stamp = ros::Time(camera_start_ts_) + ros::Duration(frame_ts * 0.001); // Publish timestamp to synchronize frames.
+        //use ros::Time::now() instead since the previous time stamp calculation will cause tf time inconsistent problem
+        msg->header.stamp = ros::Time::now();
         msg->width = image_[stream_index].cols;
         msg->height = image_[stream_index].rows;
         msg->is_bigendian = false;

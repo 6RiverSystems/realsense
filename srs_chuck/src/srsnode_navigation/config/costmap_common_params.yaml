@@ -1,4 +1,4 @@
-#obstacle cost shapping
+# Obstacle cost shapping
 footprint: [[-0.5, -0.3], [-0.5, 0.3], [0.55, 0.3], [0.55,-0.3]]
 footprint_padding: 0.01
 resolution: 0.1

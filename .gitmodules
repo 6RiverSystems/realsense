@@ -1,6 +1,19 @@
 [submodule "srs_chuck/src/laser_filters"]
 	path = srs_chuck/src/laser_filters
 	url = git@github.com:6RiverSystems/laser_filters.git
+
 [submodule "srs_chuck/src/navigation"]
-   path = srs_chuck/src/navigation
-   url = git@github.com:6RiverSystems/navigation.git
+	path = srs_chuck/src/navigation
+	url = git@github.com:6RiverSystems/navigation.git
+
+[submodule "srs_chuck/src/librealsense"]
+	path = srs_chuck/src/librealsense
+	url = git@github.com:6RiverSystems/librealsense.git
+
+[submodule "srs_chuck/src/realsense"]
+	path = srs_chuck/src/realsense
+	url = git@github.com:6RiverSystems/realsense.git
+
+[submodule "srs_chuck/src/depthimage_to_laserscan"]
+	path = srs_chuck/src/depthimage_to_laserscan
+	url = git@github.com:6RiverSystems/depthimage_to_laserscan.git

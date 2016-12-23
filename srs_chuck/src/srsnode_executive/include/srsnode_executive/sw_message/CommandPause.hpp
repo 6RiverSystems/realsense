@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/channel/ChannelBrainstemCmd_FreeSpin.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemCmd_SetMotionState.hpp>
 
 #include <srsnode_executive/sw_message/Command.hpp>
 
@@ -24,7 +24,7 @@ public:
     bool execute(const vector<string>& params);
 
 private:
-    ChannelBrainstemCmd_FreeSpin freeSpin_;
+    ChannelBrainstemCmd_SetMotionState setMotionState_;
 };
 
 } // namespace srs

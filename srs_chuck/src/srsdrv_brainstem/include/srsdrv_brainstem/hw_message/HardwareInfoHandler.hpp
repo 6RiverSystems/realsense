@@ -5,48 +5,55 @@
  */
 #pragma once
 
-#include <string>
-using namespace std;
+#include <BrainStemMessages.hpp>
+#include <HardwareMessageHandler.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessages.h>
-#include <srsdrv_brainstem/hw_message/HardwareMessageHandler.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 
 namespace srs {
 
 class HardwareInfoHandler : public HardwareMessageHandler
 {
 public:
-    static constexpr char HARDWARE_INFO_KEY = static_cast<char>(BRAIN_STEM_MSG::HARDWARE_INFO);
 
-    static const string TOPIC_HARDWARE_INFO;
+    HardwareInfoHandler(ChannelBrainstemHardwareInfo::Interface& publisher);
 
-    HardwareInfoHandler();
+    virtual ~HardwareInfoHandler() {}
 
-    virtual ~HardwareInfoHandler()
-    {}
+    void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
-    void receiveData(ros::Time currentTime, vector<char>& binaryData);
+    bool hasValidMessage() const { return hasValidMessage_; };
 
 private:
-    HW_MESSAGE_BEGIN(MsgHardwareInfo)
+
+    HW_MESSAGE_BEGIN(HardwareInfoData)
         uint8_t cmd;
         uint16_t uniqueId[8];
         uint8_t chassisGeneration;
         uint8_t brainstemHwVersion;
+        // char brainstemFirmwareVersion* (null terminated string)
     HW_MESSAGE_END
 
-    void publishHardwareInfo();
+    HW_MESSAGE_BEGIN(HardwareInfoData2)
+		uint8_t cmd;
+		uint16_t uniqueId[8];
+		uint8_t chassisGeneration;
+		uint8_t brainstemHwVersion;
+        // char brainstemFirmwareVersion* (null terminated string)
+        // uint8_t numberOfBatteries;
+    	// MsgBatteryInfo[numberOfBatteries];
+    HW_MESSAGE_END
 
-    unsigned int brainstemHwVersion_;
-    string brainstemSwVersion_;
+    HW_MESSAGE_BEGIN(BatteryInfoData)
+    	char manufacturer[13];
+    	char serialNumber[33];
+    HW_MESSAGE_END
 
-    unsigned int chassisGeneration_;
+	bool hasValidMessage_;
 
-    ros::Publisher pubHardwareInfo_;
+    srslib_framework::MsgHardwareInfo hardwareInfoMsg_;
 
-    string robotName_;
-
-    string uid_;
+    ChannelBrainstemHardwareInfo::Interface& publisher_;
 };
 
 } // namespace srs

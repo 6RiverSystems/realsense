@@ -12,6 +12,7 @@ bool pause
 bool hardStop
 bool safetyProcessorFailure
 bool brainstemFailure
+bool brainstemTimeoutFailure
 bool brainTimeoutFailure
 bool rightMotorFailure
 bool leftMotorFailure

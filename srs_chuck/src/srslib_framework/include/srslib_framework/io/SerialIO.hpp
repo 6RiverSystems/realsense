@@ -47,6 +47,8 @@ public:
 
 // Serial IO Configuration
 
+	void SetSynced(bool synced);
+
 	void SetRetryTimeout( float fRetryTimeout );
 
 	void EnableCRC( bool bEnableCRC );
@@ -98,6 +100,8 @@ private:
 
 	std::string								m_strName;
 
+	bool									m_isSynced;
+
 	std::string								m_strDebug;
 
     std::shared_ptr<std::thread>			m_Thread;
@@ -124,11 +128,11 @@ private:
 
     std::vector<char>						m_writeBuffer;
 
+    std::vector<char>						message_;
+
 	READ_STATE								m_readState;
 
 	uint8_t									m_cCRC;
-
-    std::vector<char>						m_readPartialData;
 
     ConnectionCallbackFn					m_connectionCallback;
 

@@ -58,8 +58,15 @@ set(${PROJECT_NAME}_MSGS
     MapStack.msg
     MsgHardwareInfo.msg
     MsgOperationalState.msg
+    MsgSetOperationalState.msg
     MsgSolution.msg
     MsgSolutionItem.msg
+    MsgBatteryInfo.msg
+    MsgBatteryDescriptor.msg
+    MsgBatteryState.msg
+    MsgPowerState.msg
+    MsgUpdateUI.msg
+    MsgUIState.msg
     OccupancyMap.msg
     OccupancyMetadata.msg
     Pose.msg
@@ -69,7 +76,7 @@ set(${PROJECT_NAME}_MSGS
     TimingDataSample.msg
     Velocity.msg
     Odometry.msg
-    OdometryRPM.msg
+    OdometryRpm.msg
 )
 
 set(${PROJECT_NAME}_SRVS

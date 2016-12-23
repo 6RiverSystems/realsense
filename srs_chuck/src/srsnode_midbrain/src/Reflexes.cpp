@@ -75,6 +75,9 @@ void Reflexes::execute()
     // Update robot position
     hardStopReflex_.setPose(tapRobotPose_.pop());
 
+    // Update brainstem connected state
+    brainstemConnected_ = tapBrainstemConnected_.pop();
+
     // Check for laser scan.
     if (tapFilteredLidar_.newDataAvailable())
     {
@@ -87,16 +90,27 @@ void Reflexes::execute()
         hardStopReflex_.setVelocity(tapOdometryPose_.popVelocity());
     }
 
-    // Call for hard stop check.
-    if (hardStopReflex_.checkHardStop())
+    if (brainstemConnected_)
     {
-        ROS_WARN("Publishing stop");
-        cmdClChannel_.publish("STOP;");
-    }
-    else if (hardStopReflex_.checkForClear())
-    {
-        ROS_INFO("Clearing motion.");
-        cmdClChannel_.publish("CLEAR_MOTION_STATUS;");
+		// Call for hard stop check.
+		if (hardStopReflex_.checkHardStop())
+		{
+			srslib_framework::MsgSetOperationalState setOperationalState;
+			setOperationalState.state = true;
+			setOperationalState.operationalState.hardStop = true;
+
+			ROS_WARN_THROTTLE(1.0f, "Publishing stop");
+			setMotionStateChannel_.publish(setOperationalState);
+		}
+		else if (hardStopReflex_.checkForClear())
+		{
+			srslib_framework::MsgSetOperationalState setOperationalState;
+			setOperationalState.state = false;
+			setOperationalState.operationalState.hardStop = true;
+
+			ROS_WARN_THROTTLE(1.0f, "Clearing motion status stop");
+			setMotionStateChannel_.publish(setOperationalState);
+		}
     }
 
     // Publish the polygon

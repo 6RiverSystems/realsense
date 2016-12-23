@@ -23,6 +23,8 @@ public:
         return owner_;
     }
 
+    virtual void attach() {};
+
 private:
     OWNER* owner_;
 };

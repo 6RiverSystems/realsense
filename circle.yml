@@ -25,7 +25,6 @@ dependencies:
     - echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:${PYTHONPATH}" >> ~/.bashrc
     - echo "export PATH=/usr/lib/ccache:$PATH" >> ~/.bashrc
     - echo "export ROS_PARALLEL_JOBS=-j8" >> ~/.bashrc
-    - cd ~/ros/srs_chuck/src && catkin_init_workspace
 
   override:
     - cd ~/ros/srs_chuck && catkin_make run_tests

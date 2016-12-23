@@ -416,8 +416,8 @@ void HidIO::ReadCompletedInternal(libusb_transfer* transfer)
 			}
 		}
 		else if (transfer->status == LIBUSB_TRANSFER_TIMED_OUT ||
-				transfer->status == LIBUSB_TRANSFER_CANCELLED ||
-				transfer->status == LIBUSB_TRANSFER_STALL)
+			transfer->status == LIBUSB_TRANSFER_CANCELLED ||
+			transfer->status == LIBUSB_TRANSFER_STALL)
 		{
 			ROS_DEBUG("Hid read failed: %d", transfer->status);
 		}
@@ -457,8 +457,8 @@ void HidIO::WriteCompletedInternal(libusb_transfer* transfer)
 			transfers_.erase(transfer);
 		}
 		else if (transfer->status == LIBUSB_TRANSFER_TIMED_OUT ||
-						transfer->status == LIBUSB_TRANSFER_CANCELLED ||
-						transfer->status == LIBUSB_TRANSFER_STALL)
+			transfer->status == LIBUSB_TRANSFER_CANCELLED ||
+			transfer->status == LIBUSB_TRANSFER_STALL)
 		{
 			ROS_DEBUG("Hid write failed: %d", transfer->status);
 		}

@@ -15,10 +15,10 @@ BrainStemEmulator::BrainStemEmulator( ) :
 	CreatePublishers( );
 
 	CreateSubscribers( );
-//
-//    // Start the odometry timer
-//	m_odometryTimer = m_rosNodeHandle.createTimer(ros::Duration(1.0 / ODOMETRY_RATE_HZ),
-//        boost::bind(&BrainStemEmulator::PublishOdometry, this, _1));
+
+    // Start the odometry timer
+	m_odometryTimer = m_rosNodeHandle.createTimer(ros::Duration(1.0 / ODOMETRY_RATE_HZ),
+        boost::bind(&BrainStemEmulator::PublishOdometry, this, _1));
 }
 
 BrainStemEmulator::~BrainStemEmulator( )

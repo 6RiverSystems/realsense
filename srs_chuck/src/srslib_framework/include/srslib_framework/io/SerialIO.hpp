@@ -14,8 +14,7 @@
 
 #include <srslib_framework/io/IO.hpp>
 
-#ifndef SRS_SERIAL_IO_H
-#define SRS_SERIAL_IO_H
+#pragma once
 
 namespace srs {
 
@@ -173,5 +172,3 @@ private:
 };
 
 } /* namespace srs */
-
-#endif /* SRS_SERIAL_IO_H */

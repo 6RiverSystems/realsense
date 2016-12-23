@@ -17,8 +17,7 @@
 
 #include <srslib_framework/io/IO.hpp>
 
-#ifndef SRC_HIDIO_H_
-#define SRC_HIDIO_H_
+#pragma once
 
 namespace srs {
 
@@ -109,5 +108,3 @@ private:
 };
 
 } /* namespace srs */
-
-#endif /* SRC_HIDIO_H_ */

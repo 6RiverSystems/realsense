@@ -44,6 +44,8 @@ public:
 
 	void Close( );
 
+	void spinOnce( ) {};
+
 // Serial IO Configuration
 
 	void SetSynced(bool synced);

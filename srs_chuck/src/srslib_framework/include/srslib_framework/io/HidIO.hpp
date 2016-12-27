@@ -39,6 +39,8 @@ public:
 
 	void Close();
 
+	void spinOnce();
+
 // Write Methods
 
 	void Write(const std::vector<char>& buffer);
@@ -62,6 +64,8 @@ private:
 	void ReleaseDevice();
 
 	void LookupEndpoints();
+
+	bool HasTransfers();
 
 	void SubmitTransfer(libusb_transfer* transfer);
 
@@ -98,7 +102,6 @@ private:
     uint8_t									txEndpointAddress_;
     uint16_t								txMaxPacketSize_;
 
-    std::mutex								transferMutex_;
 	std::set<libusb_transfer*>				transfers_;
 
     std::shared_ptr<std::thread>			thread_;

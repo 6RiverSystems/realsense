@@ -103,6 +103,8 @@ private:
 
 	void getOperationalState(const ros::Time& now);
 
+	void sendDimensions();
+
 // Helper Methods
 
 	void writeToSerialPort( char* data, std::size_t size );
@@ -133,6 +135,8 @@ private:
 	bool								sentPing_;
 
 	bool								isConnected_;
+
+	std::map<DIMENSION, float>			dimensions_;
 
 	bool								hasValidHardareInfo_;
 	ros::Time							lastHardareInfoRequestTime_;

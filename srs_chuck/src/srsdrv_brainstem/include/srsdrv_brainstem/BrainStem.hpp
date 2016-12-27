@@ -35,11 +35,11 @@ private:
 
     void cfgCallback(srsdrv_brainstem::RobotSetupConfig &config, uint32_t level);
 
-	static constexpr auto REFRESH_RATE_HZ = 10.0f;
+	static constexpr auto REFRESH_RATE_HZ = 100.0f;
 
 	dynamic_reconfigure::Server<srsdrv_brainstem::RobotSetupConfig> configServer_;
 
-	std::shared_ptr<IO>					serialIO_;
+	std::shared_ptr<IO>					io_;
 
 	std::shared_ptr<BrainStemEmulator>	brainstemEmulator_;
 

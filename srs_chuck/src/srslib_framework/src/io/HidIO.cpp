@@ -47,7 +47,7 @@ HidIO::HidIO(const char* pszName, int32_t pid, int32_t vid) :
 	{
 		int rc = libusb_init(nullptr);
 
-		CheckSuccess(rc, "Failed to  Closing hid ioinitialize libusb");
+		CheckSuccess(rc, "Failed to initialize libusb");
 
 		libusb_set_debug(nullptr, LIBUSB_LOG_LEVEL_WARNING);
 
@@ -55,28 +55,6 @@ HidIO::HidIO(const char* pszName, int32_t pid, int32_t vid) :
 		{
 			throw Error("Hotplug capabilities are not supported on this platform");
 		}
-
-		// Spin up the thread
-		thread_.reset(new std::thread([&]()
-		{
-			while(runEventThread_)
-			{
-				try
-				{
-					int rc = libusb_handle_events(nullptr);
-
-					CheckSuccess(rc, "handle events error");
-				}
-				catch(std::runtime_error& e)
-				{
-					ROS_ERROR("Hid Error: %s", e.what());
-				}
-				catch(...)
-				{
-					ROS_ERROR("Hid unknown error");
-				}
-			}
-		}));
 	}
 	catch(std::runtime_error& e)
 	{
@@ -87,11 +65,6 @@ HidIO::HidIO(const char* pszName, int32_t pid, int32_t vid) :
 HidIO::~HidIO()
 {
 	Close();
-
-	runEventThread_ = false;
-
-	// Clean up the thread
-	thread_->join();
 
 	libusb_exit(nullptr);
 }
@@ -142,17 +115,17 @@ void HidIO::Close()
 
 		readCallback_ = {};
 
+		bool hasTransfers = false;
+
 		// Wait for all transfers to cancel
 		for(auto transfer : transfers_)
 		{
 			libusb_cancel_transfer(transfer);
 		}
 
-		while(transfers_.size())
+		while(HasTransfers())
 		{
-			ROS_ERROR("Waiting for transfers to finish: %zu", transfers_.size());
-
-			ros::spinOnce( );
+			spinOnce();
 		}
 
 		ReleaseDevice();
@@ -173,28 +146,40 @@ void HidIO::Close()
 	}
 }
 
+void HidIO::spinOnce()
+{
+	timeval tv;
+	memset(&tv, 0, sizeof(struct timeval));
+	libusb_handle_events_timeout_completed(nullptr, &tv, nullptr);
+}
+
 void HidIO::Write(const std::vector<char>& buffer)
 {
 	try
 	{
 		if(IsOpen())
 		{
-			if (buffer.size() > txMaxPacketSize_)
+			if (buffer.size() > txMaxPacketSize_ - 1)
 			{
 				throw std::runtime_error("Invalid buffer size");
 			}
 
 			libusb_transfer* transfer  = libusb_alloc_transfer(0);
 
-			uint8_t* data = static_cast<uint8_t*>(calloc(buffer.size(), sizeof(uint8_t)));
+			// Allocate enough for the buffer
+			uint8_t* data = static_cast<uint8_t*>(calloc(txMaxPacketSize_, sizeof(uint8_t)));
 
-			memcpy(data, &buffer[0], buffer.size());
+			// Write the data size
+			data[0] = buffer.size();
 
-//			ROS_ERROR_STREAM("WriteData (" <<  buffer.size() << "): " <<
-//				ToHex(std::vector<char>(buffer.begin(), buffer.begin() + buffer.size())));
+			// Write the data
+			memcpy(data + 1, &buffer[0], buffer.size());
+
+			ROS_ERROR_STREAM("WriteData (" <<  buffer.size() << "): " <<
+				ToHex(std::vector<char>(buffer.begin(), buffer.begin() + buffer.size())));
 
 			libusb_fill_interrupt_transfer(transfer, deviceHandle_,
-				txEndpointAddress_, data, buffer.size(), &HidIO::WriteCompleted, this, 0);
+				txEndpointAddress_, data, txMaxPacketSize_, &HidIO::WriteCompleted, this, 0);
 
 			SubmitTransfer(transfer);
 		}
@@ -226,7 +211,6 @@ void HidIO::Read()
 	if (IsOpen())
 	{
 		libusb_transfer* transfer = libusb_alloc_transfer(0);
-		transfer->flags |= LIBUSB_TRANSFER_SHORT_NOT_OK;
 
 		uint8_t* data = static_cast<uint8_t*>(calloc(rxMaxPacketSize_, sizeof(uint8_t)));
 
@@ -399,11 +383,20 @@ void HidIO::ReadCompleted(libusb_transfer* transfer)
 {
 	HidIO* pThis = reinterpret_cast<HidIO*>(transfer->user_data);
 
-	ExecuteInRosThread(std::bind(&HidIO::ReadCompletedInternal, pThis, transfer));
+	pThis->ReadCompletedInternal(transfer);
+}
+
+bool HidIO::HasTransfers()
+{
+	return transfers_.size() > 0;
 }
 
 void HidIO::SubmitTransfer(libusb_transfer* transfer)
 {
+	transfer->flags |= LIBUSB_TRANSFER_FREE_BUFFER;
+	transfer->flags |= LIBUSB_TRANSFER_FREE_TRANSFER;
+	transfer->flags |= LIBUSB_TRANSFER_SHORT_NOT_OK;
+
 	int rc = libusb_submit_transfer(transfer);
 
 	CheckSuccess(rc, "Hid submit transfer failed ");
@@ -413,10 +406,6 @@ void HidIO::SubmitTransfer(libusb_transfer* transfer)
 
 void HidIO::CleanupTransfer(libusb_transfer* transfer)
 {
-	free(transfer->buffer);
-
-	libusb_free_transfer(transfer);
-
 	transfers_.erase(transfer);
 }
 
@@ -428,41 +417,25 @@ void HidIO::ReadCompletedInternal(libusb_transfer* transfer)
 
 		if (transfer->status == LIBUSB_TRANSFER_COMPLETED)
 		{
+			uint8_t size = transfer->buffer[0];
+
+			std::vector<char> message(transfer->buffer + 1, transfer->buffer + 1 + size);
+
 			if(readCallback_)
 			{
-				std::vector<char> message(transfer->buffer, transfer->buffer + transfer->actual_length);
+				ROS_ERROR_STREAM("ReadData (" << size << "): " <<
+					ToHex(std::vector<char>(message.begin(), message.end())));
 
-//				ROS_ERROR_STREAM("ReadData (" << transfer->actual_length << "): " <<
-//					ToHex(std::vector<char>(message.begin(), message.end())));
-
-				readCallback_(message);
+				readCallback_(std::move(message));
 			}
 			else
 			{
 				printf("Hid IO read but no callback specified!\n");
 			}
 		}
-		else if (transfer->status == LIBUSB_TRANSFER_TIMED_OUT ||
-			transfer->status == LIBUSB_TRANSFER_CANCELLED ||
-			transfer->status == LIBUSB_TRANSFER_STALL)
-		{
-			ROS_DEBUG("Hid read failed: %d", transfer->status);
-		}
-		else if (transfer->status == LIBUSB_TRANSFER_NO_DEVICE)
-		{
-			read = false;
-
-			ReleaseDevice();
-		}
 		else
 		{
 			ROS_ERROR("Hid read failed: %d", transfer->status);
-		}
-
-		if (IsOpen())
-		{
-			// Start another read
-			Read();
 		}
 	}
 	catch(std::exception& e)
@@ -475,34 +448,29 @@ void HidIO::ReadCompletedInternal(libusb_transfer* transfer)
 	}
 
 	CleanupTransfer(transfer);
+
+	if (transfer->status == LIBUSB_TRANSFER_NO_DEVICE)
+	{
+		Close();
+	}
+	else
+	{
+		Read();
+	}
 }
 
 void HidIO::WriteCompleted(libusb_transfer* transfer)
 {
 	HidIO* pThis = reinterpret_cast<HidIO*>(transfer->user_data);
 
-	ExecuteInRosThread(std::bind(&HidIO::WriteCompletedInternal, pThis, transfer));
+	pThis->WriteCompletedInternal(transfer);
 }
 
 void HidIO::WriteCompletedInternal(libusb_transfer* transfer)
 {
 	try
 	{
-		if (transfer->status == LIBUSB_TRANSFER_COMPLETED)
-		{
-			// Success!
-		}
-		else if (transfer->status == LIBUSB_TRANSFER_TIMED_OUT ||
-			transfer->status == LIBUSB_TRANSFER_CANCELLED ||
-			transfer->status == LIBUSB_TRANSFER_STALL)
-		{
-			ROS_ERROR("Hid write failed: %d", transfer->status);
-		}
-		else if (transfer->status == LIBUSB_TRANSFER_NO_DEVICE)
-		{
-			ReleaseDevice();
-		}
-		else
+		if (transfer->status != LIBUSB_TRANSFER_COMPLETED)
 		{
 			ROS_ERROR("Hid write failed: %d", transfer->status);
 		}
@@ -517,6 +485,11 @@ void HidIO::WriteCompletedInternal(libusb_transfer* transfer)
 	}
 
 	CleanupTransfer(transfer);
+
+	if (transfer->status == LIBUSB_TRANSFER_NO_DEVICE)
+	{
+		Close();
+	}
 }
 
 }

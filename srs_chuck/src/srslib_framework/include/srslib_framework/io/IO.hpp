@@ -45,6 +45,14 @@ public:
 	*/
 	virtual void Close( ) = 0;
 
+
+	/**
+	    Pump the io thread
+
+	    @return true if open, false otherwise
+	*/
+	virtual void spinOnce( ) = 0;
+
 	/**
 	    Writes data to a serial port
 

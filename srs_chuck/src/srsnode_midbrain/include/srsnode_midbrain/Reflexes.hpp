@@ -39,7 +39,6 @@ private:
 
     // Taps
     TapSensorOdometryPose tapOdometryPose_;
-    RosTapOperationalState tapOperationalState_;
     TapFilteredLidar tapFilteredLidar_;
 
     TapLidarPoseOnRobot tapLidarPoseOnRobot_;

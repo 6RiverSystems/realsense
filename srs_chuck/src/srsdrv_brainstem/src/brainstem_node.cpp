@@ -13,7 +13,7 @@ const std::string g_SerialPort("/dev/malg");
 int main(int argc, char** argv)
 {
 	// Initialize ROS
-	ros::init(argc, argv, "srsdrv_brainstem");
+	ros::init(argc, argv, "srsdrv_brainstem", ros::init_options::NoSigintHandler);
 
 	ROS_INFO_STREAM("Brainstem driver: started");
 

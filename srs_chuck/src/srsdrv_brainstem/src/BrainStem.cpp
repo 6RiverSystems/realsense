@@ -22,12 +22,21 @@
 namespace srs
 {
 
+bool g_shutdown = false;
+
+void SigintHandler(int sig)
+{
+	g_shutdown = true;
+}
+
 BrainStem::BrainStem( const std::string& strSerialPort ) :
 	serialIO_( new HidIO( "brainstem", 0x1930, 0x6001 ) ),
 	messageProcessor_( serialIO_ ),
 	brainstemFaultTimer_(),
 	nodeHandle_("~")
 {
+	signal(SIGINT, SigintHandler);
+
 	// Register dynamic configuration callback
 	configServer_.setCallback(boost::bind(&BrainStem::cfgCallback, this, _1, _2));
 
@@ -58,7 +67,18 @@ void BrainStem::run( )
 {
 	ros::Rate refreshRate( REFRESH_RATE_HZ );
 
-	ros::spin( );
+	while( ros::ok( ) )
+	{
+		ros::spinOnce( );
+
+		if (g_shutdown)
+		{
+			serialIO_->Close();
+			ros::shutdown();
+		}
+
+		refreshRate.sleep( );
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

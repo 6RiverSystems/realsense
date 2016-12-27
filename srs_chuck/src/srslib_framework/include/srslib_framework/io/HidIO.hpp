@@ -65,6 +65,8 @@ private:
 
 	void SubmitTransfer(libusb_transfer* transfer);
 
+	void CleanupTransfer(libusb_transfer* transfer);
+
 	static void ReadCompleted(libusb_transfer* transfer);
 
 	void ReadCompletedInternal(libusb_transfer* transfer);

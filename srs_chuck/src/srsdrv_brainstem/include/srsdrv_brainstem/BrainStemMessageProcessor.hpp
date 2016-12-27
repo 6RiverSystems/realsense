@@ -67,6 +67,11 @@ public:
 
 	void checkForBrainstemFaultTimer(const ros::TimerEvent& event);
 
+	bool isConnected() const
+	{
+		return isConnected_;
+	}
+
     void sendCommand(char* command, std::size_t size)
     {
         writeToSerialPort(command, size);

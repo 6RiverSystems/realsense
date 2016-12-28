@@ -27,6 +27,11 @@ void SoundHandler::attach()
 	tapSound_->attach(this);
 }
 
+void SoundHandler::sync()
+{
+
+}
+
 void SoundHandler::notified(Subscriber<srslib_framework::Sound>* subject)
 {
     TapBrainstemCmd_Sound* tap = static_cast<TapBrainstemCmd_Sound*>(subject);

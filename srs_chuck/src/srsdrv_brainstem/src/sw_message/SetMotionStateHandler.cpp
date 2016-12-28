@@ -29,6 +29,11 @@ void SetMotionStateHandler::attach()
 	tapSetMotionState_->attach(this);
 }
 
+void SetMotionStateHandler::sync()
+{
+
+}
+
 void SetMotionStateHandler::notified(Subscriber<srslib_framework::MsgSetOperationalState>* subject)
 {
 	TapBrainstemCmd_SetMotionState* tap = static_cast<TapBrainstemCmd_SetMotionState*>(subject);

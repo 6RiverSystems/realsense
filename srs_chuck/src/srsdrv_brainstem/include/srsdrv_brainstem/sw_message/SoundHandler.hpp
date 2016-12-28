@@ -27,6 +27,8 @@ public:
 
     virtual void attach();
 
+    virtual void sync();
+
     void notified(Subscriber<srslib_framework::Sound>* subject);
 
     void encodeData(const Sound& value);

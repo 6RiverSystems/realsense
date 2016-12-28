@@ -8,7 +8,7 @@
 #include <string>
 
 #include <BrainStemMessages.hpp>
-#include <HardwareMessageHandler.hpp>
+#include <hw_message/HardwareMessageHandler.hpp>
 
 #include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 
@@ -28,7 +28,7 @@ public:
 
 	typedef std::function<void(LOG_LEVEL level, std::string message)> LogCallbackFn;
 
-    LogHandler(LogCallbackFn logCallback = [&](LOG_LEVEL, std::string) {});
+    LogHandler(BrainStemMessageProcessorInterface* processor, LogCallbackFn logCallback = [&](LOG_LEVEL, std::string) {});
 
     virtual ~LogHandler() {}
 

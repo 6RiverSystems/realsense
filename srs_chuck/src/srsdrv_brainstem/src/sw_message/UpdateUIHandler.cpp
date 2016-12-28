@@ -62,6 +62,11 @@ void UpdateUIHandler::attach()
 	tapUpdateUI_->attach(this);
 }
 
+void UpdateUIHandler::sync()
+{
+
+}
+
 void UpdateUIHandler::notified(Subscriber<srslib_framework::MsgUpdateUI>* subject)
 {
 	TapBrainstemCmd_UpdateUI* tap = static_cast<TapBrainstemCmd_UpdateUI*>(subject);

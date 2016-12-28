@@ -5,8 +5,8 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-HardwareInfoHandler::HardwareInfoHandler(ChannelBrainstemHardwareInfo::Interface& publisher) :
-    HardwareMessageHandler(BRAIN_STEM_MSG::HARDWARE_INFO),
+HardwareInfoHandler::HardwareInfoHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemHardwareInfo::Interface& publisher) :
+    HardwareMessageHandler(processor, BRAIN_STEM_MSG::HARDWARE_INFO),
 	publisher_(publisher),
 	hasValidMessage_(false)
 {

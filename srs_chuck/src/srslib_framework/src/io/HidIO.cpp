@@ -153,9 +153,21 @@ void HidIO::close()
 
 void HidIO::spinOnce()
 {
-	timeval tv;
-	memset(&tv, 0, sizeof(struct timeval));
-	libusb_handle_events_timeout_completed(nullptr, &tv, nullptr);
+	try
+	{
+		timeval tv;
+		memset(&tv, 0, sizeof(struct timeval));
+		tv.tv_usec = 10000;
+		libusb_handle_events_timeout_completed(nullptr, &tv, nullptr);
+	}
+	catch(std::runtime_error& e)
+	{
+		ROS_ERROR("Hid Error: %s", e.what());
+	}
+	catch(...)
+	{
+		// Ignore errors
+	}
 }
 
 void HidIO::write(const std::vector<char>& buffer)
@@ -279,6 +291,8 @@ void HidIO::claimDevice(libusb_device* device)
 
 	int rc = libusb_open(device, &deviceHandle_);
 
+	ROS_INFO("Hid claiming device: %p", deviceHandle_);
+
 	checkSuccess(rc, "Failed to open usb device");
 
 	// Detach the device from the kernel driver if it has claimed the device
@@ -316,6 +330,8 @@ void HidIO::releaseDevice()
 {
 	if (deviceHandle_)
 	{
+		ROS_INFO("Hid releasing device: %p", deviceHandle_);
+
 		int rc = libusb_release_interface(deviceHandle_, 0);
 
 		checkSuccess(rc, "Failed to release usb device");
@@ -413,10 +429,14 @@ void HidIO::submitTransfer(libusb_transfer* transfer)
 	catch(std::exception& e)
 	{
 		ROS_ERROR("Hid exception: %s", e.what());
+
+		cleanupTransfer(transfer);
 	}
 	catch(...)
 	{
 		ROS_ERROR("Unknown hid exception");
+
+		cleanupTransfer(transfer);
 	}
 }
 
@@ -424,15 +444,16 @@ bool HidIO::cleanupTransfer(libusb_transfer* transfer)
 {
 	bool success = true;
 
-	transfers_.erase(transfer);
-
 	if (transfer->status == LIBUSB_TRANSFER_NO_DEVICE)
 	{
-		deviceHandle_ = nullptr;
 		connetionCallback_(false);
+
+		releaseDevice();
 
 		success = false;
 	}
+
+	transfers_.erase(transfer);
 
 	return success;
 }

@@ -39,13 +39,13 @@ BrainStemMessageProcessor::BrainStemMessageProcessor(std::shared_ptr<IO> pIO) :
 	hardwareInfoChannel_(),
 	operationalStateChannel_(),
 	powerStateChannel_(),
-	logHandler_(),
-	odometryRpmHandler_(odometryRpmChannel_),
-	odometryPoseHandler_(odometryPoseChannel_),
-	hardwareInfoHandler_(hardwareInfoChannel_),
-	operationalStateHandler_(operationalStateChannel_),
-	powerStateHandler_(powerStateChannel_),
-	buttonPressedHandler_(buttonPressedChannel_)
+	logHandler_(this),
+	odometryRpmHandler_(this, odometryRpmChannel_),
+	odometryPoseHandler_(this, odometryPoseChannel_),
+	hardwareInfoHandler_(this, hardwareInfoChannel_),
+	operationalStateHandler_(this, operationalStateChannel_),
+	powerStateHandler_(this, powerStateChannel_),
+	buttonPressedHandler_(this, buttonPressedChannel_)
 {
     hwMessageHandlers_[odometryRpmHandler_.getKey()] = &odometryRpmHandler_;
     hwMessageHandlers_[odometryPoseHandler_.getKey()] = &odometryPoseHandler_;

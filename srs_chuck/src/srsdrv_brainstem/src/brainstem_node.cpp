@@ -8,17 +8,10 @@
 
 #include <BrainStem.hpp>
 
-const std::string g_SerialPort("/dev/malg");
-
 int main(int argc, char** argv)
 {
-	// Initialize ROS
-	ros::init(argc, argv, "srsdrv_brainstem");
-
-	ROS_INFO_STREAM("Brainstem driver: started");
-
 	// Create the BrainStem node and run it
-	srs::BrainStem brainStem(g_SerialPort);
+	srs::BrainStem brainStem("srsdrv_brainstem", argc, argv);
 
 	brainStem.run();
 

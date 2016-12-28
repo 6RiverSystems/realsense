@@ -6,7 +6,7 @@
 #pragma once
 
 #include <BrainStemMessages.hpp>
-#include <HardwareMessageHandler.hpp>
+#include <hw_message/HardwareMessageHandler.hpp>
 
 #include <srslib_framework/ros/channel/ChannelBrainstemPowerState.hpp>
 
@@ -16,7 +16,7 @@ class PowerStateHandler : public HardwareMessageHandler
 {
 public:
 
-	PowerStateHandler(ChannelBrainstemPowerState::Interface& publisher);
+	PowerStateHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemPowerState::Interface& publisher);
 
     virtual ~PowerStateHandler() {}
 

@@ -6,7 +6,7 @@
 #pragma once
 
 #include <BrainStemMessages.hpp>
-#include <HardwareMessageHandler.hpp>
+#include <hw_message/HardwareMessageHandler.hpp>
 
 #include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 
@@ -16,7 +16,7 @@ class HardwareInfoHandler : public HardwareMessageHandler
 {
 public:
 
-    HardwareInfoHandler(ChannelBrainstemHardwareInfo::Interface& publisher);
+    HardwareInfoHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemHardwareInfo::Interface& publisher);
 
     virtual ~HardwareInfoHandler() {}
 

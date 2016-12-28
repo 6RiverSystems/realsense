@@ -5,8 +5,8 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-ButtonPressedHandler::ButtonPressedHandler(ChannelBrainstemButtonPressed::Interface& publisher) :
-    HardwareMessageHandler(BRAIN_STEM_MSG::BUTTON_PRESSED),
+ButtonPressedHandler::ButtonPressedHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemButtonPressed::Interface& publisher) :
+    HardwareMessageHandler(processor, BRAIN_STEM_MSG::BUTTON_PRESSED),
 	publisher_(publisher)
 {
 

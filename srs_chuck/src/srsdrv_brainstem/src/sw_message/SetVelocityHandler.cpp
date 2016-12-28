@@ -23,6 +23,12 @@ SetVelocityHandler::SetVelocityHandler(BrainStemMessageProcessorInterface* owner
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void SetVelocityHandler::sync()
+{
+
+}
+
 void SetVelocityHandler::receiveData(const geometry_msgs::Twist::ConstPtr data)
 {
 	SetVelocityData msg = {

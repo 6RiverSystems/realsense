@@ -6,15 +6,19 @@
 #pragma once
 
 #include <ros/ros.h>
-#include <HardwareMessage.hpp>
+
+#include <BrainStemMessageProcessorInterface.hpp>
+
+#include <hw_message/HardwareMessage.hpp>
 
 namespace srs {
 
 class HardwareMessageHandler
 {
 public:
-    HardwareMessageHandler(BRAIN_STEM_MSG messageKey) :
-        messageKey_(messageKey)
+    HardwareMessageHandler(BrainStemMessageProcessorInterface* processor, BRAIN_STEM_MSG messageKey) :
+        processor_(processor),
+		messageKey_(messageKey)
     {
     }
 
@@ -38,6 +42,10 @@ public:
     }
 
     virtual void receiveMessage(ros::Time currentTime, HardwareMessage& msg) = 0;
+
+protected:
+
+    BrainStemMessageProcessorInterface* processor_;
 
 private:
 

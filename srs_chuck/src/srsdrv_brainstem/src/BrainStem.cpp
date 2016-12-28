@@ -22,7 +22,8 @@
 namespace srs
 {
 
-BrainStem::BrainStem( const std::string& strSerialPort ) :
+BrainStem::BrainStem(string name, int argc, char** argv) :
+	RosUnit(name, argc, argv, REFRESH_RATE_HZ),
 	io_( new HidIO( "brainstem", 0x1930, 0x6001 ) ),
 	messageProcessor_( io_ ),
 	brainstemFaultTimer_(),
@@ -54,18 +55,15 @@ BrainStem::~BrainStem( )
 
 }
 
-void BrainStem::run( )
+void BrainStem::execute()
 {
-	ros::Rate refreshRate( REFRESH_RATE_HZ );
+	io_->spinOnce();
+}
 
-	while(ros::ok())
-	{
-		ros::spinOnce( );
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void BrainStem::initialize()
+{
 
-		io_->spinOnce();
-
-		refreshRate.sleep( );
-	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -6,7 +6,7 @@
 #pragma once
 
 #include <BrainStemMessages.hpp>
-#include <HardwareMessageHandler.hpp>
+#include <hw_message/HardwareMessageHandler.hpp>
 
 #include <srslib_framework/ros/channel/ChannelBrainstemOperationalState.hpp>
 
@@ -16,7 +16,7 @@ class OperationalStateHandler : public HardwareMessageHandler
 {
 public:
 
-	OperationalStateHandler(ChannelBrainstemOperationalState::Interface& channel);
+	OperationalStateHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemOperationalState::Interface& channel);
 
     virtual ~OperationalStateHandler() {}
 

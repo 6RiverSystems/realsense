@@ -6,8 +6,8 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-PowerStateHandler::PowerStateHandler(ChannelBrainstemPowerState::Interface& publisher) :
-	HardwareMessageHandler(BRAIN_STEM_MSG::POWER_STATE),
+PowerStateHandler::PowerStateHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemPowerState::Interface& publisher) :
+	HardwareMessageHandler(processor, BRAIN_STEM_MSG::POWER_STATE),
 	publisher_(publisher)
 {
 	validDescriptors_.insert(BATTERY_DESCRIPTOR::TEMPERATURE);

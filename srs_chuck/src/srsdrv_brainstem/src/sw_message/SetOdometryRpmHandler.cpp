@@ -28,6 +28,11 @@ void SetOdometryRpmHandler::attach()
 	tapOdometryRpm_->attach(this);
 }
 
+void SetOdometryRpmHandler::sync()
+{
+
+}
+
 void SetOdometryRpmHandler::notified(Subscriber<srslib_framework::OdometryRpm>* subject)
 {
 	TapBrainstemCmd_OdometryRpm* tap = static_cast<TapBrainstemCmd_OdometryRpm*>(subject);

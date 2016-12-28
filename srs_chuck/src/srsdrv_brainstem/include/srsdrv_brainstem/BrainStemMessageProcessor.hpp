@@ -23,7 +23,7 @@ using namespace std;
 #include <BrainStemMessages.hpp>
 #include <BrainStemMessageProcessorInterface.hpp>
 
-#include <HardwareMessageHandler.hpp>
+#include <hw_message/HardwareMessageHandler.hpp>
 
 #include <hw_message/LogHandler.hpp>
 #include <hw_message/HardwareInfoHandler.hpp>

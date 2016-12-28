@@ -6,7 +6,7 @@
 #pragma once
 
 #include <BrainStemMessages.hpp>
-#include <HardwareMessageHandler.hpp>
+#include <hw_message/HardwareMessageHandler.hpp>
 
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
 
@@ -18,7 +18,7 @@ public:
     static constexpr int SERIAL_TRANSMIT_DELAY = 3400000;
     static constexpr double OUT_OF_SYNC_TIMEOUT = 0.15;
 
-    OdometryRpmHandler(ChannelBrainstemOdometryRpm::Interface& publisher);
+    OdometryRpmHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemOdometryRpm::Interface& publisher);
 
     virtual ~OdometryRpmHandler() {}
 

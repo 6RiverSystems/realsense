@@ -8,6 +8,7 @@
 #include <srslib_framework/ros/tap/TapOdometryCmd_Velocity.hpp>
 #include <srslib_framework/ros/tap/TapRobotPose.hpp>
 #include <srslib_framework/ros/tap/TapMapStack.hpp>
+#include <srslib_framework/ros/tap/RosTapOperationalState.hpp>
 #include <srslib_framework/ros/unit/RosUnit.hpp>
 
 #include <srsnode_executive/ExecutiveContext.hpp>
@@ -44,6 +45,7 @@ private:
     ExecutiveContext context_;
 
     TapOdometryCmd_Velocity tapCommandedVelocity_;
+    RosTapOperationalState tapOperationalState_;
     TapMapStack tapMapStack_;
     TapRobotPose tapRobotPose_;
     TaskDetectLabeledAreas taskDetectLabeledAreas_;

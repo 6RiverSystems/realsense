@@ -45,7 +45,7 @@ private:
     ExecutiveContext context_;
 
     TapOdometryCmd_Velocity tapCommandedVelocity_;
-    RosTapOperationalState tapOperationalState;
+    RosTapOperationalState tapOperationalState_;
     TapMapStack tapMapStack_;
     TapRobotPose tapRobotPose_;
     TaskDetectLabeledAreas taskDetectLabeledAreas_;

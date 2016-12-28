@@ -44,7 +44,7 @@ void Executive::updateContext()
 {
     context_.robotPose = tapRobotPose_.pop();
     context_.commandedVelocity = tapCommandedVelocity_.pop();
-    context_.isRobotPaused = tapOperationalState.getPause();
+    context_.isRobotPaused = tapOperationalState_.getPause();
 
     // Make sure that the neither the logical not the occupancy maps
     // have been re-published. In case, destroy what we have and

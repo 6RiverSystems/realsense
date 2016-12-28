@@ -33,8 +33,8 @@
 	<arg name="enable_color"      	value="false" />
 	<arg name="enable_pointcloud" 	value="false" />
 	<arg name="enable_tf"         	value="false" />
-	<arg name="depth_height"	value="480" />
-	<arg name="depth_width"		value="640" />
+	<arg name="depth_height"        value="480" />
+	<arg name="depth_width"         value="640" />
 	<arg name="depth_fps"		value="30" />
 	<arg name="color_fps"		value="30" />
 	</include>

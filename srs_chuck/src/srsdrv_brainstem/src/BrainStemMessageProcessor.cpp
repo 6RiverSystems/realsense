@@ -289,11 +289,13 @@ void BrainStemMessageProcessor::ping()
 	{
 		sentPing_ = true;
 
+		ros::Time currentTime = ros::Time::now();
+
 		// Don't ask for the hardware information and the op state until we send the first ping
 		// to avoid the brainstem timeouts propogating to the rest of the stack prematurely
-		getHardwareInformation();
+		getHardwareInfo(currentTime);
 
-		getOperationalState();
+		getOperationalState(currentTime);
 	}
 }
 

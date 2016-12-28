@@ -23,11 +23,6 @@ SetVelocityHandler::SetVelocityHandler(BrainStemMessageProcessorInterface* owner
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SetVelocityHandler::attach()
-{
-	// TODO: Add to base subscriber class (delay ros intantiation for unit tests)
-}
-
 void SetVelocityHandler::receiveData(const geometry_msgs::Twist::ConstPtr data)
 {
 	SetVelocityData msg = {

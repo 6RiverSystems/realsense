@@ -25,8 +25,6 @@ public:
 
     virtual ~SetVelocityHandler() {}
 
-    void attach();
-
     virtual void receiveData(const geometry_msgs::Twist::ConstPtr data);
 
 private:

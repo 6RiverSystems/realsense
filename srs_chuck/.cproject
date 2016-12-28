@@ -104,6 +104,14 @@
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>false</runAllBuilders>
 			</target>
+			<target name="test framework" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>-j8 run_tests_srslib_framework -DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildTarget/>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>false</runAllBuilders>
+			</target>
 		</buildTargets>
 	</storageModule>
 </cproject>

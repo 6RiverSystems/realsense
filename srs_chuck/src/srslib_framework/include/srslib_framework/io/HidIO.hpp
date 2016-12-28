@@ -32,52 +32,52 @@ public:
 
 	virtual ~HidIO();
 
-	void Open(ConnectionCallbackFn connectionCallback,
+	void open(ConnectionCallbackFn connectionCallback,
 		ReadCallbackFn readCallback);
 
-	bool IsOpen() const;
+	bool isOpen() const;
 
-	void Close();
+	void close();
 
 	void spinOnce();
 
 // Write Methods
 
-	void Write(const std::vector<char>& buffer);
+	void write(const std::vector<char>& buffer);
 
 private:
 
-	void CheckSuccess(int rc, const char* message) const;
+	void checkSuccess(int rc, const char* message) const;
 
-	void Read();
+	void read();
 
-	void RegisterHotPlug();
+	void registerHotPlug();
 
-	static int HotPlugCallback(libusb_context *ctx, libusb_device *device,
+	static int hotPlugCallback(libusb_context *ctx, libusb_device *device,
 		libusb_hotplug_event event, void *user_data);
 
-	int HotPlugCallbackInternal(libusb_context *ctx, libusb_device *device,
+	int hotPlugCallbackInternal(libusb_context *ctx, libusb_device *device,
 		libusb_hotplug_event event);
 
-	void ClaimDevice(libusb_device* device);
+	void claimDevice(libusb_device* device);
 
-	void ReleaseDevice();
+	void releaseDevice();
 
-	void LookupEndpoints();
+	void lookupEndpoints();
 
-	bool HasTransfers();
+	bool hasTransfers();
 
-	void SubmitTransfer(libusb_transfer* transfer);
+	void submitTransfer(libusb_transfer* transfer);
 
-	void CleanupTransfer(libusb_transfer* transfer);
+	bool cleanupTransfer(libusb_transfer* transfer);
 
-	static void ReadCompleted(libusb_transfer* transfer);
+	static void readCompleted(libusb_transfer* transfer);
 
-	void ReadCompletedInternal(libusb_transfer* transfer);
+	void readCompletedInternal(libusb_transfer* transfer);
 
-	static void WriteCompleted(libusb_transfer* transfer);
+	static void writeCompleted(libusb_transfer* transfer);
 
-	void WriteCompletedInternal(libusb_transfer* transfer);
+	void writeCompletedInternal(libusb_transfer* transfer);
 
 	bool									runEventThread_;
 

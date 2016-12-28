@@ -230,7 +230,7 @@ void BrainStemMessageProcessor::checkSetupComplete()
 		{
 			ROS_INFO("Brainstem driver: Setup complete (received hardware info and operational state messages.");
 
-			io_->SetSynced(true);
+			io_->setSynced(true);
 
 			setupComplete_ = true;
 
@@ -254,7 +254,7 @@ void BrainStemMessageProcessor::checkSetupComplete()
 
 void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
 {
-	if (io_->IsOpen())
+	if (io_->isOpen())
 	{
 		static std::map<DIMENSION, std::string> mapDimensionName;
 
@@ -305,9 +305,9 @@ void BrainStemMessageProcessor::ping()
 
 void BrainStemMessageProcessor::writeToSerialPort(char* pszData, std::size_t dwSize)
 {
-	if(io_->IsOpen())
+	if(io_->isOpen())
 	{
-		io_->Write(std::vector<char>(pszData, pszData + dwSize));
+		io_->write(std::vector<char>(pszData, pszData + dwSize));
 	}
 	else
 	{

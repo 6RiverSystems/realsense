@@ -33,141 +33,141 @@ class SerialIO :
 
 public:
 
-	SerialIO( const char* pszName, const char* pszSerialPort );
+	SerialIO(const char* pszName, const char* pszSerialPort);
 
-	virtual ~SerialIO( );
+	virtual ~SerialIO();
 
-	void Open( ConnectionCallbackFn connectionCallback,
-		ReadCallbackFn readCallback );
+	void open(ConnectionCallbackFn connectionCallback,
+		ReadCallbackFn readCallback);
 
-	bool IsOpen( ) const;
+	bool isOpen() const;
 
-	void Close( );
+	void close();
 
-	void spinOnce( ) {};
+	void spinOnce() {};
 
 // Serial IO Configuration
 
-	void SetSynced(bool synced);
+	void setSynced(bool synced);
 
-	void SetRetryTimeout( float fRetryTimeout );
+	void setRetryTimeout(float fRetryTimeout);
 
-	void EnableCRC( bool bEnableCRC );
+	void enableCRC(bool bEnableCRC);
 
-	void SetLeadingCharacter( char cLeading );
+	void setLeadingCharacter(char cLeading);
 
-	void SetTerminatingCharacter( char cTerminating );
+	void setTerminatingCharacter(char cTerminating);
 
-	void SetEscapeCharacter( char cEscape );
+	void setEscapeCharacter(char cEscape);
 
-	void SetFirstByteDelay( std::chrono::microseconds firstByteDelay );
+	void setFirstByteDelay(std::chrono::microseconds firstByteDelay);
 
-	std::chrono::microseconds GetFirstByteDelay( );
+	std::chrono::microseconds getFirstByteDelay();
 
-	void SetByteDelay( std::chrono::microseconds byteDelay );
+	void setByteDelay(std::chrono::microseconds byteDelay);
 
-	std::chrono::microseconds GetByteDelay( );
+	std::chrono::microseconds getByteDelay();
 
 // Write Methods
 
-	void Write( const std::vector<char>& buffer );
+	void write(const std::vector<char>& buffer);
 
-#if defined( ENABLE_TEST_FIXTURE )
+#if defined(ENABLE_TEST_FIXTURE)
 
 	typedef std::vector<std::chrono::microseconds> MessageTiming;
 
-	std::vector<MessageTiming> GetTimingInfo( ) { return m_vecMessageTiming; };
+	std::vector<MessageTiming> getTimingInfo() { return vecMessageTiming_; };
 
 #endif
 
 private:
 
-	void WriteInSerialThread( std::vector<char> writeBuffer );
+	void writeInSerialThread(std::vector<char> writeBuffer);
 
-	void StartAsyncTimer( );
+	void startAsyncTimer();
 
-	void StartAsyncRead( );
+	void startAsyncRead();
 
-	void OnWriteComplete( const boost::system::error_code& error, std::size_t size );
+	void onWriteComplete(const boost::system::error_code& error, std::size_t size);
 
-	void OnReadComplete( const boost::system::error_code& error, std::size_t size );
+	void onReadComplete(const boost::system::error_code& error, std::size_t size);
 
 // Connection Retry Logic
 
-	bool OnCheckSerialPort( bool bInitialCheck, const boost::system::error_code& e =
-		boost::system::error_code( ) );
+	bool onCheckSerialPort(bool bInitialCheck, const boost::system::error_code& e =
+		boost::system::error_code());
 
 private:
 
-	std::string								m_strName;
+	std::string								name_;
 
-	bool									m_isSynced;
+	bool									isSynced_;
 
-	std::string								m_strDebug;
+	std::string								strDebug_;
 
-    std::shared_ptr<std::thread>			m_Thread;
+    std::shared_ptr<std::thread>			thread_;
 
-    std::thread::id							m_serialThreadId;
+    std::thread::id							serialThreadId_;
 
-	boost::asio::io_service					m_IOService;
+	boost::asio::io_service					ioService_;
 
-	boost::asio::io_service::work			m_oWork;
+	boost::asio::io_service::work			work_;
 
-	ConnectionTimer							m_oTimer;
+	ConnectionTimer							timer_;
 
-    boost::asio::serial_port				m_SerialPort;
+    boost::asio::serial_port				serialPort_;
 
-    bool									m_bIsSerialOpen;
+    bool									isSerialOpen_;
 
-	std::string								m_strSerialPort;
+	std::string								strSerialPort_;
 
-	float									m_fRetryTimeout;
+	float									retryTimeout_;
 
-    bool									m_bIsWriting;
+    bool									isWriting_;
 
-    std::vector<char>						m_readBuffer;
+    std::vector<char>						readBuffer_;
 
-    std::vector<char>						m_writeBuffer;
+    std::vector<char>						writeBuffer_;
 
     std::vector<char>						message_;
 
-	READ_STATE								m_readState;
+	READ_STATE								readState_;
 
-	uint8_t									m_cCRC;
+	uint8_t									cCRC_;
 
-    ConnectionCallbackFn					m_connectionCallback;
+    ConnectionCallbackFn					connectionCallback_;
 
-    ReadCallbackFn							m_readCallback;
+    ReadCallbackFn							readCallback_;
 
-	bool									m_bEnableCRC;
+	bool									enableCRC_;
 
-	bool									m_bHasLeading;
+	bool									hasLeading_;
 
-	char									m_cLeading;
+	char									leading_;
 
-	bool									m_bHasTerminating;
+	bool									hasTerminating_;
 
-	char									m_cTerminating;
+	char									terminating_;
 
-	bool									m_bHasEscape;
+	bool									hasEscape_;
 
-	char									m_cEscape;
+	char									cEscape_;
 
-	std::chrono::microseconds				m_firstByteDelay;
+	std::chrono::microseconds				firstByteDelay_;
 
-	std::chrono::microseconds				m_byteDelay;
+	std::chrono::microseconds				byteDelay_;
 
-	std::chrono::microseconds				m_interByteDelay;
+	std::chrono::microseconds				interByteDelay_;
 
-#if defined( ENABLE_TEST_FIXTURE )
+#if defined(ENABLE_TEST_FIXTURE)
 
-	std::chrono::high_resolution_clock				m_highrezclk;
+	std::chrono::high_resolution_clock				highrezclk_;
 
-	std::chrono::high_resolution_clock::time_point	m_lastTime;
+	std::chrono::high_resolution_clock::time_point	lastTime_;
 
-	MessageTiming									m_messageTiming;
+	MessageTiming									messageTiming_;
 
-	std::vector<MessageTiming>						m_vecMessageTiming;
+	std::vector<MessageTiming>						vecMessageTiming_;
 
 #endif
 

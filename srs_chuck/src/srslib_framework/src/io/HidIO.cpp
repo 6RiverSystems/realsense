@@ -47,7 +47,7 @@ HidIO::HidIO(const char* pszName, int32_t pid, int32_t vid) :
 	{
 		int rc = libusb_init(nullptr);
 
-		CheckSuccess(rc, "Failed to initialize libusb");
+		checkSuccess(rc, "Failed to initialize libusb");
 
 		libusb_set_debug(nullptr, LIBUSB_LOG_LEVEL_WARNING);
 
@@ -64,15 +64,15 @@ HidIO::HidIO(const char* pszName, int32_t pid, int32_t vid) :
 
 HidIO::~HidIO()
 {
-	Close();
+	close();
 
 	libusb_exit(nullptr);
 }
 
-void HidIO::Open(ConnectionCallbackFn connectionCallback,
+void HidIO::open(ConnectionCallbackFn connectionCallback,
 	ReadCallbackFn readCallback)
 {
-	if(!IsOpen())
+	if(!isOpen())
 	{
 		try
 		{
@@ -82,7 +82,7 @@ void HidIO::Open(ConnectionCallbackFn connectionCallback,
 
 			readCallback_ = readCallback;
 
-			RegisterHotPlug();
+			registerHotPlug();
 		}
 		catch(std::runtime_error& e)
 		{
@@ -91,7 +91,7 @@ void HidIO::Open(ConnectionCallbackFn connectionCallback,
 	}
 }
 
-bool HidIO::IsOpen() const
+bool HidIO::isOpen() const
 {
 	return open_ &&
 		deviceHandle_ &&
@@ -101,7 +101,7 @@ bool HidIO::IsOpen() const
 		txMaxPacketSize_	!= -1 ;
 }
 
-void HidIO::Close()
+void HidIO::close()
 {
 	try
 	{
@@ -115,20 +115,25 @@ void HidIO::Close()
 
 		readCallback_ = {};
 
-		bool hasTransfers = false;
-
-		// Wait for all transfers to cancel
-		for(auto transfer : transfers_)
+		if (deviceHandle_)
 		{
-			libusb_cancel_transfer(transfer);
-		}
+			// Wait for all transfers to cancel
+			for(auto transfer : transfers_)
+			{
+				libusb_cancel_transfer(transfer);
+			}
 
-		while(HasTransfers())
+			while(hasTransfers())
+			{
+				spinOnce();
+			}
+
+			releaseDevice();
+		}
+		else
 		{
-			spinOnce();
+			transfers_.erase(transfers_.begin(), transfers_.end());
 		}
-
-		ReleaseDevice();
 
 		if (hotplugHandle_)
 		{
@@ -153,11 +158,11 @@ void HidIO::spinOnce()
 	libusb_handle_events_timeout_completed(nullptr, &tv, nullptr);
 }
 
-void HidIO::Write(const std::vector<char>& buffer)
+void HidIO::write(const std::vector<char>& buffer)
 {
 	try
 	{
-		if(IsOpen())
+		if(isOpen())
 		{
 			if (buffer.size() > txMaxPacketSize_ - 1)
 			{
@@ -179,9 +184,9 @@ void HidIO::Write(const std::vector<char>& buffer)
 //				ToHex(std::vector<char>(buffer.begin(), buffer.begin() + buffer.size())));
 
 			libusb_fill_interrupt_transfer(transfer, deviceHandle_,
-				txEndpointAddress_, data, txMaxPacketSize_, &HidIO::WriteCompleted, this, 0);
+				txEndpointAddress_, data, txMaxPacketSize_, &HidIO::writeCompleted, this, 0);
 
-			SubmitTransfer(transfer);
+			submitTransfer(transfer);
 		}
 		else
 		{
@@ -198,7 +203,7 @@ void HidIO::Write(const std::vector<char>& buffer)
 	}
 }
 
-void HidIO::CheckSuccess(int rc, const char* message) const
+void HidIO::checkSuccess(int rc, const char* message) const
 {
 	if (rc != LIBUSB_SUCCESS)
 	{
@@ -206,22 +211,22 @@ void HidIO::CheckSuccess(int rc, const char* message) const
 	}
 }
 
-void HidIO::Read()
+void HidIO::read()
 {
-	if (IsOpen())
+	if (isOpen())
 	{
 		libusb_transfer* transfer = libusb_alloc_transfer(0);
 
 		uint8_t* data = static_cast<uint8_t*>(calloc(rxMaxPacketSize_, sizeof(uint8_t)));
 
 		libusb_fill_interrupt_transfer(transfer, deviceHandle_,
-			rxEndpointAddress_, data, rxMaxPacketSize_, &HidIO::ReadCompleted, this, 0);
+			rxEndpointAddress_, data, rxMaxPacketSize_, &HidIO::readCompleted, this, 0);
 
-		SubmitTransfer(transfer);
+		submitTransfer(transfer);
 	}
 }
 
-void HidIO::RegisterHotPlug()
+void HidIO::registerHotPlug()
 {
 	int rc = libusb_hotplug_register_callback(nullptr,
 		(libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED|LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT),
@@ -229,31 +234,31 @@ void HidIO::RegisterHotPlug()
 		pid_,
 		vid_,
 		LIBUSB_HOTPLUG_MATCH_ANY,
-		&HidIO::HotPlugCallback,
+		&HidIO::hotPlugCallback,
 		static_cast<void*>(this),
 		&hotplugHandle_);
 
-	CheckSuccess(rc, "Failed to register for hot plug events");
+	checkSuccess(rc, "Failed to register for hot plug events");
 }
 
-int HidIO::HotPlugCallback(libusb_context* ctx, libusb_device* device,
+int HidIO::hotPlugCallback(libusb_context* ctx, libusb_device* device,
 	libusb_hotplug_event event, void* userData)
 {
 	HidIO* pThis = reinterpret_cast<HidIO*>(userData);
 
-	ExecuteInRosThread(std::bind(&HidIO::HotPlugCallbackInternal, pThis, ctx, device, event));
+	ExecuteInRosThread(std::bind(&HidIO::hotPlugCallbackInternal, pThis, ctx, device, event));
 
 	return 0;
 }
 
-int HidIO::HotPlugCallbackInternal(libusb_context* ctx, libusb_device* device,
+int HidIO::hotPlugCallbackInternal(libusb_context* ctx, libusb_device* device,
 	libusb_hotplug_event event)
 {
 	try
 	{
 		if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED)
 		{
-			ClaimDevice(device);
+			claimDevice(device);
 		}
 	}
 	catch(std::exception& e)
@@ -268,25 +273,25 @@ int HidIO::HotPlugCallbackInternal(libusb_context* ctx, libusb_device* device,
 	return 0;
 }
 
-void HidIO::ClaimDevice(libusb_device* device)
+void HidIO::claimDevice(libusb_device* device)
 {
 	struct libusb_device_descriptor desrc = { 0 };
 
 	int rc = libusb_open(device, &deviceHandle_);
 
-	CheckSuccess(rc, "Failed to open usb device");
+	checkSuccess(rc, "Failed to open usb device");
 
 	// Detach the device from the kernel driver if it has claimed the device
 	if (libusb_kernel_driver_active(deviceHandle_, 0) == 1)
 	{
 		rc = libusb_detach_kernel_driver(deviceHandle_, 0);
 
-		CheckSuccess(rc, "Failed to detach usb device from kernel");
+		checkSuccess(rc, "Failed to detach usb device from kernel");
 	}
 
 	rc = libusb_claim_interface(deviceHandle_, 0);
 
-	CheckSuccess(rc, "Failed to claim usb device");
+	checkSuccess(rc, "Failed to claim usb device");
 
 	libusb_get_device_descriptor(device, &desrc);
 
@@ -304,16 +309,16 @@ void HidIO::ClaimDevice(libusb_device* device)
 	libusb_get_string_descriptor_ascii(deviceHandle_, desrc.iProduct,(unsigned char*)product, descriptorSize);
 	product_ = product;
 
-	LookupEndpoints();
+	lookupEndpoints();
 }
 
-void HidIO::ReleaseDevice()
+void HidIO::releaseDevice()
 {
 	if (deviceHandle_)
 	{
 		int rc = libusb_release_interface(deviceHandle_, 0);
 
-		CheckSuccess(rc, "Failed to release usb device");
+		checkSuccess(rc, "Failed to release usb device");
 
 		libusb_close(deviceHandle_);
 		deviceHandle_ = nullptr;
@@ -323,7 +328,7 @@ void HidIO::ReleaseDevice()
 	vendor_ = "";
 }
 
-void HidIO::LookupEndpoints()
+void HidIO::lookupEndpoints()
 {
 	rxEndpointAddress_	= -1;
 	rxMaxPacketSize_	= -1;
@@ -335,7 +340,7 @@ void HidIO::LookupEndpoints()
 	libusb_config_descriptor* config = nullptr;
 	int rc = libusb_get_active_config_descriptor(device, &config);
 
-	CheckSuccess(rc, "Failed to get active config descriptor");
+	checkSuccess(rc, "Failed to get active config descriptor");
 
 	const libusb_interface *interface = &config->interface[0];
 
@@ -376,40 +381,63 @@ void HidIO::LookupEndpoints()
 
 	connetionCallback_(true);
 
-	Read();
+	read();
 }
 
-void HidIO::ReadCompleted(libusb_transfer* transfer)
+void HidIO::readCompleted(libusb_transfer* transfer)
 {
 	HidIO* pThis = reinterpret_cast<HidIO*>(transfer->user_data);
 
-	pThis->ReadCompletedInternal(transfer);
+	pThis->readCompletedInternal(transfer);
 }
 
-bool HidIO::HasTransfers()
+bool HidIO::hasTransfers()
 {
 	return transfers_.size() > 0;
 }
 
-void HidIO::SubmitTransfer(libusb_transfer* transfer)
+void HidIO::submitTransfer(libusb_transfer* transfer)
 {
-	transfer->flags |= LIBUSB_TRANSFER_FREE_BUFFER;
-	transfer->flags |= LIBUSB_TRANSFER_FREE_TRANSFER;
-	transfer->flags |= LIBUSB_TRANSFER_SHORT_NOT_OK;
+	try
+	{
+		transfer->flags |= LIBUSB_TRANSFER_FREE_BUFFER;
+		transfer->flags |= LIBUSB_TRANSFER_FREE_TRANSFER;
+		transfer->flags |= LIBUSB_TRANSFER_SHORT_NOT_OK;
 
-	int rc = libusb_submit_transfer(transfer);
+		int rc = libusb_submit_transfer(transfer);
 
-	CheckSuccess(rc, "Hid submit transfer failed ");
+		checkSuccess(rc, "Hid submit transfer failed ");
 
-	transfers_.insert(transfer);
+		transfers_.insert(transfer);
+	}
+	catch(std::exception& e)
+	{
+		ROS_ERROR("Hid exception: %s", e.what());
+	}
+	catch(...)
+	{
+		ROS_ERROR("Unknown hid exception");
+	}
 }
 
-void HidIO::CleanupTransfer(libusb_transfer* transfer)
+bool HidIO::cleanupTransfer(libusb_transfer* transfer)
 {
+	bool success = true;
+
 	transfers_.erase(transfer);
+
+	if (transfer->status == LIBUSB_TRANSFER_NO_DEVICE)
+	{
+		deviceHandle_ = nullptr;
+		connetionCallback_(false);
+
+		success = false;
+	}
+
+	return success;
 }
 
-void HidIO::ReadCompletedInternal(libusb_transfer* transfer)
+void HidIO::readCompletedInternal(libusb_transfer* transfer)
 {
 	try
 	{
@@ -433,7 +461,7 @@ void HidIO::ReadCompletedInternal(libusb_transfer* transfer)
 		}
 		else
 		{
-			ROS_ERROR("Hid read failed: %d", transfer->status);
+			ROS_ERROR("Hid read failed: %s", libusb_error_name(transfer->status));
 		}
 	}
 	catch(std::exception& e)
@@ -442,35 +470,29 @@ void HidIO::ReadCompletedInternal(libusb_transfer* transfer)
 	}
 	catch(...)
 	{
-
+		ROS_ERROR("Unknown hid exception");
 	}
 
-	CleanupTransfer(transfer);
-
-	if (transfer->status == LIBUSB_TRANSFER_NO_DEVICE)
+	if (cleanupTransfer(transfer))
 	{
-		Close();
-	}
-	else
-	{
-		Read();
+		read();
 	}
 }
 
-void HidIO::WriteCompleted(libusb_transfer* transfer)
+void HidIO::writeCompleted(libusb_transfer* transfer)
 {
 	HidIO* pThis = reinterpret_cast<HidIO*>(transfer->user_data);
 
-	pThis->WriteCompletedInternal(transfer);
+	pThis->writeCompletedInternal(transfer);
 }
 
-void HidIO::WriteCompletedInternal(libusb_transfer* transfer)
+void HidIO::writeCompletedInternal(libusb_transfer* transfer)
 {
 	try
 	{
 		if (transfer->status != LIBUSB_TRANSFER_COMPLETED)
 		{
-			ROS_ERROR("Hid write failed: %d", transfer->status);
+			ROS_ERROR("Hid write failed: %s", libusb_error_name(transfer->status));
 		}
 	}
 	catch(std::exception& e)
@@ -479,15 +501,10 @@ void HidIO::WriteCompletedInternal(libusb_transfer* transfer)
 	}
 	catch(...)
 	{
-
+		ROS_ERROR("Unknown hid exception");
 	}
 
-	CleanupTransfer(transfer);
-
-	if (transfer->status == LIBUSB_TRANSFER_NO_DEVICE)
-	{
-		Close();
-	}
+	cleanupTransfer(transfer);
 }
 
 }

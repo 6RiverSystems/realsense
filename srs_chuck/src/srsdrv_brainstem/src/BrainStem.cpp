@@ -41,7 +41,7 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
 	auto connectionChanged = std::bind( &BrainStem::connectionChanged, this,
 		std::placeholders::_1 );
 
-	pSerialIO->Open(connectionChanged, processMessage);
+	pSerialIO->open(connectionChanged, processMessage);
 
     // Check for hardware faults
 	brainstemFaultTimer_ = nodeHandle_.createTimer(ros::Duration(1.0f / REFRESH_RATE_HZ),

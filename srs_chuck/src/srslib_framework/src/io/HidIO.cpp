@@ -175,8 +175,8 @@ void HidIO::Write(const std::vector<char>& buffer)
 			// Write the data
 			memcpy(data + 1, &buffer[0], buffer.size());
 
-			ROS_ERROR_STREAM("WriteData (" <<  buffer.size() << "): " <<
-				ToHex(std::vector<char>(buffer.begin(), buffer.begin() + buffer.size())));
+//			ROS_ERROR_STREAM("WriteData (" <<  buffer.size() << "): " <<
+//				ToHex(std::vector<char>(buffer.begin(), buffer.begin() + buffer.size())));
 
 			libusb_fill_interrupt_transfer(transfer, deviceHandle_,
 				txEndpointAddress_, data, txMaxPacketSize_, &HidIO::WriteCompleted, this, 0);
@@ -413,8 +413,6 @@ void HidIO::ReadCompletedInternal(libusb_transfer* transfer)
 {
 	try
 	{
-		bool read = true;
-
 		if (transfer->status == LIBUSB_TRANSFER_COMPLETED)
 		{
 			uint8_t size = transfer->buffer[0];
@@ -423,8 +421,8 @@ void HidIO::ReadCompletedInternal(libusb_transfer* transfer)
 
 			if(readCallback_)
 			{
-				ROS_ERROR_STREAM("ReadData (" << size << "): " <<
-					ToHex(std::vector<char>(message.begin(), message.end())));
+//				ROS_ERROR_STREAM("ReadData (" << size << "): " <<
+//					ToHex(std::vector<char>(message.begin(), message.end())));
 
 				readCallback_(std::move(message));
 			}

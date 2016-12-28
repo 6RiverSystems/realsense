@@ -54,32 +54,6 @@
 			<resource resourceType="PROJECT" workspacePath="/srs_chuck"/>
 		</configuration>
 	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
-		<buildTargets>
-			<target name="odometry node" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
-				<buildCommand>catkin_make</buildCommand>
-				<buildArguments>-j6 --pkg srsnode_odometry</buildArguments>
-				<stopOnError>true</stopOnError>
-				<useDefaultCommand>false</useDefaultCommand>
-				<runAllBuilders>false</runAllBuilders>
-			</target>
-			<target name="all" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
-				<buildCommand>catkin_make</buildCommand>
-				<buildArguments>-j6</buildArguments>
-				<stopOnError>true</stopOnError>
-				<useDefaultCommand>false</useDefaultCommand>
-				<runAllBuilders>false</runAllBuilders>
-			</target>
-			<target name="test brainstem" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
-				<buildCommand>catkin_make</buildCommand>
-				<buildArguments>-j8 run_tests_srsdrv_brainstem -DCMAKE_BUILD_TYPE=Debug</buildArguments>
-				<buildTarget/>
-				<stopOnError>true</stopOnError>
-				<useDefaultCommand>false</useDefaultCommand>
-				<runAllBuilders>false</runAllBuilders>
-			</target>
-		</buildTargets>
-	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.2034195475;cdt.managedbuild.toolchain.gnu.cross.base.2034195475.907328062;cdt.managedbuild.tool.gnu.cross.cpp.compiler.892439493;cdt.managedbuild.tool.gnu.cpp.compiler.input.886218490">
@@ -96,4 +70,40 @@
 		</scannerConfigBuildInfo>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+		<buildTargets>
+			<target name="odometry node" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>-j8 --pkg srsnode_odometry  -DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildTarget/>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>false</runAllBuilders>
+			</target>
+			<target name="all" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>-j8 -DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildTarget/>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>false</runAllBuilders>
+			</target>
+			<target name="test brainstem" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>-j8 run_tests_srsdrv_brainstem -DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildTarget/>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>false</runAllBuilders>
+			</target>
+			<target name="test" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>-j8 run_tests  -DCMAKE_BUILD_TYPE=Debug</buildArguments>
+				<buildTarget/>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>false</runAllBuilders>
+			</target>
+		</buildTargets>
+	</storageModule>
 </cproject>

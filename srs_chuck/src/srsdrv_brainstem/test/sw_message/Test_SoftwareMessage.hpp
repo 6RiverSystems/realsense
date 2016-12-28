@@ -22,6 +22,8 @@ public:
 
 	virtual ~MockMessageProcessor() {};
 
+	virtual bool isConnected() const { return true; };
+
     void sendCommand(char* command, std::size_t size)
     {
     	command_ = std::vector<char>(command, command + size);

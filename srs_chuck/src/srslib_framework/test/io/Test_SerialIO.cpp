@@ -140,21 +140,21 @@ public:
 
 public:
 	SerialIOTest( ) :
-		m_serial1( "test1" ),
-		m_serial2( "test2" )
+		m_serial1( "test1", g_strPort1.c_str() ),
+		m_serial2( "test2", g_strPort2.c_str() )
 	{
 		m_testConfigs.push_back( CONFIG::BRAIN_STEM );
 		m_testConfigs.push_back( CONFIG::STAR_GAZER );
 	}
 
-	void OpenSerialPort( SerialIO& serial, std::string strPort, CONFIG eConfig,
+	void OpenSerialPort( SerialIO& serial, CONFIG eConfig,
 		void (SerialIOTest::* callback) (std::vector<char>) )
 	{;
 		auto connectionCallback = [](bool bIsConnected) { };
 
 		auto readCallback = std::bind( callback, this, std::placeholders::_1 );
 
-		serial.Open( strPort.c_str( ), connectionCallback, readCallback );
+		serial.Open( connectionCallback, readCallback );
 
 		switch( eConfig )
 		{
@@ -190,12 +190,12 @@ public:
 
 	void OpenSerialPort1( CONFIG eConfig = CONFIG::BRAIN_STEM )
 	{
-		OpenSerialPort( m_serial1, g_strPort1, eConfig, &SerialIOTest::ReadMessageFrom2 );
+		OpenSerialPort( m_serial1, eConfig, &SerialIOTest::ReadMessageFrom2 );
 	}
 
 	void OpenSerialPort2( CONFIG eConfig = CONFIG::BRAIN_STEM )
 	{
-		OpenSerialPort( m_serial2, g_strPort2, eConfig, &SerialIOTest::ReadMessageFrom1 );
+		OpenSerialPort( m_serial2, eConfig, &SerialIOTest::ReadMessageFrom1 );
 	}
 
 	void OpenSerialPorts( CONFIG eConfig = CONFIG::BRAIN_STEM )
@@ -330,20 +330,12 @@ public:
    // put in any custom data members that you need
 };
 
-TEST_F( SerialIOTest, OpenInvalidSerialPort )
-{
-	m_serial1.Open( "/foobar", [](bool bIsConnected) { },
-		std::bind( &SerialIOTest::ReadMessageFrom2, this, std::placeholders::_1 ) );
-
-	EXPECT_FALSE( m_serial1.IsOpen( ) );
-}
-
 TEST_F( SerialIOTest, TestSpinUntilOpen )
 {
 	// Try once when it is closed, then spin until it connects (wait for 3 seconds)
 	for( int i : boost::irange( 0, 300 ) )
 	{
-		m_serial1.Open( g_strPort1.c_str( ), [](bool bIsConnected) { },
+		m_serial1.Open( [](bool bIsConnected) { },
 			std::bind( &SerialIOTest::ReadMessageFrom2, this, std::placeholders::_1 ) );
 
 		// If we are able to open when socat is not running, we have failed

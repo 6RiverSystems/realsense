@@ -25,6 +25,7 @@ namespace srs
 BrainStem::BrainStem(string name, int argc, char** argv) :
 	RosUnit(name, argc, argv, REFRESH_RATE_HZ),
 	io_( new HidIO( "brainstem", 0x1930, 0x6001 ) ),
+//	io_( new SerialIO( "brainstem", "/dev/malg" ) ),
 	messageProcessor_( io_ ),
 	brainstemFaultTimer_(),
 	nodeHandle_("~")
@@ -33,16 +34,28 @@ BrainStem::BrainStem(string name, int argc, char** argv) :
 	configServer_.setCallback(boost::bind(&BrainStem::cfgCallback, this, _1, _2));
 
 	connectionChanged( false );
+//
+//	std::shared_ptr<SerialIO> pSerialIO = std::dynamic_pointer_cast<SerialIO>( io_ );
+//
+//	pSerialIO->enableCRC( true );
+//	pSerialIO->setTerminatingCharacter( '\n' );
+//	pSerialIO->setEscapeCharacter( '\\' );
+//
+//    auto processMessage = [&]( std::vector<char> buffer )
+//    {
+//        ExecuteInRosThread( );
+//	};
+//
+//	auto connectionChanged = [&]( bool bIsConnected )
+//	{
+//		ExecuteInRosThread( std::bind( &BrainStem::connectionChanged, this,
+//				bIsConnected ) );
+//	};
+//
+//	pSerialIO->open( connectionChanged, processMessage );
 
-	std::shared_ptr<HidIO> pSerialIO = std::dynamic_pointer_cast<HidIO>( io_ );
-
-    auto processMessage = std::bind( &BrainStemMessageProcessor::processHardwareMessage,
-    	&messageProcessor_, std::placeholders::_1);
-
-	auto connectionChanged = std::bind( &BrainStem::connectionChanged, this,
-		std::placeholders::_1 );
-
-	pSerialIO->open(connectionChanged, processMessage);
+	io_->open( std::bind( &BrainStem::connectionChanged, this, std::placeholders::_1 ),
+		std::bind( &BrainStemMessageProcessor::processHardwareMessage, &messageProcessor_, std::placeholders::_1) );
 
     // Check for hardware faults
 	brainstemFaultTimer_ = nodeHandle_.createTimer(ros::Duration(1.0f / REFRESH_RATE_HZ),

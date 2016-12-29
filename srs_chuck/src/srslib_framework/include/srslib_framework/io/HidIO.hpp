@@ -96,6 +96,8 @@ private:
 
 	libusb_hotplug_callback_handle			hotplugHandle_;
 
+	uint8_t									sequence_;
+
     uint8_t									rxEndpointAddress_;
     uint16_t								rxMaxPacketSize_;
 

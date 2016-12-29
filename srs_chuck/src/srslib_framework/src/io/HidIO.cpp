@@ -32,6 +32,7 @@ HidIO::HidIO(const char* pszName, int32_t pid, int32_t vid) :
 	runEventThread_(true),
 	name_(pszName),
 	hotplugHandle_(0),
+	sequence_(0),
 	rxEndpointAddress_(-1),
 	rxMaxPacketSize_(-1),
 	txEndpointAddress_(-1),
@@ -483,10 +484,16 @@ void HidIO::readCompletedInternal(libusb_transfer* transfer)
 
 			if(readCallback_)
 			{
-//				ROS_ERROR_STREAM("ReadData (size=" << (int)size << ", count=" << (int)counter << "): " <<
-//					ToHex(std::vector<char>(message.begin(), message.end())));
+				if (sequence_ != counter)
+				{
+					ROS_ERROR_STREAM("ReadData (size=" << (int)size << ", count=" << (int)counter << ", expected=" <<
+						(int)sequence_ << " ): " <<
+						ToHex(std::vector<char>(message.begin(), message.end())));
+				}
 
 				readCallback_(std::move(message));
+
+				sequence_ = (counter + 1) % 256;
 			}
 			else
 			{

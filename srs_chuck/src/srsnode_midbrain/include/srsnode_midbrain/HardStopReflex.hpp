@@ -23,6 +23,12 @@ typedef ClipperLib::Path clPath;
 typedef std::vector<clPath> PathVector;
 typedef std::vector<Pose<>> PoseVector;
 
+enum class LaserScanType
+{
+    LIDAR,
+    DEPTH_CAMERA
+};
+
 class HardStopReflex
 {
 public:
@@ -39,12 +45,14 @@ public:
     };
 
     /**
-     * Set the pose of the lidar on the robot
-     * @param pose the pose of the lidar on the robot
+     * Set the pose of a sensor on the robot
+     * @param pose the pose of the sensor on the robot
+     * @param type the type of scan
      */
-    void setLidarPose(const tf::Transform pose)
+    void setSensorPose(const tf::Transform pose, LaserScanType type)
     {
-        lidarPose_ = pose;
+        createLaserMapEntryIfMissing(type);
+        laserScansMap_[type].pose = pose;
     };
 
     /**
@@ -57,10 +65,11 @@ public:
     };
 
     /**
-     * Set a new lidar scan
+     * Set a new scan
      * @param scan the scan
+     * @param type the type of the scan
      */
-    void setLaserScan(const sensor_msgs::LaserScan& scan);
+    void setLaserScan(const sensor_msgs::LaserScan& scan, LaserScanType type);
 
     /**
      * Check to see if a hard stop should be triggered.
@@ -178,9 +187,23 @@ private:
      */
     void dumpDataToLog();
 
+    /**
+     * Create an entry in the laser map if it is missing.
+     * @param type the type of the scan
+     */
+    void createLaserMapEntryIfMissing(LaserScanType type);
+
+    /**
+     * Helper struct for storing items in a map
+     */
+    struct LaserScanMapItem
+    {
+        tf::Transform pose = tf::Transform::getIdentity();
+        clPath scan;
+    };
+
     Pose<> latestPose_ = Pose<>::INVALID;
     Velocity<> latestVelocity_ = Velocity<>::INVALID;
-    tf::Transform lidarPose_ = tf::Transform::getIdentity();
 
     double nominalDecelRate_ = 0.7;  // m/s^2
     double angularDecelRate_ = 1.0;  // r/s^2
@@ -192,11 +215,12 @@ private:
 
     PoseVector footprint_;
 
-    clPath laserScan_;
     clPath dangerZone_;
 
     clPath failedDangerZone_;
     clPath failedLaserScan_;
+
+    std::map<LaserScanType, LaserScanMapItem> laserScansMap_;
 
     /**
      * Flag that is set if a hard stop has happened and the system is waiting for a clear

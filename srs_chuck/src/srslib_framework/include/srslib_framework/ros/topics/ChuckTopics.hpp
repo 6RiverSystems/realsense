@@ -81,6 +81,7 @@ namespace monitoring {
 } // namespace monitoring
 
 namespace sensor {
+    static const string FILTERED_DEPTH_CAMERA = "/internal/sensors/rgbd/scan/filtered";
     static const string FILTERED_LIDAR = "/internal/sensors/lidar/scan/filtered";
 
     static const string JOYPAD_STATE = "/internal/sensors/joypad/state";

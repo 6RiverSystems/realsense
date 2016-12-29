@@ -6,13 +6,13 @@ DWAPlannerROS:
   min_trans_vel: 0.1
   trans_stopped_vel: 1.0
 
-  max_rot_vel: 1.0
+  max_rot_vel: 1.6
   min_rot_vel: 0.5
   rot_stopped_vel: 1.0
 
   acc_lim_x: 0.7
   acc_lim_theta: 2.5
-  acc_limit_trans: 0.5
+  acc_limit_trans: 0.7
 
 # Goal Tolerance Parameters
   yaw_goal_tolerance: 0.1
@@ -27,10 +27,10 @@ DWAPlannerROS:
   meter_scoring: true
 
 # Trajectory Scoring Parameters
-  path_distance_bias: 1.0        # weighting for how much it should stick to the global path plan
+  path_distance_bias: 2.0        # weighting for how much it should stick to the global path plan
   goal_distance_bias: 1.0        # wighting for how much it should attempt to reach its goal
   occdist_scale: 3.0           # weighting for how much the controller should avoid obstacles
-  velocity_scale: 1.0
+  velocity_scale: 0.75
   forward_point_distance: 0.325 # how far along to place an additional scoring point
   stop_time_buffer: 0.2         # amount of time a robot must stop in before colliding for a valid traj.
   scaling_speed: 0.1          # absolute velocity at which to start scaling the robot's footprint
@@ -41,7 +41,7 @@ DWAPlannerROS:
   oscillation_reset_angle: 1.6  # how far to turn before resetting oscillation flags
   oscillation_reset_plan_divergence_distance: 0.3
 # Debugging
-  publish_traj_pc: true
+  publish_traj_pc: false
   publish_cost_grid_pc: false
 
 # Differential-drive robot configuration

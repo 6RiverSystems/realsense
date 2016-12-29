@@ -164,9 +164,24 @@ void BrainStemMessageProcessor::shutdown()
 
 void BrainStemMessageProcessor::setConnected(bool isConnected)
 {
-	isConnected_ = isConnected;
+	if (isConnected != isConnected_)
+	{
+		bool resync = isSetupComplete();
 
-	checkSetupComplete();
+		isConnected_ = isConnected;
+
+		checkSetupComplete();
+
+		if (resync)
+		{
+			ROS_INFO("Brainstem driver: Resyncing brainstem state (%zu)", syncMessages_.size());
+
+			for (auto message : syncMessages_)
+			{
+				writeToSerialPort(message.second->data(), message.second->size());
+			}
+		}
+	}
 }
 
 void BrainStemMessageProcessor::getHardwareInfo(const ros::Time& now)
@@ -280,6 +295,22 @@ void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
 	else
 	{
 		dimensions_[dimension] = value;
+	}
+}
+
+void BrainStemMessageProcessor::sendCommand(char* command, std::size_t size, bool resync)
+{
+	if (size)
+	{
+		// If this message is flagged as resync, save a copy
+		if (resync)
+		{
+			MessageBuffer buffer(new std::vector<char>(command, command + size));
+
+			syncMessages_[(BRAIN_STEM_CMD)command[0]] = buffer;
+		}
+
+		writeToSerialPort(command, size);
 	}
 }
 

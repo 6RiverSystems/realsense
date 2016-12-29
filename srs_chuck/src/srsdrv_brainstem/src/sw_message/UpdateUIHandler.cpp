@@ -62,11 +62,6 @@ void UpdateUIHandler::attach()
 	tapUpdateUI_->attach(this);
 }
 
-void UpdateUIHandler::sync()
-{
-
-}
-
 void UpdateUIHandler::notified(Subscriber<srslib_framework::MsgUpdateUI>* subject)
 {
 	TapBrainstemCmd_UpdateUI* tap = static_cast<TapBrainstemCmd_UpdateUI*>(subject);
@@ -89,7 +84,7 @@ void UpdateUIHandler::encodeData(const srslib_framework::MsgUpdateUI& updateUI)
 		ROS_INFO( "Brain => Brainstem: UPDATE_LIGHT: element=%d, mode=%d",
 			uiElement.element, uiElement.mode);
 
-		getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
+		getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg), true);
 	}
 }
 

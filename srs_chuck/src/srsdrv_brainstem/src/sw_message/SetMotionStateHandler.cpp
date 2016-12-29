@@ -29,11 +29,6 @@ void SetMotionStateHandler::attach()
 	tapSetMotionState_->attach(this);
 }
 
-void SetMotionStateHandler::sync()
-{
-
-}
-
 void SetMotionStateHandler::notified(Subscriber<srslib_framework::MsgSetOperationalState>* subject)
 {
 	TapBrainstemCmd_SetMotionState* tap = static_cast<TapBrainstemCmd_SetMotionState*>(subject);
@@ -72,7 +67,7 @@ void SetMotionStateHandler::encodeData(const srslib_framework::MsgSetOperational
 	    command == BRAIN_STEM_CMD::SET_MOTION_STATUS ? "SET_MOTION_STATUS" : "CLEAR_MOTION_STATUS",
 	    strMotionStatus.c_str( ) );
 
-	getOwner()->sendCommand( reinterpret_cast<char*>( &msg ), sizeof(msg) );
+	getOwner()->sendCommand( reinterpret_cast<char*>( &msg ), sizeof(msg), true);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods

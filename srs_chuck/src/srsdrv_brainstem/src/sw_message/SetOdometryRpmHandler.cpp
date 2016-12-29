@@ -28,11 +28,6 @@ void SetOdometryRpmHandler::attach()
 	tapOdometryRpm_->attach(this);
 }
 
-void SetOdometryRpmHandler::sync()
-{
-
-}
-
 void SetOdometryRpmHandler::notified(Subscriber<srslib_framework::OdometryRpm>* subject)
 {
 	TapBrainstemCmd_OdometryRpm* tap = static_cast<TapBrainstemCmd_OdometryRpm*>(subject);
@@ -63,7 +58,7 @@ void SetOdometryRpmHandler::encodeData(const srslib_framework::OdometryRpm& odom
 		s_rightWheelRPM = odometryRpm.right_wheel_rpm;
 	}
 
-	getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
+	getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg), true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

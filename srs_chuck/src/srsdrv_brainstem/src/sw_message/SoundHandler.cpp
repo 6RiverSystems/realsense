@@ -27,11 +27,6 @@ void SoundHandler::attach()
 	tapSound_->attach(this);
 }
 
-void SoundHandler::sync()
-{
-
-}
-
 void SoundHandler::notified(Subscriber<srslib_framework::Sound>* subject)
 {
     TapBrainstemCmd_Sound* tap = static_cast<TapBrainstemCmd_Sound*>(subject);
@@ -55,7 +50,7 @@ void SoundHandler::encodeData(const Sound& sound)
 		" cycleRate=%d, dutyCycle=%d, numberOfCycles=%d", sound.volume, sound.baseFrequency, sound.cycleRate,
 		sound.dutyCycle, sound.numberOfCycles);
 
-    getOwner()->sendCommand(reinterpret_cast<char*>(&msgSound), sizeof(msgSound));
+    getOwner()->sendCommand(reinterpret_cast<char*>(&msgSound), sizeof(msgSound), true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

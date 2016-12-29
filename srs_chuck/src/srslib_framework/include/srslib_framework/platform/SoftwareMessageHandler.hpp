@@ -25,8 +25,6 @@ public:
 
     virtual void attach() {};
 
-    virtual void sync() {};
-
 private:
     OWNER* owner_;
 };

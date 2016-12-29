@@ -27,8 +27,6 @@ public:
 
     virtual void attach();
 
-    virtual void sync();
-
     void notified(Subscriber<srslib_framework::MsgSetOperationalState>* subject);
 
     void encodeData(const srslib_framework::MsgSetOperationalState& value);

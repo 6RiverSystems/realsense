@@ -27,8 +27,6 @@ public:
 
     virtual void attach();
 
-    virtual void sync();
-
     void notified(Subscriber<srslib_framework::OdometryRpm>* subject);
 
     void encodeData(const srslib_framework::OdometryRpm& value);

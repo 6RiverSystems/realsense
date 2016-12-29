@@ -332,11 +332,23 @@ void HidIO::releaseDevice()
 	{
 		ROS_INFO("Hid releasing device: %p", deviceHandle_);
 
-		int rc = libusb_release_interface(deviceHandle_, 0);
+		try
+		{
+			int rc = libusb_release_interface(deviceHandle_, 0);
 
-		checkSuccess(rc, "Failed to release usb device");
+			checkSuccess(rc, "Failed to release usb device");
 
-		libusb_close(deviceHandle_);
+			libusb_close(deviceHandle_);
+		}
+		catch(std::exception& e)
+		{
+			ROS_ERROR("Hid exception: %s", e.what());
+		}
+		catch(...)
+		{
+			ROS_ERROR("Hid unknown error");
+		}
+
 		deviceHandle_ = nullptr;
 	}
 
@@ -465,12 +477,13 @@ void HidIO::readCompletedInternal(libusb_transfer* transfer)
 		if (transfer->status == LIBUSB_TRANSFER_COMPLETED)
 		{
 			uint8_t size = transfer->buffer[0];
+			uint8_t counter = transfer->buffer[254];
 
 			std::vector<char> message(transfer->buffer + 1, transfer->buffer + 1 + size);
 
 			if(readCallback_)
 			{
-//				ROS_ERROR_STREAM("ReadData (" << size << "): " <<
+//				ROS_ERROR_STREAM("ReadData (size=" << (int)size << ", count=" << (int)counter << "): " <<
 //					ToHex(std::vector<char>(message.begin(), message.end())));
 
 				readCallback_(std::move(message));

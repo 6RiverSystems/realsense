@@ -9,9 +9,9 @@
 
 #include <srslib_test/utils/Compare.hpp>
 
-#include <srsdrv_brainstem/HardwareMessage.hpp>
+#include <srsdrv_brainstem/hw_message/HardwareMessage.hpp>
 #include <srsdrv_brainstem/BrainStemMessages.hpp>
-#include "../../include/srsdrv_brainstem/BrainStemMessageProcessorInterface.hpp"
+#include <srsdrv_brainstem/BrainStemMessageProcessorInterface.hpp>
 
 namespace srs {
 
@@ -24,7 +24,7 @@ public:
 
 	virtual bool isConnected() const { return true; };
 
-    void sendCommand(char* command, std::size_t size)
+    void sendCommand(char* command, std::size_t size, bool reSync = false)
     {
     	command_ = std::vector<char>(command, command + size);
     };

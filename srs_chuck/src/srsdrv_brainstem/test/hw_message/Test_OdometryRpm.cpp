@@ -60,14 +60,14 @@ namespace srslib_framework
 
 TEST_F(Test_OdometryRpm, Key)
 {
-	OdometryRpmHandler RawOdometryHandler(publisher_);
+	OdometryRpmHandler RawOdometryHandler(nullptr, publisher_);
 
     ASSERT_EQ(RawOdometryHandler.getKey(), BRAIN_STEM_MSG::RAW_ODOMETRY);
 }
 
 TEST_F(Test_OdometryRpm, EmptyPacket)
 {
-	OdometryRpmHandler RawOdometryHandler(publisher_);
+	OdometryRpmHandler RawOdometryHandler(nullptr, publisher_);
 
 	vector<char> messageBuffer;
 
@@ -85,7 +85,7 @@ TEST_F(Test_OdometryRpm, EmptyPacket)
 
 TEST_F(Test_OdometryRpm, BadPacket)
 {
-	OdometryRpmHandler RawOdometryHandler(publisher_);
+	OdometryRpmHandler RawOdometryHandler(nullptr, publisher_);
 
 	vector<OdometryRpm>& testMsgs = getTestMsgs();
 
@@ -106,7 +106,7 @@ TEST_F(Test_OdometryRpm, BadPacket)
 
 TEST_F(Test_OdometryRpm, ValidMessages)
 {
-	OdometryRpmHandler RawOdometryHandler(publisher_);
+	OdometryRpmHandler RawOdometryHandler(nullptr, publisher_);
 
 	vector<OdometryRpm>& testMsgs = getTestMsgs();
 

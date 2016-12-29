@@ -105,14 +105,14 @@ namespace srslib_framework
 
 TEST_F(Test_HardwareInfo, Key)
 {
-	HardwareInfoHandler HardwareInfoHandler(publisher_);
+	HardwareInfoHandler HardwareInfoHandler(nullptr, publisher_);
 
     ASSERT_EQ(HardwareInfoHandler.getKey(), BRAIN_STEM_MSG::HARDWARE_INFO);
 }
 
 TEST_F(Test_HardwareInfo, EmptyPacket)
 {
-	HardwareInfoHandler HardwareInfoHandler(publisher_);
+	HardwareInfoHandler HardwareInfoHandler(nullptr, publisher_);
 
 	vector<char> messageBuffer;
 
@@ -128,7 +128,7 @@ TEST_F(Test_HardwareInfo, EmptyPacket)
 
 TEST_F(Test_HardwareInfo, BadPacket)
 {
-	HardwareInfoHandler hardwareInfoHandler(publisher_);
+	HardwareInfoHandler hardwareInfoHandler(nullptr, publisher_);
 
 	vector<MsgHardwareInfo>& testMsgs = getTestMsgs();
 
@@ -147,7 +147,7 @@ TEST_F(Test_HardwareInfo, BadPacket)
 
 TEST_F(Test_HardwareInfo, ValidMessage)
 {
-	HardwareInfoHandler hardwareInfoHandler(publisher_);
+	HardwareInfoHandler hardwareInfoHandler(nullptr, publisher_);
 
 	vector<MsgHardwareInfo>& testMsgs = getTestMsgs();
 
@@ -166,7 +166,7 @@ TEST_F(Test_HardwareInfo, ValidMessage)
 
 TEST_F(Test_HardwareInfo, BatteryInfo)
 {
-	HardwareInfoHandler hardwareInfoHandler(publisher_);
+	HardwareInfoHandler hardwareInfoHandler(nullptr, publisher_);
 
 	vector<MsgHardwareInfo>& testMsgs = getTestMsgs();
 

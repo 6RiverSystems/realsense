@@ -22,6 +22,7 @@ set(${PROJECT_NAME}_SOURCES
     src/hw_message/OdometryPoseHandler.cpp
 
     src/sw_message/ShutdownHandler.cpp
+    src/sw_message/ResetHandler.cpp
     src/sw_message/PingHandler.cpp
     src/sw_message/SetOdometryRpmHandler.cpp
     src/sw_message/SoundHandler.cpp

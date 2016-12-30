@@ -34,6 +34,7 @@ using namespace std;
 #include <hw_message/OdometryPoseHandler.hpp>
 #include <hw_message/ButtonPressedHandler.hpp>
 
+#include <sw_message/ResetHandler.hpp>
 #include <sw_message/PingHandler.hpp>
 #include <sw_message/SetMotionStateHandler.hpp>
 #include <sw_message/SetOdometryRpmHandler.hpp>
@@ -105,8 +106,6 @@ private:
 
 	void sendDimensions();
 
-	void forceWatchdogTimeout();
-
 // Helper Methods
 
 	void writeToSerialPort( char* data, std::size_t size );
@@ -170,6 +169,7 @@ private:
     OdometryPoseHandler odometryPoseHandler_;
     ButtonPressedHandler buttonPressedHandler_;
 
+    ResetHandler resetHandler_;
     PingHandler pingHandler_;
     SetMotionStateHandler setMotionStateHandler_;
     SetOdometryRpmHandler setOdometryRpmHandler_;

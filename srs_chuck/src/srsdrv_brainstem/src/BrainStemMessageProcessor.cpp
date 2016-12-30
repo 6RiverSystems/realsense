@@ -28,6 +28,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor(std::shared_ptr<IO> pIO) :
 	lastOperationalStateRequestTime_(),
 	lastMessageTime_(),
 	connectedChannel_(),
+    resetHandler_(this),
     pingHandler_(this),
 	setMotionStateHandler_(this),
 	setOdometryRpmHandler_(this),
@@ -56,6 +57,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor(std::shared_ptr<IO> pIO) :
     hwMessageHandlers_[buttonPressedHandler_.getKey()] = &buttonPressedHandler_;
     hwMessageHandlers_[logHandler_.getKey()] = &logHandler_;
 
+    resetHandler_.attach();
     pingHandler_.attach();
     setMotionStateHandler_.attach();
     setOdometryRpmHandler_.attach();
@@ -165,6 +167,8 @@ void BrainStemMessageProcessor::shutdown()
 
 void BrainStemMessageProcessor::setConnected(bool isConnected)
 {
+	ROS_INFO("Brainstem driver: setConnected: %d", isConnected);
+
 	if (isConnected != isConnected_)
 	{
 		bool resync = isSetupComplete();
@@ -177,6 +181,8 @@ void BrainStemMessageProcessor::setConnected(bool isConnected)
 		}
 		else
 		{
+			ROS_INFO("Brainstem driver: hid disconnected (resetting state).");
+
 			// Reset state so we sync again when the brainstem reconnects
 			sentPing_ = false;
 
@@ -316,10 +322,6 @@ void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
 	{
 		dimensions_[dimension] = value;
 	}
-}
-
-void BrainStemMessageProcessor::forceWatchdogTimeout()
-{
 }
 
 void BrainStemMessageProcessor::sendCommand(char* command, std::size_t size, bool resync)

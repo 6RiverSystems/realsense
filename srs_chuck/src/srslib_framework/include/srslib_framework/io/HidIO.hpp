@@ -47,7 +47,7 @@ public:
 
 private:
 
-	void checkSuccess(int rc, const char* message) const;
+	bool checkSuccess(const char* action, int rc);
 
 	void read();
 
@@ -63,7 +63,7 @@ private:
 
 	void releaseDevice();
 
-	void lookupEndpoints();
+	int lookupEndpoints();
 
 	bool hasTransfers();
 
@@ -79,7 +79,9 @@ private:
 
 	void writeCompletedInternal(libusb_transfer* transfer);
 
-	bool									runEventThread_;
+	bool									initializedUsb_;
+
+	bool									claimedUsb_;
 
 	std::string								name_;
 

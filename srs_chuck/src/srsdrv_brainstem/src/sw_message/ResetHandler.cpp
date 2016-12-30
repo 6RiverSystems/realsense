@@ -22,14 +22,16 @@ ResetHandler::ResetHandler(BrainStemMessageProcessorInterface* owner) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void ResetHandler::attach()
 {
-	tapReset_.reset(new TapBrainstemCmd_Ping());
+	tapReset_.reset(new TapBrainstemCmd_Reset());
 
 	tapReset_->attach(this);
 }
 
-void ResetHandler::notified(Subscriber<std_msgs::Bool>*)
+void ResetHandler::notified(Subscriber<std_msgs::Bool>* subject)
 {
-	encodeData(true);
+	TapBrainstemCmd_Reset* tap = static_cast<TapBrainstemCmd_Reset*>(subject);
+
+	encodeData(tap->pop());
 }
 
 void ResetHandler::encodeData(const bool& value)

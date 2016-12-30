@@ -311,7 +311,7 @@ void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
 	}
 }
 
-void BrainStemMessageProcessor::ForceWatchdogTimeout()
+void BrainStemMessageProcessor::forceWatchdogTimeout()
 {
 }
 

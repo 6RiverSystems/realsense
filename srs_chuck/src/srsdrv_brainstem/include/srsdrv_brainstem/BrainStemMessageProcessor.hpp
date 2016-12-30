@@ -105,7 +105,7 @@ private:
 
 	void sendDimensions();
 
-	void ForceWatchdogTimeout();
+	void forceWatchdogTimeout();
 
 // Helper Methods
 

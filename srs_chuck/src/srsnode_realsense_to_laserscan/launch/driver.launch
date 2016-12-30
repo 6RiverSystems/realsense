@@ -22,9 +22,9 @@
 	<remap from="/camera/nodelet_manager/bond" to="/internal/sensors/rgbd/nodelet_manager/bond"/>
 
 	<param name="$(arg camera)/driver/r200_dc_preset" type="int" value="5" />
-	<!--param name="$(arg camera)/driver/r200_lr_auto_exposure_enabled" type="bool" value="false" /-->
-	<!--param name="$(arg camera)/driver/r200_lr_gain"	type="int" value="100" /-->
-	<!--param name="$(arg camera)/driver/r200_lr_exposure" type="int" value="330" /-->
+	<param name="$(arg camera)/driver/r200_lr_auto_exposure_enabled" type="bool" value="false" />
+	<param name="$(arg camera)/driver/r200_lr_gain"	type="int" value="100" />
+	<param name="$(arg camera)/driver/r200_lr_exposure" type="int" value="330" />
        
 	<!-- Intel Realsense R200 driver -->
 	<include file="$(find realsense_camera)/launch/r200_nodelet_modify_params.launch" >

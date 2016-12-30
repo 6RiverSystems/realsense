@@ -277,12 +277,13 @@ void BrainStemMessageProcessor::checkSetupComplete()
 			// If this is a reconnect sync the brainstem statate
 			if (resync)
 			{
-				ROS_INFO("Brainstem driver: Resyncing brainstem state (%zu)", syncMessages_.size());
+				ROS_INFO("Brainstem driver: Resyncing brainstem state");
 
-				for (auto message : syncMessages_)
-				{
-					writeToSerialPort(message.second->data(), message.second->size());
-				}
+				setMotionStateHandler_.syncState();
+				setOdometryRpmHandler_.syncState();
+				setVelocityHandler_.syncState();
+				soundHandler_.syncState();
+				updateUIHandler_.syncState();
 			}
 
 			connectedChannel_.publish(syncState_);
@@ -332,18 +333,10 @@ void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
 	}
 }
 
-void BrainStemMessageProcessor::sendCommand(char* command, std::size_t size, bool resync)
+void BrainStemMessageProcessor::sendCommand(char* command, std::size_t size)
 {
 	if (size)
 	{
-		// If this message is flagged as resync, save a copy
-		if (resync)
-		{
-			MessageBuffer buffer(new std::vector<char>(command, command + size));
-
-			syncMessages_[(BRAIN_STEM_CMD)command[0]] = buffer;
-		}
-
 		writeToSerialPort(command, size);
 	}
 }

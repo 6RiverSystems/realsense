@@ -73,6 +73,8 @@ void UpdateUIHandler::notified(Subscriber<srslib_framework::MsgUpdateUI>* subjec
 
 void UpdateUIHandler::encodeData(const srslib_framework::MsgUpdateUI& updateUI)
 {
+	updateUI_ = updateUI;
+
 	for (auto uiElement : updateUI.uiUpdates)
 	{
 		UpdateUIData msg = {
@@ -84,8 +86,12 @@ void UpdateUIHandler::encodeData(const srslib_framework::MsgUpdateUI& updateUI)
 		ROS_INFO( "Brain => Brainstem: UPDATE_LIGHT: element=%d, mode=%d",
 			uiElement.element, uiElement.mode);
 
-		getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg), true);
+		getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
 	}
 }
 
+void UpdateUIHandler::syncState()
+{
+	encodeData(updateUI_);
+}
 } // namespace srs

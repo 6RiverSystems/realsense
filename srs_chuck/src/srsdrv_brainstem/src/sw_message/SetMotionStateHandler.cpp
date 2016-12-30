@@ -40,6 +40,8 @@ void SetMotionStateHandler::notified(Subscriber<srslib_framework::MsgSetOperatio
 
 void SetMotionStateHandler::encodeData(const srslib_framework::MsgSetOperationalState& setOpState)
 {
+	setOpState_ = setOpState;
+
 	std::bitset<8> motionStateSet;
 	motionStateSet.set( MOTION_STATUS::FRONT_E_STOP, setOpState.operationalState.frontEStop );
 	motionStateSet.set( MOTION_STATUS::BACK_E_STOP, setOpState.operationalState.backEStop );
@@ -67,8 +69,14 @@ void SetMotionStateHandler::encodeData(const srslib_framework::MsgSetOperational
 	    command == BRAIN_STEM_CMD::SET_MOTION_STATUS ? "SET_MOTION_STATUS" : "CLEAR_MOTION_STATUS",
 	    strMotionStatus.c_str( ) );
 
-	getOwner()->sendCommand( reinterpret_cast<char*>( &msg ), sizeof(msg), true);
+	getOwner()->sendCommand( reinterpret_cast<char*>( &msg ), sizeof(msg));
 }
+
+void SetMotionStateHandler::syncState()
+{
+	encodeData(setOpState_);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 

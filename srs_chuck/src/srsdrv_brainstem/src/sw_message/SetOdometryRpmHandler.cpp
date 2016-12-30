@@ -39,6 +39,8 @@ void SetOdometryRpmHandler::notified(Subscriber<srslib_framework::OdometryRpm>* 
 
 void SetOdometryRpmHandler::encodeData(const srslib_framework::OdometryRpm& odometryRpm)
 {
+	odometryRpm_ = odometryRpm;
+
 	RawOdometryData msg = {
 		static_cast<uint8_t>( BRAIN_STEM_CMD::SET_VELOCITY_RPM ),
 		static_cast<float>( odometryRpm.left_wheel_rpm ),
@@ -58,9 +60,13 @@ void SetOdometryRpmHandler::encodeData(const srslib_framework::OdometryRpm& odom
 		s_rightWheelRPM = odometryRpm.right_wheel_rpm;
 	}
 
-	getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg), true);
+	getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
 }
 
+void SetOdometryRpmHandler::syncState()
+{
+	encodeData(odometryRpm_);
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 

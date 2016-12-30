@@ -31,7 +31,9 @@ public:
 
 	void encodeData(const srslib_framework::MsgUpdateUI& value);
 
-	private:
+    void syncState();
+
+private:
 
 	HW_MESSAGE_BEGIN(UpdateUIData)
 		uint8_t cmd;
@@ -39,11 +41,13 @@ public:
 		uint8_t mode;
 	HW_MESSAGE_END
 
+	srslib_framework::MsgUpdateUI updateUI_;
+
 	std::shared_ptr<TapBrainstemCmd_UpdateUI>	tapUpdateUI_;
 
 	std::set<LED_ENTITIES>						setValidEntities_;
 
 	std::map<LED_ENTITIES, std::set<LED_MODE>>	mapValidModes_;
-		};
+};
 
 } // namespace srs

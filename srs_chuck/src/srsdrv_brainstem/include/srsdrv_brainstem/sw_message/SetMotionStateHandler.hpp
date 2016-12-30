@@ -31,12 +31,16 @@ public:
 
     void encodeData(const srslib_framework::MsgSetOperationalState& value);
 
+    void syncState();
+
 private:
 
     HW_MESSAGE_BEGIN(OperationalStateData)
     	uint8_t cmd;
 		uint8_t motionStatus;
 	HW_MESSAGE_END
+
+	srslib_framework::MsgSetOperationalState setOpState_;
 
     std::shared_ptr<TapBrainstemCmd_SetMotionState>	tapSetMotionState_;
 };

@@ -31,6 +31,8 @@ public:
 
     void encodeData(const Sound& value);
 
+    void syncState();
+
 private:
 
     HW_MESSAGE_BEGIN(SoundData)
@@ -41,6 +43,8 @@ private:
         uint8_t dutyCycle;
         uint16_t numberOfCycles;
     HW_MESSAGE_END
+
+	Sound sound_;
 
 	std::shared_ptr<TapBrainstemCmd_Sound> tapSound_;
 };

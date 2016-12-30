@@ -24,7 +24,7 @@ public:
 
 	virtual bool isConnected() const { return true; };
 
-    void sendCommand(char* command, std::size_t size, bool reSync = false)
+    void sendCommand(char* command, std::size_t size)
     {
     	command_ = std::vector<char>(command, command + size);
     };

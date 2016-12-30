@@ -37,6 +37,8 @@ void SoundHandler::notified(Subscriber<srslib_framework::Sound>* subject)
 
 void SoundHandler::encodeData(const Sound& sound)
 {
+	sound_ = sound;
+
     SoundData msgSound = {
         static_cast<uint8_t>(BRAIN_STEM_CMD::SOUND_BUZZER),
         static_cast<uint8_t>(sound.volume),
@@ -50,9 +52,13 @@ void SoundHandler::encodeData(const Sound& sound)
 		" cycleRate=%d, dutyCycle=%d, numberOfCycles=%d", sound.volume, sound.baseFrequency, sound.cycleRate,
 		sound.dutyCycle, sound.numberOfCycles);
 
-    getOwner()->sendCommand(reinterpret_cast<char*>(&msgSound), sizeof(msgSound), true);
+    getOwner()->sendCommand(reinterpret_cast<char*>(&msgSound), sizeof(msgSound));
 }
 
+void SoundHandler::syncState()
+{
+	encodeData(sound_);
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 

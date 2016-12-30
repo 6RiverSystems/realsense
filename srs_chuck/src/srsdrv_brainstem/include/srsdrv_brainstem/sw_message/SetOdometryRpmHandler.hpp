@@ -31,6 +31,8 @@ public:
 
     void encodeData(const srslib_framework::OdometryRpm& value);
 
+    void syncState();
+
 private:
 
     HW_MESSAGE_BEGIN(RawOdometryData)
@@ -39,6 +41,7 @@ private:
 		float rpm_right_wheel;
 	HW_MESSAGE_END
 
+	srslib_framework::OdometryRpm odometryRpm_;
 	std::shared_ptr<TapBrainstemCmd_OdometryRpm>	tapOdometryRpm_;
 };
 

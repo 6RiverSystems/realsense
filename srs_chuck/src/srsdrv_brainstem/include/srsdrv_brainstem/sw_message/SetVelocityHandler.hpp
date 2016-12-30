@@ -27,6 +27,8 @@ public:
 
     virtual void receiveData(const geometry_msgs::Twist::ConstPtr data);
 
+    void syncState();
+
 private:
 
     HW_MESSAGE_BEGIN(SetVelocityData)
@@ -34,6 +36,8 @@ private:
 		float linearVelocity;
 		float angularVelocity;
 	HW_MESSAGE_END
+
+	geometry_msgs::Twist::ConstPtr twist_;
 };
 
 } // namespace srs

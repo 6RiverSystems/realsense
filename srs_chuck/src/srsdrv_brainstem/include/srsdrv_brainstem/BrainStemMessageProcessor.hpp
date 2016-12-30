@@ -52,8 +52,6 @@ class BrainStemMessageProcessor : public BrainStemMessageProcessorInterface
 {
 public:
 
-	typedef std::shared_ptr<vector<char>> MessageBuffer;
-
 	enum class DIMENSION
 	{
 		WHEEL_BASE_LENGTH = 0,
@@ -76,7 +74,7 @@ public:
 		return isConnected_;
 	}
 
-    void sendCommand(char* command, std::size_t size, bool resync = false);
+    void sendCommand(char* command, std::size_t size);
 
     void ping();
 
@@ -138,8 +136,6 @@ private:
 	bool sentPing_;
 
 	bool isConnected_;
-
-	std::map<BRAIN_STEM_CMD,MessageBuffer> syncMessages_;
 
 	std::map<DIMENSION, float> dimensions_;
 

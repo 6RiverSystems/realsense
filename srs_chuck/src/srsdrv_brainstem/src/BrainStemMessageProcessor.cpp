@@ -85,36 +85,42 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 
 		ros::Time currentTime = ros::Time::now();
 
-		// Go through the registered message handlers and communicate the data if the key matches
-		HwMessageHandlerMapType::iterator handler = hwMessageHandlers_.find(eCommand);
-		if (handler != hwMessageHandlers_.end())
+		if (setupComplete_ ||
+			eCommand == BRAIN_STEM_MSG::OPERATIONAL_STATE ||
+			eCommand == BRAIN_STEM_MSG::HARDWARE_INFO)
 		{
-			try
+			// Go through the registered message handlers and communicate the data if the key matches
+			HwMessageHandlerMapType::iterator handler = hwMessageHandlers_.find(eCommand);
+			if (handler != hwMessageHandlers_.end())
 			{
-				handler->second->receiveData(currentTime, buffer);
+				try
+				{
+					handler->second->receiveData(currentTime, buffer);
 
-				checkSetupComplete();
-
-				lastMessageTime_ = currentTime;
+				}
+				catch(std::runtime_error& error)
+				{
+					// If it arrives here, the message failed to parse
+					ROS_ERROR_STREAM("Brainstem driver: Message from brainstem malformed: " <<
+						static_cast<char>(eCommand) << ", data: " << ToHex(buffer) << ", exception: " << error.what());
+				}
 			}
-			catch(std::runtime_error& error)
+			else
 			{
-				// If it arrives here, the message failed to parse
-				ROS_ERROR_STREAM("Brainstem driver: Message from brainstem malformed: " <<
-					static_cast<char>(eCommand) << ", data: " << ToHex(buffer) << ", exception: " << error.what());
+				if (isSetupComplete() &&
+					eCommand != BRAIN_STEM_MSG::SYSTEM_VOLTAGE  &&
+					eCommand != BRAIN_STEM_MSG::SENSOR_FRAME &&
+					eCommand != BRAIN_STEM_MSG::MESSAGE)
+				{
+					ROS_ERROR_STREAM("Brainstem driver: Unknown message from brainstem: " <<
+						static_cast<int>(eCommand) << ", data: " << ToHex(buffer));
+				}
 			}
 		}
-		else
-		{
-			if (isSetupComplete() &&
-				eCommand != BRAIN_STEM_MSG::SYSTEM_VOLTAGE  &&
-				eCommand != BRAIN_STEM_MSG::SENSOR_FRAME &&
-				eCommand != BRAIN_STEM_MSG::MESSAGE)
-			{
-			    ROS_ERROR_STREAM("Brainstem driver: Unknown message from brainstem: " <<
-			        static_cast<int>(eCommand) << ", data: " << ToHex(buffer));
-			}
-		}
+
+		checkSetupComplete();
+
+		lastMessageTime_ = currentTime;
     }
 }
 
@@ -191,6 +197,8 @@ void BrainStemMessageProcessor::setConnected(bool isConnected)
 			hardwareInfoHandler_.reset();
 
 			operationalStateHandler_.reset();
+
+			resetHandler_.reset();
 		}
 	}
 }

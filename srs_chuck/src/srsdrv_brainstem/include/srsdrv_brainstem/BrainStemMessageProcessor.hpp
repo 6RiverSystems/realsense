@@ -151,32 +151,32 @@ private:
 
 	ros::Time lastMessageTime_;
 
-    HwMessageHandlerMapType hwMessageHandlers_;
+    HwMessageHandlerMapType	hwMessageHandlers_;
 
-	ChannelBrainstemConnected connectedChannel_;
-    ChannelBrainstemHardwareInfo hardwareInfoChannel_;
-    ChannelBrainstemOperationalState operationalStateChannel_;
-    ChannelBrainstemPowerState powerStateChannel_;
-    ChannelBrainstemOdometryRpm odometryRpmChannel_;
-    ChannelBrainstemOdometryPose odometryPoseChannel_;
-    ChannelBrainstemButtonPressed buttonPressedChannel_;
+	ChannelBrainstemConnected	connectedChannel_;
+    ChannelBrainstemHardwareInfo	hardwareInfoChannel_;
+    ChannelBrainstemOperationalState	operationalStateChannel_;
+    ChannelBrainstemPowerState	powerStateChannel_;
+    ChannelBrainstemOdometryRpm	odometryRpmChannel_;
+    ChannelBrainstemOdometryPose	odometryPoseChannel_;
+    ChannelBrainstemButtonPressed	buttonPressedChannel_;
 
-    LogHandler logHandler_;
-    HardwareInfoHandler hardwareInfoHandler_;
-    OperationalStateHandler operationalStateHandler_;
-    PowerStateHandler powerStateHandler_;
-    OdometryRpmHandler odometryRpmHandler_;
-    OdometryPoseHandler odometryPoseHandler_;
-    ButtonPressedHandler buttonPressedHandler_;
+    LogHandler	logHandler_;
+    HardwareInfoHandler	hardwareInfoHandler_;
+    OperationalStateHandler	operationalStateHandler_;
+    PowerStateHandler	powerStateHandler_;
+    OdometryRpmHandler	odometryRpmHandler_;
+    OdometryPoseHandler	odometryPoseHandler_;
+    ButtonPressedHandler	buttonPressedHandler_;
 
-    ResetHandler resetHandler_;
-    PingHandler pingHandler_;
-    SetMotionStateHandler setMotionStateHandler_;
-    SetOdometryRpmHandler setOdometryRpmHandler_;
-    SetVelocityHandler setVelocityHandler_;
-    ShutdownHandler shutdownHandler_;
-    SoundHandler soundHandler_;
-    UpdateUIHandler updateUIHandler_;
+    ResetHandler	resetHandler_;
+    PingHandler	pingHandler_;
+    SetMotionStateHandler	setMotionStateHandler_;
+    SetOdometryRpmHandler	setOdometryRpmHandler_;
+    SetVelocityHandler	setVelocityHandler_;
+    ShutdownHandler	shutdownHandler_;
+    SoundHandler	soundHandler_;
+    UpdateUIHandler	updateUIHandler_;
 };
 
 } /* namespace srs */

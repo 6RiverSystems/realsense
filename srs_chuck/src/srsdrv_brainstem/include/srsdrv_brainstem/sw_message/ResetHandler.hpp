@@ -31,6 +31,8 @@ public:
 
     void encodeData(const bool& value);
 
+    void reset() { sentReset_ = false; };
+
 private:
 
 
@@ -38,6 +40,8 @@ private:
     	uint8_t cmd;
 		char token[4];
     HW_MESSAGE_END
+
+	bool sentReset_;
 
     std::shared_ptr<TapBrainstemCmd_Reset>	tapReset_;
 };

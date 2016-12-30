@@ -16,7 +16,7 @@ class OperationalStateHandler : public HardwareMessageHandler
 {
 public:
 
-	OperationalStateHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemOperationalState::Interface& channel);
+	OperationalStateHandler(ChannelBrainstemOperationalState::Interface& channel);
 
     virtual ~OperationalStateHandler() {}
 

@@ -5,8 +5,8 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-LogHandler::LogHandler(BrainStemMessageProcessorInterface* processor, LogCallbackFn logCallback) :
-    HardwareMessageHandler(processor, BRAIN_STEM_MSG::LOG),
+LogHandler::LogHandler(LogCallbackFn logCallback) :
+    HardwareMessageHandler(BRAIN_STEM_MSG::LOG),
 	logCallback_(logCallback)
 {
 

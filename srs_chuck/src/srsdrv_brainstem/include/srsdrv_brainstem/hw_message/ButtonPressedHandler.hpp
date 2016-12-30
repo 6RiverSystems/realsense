@@ -17,7 +17,7 @@ class ButtonPressedHandler : public HardwareMessageHandler
 {
 public:
 
-    ButtonPressedHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemButtonPressed::Interface& publisher);
+    ButtonPressedHandler(ChannelBrainstemButtonPressed::Interface& publisher);
 
     virtual ~ButtonPressedHandler() {}
 

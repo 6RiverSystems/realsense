@@ -16,7 +16,7 @@ class PowerStateHandler : public HardwareMessageHandler
 {
 public:
 
-	PowerStateHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemPowerState::Interface& publisher);
+	PowerStateHandler(ChannelBrainstemPowerState::Interface& publisher);
 
     virtual ~PowerStateHandler() {}
 

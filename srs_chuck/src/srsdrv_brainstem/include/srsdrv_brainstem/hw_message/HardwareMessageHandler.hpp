@@ -16,8 +16,7 @@ namespace srs {
 class HardwareMessageHandler
 {
 public:
-    HardwareMessageHandler(BrainStemMessageProcessorInterface* processor, BRAIN_STEM_MSG messageKey) :
-        processor_(processor),
+    HardwareMessageHandler(BRAIN_STEM_MSG messageKey) :
 		messageKey_(messageKey)
     {
     }
@@ -42,10 +41,6 @@ public:
     }
 
     virtual void receiveMessage(ros::Time currentTime, HardwareMessage& msg) = 0;
-
-protected:
-
-    BrainStemMessageProcessorInterface* processor_;
 
 private:
 

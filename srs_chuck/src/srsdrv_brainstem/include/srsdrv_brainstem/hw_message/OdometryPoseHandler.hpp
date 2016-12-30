@@ -17,7 +17,7 @@ namespace srs {
 class OdometryPoseHandler : public HardwareMessageHandler
 {
 public:
-    OdometryPoseHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemOdometryPose::Interface& publisher);
+    OdometryPoseHandler(ChannelBrainstemOdometryPose::Interface& publisher);
 
     virtual ~OdometryPoseHandler() {}
 

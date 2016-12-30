@@ -84,14 +84,14 @@ namespace srslib_framework
 
 TEST_F(Test_Log, Key)
 {
-	LogHandler LogHandler(nullptr, logCallback_);
+	LogHandler LogHandler(logCallback_);
 
     ASSERT_EQ(LogHandler.getKey(), BRAIN_STEM_MSG::LOG);
 }
 
 TEST_F(Test_Log, EmptyPacket)
 {
-	LogHandler LogHandler(nullptr, logCallback_);
+	LogHandler LogHandler(logCallback_);
 
 	vector<char> messageBuffer;
 
@@ -109,7 +109,7 @@ TEST_F(Test_Log, EmptyPacket)
 
 TEST_F(Test_Log, ValidMessages)
 {
-	LogHandler logHandler(nullptr, logCallback_);
+	LogHandler logHandler(logCallback_);
 
 	vector<LogData>& testMsgs = getTestMsgs();
 

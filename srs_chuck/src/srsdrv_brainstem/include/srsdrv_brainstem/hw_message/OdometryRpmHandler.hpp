@@ -18,7 +18,7 @@ public:
     static constexpr int SERIAL_TRANSMIT_DELAY = 3400000;
     static constexpr double OUT_OF_SYNC_TIMEOUT = 0.15;
 
-    OdometryRpmHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemOdometryRpm::Interface& publisher);
+    OdometryRpmHandler(ChannelBrainstemOdometryRpm::Interface& publisher);
 
     virtual ~OdometryRpmHandler() {}
 

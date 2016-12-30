@@ -5,8 +5,10 @@
  *      Author: dan
  */
 
+#define ENABLE_TEST_FIXTURE
+
 #include <srslib_framework/io/SerialIO.hpp>
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include <cstdlib>
 #include <unistd.h>
 #include <queue>

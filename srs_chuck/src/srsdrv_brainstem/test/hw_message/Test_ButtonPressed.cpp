@@ -51,14 +51,14 @@ public:
 
 TEST_F(Test_ButtonPressed, Key)
 {
-	ButtonPressedHandler ButtonPressedHandler(nullptr, publisher_);
+	ButtonPressedHandler ButtonPressedHandler(publisher_);
 
     ASSERT_EQ(ButtonPressedHandler.getKey(), BRAIN_STEM_MSG::BUTTON_PRESSED);
 }
 
 TEST_F(Test_ButtonPressed, EmptyPacket)
 {
-	ButtonPressedHandler ButtonPressedHandler(nullptr, publisher_);
+	ButtonPressedHandler ButtonPressedHandler(publisher_);
 
 	vector<char> messageBuffer;
 
@@ -76,7 +76,7 @@ TEST_F(Test_ButtonPressed, EmptyPacket)
 
 TEST_F(Test_ButtonPressed, BadPacket)
 {
-	ButtonPressedHandler buttonPressedHandler(nullptr, publisher_);
+	ButtonPressedHandler buttonPressedHandler(publisher_);
 
 	vector<std_msgs::UInt32>& testMsgs = getTestMsgs();
 
@@ -97,7 +97,7 @@ TEST_F(Test_ButtonPressed, BadPacket)
 
 TEST_F(Test_ButtonPressed, ValidMessages)
 {
-	ButtonPressedHandler buttonPressedHandler(nullptr, publisher_);
+	ButtonPressedHandler buttonPressedHandler(publisher_);
 
 	vector<std_msgs::UInt32>& testMsgs = getTestMsgs();
 

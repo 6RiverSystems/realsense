@@ -6,8 +6,8 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-OperationalStateHandler::OperationalStateHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemOperationalState::Interface& publisher) :
-    HardwareMessageHandler(processor, BRAIN_STEM_MSG::OPERATIONAL_STATE),
+OperationalStateHandler::OperationalStateHandler(ChannelBrainstemOperationalState::Interface& publisher) :
+    HardwareMessageHandler(BRAIN_STEM_MSG::OPERATIONAL_STATE),
 	publisher_(publisher),
 	hasValidMessage_(false)
 {

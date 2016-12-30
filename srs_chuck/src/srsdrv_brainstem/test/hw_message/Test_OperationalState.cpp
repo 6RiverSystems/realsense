@@ -96,14 +96,14 @@ namespace srslib_framework
 
 TEST_F(Test_OperationalState, Key)
 {
-	OperationalStateHandler OperationalStateHandler(nullptr, publisher_);
+	OperationalStateHandler OperationalStateHandler(publisher_);
 
     ASSERT_EQ(OperationalStateHandler.getKey(), BRAIN_STEM_MSG::OPERATIONAL_STATE);
 }
 
 TEST_F(Test_OperationalState, EmptyPacket)
 {
-	OperationalStateHandler OperationalStateHandler(nullptr, publisher_);
+	OperationalStateHandler OperationalStateHandler(publisher_);
 
 	vector<char> messageBuffer;
 
@@ -119,7 +119,7 @@ TEST_F(Test_OperationalState, EmptyPacket)
 
 TEST_F(Test_OperationalState, BadPacket)
 {
-	OperationalStateHandler OperationalStateHandler(nullptr, publisher_);
+	OperationalStateHandler OperationalStateHandler(publisher_);
 
 	vector<MsgOperationalState>& testMsgs = getTestMsgs();
 
@@ -138,7 +138,7 @@ TEST_F(Test_OperationalState, BadPacket)
 
 TEST_F(Test_OperationalState, ValidMessage)
 {
-	OperationalStateHandler OperationalStateHandler(nullptr, publisher_);
+	OperationalStateHandler OperationalStateHandler(publisher_);
 
 	vector<MsgOperationalState>& testMsgs = getTestMsgs();
 

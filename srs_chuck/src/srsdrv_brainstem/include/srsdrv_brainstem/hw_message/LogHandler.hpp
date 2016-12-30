@@ -28,7 +28,7 @@ public:
 
 	typedef std::function<void(LOG_LEVEL level, std::string message)> LogCallbackFn;
 
-    LogHandler(BrainStemMessageProcessorInterface* processor, LogCallbackFn logCallback = [&](LOG_LEVEL, std::string) {});
+    LogHandler(LogCallbackFn logCallback = [&](LOG_LEVEL, std::string) {});
 
     virtual ~LogHandler() {}
 

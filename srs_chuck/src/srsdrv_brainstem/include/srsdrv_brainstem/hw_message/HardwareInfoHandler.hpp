@@ -16,7 +16,7 @@ class HardwareInfoHandler : public HardwareMessageHandler
 {
 public:
 
-    HardwareInfoHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemHardwareInfo::Interface& publisher);
+    HardwareInfoHandler(ChannelBrainstemHardwareInfo::Interface& publisher);
 
     virtual ~HardwareInfoHandler() {}
 

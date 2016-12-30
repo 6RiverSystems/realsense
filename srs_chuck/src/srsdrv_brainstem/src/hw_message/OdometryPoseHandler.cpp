@@ -15,8 +15,8 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-OdometryPoseHandler::OdometryPoseHandler(BrainStemMessageProcessorInterface* processor, ChannelBrainstemOdometryPose::Interface& publisher) :
-	HardwareMessageHandler(processor, BRAIN_STEM_MSG::ODOMETRY_POSE),
+OdometryPoseHandler::OdometryPoseHandler(ChannelBrainstemOdometryPose::Interface& publisher) :
+	HardwareMessageHandler(BRAIN_STEM_MSG::ODOMETRY_POSE),
 	publisher_(publisher)
 {
 

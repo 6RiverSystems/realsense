@@ -14,6 +14,7 @@ using namespace std;
 
 #include <srslib_framework/io/IO.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemConnected.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemConnected.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemPowerState.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
@@ -103,6 +104,8 @@ private:
 	void getOperationalState(const ros::Time& now);
 
 	void sendDimensions();
+
+	void ForceWatchdogTimeout();
 
 // Helper Methods
 

@@ -125,14 +125,14 @@ namespace srslib_framework
 
 TEST_F(Test_PowerState, Key)
 {
-	PowerStateHandler powerStateHandler(nullptr, publisher_);
+	PowerStateHandler powerStateHandler(publisher_);
 
     ASSERT_EQ(powerStateHandler.getKey(), BRAIN_STEM_MSG::POWER_STATE);
 }
 
 TEST_F(Test_PowerState, EmptyPacket)
 {
-	PowerStateHandler powerStateHandler(nullptr, publisher_);
+	PowerStateHandler powerStateHandler(publisher_);
 
 	vector<char> messageBuffer;
 
@@ -150,7 +150,7 @@ TEST_F(Test_PowerState, EmptyPacket)
 
 TEST_F(Test_PowerState, BadPacket)
 {
-	PowerStateHandler PowerStateHandler(nullptr, publisher_);
+	PowerStateHandler PowerStateHandler(publisher_);
 
 	vector<MsgPowerState>& testMsgs = getTestMsgs();
 
@@ -171,7 +171,7 @@ TEST_F(Test_PowerState, BadPacket)
 
 TEST_F(Test_PowerState, InvalidDescriptor)
 {
-	PowerStateHandler powerStateHandler(nullptr, publisher_);
+	PowerStateHandler powerStateHandler(publisher_);
 
 	vector<MsgPowerState>& testMsgs = getTestMsgs();
 
@@ -198,7 +198,7 @@ TEST_F(Test_PowerState, InvalidDescriptor)
 
 TEST_F(Test_PowerState, ValidMessages)
 {
-	PowerStateHandler powerStateHandler(nullptr, publisher_);
+	PowerStateHandler powerStateHandler(publisher_);
 
 	vector<MsgPowerState>& testMsgs = getTestMsgs();
 

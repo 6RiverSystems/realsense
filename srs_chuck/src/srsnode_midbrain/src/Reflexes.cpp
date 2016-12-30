@@ -26,6 +26,7 @@ namespace srs
 Reflexes::Reflexes() : tdr_("Reflexes")
 {
     readParams();
+    tapOperationalState_.connectTap();
 }
 
 Reflexes::~Reflexes( )
@@ -78,6 +79,12 @@ void Reflexes::execute()
 
     // Update brainstem connected state
     brainstemConnected_ = tapBrainstemConnected_.pop();
+
+    // Update the robot state
+    if (tapOperationalState_.newDataAvailable())
+    {
+        hardStopReflex_.setRobotState(tapOperationalState_.getRobotState());
+    }
 
     // Set the lidar data
     if (checkLidarHardStop_)

@@ -288,7 +288,7 @@ void HardStopReflex::calculateUnion(clPath& output, PathVector& polygons)
 
 bool HardStopReflex::checkForClear()
 {
-    if (waitingForClear_
+    if ((waitingForClear_ || robotState_.hardStop)
         && BasicMath::equal(latestVelocity_.linear, 0.0, VELOCITY_EPSILON)
         && BasicMath::equal(latestVelocity_.angular, 0.0, VELOCITY_EPSILON))
     {

@@ -14,6 +14,7 @@
 #include <polyclipping/clipper.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
+#include <srslib_framework/robotics/RobotState.hpp>
 
 namespace srs
 {
@@ -62,6 +63,15 @@ public:
     void setVelocity(const Velocity<>& velocity)
     {
         latestVelocity_ = velocity;
+    };
+
+    /**
+     * Set the current state of the robot.
+     * @param velocity the current velocity
+     */
+    void setRobotState(const RobotState& state)
+    {
+        robotState_ = state;
     };
 
     /**
@@ -221,6 +231,8 @@ private:
     clPath failedLaserScan_;
 
     std::map<LaserScanType, LaserScanMapItem> laserScansMap_;
+
+    RobotState robotState_;
 
     /**
      * Flag that is set if a hard stop has happened and the system is waiting for a clear

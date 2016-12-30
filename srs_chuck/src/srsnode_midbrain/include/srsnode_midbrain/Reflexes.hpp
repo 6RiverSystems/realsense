@@ -49,6 +49,7 @@ private:
 
     TapRobotPose tapRobotPose_;
     TapBrainstem_Connected tapBrainstemConnected_;
+    RosTapOperationalState tapOperationalState_;
 
     // Channels
     ChannelBrainstemCmd_SetMotionState setMotionStateChannel_;

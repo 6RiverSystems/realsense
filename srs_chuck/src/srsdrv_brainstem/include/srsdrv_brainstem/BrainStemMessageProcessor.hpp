@@ -130,51 +130,53 @@ private:
 
 	static constexpr auto FAULT_TIMEOUT = 0.2f;
 
-	std::shared_ptr<IO>					io_;
+	std::shared_ptr<IO> io_;
 
-	bool								setupComplete_;
+	bool setupComplete_;
 
-	bool								sentPing_;
+	bool syncState_;
 
-	bool								isConnected_;
+	bool sentPing_;
+
+	bool isConnected_;
 
 	std::map<BRAIN_STEM_CMD,MessageBuffer> syncMessages_;
 
-	std::map<DIMENSION, float>			dimensions_;
+	std::map<DIMENSION, float> dimensions_;
 
-	bool								hasValidHardareInfo_;
-	ros::Time							lastHardareInfoRequestTime_;
+	bool hasValidHardareInfo_;
+	ros::Time lastHardareInfoRequestTime_;
 
-	bool								hasValidOperationalState_;
-	ros::Time							lastOperationalStateRequestTime_;
+	bool hasValidOperationalState_;
+	ros::Time lastOperationalStateRequestTime_;
 
-	ros::Time							lastMessageTime_;
+	ros::Time lastMessageTime_;
 
-    HwMessageHandlerMapType				hwMessageHandlers_;
+    HwMessageHandlerMapType hwMessageHandlers_;
 
-	ChannelBrainstemConnected			connectedChannel_;
-    ChannelBrainstemHardwareInfo		hardwareInfoChannel_;
-    ChannelBrainstemOperationalState	operationalStateChannel_;
-    ChannelBrainstemPowerState			powerStateChannel_;
-    ChannelBrainstemOdometryRpm			odometryRpmChannel_;
-    ChannelBrainstemOdometryPose		odometryPoseChannel_;
-    ChannelBrainstemButtonPressed		buttonPressedChannel_;
+	ChannelBrainstemConnected connectedChannel_;
+    ChannelBrainstemHardwareInfo hardwareInfoChannel_;
+    ChannelBrainstemOperationalState operationalStateChannel_;
+    ChannelBrainstemPowerState powerStateChannel_;
+    ChannelBrainstemOdometryRpm odometryRpmChannel_;
+    ChannelBrainstemOdometryPose odometryPoseChannel_;
+    ChannelBrainstemButtonPressed buttonPressedChannel_;
 
-    LogHandler							logHandler_;
-    HardwareInfoHandler					hardwareInfoHandler_;
-    OperationalStateHandler				operationalStateHandler_;
-    PowerStateHandler					powerStateHandler_;
-    OdometryRpmHandler					odometryRpmHandler_;
-    OdometryPoseHandler					odometryPoseHandler_;
-    ButtonPressedHandler				buttonPressedHandler_;
+    LogHandler logHandler_;
+    HardwareInfoHandler hardwareInfoHandler_;
+    OperationalStateHandler operationalStateHandler_;
+    PowerStateHandler powerStateHandler_;
+    OdometryRpmHandler odometryRpmHandler_;
+    OdometryPoseHandler odometryPoseHandler_;
+    ButtonPressedHandler buttonPressedHandler_;
 
-    PingHandler							pingHandler_;
-    SetMotionStateHandler				setMotionStateHandler_;
-    SetOdometryRpmHandler				setOdometryRpmHandler_;
-    SetVelocityHandler					setVelocityHandler_;
-    ShutdownHandler						shutdownHandler_;
-    SoundHandler						soundHandler_;
-    UpdateUIHandler						updateUIHandler_;
+    PingHandler pingHandler_;
+    SetMotionStateHandler setMotionStateHandler_;
+    SetOdometryRpmHandler setOdometryRpmHandler_;
+    SetVelocityHandler setVelocityHandler_;
+    ShutdownHandler shutdownHandler_;
+    SoundHandler soundHandler_;
+    UpdateUIHandler updateUIHandler_;
 };
 
 } /* namespace srs */

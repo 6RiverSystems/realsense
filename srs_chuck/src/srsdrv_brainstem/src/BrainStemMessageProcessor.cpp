@@ -19,6 +19,7 @@ using namespace ros;
 BrainStemMessageProcessor::BrainStemMessageProcessor(std::shared_ptr<IO> pIO) :
 	io_(pIO),
 	setupComplete_(false),
+	syncState_(false),
 	sentPing_(false),
 	isConnected_(false),
 	hasValidHardareInfo_(false),
@@ -170,16 +171,13 @@ void BrainStemMessageProcessor::setConnected(bool isConnected)
 
 		isConnected_ = isConnected;
 
-		checkSetupComplete();
-
-		if (resync)
+		if (isConnected)
 		{
-			ROS_INFO("Brainstem driver: Resyncing brainstem state (%zu)", syncMessages_.size());
-
-			for (auto message : syncMessages_)
-			{
-				writeToSerialPort(message.second->data(), message.second->size());
-			}
+			checkSetupComplete();
+		}
+		else
+		{
+			setupComplete_ = false;
 		}
 	}
 }
@@ -243,15 +241,30 @@ void BrainStemMessageProcessor::checkSetupComplete()
 			operationalStateHandler_.hasValidMessage() &&
 			isConnected_)
 		{
+			bool resync = syncState_;
+
 			ROS_INFO("Brainstem driver: Setup complete (received hardware info and operational state messages.");
 
 			io_->setSynced(true);
 
 			setupComplete_ = true;
 
+			syncState_ = true;
+
 			sendDimensions();
 
-			connectedChannel_.publish(setupComplete_);
+			// If this is a reconnect sync the brainstem statate
+			if (resync)
+			{
+				ROS_INFO("Brainstem driver: Resyncing brainstem state (%zu)", syncMessages_.size());
+
+				for (auto message : syncMessages_)
+				{
+					writeToSerialPort(message.second->data(), message.second->size());
+				}
+			}
+
+			connectedChannel_.publish(syncState_);
 		}
 		else
 		{

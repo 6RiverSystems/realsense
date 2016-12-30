@@ -8,7 +8,7 @@
 namespace srs {
 
 const Sound TaskPlaySound::SOUND_OFF = Sound(0, 3000, 250, 32, 0);
-const Sound TaskPlaySound::SOUND_WARNING = Sound(100, 3000, 250, 32, 65000);
+const Sound TaskPlaySound::SOUND_WARNING = Sound(255, 3000, 500, 64, 65000);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods

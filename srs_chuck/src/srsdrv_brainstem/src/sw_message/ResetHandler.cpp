@@ -37,7 +37,7 @@ void ResetHandler::notified(Subscriber<std_msgs::Bool>* subject)
 
 void ResetHandler::encodeData(const bool& value)
 {
-	if (!sentReset_)
+	if (!value)
 	{
 		WatchdogTimeoutData msg = {
 			static_cast<uint8_t>(BRAIN_STEM_CMD::FORCE_WATCHDOG_TIMEOUT),

@@ -37,14 +37,14 @@ HidIO::HidIO(const char* pszName, int32_t pid, int32_t vid) :
 
 	if (!initializedUsb_)
 	{
-		ROS_ERROR("Failed to initialize libusb: %s", libusb_error_name(rc));
+		ROS_ERROR_NAMED(name_, "Failed to initialize libusb: %s", libusb_error_name(rc));
 	}
 
 	libusb_set_debug(nullptr, LIBUSB_LOG_LEVEL_WARNING);
 
 	if(libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG) != 1)
 	{
-		ROS_ERROR("Hotplug capabilities are not supported on this platform");
+		ROS_ERROR_NAMED(name_, "Hotplug capabilities are not supported on this platform");
 	}
 }
 
@@ -125,21 +125,10 @@ void HidIO::close()
 
 void HidIO::spinOnce()
 {
-	try
-	{
-		timeval tv;
-		memset(&tv, 0, sizeof(struct timeval));
-		tv.tv_usec = 10000;
-		libusb_handle_events_timeout_completed(nullptr, &tv, nullptr);
-	}
-	catch(std::runtime_error& e)
-	{
-		ROS_ERROR("Hid Error: %s", e.what());
-	}
-	catch(...)
-	{
-		// Ignore errors
-	}
+	timeval tv;
+	memset(&tv, 0, sizeof(struct timeval));
+	tv.tv_usec = 10000;
+	libusb_handle_events_timeout_completed(nullptr, &tv, nullptr);
 }
 
 void HidIO::write(const std::vector<char>& buffer)
@@ -172,7 +161,7 @@ void HidIO::write(const std::vector<char>& buffer)
 	}
 	else
 	{
-		ROS_ERROR("Attempt to write to hid IO which is not open");
+		ROS_ERROR_NAMED(name_, "Attempt to write to hid IO which is not open");
 	}
 }
 
@@ -189,7 +178,7 @@ bool HidIO::checkSuccess(const char* action, int rc)
 			connetionCallback_(false);
 		}
 
-		ROS_ERROR("%s: %s", action, libusb_error_name(rc));
+		ROS_ERROR_NAMED(name_, "%s: %s", action, libusb_error_name(rc));
 	}
 
 	return success;
@@ -222,10 +211,8 @@ void HidIO::registerHotPlug()
 		static_cast<void*>(this),
 		&hotplugHandle_);
 
-	if (rc != LIBUSB_SUCCESS)
+	if (!checkSuccess("Failed to register for hot plug events", rc))
 	{
-		ROS_ERROR("Failed to register for hot plug events: %s", libusb_error_name(rc));
-
 		hotplugHandle_ = 0;
 	}
 }
@@ -257,10 +244,7 @@ void HidIO::claimDevice(libusb_device* device)
 
 	int rc = libusb_open(device, &deviceHandle_);
 
-	if (rc != LIBUSB_SUCCESS)
-	{
-		ROS_ERROR("Failed to open usb device: %s", libusb_error_name(rc));
-	}
+	checkSuccess("Failed to open usb device", rc);
 
 	if (rc == LIBUSB_SUCCESS)
 	{
@@ -269,10 +253,7 @@ void HidIO::claimDevice(libusb_device* device)
 		{
 			rc = libusb_detach_kernel_driver(deviceHandle_, 0);
 
-			if (rc != LIBUSB_SUCCESS)
-			{
-				ROS_ERROR("Failed to detach usb device from kernel: %s", libusb_error_name(rc));
-			}
+			checkSuccess("Failed to detach usb device from kernel", rc);
 		}
 	}
 
@@ -280,14 +261,9 @@ void HidIO::claimDevice(libusb_device* device)
 	{
 		rc = libusb_claim_interface(deviceHandle_, 0);
 
-		if (rc == LIBUSB_SUCCESS)
-		{
-			claimedUsb_ = true;
-		}
-		else
-		{
-			ROS_ERROR("Failed to claim usb device: %s", libusb_error_name(rc));
-		}
+		checkSuccess("Failed to claim usb device", rc);
+
+		claimedUsb_ = rc == LIBUSB_SUCCESS;
 	}
 
 	if (rc == LIBUSB_SUCCESS)
@@ -314,22 +290,9 @@ void HidIO::claimDevice(libusb_device* device)
 		rc = lookupEndpoints();
 	}
 
-	if (rc != LIBUSB_SUCCESS)
+	if (rc == LIBUSB_SUCCESS)
 	{
-		if (claimedUsb_)
-		{
-			int rc = libusb_release_interface(deviceHandle_, 0);
-
-			ROS_ERROR("Failed to release usb device: %s", libusb_error_name(rc));
-
-			claimedUsb_ = false;
-		}
-
-		if (deviceHandle_)
-		{
-			libusb_close(deviceHandle_);
-			deviceHandle_ = nullptr;
-		}
+		releaseDevice();
 	}
 }
 
@@ -343,10 +306,7 @@ void HidIO::releaseDevice()
 		{
 			int rc = libusb_release_interface(deviceHandle_, 0);
 
-			if (rc == LIBUSB_SUCCESS)
-			{
-				ROS_ERROR("Failed to release usb device: %s", libusb_error_name(rc));
-			}
+			checkSuccess("Failed to release usb device", rc);
 		}
 
 		libusb_close(deviceHandle_);
@@ -398,7 +358,7 @@ int HidIO::lookupEndpoints()
 	}
 	else
 	{
-		ROS_ERROR("Failed to get active config descriptor: %s", libusb_error_name(rc));
+		ROS_ERROR_NAMED(name_, "Failed to get active config descriptor: %s", libusb_error_name(rc));
 	}
 
 	if (rxEndpointAddress_	== -1	||
@@ -406,14 +366,14 @@ int HidIO::lookupEndpoints()
 		txEndpointAddress_	== -1	||
 		txMaxPacketSize_	== -1)
 	{
-		ROS_ERROR("Failed to get endpoint addresses and/or size");
+		ROS_ERROR_NAMED(name_, "Failed to get endpoint addresses and/or size");
 
 		rc = LIBUSB_ERROR_NOT_FOUND;
 	}
 
 	if (rc == LIBUSB_SUCCESS)
 	{
-		ROS_INFO("USB device connected: pid=0x%x, vid=0x%x, vendor=%s, product=%s rxAddr=0x%x rxSize=%d txAddr=0x%x txSize=%d",
+		ROS_INFO_NAMED(name_, "USB device connected: pid=0x%x, vid=0x%x, vendor=%s, product=%s rxAddr=0x%x rxSize=%d txAddr=0x%x txSize=%d",
 			pid_, vid_, vendor_.c_str(), product_.c_str(),
 			rxEndpointAddress_, rxMaxPacketSize_, txEndpointAddress_, txMaxPacketSize_);
 
@@ -481,7 +441,7 @@ void HidIO::readCompletedInternal(libusb_transfer* transfer)
 		{
 			if (sequence_ != counter)
 			{
-				ROS_ERROR_STREAM("ReadData (size=" << (int)size << ", count=" << (int)counter << ", expected=" <<
+				ROS_ERROR_STREAM_NAMED(name_, "ReadData (size=" << (int)size << ", count=" << (int)counter << ", expected=" <<
 					(int)sequence_ << " ): " <<
 					ToHex(std::vector<char>(message.begin(), message.end())));
 			}
@@ -492,12 +452,12 @@ void HidIO::readCompletedInternal(libusb_transfer* transfer)
 		}
 		else
 		{
-			printf("Hid IO read but no callback specified!\n");
+			ROS_ERROR_NAMED(name_, "Hid IO read but no callback specified!\n");
 		}
 	}
 	else if (transfer->status != LIBUSB_TRANSFER_STALL)
 	{
-		ROS_ERROR("Hid read failed: %s", libusb_error_name(transfer->status));
+		ROS_ERROR_NAMED(name_, "Hid read failed: %s", libusb_error_name(transfer->status));
 	}
 
 	if (cleanupTransfer(transfer))
@@ -518,7 +478,7 @@ void HidIO::writeCompletedInternal(libusb_transfer* transfer)
 	if (transfer->status != LIBUSB_TRANSFER_COMPLETED &&
 		transfer->status != LIBUSB_TRANSFER_STALL)
 	{
-		ROS_ERROR("Hid write failed: %s", libusb_error_name(transfer->status));
+		ROS_ERROR_NAMED(name_, "Hid write failed: %s", libusb_error_name(transfer->status));
 	}
 
 	cleanupTransfer(transfer);

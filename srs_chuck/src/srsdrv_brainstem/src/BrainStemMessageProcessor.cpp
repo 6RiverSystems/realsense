@@ -177,7 +177,14 @@ void BrainStemMessageProcessor::setConnected(bool isConnected)
 		}
 		else
 		{
+			// Reset state so we sync again when the brainstem reconnects
+			sentPing_ = false;
+
 			setupComplete_ = false;
+
+			hardwareInfoHandler_.reset();
+
+			operationalStateHandler_.reset();
 		}
 	}
 }

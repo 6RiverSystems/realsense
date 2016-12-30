@@ -24,6 +24,8 @@ public:
 
     bool hasValidMessage() const { return hasValidMessage_; };
 
+    void reset() { hasValidMessage_ = false; };
+
 private:
 
     HW_MESSAGE_BEGIN(HardwareInfoData)

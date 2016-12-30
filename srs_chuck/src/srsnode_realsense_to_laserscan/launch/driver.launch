@@ -33,8 +33,8 @@
 	<arg name="enable_color"      	value="false" />
 	<arg name="enable_pointcloud" 	value="false" />
 	<arg name="enable_tf"         	value="false" />
-	<arg name="depth_height"        value="480" />
-	<arg name="depth_width"         value="640" />
+	<arg name="depth_height"        value="240" />
+	<arg name="depth_width"         value="320" />
 	<arg name="depth_fps"		value="30" />
 	<arg name="color_fps"		value="30" />
 	</include>
@@ -47,12 +47,12 @@
         <remap from="scan" to="/internal/sensors/rgbd/scan"/>
         <rosparam>
             output_frame_id: laser_frame
-            scan_height: 150
+            scan_height: 120
             scan_time: 0.333
             range_min: 0.3
             range_max: 4.0
             height_min: 0.1
-            height_max: 5.0
+            height_max: 3.0
         </rosparam>
         </node>
 

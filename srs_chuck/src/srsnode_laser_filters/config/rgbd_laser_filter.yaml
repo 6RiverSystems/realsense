@@ -41,9 +41,9 @@ scan_filter_chain:
 - name: srs_radius_search_filter
   type: laser_filters/RadiusSearchFilter
   params: 
-    neighbor_number: 15
+    neighbor_number: 5
     threshold_number: 2
-    threshold_radius: 0.2
+    threshold_ratio: 0.10 # ratio: search radius in meter per meter
 - name: clean_up
   type: laser_filters/LaserScanRangeCleanUpFilter
 # intensity filter generally filters out only correct readings with low intensity 

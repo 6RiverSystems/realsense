@@ -13,5 +13,8 @@
 
     <node name="srsnode_midbrain"
         pkg="srsnode_midbrain" type="srsnode_midbrain"
-        output="screen" launch-prefix="$(arg launch-prefix)"/>
+        output="screen" launch-prefix="$(arg launch-prefix)">
+      <param name="check_lidar_hard_stop" value="true"/>
+      <param name="check_depth_camera_hard_stop" value="true"/>
+    </node>
 </launch>

@@ -49,6 +49,12 @@ public:
         return currentRobotState_.pause;
     }
 
+    RobotState getRobotState()
+    {
+        setNewData(false);
+        return currentRobotState_;
+    }
+
     void reset()
     {
         RosTap::reset();

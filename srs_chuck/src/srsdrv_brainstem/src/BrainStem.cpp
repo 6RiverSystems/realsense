@@ -88,14 +88,14 @@ void BrainStem::connectionChanged( bool bIsConnected )
 {
 	messageProcessor_.setConnected(bIsConnected);
 
-//	if( !bIsConnected )
-//	{
-//		brainstemEmulator_.reset( new BrainStemEmulator( ) );
-//	}
-//	else
-//	{
-//		brainstemEmulator_.reset( );
-//	}
+	if( !bIsConnected )
+	{
+		brainstemEmulator_.reset( new BrainStemEmulator( ) );
+	}
+	else
+	{
+		brainstemEmulator_.reset( );
+	}
 }
 
 void BrainStem::cfgCallback(srsdrv_brainstem::RobotSetupConfig &config,

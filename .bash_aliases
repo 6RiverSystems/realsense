@@ -79,8 +79,8 @@ function cleanChuck() {
 function showChuck() {
   source /opt/ros/indigo/setup.bash
 
-  killall electron
-  killall electron
+  killall mfp_gui
+  killall mfp_gui
 
   export DISPLAY=:0
 

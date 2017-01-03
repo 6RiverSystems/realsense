@@ -782,11 +782,7 @@ namespace realsense_camera
 
         duplicate_depth_color_ = false;
 
-        // use a boolean flag to make the publish rate down to 15 HZ for now
-        if(publish_flag_){
-          publishTopics();
-        }
-        publish_flag_ = !publish_flag_ ;
+        publishTopics();
 
         if (pointcloud_publisher_.getNumSubscribers() > 0 &&
             rs_is_stream_enabled(rs_device_, RS_STREAM_DEPTH, 0) == 1 && enable_pointcloud_ == true &&

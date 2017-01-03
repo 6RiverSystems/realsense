@@ -138,7 +138,6 @@ namespace realsense_camera
     cv::Mat cvWrapper_;
     bool start_camera_ = true;
     bool start_stop_srv_called_ = false;
-    bool publish_flag_ = true;
     struct CameraOptions
     {
       rs_option opt;

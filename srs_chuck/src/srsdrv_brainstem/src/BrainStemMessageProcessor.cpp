@@ -207,9 +207,9 @@ void BrainStemMessageProcessor::setConnected(bool isConnected)
 
 			setupComplete_ = false;
 
-			hardwareInfoHandler_.reset();
+			hardwareInfoHandler_->reset();
 
-			operationalStateHandler_.reset();
+			operationalStateHandler_->reset();
 		}
 	}
 }

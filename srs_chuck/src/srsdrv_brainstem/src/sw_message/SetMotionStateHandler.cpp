@@ -20,6 +20,10 @@ SetMotionStateHandler::SetMotionStateHandler(BrainStemMessageProcessorInterface*
 	SoftwareMessage(owner),
 	operationalState_(0)
 {
+//	std::bitset<8> operationalStateChange;
+//	operationalStateChange.set(MOTION_STATUS::FREE_SPIN, true);
+//
+//	operationalState_ = (uint8_t)operationalStateChange.to_ulong();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,16 +62,16 @@ void SetMotionStateHandler::encodeData(const srslib_framework::MsgSetOperational
 	}
 	else
 	{
-		operationalState_ &= operationalStateMask;
+		operationalState_ &= ~operationalStateMask;
 	}
 
-	setOperationalState(operationalState_, setOpState.state);
+	setOperationalState(operationalStateMask, setOpState.state);
 }
 
 void SetMotionStateHandler::syncState()
 {
 	setOperationalState(operationalState_, true);
-	setOperationalState(~operationalState_, false);
+	setOperationalState((uint8_t)~operationalState_, false);
 }
 
 void SetMotionStateHandler::setOperationalState(uint8_t opState, bool setValues)
@@ -77,7 +81,7 @@ void SetMotionStateHandler::setOperationalState(uint8_t opState, bool setValues)
 	std::string strMotionStatus;
 	strMotionStatus += operationalState.test(MOTION_STATUS::FRONT_E_STOP) ? "frontEStop, " : "";
 	strMotionStatus += operationalState.test(MOTION_STATUS::BACK_E_STOP) ? "backEStop, " : "";
-	strMotionStatus += operationalState.test(MOTION_STATUS::WIRELESS_E_STOP) ?"wirelessEStop, " : "";
+	strMotionStatus += operationalState.test(MOTION_STATUS::WIRELESS_E_STOP) ? "wirelessEStop, " : "";
 	strMotionStatus += operationalState.test(MOTION_STATUS::BUMP_SENSOR) ? "bumpSensor, " : "";
 	strMotionStatus += operationalState.test(MOTION_STATUS::FREE_SPIN) ? "pause, " : "";
 	strMotionStatus += operationalState.test(MOTION_STATUS::HARD_STOP) ? "hardStop" : "";
@@ -90,7 +94,7 @@ void SetMotionStateHandler::setOperationalState(uint8_t opState, bool setValues)
 
 	OperationalStateData msg = {
         static_cast<uint8_t>(command),
-        static_cast<uint8_t>(operationalState.to_ulong())
+        static_cast<uint8_t>(opState)
     };
 
 	sendCommand(reinterpret_cast<char*>( &msg ), sizeof(msg));

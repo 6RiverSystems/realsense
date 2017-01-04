@@ -31,6 +31,8 @@ public:
 
 	void encodeData(const srslib_framework::MsgUpdateUI& value);
 
+	void updateEntity(LED_ENTITIES entity, LED_MODE mode);
+
     void syncState();
 
 private:
@@ -41,7 +43,7 @@ private:
 		uint8_t mode;
 	HW_MESSAGE_END
 
-	srslib_framework::MsgUpdateUI updateUI_;
+	std::map<LED_ENTITIES, LED_MODE>	setEntityMode_;
 
 	std::shared_ptr<TapBrainstemCmd_UpdateUI>	tapUpdateUI_;
 

@@ -88,6 +88,8 @@ void UpdateUIHandler::encodeData(const srslib_framework::MsgUpdateUI& updateUI)
 
 		getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
 	}
+
+	valid_ = true;
 }
 
 void UpdateUIHandler::syncState()

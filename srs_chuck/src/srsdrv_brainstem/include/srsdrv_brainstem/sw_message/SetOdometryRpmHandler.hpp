@@ -42,6 +42,7 @@ private:
 	HW_MESSAGE_END
 
 	srslib_framework::OdometryRpm odometryRpm_;
+
 	std::shared_ptr<TapBrainstemCmd_OdometryRpm>	tapOdometryRpm_;
 };
 

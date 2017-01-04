@@ -24,8 +24,8 @@ namespace srs
 
 BrainStem::BrainStem(string name, int argc, char** argv) :
 	RosUnit(name, argc, argv, REFRESH_RATE_HZ),
-//	io_( new HidIO( "brainstem", 0x1930, 0x6001 ) ),
-	io_( new SerialIO( "brainstem", "/dev/malg" ) ),
+	io_( new HidIO( "brainstem", 0x1930, 0x6001 ) ),
+
 	messageProcessor_( io_ ),
 	brainstemFaultTimer_(),
 	nodeHandle_("~")
@@ -35,30 +35,9 @@ BrainStem::BrainStem(string name, int argc, char** argv) :
 
 	connectionChanged( false );
 
-//	io_->open( std::bind( &BrainStem::connectionChanged, this, std::placeholders::_1 ),
-//		std::bind( &BrainStemMessageProcessor::processHardwareMessage, &messageProcessor_, std::placeholders::_1) );
+	io_->open( std::bind( &BrainStem::connectionChanged, this, std::placeholders::_1 ),
+		std::bind( &BrainStemMessageProcessor::processHardwareMessage, &messageProcessor_, std::placeholders::_1) );
 
-	std::shared_ptr<SerialIO> pSerialIO = std::dynamic_pointer_cast<SerialIO>( io_ );
-
-	pSerialIO->enableCRC( true );
-	pSerialIO->setTerminatingCharacter( '\n' );
-	pSerialIO->setEscapeCharacter( '\\' );
-
-	auto processMessage = [&]( std::vector<char> buffer )
-	{
-		ExecuteInRosThread( std::bind( &BrainStemMessageProcessor::processHardwareMessage,
-			&messageProcessor_, buffer));
-	};
-
-	auto connectionChanged = [&]( bool bIsConnected )
-	{
-		ExecuteInRosThread( std::bind( &BrainStem::connectionChanged, this,
-				bIsConnected ) );
-	};
-
-	pSerialIO->open(connectionChanged, processMessage );
-
-	// Check for hardware faults
 	brainstemFaultTimer_ = nodeHandle_.createTimer(ros::Duration(1.0f / REFRESH_RATE_HZ),
         boost::bind(&BrainStemMessageProcessor::checkForBrainstemFaultTimer,
         	&messageProcessor_, _1));
@@ -88,14 +67,14 @@ void BrainStem::connectionChanged( bool bIsConnected )
 {
 	messageProcessor_.setConnected(bIsConnected);
 
-	if( !bIsConnected )
-	{
-		brainstemEmulator_.reset( new BrainStemEmulator( ) );
-	}
-	else
-	{
-		brainstemEmulator_.reset( );
-	}
+//	if( !bIsConnected )
+//	{
+//		brainstemEmulator_.reset( new BrainStemEmulator( ) );
+//	}
+//	else
+//	{
+//		brainstemEmulator_.reset( );
+//	}
 }
 
 void BrainStem::cfgCallback(srsdrv_brainstem::RobotSetupConfig &config,

@@ -28,7 +28,6 @@ HidIO::HidIO(const char* pszName, int32_t pid, int32_t vid) :
 	deviceHandle_(nullptr),
 	pid_(pid),
 	vid_(vid),
-	thread_(),
 	readCallback_()
 {
 	int rc = libusb_init(nullptr);
@@ -290,7 +289,7 @@ void HidIO::claimDevice(libusb_device* device)
 		rc = lookupEndpoints();
 	}
 
-	if (rc == LIBUSB_SUCCESS)
+	if (rc != LIBUSB_SUCCESS)
 	{
 		releaseDevice();
 	}

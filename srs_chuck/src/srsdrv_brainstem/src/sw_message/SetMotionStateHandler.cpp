@@ -70,6 +70,8 @@ void SetMotionStateHandler::encodeData(const srslib_framework::MsgSetOperational
 	    strMotionStatus.c_str( ) );
 
 	getOwner()->sendCommand( reinterpret_cast<char*>( &msg ), sizeof(msg));
+
+	valid_ = true;
 }
 
 void SetMotionStateHandler::syncState()

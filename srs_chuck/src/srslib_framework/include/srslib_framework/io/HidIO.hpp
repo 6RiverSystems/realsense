@@ -108,8 +108,6 @@ private:
 
 	std::set<libusb_transfer*>				transfers_;
 
-    std::shared_ptr<std::thread>			thread_;
-
     ConnectionCallbackFn					connetionCallback_;
 
     ReadCallbackFn							readCallback_;

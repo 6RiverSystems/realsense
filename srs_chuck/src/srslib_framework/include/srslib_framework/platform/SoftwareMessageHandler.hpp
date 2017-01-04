@@ -12,7 +12,8 @@ class SoftwareMessageHandler
 {
 public:
     SoftwareMessageHandler(OWNER* owner) :
-        owner_(owner)
+        owner_(owner),
+		valid_(false)
     {}
 
     virtual ~SoftwareMessageHandler()
@@ -25,7 +26,22 @@ public:
 
     virtual void attach() {};
 
+    virtual void sync()
+    {
+    	if (valid_)
+    	{
+    		syncState();
+    	}
+    };
+
+protected:
+
+    virtual void syncState() {};
+
+    bool valid_;
+
 private:
+
     OWNER* owner_;
 };
 

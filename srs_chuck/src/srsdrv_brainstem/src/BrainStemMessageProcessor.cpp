@@ -279,11 +279,9 @@ void BrainStemMessageProcessor::checkSetupComplete()
 			{
 				ROS_INFO("Brainstem driver: Resyncing brainstem state");
 
-				setMotionStateHandler_.syncState();
-				setOdometryRpmHandler_.syncState();
-				setVelocityHandler_.syncState();
-				soundHandler_.syncState();
-				updateUIHandler_.syncState();
+				setMotionStateHandler_.sync();
+				soundHandler_.sync();
+				updateUIHandler_.sync();
 			}
 
 			connectedChannel_.publish(syncState_);

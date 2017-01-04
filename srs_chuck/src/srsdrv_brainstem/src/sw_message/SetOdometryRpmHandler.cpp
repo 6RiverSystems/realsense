@@ -61,6 +61,8 @@ void SetOdometryRpmHandler::encodeData(const srslib_framework::OdometryRpm& odom
 	}
 
 	getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
+
+	valid_ = true;
 }
 
 void SetOdometryRpmHandler::syncState()

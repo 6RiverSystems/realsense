@@ -53,6 +53,8 @@ void SoundHandler::encodeData(const Sound& sound)
 		sound.dutyCycle, sound.numberOfCycles);
 
     getOwner()->sendCommand(reinterpret_cast<char*>(&msgSound), sizeof(msgSound));
+
+	valid_ = true;
 }
 
 void SoundHandler::syncState()

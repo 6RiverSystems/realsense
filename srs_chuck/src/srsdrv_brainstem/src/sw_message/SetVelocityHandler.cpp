@@ -38,11 +38,16 @@ void SetVelocityHandler::receiveData(const geometry_msgs::Twist::ConstPtr twist)
 //		data->linear.x, data->angular.z);
 
 	getOwner()->sendCommand( reinterpret_cast<char*>( &msg ), sizeof(msg));
+
+	valid_ = true;
 }
 
 void SetVelocityHandler::syncState()
 {
-	receiveData(twist_);
+	if (twist_)
+	{
+		receiveData(twist_);
+	}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods

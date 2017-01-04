@@ -89,6 +89,9 @@ void HidIO::close()
 
 	if (connetionCallback_)
 	{
+		ROS_INFO_NAMED(name_, "USB device closed: pid=0x%x, vid=0x%x, vendor=%s, product=%s",
+			pid_, vid_, vendor_.c_str(), product_.c_str());
+
 		connetionCallback_(false);
 		connetionCallback_ = {};
 	}
@@ -173,6 +176,9 @@ bool HidIO::checkSuccess(const char* action, int rc)
 		if (rc == LIBUSB_ERROR_NO_DEVICE)
 		{
 			deviceHandle_ = nullptr;
+
+			ROS_INFO_NAMED(name_, "USB device closed: pid=0x%x, vid=0x%x, vendor=%s, product=%s",
+				pid_, vid_, vendor_.c_str(), product_.c_str());
 
 			connetionCallback_(false);
 		}
@@ -299,8 +305,6 @@ void HidIO::releaseDevice()
 {
 	if (deviceHandle_)
 	{
-		ROS_INFO("Hid releasing device: %p", deviceHandle_);
-
 		if (claimedUsb_)
 		{
 			int rc = libusb_release_interface(deviceHandle_, 0);
@@ -417,6 +421,7 @@ bool HidIO::cleanupTransfer(libusb_transfer* transfer)
 	if (transfer->status == LIBUSB_TRANSFER_NO_DEVICE)
 	{
 		deviceHandle_ = nullptr;
+
 		connetionCallback_(false);
 
 		success = false;

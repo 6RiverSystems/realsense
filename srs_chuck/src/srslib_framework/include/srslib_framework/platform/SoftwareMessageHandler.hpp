@@ -26,6 +26,7 @@ public:
     virtual void attach() {};
 
 private:
+
     OWNER* owner_;
 };
 

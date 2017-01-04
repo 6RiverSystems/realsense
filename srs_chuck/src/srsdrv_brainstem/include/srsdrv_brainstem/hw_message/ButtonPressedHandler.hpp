@@ -6,7 +6,8 @@
 #pragma once
 
 #include <BrainStemMessages.hpp>
-#include <HardwareMessageHandler.hpp>
+
+#include <hw_message/HardwareMessageHandler.hpp>
 
 #include <srslib_framework/ros/channel/ChannelBrainstemButtonPressed.hpp>
 

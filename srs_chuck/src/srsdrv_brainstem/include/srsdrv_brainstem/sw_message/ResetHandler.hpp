@@ -10,20 +10,20 @@
 
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/platform/observer/Observer.hpp>
-#include <srslib_framework/ros/tap/TapBrainstemCmd_Ping.hpp>
+#include <srslib_framework/ros/tap/TapBrainstemCmd_Reset.hpp>
 
 namespace srs {
 
 class BrainStemMessageProcessorInterface;
 
-class PingHandler :
+class ResetHandler :
 	public SoftwareMessage,
-	public Observer<Subscriber<std_msgs::Bool>>
+    public Observer<Subscriber<std_msgs::Bool>>
 {
 public:
-    PingHandler(BrainStemMessageProcessorInterface* owner);
+    ResetHandler(BrainStemMessageProcessorInterface* owner);
 
-    virtual ~PingHandler() {}
+    virtual ~ResetHandler() {}
 
     virtual void attach();
 
@@ -33,7 +33,12 @@ public:
 
 private:
 
-    std::shared_ptr<TapBrainstemCmd_Ping>	tapPing_;
+    HW_MESSAGE_BEGIN(WatchdogTimeoutData)
+    	uint8_t cmd;
+		char token[4];
+    HW_MESSAGE_END
+
+    std::shared_ptr<TapBrainstemCmd_Reset>	tapReset_;
 };
 
 } // namespace srs

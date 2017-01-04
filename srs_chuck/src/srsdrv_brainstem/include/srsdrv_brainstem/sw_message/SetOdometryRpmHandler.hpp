@@ -6,8 +6,8 @@
 #pragma once
 
 #include <BrainStemMessages.hpp>
+#include <sw_message/SoftwareMessage.hpp>
 
-#include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/platform/observer/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_OdometryRpm.hpp>
@@ -17,7 +17,7 @@ namespace srs {
 class BrainStemMessageProcessorInterface;
 
 class SetOdometryRpmHandler :
-    public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
+	public SoftwareMessage,
     public Observer<Subscriber<srslib_framework::OdometryRpm>>
 {
 public:
@@ -31,6 +31,8 @@ public:
 
     void encodeData(const srslib_framework::OdometryRpm& value);
 
+    void syncState();
+
 private:
 
     HW_MESSAGE_BEGIN(RawOdometryData)
@@ -38,6 +40,8 @@ private:
 		float rpm_left_wheel;
 		float rpm_right_wheel;
 	HW_MESSAGE_END
+
+	srslib_framework::OdometryRpm odometryRpm_;
 
 	std::shared_ptr<TapBrainstemCmd_OdometryRpm>	tapOdometryRpm_;
 };

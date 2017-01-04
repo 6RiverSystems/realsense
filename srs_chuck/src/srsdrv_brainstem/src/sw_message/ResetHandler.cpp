@@ -6,7 +6,7 @@
 
 #include <BrainStemMessageProcessorInterface.hpp>
 
-#include <sw_message/PingHandler.hpp>
+#include <sw_message/ResetHandler.hpp>
 
 namespace srs {
 
@@ -14,36 +14,36 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-PingHandler::PingHandler(BrainStemMessageProcessorInterface* owner) :
+ResetHandler::ResetHandler(BrainStemMessageProcessorInterface* owner) :
 	SoftwareMessage(owner)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void PingHandler::attach()
+void ResetHandler::attach()
 {
-	tapPing_.reset(new TapBrainstemCmd_Ping());
+	tapReset_.reset(new TapBrainstemCmd_Reset());
 
-	tapPing_->attach(this);
+	tapReset_->attach(this);
 }
 
-void PingHandler::notified(Subscriber<std_msgs::Bool>*)
+void ResetHandler::notified(Subscriber<std_msgs::Bool>* subject)
 {
-	encodeData(true);
+	TapBrainstemCmd_Reset* tap = static_cast<TapBrainstemCmd_Reset*>(subject);
+
+	encodeData(tap->pop());
 }
 
-void PingHandler::encodeData(const bool& value)
+void ResetHandler::encodeData(const bool& value)
 {
-	uint8_t cMessage = static_cast<uint8_t>(BRAIN_STEM_CMD::PING);
+	WatchdogTimeoutData msg = {
+		static_cast<uint8_t>(BRAIN_STEM_CMD::FORCE_WATCHDOG_TIMEOUT),
+		{ 'p', '0', 'w', 'n' }
+	};
 
-//	ROS_DEBUG_NAMED("ping", "Brain => Brainstem: Ping");
+	ROS_ERROR("Brainstem driver: Forcing watchdog reset timeout");
 
-	if (messageProcessor_->isConnected())
-	{
-		sendCommand(reinterpret_cast<char*>(&cMessage), 1);
-
-		messageProcessor_->ping();
-	}
+	sendCommand(reinterpret_cast<char*>( &msg ), sizeof(msg));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

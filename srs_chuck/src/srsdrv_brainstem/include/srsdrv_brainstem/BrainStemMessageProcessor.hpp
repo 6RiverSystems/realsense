@@ -25,23 +25,10 @@ using namespace std;
 #include <BrainStemMessageProcessorInterface.hpp>
 
 #include <hw_message/HardwareMessageHandler.hpp>
+#include <sw_message/SoftwareMessage.hpp>
 
-#include <hw_message/LogHandler.hpp>
 #include <hw_message/HardwareInfoHandler.hpp>
 #include <hw_message/OperationalStateHandler.hpp>
-#include <hw_message/PowerStateHandler.hpp>
-#include <hw_message/OdometryRpmHandler.hpp>
-#include <hw_message/OdometryPoseHandler.hpp>
-#include <hw_message/ButtonPressedHandler.hpp>
-
-#include <sw_message/ResetHandler.hpp>
-#include <sw_message/PingHandler.hpp>
-#include <sw_message/SetMotionStateHandler.hpp>
-#include <sw_message/SetOdometryRpmHandler.hpp>
-#include <sw_message/SetVelocityHandler.hpp>
-#include <sw_message/ShutdownHandler.hpp>
-#include <sw_message/SoundHandler.hpp>
-#include <sw_message/UpdateUIHandler.hpp>
 
 namespace srs {
 
@@ -61,7 +48,7 @@ public:
 
 	void processHardwareMessage(vector<char> buffer);
 
-    using HwMessageHandlerMapType = map<BRAIN_STEM_MSG, HardwareMessageHandler*>;
+    using HwMessageHandlerMapType = map<BRAIN_STEM_MSG, HardwareMessageHandlerPtr>;
 
 	BrainStemMessageProcessor( std::shared_ptr<IO> pIO );
 
@@ -88,11 +75,13 @@ public:
 
 	void getHardwareInformation( );
 
-    void setMotionStatus( const std::bitset<8>& motionStatusSet, bool setValue );
-
     void shutdown( );
 
 private:
+
+    void addHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler);
+
+    void addSoftwareMessage(SoftwareMessagePtr softwareMessage);
 
 	bool isSetupComplete() const;
 
@@ -157,22 +146,11 @@ private:
     ChannelBrainstemOdometryPose	odometryPoseChannel_;
     ChannelBrainstemButtonPressed	buttonPressedChannel_;
 
-    LogHandler	logHandler_;
-    HardwareInfoHandler	hardwareInfoHandler_;
-    OperationalStateHandler	operationalStateHandler_;
-    PowerStateHandler	powerStateHandler_;
-    OdometryRpmHandler	odometryRpmHandler_;
-    OdometryPoseHandler	odometryPoseHandler_;
-    ButtonPressedHandler	buttonPressedHandler_;
+    std::shared_ptr<HardwareInfoHandler>	hardwareInfoHandler_;
+    std::shared_ptr<OperationalStateHandler>	operationalStateHandler_;
 
-    ResetHandler	resetHandler_;
-    PingHandler	pingHandler_;
-    SetMotionStateHandler	setMotionStateHandler_;
-    SetOdometryRpmHandler	setOdometryRpmHandler_;
-    SetVelocityHandler	setVelocityHandler_;
-    ShutdownHandler	shutdownHandler_;
-    SoundHandler	soundHandler_;
-    UpdateUIHandler	updateUIHandler_;
+    std::vector<HardwareMessageHandlerPtr> hardwareHandlers_;
+    std::vector<SoftwareMessagePtr> softwareHandlers_;
 };
 
 } /* namespace srs */

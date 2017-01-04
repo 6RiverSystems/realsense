@@ -6,8 +6,8 @@
 #pragma once
 
 #include <BrainStemMessages.hpp>
+#include <sw_message/SoftwareMessage.hpp>
 
-#include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/platform/observer/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_Ping.hpp>
@@ -17,8 +17,8 @@ namespace srs {
 class BrainStemMessageProcessorInterface;
 
 class PingHandler :
-    public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
-    public Observer<Subscriber<std_msgs::Bool>>
+	public SoftwareMessage,
+	public Observer<Subscriber<std_msgs::Bool>>
 {
 public:
     PingHandler(BrainStemMessageProcessorInterface* owner);

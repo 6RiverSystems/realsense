@@ -15,7 +15,7 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 UpdateUIHandler::UpdateUIHandler(BrainStemMessageProcessorInterface* owner) :
-    SoftwareMessageHandler(owner)
+	SoftwareMessage(owner)
 {
 	setValidEntities_.insert(LED_ENTITIES::TOTE0);
 	setValidEntities_.insert(LED_ENTITIES::TOTE1);
@@ -86,10 +86,8 @@ void UpdateUIHandler::encodeData(const srslib_framework::MsgUpdateUI& updateUI)
 		ROS_INFO( "Brain => Brainstem: UPDATE_LIGHT: element=%d, mode=%d",
 			uiElement.element, uiElement.mode);
 
-		getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
+		sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
 	}
-
-	valid_ = true;
 }
 
 void UpdateUIHandler::syncState()

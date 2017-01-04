@@ -15,8 +15,7 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ResetHandler::ResetHandler(BrainStemMessageProcessorInterface* owner) :
-    SoftwareMessageHandler(owner),
-	sentReset_(false)
+	SoftwareMessage(owner)
 {
 }
 
@@ -37,19 +36,14 @@ void ResetHandler::notified(Subscriber<std_msgs::Bool>* subject)
 
 void ResetHandler::encodeData(const bool& value)
 {
-	if (!value)
-	{
-		WatchdogTimeoutData msg = {
-			static_cast<uint8_t>(BRAIN_STEM_CMD::FORCE_WATCHDOG_TIMEOUT),
-			{ 'p', '0', 'w', 'n' }
-		};
+	WatchdogTimeoutData msg = {
+		static_cast<uint8_t>(BRAIN_STEM_CMD::FORCE_WATCHDOG_TIMEOUT),
+		{ 'p', '0', 'w', 'n' }
+	};
 
-		ROS_ERROR("Brainstem driver: Forcing watchdog reset timeout");
+	ROS_ERROR("Brainstem driver: Forcing watchdog reset timeout");
 
-		getOwner()->sendCommand( reinterpret_cast<char*>( &msg ), sizeof(msg));
-
-		sentReset_ = true;
-	}
+	sendCommand(reinterpret_cast<char*>( &msg ), sizeof(msg));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

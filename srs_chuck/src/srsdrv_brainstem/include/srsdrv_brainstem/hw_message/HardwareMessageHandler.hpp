@@ -47,4 +47,6 @@ private:
     BRAIN_STEM_MSG		messageKey_;
 };
 
+typedef std::shared_ptr<HardwareMessageHandler> HardwareMessageHandlerPtr;
+
 } // namespace srs

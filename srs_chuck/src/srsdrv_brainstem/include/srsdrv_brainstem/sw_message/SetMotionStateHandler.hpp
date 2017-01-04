@@ -6,8 +6,8 @@ SetMotionStateHandler.hpp * (c) Copyright 2015-2016 River Systems, all rights re
 #pragma once
 
 #include <BrainStemMessages.hpp>
+#include <sw_message/SoftwareMessage.hpp>
 
-#include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/platform/observer/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_SetMotionState.hpp>
@@ -17,7 +17,7 @@ namespace srs {
 class BrainStemMessageProcessorInterface;
 
 class SetMotionStateHandler :
-    public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
+	public SoftwareMessage,
     public Observer<Subscriber<srslib_framework::MsgSetOperationalState>>
 {
 public:
@@ -33,6 +33,8 @@ public:
 
     void syncState();
 
+    void setOperationalState(uint8_t opState, bool setValues);
+
 private:
 
     HW_MESSAGE_BEGIN(OperationalStateData)
@@ -40,7 +42,7 @@ private:
 		uint8_t motionStatus;
 	HW_MESSAGE_END
 
-	srslib_framework::MsgSetOperationalState setOpState_;
+	uint8_t operationalState_;
 
     std::shared_ptr<TapBrainstemCmd_SetMotionState>	tapSetMotionState_;
 };

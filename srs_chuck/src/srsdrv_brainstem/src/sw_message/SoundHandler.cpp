@@ -15,7 +15,7 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SoundHandler::SoundHandler(BrainStemMessageProcessorInterface* owner) :
-    SoftwareMessageHandler(owner)
+	SoftwareMessage(owner)
 {
 }
 
@@ -39,7 +39,7 @@ void SoundHandler::encodeData(const Sound& sound)
 {
 	sound_ = sound;
 
-    SoundData msgSound = {
+    SoundData msg = {
         static_cast<uint8_t>(BRAIN_STEM_CMD::SOUND_BUZZER),
         static_cast<uint8_t>(sound.volume),
         static_cast<uint16_t>(sound.baseFrequency),
@@ -52,9 +52,7 @@ void SoundHandler::encodeData(const Sound& sound)
 		" cycleRate=%d, dutyCycle=%d, numberOfCycles=%d", sound.volume, sound.baseFrequency, sound.cycleRate,
 		sound.dutyCycle, sound.numberOfCycles);
 
-    getOwner()->sendCommand(reinterpret_cast<char*>(&msgSound), sizeof(msgSound));
-
-	valid_ = true;
+	sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
 }
 
 void SoundHandler::syncState()

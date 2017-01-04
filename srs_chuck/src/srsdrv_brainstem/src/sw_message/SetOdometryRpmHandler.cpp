@@ -15,7 +15,7 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SetOdometryRpmHandler::SetOdometryRpmHandler(BrainStemMessageProcessorInterface* owner) :
-    SoftwareMessageHandler(owner)
+	SoftwareMessage(owner)
 {
 
 }
@@ -60,9 +60,7 @@ void SetOdometryRpmHandler::encodeData(const srslib_framework::OdometryRpm& odom
 		s_rightWheelRPM = odometryRpm.right_wheel_rpm;
 	}
 
-	getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
-
-	valid_ = true;
+	sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
 }
 
 void SetOdometryRpmHandler::syncState()

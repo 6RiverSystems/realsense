@@ -12,6 +12,25 @@
 #include <BrainStemMessages.hpp>
 #include <BrainStemMessageProcessor.hpp>
 
+#include <hw_message/LogHandler.hpp>
+#include <hw_message/HardwareInfoHandler.hpp>
+#include <hw_message/OperationalStateHandler.hpp>
+#include <hw_message/PowerStateHandler.hpp>
+#include <hw_message/OdometryRpmHandler.hpp>
+#include <hw_message/OdometryPoseHandler.hpp>
+#include <hw_message/ButtonPressedHandler.hpp>
+
+#include <sw_message/ResetHandler.hpp>
+#include <sw_message/PingHandler.hpp>
+#include <sw_message/SetMotionStateHandler.hpp>
+#include <sw_message/SetOdometryRpmHandler.hpp>
+#include <sw_message/SetVelocityHandler.hpp>
+#include <sw_message/ShutdownHandler.hpp>
+#include <sw_message/SoundHandler.hpp>
+#include <sw_message/UpdateUIHandler.hpp>
+
+
+
 namespace srs {
 
 using namespace ros;
@@ -28,42 +47,36 @@ BrainStemMessageProcessor::BrainStemMessageProcessor(std::shared_ptr<IO> pIO) :
 	lastOperationalStateRequestTime_(),
 	lastMessageTime_(),
 	connectedChannel_(),
-    resetHandler_(this),
-    pingHandler_(this),
-	setMotionStateHandler_(this),
-	setOdometryRpmHandler_(this),
-	setVelocityHandler_(this),
-	shutdownHandler_(this),
-	soundHandler_(this),
-	updateUIHandler_(this),
 	odometryRpmChannel_(),
 	odometryPoseChannel_(),
 	hardwareInfoChannel_(),
 	operationalStateChannel_(),
-	powerStateChannel_(),
-	logHandler_(),
-	odometryRpmHandler_(odometryRpmChannel_),
-	odometryPoseHandler_(odometryPoseChannel_),
-	hardwareInfoHandler_(hardwareInfoChannel_),
-	operationalStateHandler_(operationalStateChannel_),
-	powerStateHandler_(powerStateChannel_),
-	buttonPressedHandler_(buttonPressedChannel_)
+	powerStateChannel_()
 {
-    hwMessageHandlers_[odometryRpmHandler_.getKey()] = &odometryRpmHandler_;
-    hwMessageHandlers_[odometryPoseHandler_.getKey()] = &odometryPoseHandler_;
-    hwMessageHandlers_[hardwareInfoHandler_.getKey()] = &hardwareInfoHandler_;
-    hwMessageHandlers_[operationalStateHandler_.getKey()] = &operationalStateHandler_;
-    hwMessageHandlers_[powerStateHandler_.getKey()] = &powerStateHandler_;
-    hwMessageHandlers_[buttonPressedHandler_.getKey()] = &buttonPressedHandler_;
-    hwMessageHandlers_[logHandler_.getKey()] = &logHandler_;
+    hardwareInfoHandler_.reset(new HardwareInfoHandler(hardwareInfoChannel_));
+    operationalStateHandler_.reset(new OperationalStateHandler(operationalStateChannel_));
 
-    resetHandler_.attach();
-    pingHandler_.attach();
-    setMotionStateHandler_.attach();
-    setOdometryRpmHandler_.attach();
-    shutdownHandler_.attach();
-    soundHandler_.attach();
-    updateUIHandler_.attach();
+    addHardwareMessageHandler(hardwareInfoHandler_);
+    addHardwareMessageHandler(operationalStateHandler_);
+    addHardwareMessageHandler(HardwareMessageHandlerPtr(new LogHandler()));
+    addHardwareMessageHandler(HardwareMessageHandlerPtr(new PowerStateHandler(powerStateChannel_)));
+    addHardwareMessageHandler(HardwareMessageHandlerPtr(new OdometryRpmHandler(odometryRpmChannel_)));
+    addHardwareMessageHandler(HardwareMessageHandlerPtr(new OdometryPoseHandler(odometryPoseChannel_)));
+    addHardwareMessageHandler(HardwareMessageHandlerPtr(new ButtonPressedHandler(buttonPressedChannel_)));
+
+    addSoftwareMessage(SoftwareMessagePtr(new ResetHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new PingHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new SetMotionStateHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new SetOdometryRpmHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new SetVelocityHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new ShutdownHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new SoundHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new UpdateUIHandler(this)));
+
+    for (auto handler : softwareHandlers_)
+    {
+    	handler->attach();
+    }
 }
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor()
@@ -197,15 +210,13 @@ void BrainStemMessageProcessor::setConnected(bool isConnected)
 			hardwareInfoHandler_.reset();
 
 			operationalStateHandler_.reset();
-
-			resetHandler_.reset();
 		}
 	}
 }
 
 void BrainStemMessageProcessor::getHardwareInfo(const ros::Time& now)
 {
-	if (!this->hardwareInfoHandler_.hasValidMessage())
+	if (!hardwareInfoHandler_->hasValidMessage())
 	{
 		ros::Duration duration = now - lastHardareInfoRequestTime_;
 		if (duration.toSec() > 1.0f)
@@ -220,7 +231,7 @@ void BrainStemMessageProcessor::getHardwareInfo(const ros::Time& now)
 
 void BrainStemMessageProcessor::getOperationalState(const ros::Time& now)
 {
-	if (!this->operationalStateHandler_.hasValidMessage())
+	if (!operationalStateHandler_->hasValidMessage())
 	{
 		ros::Duration duration = now - lastOperationalStateRequestTime_;
 		if (duration.toSec() > 1.0f)
@@ -246,7 +257,19 @@ void BrainStemMessageProcessor::checkForBrainstemFaultTimer(const ros::TimerEven
 		}
 	}
 
-	operationalStateHandler_.setBrainstemTimeout(brainstemTimeout);
+	operationalStateHandler_->setBrainstemTimeout(brainstemTimeout);
+}
+
+void BrainStemMessageProcessor::addHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler)
+{
+    hwMessageHandlers_[hardwareMessageHandler->getKey()] = hardwareMessageHandler;
+
+	hardwareHandlers_.push_back(hardwareMessageHandler);
+}
+
+void BrainStemMessageProcessor::addSoftwareMessage(SoftwareMessagePtr softwareMessage)
+{
+	softwareHandlers_.push_back(softwareMessage);
 }
 
 bool BrainStemMessageProcessor::isSetupComplete() const
@@ -258,8 +281,8 @@ void BrainStemMessageProcessor::checkSetupComplete()
 {
 	if (!setupComplete_)
 	{
-		if (hardwareInfoHandler_.hasValidMessage() &&
-			operationalStateHandler_.hasValidMessage() &&
+		if (hardwareInfoHandler_->hasValidMessage() &&
+			operationalStateHandler_->hasValidMessage() &&
 			isConnected_)
 		{
 			bool resync = syncState_;
@@ -279,9 +302,10 @@ void BrainStemMessageProcessor::checkSetupComplete()
 			{
 				ROS_INFO("Brainstem driver: Resyncing brainstem state");
 
-				setMotionStateHandler_.sync();
-				soundHandler_.sync();
-				updateUIHandler_.sync();
+				for (auto handler : softwareHandlers_)
+				{
+					handler->sync();
+				}
 			}
 
 			connectedChannel_.publish(syncState_);

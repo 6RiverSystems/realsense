@@ -6,8 +6,8 @@
 #pragma once
 
 #include <BrainStemMessages.hpp>
+#include <sw_message/SoftwareMessage.hpp>
 
-#include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/platform/observer/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_OdometryRpm.hpp>
@@ -17,7 +17,7 @@ namespace srs {
 class BrainStemMessageProcessorInterface;
 
 class SetOdometryRpmHandler :
-    public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
+	public SoftwareMessage,
     public Observer<Subscriber<srslib_framework::OdometryRpm>>
 {
 public:

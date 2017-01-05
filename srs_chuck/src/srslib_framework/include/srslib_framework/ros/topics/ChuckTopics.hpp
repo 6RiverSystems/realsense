@@ -31,6 +31,7 @@ namespace driver {
     static const string BRAINSTEM_CMD_SOUND = "/internal/drivers/brainstem/cmd/sound";
     static const string BRAINSTEM_CMD_UPDATE_LIGHTS = "/internal/drivers/brainstem/cmd/update_ui";
     static const string BRAINSTEM_CMD_PING = "/internal/drivers/brainstem/cmd/ping";
+    static const string BRAINSTEM_CMD_RESET = "/internal/drivers/brainstem/cmd/reset";
     static const string BRAINSTEM_CMD_SET_MOTION_STATE = "/internal/drivers/brainstem/cmd/set_motion_state";
     static const string BRAINSTEM_STATE_CONNECTED = "/internal/drivers/brainstem/state/connected";
     static const string BRAINSTEM_BUTTON_PRESSED = "/internal/drivers/brainstem/button_pressed";
@@ -81,6 +82,7 @@ namespace monitoring {
 } // namespace monitoring
 
 namespace sensor {
+    static const string FILTERED_DEPTH_CAMERA = "/internal/sensors/rgbd/scan/filtered";
     static const string FILTERED_LIDAR = "/internal/sensors/lidar/scan/filtered";
 
     static const string JOYPAD_STATE = "/internal/sensors/joypad/state";

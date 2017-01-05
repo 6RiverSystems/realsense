@@ -14,9 +14,11 @@
 
 #include <srslib_framework/ros/tap/TapSensorOdometryPose.hpp>
 #include <srslib_framework/ros/tap/RosTapOperationalState.hpp>
+#include <srslib_framework/ros/tap/TapFilteredDepthCamera.hpp>
 #include <srslib_framework/ros/tap/TapFilteredLidar.hpp>
 #include <srslib_framework/ros/tap/TapRobotPose.hpp>
 #include <srslib_framework/ros/tap/TapLidarPoseOnRobot.hpp>
+#include <srslib_framework/ros/tap/TapDepthCameraPoseOnRobot.hpp>
 #include <srslib_framework/ros/tap/TapBrainstem_Connected.hpp>
 
 #include <srslib_framework/platform/timing/MasterTimingDataRecorder.hpp>
@@ -40,10 +42,14 @@ private:
     // Taps
     TapSensorOdometryPose tapOdometryPose_;
     TapFilteredLidar tapFilteredLidar_;
+    TapFilteredDepthCamera tapFilteredDepthCamera_;
 
     TapLidarPoseOnRobot tapLidarPoseOnRobot_;
+    TapDepthCameraPoseOnRobot tapDepthCameraPoseOnRobot_;
+
     TapRobotPose tapRobotPose_;
     TapBrainstem_Connected tapBrainstemConnected_;
+    RosTapOperationalState tapOperationalState_;
 
     // Channels
     ChannelBrainstemCmd_SetMotionState setMotionStateChannel_;
@@ -59,6 +65,9 @@ private:
     bool brainstemConnected_ = false;
 
     bool enableHardStopDebugPlotting_ = false;
+
+    bool checkDepthCameraHardStop_ = false;
+    bool checkLidarHardStop_ = true;
 };
 
 } /* namespace srs */

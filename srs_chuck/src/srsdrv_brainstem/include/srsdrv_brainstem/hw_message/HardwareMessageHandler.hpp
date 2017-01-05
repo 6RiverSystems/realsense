@@ -6,7 +6,10 @@
 #pragma once
 
 #include <ros/ros.h>
-#include <HardwareMessage.hpp>
+
+#include <BrainStemMessageProcessorInterface.hpp>
+
+#include <hw_message/HardwareMessage.hpp>
 
 namespace srs {
 
@@ -14,7 +17,7 @@ class HardwareMessageHandler
 {
 public:
     HardwareMessageHandler(BRAIN_STEM_MSG messageKey) :
-        messageKey_(messageKey)
+		messageKey_(messageKey)
     {
     }
 
@@ -43,5 +46,7 @@ private:
 
     BRAIN_STEM_MSG		messageKey_;
 };
+
+typedef std::shared_ptr<HardwareMessageHandler> HardwareMessageHandlerPtr;
 
 } // namespace srs

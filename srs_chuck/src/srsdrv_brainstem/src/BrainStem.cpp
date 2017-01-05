@@ -12,6 +12,7 @@
 #include <srslib_framework/MsgHardwareInfo.h>
 #include <srslib_framework/MsgOperationalState.h>
 #include <srslib_framework/io/SerialIO.hpp>
+#include <srslib_framework/io/HidIO.hpp>
 #include <srslib_framework/platform/Thread.hpp>
 #include <bitset>
 
@@ -21,9 +22,11 @@
 namespace srs
 {
 
-BrainStem::BrainStem( const std::string& strSerialPort ) :
-	serialIO_( new SerialIO( "brainstem" ) ),
-	messageProcessor_( serialIO_ ),
+BrainStem::BrainStem(string name, int argc, char** argv) :
+	RosUnit(name, argc, argv, REFRESH_RATE_HZ),
+	io_( new HidIO( "brainstem", 0x1930, 0x6001 ) ),
+
+	messageProcessor_( io_ ),
 	brainstemFaultTimer_(),
 	nodeHandle_("~")
 {
@@ -32,27 +35,9 @@ BrainStem::BrainStem( const std::string& strSerialPort ) :
 
 	connectionChanged( false );
 
-	std::shared_ptr<SerialIO> pSerialIO = std::dynamic_pointer_cast<SerialIO>( serialIO_ );
+	io_->open( std::bind( &BrainStem::connectionChanged, this, std::placeholders::_1 ),
+		std::bind( &BrainStemMessageProcessor::processHardwareMessage, &messageProcessor_, std::placeholders::_1) );
 
-	pSerialIO->EnableCRC( true );
-	pSerialIO->SetTerminatingCharacter( '\n' );
-	pSerialIO->SetEscapeCharacter( '\\' );
-
-    auto processMessage = [&]( std::vector<char> buffer )
-    {
-        ExecuteInRosThread( std::bind( &BrainStemMessageProcessor::processHardwareMessage,
-            &messageProcessor_, buffer));
-	};
-
-	auto connectionChanged = [&]( bool bIsConnected )
-	{
-		ExecuteInRosThread( std::bind( &BrainStem::connectionChanged, this,
-				bIsConnected ) );
-	};
-
-	pSerialIO->Open( strSerialPort.c_str( ), connectionChanged, processMessage );
-
-    // Check for hardware faults
 	brainstemFaultTimer_ = nodeHandle_.createTimer(ros::Duration(1.0f / REFRESH_RATE_HZ),
         boost::bind(&BrainStemMessageProcessor::checkForBrainstemFaultTimer,
         	&messageProcessor_, _1));
@@ -63,11 +48,15 @@ BrainStem::~BrainStem( )
 
 }
 
-void BrainStem::run( )
+void BrainStem::execute()
 {
-	ros::Rate refreshRate( REFRESH_RATE_HZ );
+	io_->spinOnce();
+}
 
-	ros::spin( );
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void BrainStem::initialize()
+{
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,14 +67,14 @@ void BrainStem::connectionChanged( bool bIsConnected )
 {
 	messageProcessor_.setConnected(bIsConnected);
 
-	if( !bIsConnected )
-	{
-		brainstemEmulator_.reset( new BrainStemEmulator( ) );
-	}
-	else
-	{
-		brainstemEmulator_.reset( );
-	}
+//	if( !bIsConnected )
+//	{
+//		brainstemEmulator_.reset( new BrainStemEmulator( ) );
+//	}
+//	else
+//	{
+//		brainstemEmulator_.reset( );
+//	}
 }
 
 void BrainStem::cfgCallback(srsdrv_brainstem::RobotSetupConfig &config,

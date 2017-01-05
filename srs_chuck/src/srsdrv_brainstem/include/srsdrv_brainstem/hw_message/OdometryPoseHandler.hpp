@@ -8,7 +8,7 @@
 #include <tf/transform_broadcaster.h>
 
 #include <BrainStemMessages.hpp>
-#include <HardwareMessageHandler.hpp>
+#include <hw_message/HardwareMessageHandler.hpp>
 
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryPose.hpp>
 

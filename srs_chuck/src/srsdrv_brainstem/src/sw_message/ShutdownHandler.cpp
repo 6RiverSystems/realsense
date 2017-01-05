@@ -15,7 +15,7 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////TapBrainstemCmd_Startup
 ShutdownHandler::ShutdownHandler(BrainStemMessageProcessorInterface* owner) :
-    SoftwareMessageHandler(owner)
+	SoftwareMessage(owner)
 {
 }
 
@@ -38,7 +38,7 @@ void ShutdownHandler::encodeData(const bool& shutdown)
 
 	ROS_INFO( "Brain => Brainstem: SHUTDOWN");
 
-	getOwner()->sendCommand(reinterpret_cast<char*>(&cMessage), 1);
+	sendCommand(reinterpret_cast<char*>(&cMessage), 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -27,18 +27,22 @@ HardStopReflex::~HardStopReflex()
 
 }
 
-void HardStopReflex::setLaserScan(const sensor_msgs::LaserScan& scan)
+void HardStopReflex::setLaserScan(const sensor_msgs::LaserScan& scan, LaserScanType type)
 {
+    createLaserMapEntryIfMissing(type);
+    LaserScanMapItem& laserScan = laserScansMap_[type];
+
     if (!latestPose_.isValid())
     {
         ROS_WARN("Cannot save the laser scan without valid transforms.");
         return;
     }
-    tf::Transform lidarToMap = PoseMessageFactory::pose2Transform(latestPose_) * lidarPose_;
+    tf::Transform lidarToMap = PoseMessageFactory::pose2Transform(latestPose_) * laserScan.pose;
+
 
     // Iterate over the scan and convert into the map frame.
-    laserScan_.clear();
-    laserScan_.reserve(scan.ranges.size());
+    laserScan.scan.clear();
+    laserScan.scan.reserve(scan.ranges.size());
     uint32_t numberOfPoints = scan.ranges.size();
     for (size_t k = 0; k < scan.ranges.size(); ++k)
     {
@@ -55,10 +59,20 @@ void HardStopReflex::setLaserScan(const sensor_msgs::LaserScan& scan)
             ROS_DEBUG("x: %f, y: %f, in map: x: %f, y: %f", x, y, ptInMap.x, ptInMap.y);
 
             // Now convert the data into a bg point
-            laserScan_.push_back(clPoint(ptInMap.x * CL_SCALE_FACTOR, ptInMap.y * CL_SCALE_FACTOR));
+            laserScan.scan.push_back(clPoint(ptInMap.x * CL_SCALE_FACTOR, ptInMap.y * CL_SCALE_FACTOR));
         }
     }
 }
+
+void HardStopReflex::createLaserMapEntryIfMissing(LaserScanType type)
+{
+    // Check to see if the type is already in the map
+    if (laserScansMap_.find(type) == laserScansMap_.end())
+    {
+        laserScansMap_[type] = LaserScanMapItem();
+    }
+}
+
 
 bool HardStopReflex::checkHardStop()
 {
@@ -77,7 +91,7 @@ bool HardStopReflex::checkHardStop()
     if (shouldHardStop)
     {
         failedDangerZone_ = dangerZone_;
-        failedLaserScan_ = laserScan_;
+        // failedLaserScan_ = laserScan_;
         waitingForClear_ = true;
     }
     return shouldHardStop;
@@ -105,16 +119,18 @@ bool HardStopReflex::checkForDangerZoneViolation()
 
     // Iterate over the points.
     uint32_t numBadPoints = 0;
-    for (auto pt : laserScan_)
+    for (auto const& kv : laserScansMap_)
     {
-        if (ClipperLib::PointInPolygon(pt, dangerZone_))
+        for (auto const& pt : kv.second.scan)
         {
-            ROS_DEBUG("Found a point in the danger zone at [%f, %f].  Robot at [%f, %f, th: %f].",
-                pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, latestPose_.x, latestPose_.y, latestPose_.theta);
-            numBadPoints++;
+            if (ClipperLib::PointInPolygon(pt, dangerZone_))
+            {
+                ROS_DEBUG("Found a point in the danger zone at [%f, %f].  Robot at [%f, %f, th: %f].",
+                    pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, latestPose_.x, latestPose_.y, latestPose_.theta);
+                numBadPoints++;
+            }
         }
     }
-
     return numBadPoints >= numBadPointsForViolation_;
 }
 
@@ -125,16 +141,16 @@ void HardStopReflex::dumpDataToLog()
     std::cout << "Pose: " << latestPose_.x << ", " << latestPose_.y << ", " << latestPose_.theta << std::endl;
 
     std::cout << "Danger Zone: " << std::endl;
-    for (auto p : dangerZone_)
+    for (auto const& p : dangerZone_)
     {
         std::cout << "  " << p.X << ", " << p.Y << std::endl;
     }
 
-    std::cout << "Scan on map: " << std::endl;
-    for (auto p : laserScan_)
-    {
-        std::cout << "  " << p.X << ", " << p.Y << std::endl;
-    }
+    // std::cout << "Scan on map: " << std::endl;
+    // for (auto const& p : laserScan_)
+    // {
+    //     std::cout << "  " << p.X << ", " << p.Y << std::endl;
+    // }
 
 }
 
@@ -243,8 +259,7 @@ void HardStopReflex::addPoseToPolygonStack(PathVector& polygons, Pose<> pose, co
     // Convert the footprint points to the pose
     clPath footprintPolygon;
 
-    // std::cout << "New footprint points: " << std::endl;
-    for (auto p : footprint)
+    for (auto const& p : footprint)
     {
         Pose<> point = PoseMath::multiply(pose, p);
         footprintPolygon.push_back(clPoint(point.x * CL_SCALE_FACTOR, point.y * CL_SCALE_FACTOR));
@@ -255,7 +270,7 @@ void HardStopReflex::addPoseToPolygonStack(PathVector& polygons, Pose<> pose, co
 void HardStopReflex::calculateUnion(clPath& output, PathVector& polygons)
 {
     ClipperLib::Clipper c;
-    for (auto p : polygons)
+    for (auto const& p : polygons)
     {
         c.AddPath(p, ClipperLib::ptSubject, true);
     }
@@ -273,7 +288,7 @@ void HardStopReflex::calculateUnion(clPath& output, PathVector& polygons)
 
 bool HardStopReflex::checkForClear()
 {
-    if (waitingForClear_
+    if ((waitingForClear_ || robotState_.hardStop)
         && BasicMath::equal(latestVelocity_.linear, 0.0, VELOCITY_EPSILON)
         && BasicMath::equal(latestVelocity_.angular, 0.0, VELOCITY_EPSILON))
     {
@@ -309,7 +324,7 @@ PoseVector HardStopReflex::clPathToPoseVector(const clPath& path) const
     }
 
     out.reserve(path.size());
-    for (auto pt : path)
+    for (auto const& pt : path)
     {
         out.push_back(Pose<>(pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, 0.0));
     }

@@ -6,7 +6,7 @@
 #pragma once
 
 #include <BrainStemMessages.hpp>
-#include <HardwareMessageHandler.hpp>
+#include <hw_message/HardwareMessageHandler.hpp>
 
 #include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 
@@ -23,6 +23,8 @@ public:
     void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
     bool hasValidMessage() const { return hasValidMessage_; };
+
+    void reset() { hasValidMessage_ = false; };
 
 private:
 

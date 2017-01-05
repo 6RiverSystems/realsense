@@ -6,8 +6,8 @@
 #pragma once
 
 #include <BrainStemMessages.hpp>
+#include <sw_message/SoftwareMessage.hpp>
 
-#include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/platform/observer/Observer.hpp>
 #include <srslib_framework/ros/tap/TapBrainstemCmd_Sound.hpp>
@@ -17,7 +17,7 @@ namespace srs {
 class BrainStemMessageProcessorInterface;
 
 class SoundHandler :
-    public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
+	public SoftwareMessage,
     public Observer<Subscriber<srslib_framework::Sound>>
 {
 public:
@@ -31,6 +31,8 @@ public:
 
     void encodeData(const Sound& value);
 
+    void syncState();
+
 private:
 
     HW_MESSAGE_BEGIN(SoundData)
@@ -41,6 +43,8 @@ private:
         uint8_t dutyCycle;
         uint16_t numberOfCycles;
     HW_MESSAGE_END
+
+	Sound sound_;
 
 	std::shared_ptr<TapBrainstemCmd_Sound> tapSound_;
 };

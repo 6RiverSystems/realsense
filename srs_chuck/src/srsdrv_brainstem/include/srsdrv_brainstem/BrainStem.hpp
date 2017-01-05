@@ -8,6 +8,8 @@
 #include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
 
+#include <srslib_framework/ros/unit/RosUnit.hpp>
+
 #include <srslib_framework/io/IO.hpp>
 
 #include <BrainStemEmulator.hpp>
@@ -18,28 +20,32 @@
 namespace srs
 {
 
-class BrainStem
+class BrainStem : public RosUnit<BrainStem>
 {
 
 public:
 
-	BrainStem(const std::string& strSerialPort);
+	BrainStem(string name, int argc, char** argv);
 
 	virtual ~BrainStem();
 
-	void run();
+protected:
 
-	void connectionChanged(bool bIsConnected);
+    void execute();
+
+    void initialize();
 
 private:
 
+	void connectionChanged(bool bIsConnected);
+
     void cfgCallback(srsdrv_brainstem::RobotSetupConfig &config, uint32_t level);
 
-	static constexpr auto REFRESH_RATE_HZ = 10.0f;
+	static constexpr auto REFRESH_RATE_HZ = 1000.0f;
 
 	dynamic_reconfigure::Server<srsdrv_brainstem::RobotSetupConfig> configServer_;
 
-	std::shared_ptr<IO>					serialIO_;
+	std::shared_ptr<IO>					io_;
 
 	std::shared_ptr<BrainStemEmulator>	brainstemEmulator_;
 

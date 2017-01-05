@@ -22,6 +22,7 @@
 	<remap from="/camera/nodelet_manager/bond" to="/internal/sensors/rgbd/nodelet_manager/bond"/>
 
 	<param name="$(arg camera)/driver/r200_dc_preset" type="int" value="4" />
+
 	<param name="$(arg camera)/driver/r200_lr_auto_exposure_enabled" type="bool" value="false" />
 	<param name="$(arg camera)/driver/r200_lr_gain"	type="int" value="100" />
 	<param name="$(arg camera)/driver/r200_lr_exposure" type="int" value="330" />
@@ -53,7 +54,10 @@
             range_max: 4.0
             height_min: 0.1
             height_max: 3.0
+<<<<<<< HEAD
             offset_bottom_row: 80
+=======
+>>>>>>> develop
         </rosparam>
         </node>
 

@@ -13,6 +13,8 @@ namespace ChuckTransforms {
 
     static const string LIDAR = "sick_lidar";
 
+    static const string DEPTH_CAMERA = "laser_frame";
+
     static const string MAP = "map";
 
     static const string ODOMETRY = "odom";

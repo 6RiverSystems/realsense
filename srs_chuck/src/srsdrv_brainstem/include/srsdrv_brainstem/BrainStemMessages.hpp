@@ -65,6 +65,8 @@ enum class BRAIN_STEM_CMD : uint8_t
 	SOUND_BUZZER            = 0x73, // 's'
 	STARTUP                 = 0x38, // '8'
 
+	FORCE_WATCHDOG_TIMEOUT	= 0x77, // 'w'
+
 	UPDATE_LIGHT            = 0x37, // '7'
 	UNKNOWN
 };

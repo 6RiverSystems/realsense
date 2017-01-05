@@ -6,8 +6,8 @@
 #pragma once
 
 #include <BrainStemMessages.hpp>
+#include <sw_message/SoftwareMessage.hpp>
 
-#include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/platform/observer/Observer.hpp>
 #include <srslib_framework/ros/tap/subscriber/SubscriberRosTwist.hpp>
@@ -17,7 +17,7 @@ namespace srs {
 class BrainStemMessageProcessorInterface;
 
 class SetVelocityHandler :
-    public SoftwareMessageHandler<BrainStemMessageProcessorInterface>,
+	public SoftwareMessage,
     public SubscriberRosTwist
 {
 public:
@@ -25,9 +25,9 @@ public:
 
     virtual ~SetVelocityHandler() {}
 
-    void attach();
-
     virtual void receiveData(const geometry_msgs::Twist::ConstPtr data);
+
+    void syncState();
 
 private:
 
@@ -36,6 +36,8 @@ private:
 		float linearVelocity;
 		float angularVelocity;
 	HW_MESSAGE_END
+
+	geometry_msgs::Twist::ConstPtr twist_;
 };
 
 } // namespace srs

@@ -21,10 +21,10 @@
 	<remap from="/camera/ir2/image_raw" to="/internal/sensors/rgbd/ir2/image_raw"/>
 	<remap from="/camera/nodelet_manager/bond" to="/internal/sensors/rgbd/nodelet_manager/bond"/>
 
-	<param name="$(arg camera)/driver/r200_dc_preset" type="int" value="5" />
-	<!--param name="$(arg camera)/driver/r200_lr_auto_exposure_enabled" type="bool" value="false" /-->
-	<!--param name="$(arg camera)/driver/r200_lr_gain"	type="int" value="100" /-->
-	<!--param name="$(arg camera)/driver/r200_lr_exposure" type="int" value="330" /-->
+	<param name="$(arg camera)/driver/r200_dc_preset" type="int" value="4" />
+	<param name="$(arg camera)/driver/r200_lr_auto_exposure_enabled" type="bool" value="false" />
+	<param name="$(arg camera)/driver/r200_lr_gain"	type="int" value="100" />
+	<param name="$(arg camera)/driver/r200_lr_exposure" type="int" value="330" />
        
 	<!-- Intel Realsense R200 driver -->
 	<include file="$(find realsense_camera)/launch/r200_nodelet_modify_params.launch" >
@@ -33,8 +33,8 @@
 	<arg name="enable_color"      	value="false" />
 	<arg name="enable_pointcloud" 	value="false" />
 	<arg name="enable_tf"         	value="false" />
-	<arg name="depth_height"        value="480" />
-	<arg name="depth_width"         value="640" />
+	<arg name="depth_height"        value="240" />
+	<arg name="depth_width"         value="320" />
 	<arg name="depth_fps"		value="30" />
 	<arg name="color_fps"		value="30" />
 	</include>
@@ -47,12 +47,13 @@
         <remap from="scan" to="/internal/sensors/rgbd/scan"/>
         <rosparam>
             output_frame_id: laser_frame
-            scan_height: 150
+            scan_height: 120
             scan_time: 0.333
             range_min: 0.3
             range_max: 4.0
             height_min: 0.1
-            height_max: 5.0
+            height_max: 3.0
+            offset_bottom_row: 80
         </rosparam>
         </node>
 

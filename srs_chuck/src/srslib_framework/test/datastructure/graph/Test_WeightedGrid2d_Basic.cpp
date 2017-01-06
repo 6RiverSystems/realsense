@@ -324,3 +324,23 @@ TEST(Test_WeightedGraph2d, EqualOperator)
 
     ASSERT_NE(correct, grid3) << "The grids do match";
 }
+
+TEST(Test_WeightedGraph2d, CopyConstructor)
+{
+    WeightedGrid2d correct(10);
+    correct.setPayload(P_3_3, 3);
+    correct.setPayload(P_1_1, 1);
+    correct.setPayload(P_2_2, 2);
+    correct.setWeights(P_2_2, 10, 20, 30, 40);
+
+    WeightedGrid2d grid1 = correct;
+
+    ASSERT_EQ(grid1, grid1) << "The grid does not agree with itself";
+    ASSERT_EQ(correct, grid1) << "The grids do not match";
+
+    WeightedGrid2d grid2(grid1);
+
+    ASSERT_EQ(grid2, grid2) << "The grid does not agree with itself";
+    ASSERT_EQ(grid1, grid2) << "The grids do not match";
+    ASSERT_EQ(correct, grid2) << "The grids do not match";
+}

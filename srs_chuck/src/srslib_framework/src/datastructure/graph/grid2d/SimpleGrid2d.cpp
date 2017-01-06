@@ -1,4 +1,4 @@
-#include <srslib_framework/datastructure/graph/grid2d/WeightedGrid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/SimpleGrid2d.hpp>
 
 #include <srslib_framework/datastructure/graph/grid2d/OutOfRangeException.hpp>
 
@@ -7,27 +7,23 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-const WeightedGrid2d::BaseType WeightedGrid2d::PAYLOAD_MIN = 0;
-const WeightedGrid2d::BaseType WeightedGrid2d::PAYLOAD_MAX = 255;
-
-const WeightedGrid2d::BaseType WeightedGrid2d::WEIGHT_MIN = 0;
-const WeightedGrid2d::BaseType WeightedGrid2d::WEIGHT_MAX = 255;
+const SimpleGrid2d::BaseType SimpleGrid2d::PAYLOAD_MIN = 0;
+const SimpleGrid2d::BaseType SimpleGrid2d::PAYLOAD_MAX = 254;
+const SimpleGrid2d::BaseType SimpleGrid2d::PAYLOAD_NO_INFORMATION = 255;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-WeightedGrid2d::WeightedGrid2d(const WeightedGrid2d& other) :
+SimpleGrid2d::SimpleGrid2d(const SimpleGrid2d& other) :
     BaseGrid2d(other.getWidth(), other.getHeight())
 {
     for (auto node : other.grid_)
     {
         Node* internalNode = node.second;
-        addNode(internalNode->location,
-            internalNode->payload,
-            internalNode->north, internalNode->east, internalNode->south, internalNode->west);
+        addNode(internalNode->location, internalNode->payload);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void WeightedGrid2d::clear()
+void SimpleGrid2d::clear()
 {
     for (auto node : grid_)
     {
@@ -38,7 +34,7 @@ void WeightedGrid2d::clear()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void WeightedGrid2d::clear(const Location& location)
+void SimpleGrid2d::clear(const Location& location)
 {
     auto found = grid_.find(location);
     if (found != grid_.end())
@@ -49,7 +45,7 @@ void WeightedGrid2d::clear(const Location& location)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-WeightedGrid2d::BaseType WeightedGrid2d::getPayload(const Location& location) const
+SimpleGrid2d::BaseType SimpleGrid2d::getPayload(const Location& location) const
 {
     Node* node = findNode(location);
     if (node)
@@ -57,11 +53,11 @@ WeightedGrid2d::BaseType WeightedGrid2d::getPayload(const Location& location) co
         return node->payload;
     }
 
-    return PAYLOAD_MIN;
+    return PAYLOAD_NO_INFORMATION;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-WeightedGrid2d::BaseType WeightedGrid2d::getPayload(const Position& position) const
+SimpleGrid2d::BaseType SimpleGrid2d::getPayload(const Position& position) const
 {
     Node* node = findNode(position);
     if (node)
@@ -69,57 +65,11 @@ WeightedGrid2d::BaseType WeightedGrid2d::getPayload(const Position& position) co
         return node->payload;
     }
 
-    return PAYLOAD_MIN;
+    return PAYLOAD_NO_INFORMATION;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-WeightedGrid2d::BaseType WeightedGrid2d::getWeight(const Position& position) const
-{
-    Node* node = findNode(position);
-    if (node)
-    {
-        switch (position.orientation)
-        {
-            case ORIENTATION_EAST:
-                return node->east;
-
-            case ORIENTATION_NORTH:
-                return node->north;
-
-            case ORIENTATION_WEST:
-                return node->west;
-
-            case ORIENTATION_SOUTH:
-                return node->south;
-        }
-    }
-
-    return WEIGHT_MIN;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void WeightedGrid2d::getWeights(const Location& location,
-    BaseType& north, BaseType& east, BaseType& south, BaseType& west) const
-{
-    Node* node = findNode(location);
-    if (node)
-    {
-        north = node->north;
-        east = node->east;
-        south = node->south;
-        west = node->west;
-    }
-    else
-    {
-        north = WEIGHT_MIN;
-        east = WEIGHT_MIN;
-        south = WEIGHT_MIN;
-        west = WEIGHT_MIN;
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void WeightedGrid2d::maxOnPayload(const Location& location, BaseType otherPayload)
+void SimpleGrid2d::maxOnPayload(const Location& location, BaseType otherPayload)
 {
     updatePayload(location, otherPayload,
         [] (BaseType oldPayload, BaseType newPayload) -> BaseType
@@ -130,51 +80,23 @@ void WeightedGrid2d::maxOnPayload(const Location& location, BaseType otherPayloa
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-ostream& operator<<(ostream& stream, const WeightedGrid2d& grid)
+ostream& operator<<(ostream& stream, const SimpleGrid2d& grid)
 {
-    stream << "Grid2d {" << endl;
+    stream << "SimpleGrid2d {" << endl;
 
     stream << "(" << grid.getHeight() << "x" << grid.getWidth() << ")" << endl;
 
     grid.printGrid(stream, "Simplified",
-        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
+        [] (SimpleGrid2d::Node* node) -> SimpleGrid2d::BaseType
         {
             return node->payload;
         }
     );
 
     grid.print(stream, "Payload",
-        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
+        [] (SimpleGrid2d::Node* node) -> SimpleGrid2d::BaseType
         {
             return node->payload;
-        }
-    );
-
-    grid.print(stream, "North Weights",
-        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
-        {
-            return node->north;
-        }
-    );
-
-    grid.print(stream, "East Weights",
-        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
-        {
-            return node->east;
-        }
-    );
-
-    grid.print(stream, "South Weights",
-        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
-        {
-            return node->south;
-        }
-    );
-
-    grid.print(stream, "West Weights",
-        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
-        {
-            return node->west;
         }
     );
 
@@ -184,7 +106,7 @@ ostream& operator<<(ostream& stream, const WeightedGrid2d& grid)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool operator==(const WeightedGrid2d& lhs, const WeightedGrid2d& rhs)
+bool operator==(const SimpleGrid2d& lhs, const SimpleGrid2d& rhs)
 {
     // First check addresses
     if (&lhs == &rhs)
@@ -211,7 +133,7 @@ bool operator==(const WeightedGrid2d& lhs, const WeightedGrid2d& rhs)
     // Check that the grids contain the same items
     for (auto it : lhs.grid_)
     {
-        WeightedGrid2d::Node* node = rhs.findNode(it.first);
+        SimpleGrid2d::Node* node = rhs.findNode(it.first);
         if (!node || *it.second != *node)
         {
             return false;
@@ -222,7 +144,7 @@ bool operator==(const WeightedGrid2d& lhs, const WeightedGrid2d& rhs)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void WeightedGrid2d::setPayload(const Location& location, BaseType newPayload)
+void SimpleGrid2d::setPayload(const Location& location, BaseType newPayload)
 {
     updatePayload(location, newPayload,
         [] (BaseType oldPayload, BaseType newPayload) -> BaseType
@@ -233,36 +155,10 @@ void WeightedGrid2d::setPayload(const Location& location, BaseType newPayload)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void WeightedGrid2d::setWeights(const Location& location,
-    BaseType north, BaseType east, BaseType south, BaseType west)
-{
-    Node* node = findNode(location);
-
-    bool nonZeroWeights = north != WEIGHT_MIN || east != WEIGHT_MIN ||
-        south != WEIGHT_MIN || west != WEIGHT_MIN;
-
-    if (!node)
-    {
-        if (!nonZeroWeights)
-        {
-            return;
-        }
-        addNode(location, PAYLOAD_MIN, north, east, south, west);
-    }
-    else
-    {
-        node->north = north;
-        node->east = east;
-        node->south = south;
-        node->west = west;
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void WeightedGrid2d::printGrid(ostream& stream, string title,
+void SimpleGrid2d::printGrid(ostream& stream, string title,
     std::function<BaseType (Node*)> fieldSelection) const
 {
     if (!title.empty())
@@ -274,25 +170,18 @@ void WeightedGrid2d::printGrid(ostream& stream, string title,
     {
         for (int x = 0; x < getWidth(); ++x)
         {
-            WeightedGrid2d::Node* node = findNode(x, y);
+            SimpleGrid2d::Node* node = findNode(x, y);
             if (node)
             {
                 BaseType payload = fieldSelection(node);
 
-                if (payload == WeightedGrid2d::PAYLOAD_MAX)
+                if (payload == SimpleGrid2d::PAYLOAD_MAX)
                 {
                     stream << "# ";
                 }
-                else if (payload == WeightedGrid2d::PAYLOAD_MIN)
+                else if (payload == SimpleGrid2d::PAYLOAD_MIN)
                 {
-                    if (node->zeroWeights())
-                    {
-                        stream << ". ";
-                    }
-                    else
-                    {
-                        stream << "' ";
-                    }
+                    stream << ". ";
                 }
                 else
                 {
@@ -309,7 +198,7 @@ void WeightedGrid2d::printGrid(ostream& stream, string title,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void WeightedGrid2d::print(ostream& stream, string title,
+void SimpleGrid2d::print(ostream& stream, string title,
     std::function<BaseType (Node*)> fieldSelection) const
 {
     if (!title.empty())
@@ -330,16 +219,20 @@ void WeightedGrid2d::print(ostream& stream, string title,
         stream << right << setw(WIDTH) << y;
         for (int x = 0; x < getWidth(); ++x)
         {
-            WeightedGrid2d::Node* node = findNode(x, y);
+            SimpleGrid2d::Node* node = findNode(x, y);
             if (node)
             {
                 BaseType info = fieldSelection(node);
 
-                if (info == WeightedGrid2d::PAYLOAD_MAX)
+                if (info == SimpleGrid2d::PAYLOAD_MAX)
                 {
                     stream << right << setw(WIDTH) << "#";
                 }
-                else if (info == WeightedGrid2d::PAYLOAD_MIN)
+                else if (info == SimpleGrid2d::PAYLOAD_NO_INFORMATION)
+                {
+                    stream << right << setw(WIDTH) << "?";
+                }
+                else if (info == SimpleGrid2d::PAYLOAD_MIN)
                 {
                     stream << right << setw(WIDTH) << ".";
                 }
@@ -358,7 +251,7 @@ void WeightedGrid2d::print(ostream& stream, string title,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void WeightedGrid2d::updatePayload(const Location& location, BaseType newPayload,
+void SimpleGrid2d::updatePayload(const Location& location, BaseType newPayload,
     std::function<BaseType (BaseType, BaseType)> payloadSelection)
 {
     if (!isWithinBounds(location))
@@ -373,10 +266,8 @@ void WeightedGrid2d::updatePayload(const Location& location, BaseType newPayload
         finalPayload = payloadSelection(node->payload, newPayload);
         node->payload = finalPayload;
 
-        // Remove the node if the specified payload
-        // is the minimum available payload and there is no additional
-        // information in the weights
-        if (finalPayload == PAYLOAD_MIN && node->zeroWeights())
+        // Remove the node if the specified payload has no information
+        if (finalPayload == PAYLOAD_NO_INFORMATION)
         {
             clear(location);
         }
@@ -387,9 +278,9 @@ void WeightedGrid2d::updatePayload(const Location& location, BaseType newPayload
 
         // Add a new node only if the specified payload
         // is not the minimum available payload
-        if (finalPayload != PAYLOAD_MIN)
+        if (finalPayload != PAYLOAD_NO_INFORMATION)
         {
-            addNode(location, finalPayload, WEIGHT_MIN, WEIGHT_MIN, WEIGHT_MIN, WEIGHT_MIN);
+            addNode(location, finalPayload);
         }
     }
 }

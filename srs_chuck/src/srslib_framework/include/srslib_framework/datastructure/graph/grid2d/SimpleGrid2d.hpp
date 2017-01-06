@@ -21,26 +21,24 @@ using namespace std;
 
 namespace srs {
 
-class WeightedGrid2d : public BaseGrid2d
+class SimpleGrid2d: public BaseGrid2d
 {
 public:
+    static const BaseType PAYLOAD_NO_INFORMATION;
     static const BaseType PAYLOAD_MIN;
     static const BaseType PAYLOAD_MAX;
 
-    static const BaseType WEIGHT_MIN;
-    static const BaseType WEIGHT_MAX;
-
-    WeightedGrid2d(unsigned int size) :
+    SimpleGrid2d(unsigned int size) :
         BaseGrid2d(size)
     {}
 
-    WeightedGrid2d(unsigned int width, unsigned int height) :
+    SimpleGrid2d(unsigned int width, unsigned int height) :
         BaseGrid2d(width, height)
     {}
 
-    WeightedGrid2d(const WeightedGrid2d& other);
+    SimpleGrid2d(const SimpleGrid2d& other);
 
-    ~WeightedGrid2d()
+    ~SimpleGrid2d()
     {
         clear();
     }
@@ -66,37 +64,24 @@ public:
         return grid_.size();
     }
 
-    BaseType getWeight(const Position& position) const;
-    void getWeights(const Location& location,
-        BaseType& north, BaseType& east, BaseType& south, BaseType& west) const;
-
     void maxOnPayload(const Location& location, BaseType otherPayload);
 
-    friend ostream& operator<<(ostream& stream, const WeightedGrid2d& grid);
-    friend bool operator==(const WeightedGrid2d& lhs, const WeightedGrid2d& rhs);
+    friend ostream& operator<<(ostream& stream, const SimpleGrid2d& grid);
+    friend bool operator==(const SimpleGrid2d& lhs, const SimpleGrid2d& rhs);
 
-    friend bool operator!=(const WeightedGrid2d& lhs, const WeightedGrid2d& rhs)
+    friend bool operator!=(const SimpleGrid2d& lhs, const SimpleGrid2d& rhs)
     {
         return !(lhs == rhs);
     }
 
     void setPayload(const Location& location, BaseType newPayload);
-    void setWeights(const Location& location,
-        BaseType north, BaseType east, BaseType south, BaseType west);
 
 protected:
     struct Node
     {
-        Node(Location location,
-            BaseType payload = PAYLOAD_MIN,
-            BaseType north = WEIGHT_MIN, BaseType east = WEIGHT_MIN,
-            BaseType south = WEIGHT_MIN, BaseType west = WEIGHT_MIN) :
+        Node(Location location, BaseType payload) :
             location(location),
-            payload(payload),
-            north(north),
-            east(east),
-            south(south),
-            west(west)
+            payload(payload)
         {}
 
         ~Node()
@@ -106,42 +91,24 @@ protected:
         {
             stream << "Node "<< hex << reinterpret_cast<long>(node) << dec << " {" << endl;
             stream << "l: " << node->location <<
-                ", p: " << node->payload <<
-                ", n: " << node->north <<
-                ", e: " << node->east <<
-                ", s: " << node->south <<
-                ", w: " << node->west << "}";
+                ", p: " << node->payload << "\n}";
             return stream;
         }
 
-        inline friend bool operator==(const Node& lhs, const Node& rhs)
+        friend bool operator==(const Node& lhs, const Node& rhs)
         {
             return lhs.location == rhs.location &&
-                lhs.payload == rhs.payload &&
-                lhs.north == rhs.north &&
-                lhs.east == rhs.east &&
-                lhs.south == rhs.south &&
-                lhs.west == rhs.west;
+                lhs.payload == rhs.payload;
         }
 
-        inline friend bool operator!=(const Node& lhs, const Node& rhs)
+        friend bool operator!=(const Node& lhs, const Node& rhs)
         {
             return !(lhs == rhs);
-        }
-
-        inline bool zeroWeights()
-        {
-            return north == WEIGHT_MIN && east == WEIGHT_MIN &&
-                south == WEIGHT_MIN && west == WEIGHT_MIN;
         }
 
         const Location location;
 
         BaseType payload;
-        BaseType north;
-        BaseType east;
-        BaseType south;
-        BaseType west;
     };
 
     inline Node* findNode(const int& x, const int& y) const
@@ -196,12 +163,9 @@ private:
 
     using MapType = unordered_map<Location, Node*, Hash, EqualTo>;
 
-    void addNode(const Location& location,
-        BaseType payload,
-        BaseType north, BaseType east,
-        BaseType south, BaseType west)
+    void addNode(const Location& location, BaseType payload)
     {
-        Node* node = new Node(location, payload, north, east, south, west);
+        Node* node = new Node(location, payload);
         grid_[location] = node;
     }
 
@@ -218,7 +182,7 @@ private:
 public:
     struct const_iterator
     {
-        const_iterator(WeightedGrid2d* grid, MapType::const_iterator mapIterator) :
+        const_iterator(SimpleGrid2d* grid, MapType::const_iterator mapIterator) :
             grid_(grid),
             mapIterator_(mapIterator)
         {}
@@ -258,18 +222,18 @@ public:
         }
 
     private:
-        WeightedGrid2d* grid_;
+        SimpleGrid2d* grid_;
         MapType::const_iterator mapIterator_;
     };
 
     const_iterator begin() const
     {
-        return const_iterator(const_cast<WeightedGrid2d*>(this), grid_.begin());
+        return const_iterator(const_cast<SimpleGrid2d*>(this), grid_.begin());
     }
 
     const_iterator end() const
     {
-        return const_iterator(const_cast<WeightedGrid2d*>(this), grid_.end());
+        return const_iterator(const_cast<SimpleGrid2d*>(this), grid_.end());
     }
 };
 

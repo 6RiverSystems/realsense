@@ -2,6 +2,7 @@
 
 #include <limits>
 
+#include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/utils/Filesystem.hpp>
 
 namespace srs {
@@ -90,7 +91,7 @@ void LogicalMap::checkAreas(double xM, double yM, LabeledAreaMapType& areas) con
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::maxCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost)
 {
-    getGrid()->maxOnPayload(Grid2d::Location(cCells, rCells), cost);
+    getGrid()->maxOnPayload(Location(cCells, rCells), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -148,13 +149,13 @@ bool operator==(const LogicalMap& lhs, const LogicalMap& rhs)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::setCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost)
 {
-    getGrid()->setPayload(Grid2d::Location(cCells, rCells), cost);
+    getGrid()->setPayload(Location(cCells, rCells), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::setObstacle(unsigned int cCells, unsigned int rCells)
 {
-    getGrid()->setPayload(Grid2d::Location(cCells, rCells), Grid2d::PAYLOAD_MAX);
+    getGrid()->setPayload(Location(cCells, rCells), Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -164,7 +165,7 @@ void LogicalMap::setWeights(unsigned int cCells, unsigned int rCells,
     Grid2d::BaseType south,
     Grid2d::BaseType west)
 {
-    getGrid()->setWeights(Grid2d::Location(cCells, rCells), north, east, south, west);
+    getGrid()->setWeights(Location(cCells, rCells), north, east, south, west);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -9,6 +9,7 @@
 using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
@@ -34,7 +35,7 @@ struct Grid2dUtils
 
             do
             {
-                grid.maxOnPayload(Grid2d::Location(c, r), cost);
+                grid.maxOnPayload(Location(c, r), cost);
                 c += deltaX;
             } while (c != (xf + deltaX));
 
@@ -82,7 +83,7 @@ struct Grid2dUtils
 
             do
             {
-                grid.setWeights(Grid2d::Location(c, r), north, east, south, west);
+                grid.setWeights(Location(c, r), north, east, south, west);
                 c += deltaX;
             } while (c != (xf + deltaX));
 

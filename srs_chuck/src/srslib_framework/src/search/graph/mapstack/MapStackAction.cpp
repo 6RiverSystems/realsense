@@ -21,12 +21,12 @@ const int MapStackAction::COMMAND_COSTS[] = {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 MapStackNode* MapStackAction::exploreBackward(MapStack* stack, MapStackNode* fromNode)
 {
-    Grid2d::Position fromPosition = fromNode->getPosition();
+    Position fromPosition = fromNode->getPosition();
 
     int directionMovement = AngleMath::normalizeDeg<int>(fromPosition.orientation + 180);
-    Grid2d::Position motion = Grid2d::Position(fromPosition.x, fromPosition.y, directionMovement);
+    Position motion = Position(fromPosition.location, directionMovement);
 
-    Grid2d::Position neighbor;
+    Position neighbor;
     if (stack->getNeighbor(motion, neighbor))
     {
         MapStackNode::SearchParameters searchParameters = fromNode->getSearchParameters();
@@ -63,9 +63,9 @@ MapStackNode* MapStackAction::exploreBackward(MapStack* stack, MapStackNode* fro
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 MapStackNode* MapStackAction::exploreForward(MapStack* stack, MapStackNode* fromNode)
 {
-    Grid2d::Position fromPosition = fromNode->getPosition();
+    Position fromPosition = fromNode->getPosition();
 
-    Grid2d::Position motion;
+    Position motion;
     if (stack->getNeighbor(fromPosition, motion))
     {
         MapStackNode::SearchParameters searchParameters = fromNode->getSearchParameters();
@@ -103,10 +103,10 @@ MapStackNode* MapStackAction::exploreForward(MapStack* stack, MapStackNode* from
 MapStackNode* MapStackAction::exploreRotation(MapStack* stack, MapStackNode* fromNode,
     ActionEnum action, int angle)
 {
-    Grid2d::Position fromPosition = fromNode->getPosition();
+    Position fromPosition = fromNode->getPosition();
 
     int newOrientation = AngleMath::normalizeDeg<int>(fromPosition.orientation + angle);
-    Grid2d::Position motion = Grid2d::Position(fromPosition.x, fromPosition.y, newOrientation);
+    Position motion = Position(fromPosition.location, newOrientation);
 
     MapStackNode::SearchParameters searchParameters = fromNode->getSearchParameters();
 

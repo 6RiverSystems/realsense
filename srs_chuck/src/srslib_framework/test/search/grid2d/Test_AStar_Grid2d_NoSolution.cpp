@@ -9,6 +9,7 @@
 #include <vector>
 using namespace std;
 
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
@@ -26,10 +27,10 @@ TEST(Test_AStar_Grid2d_NoSolution, NoSolution)
 
     AStar algorithm;
 
-    Grid2d::Position startPosition(0, 0, 0);
+    Position startPosition(0, 0, 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
 
-    Grid2d::Position goalPosition(1, 1, 0);
+    Position goalPosition(1, 1, 0);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_FALSE(algorithm.search(start, goal)) <<
@@ -49,10 +50,10 @@ TEST(Test_AStar_Grid2d_NoSolution, ForbiddenGoal)
 
     test::Grid2dUtils::addObstacle(grid, 1, 0, GRID_SIZE - 1, GRID_SIZE - 1);
 
-    Grid2d::Position startPosition(0, 0, 0);
+    Position startPosition(0, 0, 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
 
-    Grid2d::Position goalPosition(GRID_SIZE - 1, 0, 0);
+    Position goalPosition(GRID_SIZE - 1, 0, 0);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_FALSE(algorithm.search(start, goal)) <<
@@ -72,10 +73,10 @@ TEST(Test_AStar_Grid2d_NoSolution, UnreachableGoal)
 
     test::Grid2dUtils::addObstacle(grid, 2, 0, 2, GRID_SIZE - 1);
 
-    Grid2d::Position startPosition(0, 0, 0);
+    Position startPosition(0, 0, 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
 
-    Grid2d::Position goalPosition(GRID_SIZE - 1, 0, 0);
+    Position goalPosition(GRID_SIZE - 1, 0, 0);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_FALSE(algorithm.search(start, goal)) <<

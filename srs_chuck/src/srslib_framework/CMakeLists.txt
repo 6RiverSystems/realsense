@@ -9,6 +9,7 @@ set(PROJECT_NAME srslib_framework)
 
 set(${PROJECT_NAME}_SOURCES
     src/datastructure/graph/grid2d/Grid2d.cpp
+    src/datastructure/graph/grid2d/WeightedGrid2d.cpp
 
     src/io/SerialIO.cpp
 
@@ -85,6 +86,7 @@ set(${PROJECT_NAME}_SRVS
 
 set(TEST_SOURCES_DATASTRUCTURE
     test/datastructure/graph/Test_Grid2d_Basic.cpp
+    test/datastructure/graph/Test_WeightedGrid2d_Basic.cpp
     test/datastructure/queue/Test_MappedPriorityQueue_Basic.cpp
     test/datastructure/queue/Test_MappedPriorityQueue_IndexClass.cpp
     test/datastructure/queue/Test_MappedPriorityQueue_InnerHashEqual.cpp

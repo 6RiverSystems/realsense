@@ -10,6 +10,8 @@
 #include <cmath>
 using namespace std;
 
+#include <srslib_framework/datastructure/Location.hpp>
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
@@ -38,14 +40,14 @@ TEST(Test_AStar_Grid2d_Weights, SmallSearchWithWeights)
     correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 12});
 
     Grid2d grid(GRID_SIZE, GRID_SIZE);
-    grid.setWeights(Grid2d::Location(2, 1), 0, 0, 0, 100);
-    grid.setWeights(Grid2d::Location(3, 1), 0, 0, 0, 100);
+    grid.setWeights(Location(2, 1), 0, 0, 0, 100);
+    grid.setWeights(Location(3, 1), 0, 0, 0, 100);
 
     LogicalMapFactory logicalMapFactory;
     LogicalMap* logical = logicalMapFactory.fromGrid2d(&grid, 1, Pose<>::ZERO);
 
-    Grid2d::Position start(3, 1, 0);
-    Grid2d::Position goal(1, 1, 0);
+    Position start(3, 1, 0);
+    Position goal(1, 1, 0);
 
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromSingleGoal(
         logical, start, goal);
@@ -72,14 +74,14 @@ TEST(Test_AStar_Grid2d_Weights, SmallSearchWithMoreWeights)
     correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 12});
 
     Grid2d grid(GRID_SIZE, GRID_SIZE);
-    grid.setWeights(Grid2d::Location(2, 1), 0, 0, 0, 100);
-    grid.setWeights(Grid2d::Location(3, 1), 0, 0, 0, 100);
+    grid.setWeights(Location(2, 1), 0, 0, 0, 100);
+    grid.setWeights(Location(3, 1), 0, 0, 0, 100);
 
     LogicalMapFactory logicalMapFactory;
     LogicalMap* logical = logicalMapFactory.fromGrid2d(&grid, 1, Pose<>::ZERO);
 
-    Grid2d::Position start(Grid2d::Location(3, 1), 0);
-    Grid2d::Position goal(Grid2d::Location(1, 1), 0);
+    Position start(Location(3, 1), 0);
+    Position goal(Location(1, 1), 0);
 
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromSingleGoal(
         logical, start, goal);

@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/search/SearchGoal.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
 
@@ -12,7 +13,7 @@ namespace srs {
 
 struct MapStackSingleGoal : public SearchGoal
 {
-    static MapStackSingleGoal* instanceOf(Grid2d::Position position)
+    static MapStackSingleGoal* instanceOf(Position position)
     {
         return new MapStackSingleGoal(position);
     }
@@ -40,19 +41,20 @@ struct MapStackSingleGoal : public SearchGoal
     }
 
 private:
-    MapStackSingleGoal(Grid2d::Position position) :
+    MapStackSingleGoal(Position position) :
         goalPosition_(position)
     {}
 
     ~MapStackSingleGoal()
     {}
 
-    int heuristic(Grid2d::Position toPosition) const
+    int heuristic(Position toPosition) const
     {
-        return abs(goalPosition_.x - toPosition.x) + abs(goalPosition_.y - toPosition.y);
+        return abs(goalPosition_.location.x - toPosition.location.x) +
+            abs(goalPosition_.location.y - toPosition.location.y);
     }
 
-    Grid2d::Position goalPosition_;
+    Position goalPosition_;
 };
 
 } // namespace srs

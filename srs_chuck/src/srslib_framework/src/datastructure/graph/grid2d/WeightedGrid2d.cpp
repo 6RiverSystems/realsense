@@ -1,4 +1,4 @@
-#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/WeightedGrid2d.hpp>
 
 #include <srslib_framework/datastructure/graph/grid2d/OutOfRangeException.hpp>
 
@@ -7,16 +7,14 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
-const Grid2d::BaseType Grid2d::PAYLOAD_MIN = 0;
-const Grid2d::BaseType Grid2d::PAYLOAD_MAX = 254;
-const Grid2d::BaseType Grid2d::PAYLOAD_NO_INFORMATION = 255;
+const WeightedGrid2d::BaseType WeightedGrid2d::PAYLOAD_MIN = 0;
+const WeightedGrid2d::BaseType WeightedGrid2d::PAYLOAD_MAX = 254;
 
-const Grid2d::BaseType Grid2d::WEIGHT_MIN = 0;
-const Grid2d::BaseType Grid2d::WEIGHT_MAX = 254;
-const Grid2d::BaseType Grid2d::WEIGHT_NO_INFORMATION = 255;
+const WeightedGrid2d::BaseType WeightedGrid2d::WEIGHT_MIN = 0;
+const WeightedGrid2d::BaseType WeightedGrid2d::WEIGHT_MAX = 254;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::clear()
+void WeightedGrid2d::clear()
 {
     for (auto cell : grid_)
     {
@@ -24,26 +22,21 @@ void Grid2d::clear()
     }
 
     grid_.clear();
-    weightCount_ = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::clear(const Location& location)
+void WeightedGrid2d::clear(const Location& location)
 {
     auto found = grid_.find(location);
     if (found != grid_.end())
     {
-        if (found->second->weights)
-        {
-            weightCount_--;
-        }
         delete found->second;
         grid_.erase(found);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2d::BaseType Grid2d::getPayload(const Location& location) const
+WeightedGrid2d::BaseType WeightedGrid2d::getPayload(const Location& location) const
 {
     Node* node = findNode(location);
     if (node)
@@ -51,11 +44,11 @@ Grid2d::BaseType Grid2d::getPayload(const Location& location) const
         return node->payload;
     }
 
-    return PAYLOAD_NO_INFORMATION;
+    return PAYLOAD_MIN;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2d::BaseType Grid2d::getPayload(const Position& position) const
+WeightedGrid2d::BaseType WeightedGrid2d::getPayload(const Position& position) const
 {
     Node* node = findNode(position);
     if (node)
@@ -63,11 +56,11 @@ Grid2d::BaseType Grid2d::getPayload(const Position& position) const
         return node->payload;
     }
 
-    return PAYLOAD_NO_INFORMATION;
+    return PAYLOAD_MIN;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool Grid2d::getNeighbor(const Position& position, Position& result) const
+bool WeightedGrid2d::getNeighbor(const Position& position, Position& result) const
 {
     switch (position.orientation)
     {
@@ -95,60 +88,53 @@ bool Grid2d::getNeighbor(const Position& position, Position& result) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2d::BaseType Grid2d::getWeight(const Position& position) const
+WeightedGrid2d::BaseType WeightedGrid2d::getWeight(const Position& position) const
 {
-    if (weightCount_)
+    Node* node = findNode(position);
+    if (node)
     {
-        Node* node = findNode(position);
-        if (node && node->weights)
+        switch (position.orientation)
         {
-            switch (position.orientation)
-            {
-                case ORIENTATION_EAST:
-                    return node->weights->east;
+            case ORIENTATION_EAST:
+                return node->east;
 
-                case ORIENTATION_NORTH:
-                    return node->weights->north;
+            case ORIENTATION_NORTH:
+                return node->north;
 
-                case ORIENTATION_WEST:
-                    return node->weights->west;
+            case ORIENTATION_WEST:
+                return node->west;
 
-                case ORIENTATION_SOUTH:
-                    return node->weights->south;
-
-                default:
-                    return WEIGHT_NO_INFORMATION;
-            }
+            case ORIENTATION_SOUTH:
+                return node->south;
         }
     }
 
-    return WEIGHT_NO_INFORMATION;
+    return WEIGHT_MIN;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::getWeights(const Location& location,
+void WeightedGrid2d::getWeights(const Location& location,
     BaseType& north, BaseType& east, BaseType& south, BaseType& west) const
 {
-    north = WEIGHT_NO_INFORMATION;
-    east = WEIGHT_NO_INFORMATION;
-    south = WEIGHT_NO_INFORMATION;
-    west = WEIGHT_NO_INFORMATION;
-
-    if (weightCount_)
+    Node* node = findNode(location);
+    if (node)
     {
-        Node* node = findNode(location);
-        if (node && node->weights)
-        {
-            north = node->weights->north;
-            east = node->weights->east;
-            south = node->weights->south;
-            west = node->weights->west;
-        }
+        north = node->north;
+        east = node->east;
+        south = node->south;
+        west = node->west;
+    }
+    else
+    {
+        north = WEIGHT_MIN;
+        east = WEIGHT_MIN;
+        south = WEIGHT_MIN;
+        west = WEIGHT_MIN;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::maxOnPayload(const Location& location, BaseType otherPayload)
+void WeightedGrid2d::maxOnPayload(const Location& location, BaseType otherPayload)
 {
     updatePayload(location, otherPayload,
         [] (BaseType oldPayload, BaseType newPayload) -> BaseType
@@ -159,56 +145,53 @@ void Grid2d::maxOnPayload(const Location& location, BaseType otherPayload)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-ostream& operator<<(ostream& stream, const Grid2d& grid)
+ostream& operator<<(ostream& stream, const WeightedGrid2d& grid)
 {
     stream << "Grid2d {" << endl;
 
     stream << "(" << grid.height_ << "x" << grid.width_ << ")" << endl;
 
     grid.printGrid(stream, "Simplified",
-        [] (Grid2d::Node* node) -> Grid2d::BaseType
+        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
         {
             return node->payload;
         }
     );
 
     grid.print(stream, "Payload",
-        [] (Grid2d::Node* node) -> Grid2d::BaseType
+        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
         {
             return node->payload;
         }
     );
 
-    if (grid.weightCount_)
-    {
-        grid.print(stream, "North Weights",
-            [] (Grid2d::Node* node) -> Grid2d::BaseType
-            {
-                return node->weights ? node->weights->north : Grid2d::WEIGHT_NO_INFORMATION;
-            }
-        );
+    grid.print(stream, "North Weights",
+        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
+        {
+            return node->north;
+        }
+    );
 
-        grid.print(stream, "East Weights",
-            [] (Grid2d::Node* node) -> Grid2d::BaseType
-            {
-                return node->weights ? node->weights->east : Grid2d::WEIGHT_NO_INFORMATION;
-            }
-        );
+    grid.print(stream, "East Weights",
+        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
+        {
+            return node->east;
+        }
+    );
 
-        grid.print(stream, "South Weights",
-            [] (Grid2d::Node* node) -> Grid2d::BaseType
-            {
-                return node->weights ? node->weights->south : Grid2d::WEIGHT_NO_INFORMATION;
-            }
-        );
+    grid.print(stream, "South Weights",
+        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
+        {
+            return node->south;
+        }
+    );
 
-        grid.print(stream, "West Weights",
-            [] (Grid2d::Node* node) -> Grid2d::BaseType
-            {
-                return node->weights ? node->weights->west : Grid2d::WEIGHT_NO_INFORMATION;
-            }
-        );
-    }
+    grid.print(stream, "West Weights",
+        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
+        {
+            return node->west;
+        }
+    );
 
     stream << "}";
 
@@ -216,7 +199,7 @@ ostream& operator<<(ostream& stream, const Grid2d& grid)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool operator==(const Grid2d& lhs, const Grid2d& rhs)
+bool operator==(const WeightedGrid2d& lhs, const WeightedGrid2d& rhs)
 {
     // First check addresses
     if (&lhs == &rhs)
@@ -239,15 +222,11 @@ bool operator==(const Grid2d& lhs, const Grid2d& rhs)
     {
         return false;
     }
-    if (lhs.getWeightCount() != rhs.getWeightCount())
-    {
-        return false;
-    }
 
     // Check that the grids contain the same items
     for (auto it : lhs.grid_)
     {
-        Grid2d::Node* node = rhs.findNode(it.first);
+        WeightedGrid2d::Node* node = rhs.findNode(it.first);
         if (!node || *it.second != *node)
         {
             return false;
@@ -258,7 +237,7 @@ bool operator==(const Grid2d& lhs, const Grid2d& rhs)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::setPayload(const Location& location, BaseType newPayload)
+void WeightedGrid2d::setPayload(const Location& location, BaseType newPayload)
 {
     updatePayload(location, newPayload,
         [] (BaseType oldPayload, BaseType newPayload) -> BaseType
@@ -269,51 +248,28 @@ void Grid2d::setPayload(const Location& location, BaseType newPayload)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::setWeights(const Location& location,
+void WeightedGrid2d::setWeights(const Location& location,
     BaseType north, BaseType east, BaseType south, BaseType west)
 {
     Node* node = findNode(location);
 
-    bool nonZeroWeights = north != WEIGHT_NO_INFORMATION ||
-        east != WEIGHT_NO_INFORMATION ||
-        south != WEIGHT_NO_INFORMATION ||
-        west != WEIGHT_NO_INFORMATION;
+    bool nonZeroWeights = north != WEIGHT_MIN || east != WEIGHT_MIN ||
+        south != WEIGHT_MIN || west != WEIGHT_MIN;
 
     if (!node)
     {
-        if (nonZeroWeights)
-        {
-            node = addNode(location, PAYLOAD_MIN);
-        }
-        else
+        if (!nonZeroWeights)
         {
             return;
         }
-    }
-
-    if (!node->weights)
-    {
-        if (nonZeroWeights)
-        {
-            weightCount_++;
-            node->weights = new Weights(north, east, south, west);
-        }
+        node = addNode(location, PAYLOAD_MIN, north, east, south, west);
     }
     else
     {
-        if (nonZeroWeights)
-        {
-            node->weights->north = north;
-            node->weights->east = east;
-            node->weights->south = south;
-            node->weights->west = west;
-        }
-        else
-        {
-            delete node->weights;
-            node->weights = nullptr;
-            weightCount_--;
-        }
+        node->north = north;
+        node->east = east;
+        node->south = south;
+        node->west = west;
     }
 }
 
@@ -321,7 +277,7 @@ void Grid2d::setWeights(const Location& location,
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::printGrid(ostream& stream, string title,
+void WeightedGrid2d::printGrid(ostream& stream, string title,
     std::function<BaseType (Node*)> fieldSelection) const
 {
     if (!title.empty())
@@ -333,24 +289,24 @@ void Grid2d::printGrid(ostream& stream, string title,
     {
         for (int x = 0; x < width_; ++x)
         {
-            Grid2d::Node* node = findNode(x, y);
+            WeightedGrid2d::Node* node = findNode(x, y);
             if (node)
             {
                 BaseType payload = fieldSelection(node);
 
-                if (payload == Grid2d::PAYLOAD_MAX)
+                if (payload == WeightedGrid2d::PAYLOAD_MAX)
                 {
                     stream << "# ";
                 }
-                else if (payload == Grid2d::PAYLOAD_MIN)
+                else if (payload == WeightedGrid2d::PAYLOAD_MIN)
                 {
-                    if (node->weights)
+                    if (node->zeroWeights())
                     {
-                        stream << "' ";
+                        stream << ". ";
                     }
                     else
                     {
-                        stream << ". ";
+                        stream << "' ";
                     }
                 }
                 else
@@ -368,7 +324,7 @@ void Grid2d::printGrid(ostream& stream, string title,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::print(ostream& stream, string title,
+void WeightedGrid2d::print(ostream& stream, string title,
     std::function<BaseType (Node*)> fieldSelection) const
 {
     if (!title.empty())
@@ -389,20 +345,16 @@ void Grid2d::print(ostream& stream, string title,
         stream << right << setw(WIDTH) << y;
         for (int x = 0; x < width_; ++x)
         {
-            Grid2d::Node* node = findNode(x, y);
+            WeightedGrid2d::Node* node = findNode(x, y);
             if (node)
             {
                 BaseType info = fieldSelection(node);
 
-                if (info == Grid2d::PAYLOAD_MAX)
+                if (info == WeightedGrid2d::PAYLOAD_MAX)
                 {
                     stream << right << setw(WIDTH) << "#";
                 }
-                else if (info == Grid2d::PAYLOAD_NO_INFORMATION)
-                {
-                    stream << right << setw(WIDTH) << "?";
-                }
-                else if (info == Grid2d::PAYLOAD_MIN)
+                else if (info == WeightedGrid2d::PAYLOAD_MIN)
                 {
                     stream << right << setw(WIDTH) << ".";
                 }
@@ -421,7 +373,7 @@ void Grid2d::print(ostream& stream, string title,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void Grid2d::updatePayload(const Location& location, BaseType newPayload,
+void WeightedGrid2d::updatePayload(const Location& location, BaseType newPayload,
     std::function<BaseType (BaseType, BaseType)> payloadSelection)
 {
     if (!isWithinBounds(location))
@@ -429,42 +381,30 @@ void Grid2d::updatePayload(const Location& location, BaseType newPayload,
         throw OutOfRangeException(location, Location(width_, height_));
     }
 
-    BaseType finalPayload = PAYLOAD_MIN;
-
-    bool modifiedGrid = true;
-
+    BaseType finalPayload;
     Node* node = findNode(location);
     if (node)
     {
         finalPayload = payloadSelection(node->payload, newPayload);
         node->payload = finalPayload;
+
+        // Remove the node if the specified payload
+        // is the minimum available payload and there is no additional
+        // information in the weights
+        if (finalPayload == PAYLOAD_MIN && node->zeroWeights())
+        {
+            clear(location);
+        }
     }
     else
     {
         finalPayload = payloadSelection(PAYLOAD_MIN, newPayload);
 
-        // Do not create a new node if the specified payload
-        // is the minimum available payload
-        if (finalPayload != PAYLOAD_NO_INFORMATION)
+        // Add a new node only if the specified payload
+        // is not the minimum available payload
+        if (finalPayload != PAYLOAD_MIN)
         {
-            node = addNode(location, finalPayload);
-        }
-        else
-        {
-            modifiedGrid = false;
-        }
-    }
-
-    if (modifiedGrid)
-    {
-        // Prune the grid if there is no additional weight information and
-        // the new cost of the node is the minimum
-        if (finalPayload == PAYLOAD_NO_INFORMATION)
-        {
-            if (!node->weights)
-            {
-                clear(location);
-            }
+            node = addNode(location, finalPayload, WEIGHT_MIN, WEIGHT_MIN, WEIGHT_MIN, WEIGHT_MIN);
         }
     }
 }

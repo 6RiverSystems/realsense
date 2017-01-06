@@ -12,6 +12,8 @@
 using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/Location.hpp>
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/localization/map/BaseMap.hpp>
 #include <srslib_framework/localization/map/mapnote/MapNotes.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMetadata.hpp>
@@ -76,7 +78,7 @@ public:
 
     Grid2d::BaseType getCost(unsigned int cCells, unsigned int rCells) const
     {
-        return getGrid()->getPayload(Grid2d::Location(cCells, rCells));
+        return getGrid()->getPayload(Location(cCells, rCells));
     }
 
     LogicalMetadata getMetadata() const
@@ -86,7 +88,7 @@ public:
 
     Grid2d::BaseType getWeights(unsigned int cCells, unsigned int rCells, int orientation) const
     {
-        return getGrid()->getWeight(Grid2d::Position(cCells, rCells, orientation));
+        return getGrid()->getWeight(Position(cCells, rCells, orientation));
     }
 
     void maxCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost);

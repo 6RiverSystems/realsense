@@ -9,6 +9,7 @@
 using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/localization/map/BaseMap.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/planning/Solution.hpp>
@@ -31,13 +32,13 @@ struct Grid2dSolutionFactory
         MapStackNode::SearchParameters searchParameters = MapStackNode::SearchParameters());
 
     static Solution<Grid2dSolutionItem>* fromSingleGoal(BaseMap* map,
-        Grid2d::Position& start, Grid2d::Position& goal,
+        Position& start, Position& goal,
         AStar::ConfigParameters configParameters = AStar::ConfigParameters());
     static Solution<Grid2dSolutionItem>* fromSingleGoal(BaseMap* map,
         Pose<> start, Pose<> goal,
         AStar::ConfigParameters configParameters = AStar::ConfigParameters());
     static Solution<Grid2dSolutionItem>* fromSingleGoal(MapStack* stack,
-        Grid2d::Position& start, Grid2d::Position& goal,
+        Position& start, Position& goal,
         AStar::ConfigParameters configParameters = AStar::ConfigParameters(),
         MapStackNode::SearchParameters searchParameters = MapStackNode::SearchParameters());
     static Solution<Grid2dSolutionItem>* fromSingleGoal(MapStack* stack,
@@ -52,7 +53,7 @@ private:
     static Solution<Grid2dSolutionItem>* fromSearch(BaseMap* map,
         Plan& plan);
 
-    static Grid2d::Position pose2Map(BaseMap* map, Pose<> pose);
+    static Position pose2Map(BaseMap* map, Pose<> pose);
 };
 
 } // namespace srs

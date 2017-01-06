@@ -9,6 +9,7 @@
 #include <sstream>
 using namespace std;
 
+#include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/localization/map/BaseMap.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMetadata.hpp>
 
@@ -29,7 +30,7 @@ public:
 
     Grid2d::BaseType getCost(unsigned int cCells, unsigned int rCells) const
     {
-        return getGrid()->getPayload(Grid2d::Location(cCells, rCells));
+        return getGrid()->getPayload(Location(cCells, rCells));
     }
 
     OccupancyMetadata getMetadata() const

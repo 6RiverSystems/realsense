@@ -10,6 +10,8 @@
 #include <cmath>
 using namespace std;
 
+#include <srslib_framework/datastructure/Location.hpp>
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
@@ -41,13 +43,13 @@ TEST(Test_AStar_MapStack_Weights, SmallSearchWithWeights)
 
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     test::Grid2dUtils::addEmptySpace(grid);
-    grid.setWeights(Grid2d::Location(2, 1), 0, 0, 0, 100);
-    grid.setWeights(Grid2d::Location(3, 1), 0, 0, 0, 100);
+    grid.setWeights(Location(2, 1), 0, 0, 0, 100);
+    grid.setWeights(Location(3, 1), 0, 0, 0, 100);
 
     MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
 
-    Grid2d::Position start(3, 1, 0);
-    Grid2d::Position goal(1, 1, 0);
+    Position start(3, 1, 0);
+    Position goal(1, 1, 0);
 
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromSingleGoal(
         mapStack, start, goal);
@@ -77,15 +79,15 @@ TEST(Test_AStar_MapStack_Weights, WeightsAndThisWalls)
 
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     test::Grid2dUtils::addEmptySpace(grid);
-    grid.setWeights(Grid2d::Location(2, 1), 0, 0, 0, 100);
-    grid.setWeights(Grid2d::Location(3, 1), 0, 0, 0, 100);
+    grid.setWeights(Location(2, 1), 0, 0, 0, 100);
+    grid.setWeights(Location(3, 1), 0, 0, 0, 100);
     test::Grid2dUtils::addObstacle(grid, 3, 0, 3, 0);
     test::Grid2dUtils::addObstacle(grid, 3, 2, 3, 4);
 
     MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
 
-    Grid2d::Position start(Grid2d::Location(3, 1), 0);
-    Grid2d::Position goal(Grid2d::Location(1, 1), 0);
+    Position start(Location(3, 1), 0);
+    Position goal(Location(1, 1), 0);
 
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromSingleGoal(
         mapStack, start, goal);
@@ -111,8 +113,8 @@ TEST(Test_AStar_MapStack_Weights, WeightsAndThickWalls)
 
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     test::Grid2dUtils::addEmptySpace(grid);
-    grid.setWeights(Grid2d::Location(2, 1), 0, 0, 0, 100);
-    grid.setWeights(Grid2d::Location(3, 1), 0, 0, 0, 100);
+    grid.setWeights(Location(2, 1), 0, 0, 0, 100);
+    grid.setWeights(Location(3, 1), 0, 0, 0, 100);
     test::Grid2dUtils::addObstacle(grid, 2, 0, 2, 0);
     test::Grid2dUtils::addObstacle(grid, 2, 2, 2, 4);
     test::Grid2dUtils::addObstacle(grid, 3, 0, 3, 0);
@@ -120,8 +122,8 @@ TEST(Test_AStar_MapStack_Weights, WeightsAndThickWalls)
 
     MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
 
-    Grid2d::Position start(Grid2d::Location(3, 1), 0);
-    Grid2d::Position goal(Grid2d::Location(1, 1), 0);
+    Position start(Location(3, 1), 0);
+    Position goal(Location(1, 1), 0);
 
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromSingleGoal(
         mapStack, start, goal);

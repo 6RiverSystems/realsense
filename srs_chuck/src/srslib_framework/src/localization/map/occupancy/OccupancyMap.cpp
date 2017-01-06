@@ -1,5 +1,7 @@
 #include <srslib_framework/localization/map/occupancy/OccupancyMap.hpp>
 
+#include <srslib_framework/datastructure/Location.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,19 +70,19 @@ bool operator==(const OccupancyMap& lhs, const OccupancyMap& rhs)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OccupancyMap::maxCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost)
 {
-    getGrid()->maxOnPayload(Grid2d::Location(cCells, rCells), cost);
+    getGrid()->maxOnPayload(Location(cCells, rCells), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OccupancyMap::setCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost)
 {
-    getGrid()->setPayload(Grid2d::Location(cCells, rCells), cost);
+    getGrid()->setPayload(Location(cCells, rCells), cost);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OccupancyMap::setObstacle(unsigned int cCells, unsigned int rCells)
 {
-    getGrid()->setPayload(Grid2d::Location(cCells, rCells), Grid2d::PAYLOAD_MAX);
+    getGrid()->setPayload(Location(cCells, rCells), Grid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

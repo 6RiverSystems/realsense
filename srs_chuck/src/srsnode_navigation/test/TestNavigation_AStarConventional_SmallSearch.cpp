@@ -9,6 +9,7 @@
 using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMapFactory.hpp>
@@ -37,8 +38,8 @@ TEST(Test_Navigation_AStarConventional, SmallSearch)
 
     AStar algorithm;
 
-    Grid2d::Position start(1, 1, 0);
-    Grid2d::Position goal(5, 5, 0);
+    Position start(1, 1, 0);
+    Position goal(5, 5, 0);
 
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromSingleGoal(
         mapStack, start, goal);

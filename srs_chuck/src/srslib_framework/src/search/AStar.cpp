@@ -1,7 +1,7 @@
 #include <srslib_framework/search/AStar.hpp>
 
 #define DEBUG_ASTAR 0
-#define YIELD_ENABLED 1
+#define YIELD_ENABLED 0
 
 #include <iostream>
 
@@ -15,6 +15,21 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+AStar::AStar() :
+    lastNode_(nullptr),
+    startNode_(nullptr),
+    yieldCounter_(0)
+{
+    closedSet_.reserve(CLOSED_HASH_RESERVE);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+AStar::~AStar()
+{
+    clear();
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void AStar::clear()
@@ -174,8 +189,9 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
         cout << "-----------------------------------------------------------------------------------------------" << endl;
     #endif
 
-    for (auto node : nodes)
+    for (int i = 0; i < nodes.size(); i++)
     {
+        SearchNode* node = nodes[i];
 
         #if DEBUG_ASTAR
             cout << "Evaluating: " << *node;

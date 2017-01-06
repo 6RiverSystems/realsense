@@ -9,7 +9,7 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/WeightedGrid2d.hpp>
 #include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/datastructure/Position.hpp>
 using namespace srs;
@@ -20,9 +20,9 @@ const Location P_1_1 = Location(1, 1);
 const Location P_2_2 = Location(2, 2);
 const Location P_3_3 = Location(3, 3);
 
-TEST(Test_Graph2d, BasicSet)
+TEST(Test_WeightedGraph2d, BasicSet)
 {
-    Grid2d grid(10);
+    WeightedGrid2d grid(10);
 
     grid.setPayload(P_1_1, 10);
     grid.setPayload(P_3_3, 30);
@@ -42,9 +42,9 @@ TEST(Test_Graph2d, BasicSet)
         "Location payload in " << P_3_3 << " is not as expected";
 }
 
-TEST(Test_Graph2d, GetPayload)
+TEST(Test_WeightedGraph2d, GetPayload)
 {
-    Grid2d grid(10);
+    WeightedGrid2d grid(10);
 
     grid.setPayload(P_1_1, 10);
     grid.setPayload(P_3_3, 30);
@@ -53,13 +53,13 @@ TEST(Test_Graph2d, GetPayload)
         "Location payload in " << P_1_1 << " is not as expected";
     ASSERT_EQ(30, grid.getPayload(P_3_3)) <<
         "Location payload in " << P_3_3 << " is not as expected";
-    ASSERT_EQ(srs::Grid2d::PAYLOAD_NO_INFORMATION, grid.getPayload(P_2_2)) <<
+    ASSERT_EQ(srs::WeightedGrid2d::PAYLOAD_MIN, grid.getPayload(P_2_2)) <<
         "Location payload in " << P_2_2 << " is not as expected";
 }
 
-TEST(Test_Graph2d, BasicMax)
+TEST(Test_WeightedGraph2d, BasicMax)
 {
-    Grid2d grid(10);
+    WeightedGrid2d grid(10);
 
     grid.setPayload(P_1_1, 10);
     grid.setPayload(P_3_3, 30);
@@ -80,15 +80,15 @@ TEST(Test_Graph2d, BasicMax)
     ASSERT_EQ(50, grid.getPayload(P_2_2)) <<
         "Location payload in " << P_2_2 << " is not as expected";
 
-    grid.maxOnPayload(P_2_2, srs::Grid2d::PAYLOAD_MAX);
+    grid.maxOnPayload(P_2_2, srs::WeightedGrid2d::PAYLOAD_MAX);
 
-    ASSERT_EQ(srs::Grid2d::PAYLOAD_MAX, grid.getPayload(P_2_2)) <<
+    ASSERT_EQ(srs::WeightedGrid2d::PAYLOAD_MAX, grid.getPayload(P_2_2)) <<
         "Location payload in " << P_2_2 << " is not as expected";
 }
 
-TEST(Test_Graph2d, SetWithMax)
+TEST(Test_WeightedGraph2d, SetWithMax)
 {
-    Grid2d grid(10);
+    WeightedGrid2d grid(10);
 
     grid.setPayload(P_1_1, 10);
     grid.setPayload(P_3_3, 30);
@@ -98,17 +98,17 @@ TEST(Test_Graph2d, SetWithMax)
     ASSERT_EQ(30, grid.getPayload(P_3_3)) <<
         "Location payload in " << P_3_3 << " is not as expected";
 
-    grid.setPayload(P_3_3, srs::Grid2d::PAYLOAD_MAX);
+    grid.setPayload(P_3_3, srs::WeightedGrid2d::PAYLOAD_MAX);
 
     ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
         "Location payload in " << P_1_1 << " is not as expected";
-    ASSERT_EQ(srs::Grid2d::PAYLOAD_MAX, grid.getPayload(P_3_3)) <<
+    ASSERT_EQ(srs::WeightedGrid2d::PAYLOAD_MAX, grid.getPayload(P_3_3)) <<
         "Location payload in " << P_3_3 << " is not as expected";
 }
 
-TEST(Test_Graph2d, AddWithMax)
+TEST(Test_WeightedGraph2d, AddWithMax)
 {
-    Grid2d grid(10);
+    WeightedGrid2d grid(10);
 
     grid.setPayload(P_1_1, 10);
     grid.setPayload(P_3_3, 30);
@@ -118,77 +118,53 @@ TEST(Test_Graph2d, AddWithMax)
     ASSERT_EQ(30, grid.getPayload(P_3_3)) <<
         "Location payload in " << P_3_3 << " is not as expected";
 
-    grid.maxOnPayload(P_3_3, srs::Grid2d::PAYLOAD_MAX);
+    grid.maxOnPayload(P_3_3, srs::WeightedGrid2d::PAYLOAD_MAX);
 
     ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
         "Location payload in " << P_1_1 << " is not as expected";
-    ASSERT_EQ(srs::Grid2d::PAYLOAD_MAX, grid.getPayload(P_3_3)) <<
+    ASSERT_EQ(srs::WeightedGrid2d::PAYLOAD_MAX, grid.getPayload(P_3_3)) <<
         "Location payload in " << P_3_3 << " is not as expected";
 }
 
-TEST(Test_Graph2d, BasicWeigths)
+TEST(Test_WeightedGraph2d, BasicWeigths)
 {
-    Grid2d grid(10);
+    WeightedGrid2d grid(10);
 
     grid.setPayload(P_1_1, 10);
     grid.setPayload(P_3_3, 30);
     grid.setWeights(P_3_3, 11, 22, 33, 44);
 
-    ASSERT_EQ(Grid2d::WEIGHT_NO_INFORMATION,
-        grid.getWeight(Position(P_1_1, Grid2d::ORIENTATION_NORTH))) <<
+    ASSERT_EQ(WeightedGrid2d::WEIGHT_MIN,
+        grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_NORTH))) <<
         "North weight in location " << P_1_1 << " is not as expected";
 
-    ASSERT_EQ(11, grid.getWeight(Position(P_3_3, Grid2d::ORIENTATION_NORTH))) <<
+    ASSERT_EQ(11, grid.getWeight(Position(P_3_3, WeightedGrid2d::ORIENTATION_NORTH))) <<
         "North weight in location " << P_3_3 << " is not as expected";
-
-    ASSERT_EQ(1, grid.getWeightCount()) <<
-        "Unexpected number of weights";
-
-    // if set weights of P_3_3 to WIGHT_NO_INFORMATION, the weightCount_ should become 0
-    grid.setWeights(P_3_3, Grid2d::WEIGHT_NO_INFORMATION, Grid2d::WEIGHT_NO_INFORMATION,
-        Grid2d::WEIGHT_NO_INFORMATION, Grid2d::WEIGHT_NO_INFORMATION);
-
-    ASSERT_EQ(0, grid.getWeightCount()) <<
-        "Unexpected number of weights";
-
-    // if add weights back to P_3_3, weightCount_ should be 1
-    grid.setWeights(P_3_3, Grid2d::WEIGHT_MIN, Grid2d::WEIGHT_MIN,
-        Grid2d::WEIGHT_MIN, Grid2d::WEIGHT_MIN);
-
-    ASSERT_EQ(1, grid.getWeightCount()) <<
-        "Unexpected number of weights";
 
     grid.setWeights(P_1_1, 12, 23, 34, 45);
 
-    ASSERT_EQ(12, grid.getWeight(Position(P_1_1, Grid2d::ORIENTATION_NORTH))) <<
+    ASSERT_EQ(12, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_NORTH))) <<
         "North weight in location " << P_1_1 << " is not as expected";
 
-    ASSERT_EQ(23, grid.getWeight(Position(P_1_1, Grid2d::ORIENTATION_EAST))) <<
+    ASSERT_EQ(23, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_EAST))) <<
         "East weight in location " << P_1_1 << " is not as expected";
 
-    ASSERT_EQ(34, grid.getWeight(Position(P_1_1, Grid2d::ORIENTATION_SOUTH))) <<
+    ASSERT_EQ(34, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_SOUTH))) <<
         "South weight in location " << P_1_1 << " is not as expected";
 
-    ASSERT_EQ(45, grid.getWeight(Position(P_1_1, Grid2d::ORIENTATION_WEST))) <<
+    ASSERT_EQ(45, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_WEST))) <<
         "West weight in location " << P_1_1 << " is not as expected";
 
-    ASSERT_EQ(2, grid.getWeightCount()) <<
-        "Unexpected number of weights";
-
-    grid.setWeights(P_2_2, Grid2d::WEIGHT_NO_INFORMATION, Grid2d::WEIGHT_NO_INFORMATION,
-        Grid2d::WEIGHT_NO_INFORMATION, Grid2d::WEIGHT_NO_INFORMATION);
-
-    // weightCount_ should remain the same
-    ASSERT_EQ(2, grid.getWeightCount()) <<
-        "Unexpected number of weights";
+    grid.setWeights(P_2_2, WeightedGrid2d::WEIGHT_MIN, WeightedGrid2d::WEIGHT_MIN,
+        WeightedGrid2d::WEIGHT_MIN, WeightedGrid2d::WEIGHT_MIN);
 
     ASSERT_EQ(2, grid.getOccupiedCount()) <<
         "Unexpected number of occupied cells";
 }
 
-TEST(Test_Graph2d, BasicClear)
+TEST(Test_WeightedGraph2d, BasicClear)
 {
-    Grid2d grid(10);
+    WeightedGrid2d grid(10);
 
     grid.setPayload(P_3_3, 30);
     grid.setWeights(P_3_3, 11, 22, 33, 44);
@@ -196,50 +172,48 @@ TEST(Test_Graph2d, BasicClear)
     ASSERT_EQ(30, grid.getPayload(P_3_3)) <<
         "Location payload in " << P_3_3 << " is not as expected";
 
-    ASSERT_EQ(11, grid.getWeight(Position(P_3_3, Grid2d::ORIENTATION_NORTH))) <<
+    ASSERT_EQ(11, grid.getWeight(Position(P_3_3, WeightedGrid2d::ORIENTATION_NORTH))) <<
         "North weight in location " << P_3_3 << " is not as expected";
-    ASSERT_EQ(22, grid.getWeight(Position(P_3_3, Grid2d::ORIENTATION_EAST))) <<
+    ASSERT_EQ(22, grid.getWeight(Position(P_3_3, WeightedGrid2d::ORIENTATION_EAST))) <<
         "East weight in location " << P_3_3 << " is not as expected";
-    ASSERT_EQ(33, grid.getWeight(Position(P_3_3, Grid2d::ORIENTATION_SOUTH))) <<
+    ASSERT_EQ(33, grid.getWeight(Position(P_3_3, WeightedGrid2d::ORIENTATION_SOUTH))) <<
         "South weight in location " << P_3_3 << " is not as expected";
-    ASSERT_EQ(44, grid.getWeight(Position(P_3_3, Grid2d::ORIENTATION_WEST))) <<
+    ASSERT_EQ(44, grid.getWeight(Position(P_3_3, WeightedGrid2d::ORIENTATION_WEST))) <<
         "West weight in location " << P_3_3 << " is not as expected";
 
     grid.clear(P_3_3);
 
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, grid.getPayload(P_3_3)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, grid.getPayload(P_3_3)) <<
         "Location payload in " << P_3_3 << " is not as expected";
 
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, grid.getWeight(Position(P_3_3, Grid2d::ORIENTATION_NORTH))) <<
+    ASSERT_EQ(WeightedGrid2d::WEIGHT_MIN, grid.getWeight(Position(P_3_3, WeightedGrid2d::ORIENTATION_NORTH))) <<
         "North weight in location " << P_3_3 << " is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, grid.getWeight(Position(P_3_3, Grid2d::ORIENTATION_EAST))) <<
+    ASSERT_EQ(WeightedGrid2d::WEIGHT_MIN, grid.getWeight(Position(P_3_3, WeightedGrid2d::ORIENTATION_EAST))) <<
         "East weight in location " << P_3_3 << " is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, grid.getWeight(Position(P_3_3, Grid2d::ORIENTATION_SOUTH))) <<
+    ASSERT_EQ(WeightedGrid2d::WEIGHT_MIN, grid.getWeight(Position(P_3_3, WeightedGrid2d::ORIENTATION_SOUTH))) <<
         "South weight in location " << P_3_3 << " is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, grid.getWeight(Position(P_3_3, Grid2d::ORIENTATION_WEST))) <<
+    ASSERT_EQ(WeightedGrid2d::WEIGHT_MIN, grid.getWeight(Position(P_3_3, WeightedGrid2d::ORIENTATION_WEST))) <<
         "West weight in location " << P_3_3 << " is not as expected";
 
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, grid.getPayload(P_2_2)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, grid.getPayload(P_2_2)) <<
         "Location payload in " << P_2_2 << " is not as expected";
 
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, grid.getWeight(Position(P_2_2, Grid2d::ORIENTATION_NORTH))) <<
+    ASSERT_EQ(WeightedGrid2d::WEIGHT_MIN, grid.getWeight(Position(P_2_2, WeightedGrid2d::ORIENTATION_NORTH))) <<
         "North weight in location " << P_2_2 << " is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, grid.getWeight(Position(P_2_2, Grid2d::ORIENTATION_EAST))) <<
+    ASSERT_EQ(WeightedGrid2d::WEIGHT_MIN, grid.getWeight(Position(P_2_2, WeightedGrid2d::ORIENTATION_EAST))) <<
         "East weight in location " << P_2_2 << " is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, grid.getWeight(Position(P_3_3, Grid2d::ORIENTATION_SOUTH))) <<
+    ASSERT_EQ(WeightedGrid2d::WEIGHT_MIN, grid.getWeight(Position(P_3_3, WeightedGrid2d::ORIENTATION_SOUTH))) <<
         "South weight in location " << P_2_2 << " is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, grid.getWeight(Position(P_3_3, Grid2d::ORIENTATION_WEST))) <<
+    ASSERT_EQ(WeightedGrid2d::WEIGHT_MIN, grid.getWeight(Position(P_3_3, WeightedGrid2d::ORIENTATION_WEST))) <<
         "West weight in location " << P_2_2 << " is not as expected";
-
-    grid.clear(P_2_2);
 }
 
-TEST(Test_Grid2d, BasicBeginEnd)
+TEST(Test_WeightedGraph2d, BasicBeginEnd)
 {
-    Grid2d grid(10);
+    WeightedGrid2d grid(10);
 
-    Grid2d::const_iterator beginIt = grid.begin();
-    Grid2d::const_iterator endIt = grid.end();
+    WeightedGrid2d::const_iterator beginIt = grid.begin();
+    WeightedGrid2d::const_iterator endIt = grid.end();
 
     ASSERT_EQ(beginIt, endIt) << "The begin and end iterators do not match";
 
@@ -262,12 +236,12 @@ TEST(Test_Grid2d, BasicBeginEnd)
     ASSERT_EQ(*beginIt, P_3_3) << "Unexpected iterator value";
 }
 
-TEST(Test_Grid2d, BasicForEach)
+TEST(Test_WeightedGraph2d, BasicForEach)
 {
-    Grid2d grid(10);
+    WeightedGrid2d grid(10);
 
-    Grid2d::const_iterator beginIt = grid.begin();
-    Grid2d::const_iterator endIt = grid.end();
+    WeightedGrid2d::const_iterator beginIt = grid.begin();
+    WeightedGrid2d::const_iterator endIt = grid.end();
 
     ASSERT_EQ(beginIt, endIt) << "The begin and end iterators do not match";
 
@@ -292,9 +266,9 @@ TEST(Test_Grid2d, BasicForEach)
     }
 }
 
-TEST(Test_Grid2d, OccupiedCount)
+TEST(Test_WeightedGraph2d, OccupiedCount)
 {
-    Grid2d grid(10);
+    WeightedGrid2d grid(10);
 
     grid.setPayload(P_3_3, 30);
 
@@ -310,25 +284,25 @@ TEST(Test_Grid2d, OccupiedCount)
 
     ASSERT_EQ(2, grid.getOccupiedCount()) << "Unexpected occupied cells count";
 
-    grid.setPayload(P_2_2, Grid2d::PAYLOAD_NO_INFORMATION);
-    grid.setPayload(P_1_1, Grid2d::PAYLOAD_NO_INFORMATION);
+    grid.setPayload(P_2_2, WeightedGrid2d::PAYLOAD_MIN);
+    grid.setPayload(P_1_1, WeightedGrid2d::PAYLOAD_MIN);
 
     ASSERT_EQ(1, grid.getOccupiedCount()) << "Unexpected occupied cells count";
 
-    grid.maxOnPayload(P_2_2, Grid2d::PAYLOAD_MIN);
+    grid.maxOnPayload(P_2_2, WeightedGrid2d::PAYLOAD_MIN);
 
-    ASSERT_EQ(2, grid.getOccupiedCount()) << "Unexpected occupied cells count";
+    ASSERT_EQ(1, grid.getOccupiedCount()) << "Unexpected occupied cells count";
 }
 
-TEST(Test_Grid2d, EqualOperator)
+TEST(Test_WeightedGraph2d, EqualOperator)
 {
-    Grid2d correct(10);
+    WeightedGrid2d correct(10);
     correct.setPayload(P_3_3, 3);
     correct.setPayload(P_1_1, 1);
     correct.setPayload(P_2_2, 2);
     correct.setWeights(P_2_2, 10, 20, 30, 40);
 
-    Grid2d grid1(10);
+    WeightedGrid2d grid1(10);
     grid1.setPayload(P_3_3, 3);
     grid1.setPayload(P_1_1, 1);
     grid1.setPayload(P_2_2, 2);
@@ -337,12 +311,12 @@ TEST(Test_Grid2d, EqualOperator)
     ASSERT_EQ(grid1, grid1) << "The grid does not agree with itself";
     ASSERT_EQ(correct, grid1) << "The grids do not match";
 
-    Grid2d grid2(10);
+    WeightedGrid2d grid2(10);
     grid2.setPayload(P_3_3, 30);
 
     ASSERT_NE(correct, grid2) << "The grids do match";
 
-    Grid2d grid3(10);
+    WeightedGrid2d grid3(10);
     grid3.setPayload(P_3_3, 3);
     grid3.setPayload(P_1_1, 1);
     grid3.setPayload(P_2_2, 2);

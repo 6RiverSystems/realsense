@@ -8,7 +8,7 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Grid2dNode* Grid2dNode::instanceOf(Grid2d* graph,
     Grid2dNode* parentNode, Grid2dAction::ActionEnum parentAction,
-    Grid2d::Position position, int g, int h,
+    Position position, int g, int h,
     SearchGoal* goal)
 {
     return new Grid2dNode(graph,

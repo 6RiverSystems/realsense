@@ -35,7 +35,7 @@ LogicalMap* MapStack::getLogicalMap() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool MapStack::getNeighbor(const Grid2d::Position& position, Grid2d::Position& result) const
+bool MapStack::getNeighbor(const Position& position, Position& result) const
 {
     return logical_->getGrid()->getNeighbor(position, result);
 }
@@ -47,7 +47,7 @@ OccupancyMap* MapStack::getOccupancyMap() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-int MapStack::getTotalCost(const Grid2d::Position& position,
+int MapStack::getTotalCost(const Position& position,
     bool allowUnknown,
     float costMapRatio) const
 {
@@ -65,7 +65,7 @@ int MapStack::getTotalCost(const Grid2d::Position& position,
     float costMap2d = 0;
     if (costMap2d_)
     {
-        costMap2d = costMap2d_->getCost(position.x, position.y) * costMapRatio;
+        costMap2d = costMap2d_->getCost(position.location.x, position.location.y) * costMapRatio;
         if (costMap2d == costmap_2d::NO_INFORMATION)
         {
             if (!allowUnknown)
@@ -80,7 +80,7 @@ int MapStack::getTotalCost(const Grid2d::Position& position,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-int MapStack::getWeight(const Grid2d::Position& position) const
+int MapStack::getWeight(const Position& position) const
 {
     int cost = logical_->getGrid()->getWeight(position);
 

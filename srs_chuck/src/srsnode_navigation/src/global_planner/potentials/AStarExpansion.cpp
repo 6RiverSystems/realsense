@@ -1,6 +1,7 @@
 #include <costmap_2d/cost_values.h>
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/Location.hpp>
 
 #include <srsnode_navigation/global_planner/potentials/AStarExpansion.hpp>
 
@@ -53,7 +54,7 @@ bool AStarExpansion::calculatePotentials(
         int y;
         index2Coordinates(i, x, y);
 
-        logicalGrid_->getWeights(Grid2d::Location(x, y), north, east, south, west);
+        logicalGrid_->getWeights(Location(x, y), north, east, south, west);
 
         add(potentials, potentials[i], i + 1, east, end_x, end_y);
         add(potentials, potentials[i], i - 1, west, end_x, end_y);
@@ -101,7 +102,7 @@ void AStarExpansion::add(float* potentials,
     int y;
     index2Coordinates(next_i, x, y);
 
-    Grid2d::BaseType logicalCost = logicalGrid_->getPayload(Grid2d::Location(x, y));
+    Grid2d::BaseType logicalCost = logicalGrid_->getPayload(Location(x, y));
     if (logicalCost == Grid2d::PAYLOAD_MAX)
     {
         return;

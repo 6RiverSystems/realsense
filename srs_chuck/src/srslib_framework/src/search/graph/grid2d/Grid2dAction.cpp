@@ -57,12 +57,12 @@ unordered_map<int, string> Grid2dAction::ENUM_NAMES = {
 bool Grid2dAction::addBackward(Grid2d* graph, Grid2dNode* fromNode,
     ActionResultType& result)
 {
-    Grid2d::Position fromPosition = fromNode->getPosition();
+    Position fromPosition = fromNode->getPosition();
 
     int directionMovement = AngleMath::normalizeDeg<int>(fromPosition.orientation + 180);
-    Grid2d::Position motion = Grid2d::Position(fromPosition.x, fromPosition.y, directionMovement);
+    Position motion = Position(fromPosition.location, directionMovement);
 
-    Grid2d::Position neighbor;
+    Position neighbor;
     if (graph->getNeighbor(motion, neighbor))
     {
         // Calculate the motion cost
@@ -91,9 +91,9 @@ bool Grid2dAction::addBackward(Grid2d* graph, Grid2dNode* fromNode,
 bool Grid2dAction::addForward(Grid2d* graph, Grid2dNode* fromNode,
     ActionResultType& result)
 {
-    Grid2d::Position fromPosition = fromNode->getPosition();
+    Position fromPosition = fromNode->getPosition();
 
-    Grid2d::Position neighbor;
+    Position neighbor;
     if (graph->getNeighbor(fromPosition, neighbor))
     {
         // Calculate the motion cost
@@ -122,10 +122,10 @@ bool Grid2dAction::addForward(Grid2d* graph, Grid2dNode* fromNode,
 bool Grid2dAction::addRotation(Grid2d* graph, Grid2dNode* fromNode, ActionEnum action, int angle,
     ActionResultType& result)
 {
-    Grid2d::Position fromPosition = fromNode->getPosition();
+    Position fromPosition = fromNode->getPosition();
 
     int newOrientation = AngleMath::normalizeDeg<int>(fromPosition.orientation + angle);
-    Grid2d::Position motion = Grid2d::Position(fromPosition.x, fromPosition.y, newOrientation);
+    Position motion = Position(fromPosition.location, newOrientation);
 
     result = ActionResultType(motion, fromNode->getLocalCost() + COMMAND_COSTS[action]);
     return true;

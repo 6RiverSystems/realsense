@@ -12,6 +12,7 @@ using namespace std;
 #include <tf/tf.h>
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
@@ -67,7 +68,7 @@ public:
         Grid2d::BaseType& north, Grid2d::BaseType& east,
         Grid2d::BaseType& south, Grid2d::BaseType& west) const
     {
-        Grid2d::Location location(cCells, rCells);
+        Location location(cCells, rCells);
         grid_->getWeights(location, north, east, south, west);
     }
 
@@ -83,7 +84,7 @@ public:
 
     bool isWithinBounds(unsigned int cCells, unsigned int rCells) const
     {
-        Grid2d::Location location(cCells, rCells);
+        Location location(cCells, rCells);
         return grid_->isWithinBounds(location);
     }
 

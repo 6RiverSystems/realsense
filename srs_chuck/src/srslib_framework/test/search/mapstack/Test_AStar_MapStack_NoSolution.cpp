@@ -9,6 +9,7 @@
 #include <vector>
 using namespace std;
 
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
@@ -33,10 +34,10 @@ TEST(Test_AStar_MapStack_NoSolution, NoSolution)
 
     AStar algorithm;
 
-    Grid2d::Position startPosition(0, 0, 0);
+    Position startPosition(0, 0, 0);
     MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
 
-    Grid2d::Position goalPosition(1, 1, 0);
+    Position goalPosition(1, 1, 0);
     MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
 
     ASSERT_FALSE(algorithm.search(start, goal)) <<
@@ -58,10 +59,10 @@ TEST(Test_AStar_MapStack_NoSolution, ForbiddenGoal)
 
     AStar algorithm;
 
-    Grid2d::Position startPosition(0, 0, 0);
+    Position startPosition(0, 0, 0);
     MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
 
-    Grid2d::Position goalPosition(GRID_SIZE - 1, 0, 0);
+    Position goalPosition(GRID_SIZE - 1, 0, 0);
     MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
 
     ASSERT_FALSE(algorithm.search(start, goal)) <<
@@ -83,10 +84,10 @@ TEST(Test_AStar_MapStack_NoSolution, UnreachableGoal)
 
     AStar algorithm;
 
-    Grid2d::Position startPosition(0, 0, 0);
+    Position startPosition(0, 0, 0);
     MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
 
-    Grid2d::Position goalPosition(GRID_SIZE - 1, 0, 0);
+    Position goalPosition(GRID_SIZE - 1, 0, 0);
     MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
 
     ASSERT_FALSE(algorithm.search(start, goal)) <<

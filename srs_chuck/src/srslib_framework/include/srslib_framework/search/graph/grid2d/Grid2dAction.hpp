@@ -12,6 +12,7 @@
 using namespace std;
 
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/search/SearchGoal.hpp>
 
 namespace srs {
@@ -29,7 +30,7 @@ public:
         START
     };
 
-    typedef pair<Grid2d::Position, unsigned int> ActionResultType;
+    typedef pair<Position, unsigned int> ActionResultType;
 
     static array<ActionEnum, 3> ALLOWED_ACTIONS;
 

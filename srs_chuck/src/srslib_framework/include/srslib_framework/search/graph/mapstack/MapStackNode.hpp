@@ -8,6 +8,7 @@
 #include <sstream>
 using namespace std;
 
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/search/SearchGoal.hpp>
 #include <srslib_framework/search/SearchNode.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackAction.hpp>
@@ -28,7 +29,7 @@ struct MapStackNode : public SearchNode
     };
 
     static MapStackNode* instanceOfStart(MapStack* stack,
-        Grid2d::Position position,
+        Position position,
         SearchParameters searchParameters = SearchParameters())
     {
         return instanceOf(stack,
@@ -42,7 +43,7 @@ struct MapStackNode : public SearchNode
 
     static MapStackNode* instanceOf(MapStack* grid,
         MapStackNode* parentNode, MapStackAction::ActionEnum parentAction,
-        Grid2d::Position position, int g, int h,
+        Position position, int g, int h,
         SearchGoal* goal,
         SearchParameters searchParameters);
 
@@ -79,7 +80,7 @@ struct MapStackNode : public SearchNode
         return parentAction_;
     }
 
-    Grid2d::Position getPosition() const
+    inline Position getPosition() const
     {
         return position_;
     }
@@ -89,7 +90,7 @@ struct MapStackNode : public SearchNode
         return searchParameters_;
     }
 
-    int getTotalCost() const
+    inline int getTotalCost() const
     {
         return g_ + h_;
     }
@@ -99,7 +100,7 @@ struct MapStackNode : public SearchNode
         return goal_->reached(reinterpret_cast<const MapStackNode*>(this));
     }
 
-    std::size_t hash() const
+    inline std::size_t hash() const
     {
         return position_.hash();
     }
@@ -144,7 +145,7 @@ struct MapStackNode : public SearchNode
 protected:
     MapStackNode(MapStack* stack,
         MapStackNode* parentNode, MapStackAction::ActionEnum parentAction,
-            Grid2d::Position position, int g, int h,
+            Position position, int g, int h,
             SearchGoal* goal,
             SearchParameters searchParameters) :
         stack_(stack),
@@ -169,7 +170,7 @@ private:
 
     MapStackAction::ActionEnum parentAction_;
     MapStackNode* parentNode_;
-    Grid2d::Position position_;
+    Position position_;
 
     SearchParameters searchParameters_;
 };

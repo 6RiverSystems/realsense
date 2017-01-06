@@ -20,6 +20,8 @@ namespace srs {
 class AStar
 {
 public:
+    static constexpr int CLOSED_HASH_RESERVE = 400000;
+
     struct ConfigParameters
     {
         ConfigParameters() :
@@ -31,16 +33,8 @@ public:
         unsigned int yieldFrequency;
     };
 
-    AStar() :
-        lastNode_(nullptr),
-        startNode_(nullptr),
-        yieldCounter_(0)
-    {}
-
-    ~AStar()
-    {
-        clear();
-    }
+    AStar();
+    ~AStar();
 
     void clear();
 

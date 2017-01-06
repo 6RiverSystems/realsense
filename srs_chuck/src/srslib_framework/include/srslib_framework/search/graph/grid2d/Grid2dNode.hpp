@@ -8,6 +8,7 @@
 #include <sstream>
 using namespace std;
 
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/search/SearchGoal.hpp>
 #include <srslib_framework/search/SearchNode.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dAction.hpp>
@@ -16,7 +17,7 @@ namespace srs {
 
 struct Grid2dNode : public SearchNode
 {
-    static Grid2dNode* instanceOfStart(Grid2d* grid, Grid2d::Position position)
+    static Grid2dNode* instanceOfStart(Grid2d* grid, Position position)
     {
         int localCost = grid->getPayload(position);
         if (Grid2dAction::isCostAvailable(localCost))
@@ -35,7 +36,7 @@ struct Grid2dNode : public SearchNode
 
     static Grid2dNode* instanceOf(Grid2d* grid,
         Grid2dNode* parentNode, Grid2dAction::ActionEnum parentAction,
-        Grid2d::Position position, int g, int h,
+        Position position, int g, int h,
         SearchGoal* goal);
 
     bool equals(SearchNode* const& rhs) const
@@ -65,7 +66,7 @@ struct Grid2dNode : public SearchNode
         return parentAction_;
     }
 
-    Grid2d::Position getPosition() const
+    inline Position getPosition() const
     {
         return position_;
     }
@@ -80,7 +81,7 @@ struct Grid2dNode : public SearchNode
         return goal_->reached(reinterpret_cast<const Grid2dNode*>(this));
     }
 
-    std::size_t hash() const
+    inline std::size_t hash() const
     {
         return position_.hash();
     }
@@ -125,7 +126,7 @@ struct Grid2dNode : public SearchNode
 protected:
     Grid2dNode(Grid2d* graph,
             Grid2dNode* parentNode, Grid2dAction::ActionEnum parentAction,
-            Grid2d::Position position, int g, int h,
+            Position position, int g, int h,
             SearchGoal* goal) :
         graph_(graph),
         parentAction_(parentAction),
@@ -148,7 +149,7 @@ private:
 
     Grid2dAction::ActionEnum parentAction_;
     Grid2dNode* parentNode_;
-    Grid2d::Position position_;
+    Position position_;
 };
 
 } // namespace srs

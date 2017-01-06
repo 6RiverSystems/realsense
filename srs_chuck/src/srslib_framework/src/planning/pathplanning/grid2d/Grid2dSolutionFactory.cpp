@@ -81,7 +81,7 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(MapSta
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(BaseMap* map,
-    Grid2d::Position& start, Grid2d::Position& goal,
+    Position& start, Position& goal,
     AStar::ConfigParameters configParameters)
 {
     if (!map)
@@ -118,17 +118,17 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(BaseMap* map
     }
 
     // Prepare the start position for the search
-    Grid2d::Position start = pose2Map(map, fromPose);
+    Position start = pose2Map(map, fromPose);
 
     // Prepare the goal position for the search
-    Grid2d::Position goal = pose2Map(map, toPose);
+    Position goal = pose2Map(map, toPose);
 
     return fromSingleGoal(map, start, goal, configParameters);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* stack,
-    Grid2d::Position& start, Grid2d::Position& goal,
+    Position& start, Position& goal,
     AStar::ConfigParameters configParameters,
     MapStackNode::SearchParameters searchParameters)
 {
@@ -165,10 +165,10 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* st
     }
 
     // Prepare the start position for the search
-    Grid2d::Position start = pose2Map(stack->getLogicalMap(), fromPose);
+    Position start = pose2Map(stack->getLogicalMap(), fromPose);
 
     // Prepare the goal position for the search
-    Grid2d::Position goal = pose2Map(stack->getLogicalMap(), toPose);
+    Position goal = pose2Map(stack->getLogicalMap(), toPose);
 
     return fromSingleGoal(stack, start, goal, configParameters, searchParameters);
 }
@@ -226,14 +226,14 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map, Pl
         Grid2dNode* toNode = reinterpret_cast<Grid2dNode*>(*toCursor);
 
         map->transformCells2M(
-            fromNode->getPosition().x, fromNode->getPosition().y,
+            fromNode->getPosition().location.x, fromNode->getPosition().location.y,
             fromX, fromY);
 
         fromTheta = AngleMath::deg2Rad<double>(fromNode->getPosition().orientation);
         fromPose = Pose<>(fromX, fromY, AngleMath::normalizeRad<double>(fromTheta));
 
         map->transformCells2M(
-            toNode->getPosition().x, toNode->getPosition().y,
+            toNode->getPosition().location.x, toNode->getPosition().location.y,
             toX, toY);
 
         toTheta = AngleMath::deg2Rad<double>(toNode->getPosition().orientation);
@@ -271,14 +271,14 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map, Pl
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2d::Position Grid2dSolutionFactory::pose2Map(BaseMap* map, Pose<> pose)
+Position Grid2dSolutionFactory::pose2Map(BaseMap* map, Pose<> pose)
 {
     unsigned int r = 0;
     unsigned int c = 0;
     map->transformM2Cells(pose, c, r);
 
     int orientation = static_cast<int>(AngleMath::normalizeRad2Deg90(pose.theta));
-    return Grid2d::Position(c, r, orientation);
+    return Position(c, r, orientation);
 }
 
 } // namespace srs

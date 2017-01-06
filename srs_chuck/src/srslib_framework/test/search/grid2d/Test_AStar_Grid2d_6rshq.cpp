@@ -10,6 +10,7 @@ using namespace std;
 
 #include <ros/ros.h>
 
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
@@ -23,8 +24,8 @@ TEST(Test_AStar_Grid2d_6rshq, SmallSearch)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 
-    Grid2d::Position startPosition(220, 260, 0);
-    Grid2d::Position goalPosition(222, 260, 0);
+    Position startPosition(220, 260, 0);
+    Position goalPosition(222, 260, 0);
 
     test::MemoryWatch memoryWatch;
 

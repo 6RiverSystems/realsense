@@ -9,6 +9,7 @@
 #include <vector>
 using namespace std;
 
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/search/graph/grid2d/Grid2dNode.hpp>
@@ -25,10 +26,10 @@ TEST(Test_AStar_Grid2d_Basic, SmallSearchOnEmptyGrid)
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
 
-    Grid2d::Position startPosition(0, 0, 0);
+    Position startPosition(0, 0, 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
 
-    Grid2d::Position goalPosition(1, 1, 0);
+    Position goalPosition(1, 1, 0);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
@@ -46,10 +47,10 @@ TEST(Test_AStar_Grid2d_Basic, Corner2CornerSearchOnEmptyGrid)
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
 
-    Grid2d::Position startPosition(0, 0, 0);
+    Position startPosition(0, 0, 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
 
-    Grid2d::Position goalPosition(GRID_SIZE - 1, GRID_SIZE - 1, 0);
+    Position goalPosition(GRID_SIZE - 1, GRID_SIZE - 1, 0);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
@@ -69,10 +70,10 @@ TEST(Test_AStar_Grid2d_Basic, SearchAroundObstacle)
 
     test::Grid2dUtils::addObstacle(grid, 2, 0, 2, 3);
 
-    Grid2d::Position startPosition(0, 0, 0);
+    Position startPosition(0, 0, 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
 
-    Grid2d::Position goalPosition(GRID_SIZE - 1, GRID_SIZE - 1, 0);
+    Position goalPosition(GRID_SIZE - 1, GRID_SIZE - 1, 0);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
@@ -90,10 +91,10 @@ TEST(Test_AStar_Grid2d_Basic, Clear)
     Grid2d grid(GRID_SIZE, GRID_SIZE);
     AStar algorithm;
 
-    Grid2d::Position startPosition(0, 0, 0);
+    Position startPosition(0, 0, 0);
     Grid2dNode* start = Grid2dNode::instanceOfStart(&grid, startPosition);
 
-    Grid2d::Position goalPosition(1, 1, 0);
+    Position goalPosition(1, 1, 0);
     Grid2dSingleGoal* goal = Grid2dSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
@@ -130,8 +131,8 @@ TEST(Test_AStar_Grid2d_Basic, MemoryLeaks)
 {
     Grid2d grid(GRID_SIZE, GRID_SIZE);
 
-    Grid2d::Position startPosition(0, 0, 0);
-    Grid2d::Position goalPosition(1, 1, 0);
+    Position startPosition(0, 0, 0);
+    Position goalPosition(1, 1, 0);
 
     test::MemoryWatch memoryWatch;
 

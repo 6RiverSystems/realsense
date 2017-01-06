@@ -23,8 +23,8 @@ template<typename TYPE,
     typename PRIORITY = int,
     typename HASH = std::hash<TYPE>,
     typename EQUAL_TO = std::equal_to<TYPE>,
-    int BUCKETS_INITIAL = 100,
-    int BUCKETS_MAX = 10000>
+    int BUCKETS_INITIAL = 10000,
+    int BUCKETS_MAX = 100000>
 class MappedPriorityQueue
 {
 public:
@@ -35,15 +35,15 @@ public:
 
     bool empty() const
     {
-        return index_.empty();
+        return nodeIndex_.empty();
     }
 
     void erase(TYPE item);
 
     bool exists(TYPE item) const
     {
-        auto result = index_.find(item);
-        return result != index_.end();
+        auto result = nodeIndex_.find(item);
+        return result != nodeIndex_.end();
     }
 
     TYPE find(TYPE item) const;
@@ -75,7 +75,7 @@ public:
 
     size_t size() const
     {
-        return index_.size();
+        return nodeIndex_.size();
     }
 
     size_t sizeEmptyBuckets() const
@@ -95,7 +95,7 @@ public:
 
     size_t sizeOccuppiedBuckets() const
     {
-        return queue_.size();
+        return nodeQueue_.size();
     }
 
 private:
@@ -104,6 +104,7 @@ private:
     using BucketType = list<Node>;
     using QueueType = map<PRIORITY, BucketType*, less<PRIORITY>>;
     using IndexType = unordered_map<TYPE, typename BucketType::iterator, HASH, EQUAL_TO>;
+    using BucketIndexType = unordered_map<PRIORITY, BucketType*>;
 
     using BucketPoolType = forward_list<BucketType*>;
 
@@ -163,12 +164,13 @@ private:
         }
     }
 
+    BucketIndexType bucketIndex_;
+
     BucketPoolType emptyBuckets_;
     int emptyBucketsCounter_;
 
-    IndexType index_;
-
-    QueueType queue_;
+    IndexType nodeIndex_;
+    QueueType nodeQueue_;
 };
 
 } // namespace srs

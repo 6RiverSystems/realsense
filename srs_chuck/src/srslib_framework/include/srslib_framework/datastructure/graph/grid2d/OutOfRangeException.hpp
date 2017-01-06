@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/exception/SrsRuntimeErrorException.hpp>
 
 namespace srs {
@@ -12,7 +13,7 @@ namespace srs {
 class OutOfRangeException: public SrsRuntimeErrorException
 {
 public:
-    OutOfRangeException(const Grid2d::Location& location, const Grid2d::Location max) :
+    OutOfRangeException(const Location& location, const Location max) :
         SrsRuntimeErrorException("Location out of range [" + location.toString() +
             ", limits: " + max.toString() + "]")
     {}

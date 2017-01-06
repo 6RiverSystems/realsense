@@ -1,5 +1,8 @@
 #include <srslib_framework/ros/message/LogicalMapMessageFactory.hpp>
 
+#include <srslib_framework/datastructure/Location.hpp>
+#include <srslib_framework/datastructure/Position.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,20 +42,20 @@ void LogicalMapMessageFactory::map2Vector(const LogicalMap* map,
             for (int col = 0; col < grid->getWidth(); col++)
             {
                 srslib_framework::LogicalCell cell;
-                Grid2d::Location location = Grid2d::Location(col, row);
+                Location location = Location(col, row);
 
                 // Transfer the cost
                 cell.cost = static_cast<int32_t>(grid->getPayload(location));
 
                 // Transfer the weights
                 cell.north = static_cast<int32_t>(grid->getWeight(
-                    Grid2d::Position(col, row, Grid2d::ORIENTATION_NORTH)));
+                    Position(col, row, Grid2d::ORIENTATION_NORTH)));
                 cell.east = static_cast<int32_t>(grid->getWeight(
-                    Grid2d::Position(col, row, Grid2d::ORIENTATION_EAST)));
+                    Position(col, row, Grid2d::ORIENTATION_EAST)));
                 cell.south = static_cast<int32_t>(grid->getWeight(
-                    Grid2d::Position(col, row, Grid2d::ORIENTATION_SOUTH)));
+                    Position(col, row, Grid2d::ORIENTATION_SOUTH)));
                 cell.west = static_cast<int32_t>(grid->getWeight(
-                    Grid2d::Position(col, row, Grid2d::ORIENTATION_WEST)));
+                    Position(col, row, Grid2d::ORIENTATION_WEST)));
 
                 logical.push_back(cell);
             }

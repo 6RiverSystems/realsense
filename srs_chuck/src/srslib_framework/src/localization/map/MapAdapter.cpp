@@ -5,6 +5,7 @@
 #include <yaml-cpp/yaml.h>
 #include <costmap_2d/cost_values.h>
 
+#include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/exception/io/FailedToOpenFileException.hpp>
 #include <srslib_framework/localization/map/occupancy/exception/InvalidChannelNumberException.hpp>
 
@@ -25,7 +26,7 @@ void MapAdapter::baseMap2Vector(const BaseMap* map, vector<int8_t>& occupancy)
         {
             for (int col = 0; col < grid->getWidth(); col++)
             {
-                int8_t cost = static_cast<int8_t>(grid->getPayload(Grid2d::Location(col, row)));
+                int8_t cost = static_cast<int8_t>(grid->getPayload(Location(col, row)));
                 occupancy.push_back(cost);
             }
         }
@@ -82,7 +83,7 @@ void MapAdapter::occupancyMap2AmclVector(const OccupancyMap* map, vector<int8_t>
         {
             for (int col = 0; col < grid->getWidth(); col++)
             {
-                Grid2d::BaseType cost = grid->getPayload(Grid2d::Location(col, row));
+                Grid2d::BaseType cost = grid->getPayload(Location(col, row));
 
                 int8_t adaptedCost = static_cast<int8_t>(cost);
                 if (cost == Grid2d::PAYLOAD_NO_INFORMATION)

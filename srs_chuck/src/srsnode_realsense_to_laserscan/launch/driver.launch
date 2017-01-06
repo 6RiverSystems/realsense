@@ -54,10 +54,6 @@
             range_max: 4.0
             height_min: 0.1
             height_max: 3.0
-<<<<<<< HEAD
-            offset_bottom_row: 80
-=======
->>>>>>> develop
         </rosparam>
         </node>
 

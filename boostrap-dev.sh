@@ -1,6 +1,8 @@
 #!/bin/bash
 sudo apt-get install git -y
 
+sudo apt-get install ca-cacert
+
 git clone https://github.com/6RiverSystems/ros.git ~/ros
 
 # Instructions => ~/ros/bootstrap-dev.sh
@@ -19,7 +21,8 @@ sudo nmcli d wifi connect <network> password <password> iface wlan0
 
 sudo update-locale LANG=C LANGUAGE=C LC_ALL=C LC_MESSAGES=POSIX
 
-sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list'
+14.04 => sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list'
+16.04 => sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list'
 
 ############# x86_64 ROS #############
 gpg --keyserver pgp.mit.edu --recv-keys 749D6EEC0353B12C
@@ -67,37 +70,6 @@ sudo vim /etc/hosts
 
 # Install other development dependencies
 sudo apt-get install libsdl-image1.2-dev socat socat ccache python-gevent=1.0-1ubuntu1 libunwind8-dev expect-dev network-manager-openvpn-gnome linux-firmware -y
-
-
-# Install librealsense
-git clone https://github.com/6RiverSystems/librealsense.git
-cd ~/librealsense/
-sudo apt-get install libusb-1.0-0-dev -y
-./scripts/install_glfw3.sh
-sudo cp ./config/99-realsense-libusb.rules /etc/udev/rules.d/
-sudo cp ./config/uvc.conf /etc/modprobe.d/
-sudo udevadm control --reload-rules && udevadm trigger
-cd ~/librealsense/scripts
-./install-r200-udev-fix.sh 
-cd ~/librealsense
-make BACKEND=LIBUVC
-sudo make install
-
-# Optional (check if device is detected)
-sudo dmesg | tail -n 1000
-sudo rm /usr/lib/arm-linux-gnueabihf/libGL.so 
-sudo ln -s /usr/lib/arm-linux-gnueabihf/tegra/libGL.so /usr/lib/arm-linux-gnueabihf/libGL.so
-
-
-# Change all network interfaces to default to eth0 and wlan0
-sudo rm /etc/udev/rules.d/70-persistent-net.rules
-
-git clone https://github.com/6RiverSystems/ros.git ~/ros
-sudo cp ~/ros/mfp-ros.conf /etc/init
-
-sudo find /opt/ros -type f -exec sed -i 's/\.so\.2\.4\.8/.so/g' {} \;
-sudo find /opt/ros -type f -exec sed -i 's/\/arm-linux-gnueabihf\/libopencv_/\/libopencv_/g' {} \;
-sudo find /opt/ros -type f -exec sed -i 's/\/usr\/lib\/libopencv_ocl\.so;//g' {} \;
 
 # Copy default logging config
 cp ~/ros/.rosconsole.config ~/

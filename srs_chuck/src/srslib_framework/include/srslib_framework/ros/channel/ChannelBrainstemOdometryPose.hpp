@@ -16,7 +16,7 @@ class ChannelBrainstemOdometryPose :
 public:
 
 	ChannelBrainstemOdometryPose() :
-		PublisherOdometryPose(ChuckTopics::sensor::ODOMETRY_POSE)
+		PublisherOdometryPose(ChuckTopics::sensor::ODOMETRY_POSE_RAW)
     {}
 };
 

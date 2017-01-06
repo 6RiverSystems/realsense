@@ -334,7 +334,7 @@ void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
 		{
 			mapDimensionName[DIMENSION::WHEEL_BASE_LENGTH] = "wheel_base_length";
 			mapDimensionName[DIMENSION::LEFT_WHEEL_RADIUS] = "left_wheel_radius";
-			mapDimensionName[DIMENSION::RIGHT_WHEEL_RADIUS] = "right_whee_radius";
+			mapDimensionName[DIMENSION::RIGHT_WHEEL_RADIUS] = "right_wheel_radius";
 		};
 
 		DimensionData msg = {

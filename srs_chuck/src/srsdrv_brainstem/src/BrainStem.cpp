@@ -33,6 +33,37 @@ BrainStem::BrainStem(string name, int argc, char** argv) :
 	// Register dynamic configuration callback
 	configServer_.setCallback(boost::bind(&BrainStem::cfgCallback, this, _1, _2));
 
+	char* pszLeftWheelRadius = getenv("ROBOT_LEFT_WHEEL_RADIUS");
+	char* pszRightWheelRadius = getenv("ROBOT_RIGHT_WHEEL_RADIUS");
+	char* pszWheelBaseLength = getenv("ROBOT_WHEEL_BASE");
+
+	if( pszLeftWheelRadius )
+	{
+		double leftWheelRadius = 0.0f;
+		sscanf( pszLeftWheelRadius, "%lf", &leftWheelRadius );
+
+		messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::LEFT_WHEEL_RADIUS,
+			leftWheelRadius);
+	}
+
+	if( pszRightWheelRadius )
+	{
+		double rightWheelRadius = 0.0f;
+		sscanf( pszRightWheelRadius, "%lf", &rightWheelRadius );
+
+		messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::RIGHT_WHEEL_RADIUS,
+			rightWheelRadius);
+	}
+
+	if( pszWheelBaseLength )
+	{
+		double wheelbaseLength = 0.0f;
+		sscanf( pszWheelBaseLength, "%lf", &wheelbaseLength );
+
+		messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::WHEEL_BASE_LENGTH,
+			wheelbaseLength);
+	}
+
 	connectionChanged( false );
 
 	io_->open( std::bind( &BrainStem::connectionChanged, this, std::placeholders::_1 ),

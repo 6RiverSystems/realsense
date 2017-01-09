@@ -50,18 +50,18 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 
 	publisher_.publish(odom);
 
-	// Publish the TF
-	geometry_msgs::TransformStamped odom_trans;
-	odom_trans.header.frame_id = ChuckTransforms::ODOMETRY;
-	odom_trans.child_frame_id = ChuckTransforms::BASE_FOOTPRINT;
-
-	odom_trans.header.stamp = currentTime;
-	odom_trans.transform.translation.x = odometryPoseData.linearVelocity;
-	odom_trans.transform.translation.y = odometryPoseData.angularVelocity;
-	odom_trans.transform.translation.z = 0.0;
-	odom_trans.transform.rotation = odom_quat;
-
-	broadcaster_.sendTransform( odom_trans );
+//	// Publish the TF
+//	geometry_msgs::TransformStamped odom_trans;
+//	odom_trans.header.frame_id = ChuckTransforms::ODOMETRY;
+//	odom_trans.child_frame_id = ChuckTransforms::BASE_FOOTPRINT;
+//
+//	odom_trans.header.stamp = currentTime;
+//	odom_trans.transform.translation.x = odometryPoseData.linearVelocity;
+//	odom_trans.transform.translation.y = odometryPoseData.angularVelocity;
+//	odom_trans.transform.translation.z = 0.0;
+//	odom_trans.transform.rotation = odom_quat;
+//
+//	broadcaster_.sendTransform( odom_trans );
 }
 
 } // namespace srs

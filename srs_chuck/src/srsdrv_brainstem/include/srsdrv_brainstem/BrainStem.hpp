@@ -54,6 +54,8 @@ private:
 	ros::NodeHandle						nodeHandle_;
 
 	ros::Timer							brainstemFaultTimer_;
+
+	bool  					useEmulator_;
 };
 
 } // namespace srs

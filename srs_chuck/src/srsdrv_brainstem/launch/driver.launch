@@ -14,5 +14,7 @@
     <node name="srsdrv_brainstem"
         pkg="srsdrv_brainstem"
         type="srsdrv_brainstem"
-        output="screen" launch-prefix="$(arg launch-prefix)"/>
+        output="screen" launch-prefix="$(arg launch-prefix)">
+      <param name="use_emulator" value="$(arg emulation_mode)"/>
+    </node>
 </launch>

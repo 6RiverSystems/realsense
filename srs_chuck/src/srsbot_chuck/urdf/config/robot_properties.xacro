@@ -62,7 +62,7 @@
     <!-- Sensors -->
 
     <!-- Realsense -->
-    <xacro:property name="realsense_z_offset" value="0.0641858" />
+    <xacro:property name="realsense_z_offset" value="-0.09766" />
 
     <!-- Stargazer -->
     <!-- All measurements made from base_link -> bottom left corner of stargazer -->

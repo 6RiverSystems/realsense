@@ -30,8 +30,8 @@ scan_filter_chain:
 - name: shadows
   type: laser_filters/ScanShadowsFilter
   params:
-    min_angle: 10
-    max_angle: 170
+    min_angle: 20
+    max_angle: 160
     neighbors: 2
     window: 1
 # radiusSearch filter remove isolated points
@@ -43,7 +43,7 @@ scan_filter_chain:
   params: 
     neighbor_number: 5
     threshold_number: 2
-    threshold_ratio: 0.10 # ratio: search radius in meter per meter
+    threshold_ratio: 0.1
 - name: clean_up
   type: laser_filters/LaserScanRangeCleanUpFilter
 # intensity filter generally filters out only correct readings with low intensity 

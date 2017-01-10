@@ -16,10 +16,10 @@ namespace srs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 RealsenseDriver::RealsenseDriver( ) :
 	rosNodeHandle_( ),
-	depthSubscriber_( rosNodeHandle_.subscribe<sensor_msgs::Image>( "/camera/depth/image_raw", 100,
+	depthSubscriber_( rosNodeHandle_.subscribe<sensor_msgs::Image>( "/internal/sensors/rgbd/depth/image_raw", 100,
 		std::bind( &RealsenseDriver::OnDepthData, this, std::placeholders::_1 ) ) )
 {
-
+	depthMedianFilterPublisher_ = rosNodeHandle_.advertise<sensor_msgs::Image>("test_image", 100);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -28,10 +28,13 @@ BrainStem::BrainStem(string name, int argc, char** argv) :
 
 	messageProcessor_( io_ ),
 	brainstemFaultTimer_(),
-	nodeHandle_("~")
+	nodeHandle_("~"),
+	useEmulator_(false)
 {
 	// Register dynamic configuration callback
 	configServer_.setCallback(boost::bind(&BrainStem::cfgCallback, this, _1, _2));
+
+	nodeHandle_.param("use_emulator", useEmulator_, useEmulator_);
 
 	connectionChanged( false );
 
@@ -66,15 +69,17 @@ void BrainStem::initialize()
 void BrainStem::connectionChanged( bool bIsConnected )
 {
 	messageProcessor_.setConnected(bIsConnected);
-
-//	if( !bIsConnected )
-//	{
-//		brainstemEmulator_.reset( new BrainStemEmulator( ) );
-//	}
-//	else
-//	{
-//		brainstemEmulator_.reset( );
-//	}
+	if( useEmulator_ )
+	{
+		if( !bIsConnected )
+		{
+			brainstemEmulator_.reset( new BrainStemEmulator( ) );
+		}
+		else
+		{
+			brainstemEmulator_.reset( );
+		}
+	}
 }
 
 void BrainStem::cfgCallback(srsdrv_brainstem::RobotSetupConfig &config,

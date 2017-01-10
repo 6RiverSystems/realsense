@@ -28,6 +28,7 @@
        
 	<!-- Intel Realsense R200 driver -->
 	<include file="$(find realsense_camera)/launch/r200_nodelet_modify_params.launch" >
+	<arg name="enable_depth"        value="true" />
 	<arg name="enable_ir"         	value="false" />
 	<arg name="enable_ir2"        	value="false" />
 	<arg name="enable_color"      	value="false" />
@@ -36,6 +37,8 @@
 	<arg name="depth_height"        value="240" />
 	<arg name="depth_width"         value="320" />
 	<arg name="depth_fps"		value="30" />
+	<arg name="color_height"        value="240" />
+        <arg name="color_width"         value="320" />
 	<arg name="color_fps"		value="30" />
 	</include>
 	
@@ -50,7 +53,7 @@
             output_frame_id: laser_frame
             scan_height: 120
             scan_time: 0.333
-            range_min: 0.3
+            range_min: 0.4
             range_max: 4.0
             height_min: 0.1
             height_max: 3.0

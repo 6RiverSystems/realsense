@@ -68,7 +68,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor(std::shared_ptr<IO> pIO) :
     addSoftwareMessage(SoftwareMessagePtr(new PingHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new SetMotionStateHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new SetOdometryRpmHandler(this)));
-    addSoftwareMessage(SoftwareMessagePtr(new SetVelocityHandler(this)));
+//    addSoftwareMessage(SoftwareMessagePtr(new SetVelocityHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new ShutdownHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new SoundHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new UpdateUIHandler(this)));

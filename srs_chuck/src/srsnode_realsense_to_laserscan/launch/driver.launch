@@ -51,7 +51,7 @@
             scan_time: 0.333
             range_min: 0.4
             range_max: 4.0
-            height_min: 0.2
+            height_min: 0.1
             height_max: 3.0
         </rosparam>
         </node>

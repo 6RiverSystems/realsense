@@ -42,7 +42,7 @@ scan_filter_chain:
   type: laser_filters/RadiusSearchFilter
   params: 
     neighbor_number: 5
-    threshold_number: 3
+    threshold_number: 2
     threshold_ratio: 0.1
 - name: clean_up
   type: laser_filters/LaserScanRangeCleanUpFilter

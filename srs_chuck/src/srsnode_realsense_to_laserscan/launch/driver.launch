@@ -41,6 +41,8 @@
         <arg name="color_width"         value="320" />
 	<arg name="color_fps"		value="30" />
 	</include>
+
+        <!--node pkg="srsnode_realsense_to_laserscan" type="srsnode_realsense_to_laserscan" name="depthimage_filter" /-->
 	
 	<!-- Point cloud to laser scan conversion -->
 	<node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan">

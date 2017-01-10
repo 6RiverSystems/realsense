@@ -19,7 +19,7 @@ RealsenseDriver::RealsenseDriver( ) :
 	depthSubscriber_( rosNodeHandle_.subscribe<sensor_msgs::Image>( "/internal/sensors/rgbd/depth/image_raw", 100,
 		std::bind( &RealsenseDriver::OnDepthData, this, std::placeholders::_1 ) ) )
 {
-	depthMedianFilterPublisher_ = rosNodeHandle_.advertise<sensor_msgs::Image>("test_image", 100);
+	depthMedianFilterPublisher_ = rosNodeHandle_.advertise<sensor_msgs::Image>("/internal/sensors/rgbd/depth/image_filtered", 100);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +39,7 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::Image::ConstPtr& depthImag
 {
 	cv_bridge::CvImagePtr cvDepthImage = GetCvImage( depthImage );
 
-	cv::flip(cvDepthImage->image, cvDepthImage->image, -1);
+	//cv::flip(cvDepthImage->image, cvDepthImage->image, -1);
 
 	cv::Mat medianFilterImg;
 	cv::medianBlur( cvDepthImage->image, medianFilterImg, 5 );

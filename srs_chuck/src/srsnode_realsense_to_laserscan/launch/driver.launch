@@ -9,37 +9,57 @@
 	<arg name="camera" default="camera" />
 	<arg name="simulation" default="false" />
 
-	<node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+	<remap from="/camera/color/camera_info" to="/internal/sensors/rgbd/color/camera_info"/>
+	<remap from="/camera/color/image_raw" to="/internal/sensors/rgbd/color/image_raw"/>
+	<remap from="/camera/depth/camera_info" to="/internal/sensors/rgbd/depth/camera_info"/>
+	<remap from="/camera/depth/image_raw" to="/internal/sensors/rgbd/depth/image_raw"/>
+	<remap from="/camera/depth/points" to="/internal/sensors/rgbd/depth/points/filtered"/>
+	<remap from="/camera/depth/points_raw" to="/internal/sensors/rgbd/depth/points/raw"/>
+	<remap from="/camera/ir/camera_info" to="/internal/sensors/rgbd/ir/camera_info"/>
+	<remap from="/camera/ir/image_raw" to="/internal/sensors/rgbd/ir/image_raw"/>
+	<remap from="/camera/ir2/camera_info" to="/internal/sensors/rgbd/ir2/camera_info"/>
+	<remap from="/camera/ir2/image_raw" to="/internal/sensors/rgbd/ir2/image_raw"/>
+	<remap from="/camera/nodelet_manager/bond" to="/internal/sensors/rgbd/nodelet_manager/bond"/>
 
-	<!-- Run a VoxelGrid filter to clean NaNs and downsample the data -->
-    <node pkg="nodelet" type="nodelet" name="VoxelGrid" args="load pcl/VoxelGrid pcl_manager" output="screen">
-        <remap from="~input" to="/camera/depth/points" />
-        <rosparam>
-            filter_field_name: z
-            filter_limit_min: -0.1
-            filter_limit_max: 1000
-            filter_limit_negative: False
-            leaf_size: 0.10
-        </rosparam>
- 	</node>
+	<param name="$(arg camera)/driver/r200_dc_preset" type="int" value="5" />
+	<param name="$(arg camera)/driver/r200_lr_auto_exposure_enabled" type="bool" value="false" />
+	<param name="$(arg camera)/driver/r200_lr_gain"	type="int" value="100" />
+	<param name="$(arg camera)/driver/r200_lr_exposure" type="int" value="330" />
+       
+	<!-- Intel Realsense R200 driver -->
+	<include file="$(find realsense_camera)/launch/r200_nodelet_modify_params.launch" >
+	<arg name="enable_ir"         	value="false" />
+	<arg name="enable_ir2"        	value="false" />
+	<arg name="enable_color"      	value="false" />
+	<arg name="enable_pointcloud" 	value="false" />
+	<arg name="enable_tf"         	value="false" />
+	<arg name="depth_height"        value="240" />
+	<arg name="depth_width"         value="320" />
+	<arg name="depth_fps"		value="30" />
+	<arg name="color_fps"		value="30" />
+	</include>
+	
+	<!-- Point cloud to laser scan conversion -->
+	<node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan">
 
-   <node pkg="nodelet" type="nodelet" name="PassThrough" args="load pcl/PassThrough pcl_manager" output="screen">
-        <remap from="~input" to="/VoxelGrid/output"/>
+        <remap from="image" to="/internal/sensors/rgbd/depth/image_raw"/>
+        <remap from="camera_info" to="/internal/sensors/rgbd/depth/camera_info"/>
+        <remap from="scan" to="/internal/sensors/rgbd/scan"/>
         <rosparam>
-            filter_field_name: z
-            filter_limit_min: 0.3
-            filter_limit_max: 3.5
-            filter_limit_negative: False
+            output_frame_id: laser_frame
+            scan_height: 120
+            scan_time: 0.333
+            range_min: 0.3
+            range_max: 4.0
+            height_min: 0.1
+            height_max: 3.0
         </rosparam>
-	</node>
+        </node>
 
-	<node pkg="nodelet" type="nodelet" name="StatisticalOutlier" args="load pcl/StatisticalOutlierRemoval pcl_manager" output="screen">
-        <remap from="~input" to="/PassThrough/output"/>
-        <remap from="~output" to="/camera/depth/points/filtered"/>
-        <rosparam>
-               mean_k: 10
-               stddev: 0.05
-        </rosparam>
+	<node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="rgbd_laser_filter">
+		<remap from="scan" to="/internal/sensors/rgbd/scan" />
+		<remap from="scan_filtered" to="/internal/sensors/rgbd/scan/filtered" />
+		<rosparam command="load" file="$(find srsnode_laser_filters)/config/rgbd_laser_filter.yaml" />
 	</node>
 
 </launch>

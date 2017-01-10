@@ -3,93 +3,85 @@
  *
  * This is proprietary software, unauthorized distribution is not permitted.
  */
-#include <srsdrv_brainstem/BrainStemMessageProcessor.h>
-
-#include <chrono>
-#include <boost/tokenizer.hpp>
 
 #include <ros/ros.h>
 
 #include <srslib_framework/io/IO.hpp>
 #include <srslib_framework/utils/Logging.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessages.h>
+#include <BrainStemMessages.hpp>
+#include <BrainStemMessageProcessor.hpp>
+
+#include <hw_message/LogHandler.hpp>
+#include <hw_message/HardwareInfoHandler.hpp>
+#include <hw_message/OperationalStateHandler.hpp>
+#include <hw_message/PowerStateHandler.hpp>
+#include <hw_message/OdometryRpmHandler.hpp>
+#include <hw_message/OdometryPoseHandler.hpp>
+#include <hw_message/ButtonPressedHandler.hpp>
+
+#include <sw_message/ResetHandler.hpp>
+#include <sw_message/PingHandler.hpp>
+#include <sw_message/SetMotionStateHandler.hpp>
+#include <sw_message/SetOdometryRpmHandler.hpp>
+#include <sw_message/SetVelocityHandler.hpp>
+#include <sw_message/ShutdownHandler.hpp>
+#include <sw_message/SoundHandler.hpp>
+#include <sw_message/UpdateUIHandler.hpp>
+
+
 
 namespace srs {
 
 using namespace ros;
 
-BrainStemMessageProcessor::BrainStemMessageProcessor( std::shared_ptr<IO> pIO ) :
-	m_pIO( pIO ),
-    soundHandler_(this),
-    freeSpinHandler_(this)
+BrainStemMessageProcessor::BrainStemMessageProcessor(std::shared_ptr<IO> pIO) :
+	io_(pIO),
+	setupComplete_(false),
+	syncState_(false),
+	sentPing_(false),
+	isConnected_(false),
+	hasValidHardareInfo_(false),
+	lastHardareInfoRequestTime_(),
+	hasValidOperationalState_(false),
+	lastOperationalStateRequestTime_(),
+	lastMessageTime_(),
+	connectedChannel_(),
+	odometryRpmChannel_(),
+	odometryPoseChannel_(),
+	hardwareInfoChannel_(),
+	operationalStateChannel_(),
+	powerStateChannel_()
 {
-	m_mapEntityButton[LED_ENTITIES::TOTE0]		= "TOTE0";
-	m_mapEntityButton[LED_ENTITIES::TOTE1]		= "TOTE1";
-	m_mapEntityButton[LED_ENTITIES::TOTE2]		= "TOTE2";
-	m_mapEntityButton[LED_ENTITIES::TOTE3]		= "TOTE3";
-	m_mapEntityButton[LED_ENTITIES::TOTE4]		= "TOTE4";
-	m_mapEntityButton[LED_ENTITIES::TOTE5]		= "TOTE5";
-	m_mapEntityButton[LED_ENTITIES::TOTE6]		= "TOTE6";
-	m_mapEntityButton[LED_ENTITIES::TOTE7]		= "TOTE7";
-	m_mapEntityButton[LED_ENTITIES::ACTION]		= "ACTION";
-	m_mapEntityButton[LED_ENTITIES::PAUSE]		= "PAUSE";
-	m_mapEntityButton[LED_ENTITIES::TAIL_LEFT]	= "TAIL_LEFT";
-	m_mapEntityButton[LED_ENTITIES::TAIL_RIGHT]	= "TAIL_RIGHT";
-	m_mapEntityButton[LED_ENTITIES::SCANNER]	= "SCANNER";
+    hardwareInfoHandler_.reset(new HardwareInfoHandler(hardwareInfoChannel_));
+    operationalStateHandler_.reset(new OperationalStateHandler(operationalStateChannel_));
 
-	m_mapLedMode["OFF"] 					= LED_MODE::OFF;
-	m_mapLedMode["ON"] 						= LED_MODE::ON;
-	m_mapLedMode["ESTOP"] 					= LED_MODE::ESTOP;
-	m_mapLedMode["GRAB"] 					= LED_MODE::GRAB;
-	m_mapLedMode["PUT"] 					= LED_MODE::PUT;
-	m_mapLedMode["BRAKE"] 					= LED_MODE::BRAKE;
-	m_mapLedMode["TURN"] 					= LED_MODE::TURN;
-	m_mapLedMode["SELECT"] 					= LED_MODE::SELECT;
-	m_mapLedMode["RAPID_BLINK"] 			= LED_MODE::RAPID_BLINK;
+    addHardwareMessageHandler(hardwareInfoHandler_);
+    addHardwareMessageHandler(operationalStateHandler_);
+    addHardwareMessageHandler(HardwareMessageHandlerPtr(new LogHandler()));
+    addHardwareMessageHandler(HardwareMessageHandlerPtr(new PowerStateHandler(powerStateChannel_)));
+    addHardwareMessageHandler(HardwareMessageHandlerPtr(new OdometryRpmHandler(odometryRpmChannel_)));
+    addHardwareMessageHandler(HardwareMessageHandlerPtr(new OdometryPoseHandler(odometryPoseChannel_)));
+    addHardwareMessageHandler(HardwareMessageHandlerPtr(new ButtonPressedHandler(buttonPressedChannel_)));
 
-	for( auto& kv : m_mapEntityButton )
-	{
-		m_mapButtonEntity[kv.second] = kv.first;
-	}
+    addSoftwareMessage(SoftwareMessagePtr(new ResetHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new PingHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new SetMotionStateHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new SetOdometryRpmHandler(this)));
+//    addSoftwareMessage(SoftwareMessagePtr(new SetVelocityHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new ShutdownHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new SoundHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new UpdateUIHandler(this)));
 
-	m_vecBridgeCallbacks["UI"] = { std::bind( &BrainStemMessageProcessor::OnUpdateLights, this, std::placeholders::_1 ), 2 };
-	m_vecBridgeCallbacks["STOP"] = { std::bind( &BrainStemMessageProcessor::OnHardStop, this ), 0 };
-	m_vecBridgeCallbacks["STARTUP"] = { std::bind( &BrainStemMessageProcessor::OnStartup, this, std::placeholders::_1 ), 0 };
-	m_vecBridgeCallbacks["CLEAR_MOTION_STATUS"] = { std::bind( &BrainStemMessageProcessor::ClearMotionStatus, this ), 0 };
-
-    hwMessageHandlers_[rawOdometryHandler_.getKey()] = &rawOdometryHandler_;
-    hwMessageHandlers_[sensorFrameHandler_.getKey()] = &sensorFrameHandler_;
-    hwMessageHandlers_[hardwareInfoHandler_.getKey()] = &hardwareInfoHandler_;
+    for (auto handler : softwareHandlers_)
+    {
+    	handler->attach();
+    }
 }
 
-BrainStemMessageProcessor::~BrainStemMessageProcessor( )
+BrainStemMessageProcessor::~BrainStemMessageProcessor()
 {
 
-}
-
-//////////////////////////////////////////////////////////////////////////
-// Message Callbacks
-//////////////////////////////////////////////////////////////////////////
-
-void BrainStemMessageProcessor::SetConnectionChangedCallback( ConnectionChangedFn connectionChangedCallback )
-{
-	m_connectionChangedCallback = connectionChangedCallback;
-}
-
-void BrainStemMessageProcessor::SetButtonCallback( ButtonCallbackFn buttonCallback )
-{
-	m_buttonCallback = buttonCallback;
-}
-
-void BrainStemMessageProcessor::SetOperationalStateCallback( OperationalStateCallbackFn operationalStateCallback )
-{
-	m_operationalStateCallback = operationalStateCallback;
-}
-
-void BrainStemMessageProcessor::SetVoltageCallback( VoltageCallbackFn voltageCallback )
-{
-	m_voltageCallback = voltageCallback;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -99,390 +91,307 @@ void BrainStemMessageProcessor::SetVoltageCallback( VoltageCallbackFn voltageCal
 void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 {
     BRAIN_STEM_MSG eCommand = BRAIN_STEM_MSG::UNKNOWN;
-    char messageKey = 0x00;
 
     if (buffer.size() > 0)
     {
-        messageKey = buffer[0];
         eCommand = static_cast<BRAIN_STEM_MSG>(buffer[0]);
-    }
 
-	switch (eCommand)
-	{
-		case BRAIN_STEM_MSG::MESSAGE:
+		ros::Time currentTime = ros::Time::now();
+
+		if (setupComplete_ ||
+			eCommand == BRAIN_STEM_MSG::OPERATIONAL_STATE ||
+			eCommand == BRAIN_STEM_MSG::HARDWARE_INFO)
 		{
-			std::string strMessage( buffer.begin( ), buffer.end( ) );
-
-			if( strMessage.find( "<MSG Error" ) != -1 )
+			// Go through the registered message handlers and communicate the data if the key matches
+			HwMessageHandlerMapType::iterator handler = hwMessageHandlers_.find(eCommand);
+			if (handler != hwMessageHandlers_.end())
 			{
-				ROS_ERROR_NAMED( "firmware", "Fatal Error: %s", strMessage.c_str( ) );
-			}
-			else
-			{
-				ROS_DEBUG_STREAM_NAMED( "firmware", "Message: <" << strMessage << ">" );
-			}
-            return;
-		}
-
-		case BRAIN_STEM_MSG::BUTTON_PRESSED:
-		{
-			LED_ENTITIES eButtonId = static_cast<LED_ENTITIES>( buffer[1] );
-
-			if( m_mapEntityButton.find( eButtonId ) != m_mapEntityButton.end( ) )
-			{
-				m_buttonCallback( eButtonId );
-			}
-			else
-			{
-				ROS_ERROR_STREAM( "Unknown button pressed: " << (int)eButtonId );
-			}
-            return;
-		}
-
-		case BRAIN_STEM_MSG::OPERATIONAL_STATE:
-		{
-			OPERATIONAL_STATE_DATA* pOperationalState = reinterpret_cast<OPERATIONAL_STATE_DATA*>( buffer.data( ) );
-
-			std::bitset<8> motionStatusSet( pOperationalState->motionStatus );
-			std::bitset<8> failureStatusSet( pOperationalState->failureStatus );
-
-			MOTION_STATUS_DATA motionStatusData;
-			motionStatusData.frontEStop = motionStatusSet.test( MOTION_STATUS::FRONT_E_STOP );
-			motionStatusData.backEStop = motionStatusSet.test( MOTION_STATUS::BACK_E_STOP );
-			motionStatusData.wirelessEStop = motionStatusSet.test( MOTION_STATUS::WIRELESS_E_STOP );
-			motionStatusData.bumpSensor = motionStatusSet.test( MOTION_STATUS::BUMP_SENSOR);
-            motionStatusData.freeSpin = motionStatusSet.test(MOTION_STATUS::FREE_SPIN);
-			motionStatusData.hardStop = motionStatusSet.test( MOTION_STATUS::HARD_STOP );
-
-			FAILURE_STATUS_DATA failureStatusData;
-			failureStatusData.safetyProcessorFailure = failureStatusSet.test( FAILURE_STATUS::SAFETY_PROCESSOR );
-			failureStatusData.brainstemFailure = failureStatusSet.test( FAILURE_STATUS::BRAINSTEM );
-			failureStatusData.brainTimeoutFailure = failureStatusSet.test( FAILURE_STATUS::BRAINSTEM_TIMEOUT );
-			failureStatusData.rightMotorFailure = failureStatusSet.test( FAILURE_STATUS::RIGHT_MOTOR );
-			failureStatusData.leftMotorFailure = failureStatusSet.test( FAILURE_STATUS::LEFT_MOTOR );
-
-			m_operationalStateCallback( pOperationalState->upTime, motionStatusData,
-				failureStatusData );
-            return;
-		}
-
-		case BRAIN_STEM_MSG::SYSTEM_VOLTAGE:
-		{
-			VOLTAGE_DATA* pVoltage = reinterpret_cast<VOLTAGE_DATA*>( buffer.data( ) );
-
-			m_voltageCallback( pVoltage->voltage );
-            return;
-		}
-	}
-
-    ros::Time currentTime = ros::Time::now();
-
-    // Go through the registered message handlers and
-    // communicate the data if the key matches
-    HwMessageHandlerMapType::iterator handler = hwMessageHandlers_.find(messageKey);
-    if (handler != hwMessageHandlers_.end())
-    {
-        handler->second->receiveData(currentTime, buffer);
-        return;
-    }
-
-    // If it arrives here, the message key is unknown
-    ROS_ERROR_STREAM( "Unknown message from brainstem: " <<
-        static_cast<int>(eCommand) << ", data: " << ToHex(buffer));
-}
-
-void BrainStemMessageProcessor::GetOperationalState( )
-{
-	ROS_DEBUG( "GetOperationalState" );
-
-	COMMAND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_OPERATIONAL_STATE) };
-
-	// Get the operational state
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
-}
-
-void BrainStemMessageProcessor::GetHardwareInformation( )
-{
-	ROS_DEBUG( "GetHardwareInformation" );
-
-	COMMAND_DATA msg = { static_cast<uint8_t>( BRAIN_STEM_CMD::GET_HARDWARE_INFO ) };
-
-	// Get the hardware information (version, configuration, etc.)
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
-}
-
-void BrainStemMessageProcessor::SendPing( )
-{
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::PING );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
-}
-
-void BrainStemMessageProcessor::SetRPM( double leftWheelRPM, double rightWheelRPM )
-{
-	ODOMETRY_RPM_DATA msg = {
-	    static_cast<uint8_t>( BRAIN_STEM_CMD::SET_VELOCITY_RPM ),
-	    static_cast<float>( leftWheelRPM ),
-	    static_cast<float>( rightWheelRPM )
-	};
-
-	static double s_leftWheelRPM = leftWheelRPM;
-	static double s_rightWheelRPM = rightWheelRPM;
-
-	if( leftWheelRPM != s_leftWheelRPM ||
-		rightWheelRPM != s_rightWheelRPM )
-	{
-		ROS_DEBUG_NAMED( "velocity_rpm", "Odometry: SetRPM: %f, %f", leftWheelRPM, rightWheelRPM );
-
-		s_leftWheelRPM = leftWheelRPM;
-		s_rightWheelRPM = rightWheelRPM;
-	}
-
-	// Send the RPM down to the motors
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
-}
-
-
-void BrainStemMessageProcessor::SetVelocity( double dfLinear, double dfAngular )
-{
-	VELOCITY_DATA msg = {
-		static_cast<uint8_t>( BRAIN_STEM_CMD::SET_VELOCITY ),
-		static_cast<float>( dfLinear ),
-		static_cast<float>( dfAngular )
-	};
-
-	static double s_dfLinear = dfLinear;
-	static double s_dfAngular = dfAngular;
-
-	if( dfLinear != s_dfLinear ||
-		dfAngular != s_dfAngular )
-	{
-		ROS_DEBUG_NAMED( "velocity", "Odometry: SetVelocity: %f, %f", dfLinear, dfAngular );
-
-		s_dfLinear = dfLinear;
-		s_dfAngular = dfAngular;
-	}
-
-	// Send the velocity down to the motors
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
-}
-
-////////////////////////////////////////////////////////////////////////////
-//// ROS Callbacks
-////////////////////////////////////////////////////////////////////////////
-
-void BrainStemMessageProcessor::processRosMessage(const string& strMessage)
-{
-	boost::char_separator<char> separator(";");
-
-	boost::tokenizer<boost::char_separator<char>> messageListTokenizer( strMessage, separator );
-
-	// Parse the list of semicolon delimited commands
-	for( auto && strCommand : messageListTokenizer )
-	{
-		ROS_DEBUG( "Parse command: %s", strCommand.c_str( ) );
-
-		// Parse the command by whitespace
-		std::vector<std::string> vecParsed;
-
-		boost::char_separator<char> spaceSeparator(" ");
-
-		boost::tokenizer<boost::char_separator<char>> commandListTokenizer( strCommand, spaceSeparator );
-
-		for( auto && strValue : commandListTokenizer )
-		{
-			vecParsed.push_back( strValue );
-		}
-
-		if( vecParsed.size( ) )
-		{
-			const std::string& strCommand = vecParsed[0];
-
-			std::vector<std::string> vecParams = { vecParsed.begin( ) + 1, vecParsed.end( ) };
-
-			auto iter = m_vecBridgeCallbacks.find( strCommand );
-
-			if( iter != m_vecBridgeCallbacks.end( ) )
-			{
-				if( vecParams.size( ) == iter->second.dwNumParams )
+				try
 				{
-					iter->second.callback( vecParams );
+					handler->second->receiveData(currentTime, buffer);
+
 				}
-				else
+				catch(std::runtime_error& error)
 				{
-					ROS_ERROR( "Bridge has invalid number of arguments for command %s: %s",
-						strCommand.c_str( ), strMessage.c_str( ) );
+					// If it arrives here, the message failed to parse
+					ROS_ERROR_STREAM("Brainstem driver: Message from brainstem malformed: " <<
+						static_cast<char>(eCommand) << ", data: " << ToHex(buffer) << ", exception: " << error.what());
 				}
 			}
 			else
 			{
-				ROS_WARN( "Unknown command %s", strCommand.c_str( ) );
+				if (isSetupComplete() &&
+					eCommand != BRAIN_STEM_MSG::SYSTEM_VOLTAGE  &&
+					eCommand != BRAIN_STEM_MSG::SENSOR_FRAME &&
+					eCommand != BRAIN_STEM_MSG::MESSAGE)
+				{
+					ROS_ERROR_STREAM("Brainstem driver: Unknown message from brainstem: " <<
+						static_cast<int>(eCommand) << ", data: " << ToHex(buffer));
+				}
 			}
 		}
-	}
+
+		checkSetupComplete();
+
+		lastMessageTime_ = currentTime;
+    }
 }
 
-void BrainStemMessageProcessor::SetConnected( bool bIsConnected )
+void BrainStemMessageProcessor::getOperationalState()
 {
-	m_connectionChangedCallback( bIsConnected );
-}
-
-void BrainStemMessageProcessor::Shutdown( )
-{
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::SHUTDOWN );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
-}
-
-//////////////////////////////////////////////////////////////////////////
-// Helper
-//////////////////////////////////////////////////////////////////////////
-
-std::string BrainStemMessageProcessor::GetButtonName( LED_ENTITIES eButtonId ) const
-{
-	std::string strName;
-
-	auto iter = m_mapEntityButton.find( eButtonId );
-
-	if( iter != m_mapEntityButton.end( ) )
+	if (sentPing_)
 	{
-		strName = iter->second;
-	}
+		ROS_DEBUG("Brainstem driver: GetOperationalState");
 
-	return strName;
+		CommandData msg = { static_cast<uint8_t>(BRAIN_STEM_CMD::GET_OPERATIONAL_STATE) };
+
+		// Get the operational state
+		writeToSerialPort(reinterpret_cast<char*>(&msg), sizeof(msg));
+	}
+}
+
+void BrainStemMessageProcessor::getHardwareInformation()
+{
+	if (sentPing_)
+	{
+		ROS_DEBUG("Brainstem driver: GetHardwareInformation");
+
+		CommandData msg = { static_cast<uint8_t>(BRAIN_STEM_CMD::GET_HARDWARE_INFO) };
+
+		// Get the hardware information (version, configuration, etc.)
+		writeToSerialPort(reinterpret_cast<char*>(&msg), sizeof(msg));
+	}
+}
+
+void BrainStemMessageProcessor::sendDimensions()
+{
+	for (auto dimension : dimensions_)
+	{
+		setDimension(dimension.first, dimension.second);
+	}
+}
+
+void BrainStemMessageProcessor::shutdown()
+{
+	ROS_INFO("Brainstem driver: Shutdown");
+
+	uint8_t cMessage = static_cast<uint8_t>(BRAIN_STEM_CMD::SHUTDOWN);
+
+	writeToSerialPort(reinterpret_cast<char*>(&cMessage), 1);
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Bridge Callbacks
 //////////////////////////////////////////////////////////////////////////
 
-void BrainStemMessageProcessor::SetMotionStatus( const std::bitset<8>& motionStatusSet, bool bSetValues )
+void BrainStemMessageProcessor::setConnected(bool isConnected)
 {
-	std::string strMotionStatus;
-	strMotionStatus += motionStatusSet.test( MOTION_STATUS::FRONT_E_STOP ) ? "frontEStop, " : "";
-	strMotionStatus += motionStatusSet.test( MOTION_STATUS::BACK_E_STOP ) ? "backEStop, " : "";
-	strMotionStatus += motionStatusSet.test( MOTION_STATUS::WIRELESS_E_STOP ) ? "wirelessEStop, " : "";
-	strMotionStatus += motionStatusSet.test( MOTION_STATUS::BUMP_SENSOR ) ? "bumpSensor, " : "";
-	strMotionStatus += motionStatusSet.test( MOTION_STATUS::FREE_SPIN) ? "free-spin, " : "";
-	strMotionStatus += motionStatusSet.test( MOTION_STATUS::HARD_STOP ) ? "hardStop, " : "";
+	ROS_INFO("Brainstem driver: setConnected: %d", isConnected);
 
-	BRAIN_STEM_CMD command = bSetValues ? BRAIN_STEM_CMD::SET_MOTION_STATUS : BRAIN_STEM_CMD::CLEAR_MOTION_STATUS;
-
-    SET_OPERATIONAL_STATE_DATA msg = {
-        static_cast<uint8_t>(command),
-        static_cast<uint8_t>(motionStatusSet.to_ulong())
-    };
-
-	ROS_DEBUG( "%s motion status for %s",
-	    command == BRAIN_STEM_CMD::SET_MOTION_STATUS ? "Setting" : "Clearing",
-	        strMotionStatus.c_str( ) );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof(msg) );
-}
-
-void BrainStemMessageProcessor::OnHardStop( )
-{
-    std::bitset<8> hardStopSet;
-    hardStopSet.set( MOTION_STATUS::HARD_STOP, true );
-    SetMotionStatus( hardStopSet, true );
-}
-
-void BrainStemMessageProcessor::OnResetBatteryHours( )
-{
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::RESET_BATTERY_HOURS );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
-}
-
-void BrainStemMessageProcessor::OnResetWheelMeters( )
-{
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::RESET_WHEEL_METERS );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
-}
-
-void BrainStemMessageProcessor::OnSetConfiguration( uint32_t configuration )
-{
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::SET_CONFIGURATION );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
-}
-
-void BrainStemMessageProcessor::OnUpdateLights( std::vector<std::string> vecParams )
-{
-	std::string strEntity = vecParams[0];
-
-	std::string strMode = vecParams[1];
-
-	auto iterEntity = m_mapButtonEntity.find( strEntity );
-
-	LIGHT_UPDATE_DATA msg = {
-		static_cast<uint8_t>( BRAIN_STEM_CMD::UPDATE_LIGHT ),
-		static_cast<uint8_t>( LED_ENTITIES::UNKNOWN ),
-		static_cast<uint8_t>( LED_MODE::UNKNOWN )
-	};
-
-	if( iterEntity != m_mapButtonEntity.end( ) )
+	if (isConnected != isConnected_)
 	{
-		msg.entitiy = static_cast<uint8_t>( iterEntity->second );
+		bool resync = isSetupComplete();
+
+		isConnected_ = isConnected;
+
+		if (isConnected)
+		{
+			checkSetupComplete();
+		}
+		else
+		{
+			ROS_INFO("Brainstem driver: hid disconnected (resetting state).");
+
+			// Reset state so we sync again when the brainstem reconnects
+			sentPing_ = false;
+
+			setupComplete_ = false;
+
+			hardwareInfoHandler_->reset();
+
+			operationalStateHandler_->reset();
+		}
+	}
+}
+
+void BrainStemMessageProcessor::getHardwareInfo(const ros::Time& now)
+{
+	if (!hardwareInfoHandler_->hasValidMessage())
+	{
+		ros::Duration duration = now - lastHardareInfoRequestTime_;
+		if (duration.toSec() > 1.0f)
+		{
+			// Send another request
+			getHardwareInformation();
+
+			lastHardareInfoRequestTime_ = now;
+		}
+	}
+}
+
+void BrainStemMessageProcessor::getOperationalState(const ros::Time& now)
+{
+	if (!operationalStateHandler_->hasValidMessage())
+	{
+		ros::Duration duration = now - lastOperationalStateRequestTime_;
+		if (duration.toSec() > 1.0f)
+		{
+			// Send another request
+			getOperationalState();
+
+			lastOperationalStateRequestTime_ = now;
+		}
+	}
+}
+
+
+void BrainStemMessageProcessor::checkForBrainstemFaultTimer(const ros::TimerEvent& event)
+{
+	bool brainstemTimeout = false;
+
+	if (isSetupComplete())
+	{
+		if ((event.current_expected - lastMessageTime_).toSec() > FAULT_TIMEOUT)
+		{
+			brainstemTimeout = true;
+		}
+	}
+
+	operationalStateHandler_->setBrainstemTimeout(brainstemTimeout);
+}
+
+void BrainStemMessageProcessor::addHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler)
+{
+    hwMessageHandlers_[hardwareMessageHandler->getKey()] = hardwareMessageHandler;
+
+	hardwareHandlers_.push_back(hardwareMessageHandler);
+}
+
+void BrainStemMessageProcessor::addSoftwareMessage(SoftwareMessagePtr softwareMessage)
+{
+	softwareHandlers_.push_back(softwareMessage);
+}
+
+bool BrainStemMessageProcessor::isSetupComplete() const
+{
+	return setupComplete_;
+}
+
+void BrainStemMessageProcessor::checkSetupComplete()
+{
+	if (!setupComplete_)
+	{
+		if (hardwareInfoHandler_->hasValidMessage() &&
+			operationalStateHandler_->hasValidMessage() &&
+			isConnected_)
+		{
+			bool resync = syncState_;
+
+			ROS_INFO("Brainstem driver: Setup complete (received hardware info and operational state messages.");
+
+			io_->setSynced(true);
+
+			setupComplete_ = true;
+
+			syncState_ = true;
+
+			sendDimensions();
+
+			// If this is a reconnect sync the brainstem statate
+			if (resync)
+			{
+				ROS_INFO("Brainstem driver: Resyncing brainstem state");
+
+				for (auto handler : softwareHandlers_)
+				{
+					handler->sync();
+				}
+			}
+
+			connectedChannel_.publish(syncState_);
+		}
+		else
+		{
+			if (sentPing_)
+			{
+				ros::Time currentTime = ros::Time::now();
+
+				getHardwareInfo(currentTime);
+
+				getOperationalState(currentTime);
+			}
+		}
+	}
+}
+
+void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
+{
+	if (io_->isOpen())
+	{
+		static std::map<DIMENSION, std::string> mapDimensionName;
+
+		if (!mapDimensionName.size())
+		{
+			mapDimensionName[DIMENSION::WHEEL_BASE_LENGTH] = "wheel_base_length";
+			mapDimensionName[DIMENSION::LEFT_WHEEL_RADIUS] = "left_wheel_radius";
+			mapDimensionName[DIMENSION::RIGHT_WHEEL_RADIUS] = "right_whee_radius";
+		};
+
+		DimensionData msg = {
+			static_cast<uint8_t>(BRAIN_STEM_CMD::SET_DIMENSION),
+			static_cast<uint8_t>(dimension),
+			static_cast<float>(value)
+		};
+
+		ROS_DEBUG("Brainstem driver: Setting dimension: %s => %f",
+			mapDimensionName[dimension].c_str(), value);
+
+		// Get the hardware information (version, configuration, etc.)
+		writeToSerialPort(reinterpret_cast<char*>(&msg), sizeof(msg));
 	}
 	else
 	{
-		ROS_ERROR( "Invalid button entity name: %s", strEntity.c_str( ) );
-	}
-
-	auto iterMode = m_mapLedMode.find( strMode );
-
-	if( iterMode != m_mapLedMode.end( ) )
-	{
-		msg.mode = static_cast<uint8_t>( iterMode->second );
-	}
-	else
-	{
-		ROS_ERROR( "Invalid button entity name: %s", strEntity.c_str( ) );
-	}
-
-	if( static_cast<LED_ENTITIES>( msg.entitiy ) != LED_ENTITIES::UNKNOWN &&
-		static_cast<LED_MODE>( msg.mode ) != LED_MODE::UNKNOWN )
-	{
-		ROS_DEBUG( "OnUpdateLights (0x%x): %d=>%d", msg.cmd, msg.entitiy, msg.mode );
-
-		WriteToSerialPort( reinterpret_cast<char*>( &msg ), sizeof( msg ) );
+		dimensions_[dimension] = value;
 	}
 }
 
-void BrainStemMessageProcessor::OnStartup( std::vector<std::string> vecParams )
+void BrainStemMessageProcessor::sendCommand(char* command, std::size_t size)
 {
-	uint8_t cMessage = static_cast<uint8_t>( BRAIN_STEM_CMD::STARTUP );
-
-	WriteToSerialPort( reinterpret_cast<char*>( &cMessage ), 1 );
+	if (size)
+	{
+		writeToSerialPort(command, size);
+	}
 }
 
-void BrainStemMessageProcessor::ClearMotionStatus( )
+void BrainStemMessageProcessor::ping()
 {
-	ROS_DEBUG( "Clearing motion status." );
+	if (!sentPing_)
+	{
+		sentPing_ = true;
 
-	std::bitset<8> clearSet;
-	clearSet.set( MOTION_STATUS::WIRELESS_E_STOP, true );
-	clearSet.set( MOTION_STATUS::BUMP_SENSOR, true );
-	clearSet.set( MOTION_STATUS::HARD_STOP, true );
+		ros::Time currentTime = ros::Time::now();
 
-	SetMotionStatus( clearSet, false );
+		// Don't ask for the hardware information and the op state until we send the first ping
+		// to avoid the brainstem timeouts propogating to the rest of the stack prematurely
+		getHardwareInfo(currentTime);
+
+		getOperationalState(currentTime);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Helper Methods
 //////////////////////////////////////////////////////////////////////////
 
-void BrainStemMessageProcessor::WriteToSerialPort( char* pszData, std::size_t dwSize )
+void BrainStemMessageProcessor::writeToSerialPort(char* pszData, std::size_t dwSize)
 {
-	if( m_pIO->IsOpen( ) )
+	if(io_->isOpen())
 	{
-		m_pIO->Write( std::vector<char>( pszData, pszData + dwSize ) );
+		io_->write(std::vector<char>(pszData, pszData + dwSize));
 	}
 	else
 	{
-		ROS_ERROR_THROTTLE_NAMED( 60, "BrainStem", "Attempt to write to the brain stem, but the serial port is not open!" );
+		ROS_ERROR_THROTTLE(60, "Brainstem driver: Attempt to write to the brain stem, but the serial port is not open!");
 	}
 }
 

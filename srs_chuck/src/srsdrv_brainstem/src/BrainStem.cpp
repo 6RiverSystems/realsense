@@ -4,13 +4,15 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 
-#include <BrainStem.h>
+#include <BrainStem.hpp>
+
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Float32.h>
 #include <srslib_framework/MsgHardwareInfo.h>
 #include <srslib_framework/MsgOperationalState.h>
 #include <srslib_framework/io/SerialIO.hpp>
+#include <srslib_framework/io/HidIO.hpp>
 #include <srslib_framework/platform/Thread.hpp>
 #include <bitset>
 
@@ -20,45 +22,28 @@
 namespace srs
 {
 
-BrainStem::BrainStem( const std::string& strSerialPort ) :
-	m_rosNodeHandle( ),
-	m_pingSubscriber( ),
-    m_velocitySubscriber( ),
-    m_connectedPublisher( ),
-	m_llcmdSubscriber( ),
-	m_llEventPublisher( ),
-	m_operationalStatePublisher( ),
-	m_voltagePublisher( ),
-	m_pSerialIO( new SerialIO( "brainstem" ) ),
-	m_messageProcessor( m_pSerialIO )
+BrainStem::BrainStem(string name, int argc, char** argv) :
+	RosUnit(name, argc, argv, REFRESH_RATE_HZ),
+	io_( new HidIO( "brainstem", 0x1930, 0x6001 ) ),
+
+	messageProcessor_( io_ ),
+	brainstemFaultTimer_(),
+	nodeHandle_("~"),
+	useEmulator_(false)
 {
-	CreateSubscribers( );
+	// Register dynamic configuration callback
+	configServer_.setCallback(boost::bind(&BrainStem::cfgCallback, this, _1, _2));
 
-	CreatePublishers( );
+	nodeHandle_.param("use_emulator", useEmulator_, useEmulator_);
 
-	SetupCallbacks( );
+	connectionChanged( false );
 
-	OnConnectionChanged( false );
+	io_->open( std::bind( &BrainStem::connectionChanged, this, std::placeholders::_1 ),
+		std::bind( &BrainStemMessageProcessor::processHardwareMessage, &messageProcessor_, std::placeholders::_1) );
 
-	std::shared_ptr<SerialIO> pSerialIO = std::dynamic_pointer_cast<SerialIO>( m_pSerialIO );
-
-	pSerialIO->EnableCRC( true );
-	pSerialIO->SetTerminatingCharacter( '\n' );
-	pSerialIO->SetEscapeCharacter( '\\' );
-
-    auto processMessage = [&]( std::vector<char> buffer )
-    {
-        ExecuteInRosThread( std::bind( &BrainStemMessageProcessor::processHardwareMessage,
-            &m_messageProcessor, buffer));
-	};
-
-	auto connectionChanged = [&]( bool bIsConnected )
-	{
-		ExecuteInRosThread( std::bind( &BrainStem::OnConnectionChanged, this,
-				bIsConnected ) );
-	};
-
-	pSerialIO->Open( strSerialPort.c_str( ), connectionChanged, processMessage );
+	brainstemFaultTimer_ = nodeHandle_.createTimer(ros::Duration(1.0f / REFRESH_RATE_HZ),
+        boost::bind(&BrainStemMessageProcessor::checkForBrainstemFaultTimer,
+        	&messageProcessor_, _1));
 }
 
 BrainStem::~BrainStem( )
@@ -66,172 +51,48 @@ BrainStem::~BrainStem( )
 
 }
 
-void BrainStem::Run( )
+void BrainStem::execute()
 {
-	ros::Rate refreshRate( REFRESH_RATE_HZ );
+	io_->spinOnce();
+}
 
-	ros::spin( );
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void BrainStem::initialize()
+{
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Callbacks
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void BrainStem::OnConnectionChanged( bool bIsConnected )
+void BrainStem::connectionChanged( bool bIsConnected )
 {
-	std_msgs::Bool msg;
-	msg.data = bIsConnected;
-
-	m_connectedPublisher.publish( msg );
-
-	if( !bIsConnected )
+	messageProcessor_.setConnected(bIsConnected);
+	if( useEmulator_ )
 	{
-		m_brainstemEmulator.reset( new BrainStemEmulator( ) );
-	}
-	else
-	{
-		m_brainstemEmulator.reset( );
-	}
-
-	// Get the hardware information
-	GetHardwareInformation( );
-
-	// Get the operational state
-	GetOperationalState( );
-}
-
-void BrainStem::OnButtonEvent( LED_ENTITIES eButtonId )
-{
-	std::string strEntity = m_messageProcessor.GetButtonName( eButtonId );
-
-	if( strEntity.length( ) )
-	{
-		std_msgs::String msg;
-
-		std::stringstream ss;
-		ss << "UI " << strEntity;
-		msg.data = ss.str( );
-
-		ROS_DEBUG( "%s", msg.data.c_str( ) );
-
-		m_llEventPublisher.publish( msg );
-	}
-	else
-	{
-		ROS_ERROR( "Unknown button entity %d", eButtonId );
+		if( !bIsConnected )
+		{
+			brainstemEmulator_.reset( new BrainStemEmulator( ) );
+		}
+		else
+		{
+			brainstemEmulator_.reset( );
+		}
 	}
 }
-void BrainStem::OnOperationalStateChanged( uint32_t upTime, const MOTION_STATUS_DATA& motionStatus,
-	const FAILURE_STATUS_DATA& failureStatus )
+
+void BrainStem::cfgCallback(srsdrv_brainstem::RobotSetupConfig &config,
+	uint32_t level)
 {
-	std::ostringstream stream;
+	messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::WHEEL_BASE_LENGTH,
+		static_cast<float>(config.robot_wheelbase_length));
 
-	stream << "Operational State => uptime:" << upTime <<
-		", frontEStop: " << motionStatus.frontEStop <<
-		", backEStop: " << motionStatus.backEStop <<
-		", wirelessEStop: " << motionStatus.wirelessEStop <<
-		", bumpSensor: " << motionStatus.bumpSensor <<
-		", free-spin: " << motionStatus.freeSpin <<
-		", hardStop: " << motionStatus.hardStop <<
-		", safetyProcessorFailure: " << failureStatus.safetyProcessorFailure <<
-		", brainstemFailure: " << failureStatus.brainstemFailure <<
-		", brainTimeoutFailure: " << failureStatus.brainTimeoutFailure <<
-		", rightMotorFailure: " << failureStatus.rightMotorFailure <<
-		", leftMotorFailure: " << failureStatus.leftMotorFailure <<
-		std::endl;
+	messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::LEFT_WHEEL_RADIUS,
+		static_cast<float>(config.robot_leftwheel_radius));
 
-	std::string strData =  stream.str( );
-
-	ROS_INFO_STREAM( strData );
-
-	srslib_framework::MsgOperationalState msg;
-	msg.frontEStop = motionStatus.frontEStop;
-	msg.backEStop = motionStatus.backEStop;
-	msg.wirelessEStop = motionStatus.wirelessEStop;
-	msg.bumpSensor = motionStatus.bumpSensor;
-	msg.pause = motionStatus.freeSpin;
-	msg.hardStop = motionStatus.hardStop;
-	msg.safetyProcessorFailure = failureStatus.safetyProcessorFailure;
-	msg.brainstemFailure = failureStatus.brainstemFailure;
-	msg.brainTimeoutFailure = failureStatus.brainTimeoutFailure;
-	msg.rightMotorFailure = failureStatus.rightMotorFailure;
-	msg.leftMotorFailure = failureStatus.leftMotorFailure;
-
-	m_operationalStatePublisher.publish( msg );
-}
-
-void BrainStem::OnVoltageChanged( float fVoltage )
-{
-	ROS_INFO_STREAM( "Voltage => " << fVoltage );
-
-	std_msgs::Float32 msg;
-	msg.data = fVoltage;
-
-	m_voltagePublisher.publish( msg );
-}
-
-void BrainStem::CreateSubscribers( )
-{
-	m_pingSubscriber = m_rosNodeHandle.subscribe<std_msgs::Bool>( PING_TOPIC, 10,
-	    std::bind( &BrainStem::OnPing, this ) );
-
-	m_velocitySubscriber = m_rosNodeHandle.subscribe<srslib_framework::OdometryRPM>( VELOCITY_TOPIC, 10,
-	    std::bind( &BrainStem::OnChangeVelocity, this, std::placeholders::_1 ) );
-
-	m_llcmdSubscriber = m_rosNodeHandle.subscribe<std_msgs::String>( COMMAND_TOPIC, 100,
-	    std::bind( &BrainStem::OnRosCallback, this, std::placeholders::_1 ) );
-}
-
-void BrainStem::CreatePublishers( )
-{
-	m_connectedPublisher = m_rosNodeHandle.advertise<std_msgs::Bool>(
-	    ChuckTopics::driver::BRAINSTEM_STATE_CONNECTED, 1, true );
-
-	m_operationalStatePublisher = m_rosNodeHandle.advertise<srslib_framework::MsgOperationalState>(
-	    OPERATIONAL_STATE_TOPIC, 1, true );
-
-	m_voltagePublisher = m_rosNodeHandle.advertise<std_msgs::Float32>( VOLTAGE_TOPIC, 1, true );
-
-	m_llEventPublisher = m_rosNodeHandle.advertise<std_msgs::String>( EVENT_TOPIC, 100 );
-}
-
-void BrainStem::SetupCallbacks( )
-{
-	m_messageProcessor.SetConnectionChangedCallback( std::bind( &BrainStem::OnConnectionChanged,
-		this, std::placeholders::_1 ) );
-
-	m_messageProcessor.SetButtonCallback( std::bind( &BrainStem::OnButtonEvent, this, std::placeholders::_1 ) );
-
-	m_messageProcessor.SetOperationalStateCallback( std::bind( &BrainStem::OnOperationalStateChanged, this,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
-
-	m_messageProcessor.SetVoltageCallback( std::bind( &BrainStem::OnVoltageChanged, this,
-		std::placeholders::_1 ) );
-}
-
-void BrainStem::GetOperationalState( )
-{
-	m_messageProcessor.GetOperationalState( );
-}
-
-void BrainStem::GetHardwareInformation( )
-{
-	m_messageProcessor.GetHardwareInformation( );
-}
-
-void BrainStem::OnPing( )
-{
-	m_messageProcessor.SendPing( );
-}
-
-void BrainStem::OnChangeVelocity( const srslib_framework::OdometryRPM::ConstPtr& velocityRPM )
-{
-	m_messageProcessor.SetRPM( velocityRPM->left_wheel_rpm, velocityRPM->right_wheel_rpm );
-}
-
-void BrainStem::OnRosCallback(const std_msgs::String::ConstPtr& msg)
-{
-    m_messageProcessor.processRosMessage(msg->data);
+	messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::RIGHT_WHEEL_RADIUS,
+		static_cast<float>(config.robot_rightwheel_radius));
 }
 
 }// namespace srs

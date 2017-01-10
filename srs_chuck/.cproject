@@ -5,22 +5,22 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.cross.base.1269838755" moduleId="org.eclipse.cdt.core.settings" name="Default">
 				<externalSettings/>
 				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.cross.base.1269838755" name="Default" parent="org.eclipse.cdt.build.core.emptycfg">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.cross.base.1269838755" name="Default" parent="org.eclipse.cdt.build.core.emptycfg">
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.cross.base.1269838755.1397969623" name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.base.1170787740" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.base">
 							<option id="cdt.managedbuild.option.gnu.cross.prefix.1758159248" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix"/>
 							<option id="cdt.managedbuild.option.gnu.cross.path.1106300439" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.1726884498" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
-							<builder command="catkin_make" id="cdt.managedbuild.builder.gnu.cross.1281719415" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.builder.gnu.cross"/>
+							<builder arguments="-DCMAKE_BUILD_TYPE=RelWithDebInfo" command="catkin_make" enableCleanBuild="true" enabledIncrementalBuild="true" id="cdt.managedbuild.builder.gnu.cross.1281719415" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.builder.gnu.cross"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.977563229" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.9872363" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -54,11 +54,27 @@
 			<resource resourceType="PROJECT" workspacePath="/srs_chuck"/>
 		</configuration>
 	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.2034195475;cdt.managedbuild.toolchain.gnu.cross.base.2034195475.907328062;cdt.managedbuild.tool.gnu.cross.cpp.compiler.892439493;cdt.managedbuild.tool.gnu.cpp.compiler.input.886218490">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.1269838755;cdt.managedbuild.toolchain.gnu.cross.base.1269838755.1397969623;cdt.managedbuild.tool.gnu.cross.c.compiler.977563229;cdt.managedbuild.tool.gnu.c.compiler.input.9872363">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.1269838755;cdt.managedbuild.toolchain.gnu.cross.base.1269838755.1397969623;cdt.managedbuild.tool.gnu.cross.cpp.compiler.1876133574;cdt.managedbuild.tool.gnu.cpp.compiler.input.1170948623">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.2034195475;cdt.managedbuild.toolchain.gnu.cross.base.2034195475.907328062;cdt.managedbuild.tool.gnu.cross.c.compiler.1892950261;cdt.managedbuild.tool.gnu.c.compiler.input.769531694">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets>
 			<target name="odometry node" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
-				<buildArguments>-j6 --pkg srsnode_odometry</buildArguments>
+				<buildArguments>-j8 --pkg srsnode_odometry  -DCMAKE_BUILD_TYPE=RelWithDebInfo</buildArguments>
 				<buildTarget/>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
@@ -66,29 +82,35 @@
 			</target>
 			<target name="all" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
-				<buildArguments>-j6</buildArguments>
+				<buildArguments>-j8 -DCMAKE_BUILD_TYPE=RelWithDebInfo</buildArguments>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>false</runAllBuilders>
+			</target>
+			<target name="test brainstem" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>-j8 run_tests_srsdrv_brainstem -DCMAKE_BUILD_TYPE=RelWithDebInfo</buildArguments>
 				<buildTarget/>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>false</runAllBuilders>
 			</target>
-			<target name="brainstem node" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="test" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
-				<buildArguments>-j6 --pkg srsdrv_brainstem</buildArguments>
+				<buildArguments>-j8 run_tests  -DCMAKE_BUILD_TYPE=RelWithDebInfo</buildArguments>
+				<buildTarget/>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>false</runAllBuilders>
+			</target>
+			<target name="test framework" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>catkin_make</buildCommand>
+				<buildArguments>-j8 run_tests_srslib_framework -DCMAKE_BUILD_TYPE=RelWithDebInfo</buildArguments>
 				<buildTarget/>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>false</runAllBuilders>
 			</target>
 		</buildTargets>
-	</storageModule>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.2034195475;cdt.managedbuild.toolchain.gnu.cross.base.2034195475.907328062;cdt.managedbuild.tool.gnu.cross.cpp.compiler.892439493;cdt.managedbuild.tool.gnu.cpp.compiler.input.886218490">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.2034195475;cdt.managedbuild.toolchain.gnu.cross.base.2034195475.907328062;cdt.managedbuild.tool.gnu.cross.c.compiler.1892950261;cdt.managedbuild.tool.gnu.c.compiler.input.769531694">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>

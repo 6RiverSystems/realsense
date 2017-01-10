@@ -5,6 +5,10 @@
  */
 #pragma once
 
+#include <string>
+
+using namespace std;
+
 namespace srs {
 
 namespace ChuckTopics {
@@ -23,12 +27,20 @@ namespace debug {
 
 namespace driver {
 
-    static const string BRAINSTEM_CMD_FREESPIN = "/internal/drivers/brainstem/cmd/freespin";
+	static const string BRAINSTEM_CMD_SHUTDOWN = "/internal/drivers/brainstem/cmd/shutdown";
     static const string BRAINSTEM_CMD_SOUND = "/internal/drivers/brainstem/cmd/sound";
+    static const string BRAINSTEM_CMD_UPDATE_LIGHTS = "/internal/drivers/brainstem/cmd/update_ui";
+    static const string BRAINSTEM_CMD_PING = "/internal/drivers/brainstem/cmd/ping";
+    static const string BRAINSTEM_CMD_RESET = "/internal/drivers/brainstem/cmd/reset";
+    static const string BRAINSTEM_CMD_SET_MOTION_STATE = "/internal/drivers/brainstem/cmd/set_motion_state";
     static const string BRAINSTEM_STATE_CONNECTED = "/internal/drivers/brainstem/state/connected";
-
+    static const string BRAINSTEM_BUTTON_PRESSED = "/internal/drivers/brainstem/button_pressed";
+    static const string BRAINSTEM_ODOMETRY_RPM = "/internal/sensors/odometry/rpm/raw";
+    static const string BRAINSTEM_ODOMETRY_RPM_CMD = "/internal/sensors/odometry/rpm/cmd";
     static const string ODOMETRY_CMD_VELOCITY = "/internal/sensors/odometry/velocity/cmd";
-
+    static const string BRAINSTEM_STATE_POWER = "/info/power";
+    static const string BRAINSTEM_HARDWARE_INFO = "/info/hardware";
+    static const string BRAINSTEM_OPERATIONAL_STATE = "/info/operational_state";
 } // namespace debug
 
 namespace internal {
@@ -56,6 +68,9 @@ namespace internal {
     static const string MAP_ROS_WEIGHTS_WEST = "/internal/state/map/weights_west";
     static const string MAP_STACK = "/internal/state/map/stack";
 
+    static const string ODOMETRY_VELOCITY_ESTIMATE = "/internal/sensors/odometry/velocity/estimate";
+
+    static const string ODOMETRY_INITIAL_POSE = "/request/odometry/initial_pose";
     static const string SWCMD_INITIAL_POSE = "/internal/sw_cmd/initial_pose";
 
 } // namespace internal
@@ -66,14 +81,8 @@ namespace monitoring {
 
 } // namespace monitoring
 
-
-namespace node {
-
-    static const string EXECUTIVE_CMD_CL = "/cmd_ll";
-
-} // namespace node
-
 namespace sensor {
+    static const string FILTERED_DEPTH_CAMERA = "/internal/sensors/rgbd/scan/filtered";
     static const string FILTERED_LIDAR = "/internal/sensors/lidar/scan/filtered";
 
     static const string JOYPAD_STATE = "/internal/sensors/joypad/state";
@@ -88,6 +97,14 @@ namespace service {
     static const string GET_MAP_OCCUPANCY = "static_map";
 
 } // namespace service
+
+
+namespace tools {
+
+    static const string RACE = "/internal/command/race";
+
+} // namespace node
+
 
 } // namespace ChuckTopics
 

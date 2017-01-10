@@ -20,38 +20,47 @@ public:
 
 	typedef std::function<void(std::vector<char>)> ReadCallbackFn;
 
-	virtual ~IO( ) { };
+	virtual ~IO() { };
 
 	/**
 	    Opens the serial port
 
-	    @pszName - serial port name (e.g. /dev/malg, /dev/ttyS0, etc.)
 	    @connectionCallback - called when the connection state has changed
 	    @readCallback - called when data is read from the port (called from io thread)
 	*/
-	virtual void Open( const char* pszName, ConnectionCallbackFn connectionCallback,
-		ReadCallbackFn readCallback ) = 0;
+	virtual void open(ConnectionCallbackFn connectionCallback,
+		ReadCallbackFn readCallback) = 0;
 
 	/**
 	    Checks to see if the serial port is open
 
 	    @return true if open, false otherwise
 	*/
-	virtual bool IsOpen( ) const = 0;
+	virtual bool isOpen() const = 0;
 
 	/**
 	    Closes a serial port
 
 	    @return true if open, false otherwise
 	*/
-	virtual void Close( ) = 0;
+	virtual void close() = 0;
+
+
+	/**
+	    Pump the io thread
+
+	    @return true if open, false otherwise
+	*/
+	virtual void spinOnce() = 0;
 
 	/**
 	    Writes data to a serial port
 
 	    @buffer - data to send
 	*/
-	virtual void Write( const std::vector<char>& buffer ) = 0;
+	virtual void write(const std::vector<char>& buffer) = 0;
+
+	virtual void setSynced(bool synced) {};
 
 };
 

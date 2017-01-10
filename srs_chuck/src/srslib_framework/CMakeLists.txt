@@ -11,6 +11,7 @@ set(${PROJECT_NAME}_SOURCES
     src/datastructure/graph/grid2d/Grid2d.cpp
 
     src/io/SerialIO.cpp
+    src/io/HidIO.cpp
 
     src/localization/map/BaseMap.cpp
     src/localization/map/MapAdapter.cpp
@@ -58,8 +59,15 @@ set(${PROJECT_NAME}_MSGS
     MapStack.msg
     MsgHardwareInfo.msg
     MsgOperationalState.msg
+    MsgSetOperationalState.msg
     MsgSolution.msg
     MsgSolutionItem.msg
+    MsgBatteryInfo.msg
+    MsgBatteryDescriptor.msg
+    MsgBatteryState.msg
+    MsgPowerState.msg
+    MsgUpdateUI.msg
+    MsgUIState.msg
     OccupancyMap.msg
     OccupancyMetadata.msg
     Pose.msg
@@ -69,7 +77,7 @@ set(${PROJECT_NAME}_MSGS
     TimingDataSample.msg
     Velocity.msg
     Odometry.msg
-    OdometryRPM.msg
+    OdometryRpm.msg
 )
 
 set(${PROJECT_NAME}_SRVS
@@ -237,6 +245,7 @@ target_link_libraries(${PROJECT_LIBRARY}
     ${PROJECT_LIBRARIES}
     ${UNWIND_LIBRARIES}
     ${catkin_LIBRARIES}
+    usb-1.0
 )
 
 ####################################################################################################

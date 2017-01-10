@@ -26,6 +26,7 @@ namespace srs
 Reflexes::Reflexes() : tdr_("Reflexes")
 {
     readParams();
+    tapOperationalState_.connectTap();
 }
 
 Reflexes::~Reflexes( )
@@ -63,22 +64,52 @@ void Reflexes::readParams()
     {
     	hardStopReflex_.setNumBadPointsForViolation(numBadPoints);
     }
+
+    privateNh.param("check_lidar_hard_stop", checkLidarHardStop_, checkLidarHardStop_);
+    privateNh.param("check_depth_camera_hard_stop", checkDepthCameraHardStop_, checkDepthCameraHardStop_);
 }
 
 void Reflexes::execute()
 {
     srs::ScopedTimingSampleRecorder stsr(tdr_.getRecorder("-Loop"));
 
-    // Get the sensor position
-    hardStopReflex_.setLidarPose(tapLidarPoseOnRobot_.pop());
 
     // Update robot position
     hardStopReflex_.setPose(tapRobotPose_.pop());
 
-    // Check for laser scan.
-    if (tapFilteredLidar_.newDataAvailable())
+    // Update brainstem connected state
+    brainstemConnected_ = tapBrainstemConnected_.pop();
+
+    // Update the robot state
+    if (tapOperationalState_.newDataAvailable())
     {
-        hardStopReflex_.setLaserScan(tapFilteredLidar_.pop());
+        hardStopReflex_.setRobotState(tapOperationalState_.getRobotState());
+    }
+
+    // Set the lidar data
+    if (checkLidarHardStop_)
+    {
+        // Get the lidar sensor position
+        hardStopReflex_.setSensorPose(tapLidarPoseOnRobot_.pop(), LaserScanType::LIDAR);
+
+        // Check for laser scan.
+        if (tapFilteredLidar_.newDataAvailable())
+        {
+            hardStopReflex_.setLaserScan(tapFilteredLidar_.pop(), LaserScanType::LIDAR);
+        }
+    }
+
+    // Set the depth camera data
+    if (checkDepthCameraHardStop_)
+    {
+        // Get the lidar sensor position
+        hardStopReflex_.setSensorPose(tapDepthCameraPoseOnRobot_.pop(), LaserScanType::DEPTH_CAMERA);
+
+        // Check for laser scan.
+        if (tapFilteredDepthCamera_.newDataAvailable())
+        {
+            hardStopReflex_.setLaserScan(tapFilteredDepthCamera_.pop(), LaserScanType::DEPTH_CAMERA);
+        }
     }
 
     // Check for velocity.
@@ -87,16 +118,27 @@ void Reflexes::execute()
         hardStopReflex_.setVelocity(tapOdometryPose_.popVelocity());
     }
 
-    // Call for hard stop check.
-    if (hardStopReflex_.checkHardStop())
+    if (brainstemConnected_)
     {
-        ROS_WARN("Publishing stop");
-        cmdClChannel_.publish("STOP;");
-    }
-    else if (hardStopReflex_.checkForClear())
-    {
-        ROS_INFO("Clearing motion.");
-        cmdClChannel_.publish("CLEAR_MOTION_STATUS;");
+		// Call for hard stop check.
+		if (hardStopReflex_.checkHardStop())
+		{
+			srslib_framework::MsgSetOperationalState setOperationalState;
+			setOperationalState.state = true;
+			setOperationalState.operationalState.hardStop = true;
+
+			ROS_WARN_THROTTLE(1.0f, "Publishing stop");
+			setMotionStateChannel_.publish(setOperationalState);
+		}
+		else if (hardStopReflex_.checkForClear())
+		{
+			srslib_framework::MsgSetOperationalState setOperationalState;
+			setOperationalState.state = false;
+			setOperationalState.operationalState.hardStop = true;
+
+			ROS_WARN_THROTTLE(1.0f, "Clearing motion status stop");
+			setMotionStateChannel_.publish(setOperationalState);
+		}
     }
 
     // Publish the polygon

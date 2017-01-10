@@ -1,10 +1,12 @@
-#include <srsdrv_brainstem/sw_message/SoundHandler.hpp>
+/*
+ * (c) Copyright 2015-2016 River Systems, all rights reserved.
+ *
+ * This is proprietary software, unauthorized distribution is not permitted.
+ */
 
-#include <srslib_framework/robotics/device/Sound.hpp>
+#include <BrainStemMessageProcessorInterface.hpp>
 
-#include <srsdrv_brainstem/BrainStemMessageProcessor.h>
-
-#include <ros/ros.h>
+#include <sw_message/SoundHandler.hpp>
 
 namespace srs {
 
@@ -12,19 +14,32 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-SoundHandler::SoundHandler(BrainStemMessageProcessor* owner) :
-    SoftwareMessageHandler(owner)
+SoundHandler::SoundHandler(BrainStemMessageProcessorInterface* owner) :
+	SoftwareMessage(owner)
 {
-    tapSound_.attach(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void SoundHandler::attach()
+{
+	tapSound_.reset(new TapBrainstemCmd_Sound());
+
+	tapSound_->attach(this);
+}
+
 void SoundHandler::notified(Subscriber<srslib_framework::Sound>* subject)
 {
     TapBrainstemCmd_Sound* tap = static_cast<TapBrainstemCmd_Sound*>(subject);
     Sound sound = tap->pop();
 
-    MsgSound msgSound = {
+    encodeData(sound);
+}
+
+void SoundHandler::encodeData(const Sound& sound)
+{
+	sound_ = sound;
+
+    SoundData msg = {
         static_cast<uint8_t>(BRAIN_STEM_CMD::SOUND_BUZZER),
         static_cast<uint8_t>(sound.volume),
         static_cast<uint16_t>(sound.baseFrequency),
@@ -33,12 +48,17 @@ void SoundHandler::notified(Subscriber<srslib_framework::Sound>* subject)
         static_cast<uint16_t>(sound.numberOfCycles)
     };
 
-    ROS_INFO_STREAM_COND_NAMED(sound.numberOfCycles > 0, "sound_handler", "Started sound");
-    ROS_INFO_STREAM_COND_NAMED(sound.numberOfCycles == 0, "sound_handler", "Stopped sound");
+	ROS_INFO( "Brain => Brainstem: SOUND_BUZZER: volume=%d, baseFrequency=%d,"
+		" cycleRate=%d, dutyCycle=%d, numberOfCycles=%d", sound.volume, sound.baseFrequency, sound.cycleRate,
+		sound.dutyCycle, sound.numberOfCycles);
 
-    getOwner()->sendCommand(reinterpret_cast<char*>(&msgSound), sizeof(msgSound));
+	sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
 }
 
+void SoundHandler::syncState()
+{
+	encodeData(sound_);
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 

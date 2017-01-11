@@ -346,6 +346,8 @@ void BrainStemMessageProcessor::setUseBrainstemOdom(bool useBrainstemOdom)
 	{
 		if (useBrainstemOdom)
 		{
+			ROS_DEBUG("Brainstem driver: Using brainstem odometry");
+
 			// This removeHardwareMessageHandler is only because we toggle main and alt topics for pose (for comparison in development)
 			// TODO: remove after RPM is deprecated
 			removeHardwareMessageHandler(odometryPoseHardwarewHandler_);
@@ -366,6 +368,8 @@ void BrainStemMessageProcessor::setUseBrainstemOdom(bool useBrainstemOdom)
 		}
 		else
 		{
+			ROS_DEBUG("Brainstem driver: Using rpm odometry");
+
 			// This removeHardwareMessageHandler is only because we toggle main and alt topics for pose (for comparison in development)
 			// TODO: remove after RPM is deprecated
 			removeHardwareMessageHandler(odometryPoseHardwarewHandler_);

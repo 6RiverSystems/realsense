@@ -29,8 +29,12 @@ BrainStem::BrainStem(string name, int argc, char** argv) :
 	nodeHandle_("~"),
 	useEmulator_(false)
 {
+	connectionChanged( false );
+
 	// Register dynamic configuration callback
 	configServer_.setCallback(boost::bind(&BrainStem::cfgCallback, this, _1, _2));
+
+	nodeHandle_.param("use_emulator", useEmulator_, useEmulator_);
 
 	char* pszLeftWheelRadius = getenv("ROBOT_LEFT_WHEEL_RADIUS");
 	char* pszRightWheelRadius = getenv("ROBOT_RIGHT_WHEEL_RADIUS");
@@ -62,10 +66,6 @@ BrainStem::BrainStem(string name, int argc, char** argv) :
 		messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::WHEEL_BASE_LENGTH,
 			wheelbaseLength);
 	}
-
-	nodeHandle_.param("use_emulator", useEmulator_, useEmulator_);
-
-	connectionChanged( false );
 
 	brainstemFaultTimer_ = nodeHandle_.createTimer(ros::Duration(1.0f / REFRESH_RATE_HZ),
         boost::bind(&BrainStemMessageProcessor::checkForBrainstemFaultTimer,
@@ -152,16 +152,20 @@ void BrainStem::cfgCallback(srsdrv_brainstem::RobotSetupConfig &config,
 
 void BrainStem::setupHidIo(uint32_t vid, uint32_t pid)
 {
+	ROS_DEBUG("Brainstem driver: Using hid io: vid=0x%x, pid=0x%x", vid, pid);
+
 	io_.reset(new HidIO("brainstem", vid,  pid));
+
+	messageProcessor_.setIO(io_);
 
 	io_->open( std::bind( &BrainStem::connectionChanged, this, std::placeholders::_1 ),
 		std::bind( &BrainStemMessageProcessor::processHardwareMessage, &messageProcessor_, std::placeholders::_1) );
-
-	messageProcessor_.setIO(io_);
 }
 
 void BrainStem::setupSerialIo(const char* serialPort)
 {
+	ROS_DEBUG("Brainstem driver: Using serial port io: %s", serialPort);
+
 	io_.reset(new SerialIO("brainstem", serialPort));
 
 	std::shared_ptr<SerialIO> serialIO = std::dynamic_pointer_cast<SerialIO>( io_ );

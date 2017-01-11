@@ -10,13 +10,13 @@
 
 namespace srs {
 
-class ChannelBrainstemOdometryPose :
+class ChannelBrainstemOdometryPoseBrainstem :
     public PublisherOdometryPose
 {
 public:
 
-	ChannelBrainstemOdometryPose() :
-		PublisherOdometryPose(ChuckTopics::sensor::ODOMETRY_POSE)
+	ChannelBrainstemOdometryPoseBrainstem() :
+		PublisherOdometryPose(ChuckTopics::sensor::ODOMETRY_POSE_BRAINSTEM)
     {}
 };
 

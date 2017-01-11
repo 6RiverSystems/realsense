@@ -19,12 +19,4 @@
 
 	<!-- Fixed /odom frame to /map frame TF -->
 	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
-
-    <!-- Navigation Stack -->
-	<include file="$(find srsnode_navigation)/launch/node.launch" >
-    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
-	</include>
-
-	<!-- Launch Map -->
-	<include file="$(find srsc_common)/launch/map.launch" />
 </launch>

@@ -14,7 +14,7 @@
 namespace srs
 {
 
-HidIO::HidIO(const char* pszName, int32_t pid, int32_t vid) :
+HidIO::HidIO(const char* pszName, uint32_t vid, uint32_t pid) :
 	initializedUsb_(false),
 	claimedUsb_(false),
 	name_(pszName),
@@ -26,8 +26,8 @@ HidIO::HidIO(const char* pszName, int32_t pid, int32_t vid) :
 	txMaxPacketSize_(-1),
 	open_(false),
 	deviceHandle_(nullptr),
-	pid_(pid),
 	vid_(vid),
+	pid_(pid),
 	readCallback_()
 {
 	int rc = libusb_init(nullptr);

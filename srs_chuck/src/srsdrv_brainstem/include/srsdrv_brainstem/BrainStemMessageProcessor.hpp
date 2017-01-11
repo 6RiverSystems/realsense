@@ -19,6 +19,7 @@ using namespace std;
 #include <srslib_framework/ros/channel/ChannelBrainstemPowerState.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryPose.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemOdometryPoseBrainstem.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemButtonPressed.hpp>
 
 #include <BrainStemMessages.hpp>
@@ -50,9 +51,11 @@ public:
 
     using HwMessageHandlerMapType = map<BRAIN_STEM_MSG, HardwareMessageHandlerPtr>;
 
-	BrainStemMessageProcessor( std::shared_ptr<IO> pIO );
+	BrainStemMessageProcessor();
 
-	virtual ~BrainStemMessageProcessor( );
+	virtual ~BrainStemMessageProcessor();
+
+	void setIO(std::shared_ptr<IO> io) { io_ = io; };
 
 	void checkForBrainstemFaultTimer(const ros::TimerEvent& event);
 
@@ -66,6 +69,8 @@ public:
     void ping();
 
 // Message Processing
+
+    void setUseBrainstemOdom(bool useBrainstemOdom);
 
     void setDimension(DIMENSION dimension, float value);
 
@@ -81,7 +86,11 @@ private:
 
     void addHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler);
 
+    void removeHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler);
+
     void addSoftwareMessage(SoftwareMessagePtr softwareMessage);
+
+    void removeSoftwareMessage(SoftwareMessagePtr softwareMessage);
 
 	bool isSetupComplete() const;
 
@@ -136,21 +145,32 @@ private:
 
 	ros::Time lastMessageTime_;
 
-    HwMessageHandlerMapType	hwMessageHandlers_;
+    HwMessageHandlerMapType hwMessageHandlers_;
 
-	ChannelBrainstemConnected	connectedChannel_;
-    ChannelBrainstemHardwareInfo	hardwareInfoChannel_;
-    ChannelBrainstemOperationalState	operationalStateChannel_;
-    ChannelBrainstemPowerState	powerStateChannel_;
-    ChannelBrainstemOdometryRpm	odometryRpmChannel_;
-    ChannelBrainstemOdometryPose	odometryPoseChannel_;
-    ChannelBrainstemButtonPressed	buttonPressedChannel_;
+	ChannelBrainstemConnected connectedChannel_;
+    ChannelBrainstemHardwareInfo hardwareInfoChannel_;
+    ChannelBrainstemOperationalState operationalStateChannel_;
+    ChannelBrainstemPowerState powerStateChannel_;
+    ChannelBrainstemOdometryRpm odometryRpmChannel_;
+    ChannelBrainstemOdometryPoseBrainstem odometryPoseBrainstemChannel_;
+    ChannelBrainstemOdometryPose odometryPoseChannel_;
+    ChannelBrainstemButtonPressed buttonPressedChannel_;
 
-    std::shared_ptr<HardwareInfoHandler>	hardwareInfoHandler_;
-    std::shared_ptr<OperationalStateHandler>	operationalStateHandler_;
+    std::shared_ptr<HardwareInfoHandler> hardwareInfoHandler_;
+    std::shared_ptr<OperationalStateHandler> operationalStateHandler_;
 
-    std::vector<HardwareMessageHandlerPtr> hardwareHandlers_;
-    std::vector<SoftwareMessagePtr> softwareHandlers_;
+    bool useBrainstemOdom_;
+
+    HardwareMessageHandlerPtr odometryRpmHardwareHandler_;
+    HardwareMessageHandlerPtr odometryPoseHardwarewHandler_;
+
+    SoftwareMessagePtr velocitySoftwareHandler_;
+    SoftwareMessagePtr odometryRpmSoftwareHandler_;
+
+    std::set<HardwareMessageHandlerPtr> hardwareHandlers_;
+    std::set<SoftwareMessagePtr> softwareHandlers_;
+
+
 };
 
 } /* namespace srs */

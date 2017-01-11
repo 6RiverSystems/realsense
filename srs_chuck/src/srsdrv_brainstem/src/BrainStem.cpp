@@ -24,9 +24,7 @@ namespace srs
 
 BrainStem::BrainStem(string name, int argc, char** argv) :
 	RosUnit(name, argc, argv, REFRESH_RATE_HZ),
-	io_( new HidIO( "brainstem", 0x1930, 0x6001 ) ),
-
-	messageProcessor_( io_ ),
+	messageProcessor_(),
 	brainstemFaultTimer_(),
 	nodeHandle_("~"),
 	useEmulator_(false)
@@ -69,9 +67,6 @@ BrainStem::BrainStem(string name, int argc, char** argv) :
 
 	connectionChanged( false );
 
-	io_->open( std::bind( &BrainStem::connectionChanged, this, std::placeholders::_1 ),
-		std::bind( &BrainStemMessageProcessor::processHardwareMessage, &messageProcessor_, std::placeholders::_1) );
-
 	brainstemFaultTimer_ = nodeHandle_.createTimer(ros::Duration(1.0f / REFRESH_RATE_HZ),
         boost::bind(&BrainStemMessageProcessor::checkForBrainstemFaultTimer,
         	&messageProcessor_, _1));
@@ -105,6 +100,22 @@ void BrainStem::connectionChanged( bool bIsConnected )
 		if( !bIsConnected )
 		{
 			brainstemEmulator_.reset( new BrainStemEmulator( ) );
+
+			uint16_t uniqueId[8] = { 0x3100, 0x5335, 0x4B50, 0x5948, 0x3331, 0x3130, 0x3032, 0x3331 };
+
+			// Emulate the hardware info to kick start the rest of the system (mfp_bridge, mfp_config_client, mfp_gui)
+			// TODO: Emulate the rest of the brainstem: https://github.com/6RiverSystems/ros/issues/27
+			std::string version("Brainstem Emulator");
+
+			vector<char> buffer;
+			HardwareMessage msg(buffer);
+			msg.write<uint8_t>(static_cast<uint8_t>(BRAIN_STEM_MSG::HARDWARE_INFO));
+			msg.writeArray<uint16_t>(uniqueId, 8);
+			msg.write<uint8_t>(static_cast<uint8_t>(1));
+			msg.write<uint8_t>(static_cast<uint8_t>(2));
+			msg.write(version);
+
+			messageProcessor_.processHardwareMessage(buffer);
 		}
 		else
 		{
@@ -116,6 +127,19 @@ void BrainStem::connectionChanged( bool bIsConnected )
 void BrainStem::cfgCallback(srsdrv_brainstem::RobotSetupConfig &config,
 	uint32_t level)
 {
+	IO_TYPE ioType = static_cast<IO_TYPE>(config.io_type);
+
+	if (ioType == IO_TYPE::HID)
+	{
+		setupHidIo(config.io_vid, config.io_pid);
+	}
+	else
+	{
+		setupSerialIo(config.io_serial_device.c_str());
+	}
+
+	messageProcessor_.setUseBrainstemOdom(config.use_brainstem_odom);
+
 	messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::WHEEL_BASE_LENGTH,
 		static_cast<float>(config.robot_wheelbase_length));
 
@@ -124,6 +148,43 @@ void BrainStem::cfgCallback(srsdrv_brainstem::RobotSetupConfig &config,
 
 	messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::RIGHT_WHEEL_RADIUS,
 		static_cast<float>(config.robot_rightwheel_radius));
+}
+
+void BrainStem::setupHidIo(uint32_t vid, uint32_t pid)
+{
+	io_.reset(new HidIO("brainstem", vid,  pid));
+
+	io_->open( std::bind( &BrainStem::connectionChanged, this, std::placeholders::_1 ),
+		std::bind( &BrainStemMessageProcessor::processHardwareMessage, &messageProcessor_, std::placeholders::_1) );
+
+	messageProcessor_.setIO(io_);
+}
+
+void BrainStem::setupSerialIo(const char* serialPort)
+{
+	io_.reset(new SerialIO("brainstem", serialPort));
+
+	std::shared_ptr<SerialIO> serialIO = std::dynamic_pointer_cast<SerialIO>( io_ );
+
+	serialIO->enableCRC(true);
+	serialIO->setTerminatingCharacter('\n');
+	serialIO->setEscapeCharacter('\\');
+
+    auto processMessage = [&]( std::vector<char> buffer )
+    {
+        ExecuteInRosThread( std::bind( &BrainStemMessageProcessor::processHardwareMessage,
+            &messageProcessor_, buffer));
+	};
+
+	auto connectionChanged = [&]( bool bIsConnected )
+	{
+		ExecuteInRosThread(std::bind(&BrainStem::connectionChanged, this,
+			bIsConnected));
+	};
+
+	serialIO->open(connectionChanged, processMessage);
+
+	messageProcessor_.setIO(io_);
 }
 
 }// namespace srs

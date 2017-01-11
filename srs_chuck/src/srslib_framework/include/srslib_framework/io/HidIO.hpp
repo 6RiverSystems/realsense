@@ -28,7 +28,7 @@ class HidIO :
 
 public:
 
-	HidIO(const char* pszName, int32_t pid, int32_t vid);
+	HidIO(const char* pszName, uint32_t vid, uint32_t pid);
 
 	virtual ~HidIO();
 
@@ -85,9 +85,9 @@ private:
 
 	std::string								name_;
 
-    int32_t									pid_;
-
     int32_t									vid_;
+
+    int32_t									pid_;
 
 	std::string								vendor_;
 

@@ -18,7 +18,7 @@ SerialIO::SerialIO(const char* pszName, const char* pszSerialPort) :
 	name_(pszName),
 	strSerialPort_(pszSerialPort),
 	isSynced_(false),
-	strDebug_("serial-io." + name_),
+	strDebug_("io." + name_),
 	thread_(),
 	serialThreadId_(),
 	work_(ioService_),

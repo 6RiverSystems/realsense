@@ -25,6 +25,8 @@ using namespace std;
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
 
 #include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
+#include <srslib_test/localization/map/MapStackUtils.hpp>
+#include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 
 constexpr int GRID_SIZE = 5;
@@ -41,12 +43,11 @@ TEST(Test_AStar_MapStack_Weights, SmallSearchWithWeights)
     correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 0, M_PI_2), Pose<>(1, 1, M_PI_2), 7});
     correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 8});
 
-    Grid2d grid(GRID_SIZE, GRID_SIZE);
-    test::Grid2dUtils::addEmptySpace(grid);
-    grid.setWeights(Location(2, 1), 0, 0, 0, 100);
-    grid.setWeights(Location(3, 1), 0, 0, 0, 100);
+    WeightedGrid2d logical(GRID_SIZE, GRID_SIZE);
+    logical.setWeights(Location(2, 1), 0, 0, 0, 100);
+    logical.setWeights(Location(3, 1), 0, 0, 0, 100);
 
-    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
+    MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
 
     Position start(3, 1, 0);
     Position goal(1, 1, 0);
@@ -77,14 +78,13 @@ TEST(Test_AStar_MapStack_Weights, WeightsAndThisWalls)
     correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 2, -M_PI_2), Pose<>(1, 1, -M_PI_2), 109});
     correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, -M_PI_2), Pose<>(1, 1, 0), 110});
 
-    Grid2d grid(GRID_SIZE, GRID_SIZE);
-    test::Grid2dUtils::addEmptySpace(grid);
-    grid.setWeights(Location(2, 1), 0, 0, 0, 100);
-    grid.setWeights(Location(3, 1), 0, 0, 0, 100);
-    test::Grid2dUtils::addObstacle(grid, 3, 0, 3, 0);
-    test::Grid2dUtils::addObstacle(grid, 3, 2, 3, 4);
+    WeightedGrid2d logical(GRID_SIZE, GRID_SIZE);
+    logical.setWeights(Location(2, 1), 0, 0, 0, 100);
+    logical.setWeights(Location(3, 1), 0, 0, 0, 100);
+    test::Grid2dUtils::addObstacle(logical, 3, 0, 3, 0);
+    test::Grid2dUtils::addObstacle(logical, 3, 2, 3, 4);
 
-    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
+    MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
 
     Position start(Location(3, 1), 0);
     Position goal(Location(1, 1), 0);
@@ -111,16 +111,15 @@ TEST(Test_AStar_MapStack_Weights, WeightsAndThickWalls)
     correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, -M_PI), Pose<>(1, 1, M_PI_2), 205});
     correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 206});
 
-    Grid2d grid(GRID_SIZE, GRID_SIZE);
-    test::Grid2dUtils::addEmptySpace(grid);
-    grid.setWeights(Location(2, 1), 0, 0, 0, 100);
-    grid.setWeights(Location(3, 1), 0, 0, 0, 100);
-    test::Grid2dUtils::addObstacle(grid, 2, 0, 2, 0);
-    test::Grid2dUtils::addObstacle(grid, 2, 2, 2, 4);
-    test::Grid2dUtils::addObstacle(grid, 3, 0, 3, 0);
-    test::Grid2dUtils::addObstacle(grid, 3, 2, 3, 4);
+    WeightedGrid2d logical(GRID_SIZE, GRID_SIZE);
+    logical.setWeights(Location(2, 1), 0, 0, 0, 100);
+    logical.setWeights(Location(3, 1), 0, 0, 0, 100);
+    test::Grid2dUtils::addObstacle(logical, 2, 0, 2, 0);
+    test::Grid2dUtils::addObstacle(logical, 2, 2, 2, 4);
+    test::Grid2dUtils::addObstacle(logical, 3, 0, 3, 0);
+    test::Grid2dUtils::addObstacle(logical, 3, 2, 3, 4);
 
-    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
+    MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
 
     Position start(Location(3, 1), 0);
     Position goal(Location(1, 1), 0);

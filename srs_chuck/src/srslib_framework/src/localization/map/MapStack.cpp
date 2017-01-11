@@ -37,7 +37,7 @@ LogicalMap* MapStack::getLogicalMap() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 bool MapStack::getNeighbor(const Position& position, Position& result) const
 {
-    return logical_->getGrid()->getNeighbor(position, result);
+    return logical_->getNeighbor(position, result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,11 +55,7 @@ int MapStack::getTotalCost(const Position& position,
 
     if (logical_)
     {
-        cost = logical_->getGrid()->getPayload(position);
-        if (cost == Grid2d::PAYLOAD_NO_INFORMATION)
-        {
-            cost = 0;
-        }
+        cost = logical_->getCost(position);
     }
 
     float costMap2d = 0;
@@ -70,7 +66,7 @@ int MapStack::getTotalCost(const Position& position,
         {
             if (!allowUnknown)
             {
-                return Grid2d::PAYLOAD_MAX;
+                return SimpleGrid2d::PAYLOAD_MAX;
             }
             costMap2d = 0;
         }
@@ -82,14 +78,7 @@ int MapStack::getTotalCost(const Position& position,
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 int MapStack::getWeight(const Position& position) const
 {
-    int cost = logical_->getGrid()->getWeight(position);
-
-    if (cost == Grid2d::WEIGHT_NO_INFORMATION)
-    {
-        cost = 0;
-    }
-
-    return cost;
+    return logical_->getWeight(position);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

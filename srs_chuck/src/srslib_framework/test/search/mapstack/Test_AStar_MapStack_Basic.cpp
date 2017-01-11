@@ -20,6 +20,7 @@ using namespace std;
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
 
 #include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
+#include <srslib_test/localization/map/MapStackUtils.hpp>
 #include <srslib_test/utils/MemoryWatch.hpp>
 using namespace srs;
 
@@ -27,11 +28,14 @@ constexpr int GRID_SIZE = 5;
 
 MapStack* generateMapStack()
 {
-    Grid2d* grid = new Grid2d(GRID_SIZE, GRID_SIZE);
-    test::Grid2dUtils::addEmptySpace(*grid);
-    test::Grid2dUtils::addObstacle(*grid, 2, 0, 2, 3);
+    WeightedGrid2d* logical = new WeightedGrid2d(GRID_SIZE, GRID_SIZE);
+    test::Grid2dUtils::addObstacle(logical, 2, 0, 2, 3);
 
-    return test::Grid2dUtils::grid2d2MapStack(grid, 1, Pose<>::ZERO);
+    SimpleGrid2d* occupancy = new SimpleGrid2d(GRID_SIZE, GRID_SIZE);
+    test::Grid2dUtils::addEmptySpace(occupancy);
+    test::Grid2dUtils::addObstacle(occupancy, 2, 0, 2, 3);
+
+    return test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, logical, occupancy);
 }
 
 TEST(Test_AStar_MapStack_Basic, SmallSearchOnEmptyGrid)

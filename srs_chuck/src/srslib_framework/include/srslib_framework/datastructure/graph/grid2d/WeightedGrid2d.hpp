@@ -58,6 +58,16 @@ public:
         return grid_.count(location);
     }
 
+    BaseType getMinPayloadValue()
+    {
+        return PAYLOAD_MIN;
+    }
+
+    BaseType getMaxPayloadValue()
+    {
+        return PAYLOAD_MAX;
+    }
+
     BaseType getPayload(const Location& location) const;
     BaseType getPayload(const Position& position) const;
 
@@ -70,7 +80,8 @@ public:
     void getWeights(const Location& location,
         BaseType& north, BaseType& east, BaseType& south, BaseType& west) const;
 
-    void maxOnPayload(const Location& location, BaseType otherPayload);
+    void payloadMax(const Location& location, BaseType otherPayload);
+    void payloadSet(const Location& location, BaseType newPayload);
 
     friend ostream& operator<<(ostream& stream, const WeightedGrid2d& grid);
     friend bool operator==(const WeightedGrid2d& lhs, const WeightedGrid2d& rhs);
@@ -80,7 +91,6 @@ public:
         return !(lhs == rhs);
     }
 
-    void setPayload(const Location& location, BaseType newPayload);
     void setWeights(const Location& location,
         BaseType north, BaseType east, BaseType south, BaseType west);
 

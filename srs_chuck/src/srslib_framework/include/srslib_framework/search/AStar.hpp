@@ -50,6 +50,26 @@ public:
 
     void getPlan(Plan& plan);
 
+    unsigned int getFoundInClosed() const
+    {
+        return counterFoundInClosed_;
+    }
+
+    unsigned int getInserted() const
+    {
+        return counterInserted_;
+    }
+
+    unsigned int getPruned() const
+    {
+        return counterPruned_;
+    }
+
+    unsigned int getReplaced() const
+    {
+        return counterReplaced_;
+    }
+
     bool hasSolution() const
     {
         return lastNode_;
@@ -66,14 +86,17 @@ private:
     void pushNodes(vector<SearchNode*>& nodes);
 
     ClosedSetType closedSet_;
+    unsigned int counterFoundInClosed_;
+    unsigned int counterInserted_;
+    unsigned int counterPruned_;
+    unsigned int counterReplaced_;
+    unsigned int counterYield_;
 
     SearchNode* lastNode_;
 
     OpenSetType openQueue_;
 
     SearchNode* startNode_;
-
-    unsigned int yieldCounter_;
 };
 
 } // namespace srs

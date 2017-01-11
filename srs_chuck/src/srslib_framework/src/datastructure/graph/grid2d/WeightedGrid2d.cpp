@@ -119,12 +119,23 @@ void WeightedGrid2d::getWeights(const Location& location,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void WeightedGrid2d::maxOnPayload(const Location& location, BaseType otherPayload)
+void WeightedGrid2d::payloadMax(const Location& location, BaseType otherPayload)
 {
     updatePayload(location, otherPayload,
         [] (BaseType oldPayload, BaseType newPayload) -> BaseType
         {
             return max(oldPayload, newPayload);
+        }
+    );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void WeightedGrid2d::payloadSet(const Location& location, BaseType newPayload)
+{
+    updatePayload(location, newPayload,
+        [] (BaseType oldPayload, BaseType newPayload) -> BaseType
+        {
+            return newPayload;
         }
     );
 }
@@ -219,17 +230,6 @@ bool operator==(const WeightedGrid2d& lhs, const WeightedGrid2d& rhs)
     }
 
     return true;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void WeightedGrid2d::setPayload(const Location& location, BaseType newPayload)
-{
-    updatePayload(location, newPayload,
-        [] (BaseType oldPayload, BaseType newPayload) -> BaseType
-        {
-            return newPayload;
-        }
-    );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

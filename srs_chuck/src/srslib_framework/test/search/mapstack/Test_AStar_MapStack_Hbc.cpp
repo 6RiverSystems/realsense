@@ -24,16 +24,16 @@ using namespace srs;
 #include <valgrind/callgrind.h>
 #endif
 
-TEST(Test_AStar_MapStack_Barrett, BigSearch)
+TEST(Test_AStar_MapStack_Hbc, BigSearch)
 {
-    MapStack* mapStack = MapStackFactory::fromJsonFile("data/barrett/barrett.yaml");
+    MapStack* mapStack = MapStackFactory::fromJsonFile("data/Hbc/Hbc.yaml");
 
     // Looking for a path between
-    // Pose {@: 1.4686e+09, x: 14.0, y: 10.0, t: 1.53943} (140, 100, 90)
+    // {x: 6.570, y: 8.912, t: 0} (131, 178, 0)
     // and
-    // Pose {@: 1.4686e+09, x: 73.0, y: 178.0, t: 1.5708} (730, 1780, 90)
-    Position startPosition(140, 100, 90);
-    Position goalPosition(730, 1780, 90);
+    // {x: 68.255, y: 47.726, t: 0} (1365, 955, 0)
+    Position startPosition(131, 178, 0);
+    Position goalPosition(1365, 955, 0);
 
     AStar algorithm;
     MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);

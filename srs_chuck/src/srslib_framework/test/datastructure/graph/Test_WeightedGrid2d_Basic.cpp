@@ -24,15 +24,15 @@ TEST(Test_WeightedGraph2d, BasicSet)
 {
     WeightedGrid2d grid(10);
 
-    grid.setPayload(P_1_1, 10);
-    grid.setPayload(P_3_3, 30);
+    grid.payloadSet(P_1_1, 10);
+    grid.payloadSet(P_3_3, 30);
 
     ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
         "Location payload in " << P_1_1 << " is not as expected";
     ASSERT_EQ(30, grid.getPayload(P_3_3)) <<
         "Location payload in " << P_3_3 << " is not as expected";
 
-    grid.setPayload(P_3_3, 15);
+    grid.payloadSet(P_3_3, 15);
 
     ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
         "Location payload in " << P_1_1 << " is not as expected";
@@ -46,8 +46,8 @@ TEST(Test_WeightedGraph2d, GetPayload)
 {
     WeightedGrid2d grid(10);
 
-    grid.setPayload(P_1_1, 10);
-    grid.setPayload(P_3_3, 30);
+    grid.payloadSet(P_1_1, 10);
+    grid.payloadSet(P_3_3, 30);
 
     ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
         "Location payload in " << P_1_1 << " is not as expected";
@@ -61,17 +61,17 @@ TEST(Test_WeightedGraph2d, BasicMax)
 {
     WeightedGrid2d grid(10);
 
-    grid.setPayload(P_1_1, 10);
-    grid.setPayload(P_3_3, 30);
+    grid.payloadSet(P_1_1, 10);
+    grid.payloadSet(P_3_3, 30);
 
     ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
         "Location payload in " << P_1_1 << " is not as expected";
     ASSERT_EQ(30, grid.getPayload(P_3_3)) <<
         "Location payload in " << P_3_3 << " is not as expected";
 
-    grid.maxOnPayload(P_1_1, 5);
-    grid.maxOnPayload(P_3_3, 50);
-    grid.maxOnPayload(P_2_2, 50);
+    grid.payloadMax(P_1_1, 5);
+    grid.payloadMax(P_3_3, 50);
+    grid.payloadMax(P_2_2, 50);
 
     ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
         "Location payload in " << P_1_1 << " is not as expected";
@@ -80,7 +80,7 @@ TEST(Test_WeightedGraph2d, BasicMax)
     ASSERT_EQ(50, grid.getPayload(P_2_2)) <<
         "Location payload in " << P_2_2 << " is not as expected";
 
-    grid.maxOnPayload(P_2_2, srs::WeightedGrid2d::PAYLOAD_MAX);
+    grid.payloadMax(P_2_2, srs::WeightedGrid2d::PAYLOAD_MAX);
 
     ASSERT_EQ(srs::WeightedGrid2d::PAYLOAD_MAX, grid.getPayload(P_2_2)) <<
         "Location payload in " << P_2_2 << " is not as expected";
@@ -90,15 +90,15 @@ TEST(Test_WeightedGraph2d, SetWithMax)
 {
     WeightedGrid2d grid(10);
 
-    grid.setPayload(P_1_1, 10);
-    grid.setPayload(P_3_3, 30);
+    grid.payloadSet(P_1_1, 10);
+    grid.payloadSet(P_3_3, 30);
 
     ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
         "Location payload in " << P_1_1 << " is not as expected";
     ASSERT_EQ(30, grid.getPayload(P_3_3)) <<
         "Location payload in " << P_3_3 << " is not as expected";
 
-    grid.setPayload(P_3_3, srs::WeightedGrid2d::PAYLOAD_MAX);
+    grid.payloadSet(P_3_3, srs::WeightedGrid2d::PAYLOAD_MAX);
 
     ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
         "Location payload in " << P_1_1 << " is not as expected";
@@ -110,15 +110,15 @@ TEST(Test_WeightedGraph2d, AddWithMax)
 {
     WeightedGrid2d grid(10);
 
-    grid.setPayload(P_1_1, 10);
-    grid.setPayload(P_3_3, 30);
+    grid.payloadSet(P_1_1, 10);
+    grid.payloadSet(P_3_3, 30);
 
     ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
         "Location payload in " << P_1_1 << " is not as expected";
     ASSERT_EQ(30, grid.getPayload(P_3_3)) <<
         "Location payload in " << P_3_3 << " is not as expected";
 
-    grid.maxOnPayload(P_3_3, srs::WeightedGrid2d::PAYLOAD_MAX);
+    grid.payloadMax(P_3_3, srs::WeightedGrid2d::PAYLOAD_MAX);
 
     ASSERT_EQ(10, grid.getPayload(P_1_1)) <<
         "Location payload in " << P_1_1 << " is not as expected";
@@ -130,8 +130,8 @@ TEST(Test_WeightedGraph2d, BasicWeigths)
 {
     WeightedGrid2d grid(10);
 
-    grid.setPayload(P_1_1, 10);
-    grid.setPayload(P_3_3, 30);
+    grid.payloadSet(P_1_1, 10);
+    grid.payloadSet(P_3_3, 30);
     grid.setWeights(P_3_3, 11, 22, 33, 44);
 
     ASSERT_EQ(WeightedGrid2d::WEIGHT_MIN,
@@ -166,7 +166,7 @@ TEST(Test_WeightedGraph2d, BasicClear)
 {
     WeightedGrid2d grid(10);
 
-    grid.setPayload(P_3_3, 30);
+    grid.payloadSet(P_3_3, 30);
     grid.setWeights(P_3_3, 11, 22, 33, 44);
 
     ASSERT_EQ(30, grid.getPayload(P_3_3)) <<
@@ -217,17 +217,17 @@ TEST(Test_WeightedGraph2d, BasicBeginEnd)
 
     ASSERT_EQ(beginIt, endIt) << "The begin and end iterators do not match";
 
-    grid.setPayload(P_3_3, 30);
+    grid.payloadSet(P_3_3, 30);
 
     ASSERT_EQ(*grid.begin(), P_3_3) << "Unexpected iterator value";
 
-    grid.setPayload(P_3_3, 30);
-    grid.setPayload(P_3_3, 30);
+    grid.payloadSet(P_3_3, 30);
+    grid.payloadSet(P_3_3, 30);
 
     ASSERT_EQ(*grid.begin(), P_3_3) << "Unexpected iterator value";
 
-    grid.setPayload(P_3_3, 30);
-    grid.setPayload(P_2_2, 10);
+    grid.payloadSet(P_3_3, 30);
+    grid.payloadSet(P_2_2, 10);
 
     beginIt = grid.begin();
     ASSERT_EQ(*beginIt, P_2_2) << "Unexpected iterator value";
@@ -245,9 +245,9 @@ TEST(Test_WeightedGraph2d, BasicForEach)
 
     ASSERT_EQ(beginIt, endIt) << "The begin and end iterators do not match";
 
-    grid.setPayload(P_3_3, 30);
-    grid.setPayload(P_3_3, 30);
-    grid.setPayload(P_2_2, 10);
+    grid.payloadSet(P_3_3, 30);
+    grid.payloadSet(P_3_3, 30);
+    grid.payloadSet(P_2_2, 10);
 
     int payloads = 0;
     for (Location it : grid)
@@ -270,26 +270,26 @@ TEST(Test_WeightedGraph2d, OccupiedCount)
 {
     WeightedGrid2d grid(10);
 
-    grid.setPayload(P_3_3, 30);
+    grid.payloadSet(P_3_3, 30);
 
     ASSERT_EQ(1, grid.getOccupiedCount()) << "Unexpected occupied cells count";
 
-    grid.setPayload(P_3_3, 30);
-    grid.setPayload(P_3_3, 30);
+    grid.payloadSet(P_3_3, 30);
+    grid.payloadSet(P_3_3, 30);
 
     ASSERT_EQ(1, grid.getOccupiedCount()) << "Unexpected occupied cells count";
 
-    grid.setPayload(P_3_3, 30);
-    grid.setPayload(P_2_2, 10);
+    grid.payloadSet(P_3_3, 30);
+    grid.payloadSet(P_2_2, 10);
 
     ASSERT_EQ(2, grid.getOccupiedCount()) << "Unexpected occupied cells count";
 
-    grid.setPayload(P_2_2, WeightedGrid2d::PAYLOAD_MIN);
-    grid.setPayload(P_1_1, WeightedGrid2d::PAYLOAD_MIN);
+    grid.payloadSet(P_2_2, WeightedGrid2d::PAYLOAD_MIN);
+    grid.payloadSet(P_1_1, WeightedGrid2d::PAYLOAD_MIN);
 
     ASSERT_EQ(1, grid.getOccupiedCount()) << "Unexpected occupied cells count";
 
-    grid.maxOnPayload(P_2_2, WeightedGrid2d::PAYLOAD_MIN);
+    grid.payloadMax(P_2_2, WeightedGrid2d::PAYLOAD_MIN);
 
     ASSERT_EQ(1, grid.getOccupiedCount()) << "Unexpected occupied cells count";
 }
@@ -297,29 +297,29 @@ TEST(Test_WeightedGraph2d, OccupiedCount)
 TEST(Test_WeightedGraph2d, EqualOperator)
 {
     WeightedGrid2d correct(10);
-    correct.setPayload(P_3_3, 3);
-    correct.setPayload(P_1_1, 1);
-    correct.setPayload(P_2_2, 2);
+    correct.payloadSet(P_3_3, 3);
+    correct.payloadSet(P_1_1, 1);
+    correct.payloadSet(P_2_2, 2);
     correct.setWeights(P_2_2, 10, 20, 30, 40);
 
     WeightedGrid2d grid1(10);
-    grid1.setPayload(P_3_3, 3);
-    grid1.setPayload(P_1_1, 1);
-    grid1.setPayload(P_2_2, 2);
+    grid1.payloadSet(P_3_3, 3);
+    grid1.payloadSet(P_1_1, 1);
+    grid1.payloadSet(P_2_2, 2);
     grid1.setWeights(P_2_2, 10, 20, 30, 40);
 
     ASSERT_EQ(grid1, grid1) << "The grid does not agree with itself";
     ASSERT_EQ(correct, grid1) << "The grids do not match";
 
     WeightedGrid2d grid2(10);
-    grid2.setPayload(P_3_3, 30);
+    grid2.payloadSet(P_3_3, 30);
 
     ASSERT_NE(correct, grid2) << "The grids do match";
 
     WeightedGrid2d grid3(10);
-    grid3.setPayload(P_3_3, 3);
-    grid3.setPayload(P_1_1, 1);
-    grid3.setPayload(P_2_2, 2);
+    grid3.payloadSet(P_3_3, 3);
+    grid3.payloadSet(P_1_1, 1);
+    grid3.payloadSet(P_2_2, 2);
     grid3.setWeights(P_2_2, 10, 0, 30, 40);
 
     ASSERT_NE(correct, grid3) << "The grids do match";
@@ -328,9 +328,9 @@ TEST(Test_WeightedGraph2d, EqualOperator)
 TEST(Test_WeightedGraph2d, CopyConstructor)
 {
     WeightedGrid2d correct(10);
-    correct.setPayload(P_3_3, 3);
-    correct.setPayload(P_1_1, 1);
-    correct.setPayload(P_2_2, 2);
+    correct.payloadSet(P_3_3, 3);
+    correct.payloadSet(P_1_1, 1);
+    correct.payloadSet(P_2_2, 2);
     correct.setWeights(P_2_2, 10, 20, 30, 40);
 
     WeightedGrid2d grid1 = correct;

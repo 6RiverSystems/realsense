@@ -19,10 +19,11 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 AStar::AStar() :
     lastNode_(nullptr),
-    startNode_(nullptr),
-    yieldCounter_(0)
+    startNode_(nullptr)
 {
     closedSet_.reserve(CLOSED_HASH_RESERVE);
+
+    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +61,13 @@ void AStar::clear()
 
     // Clear the last search and the yield counter
     lastNode_ = nullptr;
-    yieldCounter_ = 0;
+
+    // Reset the stats counters
+    counterYield_ = 0;
+    counterInserted_ = 0;
+    counterFoundInClosed_ = 0;
+    counterReplaced_ = 0;
+    counterPruned_ = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -158,10 +165,10 @@ bool AStar::search(SearchNode* start, SearchGoal* goal, ConfigParameters paramet
 
         // If the yield property has been set
         #ifdef YIELD_ENABLED
-            yieldCounter_++;
-            if (parameters.useYield && yieldCounter_ > parameters.yieldFrequency)
+            counterYield_++;
+            if (parameters.useYield && counterYield_ > parameters.yieldFrequency)
             {
-                yieldCounter_ = 0;
+                counterYield_ = 0;
                 this_thread::yield();
             }
         #endif
@@ -207,6 +214,8 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
                 // the new one
                 if (inOpenQueue->getTotalCost() > node->getTotalCost())
                 {
+                    counterReplaced_++;
+
                     openQueue_.erase(inOpenQueue);
                     inOpenQueue->release();
 
@@ -218,6 +227,8 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
                 }
                 else
                 {
+                    counterPruned_++;
+
                     // If the latest node has a total cost that is greater
                     // than what we already have, delete the new node
                     // and do not do anything else
@@ -230,6 +241,8 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
             }
             else
             {
+                counterInserted_++;
+
                 // If the node is not in the open list
                 // add it right away
                 openQueue_.push(node->getTotalCost(), node);
@@ -241,6 +254,8 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
         }
         else
         {
+            counterFoundInClosed_++;
+
             // If the node is already in the closed list, there
             // is no need to add it again. It can be removed
             node->release();

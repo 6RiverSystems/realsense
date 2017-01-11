@@ -8,8 +8,6 @@
 #include <vector>
 using namespace std;
 
-#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
-
 #include <srslib_framework/planning/Solution.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
 

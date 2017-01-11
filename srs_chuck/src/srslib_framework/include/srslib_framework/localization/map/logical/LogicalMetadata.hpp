@@ -7,6 +7,7 @@
 
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
+#include <srslib_framework/math/MeasurementMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
@@ -25,6 +26,45 @@ public:
         origin(Pose<>::INVALID),
         resolution(0.0),
         logicalFilename("")
+    {}
+
+    LogicalMetadata(double loadTime,
+            unsigned int widthCells, unsigned int heightCells,
+            Pose<> origin, double resolution,
+            string logicalFilename) :
+        loadTime(loadTime),
+        heightCells(heightCells),
+        widthCells(widthCells),
+        heightM(MeasurementMath::cells2M(heightCells, resolution)),
+        widthM(MeasurementMath::cells2M(widthCells, resolution)),
+        origin(origin),
+        resolution(resolution),
+        logicalFilename(logicalFilename)
+    {}
+
+    LogicalMetadata(double loadTime,
+            double widthM, double heightM,
+            Pose<> origin, double resolution,
+            string logicalFilename) :
+        loadTime(loadTime),
+        heightCells(MeasurementMath::m2Cells(heightM, resolution)),
+        widthCells(MeasurementMath::m2Cells(widthM, resolution)),
+        heightM(heightM),
+        widthM(widthM),
+        origin(origin),
+        resolution(resolution),
+        logicalFilename(logicalFilename)
+    {}
+
+    LogicalMetadata(const LogicalMetadata& other) :
+        loadTime(other.loadTime),
+        heightCells(other.heightCells),
+        widthCells(other.widthCells),
+        heightM(other.heightM),
+        widthM(other.widthM),
+        origin(other.origin),
+        resolution(other.resolution),
+        logicalFilename(other.logicalFilename)
     {}
 
     friend bool operator==(const LogicalMetadata& lhs, const LogicalMetadata& rhs)

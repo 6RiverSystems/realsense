@@ -65,29 +65,13 @@ const string LogicalMapFactory::KEYWORD_VERTEX = "vertex";
 const string LogicalMapFactory::KEYWORD_WEIGHTED_AREA = "weighted_area";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap* LogicalMapFactory::fromCostMap2D(costmap_2d::Costmap2D* costMap)
+LogicalMap* LogicalMapFactory::fromGrid2d(WeightedGrid2d* logical, Pose<> origin, double resolution)
 {
-    map_ = new LogicalMap(costMap->getSizeInMetersX(), costMap->getSizeInMetersY(),
-        costMap->getResolution(),
-        Pose<>(costMap->getOriginX(), costMap->getOriginY(), 0));
-    metadata_ = map_->getMetadata();
+    metadata_ = LogicalMetadata(0,
+        logical->getWidth(), logical->getHeight(),
+        origin, resolution, "");
 
-    for (int row = 0; row < costMap->getSizeInCellsY(); row++)
-    {
-        for (int col = 0; col < costMap->getSizeInCellsX(); col++)
-        {
-            map_->setCost(col, row, costMap->getCost(col, row));
-        }
-    }
-
-    return map_;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap* LogicalMapFactory::fromGrid2d(Grid2d* grid, double resolution, Pose<> origin)
-{
-    map_ = new LogicalMap(grid, resolution, origin);
-    metadata_ = map_->getMetadata();
+    map_ = new LogicalMap(metadata_, logical);
 
     return map_;
 }
@@ -144,7 +128,7 @@ LogicalMap* LogicalMapFactory::fromString(string geoJson, double loadTime)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::addCostArea(Pose<> origin, double widthM, double heightM,
-    Grid2d::BaseType cost)
+    WeightedGrid2d::BaseType cost)
 {
     unsigned int c0;
     unsigned int r0;
@@ -163,7 +147,7 @@ void LogicalMapFactory::addCostArea(Pose<> origin, double widthM, double heightM
         {
             if (map_->isWithinBounds(c, r))
             {
-                map_->maxCost(c, r, cost);
+                map_->costMax(c, r, cost);
             }
         }
     }
@@ -186,7 +170,7 @@ void LogicalMapFactory::addLabelArea(Pose<> origin, double widthM, double height
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::addObstacleArea(Pose<> origin, double widthM, double heightM,
-    double sizeEnvelopeM, Grid2d::BaseType costEnvelope)
+    double sizeEnvelopeM, WeightedGrid2d::BaseType costEnvelope)
 {
     // First add the envelope, if specified
     if (sizeEnvelopeM > 0.0 && costEnvelope > 0)
@@ -197,15 +181,15 @@ void LogicalMapFactory::addObstacleArea(Pose<> origin, double widthM, double hei
     }
 
     // Add the static obstacle
-    addCostArea(origin, widthM, heightM, Grid2d::PAYLOAD_MAX);
+    addCostArea(origin, widthM, heightM, WeightedGrid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::addWeightArea(Pose<> origin, double widthM, double heightM,
-    Grid2d::BaseType north,
-    Grid2d::BaseType east,
-    Grid2d::BaseType south,
-    Grid2d::BaseType west)
+    WeightedGrid2d::BaseType north,
+    WeightedGrid2d::BaseType east,
+    WeightedGrid2d::BaseType south,
+    WeightedGrid2d::BaseType west)
 {
     unsigned int c0;
     unsigned int r0;
@@ -254,13 +238,13 @@ void LogicalMapFactory::calculateArea(Pose<> origin, double widthM, double heigh
         y = 0;
     }
 
-    map_->convertM2Cells(x, c0);
-    map_->convertM2Cells(y, r0);
+    c0 = MeasurementMath::m2Cells(x, metadata_.resolution);
+    r0 = MeasurementMath::m2Cells(y, metadata_.resolution);
 
-    map_->convertM2Cells(newWidthM, widthCells);
+    widthCells = MeasurementMath::m2Cells(newWidthM, metadata_.resolution);
     widthCells = max<unsigned int>(0, widthCells);
 
-    map_->convertM2Cells(newHeightM, heightCells);
+    heightCells = MeasurementMath::m2Cells(newHeightM, metadata_.resolution);
     heightCells = max<unsigned int>(0, heightCells);
 }
 
@@ -379,7 +363,7 @@ void LogicalMapFactory::ntEntityBoundary(YAML::Node root)
     YAML::Node properties = root[KEYWORD_PROPERTIES];
 
     double envelopeSize = ntValueDouble(properties[KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE], false);
-    Grid2d::BaseType envelopeCost = ntValueCost(properties[KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_COST], false);
+    WeightedGrid2d::BaseType envelopeCost = ntValueCost(properties[KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_COST], false);
 
     double widthM = map_->getWidthM();
     double heightM = map_->getHeightM();
@@ -410,7 +394,7 @@ void LogicalMapFactory::ntEntityCostArea(YAML::Node root)
 {
     YAML::Node properties = root[KEYWORD_PROPERTIES];
 
-    Grid2d::BaseType cost = ntValueCost(properties[KEYWORD_PROPERTY_COST_AREA_COST], true);
+    WeightedGrid2d::BaseType cost = ntValueCost(properties[KEYWORD_PROPERTY_COST_AREA_COST], true);
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
@@ -460,8 +444,12 @@ void LogicalMapFactory::ntEntityMap(YAML::Node root)
     metadata_.widthM = ntValueDouble(properties[KEYWORD_PROPERTY_MAP_WIDTH], false);
     metadata_.heightM = ntValueDouble(properties[KEYWORD_PROPERTY_MAP_HEIGHT], false);
 
-    map_ = new LogicalMap(metadata_);
-    metadata_ = map_->getMetadata();
+    metadata_.widthCells = MeasurementMath::m2Cells(metadata_.widthM, metadata_.resolution);
+    metadata_.heightCells = MeasurementMath::m2Cells(metadata_.heightM, metadata_.resolution);
+
+    WeightedGrid2d* grid = new WeightedGrid2d(metadata_.widthCells, metadata_.heightCells);
+
+    map_ = new LogicalMap(metadata_, grid);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -470,7 +458,7 @@ void LogicalMapFactory::ntEntityObstacle(YAML::Node root)
     YAML::Node properties = root[KEYWORD_PROPERTIES];
 
     double envelopeSize = ntValueDouble(properties[KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_SIZE], false);
-    Grid2d::BaseType envelopeCost = ntValueCost(properties[KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_COST], false);
+    WeightedGrid2d::BaseType envelopeCost = ntValueCost(properties[KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_COST], false);
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
@@ -496,10 +484,10 @@ void LogicalMapFactory::ntEntityWeightArea(YAML::Node root)
 {
     YAML::Node properties = ntProperties(root);
 
-    Grid2d::BaseType northCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH], false);
-    Grid2d::BaseType eastCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_EAST], false);
-    Grid2d::BaseType southCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH], false);
-    Grid2d::BaseType westCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_WEST], false);
+    WeightedGrid2d::BaseType northCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH], false);
+    WeightedGrid2d::BaseType eastCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_EAST], false);
+    WeightedGrid2d::BaseType southCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH], false);
+    WeightedGrid2d::BaseType westCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_WEST], false);
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 1, 2);
     Pose<> p1 = coordinates[0];
@@ -626,9 +614,9 @@ YAML::Node LogicalMapFactory::ntProperties(YAML::Node root)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2d::BaseType LogicalMapFactory::ntValueCost(YAML::Node root, bool required)
+WeightedGrid2d::BaseType LogicalMapFactory::ntValueCost(YAML::Node root, bool required)
 {
-    int value = Grid2d::PAYLOAD_MIN;
+    int value = WeightedGrid2d::PAYLOAD_MIN;
 
     if (root)
     {
@@ -636,17 +624,17 @@ Grid2d::BaseType LogicalMapFactory::ntValueCost(YAML::Node root, bool required)
 
         try
         {
-            value = cost != KEYWORD_MAX ? root.as<int>() : Grid2d::PAYLOAD_MAX;
+            value = cost != KEYWORD_MAX ? root.as<int>() : WeightedGrid2d::PAYLOAD_MAX;
         }
         catch (exception& e)
         {
             throw CostExpectedException(metadata_);
         }
 
-        if (value < Grid2d::PAYLOAD_MIN || value > Grid2d::PAYLOAD_MAX)
+        if (value < WeightedGrid2d::PAYLOAD_MIN || value > WeightedGrid2d::PAYLOAD_MAX)
         {
             throw InvalidCostValueException(metadata_, value,
-                Grid2d::PAYLOAD_MIN, Grid2d::PAYLOAD_MAX);
+                WeightedGrid2d::PAYLOAD_MIN, WeightedGrid2d::PAYLOAD_MAX);
         }
     }
     else if (required)
@@ -654,7 +642,7 @@ Grid2d::BaseType LogicalMapFactory::ntValueCost(YAML::Node root, bool required)
         throw CostExpectedException(metadata_);
     }
 
-    return static_cast<Grid2d::BaseType>(value);
+    return static_cast<WeightedGrid2d::BaseType>(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

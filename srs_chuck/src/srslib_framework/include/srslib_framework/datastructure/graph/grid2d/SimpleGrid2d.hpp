@@ -56,6 +56,16 @@ public:
         return grid_.count(location);
     }
 
+    BaseType getMinPayloadValue()
+    {
+        return PAYLOAD_MIN;
+    }
+
+    BaseType getMaxPayloadValue()
+    {
+        return PAYLOAD_MAX;
+    }
+
     BaseType getPayload(const Location& location) const;
     BaseType getPayload(const Position& position) const;
 
@@ -64,7 +74,8 @@ public:
         return grid_.size();
     }
 
-    void maxOnPayload(const Location& location, BaseType otherPayload);
+    void payloadMax(const Location& location, BaseType otherPayload);
+    void payloadSet(const Location& location, BaseType newPayload);
 
     friend ostream& operator<<(ostream& stream, const SimpleGrid2d& grid);
     friend bool operator==(const SimpleGrid2d& lhs, const SimpleGrid2d& rhs);
@@ -73,8 +84,6 @@ public:
     {
         return !(lhs == rhs);
     }
-
-    void setPayload(const Location& location, BaseType newPayload);
 
 protected:
     struct Node

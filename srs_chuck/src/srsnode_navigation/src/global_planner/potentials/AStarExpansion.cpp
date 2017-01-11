@@ -1,9 +1,8 @@
+#include <srsnode_navigation/global_planner/potentials/AStarExpansion.hpp>
+
 #include <costmap_2d/cost_values.h>
 
-#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/datastructure/Location.hpp>
-
-#include <srsnode_navigation/global_planner/potentials/AStarExpansion.hpp>
 
 namespace srs {
 
@@ -45,10 +44,10 @@ bool AStarExpansion::calculatePotentials(
             return true;
         }
 
-        Grid2d::BaseType north = 0;
-        Grid2d::BaseType east = 0;
-        Grid2d::BaseType south = 0;
-        Grid2d::BaseType west = 0;
+        WeightedGrid2d::BaseType north = 0;
+        WeightedGrid2d::BaseType east = 0;
+        WeightedGrid2d::BaseType south = 0;
+        WeightedGrid2d::BaseType west = 0;
 
         int x;
         int y;
@@ -68,7 +67,7 @@ bool AStarExpansion::calculatePotentials(
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void AStarExpansion::add(float* potentials,
     float prev_potential,
-    int next_i, Grid2d::BaseType weight,
+    int next_i, WeightedGrid2d::BaseType weight,
     int end_x, int end_y)
 {
     float nextPotential = potentials[next_i];
@@ -93,28 +92,17 @@ void AStarExpansion::add(float* potentials,
     }
 
     unsigned int weightContribution = weight * weightRatio_;
-    if (weight == Grid2d::WEIGHT_NO_INFORMATION)
-    {
-        weightContribution = 0;
-    }
 
     int x;
     int y;
     index2Coordinates(next_i, x, y);
 
-    Grid2d::BaseType logicalCost = logicalGrid_->getPayload(Location(x, y));
-    if (logicalCost == Grid2d::PAYLOAD_MAX)
+    WeightedGrid2d::BaseType logicalCost = logicalGrid_->getPayload(Location(x, y));
+    if (logicalCost == WeightedGrid2d::PAYLOAD_MAX)
     {
         return;
     }
 
-    // No-information in the logical map is different from no-information
-    // in the occupancy map. If the logical map does not have any information
-    // for a specific location, there is no additional cost attached to it
-    if (logicalCost == Grid2d::PAYLOAD_NO_INFORMATION)
-    {
-        logicalCost = 0;
-    }
     logicalCost *= logicalCostRatio_;
 
     nextPotential = pCalculator_->calculatePotential(potentials,

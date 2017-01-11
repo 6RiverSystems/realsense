@@ -25,22 +25,22 @@ TEST(Test_SmallMap, BasicRead)
     LogicalMap* logical = stack->getLogicalMap();
     OccupancyMap* occupancy = stack->getOccupancyMap();
 
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(0, 0)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, logical->getCost(0, 0)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(0, 34)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, logical->getCost(0, 34)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(34, 34)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, logical->getCost(34, 34)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(34, 0)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, logical->getCost(34, 0)) <<
         "The cost is not as expected";
 
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(11, 10)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, logical->getCost(11, 10)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(11, 22)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, logical->getCost(11, 22)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(23, 22)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, logical->getCost(23, 22)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(23, 10)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, logical->getCost(23, 10)) <<
         "The cost is not as expected";
 
     ASSERT_EQ(70, logical->getCost(12, 11)) <<
@@ -61,13 +61,13 @@ TEST(Test_SmallMap, BasicRead)
     ASSERT_EQ(70, logical->getCost(20, 13)) <<
         "The cost is not as expected";
 
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(15, 14)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MAX, logical->getCost(15, 14)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(15, 18)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MAX, logical->getCost(15, 18)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(19, 18)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MAX, logical->getCost(19, 18)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(19, 14)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MAX, logical->getCost(19, 14)) <<
         "The cost is not as expected";
 
     LogicalMap::LabeledAreaMapType areas = logical->getAreas();

@@ -29,6 +29,8 @@ public:
         START
     };
 
+    static constexpr int PRUNING_THRESHOLD = 254;
+
     static MapStackNode* exploreBackward(MapStack* stack, MapStackNode* fromNode);
     static MapStackNode* exploreForward(MapStack* stack, MapStackNode* fromNode);
     static MapStackNode* exploreRotation(MapStack* stack, MapStackNode* fromNode,

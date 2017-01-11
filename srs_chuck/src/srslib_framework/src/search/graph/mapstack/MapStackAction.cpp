@@ -38,7 +38,7 @@ MapStackNode* MapStackAction::exploreBackward(MapStack* stack, MapStackNode* fro
             searchParameters.allowUnknown,
             searchParameters.costMapRatio);
 
-        if (motionCost < Grid2d::PAYLOAD_MAX)
+        if (motionCost < PRUNING_THRESHOLD)
         {
             // Create a neighbor node with all the relative data
             MapStackNode* neighborNode = MapStackNode::instanceOf(
@@ -77,7 +77,7 @@ MapStackNode* MapStackAction::exploreForward(MapStack* stack, MapStackNode* from
             searchParameters.allowUnknown,
             searchParameters.costMapRatio);
 
-        if (motionCost < Grid2d::PAYLOAD_MAX)
+        if (motionCost < PRUNING_THRESHOLD)
         {
             // Create a neighbor node with all the relative data
             MapStackNode* neighborNode = MapStackNode::instanceOf(
@@ -116,7 +116,7 @@ MapStackNode* MapStackAction::exploreRotation(MapStack* stack, MapStackNode* fro
         searchParameters.allowUnknown,
         searchParameters.costMapRatio);
 
-    if (motionCost < Grid2d::PAYLOAD_MAX)
+    if (motionCost < PRUNING_THRESHOLD)
     {
         // Create a neighbor node with all the relative data
         MapStackNode* neighborNode = MapStackNode::instanceOf(

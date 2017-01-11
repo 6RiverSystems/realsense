@@ -42,7 +42,7 @@ public:
         height_(height)
     {}
 
-    ~BaseGrid2d()
+    virtual ~BaseGrid2d()
     {}
 
     unsigned int getHeight() const
@@ -50,24 +50,31 @@ public:
         return height_;
     }
 
+    virtual BaseType getMinPayloadValue() = 0;
+    virtual BaseType getMaxPayloadValue() = 0;
+
     bool getNeighbor(const Position& position, Position& result) const
     {
         switch (position.orientation)
         {
             case ORIENTATION_EAST:
-                result = Position(position.location.x + 1, position.location.y, position.orientation);
+                result = Position(position.location.x + 1, position.location.y,
+                    position.orientation);
                 break;
 
             case ORIENTATION_NORTH:
-                result = Position(position.location.x, position.location.y + 1, position.orientation);
+                result = Position(position.location.x, position.location.y + 1,
+                    position.orientation);
                 break;
 
             case ORIENTATION_WEST:
-                result = Position(position.location.x - 1, position.location.y, position.orientation);
+                result = Position(position.location.x - 1, position.location.y,
+                    position.orientation);
                 break;
 
             case ORIENTATION_SOUTH:
-                result = Position(position.location.x, position.location.y - 1, position.orientation);
+                result = Position(position.location.x, position.location.y - 1,
+                    position.orientation);
                 break;
 
             default:
@@ -93,6 +100,9 @@ public:
         return (0 <= position.location.x && position.location.x < width_) &&
             (0 <= position.location.y && position.location.y < height_);
     }
+
+    virtual void payloadMax(const Location& location, BaseType otherPayload) = 0;
+    virtual void payloadSet(const Location& location, BaseType newPayload) = 0;
 
 private:
     unsigned int height_;

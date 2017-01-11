@@ -69,12 +69,23 @@ SimpleGrid2d::BaseType SimpleGrid2d::getPayload(const Position& position) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SimpleGrid2d::maxOnPayload(const Location& location, BaseType otherPayload)
+void SimpleGrid2d::payloadMax(const Location& location, BaseType otherPayload)
 {
     updatePayload(location, otherPayload,
         [] (BaseType oldPayload, BaseType newPayload) -> BaseType
         {
             return max(oldPayload, newPayload);
+        }
+    );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void SimpleGrid2d::payloadSet(const Location& location, BaseType newPayload)
+{
+    updatePayload(location, newPayload,
+        [] (BaseType oldPayload, BaseType newPayload) -> BaseType
+        {
+            return newPayload;
         }
     );
 }
@@ -141,17 +152,6 @@ bool operator==(const SimpleGrid2d& lhs, const SimpleGrid2d& rhs)
     }
 
     return true;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void SimpleGrid2d::setPayload(const Location& location, BaseType newPayload)
-{
-    updatePayload(location, newPayload,
-        [] (BaseType oldPayload, BaseType newPayload) -> BaseType
-        {
-            return newPayload;
-        }
-    );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

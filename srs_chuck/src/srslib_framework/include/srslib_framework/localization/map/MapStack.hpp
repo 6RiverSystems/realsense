@@ -11,7 +11,6 @@ using namespace std;
 
 #include <costmap_2d/costmap_2d.h>
 
-#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/localization/map/BaseMap.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMap.hpp>
@@ -39,9 +38,11 @@ public:
     void setCostMap2d(costmap_2d::Costmap2D* costMap2d);
 
 private:
-    LogicalMap* logical_;
-    OccupancyMap* occupancy_;
     costmap_2d::Costmap2D* costMap2d_;
+
+    LogicalMap* logical_;
+
+    OccupancyMap* occupancy_;
 };
 
 } // namespace srs

@@ -29,12 +29,12 @@ BrainStem::BrainStem(string name, int argc, char** argv) :
 	nodeHandle_("~"),
 	useEmulator_(false)
 {
+	nodeHandle_.param("use_emulator", useEmulator_, useEmulator_);
+
 	connectionChanged( false );
 
 	// Register dynamic configuration callback
 	configServer_.setCallback(boost::bind(&BrainStem::cfgCallback, this, _1, _2));
-
-	nodeHandle_.param("use_emulator", useEmulator_, useEmulator_);
 
 	char* pszLeftWheelRadius = getenv("ROBOT_LEFT_WHEEL_RADIUS");
 	char* pszRightWheelRadius = getenv("ROBOT_RIGHT_WHEEL_RADIUS");

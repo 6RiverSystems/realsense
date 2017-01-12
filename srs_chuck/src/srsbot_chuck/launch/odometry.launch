@@ -17,6 +17,9 @@
         <arg name="emulation_mode" value="$(arg emulation_mode)" />
     </include>
 
+    <!-- Launch Map -->
+    <include file="$(find srsc_common)/launch/map.launch" />
+
 	<!-- Fixed /odom frame to /map frame TF -->
 	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
 </launch>

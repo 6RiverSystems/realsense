@@ -17,9 +17,10 @@ namespace srs
 RealsenseDriver::RealsenseDriver( ) :
 	rosNodeHandle_( ),
 	depthSubscriber_( rosNodeHandle_.subscribe<sensor_msgs::Image>( "/internal/sensors/rgbd/depth/image_raw", 100,
-		std::bind( &RealsenseDriver::OnDepthData, this, std::placeholders::_1 ) ) )
+		std::bind( &RealsenseDriver::OnDepthData, this, std::placeholders::_1 ) ) ),
+        depthPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>("/interal/sensors/rgbd/depth/image_filtered", 100 ) )
 {
-	depthMedianFilterPublisher_ = rosNodeHandle_.advertise<sensor_msgs::Image>("test_image", 100);
+    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,13 +40,31 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::Image::ConstPtr& depthImag
 {
 	cv_bridge::CvImagePtr cvDepthImage = GetCvImage( depthImage );
 
-	cv::flip(cvDepthImage->image, cvDepthImage->image, -1);
+    cv::Mat tmpImg;
+    tmpImg = cvDepthImage->image.clone();
 
-	cv::Mat medianFilterImg;
-	cv::medianBlur( cvDepthImage->image, medianFilterImg, 5 );
+	//cv::flip(cvDepthImage->image, cvDepthImage->image, -1);
 
-	cvDepthImage->image = medianFilterImg;
-	depthMedianFilterPublisher_.publish( cvDepthImage );
+    // normalize 16-bit unsigned range to 8-bit for visualization
+    double max, min;
+    cv::minMaxIdx(tmpImg, &min, &max);
+    ROS_DEBUG("min: %f, max: %f", min, max);
+    cv::convertScaleAbs(tmpImg, tmpImg, 255/max);
+    tmpImg.convertTo(tmpImg, CV_8UC1);
+    cv::imshow("raw image", tmpImg);
+
+    // apply median filter
+    cv::Mat medianFilterImg;
+    cv::medianBlur( tmpImg, medianFilterImg, 5 );
+    cv::imshow("median filtered image", medianFilterImg);
+
+    // apply bilateral filter
+    cv::Mat bilateralImg;
+    cv::bilateralFilter ( tmpImg, bilateralImg, 15, 80, 80 );
+    cv::imshow("bilateral image", bilateralImg);
+
+    //depthMedianFilterPublisher_.publish( cvDepthImage );
+    cv::waitKey(10);
 }
 
 cv_bridge::CvImagePtr RealsenseDriver::GetCvImage( const sensor_msgs::Image::ConstPtr& image ) const

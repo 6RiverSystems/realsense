@@ -41,7 +41,7 @@ private:
 
     ros::Subscriber						 				depthSubscriber_;
 
-    ros::Publisher 										depthMedianFilterPublisher_;
+    ros::Publisher 										depthPublisher_;
 
 };
 

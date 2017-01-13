@@ -29,8 +29,6 @@
 
 namespace srs {
 
-int LogicalMapDisplay::keyCounter_ = 0;
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
@@ -38,19 +36,13 @@ int LogicalMapDisplay::keyCounter_ = 0;
 LogicalMapDisplay::LogicalMapDisplay() :
     Display(),
     logicalMap_(nullptr),
-    mapStack_(nullptr),
-    manualObject_(nullptr)
+    mapStack_(nullptr)
 {
     propertyAlpha_ = new rviz::FloatProperty("Alpha", 1.0,
         "0 is fully transparent, 1.0 is fully opaque.",
         this, SLOT(updateAlpha()));
     propertyAlpha_->setMin(0);
     propertyAlpha_->setMax(1);
-
-    propertyDrawUnder_ = new rviz::Property("Draw Behind", false,
-        "Rendering option, controls whether or not the map is always"
-        " drawn behind everything else.",
-        this, SLOT(updateDrawUnder()));
 
     propertyResolution_ = new rviz::FloatProperty("Resolution", 0,
         "Resolution of the map [meter].", this);
@@ -67,6 +59,14 @@ LogicalMapDisplay::LogicalMapDisplay() :
     propertyOrigin_ = new rviz::VectorProperty( "Position", Ogre::Vector3::ZERO,
         "Position of the bottom left corner of the map [meter]", this);
     propertyOrigin_->setReadOnly(true);
+
+    propertyLayerBackground_ = new rviz::Property("Draw background layer", true,
+        "Rendering option, enables/disables the background layer.",
+        this, SLOT(updateLayerSwitches()));
+
+    propertyLayerObstacles_ = new rviz::Property("Draw obstacles layer", true,
+        "Rendering option, enables/disables the obstacles layer.",
+        this, SLOT(updateLayerSwitches()));
 
     connect(this, SIGNAL(mapStackUpdated()), this, SLOT(renderMapStack()));
     tapMapStack_.attach(this);
@@ -87,6 +87,7 @@ void LogicalMapDisplay::notified(Subscriber<srslib_framework::MapStack>* subject
 
     // Update the read-only properties of the display
     logicalMap_ = mapStack_->getLogicalMap();
+
     propertyResolution_->setValue(logicalMap_->getResolution());
     propertyWidth_->setValue(logicalMap_->getWidthM());
     propertyHeight_->setValue(logicalMap_->getHeightM());
@@ -94,6 +95,10 @@ void LogicalMapDisplay::notified(Subscriber<srslib_framework::MapStack>* subject
         logicalMap_->getOrigin().x,
         logicalMap_->getOrigin().y,
         0));
+
+    // Now that we know about the logical map,
+    // the different layers can be constructed and initialized
+    initializeLayers();
 
     setStatus(rviz::StatusProperty::Ok, "Message", "Logical Map received");
 
@@ -110,87 +115,54 @@ void LogicalMapDisplay::fixedFrameChanged()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapDisplay::onInitialize()
+void LogicalMapDisplay::initializeLayers()
 {
-    // Generate the palette
-    generatePalette();
+    unsigned int width = logicalMap_->getWidthCells();
+    unsigned int height = logicalMap_->getHeightCells();
+    double resolution = logicalMap_->getResolution();
 
-    // Set up map material
-    material_ = Ogre::MaterialManager::getSingleton().getByName("rviz/Indexed8BitImage");
-    material_ = material_->clone(generateKey("LogicalMapMaterial"));
-    material_->setReceiveShadows(false);
-    material_->getTechnique(0)->setLightingEnabled(false);
-    material_->setDepthBias(-16.0f, 0.0f);
-    material_->setCullingMode(Ogre::CULL_NONE);
-    material_->setDepthWriteEnabled(false);
+    LayerDisplay* background = createLayer(0, width, height, resolution, RGBA_WHITE);
+    LayerDisplay* obstacles = createLayer(1, width, height, resolution, RGBA_BLACK);
 
-    manualObject_ = scene_manager_->createManualObject(generateKey("LogicalMapObject"));
-    scene_node_->attachObject(manualObject_);
+    // Background layer
+    background->fillAll();
 
-    manualObject_->begin(material_->getName(), Ogre::RenderOperation::OT_TRIANGLE_LIST);
+    // Go through all defined cells in the grid and
+    // populate the layers
+    WeightedGrid2d* grid = logicalMap_->getGrid();
+    for (Location location : *grid)
     {
-        // First triangle
+        WeightedGrid2d::BaseType cost = grid->getPayload(location);
+        if (cost == WeightedGrid2d::PAYLOAD_MAX)
         {
-          // Bottom left
-          manualObject_->position(0.0f, 0.0f, 0.0f);
-          manualObject_->textureCoord(0.0f, 0.0f);
-          manualObject_->normal(0.0f, 0.0f, 1.0f);
-
-          // Top right
-          manualObject_->position(1.0f, 1.0f, 0.0f);
-          manualObject_->textureCoord(1.0f, 1.0f);
-          manualObject_->normal(0.0f, 0.0f, 1.0f);
-
-          // Top left
-          manualObject_->position(0.0f, 1.0f, 0.0f);
-          manualObject_->textureCoord(0.0f, 1.0f);
-          manualObject_->normal(0.0f, 0.0f, 1.0f);
-        }
-
-        // Second triangle
-        {
-          // Bottom left
-          manualObject_->position(0.0f, 0.0f, 0.0f);
-          manualObject_->textureCoord(0.0f, 0.0f);
-          manualObject_->normal(0.0f, 0.0f, 1.0f);
-
-          // Bottom right
-          manualObject_->position(1.0f, 0.0f, 0.0f);
-          manualObject_->textureCoord(1.0f, 0.0f);
-          manualObject_->normal(0.0f, 0.0f, 1.0f);
-
-          // Top right
-          manualObject_->position(1.0f, 1.0f, 0.0f);
-          manualObject_->textureCoord(1.0f, 1.0f);
-          manualObject_->normal(0.0f, 0.0f, 1.0f);
+            obstacles->fillLocation(location);
         }
     }
 
-    manualObject_->end();
-    manualObject_->setVisible(false);
+    layers_.push_back(background);
+    layers_.push_back(obstacles);
+}
 
-    updateDrawUnder();
-    updateAlpha();
-    translateLogicalMap();
-
-    setEnabled(true);
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapDisplay::onInitialize()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapDisplay::onEnable()
 {
-    if (manualObject_)
+    for (auto layer : layers_)
     {
-        manualObject_->setVisible(true);
+        layer->show(true);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapDisplay::onDisable()
 {
-    if (manualObject_)
+    for (auto layer : layers_)
     {
-        manualObject_->setVisible(false);
+        layer->show(false);
     }
 }
 
@@ -204,77 +176,14 @@ void LogicalMapDisplay::reset()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapDisplay::generatePalette()
+LayerDisplay* LogicalMapDisplay::createLayer(unsigned int order,
+    unsigned int width, unsigned int height,
+    double resolution, Ogre::RGBA color)
 {
-    const int PALETTE_SIZE = 256 * 4;
+    LayerDisplay* layer = new LayerDisplay(order, width, height, resolution, color);
+    layer->connectTo(scene_manager_, scene_node_);
 
-    unsigned char* paletteColors = new unsigned char[PALETTE_SIZE];
-    unsigned char* p = paletteColors;
-
-    // Obstacle
-    *p++ = 0; // red
-    *p++ = 0; // green
-    *p++ = 0; // blue
-    *p++ = 255; // alpha
-
-    // Empty
-    *p++ = 255; // red
-    *p++ = 255; // green
-    *p++ = 255; // blue
-    *p++ = 255; // alpha
-
-//    // Blue to red spectrum for most normal cost values
-//    for (int i = 1; i <= 98; i++)
-//    {
-//        unsigned char v = (255 * i) / 100;
-//        *p++ = v; // red
-//        *p++ = 0; // green
-//        *p++ = 255 - v; // blue
-//        *p++ = 255; // alpha
-//    }
-//
-//    // Inscribed obstacle values (99) in cyan
-//    *p++ = 0; // red
-//    *p++ = 255; // green
-//    *p++ = 255; // blue
-//    *p++ = 255; // alpha
-//
-//    // Lethal obstacle values (100) in purple
-//    *p++ = 255; // red
-//    *p++ = 0; // green
-//    *p++ = 255; // blue
-//    *p++ = 255; // alpha
-//
-//    // Illegal positive values in green
-//    for (int i = 101; i <= 127; i++)
-//    {
-//        *p++ = 0; // red
-//        *p++ = 255; // green
-//        *p++ = 0; // blue
-//        *p++ = 255; // alpha
-//    }
-//
-//    // Illegal negative (char) values in shades of red/yellow
-//    for (int i = 128; i <= 254; i++)
-//    {
-//        *p++ = 255; // red
-//        *p++ = (255 * (i - 128)) / (254 - 128); // green
-//        *p++ = 0; // blue
-//        *p++ = 255; // alpha
-//    }
-//
-//    // Legal -1 value is tasteful blueish greenish grayish color
-//    *p++ = 0x70; // red
-//    *p++ = 0x89; // green
-//    *p++ = 0x86; // blue
-//    *p++ = 255; // alpha
-
-    Ogre::DataStreamPtr paletteStream;
-    paletteStream.bind(new Ogre::MemoryDataStream(paletteColors, PALETTE_SIZE));
-
-    palette_ = Ogre::TextureManager::getSingleton().loadRawData("LogicalMapPaletteTexture",
-        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-        paletteStream, 256, 1, Ogre::PF_BYTE_RGBA, Ogre::TEX_TYPE_1D, 0);
+    return layer;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -321,119 +230,22 @@ void LogicalMapDisplay::renderMapStack()
         return;
     }
 
-    ROS_WARN("renderMapStack");
-
-    unsigned int width = logicalMap_->getWidthCells();
-    unsigned int height = logicalMap_->getHeightCells();
-    double resolution = logicalMap_->getResolution();
-
-    unsigned int numberOfPixels = width * height;
-    unsigned char* pixels = new unsigned char[numberOfPixels];
-
-    // Set the map to be completely empty
-    memset(pixels, EMPTY, numberOfPixels);
-
-    // Scan through the weighted grid of the map and
-    // choose the correct color based on the information in the cell
-    WeightedGrid2d* grid = logicalMap_->getGrid();
-    for (Location location : *grid)
+    for (auto layer : layers_)
     {
-        WeightedGrid2d::BaseType cost = grid->getPayload(location);
-        if (cost == WeightedGrid2d::PAYLOAD_MAX)
-        {
-            int index = location.x + location.y * width;
-            pixels[index] = OBSTACLE;
-        }
+        layer->render();
     }
 
-    Ogre::DataStreamPtr pixelStream;
-    pixelStream.bind(new Ogre::MemoryDataStream(pixels, numberOfPixels));
-
-    if (!texture_.isNull())
-    {
-        Ogre::TextureManager::getSingleton().remove(texture_->getName());
-        texture_.setNull();
-    }
-
-    // Generate the texture for the stream of pixels
-    try
-    {
-        texture_ = Ogre::TextureManager::getSingleton().loadRawData(generateKey("LogicalMapTexture"),
-            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-            pixelStream, width, height, Ogre::PF_L8, Ogre::TEX_TYPE_2D, 0);
-    }
-    catch (Ogre::RenderingAPIException&)
-    {
-        Ogre::Image image;
-        pixelStream->seek(0);
-
-        float scaledWidth = width;
-        float scaledHeight = height;
-
-        if (width > height)
-        {
-            float aspect = scaledHeight / scaledWidth;
-            scaledWidth = 2048;
-            scaledHeight = scaledWidth * aspect;
-        }
-        else
-        {
-            float aspect = scaledWidth / scaledHeight;
-            scaledHeight = 2048;
-            scaledWidth = scaledHeight * aspect;
-        }
-
-        std::stringstream ss;
-        ss << "Map is larger than your graphics card supports. Downsampled from [" <<
-            width << "x" << height << "] to [" << scaledWidth << "x" << scaledHeight << "]";
-        setStatus(rviz::StatusProperty::Warn, "Map", QString::fromStdString(ss.str()));
-
-        image.loadRawData(pixelStream, width, height, Ogre::PF_L8);
-        image.resize(scaledWidth, scaledHeight, Ogre::Image::FILTER_NEAREST);
-
-        texture_ = Ogre::TextureManager::getSingleton().loadImage(generateKey("Downsampled"),
-            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, image);
-    }
-
-    // There is no need for the pixels anymore
-    delete[] pixels;
-
-    // Apply the texture to the material
-    Ogre::Pass* pass = material_->getTechnique(0)->getPass(0);
-    Ogre::TextureUnitState* textureUnit = nullptr;
-    if (pass->getNumTextureUnitStates() > 0)
-    {
-        textureUnit = pass->getTextureUnitState(0);
-    }
-    else
-    {
-        textureUnit = pass->createTextureUnitState();
-    }
-    textureUnit->setTextureName(texture_->getName());
-    textureUnit->setTextureFiltering(Ogre::TFO_NONE);
-
-
-    Ogre::TextureUnitState* paletteUnit = nullptr;
-    if (pass->getNumTextureUnitStates() > 1)
-    {
-        paletteUnit = pass->getTextureUnitState(1);
-    }
-    else
-    {
-        paletteUnit = pass->createTextureUnitState();
-    }
-
-    paletteUnit->setTextureName(palette_->getName());
-    paletteUnit->setTextureFiltering(Ogre::TFO_NONE);
-
+    // Make sure that the alpha of the layers matches the specified one
     updateAlpha();
-
 
     // Make sure that the map is displayed in the correct position
     translateLogicalMap();
 
     // Ask the queue to render the object
-    manualObject_->setVisible(true);
+    unsigned int width = logicalMap_->getWidthCells();
+    unsigned int height = logicalMap_->getHeightCells();
+    double resolution = logicalMap_->getResolution();
+
     scene_node_->setScale(resolution * width, resolution * height, 1.0);
     context_->queueRender();
 }
@@ -443,37 +255,17 @@ void LogicalMapDisplay::updateAlpha()
 {
     float alpha = propertyAlpha_->getFloat();
 
-    material_->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-    material_->setDepthWriteEnabled(false);
-
-    AlphaSetter alphaSetter(alpha);
-    if (manualObject_)
+    for (auto layer : layers_)
     {
-        manualObject_->visitRenderables(&alphaSetter);
+        layer->updateAlpha(alpha);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMapDisplay::updateDrawUnder()
+void LogicalMapDisplay::updateLayerSwitches()
 {
-    bool drawUnder = propertyDrawUnder_->getValue().toBool();
-
-    if (propertyAlpha_->getFloat() >= 0.9998)
-    {
-        material_->setDepthWriteEnabled(!drawUnder);
-    }
-
-    if (manualObject_)
-    {
-        if (drawUnder)
-        {
-            manualObject_->setRenderQueueGroup(Ogre::RENDER_QUEUE_4);
-        }
-        else
-        {
-            manualObject_->setRenderQueueGroup(Ogre::RENDER_QUEUE_MAIN);
-        }
-    }
+    layers_[BACKGROUND]->show(propertyLayerBackground_->getValue().toBool());
+    layers_[OBSTACLES]->show(propertyLayerObstacles_->getValue().toBool());
 }
 
 } // namespace srs

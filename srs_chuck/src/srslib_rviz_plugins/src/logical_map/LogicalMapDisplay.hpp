@@ -7,11 +7,10 @@
 
 #include <string>
 #include <sstream>
+#include <vector>
 using namespace std;
 
 #ifndef Q_MOC_RUN
-#include <boost/thread/thread.hpp>
-
 #include <OgreTexture.h>
 #include <OgreMaterial.h>
 #include <OgreVector3.h>
@@ -33,6 +32,7 @@ using namespace std;
 #include <rviz/display.h>
 
 #include <srslib_framework/ros/tap/TapMapStack.hpp>
+#include "LayerDisplay.hpp"
 
 namespace Ogre {
 
@@ -66,6 +66,8 @@ public:
 protected:
     virtual void fixedFrameChanged();
 
+    void initializeLayers();
+
     virtual void onInitialize();
     virtual void onEnable();
     virtual void onDisable();
@@ -79,60 +81,37 @@ private Q_SLOTS:
     void renderMapStack();
 
     void updateAlpha();
+    void updateLayerSwitches();
     void updateDrawUnder();
 
 private:
     enum {
-        OBSTACLE = 0,
-        EMPTY = 1
+        BACKGROUND = 0,
+        OBSTACLES = 1
     } EnititesEnum;
 
-    class AlphaSetter: public Ogre::Renderable::Visitor
-    {
-    public:
-        AlphaSetter(float alpha) :
-            alphaVector_(alpha, alpha, alpha, alpha)
-        {}
+    static constexpr Ogre::RGBA RGBA_WHITE = 0xFFFFFFFF;
+    static constexpr Ogre::RGBA RGBA_BLACK = 0x000000FF;
 
-        void visit(Ogre::Renderable* rend, ushort lodIndex, bool isDebug, Ogre::Any* pAny = 0)
-        {
-            rend->setCustomParameter(1, alphaVector_);
-        }
-
-    private:
-        Ogre::Vector4 alphaVector_;
-    };
-
-    string generateKey(string prefix)
-    {
-        stringstream stringStream;
-        stringStream << prefix << keyCounter_;
-
-        return stringStream.str();
-    }
-
-    void generatePalette();
+    LayerDisplay* createLayer(unsigned int order, unsigned int width, unsigned int height,
+        double resolution, Ogre::RGBA color);
 
     void translateLogicalMap();
 
-    static int keyCounter_;
-
-    Ogre::TexturePtr palette_;
     rviz::FloatProperty* propertyAlpha_;
-    rviz::Property* propertyDrawUnder_;
     rviz::IntProperty* propertyHeight_;
+    rviz::Property* propertyLayerBackground_;
+    rviz::Property* propertyLayerObstacles_;
     rviz::VectorProperty* propertyOrigin_;
     rviz::FloatProperty* propertyResolution_;
     rviz::IntProperty* propertyWidth_;
 
+    vector<LayerDisplay*> layers_;
     LogicalMap* logicalMap_;
 
-    Ogre::ManualObject* manualObject_;
     MapStack* mapStack_;
-    Ogre::MaterialPtr material_;
 
     TapMapStack tapMapStack_;
-    Ogre::TexturePtr texture_;
 };
 
 } // namespace srs

@@ -68,6 +68,22 @@ LogicalMapDisplay::LogicalMapDisplay() :
         "Rendering option, enables/disables the obstacles layer.",
         this, SLOT(updateLayerSwitches()));
 
+    propertyLayerWeightsNorth_ = new rviz::Property("Draw north weights layer", true,
+        "Rendering option, enables/disables the north weights layer.",
+        this, SLOT(updateLayerSwitches()));
+
+    propertyLayerWeightsEast_ = new rviz::Property("Draw east weights layer", true,
+        "Rendering option, enables/disables the east weights layer.",
+        this, SLOT(updateLayerSwitches()));
+
+    propertyLayerWeightsSouth_ = new rviz::Property("Draw south weights layer", true,
+        "Rendering option, enables/disables the south weights layer.",
+        this, SLOT(updateLayerSwitches()));
+
+    propertyLayerWeightsWest_ = new rviz::Property("Draw west weights layer", true,
+        "Rendering option, enables/disables the west weights layer.",
+        this, SLOT(updateLayerSwitches()));
+
     connect(this, SIGNAL(mapStackUpdated()), this, SLOT(renderMapStack()));
     tapMapStack_.attach(this);
 }
@@ -121,8 +137,22 @@ void LogicalMapDisplay::initializeLayers()
     unsigned int height = logicalMap_->getHeightCells();
     double resolution = logicalMap_->getResolution();
 
-    LayerDisplay* background = createLayer(0, width, height, resolution, RGBA_WHITE);
-    LayerDisplay* obstacles = createLayer(1, width, height, resolution, RGBA_BLACK);
+    PixelLayerDisplay* background = createPixelLayer(BACKGROUND,
+        width, height, resolution, RGBA_WHITE);
+    PixelLayerDisplay* obstacles = createPixelLayer(OBSTACLES,
+        width, height, resolution, RGBA_BLACK);
+
+    PixelLayerDisplay* weightsNorth = createPixelLayer(WEIGHTS_NORTH,
+        width, height, resolution, RGBA_ORANGE);
+    PixelLayerDisplay* weightsEast = createPixelLayer(WEIGHTS_EAST,
+        width, height, resolution, RGBA_ORANGE);
+    PixelLayerDisplay* weightsSouth = createPixelLayer(WEIGHTS_SOUTH,
+        width, height, resolution, RGBA_ORANGE);
+    PixelLayerDisplay* weightsWest = createPixelLayer(WEIGHTS_WEST,
+        width, height, resolution, RGBA_ORANGE);
+
+    AreaLayerDisplay* warningSound = createAreaLayer(WARNING_SOUND,
+        width, height, resolution, RGBA_GREEN);
 
     // Background layer
     background->fillAll();
@@ -132,15 +162,50 @@ void LogicalMapDisplay::initializeLayers()
     WeightedGrid2d* grid = logicalMap_->getGrid();
     for (Location location : *grid)
     {
+        // Store the obstacle pixels
         WeightedGrid2d::BaseType cost = grid->getPayload(location);
         if (cost == WeightedGrid2d::PAYLOAD_MAX)
         {
             obstacles->fillLocation(location);
         }
+
+        // Store the weights
+        WeightedGrid2d::BaseType north;
+        WeightedGrid2d::BaseType east;
+        WeightedGrid2d::BaseType south;
+        WeightedGrid2d::BaseType west;
+
+        grid->getWeights(location, north, east, south, west);
+        if (north > 0)
+        {
+            weightsNorth->fillLocation(location, north);
+        }
+        if (east > 0)
+        {
+            weightsEast->fillLocation(location, east);
+        }
+        if (south > 0)
+        {
+            weightsSouth->fillLocation(location, south);
+        }
+        if (west > 0)
+        {
+            weightsWest->fillLocation(location, west);
+        }
     }
 
+    for (auto area : logicalMap_->getAreas())
+    {
+    }
+
+    // Add all the layers to the stack for rendering
     layers_.push_back(background);
     layers_.push_back(obstacles);
+    layers_.push_back(weightsNorth);
+    layers_.push_back(weightsEast);
+    layers_.push_back(weightsSouth);
+    layers_.push_back(weightsWest);
+    layers_.push_back(warningSound);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,11 +241,22 @@ void LogicalMapDisplay::reset()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LayerDisplay* LogicalMapDisplay::createLayer(unsigned int order,
+PixelLayerDisplay* LogicalMapDisplay::createPixelLayer(unsigned int order,
     unsigned int width, unsigned int height,
     double resolution, Ogre::RGBA color)
 {
-    LayerDisplay* layer = new LayerDisplay(order, width, height, resolution, color);
+    PixelLayerDisplay* layer = new PixelLayerDisplay(order, width, height, resolution, color);
+    layer->connectTo(scene_manager_, scene_node_);
+
+    return layer;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+AreaLayerDisplay* LogicalMapDisplay::createAreaLayer(unsigned int order,
+    unsigned int width, unsigned int height,
+    double resolution, Ogre::RGBA color)
+{
+    AreaLayerDisplay* layer = new AreaLayerDisplay(order, width, height, resolution, color);
     layer->connectTo(scene_manager_, scene_node_);
 
     return layer;
@@ -266,6 +342,7 @@ void LogicalMapDisplay::updateLayerSwitches()
 {
     layers_[BACKGROUND]->show(propertyLayerBackground_->getValue().toBool());
     layers_[OBSTACLES]->show(propertyLayerObstacles_->getValue().toBool());
+    layers_[WEIGHTS_NORTH]->show(propertyLayerWeightsNorth_->getValue().toBool());
 }
 
 } // namespace srs

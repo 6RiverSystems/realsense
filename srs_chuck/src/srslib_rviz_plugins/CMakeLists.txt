@@ -9,7 +9,8 @@ set(PROJECT_NAME srslib_rviz_plugins)
 
 set(${PROJECT_NAME}_SOURCES
     src/logical_map/LogicalMapDisplay.cpp
-    src/logical_map/LayerDisplay.cpp
+    src/logical_map/PixelLayerDisplay.cpp
+    src/logical_map/AreaLayerDisplay.cpp
 )
 
 ####################################################################################################

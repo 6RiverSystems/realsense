@@ -32,17 +32,23 @@ class ManualObject;
 
 namespace srs {
 
-class LayerDisplay
+class PixelLayerDisplay
 {
+    static constexpr int VALUE_MIN = 50;
+    static constexpr int VALUE_MAX = 255;
+
 public:
-    LayerDisplay(unsigned int order, unsigned int width, unsigned int height,
+    PixelLayerDisplay(unsigned int order, unsigned int width, unsigned int height,
         double resolution, Ogre::RGBA color);
-    virtual ~LayerDisplay();
+    virtual ~PixelLayerDisplay();
 
     void connectTo(Ogre::SceneManager* manager, Ogre::SceneNode* mainScene);
 
     void fillAll();
-    void fillLocation(Location location);
+    void fillArea(unsigned int ciCells, unsigned int riCells,
+        unsigned int cfCells, unsigned int rfCells, unsigned char value = VALUE_MAX);
+    void fillLocation(Location location, unsigned char value = VALUE_MAX);
+    void fillLocation(unsigned int x, unsigned int y, unsigned char value = VALUE_MAX);
 
     void render();
 

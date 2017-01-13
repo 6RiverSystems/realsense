@@ -19,7 +19,7 @@
 #include <rviz/validate_floats.h>
 #include <rviz/display_context.h>
 
-#include "LayerDisplay.hpp"
+#include "PixelLayerDisplay.hpp"
 
 #include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/datastructure/graph/grid2d/WeightedGrid2d.hpp>
@@ -27,13 +27,13 @@
 
 namespace srs {
 
-int LayerDisplay::keyCounter_ = 0;
+int PixelLayerDisplay::keyCounter_ = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LayerDisplay::LayerDisplay(unsigned int order, unsigned int width, unsigned int height,
+PixelLayerDisplay::PixelLayerDisplay(unsigned int order, unsigned int width, unsigned int height,
         double resolution, Ogre::RGBA color) :
     manualObject_(nullptr),
     width_(width),
@@ -52,11 +52,11 @@ LayerDisplay::LayerDisplay(unsigned int order, unsigned int width, unsigned int 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LayerDisplay::~LayerDisplay()
+PixelLayerDisplay::~PixelLayerDisplay()
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LayerDisplay::connectTo(Ogre::SceneManager* manager, Ogre::SceneNode* mainScene)
+void PixelLayerDisplay::connectTo(Ogre::SceneManager* manager, Ogre::SceneNode* mainScene)
 {
     // Create the movable scene and attach a manual object
     scene_ = manager->createSceneNode();
@@ -76,21 +76,47 @@ void LayerDisplay::connectTo(Ogre::SceneManager* manager, Ogre::SceneNode* mainS
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LayerDisplay::fillAll()
+void PixelLayerDisplay::fillAll()
 {
-    memset(pixels_, 1, pixelsPerLayer_);
+    memset(pixels_, VALUE_MAX, pixelsPerLayer_);
     modified_ = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LayerDisplay::fillLocation(Location location)
+void PixelLayerDisplay::fillLocation(Location location, unsigned char value)
 {
-    pixels_[location.x + location.y * width_] = 1;
+    fillLocation(location.x, location.y, value);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void PixelLayerDisplay::fillArea(unsigned int ciCells, unsigned int riCells,
+    unsigned int cfCells, unsigned int rfCells, unsigned char value)
+{
+    unsigned int r0 = riCells;
+    unsigned int c0 = ciCells;
+    unsigned int widthCells = cfCells - ciCells;
+    unsigned int heightCells = rfCells - riCells;
+
+    for (unsigned int r = r0; r < r0 + heightCells; ++r)
+    {
+        for (unsigned int c = c0; c < c0 + widthCells; ++c)
+        {
+            fillLocation(c, r, value);
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void PixelLayerDisplay::fillLocation(unsigned int x, unsigned int y, unsigned char value)
+{
+    float ratio = static_cast<float>(value) / VALUE_MAX;
+    pixels_[x + y * width_] = static_cast<unsigned char>(
+        VALUE_MIN + (VALUE_MAX - VALUE_MIN) * ratio);
     modified_ = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LayerDisplay::render()
+void PixelLayerDisplay::render()
 {
     if (manualObject_ && modified_)
     {
@@ -176,24 +202,16 @@ void LayerDisplay::render()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LayerDisplay::show(bool newState)
+void PixelLayerDisplay::show(bool newState)
 {
     manualObject_->setVisible(newState);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LayerDisplay::updateAlpha(float newAlpha)
+void PixelLayerDisplay::updateAlpha(float newAlpha)
 {
-//    if (newAlpha < 0.9998)
-//    {
-        objectMaterial_->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-        objectMaterial_->setDepthWriteEnabled(false);
-//    }
-//    else
-//    {
-//        objectMaterial_->setSceneBlending(Ogre::SBT_REPLACE);
-//        objectMaterial_->setDepthWriteEnabled(true);
-//    }
+    objectMaterial_->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+    objectMaterial_->setDepthWriteEnabled(false);
 
     AlphaSetter alphaSetter(newAlpha);
     if (manualObject_)
@@ -206,7 +224,7 @@ void LayerDisplay::updateAlpha(float newAlpha)
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LayerDisplay::generateManualObject()
+void PixelLayerDisplay::generateManualObject()
 {
     manualObject_->begin(objectMaterial_->getName(), Ogre::RenderOperation::OT_TRIANGLE_LIST);
     {
@@ -252,7 +270,7 @@ void LayerDisplay::generateManualObject()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LayerDisplay::generateMaterial()
+void PixelLayerDisplay::generateMaterial()
 {
     // Set up map material
     objectMaterial_ = Ogre::MaterialManager::getSingleton().getByName("rviz/Indexed8BitImage");
@@ -265,7 +283,7 @@ void LayerDisplay::generateMaterial()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LayerDisplay::generatePalette()
+void PixelLayerDisplay::generatePalette()
 {
     const int PALETTE_SIZE = 256 * 4;
 
@@ -278,11 +296,13 @@ void LayerDisplay::generatePalette()
     *p++ = 0; // blue
     *p++ = 0; // alpha
 
-    // Entity color (whatever has been passed by the layer container
-    *p++ = static_cast<unsigned char>(color_[0] * 255); // red
-    *p++ = static_cast<unsigned char>(color_[1] * 255); // green
-    *p++ = static_cast<unsigned char>(color_[2] * 255); // blue
-    *p++ = static_cast<unsigned char>(color_[3] * 255); // alpha
+    for (int i = 0; i < 256; i++)
+    {
+        *p++ = static_cast<unsigned char>(color_[0] * (static_cast<float>(i) / 255.0) * 255); // red
+        *p++ = static_cast<unsigned char>(color_[1] * (static_cast<float>(i) / 255.0) * 255); // green
+        *p++ = static_cast<unsigned char>(color_[2] * (static_cast<float>(i) / 255.0) * 255); // blue
+        *p++ = 255; // alpha
+    }
 
     Ogre::DataStreamPtr paletteStream;
     paletteStream.bind(new Ogre::MemoryDataStream(paletteColors, PALETTE_SIZE));

@@ -32,7 +32,8 @@ using namespace std;
 #include <rviz/display.h>
 
 #include <srslib_framework/ros/tap/TapMapStack.hpp>
-#include "LayerDisplay.hpp"
+#include "PixelLayerDisplay.hpp"
+#include "AreaLayerDisplay.hpp"
 
 namespace Ogre {
 
@@ -87,13 +88,22 @@ private Q_SLOTS:
 private:
     enum {
         BACKGROUND = 0,
-        OBSTACLES = 1
+        OBSTACLES = 1,
+        WEIGHTS_NORTH = 2,
+        WEIGHTS_EAST = 3,
+        WEIGHTS_SOUTH = 4,
+        WEIGHTS_WEST = 5,
+        WARNING_SOUND = 6
     } EnititesEnum;
 
-    static constexpr Ogre::RGBA RGBA_WHITE = 0xFFFFFFFF;
     static constexpr Ogre::RGBA RGBA_BLACK = 0x000000FF;
+    static constexpr Ogre::RGBA RGBA_GREEN = 0x00FF00FF;
+    static constexpr Ogre::RGBA RGBA_ORANGE = 0xF0BE48FF;
+    static constexpr Ogre::RGBA RGBA_WHITE = 0xFFFFFFFF;
 
-    LayerDisplay* createLayer(unsigned int order, unsigned int width, unsigned int height,
+    PixelLayerDisplay* createPixelLayer(unsigned int order, unsigned int width, unsigned int height,
+        double resolution, Ogre::RGBA color);
+    AreaLayerDisplay* createAreaLayer(unsigned int order, unsigned int width, unsigned int height,
         double resolution, Ogre::RGBA color);
 
     void translateLogicalMap();
@@ -102,11 +112,15 @@ private:
     rviz::IntProperty* propertyHeight_;
     rviz::Property* propertyLayerBackground_;
     rviz::Property* propertyLayerObstacles_;
+    rviz::Property* propertyLayerWeightsNorth_;
+    rviz::Property* propertyLayerWeightsEast_;
+    rviz::Property* propertyLayerWeightsSouth_;
+    rviz::Property* propertyLayerWeightsWest_;
     rviz::VectorProperty* propertyOrigin_;
     rviz::FloatProperty* propertyResolution_;
     rviz::IntProperty* propertyWidth_;
 
-    vector<LayerDisplay*> layers_;
+    vector<PixelLayerDisplay*> layers_;
     LogicalMap* logicalMap_;
 
     MapStack* mapStack_;

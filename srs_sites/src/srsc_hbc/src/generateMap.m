@@ -4,6 +4,8 @@ clear variables;
 RESOLUTION = 0.05;
 ORIGIN = [-0.025, -0.025, 0.000];
 
+IN_PGM_IMAGE = './hbc.pgm';
+
 IN_IMAGE_MAIN = './hbc-logical-border.png';
 IN_IMAGE_OBSTACLES = './hbc-logical-obstacles.png';
 
@@ -24,6 +26,7 @@ IN_IMAGE_COST_MEETING_AREA = './hbc-logical-meeting_area.png';
 COST_MEETING_AREA = 10;
 
 OUT_GEOJSON = '../map/hbc.geojson';
+OUT_PGM = '../map/hbc.pgm';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Main map layer
@@ -96,6 +99,12 @@ map = addLayer(map, {...
     layerOneWayNorthSouth,...
     layerMeeting});
 showMap(map, 'Complete map');
-saveGeoJsonMap(map, OUT_GEOJSON);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Generate, save, and open the Geojson file into the correct destination
+saveGeoJsonMap(map, OUT_GEOJSON);
 open(OUT_GEOJSON);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Copy the PGM file into the correct destination
+copyfile(IN_PGM_IMAGE, OUT_PGM);

@@ -14,32 +14,22 @@ using namespace std;
 
 #include <srslib_framework/io/IO.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemConnected.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemConnected.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemPowerState.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryPose.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemOdometryPoseBrainstem.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemButtonPressed.hpp>
 
 #include <BrainStemMessages.hpp>
 #include <BrainStemMessageProcessorInterface.hpp>
 
-#include <HardwareMessageHandler.hpp>
+#include <hw_message/HardwareMessageHandler.hpp>
+#include <sw_message/SoftwareMessage.hpp>
 
-#include <hw_message/LogHandler.hpp>
 #include <hw_message/HardwareInfoHandler.hpp>
 #include <hw_message/OperationalStateHandler.hpp>
-#include <hw_message/PowerStateHandler.hpp>
-#include <hw_message/OdometryRpmHandler.hpp>
-#include <hw_message/OdometryPoseHandler.hpp>
-#include <hw_message/ButtonPressedHandler.hpp>
-
-#include <sw_message/PingHandler.hpp>
-#include <sw_message/SetMotionStateHandler.hpp>
-#include <sw_message/SetOdometryRpmHandler.hpp>
-#include <sw_message/SetVelocityHandler.hpp>
-#include <sw_message/ShutdownHandler.hpp>
-#include <sw_message/SoundHandler.hpp>
-#include <sw_message/UpdateUIHandler.hpp>
 
 namespace srs {
 
@@ -59,22 +49,28 @@ public:
 
 	void processHardwareMessage(vector<char> buffer);
 
-    using HwMessageHandlerMapType = map<BRAIN_STEM_MSG, HardwareMessageHandler*>;
+    using HwMessageHandlerMapType = map<BRAIN_STEM_MSG, HardwareMessageHandlerPtr>;
 
-	BrainStemMessageProcessor( std::shared_ptr<IO> pIO );
+	BrainStemMessageProcessor();
 
-	virtual ~BrainStemMessageProcessor( );
+	virtual ~BrainStemMessageProcessor();
+
+	void setIO(std::shared_ptr<IO> io) { io_ = io; };
 
 	void checkForBrainstemFaultTimer(const ros::TimerEvent& event);
 
-    void sendCommand(char* command, std::size_t size)
-    {
-        writeToSerialPort(command, size);
-    }
+	bool isConnected() const
+	{
+		return isConnected_;
+	}
+
+    void sendCommand(char* command, std::size_t size);
 
     void ping();
 
 // Message Processing
+
+    void setUseBrainstemOdom(bool useBrainstemOdom);
 
     void setDimension(DIMENSION dimension, float value);
 
@@ -84,11 +80,17 @@ public:
 
 	void getHardwareInformation( );
 
-    void setMotionStatus( const std::bitset<8>& motionStatusSet, bool setValue );
-
     void shutdown( );
 
 private:
+
+    void addHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler);
+
+    void removeHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler);
+
+    void addSoftwareMessage(SoftwareMessagePtr softwareMessage);
+
+    void removeSoftwareMessage(SoftwareMessagePtr softwareMessage);
 
 	bool isSetupComplete() const;
 
@@ -97,6 +99,8 @@ private:
 	void getHardwareInfo(const ros::Time& now);
 
 	void getOperationalState(const ros::Time& now);
+
+	void sendDimensions();
 
 // Helper Methods
 
@@ -121,47 +125,52 @@ private:
 
 	static constexpr auto FAULT_TIMEOUT = 0.2f;
 
-	std::shared_ptr<IO>					io_;
+	std::shared_ptr<IO> io_;
 
-	bool								setupComplete_;
+	bool setupComplete_;
 
-	bool								sentPing_;
+	bool syncState_;
 
-	bool								isConnected_;
+	bool sentPing_;
 
-	bool								hasValidHardareInfo_;
-	ros::Time							lastHardareInfoRequestTime_;
+	bool isConnected_;
 
-	bool								hasValidOperationalState_;
-	ros::Time							lastOperationalStateRequestTime_;
+	std::map<DIMENSION, float> dimensions_;
 
-	ros::Time							lastMessageTime_;
+	bool hasValidHardareInfo_;
+	ros::Time lastHardareInfoRequestTime_;
 
-    HwMessageHandlerMapType				hwMessageHandlers_;
+	bool hasValidOperationalState_;
+	ros::Time lastOperationalStateRequestTime_;
 
-	ChannelBrainstemConnected			connectedChannel_;
-    ChannelBrainstemHardwareInfo		hardwareInfoChannel_;
-    ChannelBrainstemOperationalState	operationalStateChannel_;
-    ChannelBrainstemPowerState			powerStateChannel_;
-    ChannelBrainstemOdometryRpm			odometryRpmChannel_;
-    ChannelBrainstemOdometryPose		odometryPoseChannel_;
-    ChannelBrainstemButtonPressed		buttonPressedChannel_;
+	ros::Time lastMessageTime_;
 
-    LogHandler							logHandler_;
-    HardwareInfoHandler					hardwareInfoHandler_;
-    OperationalStateHandler				operationalStateHandler_;
-    PowerStateHandler					powerStateHandler_;
-    OdometryRpmHandler					odometryRpmHandler_;
-    OdometryPoseHandler					odometryPoseHandler_;
-    ButtonPressedHandler				buttonPressedHandler_;
+    HwMessageHandlerMapType hwMessageHandlers_;
 
-    PingHandler							pingHandler_;
-    SetMotionStateHandler				setMotionStateHandler_;
-    SetOdometryRpmHandler				setOdometryRpmHandler_;
-    SetVelocityHandler					setVelocityHandler_;
-    ShutdownHandler						shutdownHandler_;
-    SoundHandler						soundHandler_;
-    UpdateUIHandler						updateUIHandler_;
+	ChannelBrainstemConnected connectedChannel_;
+    ChannelBrainstemHardwareInfo hardwareInfoChannel_;
+    ChannelBrainstemOperationalState operationalStateChannel_;
+    ChannelBrainstemPowerState powerStateChannel_;
+    ChannelBrainstemOdometryRpm odometryRpmChannel_;
+    ChannelBrainstemOdometryPoseBrainstem odometryPoseBrainstemChannel_;
+    ChannelBrainstemOdometryPose odometryPoseChannel_;
+    ChannelBrainstemButtonPressed buttonPressedChannel_;
+
+    std::shared_ptr<HardwareInfoHandler> hardwareInfoHandler_;
+    std::shared_ptr<OperationalStateHandler> operationalStateHandler_;
+
+    bool useBrainstemOdom_;
+
+    HardwareMessageHandlerPtr odometryRpmHardwareHandler_;
+    HardwareMessageHandlerPtr odometryPoseHardwarewHandler_;
+
+    SoftwareMessagePtr velocitySoftwareHandler_;
+    SoftwareMessagePtr odometryRpmSoftwareHandler_;
+
+    std::set<HardwareMessageHandlerPtr> hardwareHandlers_;
+    std::set<SoftwareMessagePtr> softwareHandlers_;
+
+
 };
 
 } /* namespace srs */

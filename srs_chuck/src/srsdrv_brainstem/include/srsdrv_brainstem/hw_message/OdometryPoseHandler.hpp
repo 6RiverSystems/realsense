@@ -8,7 +8,7 @@
 #include <tf/transform_broadcaster.h>
 
 #include <BrainStemMessages.hpp>
-#include <HardwareMessageHandler.hpp>
+#include <hw_message/HardwareMessageHandler.hpp>
 
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryPose.hpp>
 
@@ -17,7 +17,7 @@ namespace srs {
 class OdometryPoseHandler : public HardwareMessageHandler
 {
 public:
-    OdometryPoseHandler(ChannelBrainstemOdometryPose::Interface& publisher);
+    OdometryPoseHandler(ChannelBrainstemOdometryPose::Interface& publisher, bool useBrainstemOdom);
 
     virtual ~OdometryPoseHandler() {}
 
@@ -36,7 +36,9 @@ private:
 
 	tf::TransformBroadcaster broadcaster_;
 
-	ChannelBrainstemOdometryPose::Interface& publisher_;
+	PublisherOdometryPose::Interface& publisher_;
+
+	bool useBrainstemOdom_;
 };
 
 } // namespace srs

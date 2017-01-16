@@ -15,7 +15,7 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 UpdateUIHandler::UpdateUIHandler(BrainStemMessageProcessorInterface* owner) :
-    SoftwareMessageHandler(owner)
+	SoftwareMessage(owner)
 {
 	setValidEntities_.insert(LED_ENTITIES::TOTE0);
 	setValidEntities_.insert(LED_ENTITIES::TOTE1);
@@ -75,17 +75,33 @@ void UpdateUIHandler::encodeData(const srslib_framework::MsgUpdateUI& updateUI)
 {
 	for (auto uiElement : updateUI.uiUpdates)
 	{
-		UpdateUIData msg = {
-			static_cast<uint8_t>( BRAIN_STEM_CMD::UPDATE_LIGHT ),
-			reinterpret_cast<uint8_t>( uiElement.element ),
-			reinterpret_cast<uint8_t>( uiElement.mode )
-		};
+		LED_ENTITIES entity = static_cast<LED_ENTITIES>(uiElement.element);
+		LED_MODE mode = static_cast<LED_MODE>(uiElement.mode);
 
-		ROS_INFO( "Brain => Brainstem: UPDATE_LIGHT: element=%d, mode=%d",
-			uiElement.element, uiElement.mode);
-
-		getOwner()->sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
+		updateEntity(entity, mode);
 	}
 }
 
+void UpdateUIHandler::syncState()
+{
+	for (auto iter : setEntityMode_)
+	{
+		updateEntity(iter.first, iter.second);
+	}
+}
+
+void UpdateUIHandler::updateEntity(LED_ENTITIES entity, LED_MODE mode)
+{
+	UpdateUIData msg = {
+		static_cast<uint8_t>( BRAIN_STEM_CMD::UPDATE_LIGHT ),
+		static_cast<uint8_t>( entity ),
+		static_cast<uint8_t>( mode )
+	};
+
+	setEntityMode_[entity] = mode;
+
+	ROS_INFO( "Brain => Brainstem: UPDATE_LIGHT: element=%d, mode=%d", entity, mode);
+
+	sendCommand(reinterpret_cast<char*>(&msg), sizeof(msg));
+}
 } // namespace srs

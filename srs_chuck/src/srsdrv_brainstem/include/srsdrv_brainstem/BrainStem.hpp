@@ -8,6 +8,8 @@
 #include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
 
+#include <srslib_framework/ros/unit/RosUnit.hpp>
+
 #include <srslib_framework/io/IO.hpp>
 
 #include <BrainStemEmulator.hpp>
@@ -18,36 +20,52 @@
 namespace srs
 {
 
-class BrainStem
+class BrainStem : public RosUnit<BrainStem>
 {
 
 public:
 
-	BrainStem(const std::string& strSerialPort);
+	BrainStem(string name, int argc, char** argv);
 
 	virtual ~BrainStem();
 
-	void run();
+protected:
 
-	void connectionChanged(bool bIsConnected);
+    void execute();
+
+    void initialize();
 
 private:
 
+    enum class IO_TYPE
+	{
+		SERIAL = 0,
+    	HID = 1
+	};
+
+	void connectionChanged(bool bIsConnected);
+
     void cfgCallback(srsdrv_brainstem::RobotSetupConfig &config, uint32_t level);
 
-	static constexpr auto REFRESH_RATE_HZ = 10.0f;
+    void setupHidIo(uint32_t vid, uint32_t pid);
+
+    void setupSerialIo(const char* serialPort);
+
+	static constexpr auto REFRESH_RATE_HZ = 1000.0f;
 
 	dynamic_reconfigure::Server<srsdrv_brainstem::RobotSetupConfig> configServer_;
 
-	std::shared_ptr<IO>					serialIO_;
+	std::shared_ptr<IO> io_;
 
-	std::shared_ptr<BrainStemEmulator>	brainstemEmulator_;
+	std::shared_ptr<BrainStemEmulator> brainstemEmulator_;
 
-	BrainStemMessageProcessor			messageProcessor_;
+	BrainStemMessageProcessor messageProcessor_;
 
-	ros::NodeHandle						nodeHandle_;
+	ros::NodeHandle nodeHandle_;
 
-	ros::Timer							brainstemFaultTimer_;
+	ros::Timer brainstemFaultTimer_;
+
+	bool useEmulator_;
 };
 
 } // namespace srs

@@ -71,6 +71,9 @@ void OdometryRpmHandler::receiveMessage(ros::Time currentTime, HardwareMessage& 
 	srslib_framework::OdometryRpm message;
 	message.header.stamp = lastRosOdometryTime_;
 
+//		ROS_DEBUG_NAMED("velocity", "left wheel raw: %f, right wheel raw: %f",
+//			odometryRpmData.rpm_left_wheel, odometryRpmData.rpm_right_wheel);
+
 	message.left_wheel_rpm = odometryRpmData.rpm_left_wheel;
 	message.right_wheel_rpm = odometryRpmData.rpm_right_wheel;
 

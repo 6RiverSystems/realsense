@@ -102,9 +102,9 @@ void StarGazerMessageProcessor::SendRawCommand( QueuedMessage msg )
 		cmdVec.push_back( (char)msg.type );
 		cmdVec.insert( cmdVec.end( ), msg.command.begin( ), msg.command.end( ) );
 
-		if( m_pSerialIO->IsOpen( ) )
+		if( m_pSerialIO->isOpen( ) )
 		{
-			m_pSerialIO->Write( cmdVec );
+			m_pSerialIO->write( cmdVec );
 		}
 		else
 		{
@@ -487,9 +487,9 @@ void StarGazerMessageProcessor::ProcessStarGazerMessage( std::vector<char> msgBu
 // TODO: Move down to base class
 void StarGazerMessageProcessor::WriteToSerialPort( char* pszData, std::size_t dwSize )
 {
-	if( m_pSerialIO->IsOpen( ) )
+	if( m_pSerialIO->isOpen( ) )
 	{
-		m_pSerialIO->Write( std::vector<char>( pszData, pszData + dwSize ) );
+		m_pSerialIO->write( std::vector<char>( pszData, pszData + dwSize ) );
 	}
 	else
 	{

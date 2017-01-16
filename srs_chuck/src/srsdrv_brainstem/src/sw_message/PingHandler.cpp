@@ -15,7 +15,7 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 PingHandler::PingHandler(BrainStemMessageProcessorInterface* owner) :
-    SoftwareMessageHandler(owner)
+	SoftwareMessage(owner)
 {
 }
 
@@ -38,9 +38,12 @@ void PingHandler::encodeData(const bool& value)
 
 //	ROS_DEBUG_NAMED("ping", "Brain => Brainstem: Ping");
 
-	getOwner()->sendCommand(reinterpret_cast<char*>(&cMessage), 1);
+	if (messageProcessor_->isConnected())
+	{
+		sendCommand(reinterpret_cast<char*>(&cMessage), 1);
 
-	getOwner()->ping();
+		messageProcessor_->ping();
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

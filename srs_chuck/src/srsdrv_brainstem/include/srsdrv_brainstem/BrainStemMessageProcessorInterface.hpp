@@ -17,6 +17,8 @@ public:
 
 	virtual ~BrainStemMessageProcessorInterface() {};
 
+	virtual bool isConnected() const = 0;
+
     virtual void sendCommand(char* command, std::size_t size) = 0;
 
     virtual void ping() = 0;

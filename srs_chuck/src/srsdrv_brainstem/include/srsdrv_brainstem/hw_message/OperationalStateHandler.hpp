@@ -6,7 +6,7 @@
 #pragma once
 
 #include <BrainStemMessages.hpp>
-#include <HardwareMessageHandler.hpp>
+#include <hw_message/HardwareMessageHandler.hpp>
 
 #include <srslib_framework/ros/channel/ChannelBrainstemOperationalState.hpp>
 
@@ -25,6 +25,8 @@ public:
     void setBrainstemTimeout(bool brainstemTimeout);
 
     bool hasValidMessage() const { return hasValidMessage_; };
+
+    void reset() { hasValidMessage_ = false; };
 
 private:
 

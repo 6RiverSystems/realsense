@@ -13,6 +13,7 @@ set(${PROJECT_NAME}_SOURCES
     src/datastructure/graph/grid2d/WeightedGrid2d.cpp
 
     src/io/SerialIO.cpp
+    src/io/HidIO.cpp
 
     src/localization/map/BaseMap.cpp
     src/localization/map/MapAdapter.cpp
@@ -238,6 +239,7 @@ target_link_libraries(${PROJECT_LIBRARY}
     ${PROJECT_LIBRARIES}
     ${UNWIND_LIBRARIES}
     ${catkin_LIBRARIES}
+    usb-1.0
 )
 
 ####################################################################################################

@@ -17,7 +17,7 @@ namespace srs {
 class OdometryPoseHandler : public HardwareMessageHandler
 {
 public:
-    OdometryPoseHandler(ChannelBrainstemOdometryPose::Interface& publisher);
+    OdometryPoseHandler(ChannelBrainstemOdometryPose::Interface& publisher, bool useBrainstemOdom);
 
     virtual ~OdometryPoseHandler() {}
 
@@ -36,7 +36,9 @@ private:
 
 	tf::TransformBroadcaster broadcaster_;
 
-	ChannelBrainstemOdometryPose::Interface& publisher_;
+	PublisherOdometryPose::Interface& publisher_;
+
+	bool useBrainstemOdom_;
 };
 
 } // namespace srs

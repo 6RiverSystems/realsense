@@ -90,6 +90,8 @@ namespace sensor {
     static const string JOYSTICK_RAW = "/joy";
 
     static const string ODOMETRY_POSE = "/internal/sensors/odometry/pose";
+
+    static const string ODOMETRY_POSE_BRAINSTEM = "/internal/sensors/odometry/pose/brainstem";
 }
 
 namespace service {

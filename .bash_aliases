@@ -30,14 +30,14 @@ function buildChuck() {
   source /opt/ros/indigo/setup.bash
 
   getChuckDirectory &&
-  printInfo &&
+  printInfo
 
   pushd "$baseDirectory/srs_chuck" &&
-  catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo -j8 &&
+  taskset -c 0-3 catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo -j8 &&
   source devel/setup.bash &&
   popd &&
   pushd "$baseDirectory/srs_sites" &&
-  catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo -j8 &&
+  taskset -c 0-3 catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo -j8 &&
   source devel/setup.bash &&
 
   source "$baseDirectory/srs_sites/devel/setup.bash"

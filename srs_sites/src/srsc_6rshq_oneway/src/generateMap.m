@@ -37,7 +37,7 @@ layerWarningSound = png2Map(sprintf('%s%s', INPUT_DIR, '6rshq_oneway-logical-war
 showMap(layerWarningSound, 'Warning sound');
 
 layerWarningSound = convertToLabeledArea(layerWarningSound, 'all', 'ws', ...
-        struct('play_sound', 'warning', 'set_max_velocity', 0.3));
+        struct('play_sound', 'warning'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Reduced speed layer
@@ -46,7 +46,7 @@ layerReducedSpeed = png2Map('/Users/fsantini/Projects/repos/ros/srs_sites/src/sr
 showMap(layerReducedSpeed, 'Reduced speed');
 
 layerReducedSpeed = convertToLabeledArea(layerReducedSpeed, 'all', 'ws', ...
-    struct('set_max_velocity', 0.4));
+    struct('set_max_velocity', 0.6));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Graph layer

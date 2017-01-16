@@ -7,7 +7,7 @@
 -->
 <launch>
     <arg name="use_sim_time" default="true"/>
-    <arg name="start_bridge" default="false" />
+    <arg name="start_bridge" default="true" />
     <arg name="emulation_mode" default="true" />
 
     <!-- Fixed /odom frame to /map frame TF -->

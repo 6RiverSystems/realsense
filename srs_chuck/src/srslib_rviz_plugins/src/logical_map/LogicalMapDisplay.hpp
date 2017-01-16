@@ -86,6 +86,7 @@ private Q_SLOTS:
     void updateDrawUnder();
 
 private:
+    // Explicitly set the order of the layer
     enum {
         BACKGROUND = 0,
         OBSTACLES = 1,
@@ -93,11 +94,13 @@ private:
         WEIGHTS_EAST = 3,
         WEIGHTS_SOUTH = 4,
         WEIGHTS_WEST = 5,
-        WARNING_SOUND = 6
+        PLAY_SOUND = 6,
+        SET_MAX_VELOCITY = 7
     } EnititesEnum;
 
     static constexpr Ogre::RGBA RGBA_BLACK = 0x000000FF;
-    static constexpr Ogre::RGBA RGBA_GREEN = 0x00FF00FF;
+    static constexpr Ogre::RGBA RGBA_BLUE = 0x2874C4FF;
+    static constexpr Ogre::RGBA RGBA_GREEN = 0x30845CFF;
     static constexpr Ogre::RGBA RGBA_ORANGE = 0xF0BE48FF;
     static constexpr Ogre::RGBA RGBA_WHITE = 0xFFFFFFFF;
 
@@ -112,6 +115,8 @@ private:
     rviz::IntProperty* propertyHeight_;
     rviz::Property* propertyLayerBackground_;
     rviz::Property* propertyLayerObstacles_;
+    rviz::Property* propertyLayerPlaySound_;
+    rviz::Property* propertyLayerSetMaxVelocity_;
     rviz::Property* propertyLayerWeightsNorth_;
     rviz::Property* propertyLayerWeightsEast_;
     rviz::Property* propertyLayerWeightsSouth_;

@@ -76,10 +76,10 @@ TEST(Test_SmallMap, BasicRead)
     ASSERT_EQ(1, areas.count("test1")) << "The 'test1' area was not defined";
     LogicalMap::LabeledArea area1 = areas["test1"];
     ASSERT_EQ("test1", area1.label) << "The 'test1' area label is not as expected";
-    ASSERT_EQ(11, area1.ci) << "The 'test1' area initial X coordinate is not as expected";
-    ASSERT_EQ(24, area1.ri) << "The 'test1' area initial Y coordinate is not as expected";
-    ASSERT_EQ(32, area1.cf) << "The 'test1' area final X coordinate is not as expected";
-    ASSERT_EQ(31, area1.rf) << "The 'test1' area final Y coordinate is not as expected";
+    ASSERT_EQ(11, area1.surface.x0) << "The 'test1' area initial X coordinate is not as expected";
+    ASSERT_EQ(24, area1.surface.y0) << "The 'test1' area initial Y coordinate is not as expected";
+    ASSERT_EQ(32, area1.surface.x1) << "The 'test1' area final X coordinate is not as expected";
+    ASSERT_EQ(31, area1.surface.y1) << "The 'test1' area final Y coordinate is not as expected";
     ASSERT_TRUE(area1.notes->has(NotePlaySound::TYPE)) << "The map note does not contain PLAY_SOUND";
 
 }

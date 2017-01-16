@@ -31,20 +31,20 @@ TEST(Test_MicroMap, MapNotes)
     ASSERT_EQ(1, areas.count("test1")) << "The 'test1' area was not defined";
     LogicalMap::LabeledArea area1 = areas["test1"];
     ASSERT_EQ("test1", area1.label) << "The 'test1' area label is not as expected";
-    ASSERT_EQ(2, area1.ci) << "The 'test1' area initial X coordinate is not as expected";
-    ASSERT_EQ(2, area1.ri) << "The 'test1' area initial Y coordinate is not as expected";
-    ASSERT_EQ(2, area1.cf) << "The 'test1' area final X coordinate is not as expected";
-    ASSERT_EQ(2, area1.rf) << "The 'test1' area final Y coordinate is not as expected";
+    ASSERT_EQ(2, area1.surface.x0) << "The 'test1' area initial X coordinate is not as expected";
+    ASSERT_EQ(2, area1.surface.y0) << "The 'test1' area initial Y coordinate is not as expected";
+    ASSERT_EQ(2, area1.surface.x1) << "The 'test1' area final X coordinate is not as expected";
+    ASSERT_EQ(2, area1.surface.y1) << "The 'test1' area final Y coordinate is not as expected";
     ASSERT_TRUE(area1.notes->has(NotePlaySound::TYPE)) << "The map notes doesn't contain PLAY_SOUND";
     ASSERT_FALSE(area1.notes->has(NoteSetMaxVelocity::TYPE)) << "The map notes does contain SET_MAX_VELOCITY";
 
     ASSERT_EQ(1, areas.count("test2")) << "The 'test2' area was not defined";
     LogicalMap::LabeledArea area2 = areas["test2"];
     ASSERT_EQ("test2", area2.label) << "The 'test2' area label is not as expected";
-    ASSERT_EQ(0, area2.ci) << "The 'test2' area initial X coordinate is not as expected";
-    ASSERT_EQ(0, area2.ri) << "The 'test2' area initial Y coordinate is not as expected";
-    ASSERT_EQ(2, area2.cf) << "The 'test2' area final X coordinate is not as expected";
-    ASSERT_EQ(1, area2.rf) << "The 'test2' area final Y coordinate is not as expected";
+    ASSERT_EQ(0, area2.surface.x0) << "The 'test2' area initial X coordinate is not as expected";
+    ASSERT_EQ(0, area2.surface.y0) << "The 'test2' area initial Y coordinate is not as expected";
+    ASSERT_EQ(2, area2.surface.x1) << "The 'test2' area final X coordinate is not as expected";
+    ASSERT_EQ(1, area2.surface.y1) << "The 'test2' area final Y coordinate is not as expected";
     ASSERT_TRUE(area2.notes->has(NotePlaySound::TYPE)) << "The map notes doesn't contain PLAY_SOUND";
     ASSERT_TRUE(area2.notes->has(NoteSetMaxVelocity::TYPE)) << "The map notes doesn't contain SET_MAX_VELOCITY";
 }

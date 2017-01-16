@@ -26,6 +26,8 @@
 #include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/datastructure/graph/grid2d/WeightedGrid2d.hpp>
 #include <srslib_framework/ros/topics/ChuckTransforms.hpp>
+#include <srslib_framework/localization/map/mapnote/NotePlaySound.hpp>
+#include <srslib_framework/localization/map/mapnote/NoteSetMaxVelocity.hpp>
 
 namespace srs {
 
@@ -60,28 +62,36 @@ LogicalMapDisplay::LogicalMapDisplay() :
         "Position of the bottom left corner of the map [meter]", this);
     propertyOrigin_->setReadOnly(true);
 
-    propertyLayerBackground_ = new rviz::Property("Draw background layer", true,
+    propertyLayerBackground_ = new rviz::Property("Draw the background layer", true,
         "Rendering option, enables/disables the background layer.",
         this, SLOT(updateLayerSwitches()));
 
-    propertyLayerObstacles_ = new rviz::Property("Draw obstacles layer", true,
+    propertyLayerObstacles_ = new rviz::Property("Draw the obstacles layer", true,
         "Rendering option, enables/disables the obstacles layer.",
         this, SLOT(updateLayerSwitches()));
 
-    propertyLayerWeightsNorth_ = new rviz::Property("Draw north weights layer", true,
+    propertyLayerWeightsNorth_ = new rviz::Property("Draw the north weights layer", true,
         "Rendering option, enables/disables the north weights layer.",
         this, SLOT(updateLayerSwitches()));
 
-    propertyLayerWeightsEast_ = new rviz::Property("Draw east weights layer", true,
+    propertyLayerWeightsEast_ = new rviz::Property("Draw the east weights layer", true,
         "Rendering option, enables/disables the east weights layer.",
         this, SLOT(updateLayerSwitches()));
 
-    propertyLayerWeightsSouth_ = new rviz::Property("Draw south weights layer", true,
+    propertyLayerWeightsSouth_ = new rviz::Property("Draw the south weights layer", true,
         "Rendering option, enables/disables the south weights layer.",
         this, SLOT(updateLayerSwitches()));
 
-    propertyLayerWeightsWest_ = new rviz::Property("Draw west weights layer", true,
+    propertyLayerWeightsWest_ = new rviz::Property("Draw the west weights layer", true,
         "Rendering option, enables/disables the west weights layer.",
+        this, SLOT(updateLayerSwitches()));
+
+    propertyLayerPlaySound_ = new rviz::Property("Draw the play-sound layer", true,
+        "Rendering option, enables/disables the play-sound layer.",
+        this, SLOT(updateLayerSwitches()));
+
+    propertyLayerSetMaxVelocity_ = new rviz::Property("Draw the set-max-velocity layer", true,
+        "Rendering option, enables/disables the set-max-velocity layer.",
         this, SLOT(updateLayerSwitches()));
 
     connect(this, SIGNAL(mapStackUpdated()), this, SLOT(renderMapStack()));
@@ -151,8 +161,11 @@ void LogicalMapDisplay::initializeLayers()
     PixelLayerDisplay* weightsWest = createPixelLayer(WEIGHTS_WEST,
         width, height, resolution, RGBA_ORANGE);
 
-    AreaLayerDisplay* warningSound = createAreaLayer(WARNING_SOUND,
+    AreaLayerDisplay* playSound = createAreaLayer(PLAY_SOUND,
         width, height, resolution, RGBA_GREEN);
+
+    AreaLayerDisplay* setMaxVelocity = createAreaLayer(SET_MAX_VELOCITY,
+        width, height, resolution, RGBA_BLUE);
 
     // Background layer
     background->fillAll();
@@ -194,8 +207,25 @@ void LogicalMapDisplay::initializeLayers()
         }
     }
 
-    for (auto area : logicalMap_->getAreas())
+    for (auto labeledArea : logicalMap_->getAreas())
     {
+        LogicalMap::LabeledArea area = labeledArea.second;
+
+        // Search for PlaySound notes
+        shared_ptr<NotePlaySound> notePlaySound =
+            area.notes->get<NotePlaySound>(NotePlaySound::TYPE);
+        if (notePlaySound)
+        {
+            playSound->addArea(area.label, area.surface, notePlaySound);
+        }
+
+        // Search for SetMaxVelocity notes
+        shared_ptr<NoteSetMaxVelocity> noteSetMaxVelocity =
+            area.notes->get<NoteSetMaxVelocity>(NoteSetMaxVelocity::TYPE);
+        if (noteSetMaxVelocity)
+        {
+            setMaxVelocity->addArea(area.label, area.surface, noteSetMaxVelocity);
+        }
     }
 
     // Add all the layers to the stack for rendering
@@ -205,7 +235,8 @@ void LogicalMapDisplay::initializeLayers()
     layers_.push_back(weightsEast);
     layers_.push_back(weightsSouth);
     layers_.push_back(weightsWest);
-    layers_.push_back(warningSound);
+    layers_.push_back(playSound);
+    layers_.push_back(setMaxVelocity);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -343,6 +374,11 @@ void LogicalMapDisplay::updateLayerSwitches()
     layers_[BACKGROUND]->show(propertyLayerBackground_->getValue().toBool());
     layers_[OBSTACLES]->show(propertyLayerObstacles_->getValue().toBool());
     layers_[WEIGHTS_NORTH]->show(propertyLayerWeightsNorth_->getValue().toBool());
+    layers_[WEIGHTS_EAST]->show(propertyLayerWeightsEast_->getValue().toBool());
+    layers_[WEIGHTS_SOUTH]->show(propertyLayerWeightsSouth_->getValue().toBool());
+    layers_[WEIGHTS_WEST]->show(propertyLayerWeightsWest_->getValue().toBool());
+    layers_[PLAY_SOUND]->show(propertyLayerPlaySound_->getValue().toBool());
+    layers_[SET_MAX_VELOCITY]->show(propertyLayerSetMaxVelocity_->getValue().toBool());
 }
 
 } // namespace srs

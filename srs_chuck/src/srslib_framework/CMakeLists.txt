@@ -8,6 +8,7 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srslib_framework)
 
 set(${PROJECT_NAME}_SOURCES
+
     src/datastructure/graph/grid2d/SimpleGrid2d.cpp
     src/datastructure/graph/grid2d/WeightedGrid2d.cpp
 
@@ -163,10 +164,10 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     nav_msgs
     costmap_2d
+    srslib_test
 )
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED)
-find_package(srslib_test REQUIRED)
 
 find_package(PkgConfig)
 pkg_check_modules(NEW_YAMLCPP yaml-cpp>=0.5)
@@ -177,7 +178,7 @@ include_directories(
     src/
     test/
     ${roscpp_INCLUDE_DIRS}
-	${OpenCV_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
 )

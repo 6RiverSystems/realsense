@@ -165,7 +165,8 @@ void LogicalMapFactory::addLabelArea(Pose<> origin, double widthM, double height
 
     calculateArea(origin, widthM, heightM, c0, r0, widthCells, heightCells);
 
-    map_->addLabeledArea(c0, r0, c0 + widthCells, r0 + heightCells, label, notes);
+    Rectangle surface(c0, r0, c0 + widthCells, r0 + heightCells);
+    map_->addLabeledArea(surface, label, notes);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

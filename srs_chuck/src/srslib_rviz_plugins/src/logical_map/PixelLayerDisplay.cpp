@@ -89,13 +89,13 @@ void PixelLayerDisplay::fillLocation(Location location, unsigned char value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void PixelLayerDisplay::fillArea(unsigned int ciCells, unsigned int riCells,
-    unsigned int cfCells, unsigned int rfCells, unsigned char value)
+void PixelLayerDisplay::fillArea(unsigned int x0, unsigned int y0,
+    unsigned int x1, unsigned int y1, unsigned char value)
 {
-    unsigned int r0 = riCells;
-    unsigned int c0 = ciCells;
-    unsigned int widthCells = cfCells - ciCells;
-    unsigned int heightCells = rfCells - riCells;
+    unsigned int c0 = x0;
+    unsigned int r0 = y0;
+    unsigned int widthCells = x1 - x0;
+    unsigned int heightCells = y1 - y0;
 
     for (unsigned int r = r0; r < r0 + heightCells; ++r)
     {

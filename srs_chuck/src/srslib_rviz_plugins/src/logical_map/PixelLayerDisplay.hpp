@@ -45,8 +45,8 @@ public:
     void connectTo(Ogre::SceneManager* manager, Ogre::SceneNode* mainScene);
 
     void fillAll();
-    void fillArea(unsigned int ciCells, unsigned int riCells,
-        unsigned int cfCells, unsigned int rfCells, unsigned char value = VALUE_MAX);
+    void fillArea(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1,
+        unsigned char value = VALUE_MAX);
     void fillLocation(Location location, unsigned char value = VALUE_MAX);
     void fillLocation(unsigned int x, unsigned int y, unsigned char value = VALUE_MAX);
 

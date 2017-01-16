@@ -17,19 +17,14 @@ LogicalMap::LogicalMap(LogicalMetadata metadata, WeightedGrid2d* grid) :
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::addLabeledArea(unsigned int ciCells, unsigned int riCells,
-    unsigned int cfCells, unsigned int rfCells,
-    string label, shared_ptr<MapNotes> notes)
+void LogicalMap::addLabeledArea(Rectangle surface, string label, shared_ptr<MapNotes> notes)
 {
-    LabeledArea area;
-    area.ci = ciCells;
-    area.ri = riCells;
-    area.cf = cfCells;
-    area.rf = rfCells;
-    area.label = label;
-    area.notes = notes;
+    LabeledArea labeledArea;
+    labeledArea.surface = surface;
+    labeledArea.label = label;
+    labeledArea.notes = notes;
 
-    labeledAreas_[label] = area;
+    labeledAreas_[label] = labeledArea;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,8 +35,7 @@ void LogicalMap::checkAreas(unsigned int cCells, unsigned int rCells,
 
     for (auto area : labeledAreas_)
     {
-        if (cCells >= area.second.ci &&  cCells <= area.second.cf &&
-            rCells >= area.second.ri && rCells <= area.second.rf)
+        if (area.second.surface.isIn(cCells, rCells))
         {
             areas[area.first] = area.second;
         }

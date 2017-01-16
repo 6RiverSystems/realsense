@@ -25,6 +25,11 @@ struct Location
         y(y)
     {}
 
+    Location(const Location& other) :
+        x(other.x),
+        y(other.y)
+    {}
+
     inline size_t hash() const
     {
         return (401 + x) * 401 + y;

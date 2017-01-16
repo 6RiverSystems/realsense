@@ -17,6 +17,14 @@ AreaLayerDisplay::~AreaLayerDisplay()
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+void AreaLayerDisplay::addArea(string label, Rectangle surface, MapNote::BaseMapNoteType note)
+{
+    areas.push_back(LabeledArea(label, surface, note));
+
+    fillArea(surface.x0, surface.y0, surface.x1, surface.y1);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
 } // namespace srs

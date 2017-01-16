@@ -30,6 +30,11 @@ struct Position
         orientation(orientation)
     {}
 
+    Position(const Position& other) :
+        location(other.location),
+        orientation(other.orientation)
+    {}
+
     ~Position()
     {}
 

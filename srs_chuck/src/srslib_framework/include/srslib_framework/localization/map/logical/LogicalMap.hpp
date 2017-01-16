@@ -14,6 +14,7 @@ using namespace std;
 #include <srslib_framework/datastructure/graph/grid2d/WeightedGrid2d.hpp>
 #include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/datastructure/Position.hpp>
+#include <srslib_framework/datastructure/Rectangle.hpp>
 #include <srslib_framework/localization/map/BaseMap.hpp>
 #include <srslib_framework/localization/map/mapnote/MapNotes.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMetadata.hpp>
@@ -29,8 +30,7 @@ public:
         {
             return stream << "{" <<
                 "l: '" << labeledArea.label <<
-                "', a: [" << labeledArea.ci << ", " << labeledArea.ri << ", " <<
-                    labeledArea.cf << ", " << labeledArea.rf <<
+                "', s: " << labeledArea.surface <<
                 "], n: " << *labeledArea.notes <<
                 "}";
         }
@@ -39,21 +39,14 @@ public:
         {
             return lhs.label == rhs.label &&
                 lhs.notes == rhs.notes &&
-                lhs.ci == rhs.ci &&
-                lhs.ri == rhs.ri &&
-                lhs.cf == rhs.cf &&
-                lhs.rf== rhs.rf;
+                lhs.surface == rhs.surface;
         }
 
         string label;
 
         shared_ptr<MapNotes> notes;
 
-        unsigned int cf;
-        unsigned int ci;
-
-        unsigned int rf;
-        unsigned int ri;
+        Rectangle surface;
     };
 
     using LabeledAreaMapType = unordered_map<string, LabeledArea>;
@@ -62,9 +55,7 @@ public:
     ~LogicalMap()
     {}
 
-    void addLabeledArea(unsigned int ciCells, unsigned int riCells,
-        unsigned int cfCells, unsigned int rfCells,
-        string label, shared_ptr<MapNotes> notes);
+    void addLabeledArea(Rectangle surface, string label, shared_ptr<MapNotes> notes);
 
     void checkAreas(unsigned int cCells, unsigned int rCells, LabeledAreaMapType& areas) const;
     void checkAreas(double xM, double yM, LabeledAreaMapType& areas) const;

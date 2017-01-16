@@ -5,6 +5,8 @@
  */
 #pragma once
 
+#include <srslib_framework/localization/map/logical/LogicalMap.hpp>
+
 #include "PixelLayerDisplay.hpp"
 
 namespace srs {
@@ -16,9 +18,25 @@ public:
         double resolution, Ogre::RGBA color);
     virtual ~AreaLayerDisplay();
 
-    void fillArea();
+    void addArea(string label, Rectangle surface, MapNote::BaseMapNoteType note);
 
 private:
+    struct LabeledArea
+    {
+        LabeledArea(string label, Rectangle surface, MapNote::BaseMapNoteType note) :
+            label(label),
+            surface(surface),
+            note(note)
+        {}
+
+        string label;
+
+        MapNote::BaseMapNoteType note;
+
+        Rectangle surface;
+    };
+
+    vector<LabeledArea> areas;
 };
 
 } // namespace srs

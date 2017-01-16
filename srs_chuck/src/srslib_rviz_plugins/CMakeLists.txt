@@ -8,6 +8,7 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srslib_rviz_plugins)
 
 set(${PROJECT_NAME}_SOURCES
+
     src/logical_map/LogicalMapDisplay.cpp
     src/logical_map/PixelLayerDisplay.cpp
     src/logical_map/AreaLayerDisplay.cpp
@@ -18,7 +19,7 @@ set(${PROJECT_NAME}_SOURCES
 
 project(${PROJECT_NAME})
 
-set(PROJECT_NODE ${PROJECT_NAME})
+set(PROJECT_LIBRARY ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
 set(CMAKE_AUTOMOC ON)
@@ -31,6 +32,15 @@ find_package(catkin REQUIRED COMPONENTS
     rviz
 )
 
+include_directories(include
+    src/
+    ${catkin_INCLUDE_DIRS}
+    ${srslib_framework_INCLUDE_DIRS}
+    ${srslib_test_INCLUDE_DIRS}
+)
+
+add_definitions(-DQT_NO_KEYWORDS)
+
 if(rviz_QT_VERSION VERSION_LESS "5")
     message(STATUS "Using Qt4 based on the rviz_QT_VERSION: ${rviz_QT_VERSION}")
     find_package(Qt4 ${rviz_QT_VERSION} EXACT REQUIRED QtCore QtGui)
@@ -41,29 +51,28 @@ else()
     set(QT_LIBRARIES Qt5::Widgets)
 endif()
 
-add_definitions(-DQT_NO_KEYWORDS)
+set(PROJECT_LIBRARIES
+    ${QT_LIBRARIES} 
+    ${srslib_test_LIBRARIES}
+)
 
 ####################################################################################################
 # Target
 
-catkin_package()
-
-include_directories(
-    ${catkin_INCLUDE_DIRS}
-    ${srslib_framework_INCLUDE_DIRS}
-    ${srslib_test_INCLUDE_DIRS}
-)
-
-link_directories(
-    ${catkin_LIBRARY_DIRS}
+catkin_package(
+    INCLUDE_DIRS src
+    LIBRARIES ${PROJECT_LIBRARY}
+    DEPENDS
+        srslib_framework
 )
 
 add_library(${PROJECT_NAME} 
     ${${PROJECT_NAME}_SOURCES}
 )
 
-target_link_libraries(${PROJECT_NAME} 
-    ${QT_LIBRARIES} 
+target_link_libraries(${PROJECT_LIBRARY}
+    ${PROJECT_LIBRARIES}
+    ${UNWIND_LIBRARIES}
     ${catkin_LIBRARIES}
 )
 

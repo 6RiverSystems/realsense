@@ -5,9 +5,11 @@ resolution: 0.1
 inflation_layer:
   inflation_radius: 0.75
   cost_scaling_factor: 2.0
-obstacle_layer:
+obstruction_layer:
   obstacle_range: 3.0
   raytrace_range: 25.0
+  inflation_radius: 0.75
+  cost_scaling_factor: 2.0
 obstacle_realsense_layer:
   obstacle_range: 3.0
   raytrace_range: 4.0

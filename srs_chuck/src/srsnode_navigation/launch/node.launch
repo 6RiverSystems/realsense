@@ -28,7 +28,7 @@
 
         <!-- Global Costmap -->
         <rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
-        <rosparam unless="$(arg use_sim_time)" file="$(find srsnode_navigation)/config/costmap_sensors.yaml" command="load" ns="global_costmap" />
+        <rosparam  file="$(find srsnode_navigation)/config/costmap_sensors.yaml" command="load" ns="global_costmap" />
         <rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
         <rosparam unless="$(arg use_sim_time)" file="$(find srsnode_navigation)/config/costmap_sensors.yaml" command="load" ns="local_costmap" />
         <rosparam file="$(find srsnode_navigation)/config/local_costmap_params.yaml" command="load" />

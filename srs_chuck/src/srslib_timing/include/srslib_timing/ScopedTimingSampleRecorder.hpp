@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include <srslib_framework/platform/timing/TimingDataRecorder.hpp>
+#include <srslib_timing/TimingDataRecorder.hpp>
 
 namespace srs {
 

@@ -10,16 +10,16 @@
 #include <utility>
 
 #include <ros/ros.h>
-#include <srslib_framework/TimingData.h>
-#include <srslib_framework/TimingDataSample.h>
-#include <srslib_framework/platform/timing/TimingData.hpp>
+#include <srslib_timing/TimingData.h>
+#include <srslib_timing/TimingDataSample.h>
+#include <srslib_timing/TimingData.hpp>
 
 namespace srs {
 
 struct TimingDataMessageFactory
 {
 
-    static srslib_framework::TimingData data2Msg(const TimingData& data)
+    static srslib_timing::TimingData data2Msg(const TimingData& data)
     {
         srslib_framework::TimingData td;
         td.id = data.getId();

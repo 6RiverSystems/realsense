@@ -22,7 +22,7 @@ RealsenseDriver::RealsenseDriver( ) :
         colorSubscriber_( rosNodeHandle_.subscribe<sensor_msgs::Image>( "/internal/sensors/rgbd/color/image_raw", 100, std::bind( &RealsenseDriver::OnColorData, this, std::placeholders::_1 ) ) ),
         depthPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>("/internal/sensors/rgbd/depth/image_filtered", 100 ) )
 {
-
+          
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

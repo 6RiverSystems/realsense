@@ -5,6 +5,7 @@ project(srslib_timing)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  message_generation
   roscpp
   rospy
   std_msgs
@@ -45,9 +46,10 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate messages in the 'msg' folder
  add_message_files(
+   DIRECTORY msg
    FILES
-   TimingData.msg
-   TimingDataSample.msg
+     TimingData.msg
+     TimingDataSample.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -65,10 +67,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+ generate_messages(
+   DEPENDENCIES
+    std_msgs
+ )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -103,7 +105,7 @@ catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES srslib_timing
   CATKIN_DEPENDS roscpp rospy std_msgs
-#  DEPENDS system_lib
+  DEPENDS message_runtime
 )
 
 ###########

@@ -15,17 +15,16 @@ using namespace std;
 
 namespace srs {
 
-class PublisherTimingData :
-    public Publisher<const TimingData&, srslib_framework::TimingData>
+class PublisherTimingData
 {
 public:
     PublisherTimingData(string topic,
-        unsigned int buffer = 100,
+        unsigned int buffer = 10,
         bool latched = false,
         string nameSpace = "~") : topic_(topic)
     {
         rosNodeHandle_ = ros::NodeHandle(nameSpace);
-        dataPublisher_ = rosNodeHandle_.advertise<srslib_timing::TimingData>(topic_, queueLength, latched);
+        dataPublisher_ = rosNodeHandle_.advertise<srslib_timing::TimingData>(topic_, buffer, latched);
     }
 
     std::string getTopic() const
@@ -51,7 +50,7 @@ private:
 
     ros::Publisher dataPublisher_;
     ros::NodeHandle rosNodeHandle_;
-    std::string topic_
+    std::string topic_;
 };
 
 } // namespace srs

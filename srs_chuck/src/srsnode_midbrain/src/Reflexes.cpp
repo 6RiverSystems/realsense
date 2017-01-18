@@ -18,7 +18,7 @@
 #include <srslib_framework/ros/message/PolygonMessageFactory.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
 
-#include <srslib_framework/platform/timing/ScopedTimingSampleRecorder.hpp>
+#include <srslib_timing/ScopedTimingSampleRecorder.hpp>
 
 namespace srs
 {

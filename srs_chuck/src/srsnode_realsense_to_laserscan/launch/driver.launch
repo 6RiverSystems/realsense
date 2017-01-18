@@ -31,7 +31,7 @@
 	<arg name="enable_depth"        value="true" />
 	<arg name="enable_ir"         	value="false" />
 	<arg name="enable_ir2"        	value="false" />
-	<arg name="enable_color"      	value="false" />
+	<arg name="enable_color"      	value="true" />
 	<arg name="enable_pointcloud" 	value="false" />
 	<arg name="enable_tf"         	value="false" />
 	<arg name="depth_height"        value="240" />

@@ -127,16 +127,24 @@ costmap_2d::Costmap2D* MapAdapter::weights2CostMap2D(LogicalMap* occupancy, int 
         occupancy->getResolution(), occupancy->getOrigin().x, occupancy->getOrigin().y);
 
     WeightedGrid2d::BaseType north;
+    WeightedGrid2d::BaseType northEast;
     WeightedGrid2d::BaseType east;
+    WeightedGrid2d::BaseType southEast;
     WeightedGrid2d::BaseType south;
+    WeightedGrid2d::BaseType southWest;
     WeightedGrid2d::BaseType west;
+    WeightedGrid2d::BaseType northWest;
     WeightedGrid2d::BaseType cost;
 
     for (int row = 0; row < rows; row++)
     {
         for (int col = 0; col < columns; col++)
         {
-            occupancy->getWeights(col, row, north, east, south, west);
+            occupancy->getWeights(col, row,
+                north, northEast,
+                east, southEast,
+                south, southWest,
+                west, northWest);
 
             switch (orientation)
             {
@@ -144,16 +152,32 @@ costmap_2d::Costmap2D* MapAdapter::weights2CostMap2D(LogicalMap* occupancy, int 
                     cost = north;
                     break;
 
+                case WeightedGrid2d::ORIENTATION_NORTH_EAST:
+                    cost = northEast;
+                    break;
+
                 case WeightedGrid2d::ORIENTATION_EAST:
                     cost = east;
+                    break;
+
+                case WeightedGrid2d::ORIENTATION_SOUTH_EAST:
+                    cost = southEast;
                     break;
 
                 case WeightedGrid2d::ORIENTATION_SOUTH:
                     cost = south;
                     break;
 
+                case WeightedGrid2d::ORIENTATION_SOUTH_WEST:
+                    cost = southWest;
+                    break;
+
                 case WeightedGrid2d::ORIENTATION_WEST:
                     cost = west;
+                    break;
+
+                case WeightedGrid2d::ORIENTATION_NORTH_WEST:
+                    cost = northWest;
                     break;
             }
 

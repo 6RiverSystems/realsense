@@ -91,9 +91,13 @@ private:
         BACKGROUND = 0,
         OBSTACLES = 1,
         WEIGHTS_NORTH = 2,
-        WEIGHTS_EAST = 3,
-        WEIGHTS_SOUTH = 4,
-        WEIGHTS_WEST = 5,
+        WEIGHTS_NORTH_EAST = 3,
+        WEIGHTS_EAST = 4,
+        WEIGHTS_SOUTH_EAST = 5,
+        WEIGHTS_SOUTH = 6,
+        WEIGHTS_SOUTH_WEST = 7,
+        WEIGHTS_WEST = 8,
+        WEIGHTS_NORTH_WEST = 9,
         PLAY_SOUND = 6,
         SET_MAX_VELOCITY = 7
     } EnititesEnum;
@@ -118,9 +122,13 @@ private:
     rviz::Property* propertyLayerPlaySound_;
     rviz::Property* propertyLayerSetMaxVelocity_;
     rviz::Property* propertyLayerWeightsNorth_;
+    rviz::Property* propertyLayerWeightsNorthEast_;
     rviz::Property* propertyLayerWeightsEast_;
+    rviz::Property* propertyLayerWeightsSouthEast_;
     rviz::Property* propertyLayerWeightsSouth_;
+    rviz::Property* propertyLayerWeightsSouthWest_;
     rviz::Property* propertyLayerWeightsWest_;
+    rviz::Property* propertyLayerWeightsNorthWest_;
     rviz::VectorProperty* propertyOrigin_;
     rviz::FloatProperty* propertyResolution_;
     rviz::IntProperty* propertyWidth_;

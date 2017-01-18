@@ -45,15 +45,23 @@ bool AStarExpansion::calculatePotentials(
         }
 
         WeightedGrid2d::BaseType north = 0;
+        WeightedGrid2d::BaseType northEast = 0;
         WeightedGrid2d::BaseType east = 0;
+        WeightedGrid2d::BaseType southEast = 0;
         WeightedGrid2d::BaseType south = 0;
+        WeightedGrid2d::BaseType southWest = 0;
         WeightedGrid2d::BaseType west = 0;
+        WeightedGrid2d::BaseType northWest = 0;
 
         int x;
         int y;
         index2Coordinates(i, x, y);
 
-        logicalGrid_->getWeights(Location(x, y), north, east, south, west);
+        logicalGrid_->getWeights(Location(x, y),
+            north, northEast,
+            east, southEast,
+            south, southWest,
+            west, northWest);
 
         add(potentials, potentials[i], i + 1, east, end_x, end_y);
         add(potentials, potentials[i], i - 1, west, end_x, end_y);

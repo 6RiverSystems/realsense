@@ -28,7 +28,7 @@ layerOneway = png2Map(sprintf('%s%s', INPUT_DIR, '6rshq_oneway-logical-oneway.pn
     RESOLUTION, ORIGIN);
 showMap(layerOneway, 'One-ways');
 
-layerOneway = convertToWeightedArea(layerOneway, 1, 0, 0, 0, 100);
+layerOneway = convertToWeightedArea(layerOneway, 1, 0, 0, 0, 0, 0, 100, 100, 100);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Warning sound layer

@@ -83,8 +83,10 @@ public:
 
     WeightedGrid2d::BaseType getWeight(const Position& position) const;
     void getWeights(unsigned int cCells, unsigned int rCells,
-        WeightedGrid2d::BaseType& north, WeightedGrid2d::BaseType& east,
-        WeightedGrid2d::BaseType& south, WeightedGrid2d::BaseType& west);
+        WeightedGrid2d::BaseType& north, WeightedGrid2d::BaseType& northEast,
+        WeightedGrid2d::BaseType& east, WeightedGrid2d::BaseType& southEast,
+        WeightedGrid2d::BaseType& south, WeightedGrid2d::BaseType& southWest,
+        WeightedGrid2d::BaseType& west, WeightedGrid2d::BaseType& northWest);
     WeightedGrid2d::BaseType getWeights(unsigned int cCells, unsigned int rCells,
         int orientation) const;
 
@@ -92,10 +94,10 @@ public:
     friend bool operator==(const LogicalMap& lhs, const LogicalMap& rhs);
 
     void setWeights(unsigned int cCells, unsigned int rCells,
-        WeightedGrid2d::BaseType north,
-        WeightedGrid2d::BaseType east,
-        WeightedGrid2d::BaseType south,
-        WeightedGrid2d::BaseType west);
+        WeightedGrid2d::BaseType north, WeightedGrid2d::BaseType northEast,
+        WeightedGrid2d::BaseType east, WeightedGrid2d::BaseType southEast,
+        WeightedGrid2d::BaseType south, WeightedGrid2d::BaseType southWest,
+        WeightedGrid2d::BaseType west, WeightedGrid2d::BaseType northWest);
 
 private:
     LabeledAreaMapType labeledAreas_;

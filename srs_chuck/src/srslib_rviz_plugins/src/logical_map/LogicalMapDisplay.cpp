@@ -74,16 +74,32 @@ LogicalMapDisplay::LogicalMapDisplay() :
         "Rendering option, enables/disables the north weights layer.",
         this, SLOT(updateLayerSwitches()));
 
+    propertyLayerWeightsNorthEast_ = new rviz::Property("Draw the north-east weights layer", true,
+        "Rendering option, enables/disables the north-east weights layer.",
+        this, SLOT(updateLayerSwitches()));
+
     propertyLayerWeightsEast_ = new rviz::Property("Draw the east weights layer", true,
         "Rendering option, enables/disables the east weights layer.",
+        this, SLOT(updateLayerSwitches()));
+
+    propertyLayerWeightsSouthEast_ = new rviz::Property("Draw the south-east weights layer", true,
+        "Rendering option, enables/disables the south-east weights layer.",
         this, SLOT(updateLayerSwitches()));
 
     propertyLayerWeightsSouth_ = new rviz::Property("Draw the south weights layer", true,
         "Rendering option, enables/disables the south weights layer.",
         this, SLOT(updateLayerSwitches()));
 
+    propertyLayerWeightsSouthWest_ = new rviz::Property("Draw the south-west weights layer", true,
+        "Rendering option, enables/disables the south-west weights layer.",
+        this, SLOT(updateLayerSwitches()));
+
     propertyLayerWeightsWest_ = new rviz::Property("Draw the west weights layer", true,
         "Rendering option, enables/disables the west weights layer.",
+        this, SLOT(updateLayerSwitches()));
+
+    propertyLayerWeightsNorthWest_ = new rviz::Property("Draw the north-west weights layer", true,
+        "Rendering option, enables/disables the north-west weights layer.",
         this, SLOT(updateLayerSwitches()));
 
     propertyLayerPlaySound_ = new rviz::Property("Draw the play-sound layer", true,
@@ -154,11 +170,19 @@ void LogicalMapDisplay::initializeLayers()
 
     PixelLayerDisplay* weightsNorth = createPixelLayer(WEIGHTS_NORTH,
         width, height, resolution, RGBA_ORANGE);
+    PixelLayerDisplay* weightsNorthEast = createPixelLayer(WEIGHTS_NORTH_EAST,
+        width, height, resolution, RGBA_ORANGE);
     PixelLayerDisplay* weightsEast = createPixelLayer(WEIGHTS_EAST,
+        width, height, resolution, RGBA_ORANGE);
+    PixelLayerDisplay* weightsSouthEast = createPixelLayer(WEIGHTS_SOUTH_EAST,
         width, height, resolution, RGBA_ORANGE);
     PixelLayerDisplay* weightsSouth = createPixelLayer(WEIGHTS_SOUTH,
         width, height, resolution, RGBA_ORANGE);
+    PixelLayerDisplay* weightsSouthWest = createPixelLayer(WEIGHTS_SOUTH_WEST,
+        width, height, resolution, RGBA_ORANGE);
     PixelLayerDisplay* weightsWest = createPixelLayer(WEIGHTS_WEST,
+        width, height, resolution, RGBA_ORANGE);
+    PixelLayerDisplay* weightsNorthWest = createPixelLayer(WEIGHTS_NORTH_WEST,
         width, height, resolution, RGBA_ORANGE);
 
     AreaLayerDisplay* playSound = createAreaLayer(PLAY_SOUND,
@@ -184,26 +208,49 @@ void LogicalMapDisplay::initializeLayers()
 
         // Store the weights
         WeightedGrid2d::BaseType north;
+        WeightedGrid2d::BaseType northEast;
         WeightedGrid2d::BaseType east;
+        WeightedGrid2d::BaseType southEast;
         WeightedGrid2d::BaseType south;
+        WeightedGrid2d::BaseType southWest;
         WeightedGrid2d::BaseType west;
+        WeightedGrid2d::BaseType northWest;
 
-        grid->getWeights(location, north, east, south, west);
+        grid->getWeights(location, north, northEast,
+            east, southEast,
+            south, southWest,
+            west, northWest);
         if (north > 0)
         {
             weightsNorth->fillLocation(location, north);
+        }
+        if (northEast > 0)
+        {
+            weightsNorthEast->fillLocation(location, northEast);
         }
         if (east > 0)
         {
             weightsEast->fillLocation(location, east);
         }
+        if (southEast > 0)
+        {
+            weightsSouthEast->fillLocation(location, southEast);
+        }
         if (south > 0)
         {
             weightsSouth->fillLocation(location, south);
         }
+        if (southWest > 0)
+        {
+            weightsSouthWest->fillLocation(location, southWest);
+        }
         if (west > 0)
         {
             weightsWest->fillLocation(location, west);
+        }
+        if (northWest > 0)
+        {
+            weightsNorthWest->fillLocation(location, northWest);
         }
     }
 
@@ -232,9 +279,13 @@ void LogicalMapDisplay::initializeLayers()
     layers_.push_back(background);
     layers_.push_back(obstacles);
     layers_.push_back(weightsNorth);
+    layers_.push_back(weightsNorthEast);
     layers_.push_back(weightsEast);
+    layers_.push_back(weightsSouthEast);
     layers_.push_back(weightsSouth);
+    layers_.push_back(weightsSouthWest);
     layers_.push_back(weightsWest);
+    layers_.push_back(weightsNorthWest);
     layers_.push_back(playSound);
     layers_.push_back(setMaxVelocity);
 }
@@ -373,10 +424,16 @@ void LogicalMapDisplay::updateLayerSwitches()
 {
     layers_[BACKGROUND]->show(propertyLayerBackground_->getValue().toBool());
     layers_[OBSTACLES]->show(propertyLayerObstacles_->getValue().toBool());
+
     layers_[WEIGHTS_NORTH]->show(propertyLayerWeightsNorth_->getValue().toBool());
+    layers_[WEIGHTS_NORTH_EAST]->show(propertyLayerWeightsNorthEast_->getValue().toBool());
     layers_[WEIGHTS_EAST]->show(propertyLayerWeightsEast_->getValue().toBool());
+    layers_[WEIGHTS_SOUTH_EAST]->show(propertyLayerWeightsSouthEast_->getValue().toBool());
     layers_[WEIGHTS_SOUTH]->show(propertyLayerWeightsSouth_->getValue().toBool());
+    layers_[WEIGHTS_SOUTH_WEST]->show(propertyLayerWeightsSouthWest_->getValue().toBool());
     layers_[WEIGHTS_WEST]->show(propertyLayerWeightsWest_->getValue().toBool());
+    layers_[WEIGHTS_NORTH_WEST]->show(propertyLayerWeightsNorthWest_->getValue().toBool());
+
     layers_[PLAY_SOUND]->show(propertyLayerPlaySound_->getValue().toBool());
     layers_[SET_MAX_VELOCITY]->show(propertyLayerSetMaxVelocity_->getValue().toBool());
 }

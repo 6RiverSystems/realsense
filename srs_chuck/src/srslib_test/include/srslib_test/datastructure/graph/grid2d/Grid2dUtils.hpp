@@ -87,10 +87,10 @@ struct Grid2dUtils
 
     static void addWeights(WeightedGrid2d& grid,
         unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
-        WeightedGrid2d::BaseType north,
-        WeightedGrid2d::BaseType east,
-        WeightedGrid2d::BaseType south,
-        WeightedGrid2d::BaseType west)
+        WeightedGrid2d::BaseType north, WeightedGrid2d::BaseType northEast,
+        WeightedGrid2d::BaseType east, WeightedGrid2d::BaseType southEast,
+        WeightedGrid2d::BaseType south, WeightedGrid2d::BaseType southWest,
+        WeightedGrid2d::BaseType west, WeightedGrid2d::BaseType northWest)
     {
         int deltaX = BasicMath::sgn<int>(xf - xi);
         int deltaY = BasicMath::sgn<int>(yf - yi);
@@ -103,7 +103,11 @@ struct Grid2dUtils
 
             do
             {
-                grid.setWeights(Location(c, r), north, east, south, west);
+                grid.setWeights(Location(c, r),
+                    north, northEast,
+                    east, southEast,
+                    south, southWest,
+                    west, northWest);
                 c += deltaX;
             } while (c != (xf + deltaX));
 
@@ -113,12 +117,16 @@ struct Grid2dUtils
 
     static void addWeights(WeightedGrid2d* grid,
         unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
-        WeightedGrid2d::BaseType north,
-        WeightedGrid2d::BaseType east,
-        WeightedGrid2d::BaseType south,
-        WeightedGrid2d::BaseType west)
+        WeightedGrid2d::BaseType north, WeightedGrid2d::BaseType northEast,
+        WeightedGrid2d::BaseType east, WeightedGrid2d::BaseType southEast,
+        WeightedGrid2d::BaseType south, WeightedGrid2d::BaseType southWest,
+        WeightedGrid2d::BaseType west, WeightedGrid2d::BaseType northWest)
     {
-        addWeights(*grid, xi, yi, xf, yf, north, east, south, west);
+        addWeights(*grid, xi, yi, xf, yf,
+            north, northEast,
+            east, southEast,
+            south, southWest,
+            west, northWest);
     }
 
 };

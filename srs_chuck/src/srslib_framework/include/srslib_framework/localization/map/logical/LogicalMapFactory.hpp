@@ -60,7 +60,11 @@ private:
     static const string KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_SIZE;
     static const string KEYWORD_PROPERTY_WEIGHTED_AREA_EAST;
     static const string KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH;
+    static const string KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH_EAST;
+    static const string KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH_WEST;
     static const string KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH;
+    static const string KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH_EAST;
+    static const string KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH_WEST;
     static const string KEYWORD_PROPERTY_WEIGHTED_AREA_WEST;
     static const string KEYWORD_TYPE;
     static const string KEYWORD_TYPE_POINT;
@@ -75,10 +79,10 @@ private:
     void addObstacleArea(Pose<> origin, double widthM, double heightM,
         double sizeEnvelopeM = 0.0, WeightedGrid2d::BaseType costEnvelope = 0);
     void addWeightArea(Pose<> origin, double widthM, double heightM,
-        WeightedGrid2d::BaseType north,
-        WeightedGrid2d::BaseType east,
-        WeightedGrid2d::BaseType south,
-        WeightedGrid2d::BaseType west);
+        WeightedGrid2d::BaseType north, WeightedGrid2d::BaseType northEast,
+        WeightedGrid2d::BaseType east, WeightedGrid2d::BaseType southEast,
+        WeightedGrid2d::BaseType south, WeightedGrid2d::BaseType southWest,
+        WeightedGrid2d::BaseType west, WeightedGrid2d::BaseType northWest);
 
     void calculateArea(Pose<> origin, double widthM, double heightM,
         unsigned int& x0, unsigned int& y0, unsigned int& widthCells, unsigned int& heightCells);

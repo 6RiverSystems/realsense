@@ -20,7 +20,7 @@ RealsenseDriver::RealsenseDriver( ) :
 	depthSubscriber_( rosNodeHandle_.subscribe<sensor_msgs::Image>( "/internal/sensors/rgbd/depth/image_raw", 100,
 		std::bind( &RealsenseDriver::OnDepthData, this, std::placeholders::_1 ) ) ),
         colorSubscriber_( rosNodeHandle_.subscribe<sensor_msgs::Image>( "/internal/sensors/rgbd/color/image_raw", 100, std::bind( &RealsenseDriver::OnColorData, this, std::placeholders::_1 ) ) ),
-        depthPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>("/interal/sensors/rgbd/depth/image_filtered", 100 ) )
+        depthPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>("/internal/sensors/rgbd/depth/image_filtered", 100 ) )
 {
 
 }
@@ -38,10 +38,10 @@ void RealsenseDriver::run( )
 	}
 }
 void RealsenseDriver::OnColorData( const sensor_msgs::Image::ConstPtr& colorImage ){
-        cv_bridge::CvImagePtr cvColorImage = GetCvImage( colorImage );
-        cv::imshow("color", cvColorImage->image);
+        //cv_bridge::CvImagePtr cvColorImage = GetCvImage( colorImage );
+        //cv::imshow("color", cvColorImage->image);
         //cv::imwrite("color.jpg", cvColorImage->image);
-        cv::waitKey(10);
+        //cv::waitKey(10);
 }
 void RealsenseDriver::OnDepthData( const sensor_msgs::Image::ConstPtr& depthImage )
 {
@@ -60,20 +60,20 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::Image::ConstPtr& depthImag
     // normalize range and convert type
     //cv::resize(cloneImage, cloneImage, size, 0, 0);
     cloneImage.convertTo(cloneImage, CV_8UC1, ratio);
-    cv::imshow("raw image", cloneImage);
+    //cv::imshow("raw image", cloneImage);
 
     // first operation- thresholding image with any value closer than 300 mm
     cv::threshold(cloneImage, cloneImage, 300 * ratio, 255, cv::THRESH_TOZERO);
 
     // second step- apply median filter
     cv::Mat medianFilterImage;
-    cv::medianBlur( cloneImage, medianFilterImage, 7 );
-    cv::imshow("median filtered image", medianFilterImage);
-    
+    cv::medianBlur( cloneImage, medianFilterImage, 5 );
+    //cv::imshow("median filtered image", medianFilterImage);
+
     // third step- retrieve the value from medianFilterImage mask
     cv::Mat outputImage;
     cloneImage.copyTo(outputImage, medianFilterImage);
-    cv::imshow("final image", outputImage);
+    //cv::imshow("final image", outputImage);
 
     outputImage.convertTo(outputImage, CV_16UC1, 1 / ratio);
     cv::minMaxIdx(outputImage, &min, &max);
@@ -86,7 +86,7 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::Image::ConstPtr& depthImag
 
     cvDepthImage->image = outputImage;
     depthPublisher_.publish( cvDepthImage );
-    cv::waitKey(10);
+    //cv::waitKey(10);
 }
 
 cv_bridge::CvImagePtr RealsenseDriver::GetCvImage( const sensor_msgs::Image::ConstPtr& image ) const

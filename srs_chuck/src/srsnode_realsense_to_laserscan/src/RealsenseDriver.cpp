@@ -47,35 +47,46 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::Image::ConstPtr& depthImag
 {
 	cv_bridge::CvImagePtr cvDepthImage = GetCvImage( depthImage );
 
-	cv::Mat tmpImg;
-	tmpImg = cvDepthImage->image.clone();
-	cv::Size size(480, 360);
-	//cv::flip(cvDepthImage->image, cvDepthImage->image, -1);
+    cv::Mat cloneImage;
+    cloneImage = cvDepthImage->image.clone();
+    //cv::Size size(480, 360);
+    //cv::flip(cvDepthImage->image, cvDepthImage->image, -1);
 
-	// normalize 16-bit unsigned range to 8-bit for visualization
-	double max, min;
-	cv::minMaxIdx(tmpImg, &min, &max);
-	ROS_DEBUG("min: %f, max: %f", min, max);
-    	cv::convertScaleAbs(tmpImg, tmpImg, 255/max);
-    	tmpImg.convertTo(tmpImg, CV_8UC1);
-    	cv::resize(tmpImg, tmpImg, size, 0, 0, cv::INTER_AREA);
-    	cv::imshow("raw image", tmpImg);
-    	//cv::imwrite("depth.jpg", tmpImg);
-    	// apply median filter
-    	cv::Mat medianFilterImg;
-    	cv::medianBlur( tmpImg, medianFilterImg, 5 );
-    	cv::imshow("median filtered image", medianFilterImg);
+    // since many operations require 8-bit image, and thus we normalize 16-bit to 8-bit
+    double max, min;
+    cv::minMaxIdx(cloneImage, &min, &max);
+    ROS_DEBUG("before min: %f, max: %f", min, max);
+    double ratio = 255 / max;
+    // normalize range and convert type
+    //cv::resize(cloneImage, cloneImage, size, 0, 0);
+    cloneImage.convertTo(cloneImage, CV_8UC1, ratio);
+    cv::imshow("raw image", cloneImage);
 
-    	// apply bilateral filter
-    	//cv::Mat bilateralImg;
-    	//cv::bilateralFilter ( tmpImg, bilateralImg, 15, 80, 80 );
-    	//cv::imshow("bilateral image", bilateralImg);
+    // first operation- thresholding image with any value closer than 300 mm
+    cv::threshold(cloneImage, cloneImage, 300 * ratio, 255, cv::THRESH_TOZERO);
+
+    // second step- apply median filter
+    cv::Mat medianFilterImage;
+    cv::medianBlur( cloneImage, medianFilterImage, 7 );
+    cv::imshow("median filtered image", medianFilterImage);
     
-    	// apply joint bilateral filter
-    	//cv::Mat jbilateralImg;
-    	//cv::ximgproc::jointBilateralFilter(tmpImg, tmpImg, jbilateralImg, 15, 80, 80);
-    	//depthMedianFilterPublisher_.publish( cvDepthImage );
-    	cv::waitKey(10);
+    // third step- retrieve the value from medianFilterImage mask
+    cv::Mat outputImage;
+    cloneImage.copyTo(outputImage, medianFilterImage);
+    cv::imshow("final image", outputImage);
+
+    outputImage.convertTo(outputImage, CV_16UC1, 1 / ratio);
+    cv::minMaxIdx(outputImage, &min, &max);
+    ROS_DEBUG("after min: %f, max: %f", min, max);
+
+    // apply bilateral filter
+    //cv::Mat bilateralImg;
+    //cv::bilateralFilter ( tmpImg, bilateralImg, 15, 80, 80 );
+    //cv::imshow("bilateral image", bilateralImg);
+
+    cvDepthImage->image = outputImage;
+    depthPublisher_.publish( cvDepthImage );
+    cv::waitKey(10);
 }
 
 cv_bridge::CvImagePtr RealsenseDriver::GetCvImage( const sensor_msgs::Image::ConstPtr& image ) const

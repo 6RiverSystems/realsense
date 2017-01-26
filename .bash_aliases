@@ -59,7 +59,7 @@ function runChuck() {
   echo -e "${BLUE}*************************************************************"
   echo -e "${NC}"
 
-  stdbuf -i0 -o0 -e0 chuck run 2>&1 | tee $logFile
+  stdbuf -i0 -o0 -e0 chuck run 2>&1 | tee -a $logFile
 }
 
 function cleanChuck() {

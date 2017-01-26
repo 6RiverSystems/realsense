@@ -4,10 +4,9 @@ dependencies:
     - "~/.ccache"
   pre:
     - sudo rm -rf /var/cache/apt/archives && sudo ln -s ~/.apt-cache /var/cache/apt/archives && mkdir -p ~/.apt-cache/partial
-    - gpg --keyserver pgp.mit.edu --recv-keys 749D6EEC0353B12C
-    - gpg --export --armor 749D6EEC0353B12C | sudo apt-key add -
+    - sudo apt-key add ~/ros/gpg_keys/ros.key
+    - sudo apt-key add ~/ros/gpg_keys/ubuntu.key
     - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-    - sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 0xB01FA116
     - sudo apt-get update
     - sudo apt-get install ros-indigo-desktop-full
     - sudo apt-get install ros-indigo-navigation

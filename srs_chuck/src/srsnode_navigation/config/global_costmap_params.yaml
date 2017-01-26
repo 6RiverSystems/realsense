@@ -19,4 +19,3 @@ global_costmap:
 #   - {name: obstruction_layer_realsense, type: "costmap_2d::ObstructionLayer"}
 #   - {name: obstacle_realsense_layer, type: "costmap_2d::ObstacleLayer"}
 #   - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
-]

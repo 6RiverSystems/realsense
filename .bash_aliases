@@ -6,7 +6,7 @@ function getChuckDirectory() {
 
   baseDirectory=~/ros
 
-  logFile="$baseDirectory/log/ros.log"
+  logFile="/var/log/upstart/mfp-ros.log"
 }
 
 function printInfo() {

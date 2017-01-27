@@ -20,14 +20,14 @@ RealsenseDriver::RealsenseDriver( ) :
 		std::bind( &RealsenseDriver::OnDepthData, this, std::placeholders::_1 ) ) ),
         depthPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>("/internal/sensors/rgbd/depth/image_filtered", 100 ) )
 {
-          
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void RealsenseDriver::run( )
 {
 	ros::Rate refreshRate( REFRESH_RATE_HZ );
-
+        ROS_ERROR("I am activated");
 	while( ros::ok( ) )
 	{
 		ros::spinOnce( );

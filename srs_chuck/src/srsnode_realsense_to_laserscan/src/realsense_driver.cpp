@@ -4,6 +4,7 @@
 
 int main( int argc, char** argv )
 {
+        ROS_ERROR("never been here");
 	// Initialize ROS
 	ros::init( argc, argv, "srsdrv_realsense" );
 

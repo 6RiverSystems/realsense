@@ -16,7 +16,6 @@ private:
   virtual void onInit()
   {
     rs.reset(new RealsenseDriver());
-    ROS_ERROR("I am in RS nodelet");
   };
 
   boost::shared_ptr<RealsenseDriver> rs;

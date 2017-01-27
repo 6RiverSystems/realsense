@@ -27,7 +27,6 @@ RealsenseDriver::RealsenseDriver( ) :
 void RealsenseDriver::run( )
 {
 	ros::Rate refreshRate( REFRESH_RATE_HZ );
-        ROS_ERROR("I am activated");
 	while( ros::ok( ) )
 	{
 		ros::spinOnce( );

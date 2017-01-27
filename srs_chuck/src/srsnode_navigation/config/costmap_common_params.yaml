@@ -4,17 +4,26 @@ footprint_padding: 0.01
 resolution: 0.1
 transform_tolerance: 0.25
 
+static_layer:
+  inflation:
+      inflation_radius: 0.75
+      cost_scaling_factor: 2.0
 
 obstruction_layer:
   obstacle_range: 3.0
   raytrace_range: 25.0
   inflation_radius: 0.75
   cost_scaling_factor: 2.0
+  obstruction_half_life: 20
+  num_obstruction_levels: 3
+
 obstruction_layer_realsense:
   obstacle_range: 3.0
   raytrace_range: 4.0
   inflation_radius: 0.75
   cost_scaling_factor: 2.0
+  obstruction_half_life: 20
+  num_obstruction_levels: 3
 
 ######
 # TO BE DELETED

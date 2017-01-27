@@ -23,6 +23,9 @@ public:
     void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
 private:
+    std::string getBatteryDescriptorName(uint8_t id);
+
+    float convertBatteryDescriptorValue(uint8_t id, uint16_t value);
 
 	void readBatteryDescriptorInfo(HardwareMessage& msg, int descriptorIndex,
 		srslib_framework::MsgPowerState& batteryState);

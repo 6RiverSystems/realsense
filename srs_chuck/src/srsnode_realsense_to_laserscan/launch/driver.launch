@@ -31,7 +31,7 @@
 	<arg name="enable_depth"        value="true" />
 	<arg name="enable_ir"         	value="false" />
 	<arg name="enable_ir2"        	value="false" />
-	<arg name="enable_color"      	value="true" />
+	<arg name="enable_color"      	value="false" />
 	<arg name="enable_pointcloud" 	value="false" />
 	<arg name="enable_tf"         	value="false" />
 	<arg name="depth_height"        value="240" />
@@ -43,14 +43,12 @@
 	</include>
 
         <!--node pkg="srsnode_realsense_to_laserscan" type="srsnode_realsense_to_laserscan" name="depthimage_filter" /-->
-	
-	<!-- Point cloud to laser scan conversion -->
-	<node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan">
 
-        <remap from="image" to="/internal/sensors/rgbd/depth/image_raw"/>
-        <remap from="camera_info" to="/internal/sensors/rgbd/depth/camera_info"/>
+	<!-- Point cloud to laser scan conversion -->
+        <!--
+	<node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan">
+        <remap from="image" to="/internal/sensors/rgbd/depth/image_filtered"/>
         <remap from="scan" to="/internal/sensors/rgbd/scan/raw"/>
-        <remap from="stair_scan" to="/internal/sensors/rgbd/stair_scan/raw"/>
         <rosparam>
             output_frame_id: laser_frame
             scan_height: 120
@@ -59,9 +57,22 @@
             range_max: 4.0
             height_min: 0.1
             height_max: 3.0
-            detect_stair: true
-            stair_scan_height: 100
-            stair_height_threshold: -0.1
+        </rosparam>
+        </node>
+        -->
+
+        <node pkg="nodelet" type="nodelet" name="srsnode_realsense" args="load srsnode_realsense_to_laserscan/RealsenseDriverNodelet /camera/nodelet_manager"/>
+        <node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet /camera/nodelet_manager">
+        <remap from="/camera/image" to="/internal/sensors/rgbd/depth/image_filtered"/>
+        <remap from="/camera/rgbd_scan"  to="/internal/sensors/rgbd/scan/raw"/>
+        <rosparam>
+            output_frame_id: laser_frame
+            scan_height: 120
+            scan_time: 0.333
+            range_min: 0.4
+            range_max: 4.0
+            height_min: 0.1
+            height_max: 3.0
         </rosparam>
         </node>
 
@@ -69,13 +80,6 @@
         <remap from="scan" to="/internal/sensors/rgbd/scan/raw" />
         <remap from="scan_filtered" to="/internal/sensors/rgbd/scan/filtered" />
         <rosparam command="load" file="$(find srsnode_laser_filters)/config/rgbd_laser_filter.yaml" />
-	</node>
-
-        <node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="rgbd_stair_laser_filter">
-        <remap from="scan" to="/internal/sensors/rgbd/stair_scan/raw" />
-        <remap from="scan_filtered" to="/internal/sensors/rgbd/stair_scan/filtered" />
-        <rosparam command="load" file="$(find srsnode_laser_filters)/config/rgbd_stair_laser_filter.yaml" />
         </node>
-
 </launch>
 

@@ -14,7 +14,7 @@
 namespace srs
 {
 
-HidIO::HidIO(const char* pszName, int32_t pid, int32_t vid) :
+HidIO::HidIO(const char* pszName, uint32_t vid, uint32_t pid) :
 	initializedUsb_(false),
 	claimedUsb_(false),
 	name_(pszName),
@@ -26,8 +26,8 @@ HidIO::HidIO(const char* pszName, int32_t pid, int32_t vid) :
 	txMaxPacketSize_(-1),
 	open_(false),
 	deviceHandle_(nullptr),
-	pid_(pid),
 	vid_(vid),
+	pid_(pid),
 	readCallback_()
 {
 	int rc = libusb_init(nullptr);
@@ -206,11 +206,13 @@ void HidIO::read()
 
 void HidIO::registerHotPlug()
 {
+	ROS_INFO_NAMED(name_, "registerHotPlug: pid=0x%x, vid=0x%x", pid_, vid_);
+
 	int rc = libusb_hotplug_register_callback(nullptr,
 		(libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED|LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT),
 		LIBUSB_HOTPLUG_ENUMERATE,
-		pid_,
 		vid_,
+		pid_,
 		LIBUSB_HOTPLUG_MATCH_ANY,
 		&HidIO::hotPlugCallback,
 		static_cast<void*>(this),

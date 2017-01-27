@@ -35,8 +35,8 @@ namespace srs {
 
 using namespace ros;
 
-BrainStemMessageProcessor::BrainStemMessageProcessor(std::shared_ptr<IO> pIO) :
-	io_(pIO),
+BrainStemMessageProcessor::BrainStemMessageProcessor() :
+	io_(),
 	setupComplete_(false),
 	syncState_(false),
 	sentPing_(false),
@@ -49,34 +49,30 @@ BrainStemMessageProcessor::BrainStemMessageProcessor(std::shared_ptr<IO> pIO) :
 	connectedChannel_(),
 	odometryRpmChannel_(),
 	odometryPoseChannel_(),
+	odometryPoseBrainstemChannel_(),
 	hardwareInfoChannel_(),
 	operationalStateChannel_(),
-	powerStateChannel_()
+	powerStateChannel_(),
+    hardwareInfoHandler_(new HardwareInfoHandler(hardwareInfoChannel_)),
+    operationalStateHandler_(new OperationalStateHandler(operationalStateChannel_)),
+	useBrainstemOdom_(false),
+	odometryRpmHardwareHandler_(),
+	odometryPoseHardwarewHandler_(),
+	velocitySoftwareHandler_(),
+	odometryRpmSoftwareHandler_()
 {
-    hardwareInfoHandler_.reset(new HardwareInfoHandler(hardwareInfoChannel_));
-    operationalStateHandler_.reset(new OperationalStateHandler(operationalStateChannel_));
-
     addHardwareMessageHandler(hardwareInfoHandler_);
     addHardwareMessageHandler(operationalStateHandler_);
     addHardwareMessageHandler(HardwareMessageHandlerPtr(new LogHandler()));
     addHardwareMessageHandler(HardwareMessageHandlerPtr(new PowerStateHandler(powerStateChannel_)));
-    addHardwareMessageHandler(HardwareMessageHandlerPtr(new OdometryRpmHandler(odometryRpmChannel_)));
-    addHardwareMessageHandler(HardwareMessageHandlerPtr(new OdometryPoseHandler(odometryPoseChannel_)));
     addHardwareMessageHandler(HardwareMessageHandlerPtr(new ButtonPressedHandler(buttonPressedChannel_)));
 
     addSoftwareMessage(SoftwareMessagePtr(new ResetHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new PingHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new SetMotionStateHandler(this)));
-    addSoftwareMessage(SoftwareMessagePtr(new SetOdometryRpmHandler(this)));
-    addSoftwareMessage(SoftwareMessagePtr(new SetVelocityHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new ShutdownHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new SoundHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new UpdateUIHandler(this)));
-
-    for (auto handler : softwareHandlers_)
-    {
-    	handler->attach();
-    }
 }
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor()
@@ -264,12 +260,30 @@ void BrainStemMessageProcessor::addHardwareMessageHandler(HardwareMessageHandler
 {
     hwMessageHandlers_[hardwareMessageHandler->getKey()] = hardwareMessageHandler;
 
-	hardwareHandlers_.push_back(hardwareMessageHandler);
+	hardwareHandlers_.insert(hardwareMessageHandler);
+}
+
+void BrainStemMessageProcessor::removeHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler)
+{
+	if (hardwareMessageHandler)
+	{
+		hardwareHandlers_.erase(hardwareMessageHandler);
+	}
 }
 
 void BrainStemMessageProcessor::addSoftwareMessage(SoftwareMessagePtr softwareMessage)
 {
-	softwareHandlers_.push_back(softwareMessage);
+	softwareHandlers_.insert(softwareMessage);
+
+	softwareMessage->attach();
+}
+
+void BrainStemMessageProcessor::removeSoftwareMessage(SoftwareMessagePtr softwareMessage)
+{
+	if (softwareMessage)
+	{
+		softwareHandlers_.erase(softwareMessage);
+	}
 }
 
 bool BrainStemMessageProcessor::isSetupComplete() const
@@ -324,6 +338,62 @@ void BrainStemMessageProcessor::checkSetupComplete()
 	}
 }
 
+void BrainStemMessageProcessor::setUseBrainstemOdom(bool useBrainstemOdom)
+{
+	bool hasHandlers = odometryRpmSoftwareHandler_ || velocitySoftwareHandler_;
+
+	if (!hasHandlers || useBrainstemOdom_ != useBrainstemOdom)
+	{
+		if (useBrainstemOdom)
+		{
+			ROS_DEBUG("Brainstem driver: Using brainstem odometry");
+
+			// This removeHardwareMessageHandler is only because we toggle main and alt topics for pose (for comparison in development)
+			// TODO: remove after RPM is deprecated
+			removeHardwareMessageHandler(odometryPoseHardwarewHandler_);
+
+			// Brainstem odometry handlers
+			odometryPoseHardwarewHandler_.reset(new OdometryPoseHandler(odometryPoseChannel_, true));
+			addHardwareMessageHandler(odometryPoseHardwarewHandler_);
+
+			velocitySoftwareHandler_.reset(new SetVelocityHandler(this));
+			addSoftwareMessage(velocitySoftwareHandler_);
+
+			// RPM odometry handlers
+			removeHardwareMessageHandler(odometryRpmHardwareHandler_);
+			odometryRpmHardwareHandler_ = nullptr;
+
+			removeSoftwareMessage(odometryRpmSoftwareHandler_);
+			odometryRpmSoftwareHandler_ = nullptr;
+		}
+		else
+		{
+			ROS_DEBUG("Brainstem driver: Using rpm odometry");
+
+			// This removeHardwareMessageHandler is only because we toggle main and alt topics for pose (for comparison in development)
+			// TODO: remove after RPM is deprecated
+			removeHardwareMessageHandler(odometryPoseHardwarewHandler_);
+
+			// RPM odometry handlers
+			odometryRpmHardwareHandler_.reset(new OdometryRpmHandler(odometryRpmChannel_));
+			addHardwareMessageHandler(odometryRpmHardwareHandler_);
+
+			odometryRpmSoftwareHandler_.reset(new SetOdometryRpmHandler(this));
+			addSoftwareMessage(odometryRpmSoftwareHandler_);
+
+			// TODO: remove after RPM is deprecated
+			odometryPoseHardwarewHandler_.reset(new OdometryPoseHandler(odometryPoseBrainstemChannel_, false));
+			addHardwareMessageHandler(odometryPoseHardwarewHandler_);
+
+			// Brainstem odometry handlers
+			removeSoftwareMessage(velocitySoftwareHandler_);
+			velocitySoftwareHandler_ = nullptr;
+		}
+
+		useBrainstemOdom_ = useBrainstemOdom;
+	}
+}
+
 void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
 {
 	if (io_->isOpen())
@@ -334,7 +404,7 @@ void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
 		{
 			mapDimensionName[DIMENSION::WHEEL_BASE_LENGTH] = "wheel_base_length";
 			mapDimensionName[DIMENSION::LEFT_WHEEL_RADIUS] = "left_wheel_radius";
-			mapDimensionName[DIMENSION::RIGHT_WHEEL_RADIUS] = "right_whee_radius";
+			mapDimensionName[DIMENSION::RIGHT_WHEEL_RADIUS] = "right_wheel_radius";
 		};
 
 		DimensionData msg = {

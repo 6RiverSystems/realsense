@@ -6,7 +6,7 @@ function getChuckDirectory() {
 
   baseDirectory=~/ros
 
-  logFile="$baseDirectory/log/ros.log"
+  logFile="/var/log/upstart/mfp-ros.log"
 }
 
 function printInfo() {
@@ -30,14 +30,14 @@ function buildChuck() {
   source /opt/ros/indigo/setup.bash
 
   getChuckDirectory &&
-  printInfo &&
+  printInfo
 
   pushd "$baseDirectory/srs_chuck" &&
-  catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo -j8 &&
+  taskset -c 0-3 catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo -j8 &&
   source devel/setup.bash &&
   popd &&
   pushd "$baseDirectory/srs_sites" &&
-  catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo -j8 &&
+  taskset -c 0-3 catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo -j8 &&
   source devel/setup.bash &&
 
   source "$baseDirectory/srs_sites/devel/setup.bash"
@@ -59,7 +59,7 @@ function runChuck() {
   echo -e "${BLUE}*************************************************************"
   echo -e "${NC}"
 
-  stdbuf -i0 -o0 -e0 chuck run 2>&1 | tee $logFile
+  stdbuf -i0 -o0 -e0 chuck run 2>&1 | tee -a $logFile
 }
 
 function cleanChuck() {

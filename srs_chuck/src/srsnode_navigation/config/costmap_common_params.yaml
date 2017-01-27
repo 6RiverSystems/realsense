@@ -24,16 +24,3 @@ obstruction_layer_realsense:
   cost_scaling_factor: 2.0
   obstruction_half_life: 20
   num_obstruction_levels: 3
-
-######
-# TO BE DELETED
-######
-obstacle_realsense_layer:
-  obstacle_range: 3.0
-  raytrace_range: 4.0
-inflation_layer:
-  inflation_radius: 0.75
-  cost_scaling_factor: 2.0
-obstacle_layer:
-  obstacle_range: 3.0
-  raytrace_range: 25.0

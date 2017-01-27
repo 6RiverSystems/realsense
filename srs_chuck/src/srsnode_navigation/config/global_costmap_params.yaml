@@ -14,4 +14,4 @@ global_costmap:
   plugins:
    - {name: static_layer, type: "costmap_2d::StaticLayerWithInflation"}
    - {name: obstruction_layer, type: "costmap_2d::ObstructionLayer"}
-#   - {name: obstruction_layer_realsense, type: "costmap_2d::ObstructionLayer"}
+   - {name: obstruction_layer_realsense, type: "costmap_2d::ObstructionLayer"}

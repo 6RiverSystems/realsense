@@ -10,18 +10,18 @@
 #include <utility>
 
 #include <ros/ros.h>
-#include <srslib_framework/TimingData.h>
-#include <srslib_framework/TimingDataSample.h>
-#include <srslib_framework/platform/timing/TimingData.hpp>
+#include <srslib_timing/TimingData.h>
+#include <srslib_timing/TimingDataSample.h>
+#include <srslib_timing/TimingData.hpp>
 
 namespace srs {
 
 struct TimingDataMessageFactory
 {
 
-    static srslib_framework::TimingData data2Msg(const TimingData& data)
+    static srslib_timing::TimingData data2Msg(const TimingData& data)
     {
-        srslib_framework::TimingData td;
+        srslib_timing::TimingData td;
         td.id = data.getId();
         td.start_time = ros::Time(data.getStartTime());
         td.end_time = ros::Time(data.getEndTime());
@@ -29,7 +29,7 @@ struct TimingDataMessageFactory
         td.samples.reserve(samples.size());
         for (auto s : samples)
         {
-            srslib_framework::TimingDataSample tds;
+            srslib_timing::TimingDataSample tds;
             tds.duration = s.duration_;
             tds.sample_end_time = ros::Time(s.endTime_);
             td.samples.push_back(tds);

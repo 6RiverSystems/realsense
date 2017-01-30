@@ -35,6 +35,7 @@ find_package(catkin REQUIRED COMPONENTS
     polyclipping
     srslib_framework
     srslib_test
+    srslib_timing
 )
 
 generate_dynamic_reconfigure_options(

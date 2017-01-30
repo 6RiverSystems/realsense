@@ -4,4 +4,5 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 uint8 id
-uint16 value
+string name
+float32 value

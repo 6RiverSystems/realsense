@@ -26,7 +26,6 @@ public:
     void run();
 
 private:
-
     void OnDepthData( const sensor_msgs::Image::ConstPtr& infraredImage );
 
 private:
@@ -37,11 +36,11 @@ private:
 
     constexpr static unsigned int REFRESH_RATE_HZ = 50;
 
-    ros::NodeHandle 									rosNodeHandle_;
+    ros::NodeHandle 										rosNodeHandle_;
 
     ros::Subscriber						 				depthSubscriber_;
 
-    ros::Publisher 										depthMedianFilterPublisher_;
+    ros::Publisher 										depthPublisher_;
 
 };
 

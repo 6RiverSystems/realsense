@@ -10,11 +10,9 @@ local_costmap:
   transform_tolerance: 0.5
   resolution: 0.05
   map_update_thread_affinity: 3
-
   static_layer:
     inflation:
         inflation_radius: 0.75
-
   plugins:
    - {name: static_layer, type: "costmap_2d::StaticLayerWithInflation"}
    - {name: obstruction_layer, type: "costmap_2d::ObstructionLayer"}

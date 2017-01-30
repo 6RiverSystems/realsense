@@ -26,6 +26,7 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp
     sensor_msgs
     message_filters
+    nodelet
 )
 
 find_package(OpenCV REQUIRED)
@@ -45,6 +46,12 @@ include_directories(include
 catkin_package(
 
 )
+
+add_library(RealsenseDriver src/RealsenseDriver.cpp)
+target_link_libraries(RealsenseDriver ${catkin_LIBRARIES})
+
+add_library(RealsenseDriverNodelet src/RealsenseDriverNodelet.cpp)
+target_link_libraries(RealsenseDriverNodelet RealsenseDriver ${catkin_LIBRARIES})
 
 add_executable(${PROJECT_NODE} 
     ${PROJECT_MAIN}

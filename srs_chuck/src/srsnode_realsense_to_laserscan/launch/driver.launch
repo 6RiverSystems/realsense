@@ -28,6 +28,7 @@
        
 	<!-- Intel Realsense R200 driver -->
 	<include file="$(find realsense_camera)/launch/r200_nodelet_modify_params.launch" >
+	<arg name="enable_depth"        value="true" />
 	<arg name="enable_ir"         	value="false" />
 	<arg name="enable_ir2"        	value="false" />
 	<arg name="enable_color"      	value="false" />
@@ -36,20 +37,23 @@
 	<arg name="depth_height"        value="240" />
 	<arg name="depth_width"         value="320" />
 	<arg name="depth_fps"		value="30" />
+	<arg name="color_height"        value="240" />
+        <arg name="color_width"         value="320" />
 	<arg name="color_fps"		value="30" />
 	</include>
-	
-	<!-- Point cloud to laser scan conversion -->
-	<node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan">
 
-        <remap from="image" to="/internal/sensors/rgbd/depth/image_raw"/>
-        <remap from="camera_info" to="/internal/sensors/rgbd/depth/camera_info"/>
-        <remap from="scan" to="/internal/sensors/rgbd/scan"/>
+        <!-- launch RealsenseDriver nodelet -->
+        <node pkg="nodelet" type="nodelet" name="srsnode_realsense" args="load srsnode_realsense_to_laserscan/RealsenseDriverNodelet /camera/nodelet_manager"/>
+
+        <!-- launch depthimage_to_laserscan nodelet -->
+        <node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet /camera/nodelet_manager">
+        <remap from="/camera/image" to="/internal/sensors/rgbd/depth/image_filtered"/>
+        <remap from="/camera/rgbd_scan"  to="/internal/sensors/rgbd/scan/raw"/>
         <rosparam>
             output_frame_id: laser_frame
             scan_height: 120
             scan_time: 0.333
-            range_min: 0.3
+            range_min: 0.4
             range_max: 4.0
             height_min: 0.1
             height_max: 3.0
@@ -57,10 +61,9 @@
         </node>
 
 	<node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="rgbd_laser_filter">
-		<remap from="scan" to="/internal/sensors/rgbd/scan" />
-		<remap from="scan_filtered" to="/internal/sensors/rgbd/scan/filtered" />
-		<rosparam command="load" file="$(find srsnode_laser_filters)/config/rgbd_laser_filter.yaml" />
-	</node>
-
+        <remap from="scan" to="/internal/sensors/rgbd/scan/raw" />
+        <remap from="scan_filtered" to="/internal/sensors/rgbd/scan/filtered" />
+        <rosparam command="load" file="$(find srsnode_laser_filters)/config/rgbd_laser_filter.yaml" />
+        </node>
 </launch>
 

@@ -7,7 +7,7 @@
 
 #include <string>
 #include <unordered_map>
-#include <srslib_framework/platform/timing/TimingDataRecorder.hpp>
+#include <srslib_timing/TimingDataRecorder.hpp>
 
 namespace srs {
 

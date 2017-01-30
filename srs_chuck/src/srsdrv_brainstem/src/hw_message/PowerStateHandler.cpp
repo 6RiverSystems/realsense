@@ -60,22 +60,17 @@ float PowerStateHandler::convertBatteryDescriptorValue(uint8_t id, uint16_t valu
 	    switch (bd)
 	    {
 	    	case BATTERY_DESCRIPTOR::TEMPERATURE:
-	    		ROS_WARN("Temp raw: %d", value);
 	    		return (float)value / 10.0 - 273.15; // originally in dK
 	    	case BATTERY_DESCRIPTOR::VOLTAGE:
-	    		ROS_WARN("Voltage raw: %d", value);
 	    		return (float)value / 1000.0;  // originally in mV
     		case BATTERY_DESCRIPTOR::AVERAGE_CURRENT:
     		{
     			int16_t signed_val = (int16_t)value;
-    			ROS_WARN("current: %d, %d", value, signed_val);
     			return (float)signed_val / 1000.0; // originally in mA
     		}
 			case BATTERY_DESCRIPTOR::CHARGED_PERCENTAGE:
-	    		ROS_WARN("Charged raw: %d", value);
 				return (float)value / 100.0;  // originally in 0-100
 			case BATTERY_DESCRIPTOR::AVERAGE_TIME_TO_EMPTY:
-				ROS_WARN("empty time raw: %d", value);
 				return (float)value; // Time in minutes
 			default:
 				ROS_WARN("Unknown battery descriptor");
@@ -143,7 +138,7 @@ void PowerStateHandler::receiveMessage(ros::Time currentTime, HardwareMessage& m
 
 	std::string strData =  stream.str( );
 
-	ROS_INFO_STREAM( strData );
+	ROS_INFO_STREAM_THROTTLE( 60, strData );
 
 	// Publish the power State
 	publisher_.publish(powerStateMsg);

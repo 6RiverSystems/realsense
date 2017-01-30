@@ -47,6 +47,7 @@ find_package(catkin REQUIRED COMPONENTS
     pluginlib
     srslib_framework
     srslib_test
+    srslib_timing
 )
 
 generate_dynamic_reconfigure_options(
@@ -59,7 +60,7 @@ include_directories(
     include
     src
     ${catkin_INCLUDE_DIRS}
-    ${OpenCV_INCLUDE_DIRS} 
+    ${OpenCV_INCLUDE_DIRS}
     ${srslib_framework_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
 )
@@ -100,7 +101,7 @@ install(TARGETS srslib_global_planner
    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
-install(DIRECTORY 
+install(DIRECTORY
     include/${PROJECT_NAME}/
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
     PATTERN ".svn" EXCLUDE

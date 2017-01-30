@@ -1,4 +1,4 @@
-<!-- 
+<!--
   *
   * (c) Copyright 2015-2016 River Systems, all rights reserved.
   *
@@ -33,5 +33,5 @@
 	<include file="$(find srsnode_laser_filters)/launch/driver.launch" />
 
     <!-- RGBD => Laserscan -->
-    <!--include unless="$(arg use_sim_time)" file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" /-->
+    <include unless="$(arg use_sim_time)" file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" />
 </launch>

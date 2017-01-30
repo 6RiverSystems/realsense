@@ -5,8 +5,7 @@
  */
 #pragma once
 #include <string>
-#include <srslib_framework/ros/channel/publisher/PublisherTimingData.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_timing/PublisherTimingData.hpp>
 
 namespace srs {
 
@@ -15,7 +14,7 @@ class ChannelTimingData :
 {
 public:
     ChannelTimingData() :
-        PublisherTimingData(ChuckTopics::monitoring::TIMING_DATA)
+        PublisherTimingData("/monitoring/timing_data")
     {}
 };
 

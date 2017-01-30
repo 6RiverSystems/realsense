@@ -73,8 +73,6 @@ set(${PROJECT_NAME}_MSGS
     Pose.msg
     SensorFrame.msg
     Sound.msg
-    TimingData.msg
-    TimingDataSample.msg
     Velocity.msg
     Odometry.msg
     OdometryRpm.msg
@@ -171,6 +169,7 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     nav_msgs
     costmap_2d
+    srslib_timing
 )
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED)

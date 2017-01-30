@@ -42,26 +42,10 @@
 	<arg name="color_fps"		value="30" />
 	</include>
 
-        <!--node pkg="srsnode_realsense_to_laserscan" type="srsnode_realsense_to_laserscan" name="depthimage_filter" /-->
-
-	<!-- Point cloud to laser scan conversion -->
-        <!--
-	<node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan">
-        <remap from="image" to="/internal/sensors/rgbd/depth/image_filtered"/>
-        <remap from="scan" to="/internal/sensors/rgbd/scan/raw"/>
-        <rosparam>
-            output_frame_id: laser_frame
-            scan_height: 120
-            scan_time: 0.333
-            range_min: 0.4
-            range_max: 4.0
-            height_min: 0.1
-            height_max: 3.0
-        </rosparam>
-        </node>
-        -->
-
+        <!-- launch RealsenseDriver nodelet -->
         <node pkg="nodelet" type="nodelet" name="srsnode_realsense" args="load srsnode_realsense_to_laserscan/RealsenseDriverNodelet /camera/nodelet_manager"/>
+
+        <!-- launch depthimage_to_laserscan nodelet -->
         <node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet /camera/nodelet_manager">
         <remap from="/camera/image" to="/internal/sensors/rgbd/depth/image_filtered"/>
         <remap from="/camera/rgbd_scan"  to="/internal/sensors/rgbd/scan/raw"/>

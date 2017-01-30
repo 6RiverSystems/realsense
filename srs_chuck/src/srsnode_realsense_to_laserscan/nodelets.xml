@@ -4,7 +4,7 @@
          type="srs::RealsenseDriverNodelet"
          base_class_type="nodelet::Nodelet">
     <description>
-      blah
+      A nodelet version of RealsenseDriver.
     </description>
   </class>
 

@@ -14,7 +14,6 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(MapStack* stack,
     Pose<> start, vector<Pose<>> goals,
-    AStar::ConfigParameters configParameters,
     MapStackNode::SearchParameters searchParameters)
 {
     Solution<Grid2dSolutionItem>* globalSolution =
@@ -26,7 +25,7 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(MapSta
     for (Pose<> goal : goals)
     {
         Solution<Grid2dSolutionItem>* localSolution = fromSingleGoal(stack, intermediateStart,
-            goal, configParameters, searchParameters);
+            goal, searchParameters);
         if (!localSolution->isValid())
         {
             globalSolution->setValid(false);
@@ -47,7 +46,6 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(MapSta
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* stack,
     Position& start, Position& goal,
-    AStar::ConfigParameters configParameters,
     MapStackNode::SearchParameters searchParameters)
 {
     if (!stack)
@@ -60,7 +58,7 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* st
 
     AStar algorithm;
 
-    if (algorithm.search(startNode, goalNode, configParameters))
+    if (algorithm.search(startNode, goalNode))
     {
         Plan plan;
         algorithm.getPlan(plan);
@@ -74,7 +72,6 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* st
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* stack,
     Pose<> fromPose, Pose<> toPose,
-    AStar::ConfigParameters configParameters,
     MapStackNode::SearchParameters searchParameters)
 {
     if (!stack)
@@ -88,7 +85,7 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* st
     // Prepare the goal position for the search
     Position goal = pose2Map(stack->getLogicalMap(), toPose);
 
-    return fromSingleGoal(stack, start, goal, configParameters, searchParameters);
+    return fromSingleGoal(stack, start, goal, searchParameters);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

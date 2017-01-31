@@ -53,8 +53,6 @@ private:
         const geometry_msgs::PoseStamped& goal,
         vector<geometry_msgs::PoseStamped>& plan);
 
-    AStar::ConfigParameters astarConfigParameters_;
-
     ChannelRosPath channelRosPath_;
     dynamic_reconfigure::Server<srsnode_navigation::SrsPlannerConfig>* configServer_;
     costmap_2d::Costmap2D* costMap2d_;

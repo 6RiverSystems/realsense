@@ -20,18 +20,13 @@ namespace srs {
 class AStar
 {
 public:
+    /*
+     * Sets the expected number of nodes to accommodate at least count elements without
+     * exceeding maximum load factor and rehashes the closed list. Since, at the moment,
+     * A* performs a search primarily on maps, the value has been estimated on the
+     * average path search.
+     */
     static constexpr int CLOSED_HASH_RESERVE = 400000;
-
-    struct ConfigParameters
-    {
-        ConfigParameters() :
-            useYield(true),
-            yieldFrequency(2000)
-        {}
-
-        bool useYield;
-        unsigned int yieldFrequency;
-    };
 
     AStar();
     ~AStar();
@@ -75,8 +70,7 @@ public:
         return lastNode_;
     }
 
-    bool search(SearchNode* start, SearchGoal* goal,
-        ConfigParameters parameters = ConfigParameters());
+    bool search(SearchNode* start, SearchGoal* goal);
 
 private:
     using ClosedSetType = unordered_set<SearchNode*, SearchNode::Hash, SearchNode::EqualTo>;
@@ -90,7 +84,6 @@ private:
     unsigned int counterInserted_;
     unsigned int counterPruned_;
     unsigned int counterReplaced_;
-    unsigned int counterYield_;
 
     SearchNode* lastNode_;
 

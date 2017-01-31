@@ -17,17 +17,7 @@ struct OccupancyMetadata
 {
 public:
     OccupancyMetadata() :
-        loadTime(0),
-        heightCells(0),
-        widthCells(0),
-        heightM(0.0),
-        widthM(0.0),
-        origin(Pose<>::INVALID),
-        resolution(0.0),
-        occupancyFilename(""),
-        thresholdOccupied(0.9),
-        thresholdFree(0.1),
-        negate(false)
+        OccupancyMetadata(0, 0, 0, 0.0, 0.0, Pose<>::INVALID, 0.0, "", 0.9, 0.1, false)
     {}
 
     OccupancyMetadata(double loadTime,
@@ -35,17 +25,14 @@ public:
             Pose<> origin, double resolution,
             string occupancyFilename,
             double thresholdOccupied, double thresholdFree, bool negate) :
-        loadTime(loadTime),
-        heightCells(heightCells),
-        widthCells(widthCells),
-        heightM(MeasurementMath::cells2M(heightCells, resolution)),
-        widthM(MeasurementMath::cells2M(widthCells, resolution)),
-        origin(origin),
-        resolution(resolution),
-        occupancyFilename(occupancyFilename),
-        thresholdOccupied(thresholdOccupied),
-        thresholdFree(thresholdFree),
-        negate(negate)
+                OccupancyMetadata(loadTime,
+                    widthCells, heightCells,
+                    MeasurementMath::cells2M(widthCells, resolution),
+                    MeasurementMath::cells2M(heightCells, resolution),
+                    origin, resolution,
+                    occupancyFilename,
+                    thresholdOccupied, thresholdFree,
+                    negate)
     {}
 
     OccupancyMetadata(double loadTime,
@@ -53,17 +40,14 @@ public:
             Pose<> origin, double resolution,
             string occupancyFilename,
             double thresholdOccupied, double thresholdFree, bool negate) :
-        loadTime(loadTime),
-        heightCells(MeasurementMath::m2Cells(heightM, resolution)),
-        widthCells(MeasurementMath::m2Cells(widthM, resolution)),
-        heightM(heightM),
-        widthM(widthM),
-        origin(origin),
-        resolution(resolution),
-        occupancyFilename(occupancyFilename),
-        thresholdOccupied(thresholdOccupied),
-        thresholdFree(thresholdFree),
-        negate(negate)
+                OccupancyMetadata(loadTime,
+                    MeasurementMath::m2Cells(widthM, resolution),
+                    MeasurementMath::m2Cells(heightM, resolution),
+                    widthM, heightM,
+                    origin, resolution,
+                    occupancyFilename,
+                    thresholdOccupied, thresholdFree,
+                    negate)
     {}
 
     OccupancyMetadata(const OccupancyMetadata& other) :
@@ -95,6 +79,23 @@ public:
             BasicMath::equal(lhs.widthM, rhs.widthM, 0.001);
     }
 
+protected:
+    OccupancyMetadata(double loadTime,
+            unsigned int widthCells, unsigned int heightCells,
+            double widthM, double heightM,
+            Pose<> origin, double resolution,
+            string occupancyFilename,
+            double thresholdOccupied, double thresholdFree, bool negate) :
+        loadTime(loadTime),
+        widthCells(widthCells), heightCells(heightCells),
+        widthM(widthM), heightM(heightM),
+        origin(origin), resolution(resolution),
+        occupancyFilename(occupancyFilename),
+        thresholdOccupied(thresholdOccupied), thresholdFree(thresholdFree),
+        negate(negate)
+    {}
+
+public:
     unsigned int heightCells;
     double heightM;
 

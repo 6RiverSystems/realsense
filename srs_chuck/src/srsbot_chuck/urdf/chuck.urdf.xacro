@@ -95,13 +95,10 @@
     <caster fb="back" parent="base_link" translateX="${caster_back_x_offset}" translateY="0" translateZ="${caster_z_offset}" />
 
 	<!-- Realsense R200 -->
-	<sensor_r200 parent="base_link" r200_cam_y_rotation="${M_PI}" r200_cam_px="${r200_x_offset}" r200_cam_py="${r200_y_offset}" r200_cam_pz="${r200_z_offset}" />
-
-	<!-- Stargazer -->
-	<stargazer parent="base_link" translateX="${stargazer_x_offset}" translateY="${stargazer_y_offset}" translateZ="${stargazer_z_offset}" />
+	<sensor_r200 parent="base_link" r200_cam_y_rotation="${realsense_z_rotation}" r200_cam_px="${r200_x_offset}" r200_cam_py="${r200_y_offset}" r200_cam_pz="${r200_z_offset}" />
 
   	<joint name="laser_frame_joint" type="fixed">
-  	  <origin xyz="${base_x_size/2} 0 0" rpy="${M_PI} 0 0" />
+  	  <origin xyz="${base_x_size/2} 0 0" rpy="${realsense_z_rotation} 0 0" />
   	  <parent link="base_footprint" />
   	  <child link="laser_frame" />
   	</joint>

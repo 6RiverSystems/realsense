@@ -13,6 +13,7 @@ PowerStateHandler::PowerStateHandler(ChannelBrainstemPowerState::Interface& publ
 	validDescriptors_.insert(BATTERY_DESCRIPTOR::TEMPERATURE);
 	validDescriptors_.insert(BATTERY_DESCRIPTOR::VOLTAGE);
 	validDescriptors_.insert(BATTERY_DESCRIPTOR::AVERAGE_CURRENT);
+	validDescriptors_.insert(BATTERY_DESCRIPTOR::INSTANTANEOUS_CURRENT);
 	validDescriptors_.insert(BATTERY_DESCRIPTOR::CHARGED_PERCENTAGE);
 	validDescriptors_.insert(BATTERY_DESCRIPTOR::AVERAGE_TIME_TO_EMPTY);
 }
@@ -32,6 +33,8 @@ std::string PowerStateHandler::getBatteryDescriptorName(uint8_t id)
 	    		return "Voltage (V)";
     		case BATTERY_DESCRIPTOR::AVERAGE_CURRENT:
     			return "Average current (A)";
+    		case BATTERY_DESCRIPTOR::INSTANTANEOUS_CURRENT:
+    			return "Instantaneous current (A)";
 			case BATTERY_DESCRIPTOR::CHARGED_PERCENTAGE:
 				return "Percent charged (0-1)";
 			case BATTERY_DESCRIPTOR::AVERAGE_TIME_TO_EMPTY:
@@ -64,6 +67,11 @@ float PowerStateHandler::convertBatteryDescriptorValue(uint8_t id, uint16_t valu
 	    	case BATTERY_DESCRIPTOR::VOLTAGE:
 	    		return (float)value / 1000.0;  // originally in mV
     		case BATTERY_DESCRIPTOR::AVERAGE_CURRENT:
+    		{
+    			int16_t signed_val = (int16_t)value;
+    			return (float)signed_val / 1000.0; // originally in mA
+    		}
+    		case BATTERY_DESCRIPTOR::INSTANTANEOUS_CURRENT:
     		{
     			int16_t signed_val = (int16_t)value;
     			return (float)signed_val / 1000.0; // originally in mA

@@ -43,7 +43,7 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::Image::ConstPtr& depthImag
 	outputImage = cvDepthImage->image.clone();
 	//cv::flip(cvDepthImage->image, cvDepthImage->image, -1);
 
-	cv::medianBlur( outputImage, outputImage, 3 );
+	cv::medianBlur( outputImage, outputImage, 5 );
 
 	cvDepthImage->image = outputImage;
 	depthPublisher_.publish( cvDepthImage );

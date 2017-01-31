@@ -8,7 +8,7 @@
 <launch>
 	<arg name="camera" default="camera" />
 	<arg name="simulation" default="false" />
-/camera/color/camera_info
+
 	<remap from="/$(arg camera)/color/camera_info" to="/internal/sensors/rgbd/color/camera_info"/>
 	<remap from="/$(arg camera)/color/image_raw" to="/internal/sensors/rgbd/color/image_raw"/>
 	<remap from="/$(arg camera)/depth/camera_info" to="/internal/sensors/rgbd/depth/camera_info"/>

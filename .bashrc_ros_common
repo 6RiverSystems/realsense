@@ -1,6 +1,7 @@
 export ROS_HOSTNAME=$ROBOT_NAME
 export ROSCONSOLE_CONFIG_FILE=$HOME/.rosconsole.config
 export ROS_PACKAGE_PATH=
+export ROS_LOG_DIR="/dev/null"
 export ROSLISP_PACKAGE_DIRECTORIES=
 unset GTK_IM_MODULE
 source ~/ros/.bash_aliases

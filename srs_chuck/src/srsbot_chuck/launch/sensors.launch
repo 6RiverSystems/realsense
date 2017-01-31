@@ -8,12 +8,11 @@
 <launch>
     <arg name="use_sim_time" default="false" />
 
-	<remap from="scan" to="/internal/sensors/lidar/scan/raw" />
-
     <!-- Sick LIDAR -->
 	<node unless="$(arg use_sim_time)" name="sick_tim571_2050101" pkg="sick_tim" type="sick_tim551_2050001" respawn="false" output="screen">
-		<param name="min_ang" type="double" value="-1.74533" />
-		<param name="max_ang" type="double" value="1.74533" />
+	<remap from="scan" to="/internal/sensors/lidar/scan/raw" />
+	<param name="min_ang" type="double" value="-1.74533" />
+	<param name="max_ang" type="double" value="1.74533" />
     	<param name="intensity" type="bool" value="true" />
     	<param name="skip" type="int" value="0" />
     	<param name="frame_id" type="str" value="sick_lidar" />
@@ -33,5 +32,6 @@
 	<include file="$(find srsnode_laser_filters)/launch/driver.launch" />
 
     <!-- RGBD => Laserscan -->
-    <include unless="$(arg use_sim_time)" file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" />
+	<include unless="$(arg use_sim_time)" file="$(find srsnode_realsense_to_laserscan)/launch/driver.launch" />
+
 </launch>

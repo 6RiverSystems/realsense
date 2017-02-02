@@ -68,6 +68,14 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <realsense_camera/constants.h>
 
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/ModelCoefficients.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+#include <pcl/sample_consensus/method_types.h>
+#include <pcl/sample_consensus/model_types.h>
+#include <pcl/segmentation/sac_segmentation.h>
+
 #include <queue>
 #include <unistd.h>
 #include <signal.h>
@@ -171,6 +179,7 @@ namespace realsense_camera
     virtual void checkError();
     virtual bool checkForSubscriber();
     virtual void wrappedSystem(std::vector<std::string> string_argv);
+    virtual void calculateNormal(const sensor_msgs::PointCloud2& input_cloud);
   };
 }
 #endif

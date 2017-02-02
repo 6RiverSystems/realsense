@@ -6,4 +6,4 @@
 string id
 time start_time
 time end_time
-srslib_framework/TimingDataSample[] samples
+srslib_timing/TimingDataSample[] samples

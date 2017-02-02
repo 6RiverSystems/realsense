@@ -16,8 +16,9 @@ namespace srs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 RealsenseDriver::RealsenseDriver( ) :
 	rosNodeHandle_( ),
-	depthSubscriber_( rosNodeHandle_.subscribe<sensor_msgs::Image>( "/camera/depth/image_raw", 100,
-		std::bind( &RealsenseDriver::OnDepthData, this, std::placeholders::_1 ) ) )
+	depthSubscriber_( rosNodeHandle_.subscribe<sensor_msgs::Image>( "/internal/sensors/rgbd/depth/image_raw", 100,
+		std::bind( &RealsenseDriver::OnDepthData, this, std::placeholders::_1 ) ) ),
+        depthPublisher_( rosNodeHandle_.advertise<sensor_msgs::Image>("/internal/sensors/rgbd/depth/image_filtered", 100 ) )
 {
 
 }
@@ -26,7 +27,6 @@ RealsenseDriver::RealsenseDriver( ) :
 void RealsenseDriver::run( )
 {
 	ros::Rate refreshRate( REFRESH_RATE_HZ );
-
 	while( ros::ok( ) )
 	{
 		ros::spinOnce( );
@@ -39,13 +39,14 @@ void RealsenseDriver::OnDepthData( const sensor_msgs::Image::ConstPtr& depthImag
 {
 	cv_bridge::CvImagePtr cvDepthImage = GetCvImage( depthImage );
 
-	cv::flip(cvDepthImage->image, cvDepthImage->image, -1);
+	cv::Mat outputImage;
+	outputImage = cvDepthImage->image.clone();
+	//cv::flip(cvDepthImage->image, cvDepthImage->image, -1);
 
-	cv::Mat medianFilterImg;
-	cv::medianBlur( cvDepthImage->image, medianFilterImg, 5 );
+	cv::medianBlur( outputImage, outputImage, 5 );
 
-	cvDepthImage->image = medianFilterImg;
-	depthMedianFilterPublisher_.publish( cvDepthImage );
+	cvDepthImage->image = outputImage;
+	depthPublisher_.publish( cvDepthImage );
 }
 
 cv_bridge::CvImagePtr RealsenseDriver::GetCvImage( const sensor_msgs::Image::ConstPtr& image ) const

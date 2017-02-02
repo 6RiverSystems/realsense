@@ -21,7 +21,7 @@
 #include <srslib_framework/ros/tap/TapDepthCameraPoseOnRobot.hpp>
 #include <srslib_framework/ros/tap/TapBrainstem_Connected.hpp>
 
-#include <srslib_framework/platform/timing/MasterTimingDataRecorder.hpp>
+#include <srslib_timing/MasterTimingDataRecorder.hpp>
 
 #include <srsnode_midbrain/HardStopReflex.hpp>
 

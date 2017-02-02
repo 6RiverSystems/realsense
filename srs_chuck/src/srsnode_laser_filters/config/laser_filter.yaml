@@ -43,7 +43,7 @@ scan_filter_chain:
   params:
     neighbor_number: 3
     threshold_number: 2
-    threshold_radius: 0.2
+    threshold_ratio: 0.05
 - name: clean_up
   type: laser_filters/LaserScanRangeCleanUpFilter
 # intensity filter generally filters out only correct readings with low intensity

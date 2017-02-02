@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- 
+<!--
   *
   * (c) Copyright 2015-2016 River Systems, all rights reserved.
   *
@@ -11,7 +11,7 @@
     <name>srslib_framework</name>
     <version>1.0.0</version>
     <description>Library package: Framework</description>
-    
+
     <author email="fsantini@6river.com">Fabrizio Santini</author>
     <maintainer email="fsantini@6river.com">Fabrizio Santini</maintainer>
 
@@ -30,6 +30,9 @@
 
     <build_depend>nav_msgs</build_depend>
     <run_depend>nav_msgs</run_depend>
+
+    <build_depend>srslib_timing</build_depend>
+    <run_depend>srslib_timing</run_depend>
 
     <build_depend>srslib_test</build_depend>
     <run_depend>srslib_test</run_depend>

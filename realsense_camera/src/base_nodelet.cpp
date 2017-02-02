@@ -979,7 +979,7 @@ namespace realsense_camera
       }
 
       msg_pointcloud.header.frame_id = optical_frame_id_[RS_STREAM_DEPTH];
-      //calculateNormal(msg_pointcloud);
+      calculateNormal(msg_pointcloud);
       pointcloud_publisher_.publish(msg_pointcloud);
     }
   }
@@ -1172,10 +1172,14 @@ namespace realsense_camera
     pcl::PCLPointCloud2::Ptr input_pcl_cloud (new pcl::PCLPointCloud2 ());
     pcl_conversions::toPCL(input_cloud, *input_pcl_cloud);
 
+    pcl::PointCloud<pcl::PointXYZ>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::fromPCLPointCloud2(*input_pcl_cloud,*temp_cloud);
+
     pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
     pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
     // Create the segmentation object
-    pcl::SACSegmentation<pcl::PCLPointCloud2> seg;
+
+    pcl::SACSegmentation<pcl::PointXYZ> seg;
     // Optional
     seg.setOptimizeCoefficients (true);
     // Mandatory
@@ -1183,12 +1187,15 @@ namespace realsense_camera
     seg.setMethodType (pcl::SAC_RANSAC);
     seg.setDistanceThreshold (0.01);
 
-    seg.setInputCloud (input_pcl_cloud);
+    seg.setInputCloud (temp_cloud);
     seg.segment (*inliers, *coefficients);
+
+    if (inliers->indices.size () == 0)
+    {
+      ROS_ERROR ("Could not estimate a planar model for the given dataset.");
+    }
 
     ROS_ERROR("Model coefficients: %f, %f, %f, %f", coefficients->values[0], coefficients->values[1], coefficients->values[2], coefficients->values[3]);
 
   }
-
-
 }  // end namespace

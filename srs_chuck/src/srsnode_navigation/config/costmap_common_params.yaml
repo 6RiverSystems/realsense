@@ -10,7 +10,7 @@ static_layer:
       cost_scaling_factor: 2.0
 
 obstruction_layer:
-  obstacle_range: 3.0
+  obstacle_range: 5.0
   raytrace_range: 25.0
   inflation_radius: 0.75
   cost_scaling_factor: 2.0

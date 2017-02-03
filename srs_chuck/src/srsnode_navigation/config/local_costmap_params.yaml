@@ -13,6 +13,10 @@ local_costmap:
   static_layer:
     inflation:
         inflation_radius: 0.75
+
+  obstruction_layer:
+    inflation_radius: 1.0
+
   plugins:
    - {name: static_layer, type: "costmap_2d::StaticLayerWithInflation"}
    - {name: obstruction_layer, type: "costmap_2d::ObstructionLayer"}

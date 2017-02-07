@@ -1,7 +1,7 @@
 #include <srsnode_executive/Executive.hpp>
 
 #include <srslib_framework/math/VelocityMath.hpp>
-#include <srslib_framework/ros/topics/ChuckConfig.hpp>
+#include <srslib_framework/chuck/ChuckConfig.hpp>
 
 namespace srs {
 

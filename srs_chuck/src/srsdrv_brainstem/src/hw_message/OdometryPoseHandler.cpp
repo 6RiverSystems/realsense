@@ -8,7 +8,7 @@
 #include <srslib_framework/math/AngleMath.hpp>
 #include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/ros/message/VelocityMessageFactory.hpp>
-#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
+#include <srslib_framework/chuck/ChuckTransforms.hpp>
 
 namespace srs {
 

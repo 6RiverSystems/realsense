@@ -14,7 +14,7 @@
 #include <boost/filesystem.hpp>
 
 #include <srslib_framework/math/AngleMath.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
 
 namespace srs {
 

@@ -18,7 +18,7 @@
 #include <srslib_framework/io/SerialIO.hpp>
 #include <srslib_framework/platform/Thread.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
 
 namespace srs
 {

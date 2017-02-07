@@ -14,7 +14,7 @@ using namespace std;
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/ros/tap/subscriber/SubscriberSingleData.hpp>
 #include <srslib_framework/ros/message/MapStackMessageFactory.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
 
 namespace srs {
 

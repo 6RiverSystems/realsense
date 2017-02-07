@@ -17,7 +17,7 @@
 #include <bitset>
 
 #include <srslib_framework/math/BasicMath.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
 
 namespace srs
 {

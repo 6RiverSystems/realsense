@@ -80,10 +80,7 @@ public:
 
 	void getHardwareInformation( );
 
-    void shutdown( );
-
 private:
-
     void addHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler);
 
     void removeHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler);
@@ -101,6 +98,7 @@ private:
 	void getOperationalState(const ros::Time& now);
 
 	void sendDimensions();
+	void sendMaxAllowedVelocity();
 
 // Helper Methods
 
@@ -108,24 +106,9 @@ private:
 
 private:
 
-    HW_MESSAGE_BEGIN(CommandData)
-        uint8_t cmd;
-    HW_MESSAGE_END
-
-    HW_MESSAGE_BEGIN(OperationalStateData)
-    	uint8_t cmd;
-		uint8_t motionStatus;
-    HW_MESSAGE_END
-
-    HW_MESSAGE_BEGIN(DimensionData)
-    	uint8_t cmd;
-		uint8_t id;
-		float value;
-    HW_MESSAGE_END
-
 	static constexpr auto FAULT_TIMEOUT = 0.2f;
 
-	std::shared_ptr<IO> io_;
+    std::shared_ptr<IO> io_;
 
 	bool setupComplete_;
 
@@ -169,8 +152,6 @@ private:
 
     std::set<HardwareMessageHandlerPtr> hardwareHandlers_;
     std::set<SoftwareMessagePtr> softwareHandlers_;
-
-
 };
 
 } /* namespace srs */

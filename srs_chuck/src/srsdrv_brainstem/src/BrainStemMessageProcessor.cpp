@@ -8,6 +8,7 @@
 
 #include <srslib_framework/io/IO.hpp>
 #include <srslib_framework/utils/Logging.hpp>
+#include <srslib_framework/chuck/ChuckLimits.hpp>
 
 #include <BrainStemMessages.hpp>
 #include <BrainStemMessageProcessor.hpp>
@@ -29,7 +30,10 @@
 #include <sw_message/SoundHandler.hpp>
 #include <sw_message/UpdateUIHandler.hpp>
 
-
+#include <command/GetHardwareInfo.hpp>
+#include <command/GetOperationalState.hpp>
+#include <command/SendPhysicalDimension.hpp>
+#include <command/SetMaxAllowedVelocity.hpp>
 
 namespace srs {
 
@@ -77,7 +81,6 @@ BrainStemMessageProcessor::BrainStemMessageProcessor() :
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor()
 {
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -94,7 +97,7 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 
 		ros::Time currentTime = ros::Time::now();
 
-		if (setupComplete_ ||
+		if (isSetupComplete() ||
 			eCommand == BRAIN_STEM_MSG::OPERATIONAL_STATE ||
 			eCommand == BRAIN_STEM_MSG::HARDWARE_INFO)
 		{
@@ -105,7 +108,6 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 				try
 				{
 					handler->second->receiveData(currentTime, buffer);
-
 				}
 				catch(std::runtime_error& error)
 				{
@@ -139,24 +141,18 @@ void BrainStemMessageProcessor::getOperationalState()
 	{
 		ROS_DEBUG("Brainstem driver: GetOperationalState");
 
-		CommandData msg = { static_cast<uint8_t>(BRAIN_STEM_CMD::GET_OPERATIONAL_STATE) };
-
-		// Get the operational state
-		writeToSerialPort(reinterpret_cast<char*>(&msg), sizeof(msg));
+        GetOperationalState::send(this);
 	}
 }
 
 void BrainStemMessageProcessor::getHardwareInformation()
 {
-	if (sentPing_)
-	{
-		ROS_DEBUG("Brainstem driver: GetHardwareInformation");
+    if (sentPing_)
+    {
+        ROS_DEBUG("Brainstem driver: GetHardwareInformation");
 
-		CommandData msg = { static_cast<uint8_t>(BRAIN_STEM_CMD::GET_HARDWARE_INFO) };
-
-		// Get the hardware information (version, configuration, etc.)
-		writeToSerialPort(reinterpret_cast<char*>(&msg), sizeof(msg));
-	}
+        GetHardwareInfo::send(this);
+    }
 }
 
 void BrainStemMessageProcessor::sendDimensions()
@@ -167,13 +163,13 @@ void BrainStemMessageProcessor::sendDimensions()
 	}
 }
 
-void BrainStemMessageProcessor::shutdown()
+void BrainStemMessageProcessor::sendMaxAllowedVelocity()
 {
-	ROS_INFO("Brainstem driver: Shutdown");
+    // Allow the hardware not to move faster than the specified velocity
 
-	uint8_t cMessage = static_cast<uint8_t>(BRAIN_STEM_CMD::SHUTDOWN);
-
-	writeToSerialPort(reinterpret_cast<char*>(&cMessage), 1);
+    SetMaxAllowedVelocity::send(this,
+        ChuckLimits::PHYSICAL_MAX_LINEAR,
+        ChuckLimits::PHYSICAL_MAX_ANGULAR);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -310,6 +306,7 @@ void BrainStemMessageProcessor::checkSetupComplete()
 			syncState_ = true;
 
 			sendDimensions();
+			sendMaxAllowedVelocity();
 
 			// If this is a reconnect sync the brainstem statate
 			if (resync)
@@ -407,17 +404,10 @@ void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
 			mapDimensionName[DIMENSION::RIGHT_WHEEL_RADIUS] = "right_wheel_radius";
 		};
 
-		DimensionData msg = {
-			static_cast<uint8_t>(BRAIN_STEM_CMD::SET_DIMENSION),
-			static_cast<uint8_t>(dimension),
-			static_cast<float>(value)
-		};
+		SendPhysicalDimension::send(this, static_cast<int>(dimension), value);
 
 		ROS_DEBUG("Brainstem driver: Setting dimension: %s => %f",
 			mapDimensionName[dimension].c_str(), value);
-
-		// Get the hardware information (version, configuration, etc.)
-		writeToSerialPort(reinterpret_cast<char*>(&msg), sizeof(msg));
 	}
 	else
 	{

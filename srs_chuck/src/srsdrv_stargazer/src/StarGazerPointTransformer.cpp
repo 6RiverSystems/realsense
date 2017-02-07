@@ -16,7 +16,7 @@
 
 #include <srsdrv_stargazer/Anchor.hpp>
 #include <srslib_framework/math/AngleMath.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
 
 using namespace boost::accumulators;
 

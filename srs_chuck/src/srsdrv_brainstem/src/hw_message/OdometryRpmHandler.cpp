@@ -32,6 +32,7 @@ void OdometryRpmHandler::receiveMessage(ros::Time currentTime, HardwareMessage& 
 
 	if (timeSliceExpired)
 	{
+		/// @todo FIX PRECISION
 		ROS_ERROR_STREAM_NAMED("odometry_frame",
 			"Time-stamp out of range: " <<
 			" diff: " << (internalTime.toSec() - lastRosOdometryTime_.toSec()) <<

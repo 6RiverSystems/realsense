@@ -16,6 +16,7 @@
     <remap from="/map" to="/internal/state/map/ros_occupancy"/>
     <remap from="/initialpose" to="/request/initial_pose"/>
 
+    <arg name="launch-prefix" value="" if="$(arg emulation_mode)"/>
     <arg name="launch-prefix" value="taskset -c 3" unless="$(arg emulation_mode)"/>
 
     <!--- Move Base -->

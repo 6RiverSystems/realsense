@@ -24,6 +24,8 @@
 #include <srslib_timing/MasterTimingDataRecorder.hpp>
 
 #include <srsnode_midbrain/HardStopReflex.hpp>
+#include <srsnode_midbrain/HeadOnCollisionReflex.hpp>
+
 
 namespace srs
 {
@@ -61,6 +63,8 @@ private:
 
     // Reflexes
     HardStopReflex hardStopReflex_;
+    HeadOnCollisionReflex headOnCollisionReflex_;
+
 
     bool brainstemConnected_ = false;
 

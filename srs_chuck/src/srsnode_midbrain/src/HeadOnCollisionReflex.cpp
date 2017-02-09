@@ -113,6 +113,11 @@ bool HeadOnCollisionReflex::checkHardStop()
     }
     // Sum up the total change vs. the total expected.  Use to calculate average velocity.
     double totalDT = buffer_.back().time_ - buffer_.front().time_;
+    if (totalDT <= 0)
+    {
+        ROS_WARN("Cannot have a non-positive time difference in HOCR laser scan buffer");
+        return false;
+    }
     double rangeChangeOverExpected = totalRangeChange - expectedTotalRangeChange;
     if (rangeChangeOverExpected < 0)
     {
@@ -121,6 +126,11 @@ bool HeadOnCollisionReflex::checkHardStop()
     double obstacleAverageVelocity = rangeChangeOverExpected / totalDT;
 
     // Given current velocity, calculate stopping time and distance nominal.
+    if (nominalDecelRate_ <= 0)
+    {
+        ROS_WARN("Head on collision reflex cannot have a non-positive deceleration rate.");
+        return false;
+    }
     double stoppingTime = latestVelocity_.linear / nominalDecelRate_; // time until the robot could stop
     double stoppingDistance = 0.5 * latestVelocity_.linear * stoppingTime; // how far it will go in that time
 

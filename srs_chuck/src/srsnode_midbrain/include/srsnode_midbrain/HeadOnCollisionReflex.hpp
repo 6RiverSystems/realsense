@@ -22,17 +22,6 @@ public:
     HeadOnCollisionReflex();
     virtual ~HeadOnCollisionReflex();
 
-    // /**
-    //  * Set the pose of a sensor on the robot
-    //  * @param pose the pose of the sensor on the robot
-    //  * @param type the type of scan
-    //  */
-    // void setSensorPose(const tf::Transform pose, LaserScanType type)
-    // {
-    //     createLaserMapEntryIfMissing(type);
-    //     laserScansMap_[type].pose = pose;
-    // };
-
     /**
      * Set the current velocity of the robot.
      * @param velocity the current velocity
@@ -129,7 +118,7 @@ private:
     double minDistanceForStop_ = 0.3; // [m] If the obstacle is going to be this close to the robot when it stops, hard stop
 
     double minLinearVelocityForCheck_ = 0.02; // [m/s] The minimum robot velocity to trigger a hardstop
-    double maxRelativeTrackingVelocity_ = 4.0; // [m/s] the max relative velocity to consider
+    double maxRelativeTrackingVelocity_ = 3.0; // [m/s] the max relative velocity to consider
     double lidarSectorHalfWidth_ = 0.05; // [rad] Half width of the lidar sector in front of the bot to check
     double maxAngularVelocityForCheck_ = 0.5; // [rad/s] Maximum angular velocity of robot to use when checking
 };

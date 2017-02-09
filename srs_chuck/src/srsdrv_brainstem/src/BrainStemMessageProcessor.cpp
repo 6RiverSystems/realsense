@@ -74,6 +74,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor() :
     addSoftwareMessage(SoftwareMessagePtr(new ResetHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new PingHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new SetMotionStateHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new SetVelocityHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new ShutdownHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new SoundHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new UpdateUIHandler(this)));
@@ -166,6 +167,9 @@ void BrainStemMessageProcessor::sendDimensions()
 void BrainStemMessageProcessor::sendMaxAllowedVelocity()
 {
     // Allow the hardware not to move faster than the specified velocity
+    ROS_DEBUG_STREAM("Brainstem driver: " <<
+        "Setting linear velocity: " << ChuckLimits::PHYSICAL_MAX_LINEAR << " [m/s], " <<
+        "and angular velocity: " << ChuckLimits::PHYSICAL_MAX_ANGULAR << " [rad/s]");
 
     SetMaxAllowedVelocity::send(this,
         ChuckLimits::PHYSICAL_MAX_LINEAR,
@@ -189,6 +193,7 @@ void BrainStemMessageProcessor::setConnected(bool isConnected)
 		if (isConnected)
 		{
 			checkSetupComplete();
+			sendMaxAllowedVelocity();
 		}
 		else
 		{
@@ -245,7 +250,7 @@ void BrainStemMessageProcessor::checkForBrainstemFaultTimer(const ros::TimerEven
 	{
 		if ((event.current_expected - lastMessageTime_).toSec() > FAULT_TIMEOUT)
 		{
-			brainstemTimeout = true;
+		    brainstemTimeout = true;
 		}
 	}
 
@@ -327,8 +332,7 @@ void BrainStemMessageProcessor::checkSetupComplete()
 			{
 				ros::Time currentTime = ros::Time::now();
 
-				getHardwareInfo(currentTime);
-
+                getHardwareInfo(currentTime);
 				getOperationalState(currentTime);
 			}
 		}

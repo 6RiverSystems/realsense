@@ -13,7 +13,7 @@
 #include <srslib_framework/ros/channel/ChannelBrainstemCmd_SetMotionState.hpp>
 
 #include <srslib_framework/ros/tap/TapSensorOdometryPose.hpp>
-#include <srslib_framework/ros/tap/RosTapOperationalState.hpp>
+#include <srslib_framework/ros/tap/TapOperationalState.hpp>
 #include <srslib_framework/ros/tap/TapFilteredDepthCamera.hpp>
 #include <srslib_framework/ros/tap/TapFilteredLidar.hpp>
 #include <srslib_framework/ros/tap/TapRobotPose.hpp>
@@ -49,7 +49,7 @@ private:
 
     TapRobotPose tapRobotPose_;
     TapBrainstem_Connected tapBrainstemConnected_;
-    RosTapOperationalState tapOperationalState_;
+    TapOperationalState tapOperationalState_;
 
     // Channels
     ChannelBrainstemCmd_SetMotionState setMotionStateChannel_;

@@ -33,7 +33,6 @@ void Executive::execute()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Executive::initialize()
 {
-    tapOperationalState_.connectTap();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +43,7 @@ void Executive::updateContext()
 {
     context_.robotPose = tapRobotPose_.pop();
     context_.commandedVelocity = tapCommandedVelocity_.pop();
-    context_.isRobotPaused = tapOperationalState_.getPause();
+    context_.isRobotPaused = tapOperationalState_.getFreeSpin();
 
     // Make sure that the neither the logical not the occupancy maps
     // have been re-published. In case, destroy what we have and

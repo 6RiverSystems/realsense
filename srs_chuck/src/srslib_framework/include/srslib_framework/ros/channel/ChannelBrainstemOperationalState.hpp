@@ -14,8 +14,8 @@ class ChannelBrainstemOperationalState :
     public PublisherOperationalState
 {
 public:
-	ChannelBrainstemOperationalState() :
-		PublisherOperationalState(ChuckTopics::driver::BRAINSTEM_OPERATIONAL_STATE, 1, true)
+    ChannelBrainstemOperationalState() :
+        PublisherOperationalState(ChuckTopics::driver::BRAINSTEM_OPERATIONAL_STATE, 1, true)
     {}
 };
 

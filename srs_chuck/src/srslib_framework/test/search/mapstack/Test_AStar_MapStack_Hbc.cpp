@@ -19,7 +19,7 @@ using namespace std;
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
 using namespace srs;
 
-#define VALGRIND 0
+// #define VALGRIND 0
 #ifdef VALGRIND
 #include <valgrind/callgrind.h>
 #endif

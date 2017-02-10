@@ -163,6 +163,8 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     nav_msgs
     costmap_2d
+    srslib_test
+    srslib_timing
 )
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED)
@@ -178,6 +180,7 @@ include_directories(
     ${roscpp_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
+    ${srslib_timing_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
 )
 
@@ -221,6 +224,7 @@ catkin_package(
         std_msgs
         nav_msgs
         srslib_test
+        srslib_timing
         costmap_2d
 )
 

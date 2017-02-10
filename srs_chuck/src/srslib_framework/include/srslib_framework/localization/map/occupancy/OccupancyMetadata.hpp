@@ -6,6 +6,7 @@
 #pragma once
 
 #include <srslib_framework/math/PoseMath.hpp>
+#include <srslib_framework/math/MeasurementMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
@@ -16,17 +17,51 @@ struct OccupancyMetadata
 {
 public:
     OccupancyMetadata() :
-        loadTime(0),
-        heightCells(0),
-        widthCells(0),
-        heightM(0.0),
-        widthM(0.0),
-        origin(Pose<>::INVALID),
-        resolution(0.0),
-        occupancyFilename(""),
-        thresholdOccupied(0.9),
-        thresholdFree(0.1),
-        negate(false)
+        OccupancyMetadata(0, 0, 0, 0.0, 0.0, Pose<>::INVALID, 0.0, "", 0.9, 0.1, false)
+    {}
+
+    OccupancyMetadata(double loadTime,
+            unsigned int widthCells, unsigned int heightCells,
+            Pose<> origin, double resolution,
+            string occupancyFilename,
+            double thresholdOccupied, double thresholdFree, bool negate) :
+                OccupancyMetadata(loadTime,
+                    widthCells, heightCells,
+                    MeasurementMath::cells2M(widthCells, resolution),
+                    MeasurementMath::cells2M(heightCells, resolution),
+                    origin, resolution,
+                    occupancyFilename,
+                    thresholdOccupied, thresholdFree,
+                    negate)
+    {}
+
+    OccupancyMetadata(double loadTime,
+            double widthM, double heightM,
+            Pose<> origin, double resolution,
+            string occupancyFilename,
+            double thresholdOccupied, double thresholdFree, bool negate) :
+                OccupancyMetadata(loadTime,
+                    MeasurementMath::m2Cells(widthM, resolution),
+                    MeasurementMath::m2Cells(heightM, resolution),
+                    widthM, heightM,
+                    origin, resolution,
+                    occupancyFilename,
+                    thresholdOccupied, thresholdFree,
+                    negate)
+    {}
+
+    OccupancyMetadata(const OccupancyMetadata& other) :
+        loadTime(other.loadTime),
+        heightCells(other.heightCells),
+        widthCells(other.widthCells),
+        heightM(other.heightM),
+        widthM(other.widthM),
+        origin(other.origin),
+        resolution(other.resolution),
+        occupancyFilename(other.occupancyFilename),
+        thresholdOccupied(other.thresholdOccupied),
+        thresholdFree(other.thresholdFree),
+        negate(other.negate)
     {}
 
     friend bool operator==(const OccupancyMetadata& lhs, const OccupancyMetadata& rhs)
@@ -44,6 +79,23 @@ public:
             BasicMath::equal(lhs.widthM, rhs.widthM, 0.001);
     }
 
+protected:
+    OccupancyMetadata(double loadTime,
+            unsigned int widthCells, unsigned int heightCells,
+            double widthM, double heightM,
+            Pose<> origin, double resolution,
+            string occupancyFilename,
+            double thresholdOccupied, double thresholdFree, bool negate) :
+        loadTime(loadTime),
+        widthCells(widthCells), heightCells(heightCells),
+        widthM(widthM), heightM(heightM),
+        origin(origin), resolution(resolution),
+        occupancyFilename(occupancyFilename),
+        thresholdOccupied(thresholdOccupied), thresholdFree(thresholdFree),
+        negate(negate)
+    {}
+
+public:
     unsigned int heightCells;
     double heightM;
 

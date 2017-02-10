@@ -26,9 +26,7 @@ public:
         metadata_()
     {}
 
-    OccupancyMap* fromCostMap2D(costmap_2d::Costmap2D* costMap,
-        double freeThreshold, double occupiedThreshold);
-    OccupancyMap* fromGrid2d(Grid2d* grid, double resolution, Pose<> origin);
+    OccupancyMap* fromGrid2d(SimpleGrid2d* grid, Pose<> origin, double resolution);
     OccupancyMap* fromMetadata(const OccupancyMetadata& metadata);
     OccupancyMap* fromMetadata(const OccupancyMetadata& metadata, const vector<int8_t>& occupancy);
     OccupancyMap* fromMetadataRawCost(const OccupancyMetadata& metadata);

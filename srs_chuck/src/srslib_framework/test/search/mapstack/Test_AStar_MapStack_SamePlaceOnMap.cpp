@@ -10,6 +10,7 @@ using namespace std;
 
 #include <ros/ros.h>
 
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_framework/search/AStar.hpp>
@@ -24,10 +25,10 @@ TEST(Test_AStar_MapStack_SamePlaceOnMap, SamePositionOnMap)
 
     AStar algorithm;
 
-    Grid2d::Position startPosition(220, 260, 0);
+    Position startPosition(220, 260, 0);
     MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
 
-    Grid2d::Position goalPosition(220, 260, 0);
+    Position goalPosition(220, 260, 0);
     MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
@@ -51,10 +52,10 @@ TEST(Test_AStar_MapStack_SamePlaceOnMap, SameLocationOnMap)
 
     AStar algorithm;
 
-    Grid2d::Position startPosition(220, 260, 0);
+    Position startPosition(220, 260, 0);
     MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
 
-    Grid2d::Position goalPosition(220, 260, 90);
+    Position goalPosition(220, 260, 90);
     MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<

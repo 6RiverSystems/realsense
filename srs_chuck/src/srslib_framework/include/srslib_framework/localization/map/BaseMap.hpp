@@ -11,7 +11,9 @@ using namespace std;
 
 #include <tf/tf.h>
 
-#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/BaseGrid2d.hpp>
+#include <srslib_framework/datastructure/Location.hpp>
+#include <srslib_framework/math/MeasurementMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
@@ -20,23 +22,8 @@ namespace srs {
 class BaseMap
 {
 public:
-    BaseMap(unsigned int widthCells, unsigned int heightCells, double resolution, Pose<> origin);
-    BaseMap(double widthM, double heightM, double resolution, Pose<> origin);
-    BaseMap(Grid2d* grid, double resolution, Pose<> origin);
+    BaseMap(BaseGrid2d* grid, double widthM, double heightM, double resolution, Pose<> origin);
     virtual ~BaseMap();
-
-    void convertCells2M(unsigned int cells, double& m) const
-    {
-        // The precision is down to 1mm
-        m = round(static_cast<double>(cells) * resolution_ * 1e3) / 1e3;
-    }
-
-    void convertM2Cells(double m, unsigned int& cells) const
-    {
-        cells = static_cast<unsigned int>(round(m / resolution_));
-    }
-
-    virtual Grid2d::BaseType getCost(unsigned int cCells, unsigned int rCells) const = 0;
 
     int getHeightCells() const
     {
@@ -48,11 +35,6 @@ public:
         return heightM_;
     }
 
-    Grid2d* getGrid() const
-    {
-        return grid_;
-    }
-
     Pose<> getOrigin() const
     {
         return origin_;
@@ -61,14 +43,6 @@ public:
     double getResolution() const
     {
         return resolution_;
-    }
-
-    void getWeights(unsigned int cCells, unsigned int rCells,
-        Grid2d::BaseType& north, Grid2d::BaseType& east,
-        Grid2d::BaseType& south, Grid2d::BaseType& west) const
-    {
-        Grid2d::Location location(cCells, rCells);
-        grid_->getWeights(location, north, east, south, west);
     }
 
     int getWidthCells() const
@@ -83,11 +57,9 @@ public:
 
     bool isWithinBounds(unsigned int cCells, unsigned int rCells) const
     {
-        Grid2d::Location location(cCells, rCells);
+        Location location(cCells, rCells);
         return grid_->isWithinBounds(location);
     }
-
-    virtual void maxCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost) = 0;
 
     friend bool operator==(const BaseMap& lhs, const BaseMap& rhs);
 
@@ -96,49 +68,41 @@ public:
         return !(lhs == rhs);
     }
 
-    virtual void setCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost) = 0;
-    virtual void setObstacle(unsigned int cCells, unsigned int rCells) = 0;
-
     void transformCells2M(unsigned int cCells, unsigned int rCells, double& x, double& y) const
     {
-        convertCells2M(cCells, x);
-        x += origin_.x;
-
-        convertCells2M(rCells, y);
-        y += origin_.y;
+        x = MeasurementMath::cells2M(cCells, resolution_) + origin_.x;
+        y = MeasurementMath::cells2M(rCells, resolution_) + origin_.y;
     }
 
     void transformCells2M(unsigned int cCells, unsigned int rCells, Pose<>& p) const
     {
-        convertCells2M(cCells, p.x);
-        convertCells2M(rCells, p.y);
+        p.x = MeasurementMath::cells2M(cCells, resolution_);
+        p.y = MeasurementMath::cells2M(rCells, resolution_);
 
         p = PoseMath::add(p, origin_);
     }
 
     void transformM2Cells(double x, double y, unsigned int& c, unsigned int& r) const
     {
-        convertM2Cells(x - origin_.x, c);
-        convertM2Cells(y - origin_.y, r);
+        c = MeasurementMath::m2Cells(x - origin_.x, resolution_);
+        r = MeasurementMath::m2Cells(y - origin_.y, resolution_);
     }
 
     void transformM2Cells(Pose<> p, unsigned int& c, unsigned int& r) const
     {
-        convertM2Cells(p.x - origin_.x, c);
-        convertM2Cells(p.y - origin_.y, r);
+        c = MeasurementMath::m2Cells(p.x - origin_.x, resolution_);
+        r = MeasurementMath::m2Cells(p.y - origin_.y, resolution_);
     }
 
+protected:
+    BaseGrid2d* grid_;
+
 private:
-
-    Grid2d* grid_;
-
     double heightM_;
 
     Pose<> origin_;
 
     double resolution_;
-
-    bool userSpecifiedGrid_;
 
     double widthM_;
 };

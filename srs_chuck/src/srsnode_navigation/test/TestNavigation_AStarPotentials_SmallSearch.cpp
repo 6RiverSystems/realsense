@@ -11,28 +11,22 @@ using namespace std;
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMapFactory.hpp>
-#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
-#include <srslib_test/utils/Print.hpp>
 #include <srsnode_navigation/global_planner/potentials/AStarPotentials.hpp>
+
+#include <srslib_test/localization/map/MapStackUtils.hpp>
+
 using namespace srs;
 
 constexpr int GRID_SIZE = 15;
 
 TEST(Test_Navigation_AStarPotentials, SmallSearch)
 {
-    Grid2d grid(GRID_SIZE, GRID_SIZE);
-    test::Grid2dUtils::addRectanglePayload(grid, 0, 0, GRID_SIZE - 1, GRID_SIZE - 1, 0);
+    WeightedGrid2d logical(GRID_SIZE, GRID_SIZE);
+    MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
 
-    LogicalMapFactory logicalMapFactory;
-    LogicalMap* logical = logicalMapFactory.fromGrid2d(&grid, 1, Pose<>::ZERO);
+    AStarPotentials astar(mapStack->getLogicalMap(), mapStack->getCostMap2d());
 
-    OccupancyMapFactory occupancyMapFactory;
-    OccupancyMap* occupancy = occupancyMapFactory.fromGrid2d(&grid, 1, Pose<>::ZERO);
-    costmap_2d::Costmap2D* cost2d = MapAdapter::map2CostMap2D(occupancy);
-
-    AStarPotentials astar(logical, cost2d);
     std::vector<std::pair<float, float>> path;
     float* potentials;
 

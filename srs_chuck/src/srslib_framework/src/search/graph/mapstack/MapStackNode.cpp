@@ -8,7 +8,7 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 MapStackNode* MapStackNode::instanceOf(MapStack* stack,
     MapStackNode* parentNode, MapStackAction::ActionEnum parentAction,
-    Grid2d::Position position, int g, int h,
+    Position position, int g, int h,
     SearchGoal* goal,
     SearchParameters searchParameters)
 {

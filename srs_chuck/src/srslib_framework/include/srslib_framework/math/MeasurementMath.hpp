@@ -13,6 +13,17 @@ namespace srs {
 
 struct MeasurementMath
 {
+    inline static double cells2M(unsigned int cells, double resolution)
+    {
+        // The precision is down to 1mm
+        return round(static_cast<double>(cells) * resolution * 1e3) / 1e3;
+    }
+
+    inline static unsigned int m2Cells(double m, double resolution)
+    {
+        return static_cast<unsigned int>(round(m / resolution));
+    }
+
     template<typename TYPE = double>
     constexpr inline static TYPE inch2m(TYPE inch)
     {

@@ -21,9 +21,11 @@
 #include <srslib_framework/ros/tap/TapDepthCameraPoseOnRobot.hpp>
 #include <srslib_framework/ros/tap/TapBrainstem_Connected.hpp>
 
-#include <srslib_framework/platform/timing/MasterTimingDataRecorder.hpp>
+#include <srslib_timing/MasterTimingDataRecorder.hpp>
 
 #include <srsnode_midbrain/HardStopReflex.hpp>
+#include <srsnode_midbrain/HeadOnCollisionReflex.hpp>
+
 
 namespace srs
 {
@@ -61,6 +63,8 @@ private:
 
     // Reflexes
     HardStopReflex hardStopReflex_;
+    HeadOnCollisionReflex headOnCollisionReflex_;
+
 
     bool brainstemConnected_ = false;
 

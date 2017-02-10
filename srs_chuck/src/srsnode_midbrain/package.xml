@@ -34,6 +34,9 @@
     <build_depend>nav_msgs</build_depend>
     <run_depend>nav_msgs</run_depend>
 
+    <build_depend>srslib_timing</build_depend>
+    <run_depend>srslib_timing</run_depend>
+
     <build_depend>srslib_framework</build_depend>
     <run_depend>srslib_framework</run_depend>
 

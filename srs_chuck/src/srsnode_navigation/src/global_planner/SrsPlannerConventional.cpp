@@ -7,7 +7,7 @@
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/trajectory/SimpleTrajectoryGenerator.hpp>
 #include <srslib_framework/planning/pathplanning/trajectory/Trajectory.hpp>
-#include <srslib_framework/platform/timing/StopWatch.hpp>
+#include <srslib_timing/StopWatch.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/robot_profile/ChuckProfile.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>

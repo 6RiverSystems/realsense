@@ -77,8 +77,6 @@ private:
         previousRobotState_ = currentRobotState_;
         currentRobotState_ = OperationalStateMessageFactory::msg2RobotState(message);
 
-        ROS_INFO_STREAM_NAMED("ros_tap_operational_state", "Pause: " << currentRobotState_.pause);
-
         setNewData(true);
     }
 

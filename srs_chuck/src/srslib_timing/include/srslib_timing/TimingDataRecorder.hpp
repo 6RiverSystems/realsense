@@ -7,11 +7,11 @@
 
 #include <string>
 #include <utility>
-#include <srslib_framework/platform/timing/StopWatch.hpp>
-#include <srslib_framework/platform/timing/TimingData.hpp>
+#include <srslib_timing/StopWatch.hpp>
+#include <srslib_timing/TimingData.hpp>
 
-#include <srslib_framework/ros/message/TimingDataMessageFactory.hpp>
-#include <srslib_framework/ros/channel/ChannelTimingData.hpp>
+#include <srslib_timing/TimingDataMessageFactory.hpp>
+#include <srslib_timing/ChannelTimingData.hpp>
 #include <ros/ros.h>
 
 namespace srs {

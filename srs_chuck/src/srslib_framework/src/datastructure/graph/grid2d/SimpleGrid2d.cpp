@@ -173,13 +173,13 @@ void SimpleGrid2d::printGrid(ostream& stream, string title,
             SimpleGrid2d::Node* node = findNode(x, y);
             if (node)
             {
-                BaseType payload = fieldSelection(node);
+                BaseType field = fieldSelection(node);
 
-                if (payload == SimpleGrid2d::PAYLOAD_MAX)
+                if (field == SimpleGrid2d::PAYLOAD_MAX)
                 {
                     stream << "# ";
                 }
-                else if (payload == SimpleGrid2d::PAYLOAD_MIN)
+                else if (field == SimpleGrid2d::PAYLOAD_MIN)
                 {
                     stream << ". ";
                 }
@@ -222,23 +222,23 @@ void SimpleGrid2d::print(ostream& stream, string title,
             SimpleGrid2d::Node* node = findNode(x, y);
             if (node)
             {
-                BaseType info = fieldSelection(node);
+                BaseType field = fieldSelection(node);
 
-                if (info == SimpleGrid2d::PAYLOAD_MAX)
+                if (field == SimpleGrid2d::PAYLOAD_MAX)
                 {
                     stream << right << setw(WIDTH) << "#";
                 }
-                else if (info == SimpleGrid2d::PAYLOAD_NO_INFORMATION)
+                else if (field == SimpleGrid2d::PAYLOAD_NO_INFORMATION)
                 {
                     stream << right << setw(WIDTH) << "?";
                 }
-                else if (info == SimpleGrid2d::PAYLOAD_MIN)
+                else if (field == SimpleGrid2d::PAYLOAD_MIN)
                 {
                     stream << right << setw(WIDTH) << ".";
                 }
                 else
                 {
-                    stream << right << setw(WIDTH) << static_cast<int>(info);
+                    stream << right << setw(WIDTH) << static_cast<int>(field);
                 }
             }
             else

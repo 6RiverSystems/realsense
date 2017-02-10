@@ -1,6 +1,6 @@
 #include <srslib_framework/search/AStar.hpp>
 
-#define DEBUG_ASTAR 0
+// #define DEBUG_ASTAR 0
 
 #include <iostream>
 

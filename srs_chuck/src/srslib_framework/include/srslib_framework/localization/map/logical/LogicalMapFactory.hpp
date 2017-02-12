@@ -25,8 +25,7 @@ public:
         metadata_()
     {}
 
-    LogicalMap* fromCostMap2D(costmap_2d::Costmap2D* costMap);
-    LogicalMap* fromGrid2d(Grid2d* grid, double resolution, Pose<> origin);
+    LogicalMap* fromGrid2d(WeightedGrid2d* logical, Pose<> origin, double resolution);
     LogicalMap* fromJsonFile(string jsonFilename, double loadTime = 0);
     LogicalMap* fromString(string geoJson, double loadTime = 0);
 
@@ -70,16 +69,16 @@ private:
     static const string KEYWORD_WEIGHTED_AREA;
 
     void addCostArea(Pose<> origin, double widthM, double heightM,
-        Grid2d::BaseType cost);
+        WeightedGrid2d::BaseType cost);
     void addLabelArea(Pose<> origin, double widthM, double heightM,
         string label, shared_ptr<MapNotes> notes);
     void addObstacleArea(Pose<> origin, double widthM, double heightM,
-        double sizeEnvelopeM = 0.0, Grid2d::BaseType costEnvelope = 0);
+        double sizeEnvelopeM = 0.0, WeightedGrid2d::BaseType costEnvelope = 0);
     void addWeightArea(Pose<> origin, double widthM, double heightM,
-        Grid2d::BaseType north,
-        Grid2d::BaseType east,
-        Grid2d::BaseType south,
-        Grid2d::BaseType west);
+        WeightedGrid2d::BaseType north,
+        WeightedGrid2d::BaseType east,
+        WeightedGrid2d::BaseType south,
+        WeightedGrid2d::BaseType west);
 
     void calculateArea(Pose<> origin, double widthM, double heightM,
         unsigned int& x0, unsigned int& y0, unsigned int& widthCells, unsigned int& heightCells);
@@ -103,7 +102,7 @@ private:
     void ntGeometryNull(YAML::Node root);
     YAML::Node ntProperties(YAML::Node root);
 
-    Grid2d::BaseType ntValueCost(YAML::Node root, bool required);
+    WeightedGrid2d::BaseType ntValueCost(YAML::Node root, bool required);
     double ntValueDouble(YAML::Node root, bool required);
     shared_ptr<MapNotes> ntValueMapNotes(YAML::Node root, bool required);
     vector<Pose<>> ntValueMultiPoint(YAML::Node root, bool required);

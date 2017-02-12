@@ -50,7 +50,7 @@
     <run_depend>eigen</run_depend>
 
     <export>
-        <nav_core plugin="${prefix}/bgp_plugin.xml" />
+        <nav_core plugin="${prefix}/srsnode_navigation_plugins.xml" />
     </export>
 
     <test_depend>rosunit</test_depend>

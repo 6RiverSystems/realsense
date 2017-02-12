@@ -8,6 +8,8 @@
 #include <vector>
 #include <algorithm>
 
+#include <srslib_framework/datastructure/graph/grid2d/WeightedGrid2d.hpp>
+
 #include <srsnode_navigation/global_planner/potentials/Expander.hpp>
 
 namespace srs {
@@ -46,7 +48,7 @@ public:
 private:
     void add(float* potentials,
         float prev_potential,
-        int next_i, Grid2d::BaseType weight,
+        int next_i, WeightedGrid2d::BaseType weight,
         int end_x, int end_y);
 
     std::vector<Index> queue_;

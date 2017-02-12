@@ -9,6 +9,7 @@
 #include <vector>
 using namespace std;
 
+#include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
@@ -19,24 +20,25 @@ using namespace std;
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
 
 #include <srslib_test/datastructure/graph/grid2d/Grid2dUtils.hpp>
+#include <srslib_test/localization/map/MapStackUtils.hpp>
+
 using namespace srs;
 
 constexpr int GRID_SIZE = 5;
 
 TEST(Test_AStar_MapStack_NoSolution, NoSolution)
 {
-    Grid2d grid(GRID_SIZE, GRID_SIZE);
-    test::Grid2dUtils::addEmptySpace(grid);
-    test::Grid2dUtils::addObstacle(grid, 0, 0, GRID_SIZE - 1, GRID_SIZE - 1);
+    WeightedGrid2d logical(GRID_SIZE, GRID_SIZE);
+    test::Grid2dUtils::addObstacle(logical, 0, 0, GRID_SIZE - 1, GRID_SIZE - 1);
 
-    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
+    MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
 
     AStar algorithm;
 
-    Grid2d::Position startPosition(0, 0, 0);
+    Position startPosition(0, 0, 0);
     MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
 
-    Grid2d::Position goalPosition(1, 1, 0);
+    Position goalPosition(1, 1, 0);
     MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
 
     ASSERT_FALSE(algorithm.search(start, goal)) <<
@@ -50,18 +52,17 @@ TEST(Test_AStar_MapStack_NoSolution, NoSolution)
 
 TEST(Test_AStar_MapStack_NoSolution, ForbiddenGoal)
 {
-    Grid2d grid(GRID_SIZE, GRID_SIZE);
-    test::Grid2dUtils::addEmptySpace(grid);
-    test::Grid2dUtils::addObstacle(grid, 1, 0, GRID_SIZE - 1, GRID_SIZE - 1);
+    WeightedGrid2d logical(GRID_SIZE, GRID_SIZE);
+    test::Grid2dUtils::addObstacle(logical, 1, 0, GRID_SIZE - 1, GRID_SIZE - 1);
 
-    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
+    MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
 
     AStar algorithm;
 
-    Grid2d::Position startPosition(0, 0, 0);
+    Position startPosition(0, 0, 0);
     MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
 
-    Grid2d::Position goalPosition(GRID_SIZE - 1, 0, 0);
+    Position goalPosition(GRID_SIZE - 1, 0, 0);
     MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
 
     ASSERT_FALSE(algorithm.search(start, goal)) <<
@@ -75,18 +76,17 @@ TEST(Test_AStar_MapStack_NoSolution, ForbiddenGoal)
 
 TEST(Test_AStar_MapStack_NoSolution, UnreachableGoal)
 {
-    Grid2d grid(GRID_SIZE, GRID_SIZE);
-    test::Grid2dUtils::addEmptySpace(grid);
-    test::Grid2dUtils::addObstacle(grid, 2, 0, 2, GRID_SIZE - 1);
+    WeightedGrid2d logical(GRID_SIZE, GRID_SIZE);
+    test::Grid2dUtils::addObstacle(logical, 2, 0, 2, GRID_SIZE - 1);
 
-    MapStack* mapStack = test::Grid2dUtils::grid2d2MapStack(&grid, 1, Pose<>::ZERO);
+    MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
 
     AStar algorithm;
 
-    Grid2d::Position startPosition(0, 0, 0);
+    Position startPosition(0, 0, 0);
     MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
 
-    Grid2d::Position goalPosition(GRID_SIZE - 1, 0, 0);
+    Position goalPosition(GRID_SIZE - 1, 0, 0);
     MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
 
     ASSERT_FALSE(algorithm.search(start, goal)) <<

@@ -8,7 +8,9 @@
 #include <iostream>
 using namespace std;
 
-#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/BaseGrid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/WeightedGrid2d.hpp>
+#include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
@@ -19,37 +21,19 @@ namespace test {
 
 struct Grid2dUtils
 {
-    static void addRectanglePayload(Grid2d& grid,
-        unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
-        Grid2d::BaseType cost)
-    {
-        int deltaX = BasicMath::sgn<int>(xf - xi);
-        int deltaY = BasicMath::sgn<int>(yf - yi);
-
-        unsigned int c;
-        unsigned int r = yi;
-        do
-        {
-            c = xi;
-
-            do
-            {
-                grid.maxOnPayload(Grid2d::Location(c, r), cost);
-                c += deltaX;
-            } while (c != (xf + deltaX));
-
-            r += deltaY;
-        } while (r != (yf + deltaY));
-    }
-
-    static void addEmptySpace(Grid2d& grid)
+    static void addEmptySpace(SimpleGrid2d& grid)
     {
         addRectanglePayload(grid, 0, 0, grid.getWidth() - 1, grid.getHeight() - 1, 0);
     }
 
-    static void addObstacle(Grid2d& grid,
+    static void addEmptySpace(SimpleGrid2d* grid)
+    {
+        addEmptySpace(*grid);
+    }
+
+    static void addObstacle(BaseGrid2d& grid,
         unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
-        int sizeEnvelopeCells = 0, Grid2d::BaseType costEnvelope = 0)
+        int sizeEnvelopeCells = 0, BaseGrid2d::BaseType costEnvelope = 0)
     {
         // First add the envelope, if specified
         if (sizeEnvelopeCells > 0 && costEnvelope > 0)
@@ -61,15 +45,19 @@ struct Grid2dUtils
         }
 
         // Add the static obstacle
-        addRectanglePayload(grid, xi, yi, xf, yf, Grid2d::PAYLOAD_MAX);
+        addRectanglePayload(grid, xi, yi, xf, yf, grid.getMaxPayloadValue());
     }
 
-    static void addWeights(Grid2d& grid,
+    static void addObstacle(BaseGrid2d* grid,
         unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
-        Grid2d::BaseType north,
-        Grid2d::BaseType east,
-        Grid2d::BaseType south,
-        Grid2d::BaseType west)
+        int sizeEnvelopeCells = 0, BaseGrid2d::BaseType costEnvelope = 0)
+    {
+        addObstacle(*grid, xi, yi, xf, yf, sizeEnvelopeCells, costEnvelope);
+    }
+
+    static void addRectanglePayload(BaseGrid2d& grid,
+        unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
+        BaseGrid2d::BaseType cost)
     {
         int deltaX = BasicMath::sgn<int>(xf - xi);
         int deltaY = BasicMath::sgn<int>(yf - yi);
@@ -82,7 +70,7 @@ struct Grid2dUtils
 
             do
             {
-                grid.setWeights(Grid2d::Location(c, r), north, east, south, west);
+                grid.payloadMax(Location(c, r), cost);
                 c += deltaX;
             } while (c != (xf + deltaX));
 
@@ -90,18 +78,49 @@ struct Grid2dUtils
         } while (r != (yf + deltaY));
     }
 
-    static MapStack* grid2d2MapStack(Grid2d* grid, double resolution, Pose<> origin)
+    static void addRectanglePayload(BaseGrid2d* grid,
+        unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
+        BaseGrid2d::BaseType cost)
     {
-        LogicalMapFactory logicalMapFactory;
-        LogicalMap* logical = logicalMapFactory.fromGrid2d(grid, resolution, origin);
-
-        OccupancyMapFactory occupancyMapFactory;
-        OccupancyMap* occupancy = occupancyMapFactory.fromGrid2d(grid, resolution, origin);
-
-        costmap_2d::Costmap2D* costMap2d = MapAdapter::map2CostMap2D(occupancy);
-
-        return new MapStack(logical, occupancy, costMap2d);
+        addRectanglePayload(*grid, xi, yi, xf, yf, cost);
     }
+
+    static void addWeights(WeightedGrid2d& grid,
+        unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
+        WeightedGrid2d::BaseType north,
+        WeightedGrid2d::BaseType east,
+        WeightedGrid2d::BaseType south,
+        WeightedGrid2d::BaseType west)
+    {
+        int deltaX = BasicMath::sgn<int>(xf - xi);
+        int deltaY = BasicMath::sgn<int>(yf - yi);
+
+        unsigned int c;
+        unsigned int r = yi;
+        do
+        {
+            c = xi;
+
+            do
+            {
+                grid.setWeights(Location(c, r), north, east, south, west);
+                c += deltaX;
+            } while (c != (xf + deltaX));
+
+            r += deltaY;
+        } while (r != (yf + deltaY));
+    }
+
+    static void addWeights(WeightedGrid2d* grid,
+        unsigned int xi, unsigned int yi, unsigned int xf, unsigned int yf,
+        WeightedGrid2d::BaseType north,
+        WeightedGrid2d::BaseType east,
+        WeightedGrid2d::BaseType south,
+        WeightedGrid2d::BaseType west)
+    {
+        addWeights(*grid, xi, yi, xf, yf, north, east, south, west);
+    }
+
 };
 
 } // namespace test

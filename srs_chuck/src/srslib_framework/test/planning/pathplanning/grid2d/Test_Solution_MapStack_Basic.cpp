@@ -15,28 +15,28 @@ using namespace std;
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
 
+#include <srslib_test/localization/map/MapStackUtils.hpp>
+
 using namespace srs;
 
 static constexpr unsigned int GRID_SIZE = 5;
 
-TEST(Test_Solution_MapStack, BasicEmptyGrid)
+TEST(Test_Solution_MapStack, BasicEmpty)
 {
     Solution<Grid2dSolutionItem>* correctSolution = Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
     correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(0, 0, 0), Pose<>(1, 0, 0), 1});
-    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 0, 0), Pose<>(1, 0, M_PI_2), 3});
-    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 0, M_PI_2), Pose<>(1, 1, M_PI_2), 4});
-    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 6});
+    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 0, 0), Pose<>(1, 0, M_PI_2), 2});
+    correctSolution->push_back({Grid2dSolutionItem::MOVE, Pose<>(1, 0, M_PI_2), Pose<>(1, 1, M_PI_2), 3});
+    correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 4});
 
-    Grid2d grid(GRID_SIZE, GRID_SIZE);
+    WeightedGrid2d logical(GRID_SIZE, GRID_SIZE);
+    MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
 
     Pose<> start = Pose<>(0, 0, 0);
     Pose<> goal = Pose<>(1, 1, 0);
 
-    LogicalMapFactory logicalMapFactory;
-    LogicalMap* logical = logicalMapFactory.fromGrid2d(&grid, 1, Pose<>::ZERO);
-
     Solution<Grid2dSolutionItem>* gridSolution = Grid2dSolutionFactory::fromSingleGoal(
-        logical, start, goal);
+        mapStack, start, goal);
 
     // The solution agrees with itself
     ASSERT_EQ(*gridSolution, *gridSolution) <<

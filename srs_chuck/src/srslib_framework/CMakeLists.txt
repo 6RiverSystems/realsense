@@ -8,7 +8,9 @@ cmake_minimum_required(VERSION 2.8.3)
 set(PROJECT_NAME srslib_framework)
 
 set(${PROJECT_NAME}_SOURCES
-    src/datastructure/graph/grid2d/Grid2d.cpp
+
+    src/datastructure/graph/grid2d/SimpleGrid2d.cpp
+    src/datastructure/graph/grid2d/WeightedGrid2d.cpp
 
     src/io/SerialIO.cpp
     src/io/HidIO.cpp
@@ -38,14 +40,11 @@ set(${PROJECT_NAME}_SOURCES
     src/ros/message/LogicalMapMessageFactory.cpp
 
     src/search/AStar.cpp
-    src/search/graph/grid2d/Grid2dAction.cpp
-    src/search/graph/grid2d/Grid2dNode.cpp
     src/search/graph/mapstack/MapStackAction.cpp
     src/search/graph/mapstack/MapStackNode.cpp
 
     src/utils/Logging.cpp
 )
-
 
 set(${PROJECT_NAME}_MSGS
     Imu.msg
@@ -83,7 +82,8 @@ set(${PROJECT_NAME}_SRVS
 )
 
 set(TEST_SOURCES_DATASTRUCTURE
-    test/datastructure/graph/Test_Grid2d_Basic.cpp
+    test/datastructure/graph/Test_SimpleGrid2d_Basic.cpp
+    test/datastructure/graph/Test_WeightedGrid2d_Basic.cpp
     test/datastructure/queue/Test_MappedPriorityQueue_Basic.cpp
     test/datastructure/queue/Test_MappedPriorityQueue_IndexClass.cpp
     test/datastructure/queue/Test_MappedPriorityQueue_InnerHashEqual.cpp
@@ -111,8 +111,7 @@ set(TEST_SOURCES_MATH
 )
 
 set(TEST_SOURCES_PLANNING
-    test/planning/pathplanning/grid2d/Test_Solution_Grid2d_Basic.cpp
-    test/planning/pathplanning/grid2d/Test_Solution_Grid2d_Empty_Consecutive.cpp
+    test/planning/pathplanning/grid2d/Test_Solution_MapStack_Consecutive.cpp
     test/planning/pathplanning/grid2d/Test_Solution_MapStack_Basic.cpp
     test/planning/pathplanning/trajectory/Test_Trajectory_180ShortTrajectory.cpp
     test/planning/pathplanning/trajectory/Test_Trajectory_LongStraight.cpp
@@ -135,14 +134,9 @@ set(TEST_SOURCES_ROS
 )
 
 set(TEST_SOURCES_SEARCH
-    test/search/grid2d/Test_AStar_Grid2d_6rshq.cpp
-    test/search/grid2d/Test_AStar_Grid2d_Barrett.cpp
-    test/search/grid2d/Test_AStar_Grid2d_Basic.cpp
-    test/search/grid2d/Test_AStar_Grid2d_NoSolution.cpp
-    test/search/grid2d/Test_AStar_Grid2d_SamePlaceOnMap.cpp
-    test/search/grid2d/Test_AStar_Grid2d_Weights.cpp
     test/search/mapstack/Test_AStar_MapStack_Barrett.cpp
     test/search/mapstack/Test_AStar_MapStack_Basic.cpp
+    test/search/mapstack/Test_AStar_MapStack_Hbc.cpp
     test/search/mapstack/Test_AStar_MapStack_NoSolution.cpp
     test/search/mapstack/Test_AStar_MapStack_SamePlaceOnMap.cpp
     test/search/mapstack/Test_AStar_MapStack_Unknown.cpp
@@ -168,11 +162,11 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     nav_msgs
     costmap_2d
+    srslib_test
     srslib_timing
 )
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED)
-find_package(srslib_test REQUIRED)
 
 find_package(PkgConfig)
 pkg_check_modules(NEW_YAMLCPP yaml-cpp>=0.5)
@@ -183,8 +177,9 @@ include_directories(
     src/
     test/
     ${roscpp_INCLUDE_DIRS}
-	${OpenCV_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
     ${srslib_test_INCLUDE_DIRS}
+    ${srslib_timing_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
 )
 
@@ -228,6 +223,7 @@ catkin_package(
         std_msgs
         nav_msgs
         srslib_test
+        srslib_timing
         costmap_2d
 )
 

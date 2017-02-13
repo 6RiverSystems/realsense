@@ -75,6 +75,8 @@ set(${PROJECT_NAME}_MSGS
     Velocity.msg
     Odometry.msg
     OdometryRpm.msg
+    Fault.msg
+    FaultState.msg
 )
 
 set(${PROJECT_NAME}_SRVS

@@ -42,6 +42,7 @@ uint32 LOCALIZE=8
 uint32 CHARGE=9
 uint32 RELOCATE=10
 
-uint32 fault
-string uid
+uint32 code
+string id
+time timestamp
 uint32 resolution

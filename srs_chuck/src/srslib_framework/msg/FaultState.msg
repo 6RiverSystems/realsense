@@ -5,4 +5,5 @@
 #
 
 # Array of faults
+Header header
 Fault[] faults

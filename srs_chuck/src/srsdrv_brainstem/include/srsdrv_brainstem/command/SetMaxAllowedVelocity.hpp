@@ -22,6 +22,10 @@ public:
     static void send(BrainStemMessageProcessorInterface* messageProcessor,
         float maxLinearVelocity, float maxAngularVelocity)
     {
+        ROS_DEBUG_STREAM("SetMaxAllowedVelocity sent: " <<
+            "Setting linear velocity: " << maxLinearVelocity << " [m/s], " <<
+            "and angular velocity: " << maxAngularVelocity << " [rad/s]");
+
         SetMaxAllowedVelocityMsg msg = {
             static_cast<uint8_t>(BRAIN_STEM_CMD::SET_ALLOWED_MAX_VELOCITY),
             static_cast<float>(maxLinearVelocity),

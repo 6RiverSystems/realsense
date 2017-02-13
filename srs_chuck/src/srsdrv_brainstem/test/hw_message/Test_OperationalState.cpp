@@ -7,14 +7,14 @@
 #include <hw_message/Test_HardwareMessage.hpp>
 #include <bitset>
 
-#include <srslib_framework/ros/message/OperationalStateMessageFactory.hpp>
+#include <srslib_framework/ros/message/RobotStateMessageFactory.hpp>
 
 class Test_OperationalState : public Test_HardwareMessage<const RobotState&, MsgOperationalState>
 {
 public:
 
 	Test_OperationalState() :
-		Test_HardwareMessage(OperationalStateMessageFactory::robotState2Msg) {}
+		Test_HardwareMessage(RobotStateMessageFactory::robotState2Msg) {}
 
 	virtual ~Test_OperationalState() {}
 

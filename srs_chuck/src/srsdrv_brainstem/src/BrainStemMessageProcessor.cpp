@@ -32,7 +32,7 @@
 
 #include <command/GetHardwareInfo.hpp>
 #include <command/GetOperationalState.hpp>
-#include <command/SendPhysicalDimension.hpp>
+#include <command/SetPhysicalDimension.hpp>
 #include <command/SetMaxAllowedVelocity.hpp>
 
 namespace srs {
@@ -140,8 +140,6 @@ void BrainStemMessageProcessor::getOperationalState()
 {
 	if (sentPing_)
 	{
-		ROS_DEBUG("Brainstem driver: GetOperationalState");
-
         GetOperationalState::send(this);
 	}
 }
@@ -150,8 +148,6 @@ void BrainStemMessageProcessor::getHardwareInformation()
 {
     if (sentPing_)
     {
-        ROS_DEBUG("Brainstem driver: GetHardwareInformation");
-
         GetHardwareInfo::send(this);
     }
 }
@@ -167,10 +163,6 @@ void BrainStemMessageProcessor::sendDimensions()
 void BrainStemMessageProcessor::sendMaxAllowedVelocity()
 {
     // Allow the hardware not to move faster than the specified velocity
-    ROS_DEBUG_STREAM("Brainstem driver: " <<
-        "Setting linear velocity: " << ChuckLimits::PHYSICAL_MAX_LINEAR << " [m/s], " <<
-        "and angular velocity: " << ChuckLimits::PHYSICAL_MAX_ANGULAR << " [rad/s]");
-
     SetMaxAllowedVelocity::send(this,
         ChuckLimits::PHYSICAL_MAX_LINEAR,
         ChuckLimits::PHYSICAL_MAX_ANGULAR);
@@ -313,7 +305,7 @@ void BrainStemMessageProcessor::checkSetupComplete()
 			sendDimensions();
 			sendMaxAllowedVelocity();
 
-			// If this is a reconnect sync the brainstem statate
+			// If this is a reconnect sync the brainstem state
 			if (resync)
 			{
 				ROS_INFO("Brainstem driver: Resyncing brainstem state");
@@ -395,23 +387,11 @@ void BrainStemMessageProcessor::setUseBrainstemOdom(bool useBrainstemOdom)
 	}
 }
 
-void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
+void BrainStemMessageProcessor::setDimension(SetPhysicalDimension::DimensionEnum dimension, float value)
 {
 	if (io_->isOpen())
 	{
-		static std::map<DIMENSION, std::string> mapDimensionName;
-
-		if (!mapDimensionName.size())
-		{
-			mapDimensionName[DIMENSION::WHEEL_BASE_LENGTH] = "wheel_base_length";
-			mapDimensionName[DIMENSION::LEFT_WHEEL_RADIUS] = "left_wheel_radius";
-			mapDimensionName[DIMENSION::RIGHT_WHEEL_RADIUS] = "right_wheel_radius";
-		};
-
-		SendPhysicalDimension::send(this, static_cast<int>(dimension), value);
-
-		ROS_DEBUG("Brainstem driver: Setting dimension: %s => %f",
-			mapDimensionName[dimension].c_str(), value);
+		SetPhysicalDimension::send(this, dimension, value);
 	}
 	else
 	{

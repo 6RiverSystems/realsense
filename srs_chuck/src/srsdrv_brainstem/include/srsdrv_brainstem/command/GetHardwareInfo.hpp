@@ -19,6 +19,8 @@ class GetHardwareInfo
 public:
     static void send(BrainStemMessageProcessorInterface* messageProcessor)
     {
+        ROS_DEBUG("GetHardwareInformation sent");
+
         GetHardwareInfoMsg msg = {
             static_cast<uint8_t>(BRAIN_STEM_CMD::GET_HARDWARE_INFO)
         };

@@ -19,6 +19,8 @@ class GetOperationalState
 public:
     static void send(BrainStemMessageProcessorInterface* messageProcessor)
     {
+        ROS_DEBUG("GetOperationalState sent");
+
         GetOperationalStateMsg msg = {
             static_cast<uint8_t>(BRAIN_STEM_CMD::GET_OPERATIONAL_STATE)
         };

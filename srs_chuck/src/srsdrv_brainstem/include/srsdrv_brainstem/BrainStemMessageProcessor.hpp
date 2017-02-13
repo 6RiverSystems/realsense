@@ -31,6 +31,8 @@ using namespace std;
 #include <hw_message/HardwareInfoHandler.hpp>
 #include <hw_message/OperationalStateHandler.hpp>
 
+#include <command/SetPhysicalDimension.hpp>
+
 namespace srs {
 
 class IO;
@@ -39,14 +41,6 @@ class MessageProcessor;
 class BrainStemMessageProcessor : public BrainStemMessageProcessorInterface
 {
 public:
-
-	enum class DIMENSION
-	{
-		WHEEL_BASE_LENGTH = 0,
-		LEFT_WHEEL_RADIUS = 1,
-		RIGHT_WHEEL_RADIUS = 2
-	};
-
 	void processHardwareMessage(vector<char> buffer);
 
     using HwMessageHandlerMapType = map<BRAIN_STEM_MSG, HardwareMessageHandlerPtr>;
@@ -72,7 +66,7 @@ public:
 
     void setUseBrainstemOdom(bool useBrainstemOdom);
 
-    void setDimension(DIMENSION dimension, float value);
+    void setDimension(SetPhysicalDimension::DimensionEnum dimension, float value);
 
 	void setConnected( bool isConnected );
 
@@ -118,7 +112,7 @@ private:
 
 	bool isConnected_;
 
-	std::map<DIMENSION, float> dimensions_;
+    std::map<SetPhysicalDimension::DimensionEnum, float> dimensions_;
 
 	bool hasValidHardareInfo_;
 	ros::Time lastHardareInfoRequestTime_;

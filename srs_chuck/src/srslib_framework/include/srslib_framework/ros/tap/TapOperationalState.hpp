@@ -18,7 +18,7 @@ class TapOperationalState :
 {
 public:
     TapOperationalState() :
-        SubscriberRobotState(ChuckTopics::driver::BRAINSTEM_OPERATIONAL_STATE, 1000)
+        SubscriberRobotState(ChuckTopics::driver::BRAINSTEM_OPERATIONAL_STATE, 1)
     {}
 
     ~TapOperationalState()

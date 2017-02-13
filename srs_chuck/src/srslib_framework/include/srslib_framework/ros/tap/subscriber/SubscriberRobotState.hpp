@@ -22,7 +22,7 @@ class SubscriberRobotState :
 {
 public:
     SubscriberRobotState(string topic,
-        unsigned int queueLength = 10,
+        unsigned int queueLength = 1,
         string nameSpace = "~") :
             SubscriberSingleData(topic, queueLength, nameSpace)
     {

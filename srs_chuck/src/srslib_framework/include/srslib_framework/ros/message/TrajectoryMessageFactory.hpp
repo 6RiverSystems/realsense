@@ -9,7 +9,7 @@
 
 #include <srslib_framework/Pose.h>
 #include <srslib_framework/planning/pathplanning/trajectory/Trajectory.hpp>
-#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
+#include <srslib_framework/chuck/ChuckTransforms.hpp>
 
 namespace srs {
 

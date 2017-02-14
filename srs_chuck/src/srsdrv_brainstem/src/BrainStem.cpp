@@ -17,7 +17,9 @@
 #include <bitset>
 
 #include <srslib_framework/math/BasicMath.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
+
+#include <command/SetPhysicalDimension.hpp>
 
 namespace srs
 {
@@ -45,7 +47,7 @@ BrainStem::BrainStem(string name, int argc, char** argv) :
 		double leftWheelRadius = 0.0f;
 		sscanf( pszLeftWheelRadius, "%lf", &leftWheelRadius );
 
-		messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::LEFT_WHEEL_RADIUS,
+		messageProcessor_.setDimension(SetPhysicalDimension::DimensionEnum::LEFT_WHEEL_RADIUS,
 			leftWheelRadius);
 	}
 
@@ -54,7 +56,7 @@ BrainStem::BrainStem(string name, int argc, char** argv) :
 		double rightWheelRadius = 0.0f;
 		sscanf( pszRightWheelRadius, "%lf", &rightWheelRadius );
 
-		messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::RIGHT_WHEEL_RADIUS,
+		messageProcessor_.setDimension(SetPhysicalDimension::DimensionEnum::RIGHT_WHEEL_RADIUS,
 			rightWheelRadius);
 	}
 
@@ -63,7 +65,7 @@ BrainStem::BrainStem(string name, int argc, char** argv) :
 		double wheelbaseLength = 0.0f;
 		sscanf( pszWheelBaseLength, "%lf", &wheelbaseLength );
 
-		messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::WHEEL_BASE_LENGTH,
+		messageProcessor_.setDimension(SetPhysicalDimension::DimensionEnum::WHEEL_BASE_LENGTH,
 			wheelbaseLength);
 	}
 
@@ -140,13 +142,13 @@ void BrainStem::cfgCallback(srsdrv_brainstem::RobotSetupConfig &config,
 
 	messageProcessor_.setUseBrainstemOdom(config.use_brainstem_odom);
 
-	messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::WHEEL_BASE_LENGTH,
+	messageProcessor_.setDimension(SetPhysicalDimension::DimensionEnum::WHEEL_BASE_LENGTH,
 		static_cast<float>(config.robot_wheelbase_length));
 
-	messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::LEFT_WHEEL_RADIUS,
+	messageProcessor_.setDimension(SetPhysicalDimension::DimensionEnum::LEFT_WHEEL_RADIUS,
 		static_cast<float>(config.robot_leftwheel_radius));
 
-	messageProcessor_.setDimension(BrainStemMessageProcessor::DIMENSION::RIGHT_WHEEL_RADIUS,
+	messageProcessor_.setDimension(SetPhysicalDimension::DimensionEnum::RIGHT_WHEEL_RADIUS,
 		static_cast<float>(config.robot_rightwheel_radius));
 }
 

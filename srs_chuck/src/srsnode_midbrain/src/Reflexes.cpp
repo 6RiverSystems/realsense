@@ -26,7 +26,6 @@ namespace srs
 Reflexes::Reflexes() : tdr_("Reflexes")
 {
     readParams();
-    tapOperationalState_.connectTap();
 }
 
 Reflexes::~Reflexes( )
@@ -115,7 +114,7 @@ void Reflexes::execute()
     // Update the robot state
     if (tapOperationalState_.newDataAvailable())
     {
-        hardStopReflex_.setRobotState(tapOperationalState_.getRobotState());
+        hardStopReflex_.setRobotState(tapOperationalState_.pop());
     }
 
     // Check for laser scan.

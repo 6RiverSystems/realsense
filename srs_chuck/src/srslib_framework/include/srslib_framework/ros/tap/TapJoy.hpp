@@ -12,7 +12,7 @@ using namespace std;
 
 #include <srslib_framework/robotics/Velocity.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
 
 namespace srs {
 

@@ -7,12 +7,14 @@
 #include <hw_message/Test_HardwareMessage.hpp>
 #include <bitset>
 
-class Test_OperationalState : public Test_HardwareMessage<const MsgOperationalState&, MsgOperationalState>
+#include <srslib_framework/ros/message/RobotStateMessageFactory.hpp>
+
+class Test_OperationalState : public Test_HardwareMessage<const RobotState&, MsgOperationalState>
 {
 public:
 
 	Test_OperationalState() :
-		Test_HardwareMessage() {}
+		Test_HardwareMessage(RobotStateMessageFactory::robotState2Msg) {}
 
 	virtual ~Test_OperationalState() {}
 
@@ -61,11 +63,12 @@ public:
 		setMotionState.set( MOTION_STATUS::HARD_STOP, operationalState.hardStop );
 
 		std::bitset<8> setFailureState;
-		setFailureState.set( FAILURE_STATUS::SAFETY_PROCESSOR, operationalState.safetyProcessorFailure);
-		setFailureState.set( FAILURE_STATUS::BRAINSTEM, operationalState.brainstemFailure );
-		setFailureState.set( FAILURE_STATUS::BRAINSTEM_TIMEOUT, operationalState.brainTimeoutFailure );
-		setFailureState.set( FAILURE_STATUS::RIGHT_MOTOR, operationalState.rightMotorFailure );
-		setFailureState.set( FAILURE_STATUS::LEFT_MOTOR, operationalState.leftMotorFailure );
+		setFailureState.set( FAILURE_STATUS::SAFETY_PROCESSOR_FAILURE, operationalState.safetyProcessorFailure);
+		setFailureState.set( FAILURE_STATUS::BRAINSTEM_FAILURE, operationalState.brainstemFailure );
+
+        setFailureState.set( FAILURE_STATUS::BRAIN_TIMEOUT, operationalState.brainTimeoutFailure );
+		setFailureState.set( FAILURE_STATUS::RIGHT_MOTOR_CONTROLLER, operationalState.rightMotorFailure );
+		setFailureState.set( FAILURE_STATUS::LEFT_MOTOR_CONTROLLER, operationalState.leftMotorFailure );
 
 		msg.write<uint8_t>(setMotionState.to_ulong());
 		msg.write<uint8_t>(setFailureState.to_ulong());

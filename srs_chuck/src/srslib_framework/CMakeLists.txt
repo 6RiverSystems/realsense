@@ -128,7 +128,6 @@ set(TEST_SOURCES_PLATFORM
 )
 
 set(TEST_SOURCES_ROBOTICS
-    test/robotics/robot/Test_Chuck.cpp
 )
 
 set(TEST_SOURCES_ROS

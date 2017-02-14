@@ -58,6 +58,7 @@ public:
 			[](TYPE data) {
 		return data;
 	}) : publisher_(convert) {};
+
 	virtual ~Test_HardwareMessage() {};
 
 	virtual vector<MESSAGE>& getTestMsgs() = 0;

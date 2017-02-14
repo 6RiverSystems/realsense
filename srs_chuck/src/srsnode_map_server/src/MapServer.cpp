@@ -15,8 +15,8 @@ using namespace std;
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/ros/message/OccupancyMapMessageFactory.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
-#include <srslib_framework/ros/topics/ChuckConfig.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckConfig.hpp>
 
 namespace srs {
 

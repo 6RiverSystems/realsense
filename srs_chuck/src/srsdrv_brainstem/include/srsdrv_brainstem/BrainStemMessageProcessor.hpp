@@ -31,6 +31,8 @@ using namespace std;
 #include <hw_message/HardwareInfoHandler.hpp>
 #include <hw_message/OperationalStateHandler.hpp>
 
+#include <command/SetPhysicalDimension.hpp>
+
 namespace srs {
 
 class IO;
@@ -39,14 +41,6 @@ class MessageProcessor;
 class BrainStemMessageProcessor : public BrainStemMessageProcessorInterface
 {
 public:
-
-	enum class DIMENSION
-	{
-		WHEEL_BASE_LENGTH = 0,
-		LEFT_WHEEL_RADIUS = 1,
-		RIGHT_WHEEL_RADIUS = 2
-	};
-
 	void processHardwareMessage(vector<char> buffer);
 
     using HwMessageHandlerMapType = map<BRAIN_STEM_MSG, HardwareMessageHandlerPtr>;
@@ -72,7 +66,7 @@ public:
 
     void setUseBrainstemOdom(bool useBrainstemOdom);
 
-    void setDimension(DIMENSION dimension, float value);
+    void setDimension(SetPhysicalDimension::DimensionEnum dimension, float value);
 
 	void setConnected( bool isConnected );
 
@@ -80,10 +74,7 @@ public:
 
 	void getHardwareInformation( );
 
-    void shutdown( );
-
 private:
-
     void addHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler);
 
     void removeHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler);
@@ -101,6 +92,7 @@ private:
 	void getOperationalState(const ros::Time& now);
 
 	void sendDimensions();
+	void sendMaxAllowedVelocity();
 
 // Helper Methods
 
@@ -108,24 +100,9 @@ private:
 
 private:
 
-    HW_MESSAGE_BEGIN(CommandData)
-        uint8_t cmd;
-    HW_MESSAGE_END
-
-    HW_MESSAGE_BEGIN(OperationalStateData)
-    	uint8_t cmd;
-		uint8_t motionStatus;
-    HW_MESSAGE_END
-
-    HW_MESSAGE_BEGIN(DimensionData)
-    	uint8_t cmd;
-		uint8_t id;
-		float value;
-    HW_MESSAGE_END
-
 	static constexpr auto FAULT_TIMEOUT = 0.2f;
 
-	std::shared_ptr<IO> io_;
+    std::shared_ptr<IO> io_;
 
 	bool setupComplete_;
 
@@ -135,7 +112,7 @@ private:
 
 	bool isConnected_;
 
-	std::map<DIMENSION, float> dimensions_;
+    std::map<SetPhysicalDimension::DimensionEnum, float> dimensions_;
 
 	bool hasValidHardareInfo_;
 	ros::Time lastHardareInfoRequestTime_;
@@ -169,8 +146,6 @@ private:
 
     std::set<HardwareMessageHandlerPtr> hardwareHandlers_;
     std::set<SoftwareMessagePtr> softwareHandlers_;
-
-
 };
 
 } /* namespace srs */

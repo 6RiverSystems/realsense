@@ -6,7 +6,7 @@
 #pragma once
 
 #include <srslib_framework/ros/channel/publisher/PublisherJoypadState.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
 
 namespace srs {
 

@@ -14,7 +14,7 @@
 #include <polyclipping/clipper.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/robotics/Velocity.hpp>
-#include <srslib_framework/robotics/RobotState.hpp>
+#include <srslib_framework/robotics/device/RobotState.hpp>
 
 namespace srs
 {

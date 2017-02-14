@@ -25,7 +25,7 @@
 
 #include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/datastructure/graph/grid2d/WeightedGrid2d.hpp>
-#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
+#include <srslib_framework/chuck/ChuckTransforms.hpp>
 #include <srslib_framework/localization/map/mapnote/NotePlaySound.hpp>
 #include <srslib_framework/localization/map/mapnote/NoteSetMaxVelocity.hpp>
 

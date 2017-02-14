@@ -9,8 +9,8 @@
 #include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
-#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTransforms.hpp>
 
 namespace srs {
 

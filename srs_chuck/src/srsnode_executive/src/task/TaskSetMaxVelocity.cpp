@@ -2,7 +2,7 @@
 
 #include <srslib_framework/localization/map/mapnote/NoteSetMaxVelocity.hpp>
 #include <srslib_framework/ros/function/service_call/ServiceCallConfig.hpp>
-#include <srslib_framework/ros/topics/ChuckConfig.hpp>
+#include <srslib_framework/chuck/ChuckConfig.hpp>
 
 namespace srs {
 

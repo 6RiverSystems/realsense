@@ -8,70 +8,55 @@ namespace srs {
 
 OperationalStateHandler::OperationalStateHandler(ChannelBrainstemOperationalState::Interface& publisher) :
     HardwareMessageHandler(BRAIN_STEM_MSG::OPERATIONAL_STATE),
-	publisher_(publisher),
-	hasValidMessage_(false)
+    publisher_(publisher),
+    hasValidMessage_(false)
 {
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OperationalStateHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
 {
-	OperationalStateData operationalState = msg.read<OperationalStateData>();
+    OperationalStateData operationalState = msg.read<OperationalStateData>();
 
-	std::bitset<8> motionStatusSet( operationalState.motionStatus );
-	std::bitset<8> failureStatusSet( operationalState.failureStatus );
+    std::bitset<8> motionStatusSet(operationalState.motionStatus);
+    std::bitset<8> failureStatusSet(operationalState.failureStatus);
 
-	operationalState_.upTime = operationalState.upTime;
+    operationalState_.upTime = operationalState.upTime;
 
-	operationalState_.frontEStop = motionStatusSet.test( MOTION_STATUS::FRONT_E_STOP );
-	operationalState_.backEStop = motionStatusSet.test( MOTION_STATUS::BACK_E_STOP );
-	operationalState_.wirelessEStop = motionStatusSet.test( MOTION_STATUS::WIRELESS_E_STOP );
-	operationalState_.bumpSensor = motionStatusSet.test( MOTION_STATUS::BUMP_SENSOR);
-	operationalState_.pause = motionStatusSet.test(MOTION_STATUS::FREE_SPIN);
-	operationalState_.hardStop = motionStatusSet.test( MOTION_STATUS::HARD_STOP );
+    operationalState_.frontEStop = motionStatusSet.test(MOTION_STATUS::FRONT_E_STOP);
+    operationalState_.backEStop = motionStatusSet.test(MOTION_STATUS::BACK_E_STOP);
+    operationalState_.wirelessEStop = motionStatusSet.test(MOTION_STATUS::WIRELESS_E_STOP);
+    operationalState_.bumpSensor = motionStatusSet.test(MOTION_STATUS::BUMP_SENSOR);
+    operationalState_.freeSpin = motionStatusSet.test(MOTION_STATUS::FREE_SPIN);
+    operationalState_.hardStop = motionStatusSet.test(MOTION_STATUS::HARD_STOP);
 
-	operationalState_.safetyProcessorFailure = failureStatusSet.test( FAILURE_STATUS::SAFETY_PROCESSOR );
-	operationalState_.brainstemFailure = failureStatusSet.test( FAILURE_STATUS::BRAINSTEM );
-	operationalState_.brainTimeoutFailure = failureStatusSet.test( FAILURE_STATUS::BRAINSTEM_TIMEOUT );
-	operationalState_.rightMotorFailure = failureStatusSet.test( FAILURE_STATUS::RIGHT_MOTOR );
-	operationalState_.leftMotorFailure = failureStatusSet.test( FAILURE_STATUS::LEFT_MOTOR );
+    operationalState_.safetyProcessorFailure = failureStatusSet.test(FAILURE_STATUS::SAFETY_PROCESSOR_FAILURE);
+    operationalState_.brainstemFailure = failureStatusSet.test(FAILURE_STATUS::BRAINSTEM_FAILURE);
+    operationalState_.brainstemTimeout = false;
+    operationalState_.brainTimeout = failureStatusSet.test(FAILURE_STATUS::BRAIN_TIMEOUT);
+    operationalState_.rightMotorController = failureStatusSet.test(FAILURE_STATUS::RIGHT_MOTOR_CONTROLLER);
+    operationalState_.leftMotorController = failureStatusSet.test(FAILURE_STATUS::LEFT_MOTOR_CONTROLLER);
+    operationalState_.rpmMessageTimeout = failureStatusSet.test(FAILURE_STATUS::RPM_MESSAGE_TIMEOUT);
+    operationalState_.velocityViolation = failureStatusSet.test(FAILURE_STATUS::VELOCITY_VIOLATION);
 
-	std::ostringstream stream;
+    ROS_INFO_STREAM("Brainstem driver: " << operationalState_);
 
-	stream << "Operational State => uptime: " << operationalState_.upTime <<
-		", frontEStop: " << (operationalState_.frontEStop ? "true" : "false")  <<
-		", backEStop: " << (operationalState_.backEStop ? "true" : "false")  <<
-		", wirelessEStop: " << (operationalState_.wirelessEStop ? "true" : "false")  <<
-		", bumpSensor: " << (operationalState_.bumpSensor ? "true" : "false")  <<
-		", free-spin: " << (operationalState_.pause ? "true" : "false")  <<
-		", hardStop: " << (operationalState_.hardStop ? "true" : "false")  <<
-		", safetyProcessorFailure: " << (operationalState_.safetyProcessorFailure ? "true" : "false")  <<
-		", brainstemFailure: " << (operationalState_.brainstemFailure ? "true" : "false")  <<
-		", brainTimeoutFailure: " << (operationalState_.brainTimeoutFailure ? "true" : "false")  <<
-		", rightMotorFailure: " << (operationalState_.rightMotorFailure ? "true" : "false")  <<
-		", leftMotorFailure: " << (operationalState_.leftMotorFailure ? "true" : "false")  <<
-		std::endl;
+    publisher_.publish(operationalState_);
 
-	std::string strData =  stream.str( );
-
-	ROS_INFO_STREAM( strData );
-
-	publisher_.publish(operationalState_);
-
-	hasValidMessage_ = true;
+    hasValidMessage_ = true;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void OperationalStateHandler::setBrainstemTimeout(bool brainstemTimeout)
 {
-	if (operationalState_.brainstemTimeoutFailure != brainstemTimeout)
-	{
-		operationalState_.brainstemTimeoutFailure = brainstemTimeout;
+    if (operationalState_.brainstemTimeout != brainstemTimeout)
+    {
+        operationalState_.brainstemTimeout = brainstemTimeout;
 
-		ROS_INFO_STREAM("Operational State => brainstemTimeoutFailure: " << brainstemTimeout);
+        ROS_INFO_STREAM("Brainstem driver: " << operationalState_);
 
-		publisher_.publish(operationalState_);
-	}
+        publisher_.publish(operationalState_);
+    }
 }
 
 

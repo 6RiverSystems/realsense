@@ -42,6 +42,8 @@ void HardwareInfoHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 		hardwareInfoMsg_.brainstemSwVersion = msg.readString();
 	}
 
+	hardwareInfoMsg_.batteryInfo.erase(hardwareInfoMsg_.batteryInfo.begin(), hardwareInfoMsg_.batteryInfo.end());
+
 	if (msg.checkBufferSize<uint8_t>())
 	{
 		uint8_t numberOfBatteries = msg.read<uint8_t>();

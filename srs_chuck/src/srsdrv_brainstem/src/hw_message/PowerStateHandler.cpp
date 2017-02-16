@@ -1,6 +1,8 @@
 #include <hw_message/PowerStateHandler.hpp>
 #include <srslib_framework/chuck/ChuckTopics.hpp>
 
+#include <filters/PowerStateFilter.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,11 +105,15 @@ void PowerStateHandler::readBatteryDescriptorInfo(HardwareMessage& msg,
 	{
 		srslib_framework::MsgBatteryDescriptor batteryDescriptor;
 		batteryDescriptor.id = id;
-		batteryDescriptor.name = descriptor_name;
 		batteryDescriptor.value = convertBatteryDescriptorValue(id, msg.read<uint16_t>());
 
 		batterIter.descriptors.push_back(batteryDescriptor);
     }
+}
+
+void PowerStateHandler::setHook(std::function<void(const srslib_framework::MsgPowerState&)> hook)
+{
+	hook_ = hook;
 }
 
 void PowerStateHandler::receiveMessage(ros::Time currentTime, HardwareMessage& msg)
@@ -138,7 +144,7 @@ void PowerStateHandler::receiveMessage(ros::Time currentTime, HardwareMessage& m
 
 		for (const auto& descriptor : battery.descriptors)
 		{
-			stream << "    -" << descriptor.name << ": " << descriptor.value << std::endl;
+			stream << "    -" << getBatteryDescriptorName(descriptor.id) << ": " << descriptor.value << std::endl;
 		}
 
 		i++;
@@ -147,6 +153,11 @@ void PowerStateHandler::receiveMessage(ros::Time currentTime, HardwareMessage& m
 	std::string strData =  stream.str( );
 
 	ROS_INFO_STREAM_THROTTLE( 60, strData );
+
+	if (hook_)
+	{
+		hook_(powerStateMsg);
+	}
 
 	// Publish the power State
 	publisher_.publish(powerStateMsg);

@@ -9,10 +9,7 @@
 
 #include "../../include/srsdrv_brainstem/BrainStemMessages.hpp"
 
-using namespace std;
 using namespace srs;
-
-#include <srslib_test/utils/Compare.hpp>
 
 #include <hw_message/HardwareInfoHandler.hpp>
 #include <srslib_framework/ros/channel/publisher/PublisherInterface.hpp>
@@ -25,7 +22,6 @@ class MockPublisher : public PublisherInterface<TYPE, MESSAGE>
 public:
 
 	typedef std::function<MESSAGE(TYPE)> ConvertFn;
-
 	MockPublisher(ConvertFn convert) :
 		convert_(convert) {}
 

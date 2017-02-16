@@ -15,7 +15,7 @@ class ChannelBrainstemPowerState :
 {
 public:
 	ChannelBrainstemPowerState() :
-    	PublisherPowerState(ChuckTopics::driver::BRAINSTEM_STATE_POWER, 1, true)
+    	PublisherPowerState(ChuckTopics::driver::BRAINSTEM_STATE_POWER_RAW, 1, true)
     {}
 };
 

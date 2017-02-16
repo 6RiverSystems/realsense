@@ -8,15 +8,13 @@
 #include <string>
 #include <ros/ros.h>
 
-using namespace std;
-
 namespace srs {
 
 class HardwareMessage
 {
 public:
 
-	HardwareMessage(vector<char>& messageBuffer) :
+	HardwareMessage(std::vector<char>& messageBuffer) :
 		buffer_(messageBuffer),
 		iter_()
 	{
@@ -59,11 +57,11 @@ public:
     	}
     }
 
-    string readString()
+    std::string readString()
     {
     	if (checkBufferSize<char>(2, true))
     	{
-    		string value = string(reinterpret_cast<char*>(&*iter_));
+    		std::string value = std::string(reinterpret_cast<char*>(&*iter_));
 
     		iter_ += value.length() + 1;
 
@@ -90,16 +88,16 @@ public:
         std::copy((uint8_t*) &value, ((uint8_t*) &value) + sizeof(T), std::back_inserter(buffer_));
     }
 
-    void write(const string& value)
+    void write(const std::string& value)
     {
         std::copy(value.c_str(), value.c_str()+value.length()+1, std::back_inserter(buffer_));
     }
 
 private:
 
-    vector<char>::iterator iter_;
+    std::vector<char>::iterator iter_;
 
-    vector<char>& buffer_;
+    std::vector<char>& buffer_;
 };
 
 } // namespace srs

@@ -89,7 +89,13 @@ public:
 			srslib_framework::MsgBatteryDescriptor batteryDescriptor;
 			batteryDescriptor.id = static_cast<uint8_t>(descriptorId);
 			batteryDescriptor.value = descriptorFilter->getFilteredValue();
-			filteredPowerState.descriptors.push_back(batteryDescriptor);
+
+			if (std::isfinite(batteryDescriptor.value))
+			{
+				ROS_ERROR("Battery Descriptor: %d, %f", batteryDescriptor.id, batteryDescriptor.value);
+
+				filteredPowerState.descriptors.push_back(batteryDescriptor);
+			}
     	}
 
         publisher_.publish(filteredPowerState);

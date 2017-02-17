@@ -20,14 +20,16 @@ namespace srs {
 class LogicalMapFactory
 {
 public:
+    static const string LANGUAGE_VERSION;
+
     LogicalMapFactory() :
         map_(nullptr),
         metadata_()
     {}
 
     LogicalMap* fromGrid2d(WeightedGrid2d* logical, Pose<> origin, double resolution);
-    LogicalMap* fromJsonFile(string jsonFilename, double loadTime = 0);
-    LogicalMap* fromString(string geoJson, double loadTime = 0);
+    LogicalMap* fromJsonFile(string jsonFilename);
+    LogicalMap* fromString(string geoJson);
 
 private:
     static const string KEYWORD_BOUNDARY;
@@ -52,6 +54,7 @@ private:
     static const string KEYWORD_PROPERTY_FEATURE_OBJECT;
     static const string KEYWORD_PROPERTY_LABEL_AREA_LABEL;
     static const string KEYWORD_PROPERTY_LABEL_AREA_NOTES;
+    static const string KEYWORD_PROPERTY_LANGUAGE_VERSION;
     static const string KEYWORD_PROPERTY_MAP_HEIGHT;
     static const string KEYWORD_PROPERTY_MAP_ORIGIN;
     static const string KEYWORD_PROPERTY_MAP_RESOLUTION;
@@ -108,6 +111,8 @@ private:
     vector<Pose<>> ntValueMultiPoint(YAML::Node root, bool required);
     Pose<> ntValuePoint(YAML::Node root, bool required);
     string ntValueString(YAML::Node root, bool required);
+
+    void ntZeroLevelProperties(YAML::Node root);
 
     LogicalMap* map_;
     LogicalMetadata metadata_;

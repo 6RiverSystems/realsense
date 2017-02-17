@@ -18,34 +18,29 @@ struct LogicalMetadata
 {
 public:
     LogicalMetadata() :
-        LogicalMetadata(0, 0, 0, 0.0, 0.0, Pose<>::INVALID, 0.0, "")
+        LogicalMetadata(0, 0, 0.0, 0.0, Pose<>::INVALID, 0.0, "")
     {}
 
-    LogicalMetadata(double loadTime,
-            unsigned int widthCells, unsigned int heightCells,
+    LogicalMetadata(unsigned int widthCells, unsigned int heightCells,
             Pose<> origin, double resolution,
             string logicalFilename) :
-                LogicalMetadata(loadTime,
-                    widthCells, heightCells,
+                LogicalMetadata(widthCells, heightCells,
                     MeasurementMath::cells2M(widthCells, resolution),
                     MeasurementMath::cells2M(heightCells, resolution),
                     origin, resolution,
                     logicalFilename)
     {}
 
-    LogicalMetadata(double loadTime,
-            double widthM, double heightM,
+    LogicalMetadata(double widthM, double heightM,
             Pose<> origin, double resolution,
             string logicalFilename) :
-                LogicalMetadata(loadTime,
-                    MeasurementMath::m2Cells(widthM, resolution),
+                LogicalMetadata(MeasurementMath::m2Cells(widthM, resolution),
                     MeasurementMath::m2Cells(heightM, resolution),
                     widthM, heightM,
                     origin, resolution, logicalFilename)
     {}
 
     LogicalMetadata(const LogicalMetadata& other) :
-        loadTime(other.loadTime),
         heightCells(other.heightCells),
         widthCells(other.widthCells),
         heightM(other.heightM),
@@ -59,7 +54,6 @@ public:
     {
         return lhs.heightCells == rhs.heightCells &&
             BasicMath::equal(lhs.heightM, rhs.heightM, 0.001) &&
-            BasicMath::equal(lhs.loadTime, rhs.loadTime, 1e-10) &&
             lhs.logicalFilename == rhs.logicalFilename &&
             PoseMath::equal(lhs.origin, rhs.origin) &&
             BasicMath::equal(lhs.resolution, rhs.resolution, 0.001) &&
@@ -68,12 +62,10 @@ public:
     }
 
 protected:
-    LogicalMetadata(double loadTime,
-            unsigned int widthCells, unsigned int heightCells,
+    LogicalMetadata(unsigned int widthCells, unsigned int heightCells,
             double widthM, double heightM,
             Pose<> origin, double resolution,
             string logicalFilename) :
-        loadTime(loadTime),
         widthCells(heightCells), heightCells(widthCells),
         widthM(widthM), heightM(heightM),
         origin(origin), resolution(resolution),
@@ -84,7 +76,6 @@ public:
     int heightCells;
     double heightM;
 
-    double loadTime;
     string logicalFilename;
 
     Pose<> origin;

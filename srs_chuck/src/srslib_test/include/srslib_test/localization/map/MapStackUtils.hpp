@@ -12,6 +12,7 @@ using namespace std;
 #include <srslib_framework/datastructure/graph/grid2d/SimpleGrid2d.hpp>
 #include <srslib_framework/datastructure/graph/grid2d/WeightedGrid2d.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/localization/map/MapStackMetadata.hpp>
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMapFactory.hpp>
@@ -50,7 +51,9 @@ struct MapStackUtils
             }
         }
 
-        return new MapStack(logicalMap, occupancyMap, costMap);
+        MapStackMetadata metadata(0, "MapStackUtils", "Test map", "1.0");
+
+        return new MapStack(metadata, logicalMap, occupancyMap, costMap);
     }
 };
 

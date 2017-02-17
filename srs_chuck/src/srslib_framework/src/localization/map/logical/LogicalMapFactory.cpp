@@ -11,6 +11,7 @@ using namespace std;
 #include <srslib_framework/localization/map/logical/exception/FeatureExpectedException.hpp>
 #include <srslib_framework/localization/map/logical/exception/FeaturesExpectedException.hpp>
 #include <srslib_framework/localization/map/logical/exception/GeoJsonTypeUnsupportedException.hpp>
+#include <srslib_framework/localization/map/logical/exception/IncompatibleLanguageVersionException.hpp>
 #include <srslib_framework/localization/map/logical/exception/InvalidCostValueException.hpp>
 #include <srslib_framework/localization/map/logical/exception/InvalidMapNoteFlagException.hpp>
 #include <srslib_framework/localization/map/logical/exception/MapNoteExpectedException.hpp>
@@ -26,7 +27,11 @@ using namespace std;
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Public methods
+// Public constants
+const string LogicalMapFactory::LANGUAGE_VERSION = "1.1";
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Private constants
 const string LogicalMapFactory::KEYWORD_BOUNDARY = "boundary";
 const string LogicalMapFactory::KEYWORD_COORDINATES = "coordinates";
 const string LogicalMapFactory::KEYWORD_COST_AREA = "cost_area";
@@ -48,6 +53,7 @@ const string LogicalMapFactory::KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE = "envel
 const string LogicalMapFactory::KEYWORD_PROPERTY_FEATURE_OBJECT = "object";
 const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_LABEL = "label";
 const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_NOTES = "notes";
+const string LogicalMapFactory::KEYWORD_PROPERTY_LANGUAGE_VERSION = "language_version";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_HEIGHT = "height";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_ORIGIN = "origin";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_RESOLUTION = "resolution";
@@ -67,8 +73,7 @@ const string LogicalMapFactory::KEYWORD_WEIGHTED_AREA = "weighted_area";
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 LogicalMap* LogicalMapFactory::fromGrid2d(WeightedGrid2d* logical, Pose<> origin, double resolution)
 {
-    metadata_ = LogicalMetadata(0,
-        logical->getWidth(), logical->getHeight(),
+    metadata_ = LogicalMetadata(logical->getWidth(), logical->getHeight(),
         origin, resolution, "");
 
     map_ = new LogicalMap(metadata_, logical);
@@ -77,7 +82,7 @@ LogicalMap* LogicalMapFactory::fromGrid2d(WeightedGrid2d* logical, Pose<> origin
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename, double loadTime)
+LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename)
 {
     YAML::Node jsonDocument;
     try
@@ -90,9 +95,7 @@ LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename, double loadTime
     }
 
     map_ = nullptr;
-
     metadata_ = LogicalMetadata();
-    metadata_.loadTime = loadTime;
     metadata_.logicalFilename = jsonFilename;
 
     ntEntry(jsonDocument);
@@ -101,7 +104,7 @@ LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename, double loadTime
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap* LogicalMapFactory::fromString(string geoJson, double loadTime)
+LogicalMap* LogicalMapFactory::fromString(string geoJson)
 {
     YAML::Node jsonDocument;
     try
@@ -114,9 +117,7 @@ LogicalMap* LogicalMapFactory::fromString(string geoJson, double loadTime)
     }
 
     map_ = nullptr;
-
     metadata_ = LogicalMetadata();
-    metadata_.loadTime = loadTime;
 
     ntEntry(jsonDocument);
 
@@ -424,6 +425,7 @@ void LogicalMapFactory::ntEntityLabelArea(YAML::Node root)
     YAML::Node properties = ntProperties(root);
 
     string label = ntValueString(properties[KEYWORD_PROPERTY_LABEL_AREA_LABEL], true);
+
     shared_ptr<MapNotes> notes = ntValueMapNotes(properties[KEYWORD_PROPERTY_LABEL_AREA_NOTES], true);
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
@@ -508,6 +510,10 @@ void LogicalMapFactory::ntEntityWeightArea(YAML::Node root)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::ntEntry(YAML::Node root)
 {
+    // Read the global properties of the logical map file, and
+    // check the language versions
+    ntZeroLevelProperties(root);
+
     YAML::Node features;
     if (findCollection(root, features))
     {
@@ -768,6 +774,22 @@ string LogicalMapFactory::ntValueString(YAML::Node root, bool required)
     }
 
     return value;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::ntZeroLevelProperties(YAML::Node root)
+{
+    YAML::Node properties = root[KEYWORD_PROPERTIES];
+
+    if (!properties)
+    {
+        throw PropertiesExpectedException(metadata_, "Level zero");
+    }
+
+    string languageVersion = ntValueString(properties[KEYWORD_PROPERTY_LANGUAGE_VERSION], true);
+    if (LANGUAGE_VERSION != languageVersion) {
+        throw IncompatibleLanguageVersionException(metadata_, LANGUAGE_VERSION, languageVersion);
+    }
 }
 
 } // namespace srs

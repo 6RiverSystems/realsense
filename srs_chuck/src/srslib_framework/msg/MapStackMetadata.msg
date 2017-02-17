@@ -4,6 +4,7 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 
-srslib_framework/MapStackMetadata metadata
-srslib_framework/LogicalMap logical
-srslib_framework/OccupancyMap occupancy
+float32 loadTime
+string mapStackFilename
+string mapName
+string mapVersion

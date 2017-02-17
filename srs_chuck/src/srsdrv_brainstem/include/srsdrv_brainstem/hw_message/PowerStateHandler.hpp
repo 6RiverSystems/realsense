@@ -27,15 +27,14 @@ public:
 
     void receiveMessage(srslib_framework::MsgPowerState& powerStateMessage);
 
-    void setHook(std::function<void(const srslib_framework::MsgPowerState&)> hook);
+    void setHook(std::function<void(const PowerState&)> hook);
 
 private:
-    std::string getBatteryDescriptorName(uint8_t id);
 
-    float convertBatteryDescriptorValue(uint8_t id, uint16_t value);
+    float convertBatteryDescriptorValue(BatteryState::Descriptor descriptor, uint16_t value);
 
 	void readBatteryDescriptorInfo(HardwareMessage& msg, int descriptorIndex,
-		srslib_framework::MsgPowerState& batteryState);
+		PowerState& batteryState);
 
     void publishPowerState(const srslib_framework::MsgPowerState& powerState);
 
@@ -50,11 +49,9 @@ private:
         uint16_t value;
     HW_MESSAGE_END
 
-	std::function<void(const srslib_framework::MsgPowerState&)> hook_;
+	std::function<void(const PowerState&)> hook_;
 
     ChannelBrainstemPowerState::Interface& publisher_;
-
-    std::set<BATTERY_DESCRIPTOR> validDescriptors_;
 };
 
 } // namespace srs

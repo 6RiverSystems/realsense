@@ -17,14 +17,16 @@ using namespace srs;
 #include <hw_message/PowerStateHandler.hpp>
 #include <hw_message/Test_HardwareMessage.hpp>
 
+#include <srslib_framework/ros/message/PowerStateMessageFactory.hpp>
+
 using namespace srslib_framework;
 
-class Test_PowerState : public Test_HardwareMessage<const MsgPowerState&, MsgPowerState>
+class Test_PowerState : public Test_HardwareMessage<const PowerState&, MsgPowerState>
 {
 public:
 
 	Test_PowerState() :
-		Test_HardwareMessage() {}
+		Test_HardwareMessage(PowerStateMessageFactory::powerState2Msg) {}
 
 	virtual ~Test_PowerState() {}
 
@@ -36,15 +38,15 @@ public:
 		{
 			MsgBatteryDescriptor temperature;
 			temperature.id = (int)BATTERY_DESCRIPTOR::TEMPERATURE;
-			temperature.value = 0;
+			temperature.value = 100;
 
 			MsgBatteryDescriptor voltage;
 			voltage.id = (int)BATTERY_DESCRIPTOR::VOLTAGE;
-			voltage.value = 0;
+			voltage.value = 22;
 
 			MsgBatteryDescriptor current;
 			current.id = (int)BATTERY_DESCRIPTOR::AVERAGE_CURRENT;
-			current.value = 0;
+			current.value = 4;
 
 			MsgBatteryDescriptor chargedPercentage;
 			chargedPercentage.id = (int)BATTERY_DESCRIPTOR::CHARGED_PERCENTAGE;
@@ -52,7 +54,7 @@ public:
 
 			MsgBatteryDescriptor timeToEmpty;
 			timeToEmpty.id = (int)BATTERY_DESCRIPTOR::AVERAGE_TIME_TO_EMPTY;
-			timeToEmpty.value = 0;
+			timeToEmpty.value = 60;
 
 
 			MsgBatteryState batteryState;
@@ -208,6 +210,12 @@ TEST_F(Test_PowerState, ValidMessages)
 
 		// Setup test expectations
 		powerStateHandler.receiveData(ros::Time(), messageBuffer);
+
+		msg.batteries[0].descriptors[0].value = -263.15;
+		msg.batteries[0].descriptors[1].value = 0.022;
+		msg.batteries[0].descriptors[2].value = 0.004;
+		msg.batteries[0].descriptors[3].value = 0.5;
+		msg.batteries[0].descriptors[4].value = 60;
 
 		EXPECT_EQ(publisher_.data_, msg);
 	}

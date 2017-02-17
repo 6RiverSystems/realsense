@@ -7,7 +7,7 @@
 
 #include <BrainStemMessages.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemPowerStateFiltered.hpp>
-#include <srslib_framework/MsgPowerState.h>
+#include <srslib_framework/robotics/device/PowerState.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/max.hpp>
@@ -27,14 +27,24 @@ class PowerStateFilter
 	{
 		public:
 
+			DescriptorFilter() :
+				valid_(false),
+				accumulator_() {}
+
 			virtual void insert(float value)
 			{
 				accumulator_(value);
+
+				valid_ = true;
 			}
+
+			bool isValid() { return valid_; };
 
 			virtual float getFilteredValue() const = 0;
 
 		protected:
+
+			bool valid_;
 
 			double_acc accumulator_;
 	};
@@ -53,27 +63,25 @@ public:
 
 	PowerStateFilter(ChannelBrainstemPowerStateFiltered::Interface& publisher) : publisher_(publisher) {}
 
-    void filter(const srslib_framework::MsgPowerState& powerStateMsg)
+    void filter(const PowerState& powerState)
     {
-    	std::map<BATTERY_DESCRIPTOR, std::shared_ptr<DescriptorFilter>> descriptorFilters;
-    	descriptorFilters[BATTERY_DESCRIPTOR::TEMPERATURE] = std::make_shared<MedianDescriptorFilter>();
-    	descriptorFilters[BATTERY_DESCRIPTOR::VOLTAGE] = std::make_shared<MedianDescriptorFilter>();
-    	descriptorFilters[BATTERY_DESCRIPTOR::AVERAGE_CURRENT] = std::make_shared<MedianDescriptorFilter>();
-    	descriptorFilters[BATTERY_DESCRIPTOR::INSTANTANEOUS_CURRENT] = std::make_shared<MedianDescriptorFilter>();
-    	descriptorFilters[BATTERY_DESCRIPTOR::CHARGED_PERCENTAGE] = std::make_shared<MedianDescriptorFilter>();
-    	descriptorFilters[BATTERY_DESCRIPTOR::AVERAGE_TIME_TO_EMPTY] = std::make_shared<MedianDescriptorFilter>();
+    	std::map<BatteryState::Descriptor, std::shared_ptr<DescriptorFilter>> descriptorFilters;
+    	descriptorFilters[BatteryState::Descriptor::TEMPERATURE] = std::make_shared<MedianDescriptorFilter>();
+    	descriptorFilters[BatteryState::Descriptor::VOLTAGE] = std::make_shared<MedianDescriptorFilter>();
+    	descriptorFilters[BatteryState::Descriptor::AVERAGE_CURRENT] = std::make_shared<MedianDescriptorFilter>();
+    	descriptorFilters[BatteryState::Descriptor::INSTANTANEOUS_CURRENT] = std::make_shared<MedianDescriptorFilter>();
+    	descriptorFilters[BatteryState::Descriptor::CHARGED_PERCENTAGE] = std::make_shared<MedianDescriptorFilter>();
+    	descriptorFilters[BatteryState::Descriptor::AVERAGE_TIME_TO_EMPTY] = std::make_shared<MedianDescriptorFilter>();
 
-    	srslib_framework::MsgBatteryState batteryState;
-
-    	for(const auto& battery : powerStateMsg.batteries)
+    	for(const auto& battery : powerState.batteries)
     	{
     		for(const auto& descriptor : battery.descriptors)
     		{
-    			const auto& descriptorFilter = descriptorFilters.find(static_cast<BATTERY_DESCRIPTOR>(descriptor.id));
+    			const auto& descriptorFilter = descriptorFilters.find(descriptor.first);
     			if (descriptorFilter != descriptorFilters.end())
     			{
     				// Add the value
-    				descriptorFilter->second->insert(descriptor.value);
+    				descriptorFilter->second->insert(descriptor.second);
     			}
     		}
     	}

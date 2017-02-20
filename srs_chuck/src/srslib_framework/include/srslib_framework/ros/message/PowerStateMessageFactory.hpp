@@ -130,7 +130,7 @@ struct PowerStateMessageFactory
      *
      * @return newly generated message
      */
-    static srslib_framework::MsgBatteryState robotBatteryState2Msg(const BatteryState& batteryState)
+    static srslib_framework::MsgBatteryState batteryState2Msg(const BatteryState& batteryState)
     {
         srslib_framework::MsgBatteryState msgBatteryState;
 
@@ -190,7 +190,7 @@ struct PowerStateMessageFactory
 
 		for(auto battery : powerState.batteries)
 		{
-			msgPowerState.batteries.push_back(robotBatteryState2Msg(battery));
+			msgPowerState.batteries.push_back(batteryState2Msg(battery));
 		}
 
         return msgPowerState;

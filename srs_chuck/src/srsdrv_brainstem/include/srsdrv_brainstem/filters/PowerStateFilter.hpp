@@ -86,23 +86,20 @@ public:
     		}
     	}
 
-    	srslib_framework::MsgBatteryState filteredPowerState;
+    	BatteryState filteredPowerState;
 
     	for(const auto& filterTuple : descriptorFilters)
     	{
     		auto descriptorId = filterTuple.first;
     		const auto& descriptorFilter = filterTuple.second;
 
-    	  	// Average Current
-			srslib_framework::MsgBatteryDescriptor batteryDescriptor;
-			batteryDescriptor.id = static_cast<uint8_t>(descriptorId);
-			batteryDescriptor.value = descriptorFilter->getFilteredValue();
-
-			if (std::isfinite(batteryDescriptor.value))
+			if (descriptorFilter->isValid())
 			{
-				ROS_ERROR("Battery Descriptor: %d, %f", batteryDescriptor.id, batteryDescriptor.value);
+				float filteredValue = descriptorFilter->getFilteredValue();
 
-				filteredPowerState.descriptors.push_back(batteryDescriptor);
+				ROS_ERROR("Battery Descriptor: %d, %f", descriptorId, filteredValue);
+
+				filteredPowerState.descriptors[descriptorId] = filteredValue;
 			}
     	}
 

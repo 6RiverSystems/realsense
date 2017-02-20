@@ -9,13 +9,13 @@
 using namespace std;
 
 #include <srslib_framework/MsgBatteryState.h>
-
 #include <srslib_framework/ros/channel/publisher/Publisher.hpp>
+#include <srslib_framework/ros/message/PowerStateMessageFactory.hpp>
 
 namespace srs {
 
 class PublisherPowerStateFiltered :
-    public Publisher<const srslib_framework::MsgBatteryState&, srslib_framework::MsgBatteryState>
+    public Publisher<const BatteryState&, srslib_framework::MsgBatteryState>
 {
 public:
 	PublisherPowerStateFiltered(string topic,
@@ -25,9 +25,9 @@ public:
             Publisher(topic, buffer, latched, nameSpace)
     {}
 
-    srslib_framework::MsgBatteryState convertData(const srslib_framework::MsgBatteryState& data)
+	srslib_framework::MsgBatteryState convertData(const BatteryState& data)
     {
-        return data;
+        return PowerStateMessageFactory::batteryState2Msg(data);
     }
 };
 

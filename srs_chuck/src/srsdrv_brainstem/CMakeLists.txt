@@ -48,7 +48,7 @@ set(${PROJECT_NAME}_TEST_SOURCES
 	test/sw_message/Test_Sound.cpp
 	test/sw_message/Test_UpdateUI.cpp
 
-#	test/filters/Test_PowerStateFilter.cpp
+	test/filters/Test_PowerStateFilter.cpp
     
 	test/TestSuite_Brainstem.cpp
 )

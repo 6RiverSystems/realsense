@@ -4,7 +4,7 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 
-#include <srsdrv_brainstem/hw_message/LogHandler.hpp>
+#include <hw_message/LogHandler.hpp>
 #include <hw_message/Test_HardwareMessage.hpp>
 
 struct LogData

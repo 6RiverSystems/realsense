@@ -5,15 +5,15 @@
  */
 #pragma once
 
-#include <gtest/gtest.h>
-
-#include "../../include/srsdrv_brainstem/BrainStemMessages.hpp"
-
-using namespace srs;
+#include <BrainStemMessages.hpp>
 
 #include <hw_message/HardwareInfoHandler.hpp>
+
 #include <srslib_framework/ros/channel/publisher/PublisherInterface.hpp>
 
+#include <gtest/gtest.h>
+
+using namespace srs;
 using namespace srslib_framework;
 
 template<typename TYPE, typename MESSAGE>

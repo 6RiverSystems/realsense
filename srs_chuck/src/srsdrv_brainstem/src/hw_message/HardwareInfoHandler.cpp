@@ -1,4 +1,4 @@
-#include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
+#include <hw_message/HardwareInfoHandler.hpp>
 
 namespace srs {
 

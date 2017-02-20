@@ -4,9 +4,11 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 
-#include <srsdrv_brainstem/filters/PowerStateFilter.hpp>
-#include <hw_message/Test_HardwareMessage.hpp>
+#include <filters/PowerStateFilter.hpp>
+
 #include <srslib_framework/ros/message/PowerStateMessageFactory.hpp>
+
+#include <hw_message/Test_HardwareMessage.hpp>
 
 class Test_PowerStateFilter : public ::testing::Test
 {

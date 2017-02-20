@@ -5,12 +5,7 @@
  */
 #include <gtest/gtest.h>
 
-#include <vector>
-
-#include "../../include/srsdrv_brainstem/BrainStemMessages.hpp"
-
-using namespace std;
-using namespace srs;
+#include <BrainStemMessages.hpp>
 
 #include <srslib_test/utils/Compare.hpp>
 
@@ -19,6 +14,7 @@ using namespace srs;
 
 #include <srslib_framework/ros/message/PowerStateMessageFactory.hpp>
 
+using namespace srs;
 using namespace srslib_framework;
 
 class Test_PowerState : public Test_HardwareMessage<const PowerState&, MsgPowerState>

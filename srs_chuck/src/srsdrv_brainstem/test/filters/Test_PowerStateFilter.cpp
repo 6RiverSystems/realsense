@@ -65,3 +65,53 @@ TEST_F(Test_PowerStateFilter, OneBattery)
 
 	EXPECT_EQ(batteryState, batteryStateExpected);
 }
+
+TEST_F(Test_PowerStateFilter, OneDescriptor)
+{
+	PowerState powerState;
+	BatteryState batteryState1;
+	BatteryState batteryState2;
+	BatteryState batteryStateExpected;
+
+	std::map<BatteryState::Descriptor, float> mapFiltered;
+
+	batteryState1.descriptors[BatteryState::Descriptor::CHARGED_PERCENTAGE] =  100.0;
+	batteryState2.descriptors[BatteryState::Descriptor::CHARGED_PERCENTAGE] =  80.0;
+	batteryStateExpected.descriptors[BatteryState::Descriptor::CHARGED_PERCENTAGE] =  90.0;
+
+	powerState.batteries.push_back(batteryState1);
+	powerState.batteries.push_back(batteryState2);
+
+	PowerStateFilter powerstateFilter(publisher_);
+
+	powerstateFilter.filter(powerState);
+
+	BatteryState batteryState = PowerStateMessageFactory::msg2BatteryState(publisher_.data_);
+
+	EXPECT_EQ(batteryState, batteryStateExpected);
+}
+
+TEST_F(Test_PowerStateFilter, Nan)
+{
+	PowerState powerState;
+	BatteryState batteryState1;
+	BatteryState batteryState2;
+	BatteryState batteryStateExpected;
+
+	std::map<BatteryState::Descriptor, float> mapFiltered;
+
+	batteryState1.descriptors[BatteryState::Descriptor::CHARGED_PERCENTAGE] =  0.0;
+	batteryStateExpected.descriptors[BatteryState::Descriptor::CHARGED_PERCENTAGE] =  0.0;
+
+	powerState.batteries.push_back(batteryState1);
+	powerState.batteries.push_back(batteryState2);
+
+	PowerStateFilter powerstateFilter(publisher_);
+
+	powerstateFilter.filter(powerState);
+
+	BatteryState batteryState = PowerStateMessageFactory::msg2BatteryState(publisher_.data_);
+
+	EXPECT_EQ(batteryState, batteryStateExpected);
+}
+

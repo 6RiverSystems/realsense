@@ -34,10 +34,11 @@ struct BatteryState
         if(!validDescriptors_.size())
         {
         	validDescriptors_[Descriptor::TEMPERATURE] = "Temperature (deg C)";
-        	validDescriptors_[Descriptor::AVERAGE_CURRENT] = "Voltage (V)";
-        	validDescriptors_[Descriptor::INSTANTANEOUS_CURRENT] = "Average current (A)";
-        	validDescriptors_[Descriptor::CHARGED_PERCENTAGE] = "Instantaneous current (A)";
-        	validDescriptors_[Descriptor::AVERAGE_TIME_TO_EMPTY] = "Percent charged (0-1)";
+        	validDescriptors_[Descriptor::VOLTAGE] = "Voltage (V)";
+        	validDescriptors_[Descriptor::AVERAGE_CURRENT] = "Average current (A)";
+        	validDescriptors_[Descriptor::INSTANTANEOUS_CURRENT] = "Instantaneous current (A)";
+        	validDescriptors_[Descriptor::CHARGED_PERCENTAGE] = "Percent charged (0-1)";
+        	validDescriptors_[Descriptor::AVERAGE_TIME_TO_EMPTY] = "Average time to empty (m)";
         }
 
     	if (validDescriptors_.find(descriptor) != validDescriptors_.end())

@@ -37,23 +37,23 @@ public:
 		if (!testMessages.size())
 		{
 			MsgBatteryDescriptor temperature;
-			temperature.id = (int)BATTERY_DESCRIPTOR::TEMPERATURE;
+			temperature.id = (int)BatteryState::Descriptor::TEMPERATURE;
 			temperature.value = 100;
 
 			MsgBatteryDescriptor voltage;
-			voltage.id = (int)BATTERY_DESCRIPTOR::VOLTAGE;
+			voltage.id = (int)BatteryState::Descriptor::VOLTAGE;
 			voltage.value = 22;
 
 			MsgBatteryDescriptor current;
-			current.id = (int)BATTERY_DESCRIPTOR::AVERAGE_CURRENT;
+			current.id = (int)BatteryState::Descriptor::AVERAGE_CURRENT;
 			current.value = 4;
 
 			MsgBatteryDescriptor chargedPercentage;
-			chargedPercentage.id = (int)BATTERY_DESCRIPTOR::CHARGED_PERCENTAGE;
+			chargedPercentage.id = (int)BatteryState::Descriptor::CHARGED_PERCENTAGE;
 			chargedPercentage.value = 50;
 
 			MsgBatteryDescriptor timeToEmpty;
-			timeToEmpty.id = (int)BATTERY_DESCRIPTOR::AVERAGE_TIME_TO_EMPTY;
+			timeToEmpty.id = (int)BatteryState::Descriptor::AVERAGE_TIME_TO_EMPTY;
 			timeToEmpty.value = 60;
 
 
@@ -213,7 +213,7 @@ TEST_F(Test_PowerState, ValidMessages)
 
 		msg.batteries[0].descriptors[0].value = -263.15;
 		msg.batteries[0].descriptors[1].value = 0.022;
-		msg.batteries[0].descriptors[2].value = 0.004;
+		msg.batteries[0].descriptors[2].value = 4;
 		msg.batteries[0].descriptors[3].value = 0.5;
 		msg.batteries[0].descriptors[4].value = 60;
 

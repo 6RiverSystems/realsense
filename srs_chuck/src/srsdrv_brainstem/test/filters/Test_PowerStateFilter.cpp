@@ -30,13 +30,13 @@ TEST_F(Test_PowerStateFilter, OneBattery)
 
 	std::map<BatteryState::Descriptor, float> mapFiltered;
 
-	batteryState1.descriptors[BatteryState::Descriptor::TEMPERATURE] =  100.0;
+	batteryState1.descriptors[BatteryState::Descriptor::TEMPERATURE] =  210.0;
 	batteryState2.descriptors[BatteryState::Descriptor::TEMPERATURE] =  50.0;
-	batteryStateExpected.descriptors[BatteryState::Descriptor::TEMPERATURE] =  75.0;
+	batteryStateExpected.descriptors[BatteryState::Descriptor::TEMPERATURE] =  210.0;
 
 	batteryState1.descriptors[BatteryState::Descriptor::VOLTAGE] =  24.0;
 	batteryState2.descriptors[BatteryState::Descriptor::VOLTAGE] =  20.0;
-	batteryStateExpected.descriptors[BatteryState::Descriptor::VOLTAGE] =  22.0;
+	batteryStateExpected.descriptors[BatteryState::Descriptor::VOLTAGE] =  20.0;
 
 	batteryState1.descriptors[BatteryState::Descriptor::AVERAGE_CURRENT] =  4.0;
 	batteryState2.descriptors[BatteryState::Descriptor::AVERAGE_CURRENT] =  6.0;
@@ -44,11 +44,11 @@ TEST_F(Test_PowerStateFilter, OneBattery)
 
 	batteryState1.descriptors[BatteryState::Descriptor::INSTANTANEOUS_CURRENT] =  1.0;
 	batteryState2.descriptors[BatteryState::Descriptor::INSTANTANEOUS_CURRENT] =  3.0;
-	batteryStateExpected.descriptors[BatteryState::Descriptor::INSTANTANEOUS_CURRENT] = 2.0;
+	batteryStateExpected.descriptors[BatteryState::Descriptor::INSTANTANEOUS_CURRENT] = 1.0;
 
 	batteryState1.descriptors[BatteryState::Descriptor::CHARGED_PERCENTAGE] =  100.0;
 	batteryState2.descriptors[BatteryState::Descriptor::CHARGED_PERCENTAGE] =  80.0;
-	batteryStateExpected.descriptors[BatteryState::Descriptor::CHARGED_PERCENTAGE] =  90.0;
+	batteryStateExpected.descriptors[BatteryState::Descriptor::CHARGED_PERCENTAGE] =  80.0;
 
 	batteryState1.descriptors[BatteryState::Descriptor::AVERAGE_TIME_TO_EMPTY] =  60.0;
 	batteryState2.descriptors[BatteryState::Descriptor::AVERAGE_TIME_TO_EMPTY] =  40.0;
@@ -77,7 +77,7 @@ TEST_F(Test_PowerStateFilter, OneDescriptor)
 
 	batteryState1.descriptors[BatteryState::Descriptor::CHARGED_PERCENTAGE] =  100.0;
 	batteryState2.descriptors[BatteryState::Descriptor::CHARGED_PERCENTAGE] =  80.0;
-	batteryStateExpected.descriptors[BatteryState::Descriptor::CHARGED_PERCENTAGE] =  90.0;
+	batteryStateExpected.descriptors[BatteryState::Descriptor::CHARGED_PERCENTAGE] =  80.0;
 
 	powerState.batteries.push_back(batteryState1);
 	powerState.batteries.push_back(batteryState2);

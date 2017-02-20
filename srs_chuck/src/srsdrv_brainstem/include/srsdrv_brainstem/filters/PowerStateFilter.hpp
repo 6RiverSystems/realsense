@@ -17,7 +17,7 @@
 
 using namespace boost::accumulators;
 
-typedef accumulator_set<float, features<tag::min, tag::mean> > double_acc;
+typedef accumulator_set<float, features<tag::min, tag::max, tag::mean> > double_acc;
 
 namespace srs {
 
@@ -55,7 +55,27 @@ class PowerStateFilter
 
 			virtual float getFilteredValue() const
 			{
-				return mean(accumulator_);
+				return boost::accumulators::mean(accumulator_);
+			}
+	};
+
+	class MinDescriptorFilter : public DescriptorFilter
+	{
+		public:
+
+			virtual float getFilteredValue() const
+			{
+				return boost::accumulators::min(accumulator_);
+			}
+	};
+
+	class MaxDescriptorFilter : public DescriptorFilter
+	{
+		public:
+
+			virtual float getFilteredValue() const
+			{
+				return boost::accumulators::max(accumulator_);
 			}
 	};
 
@@ -66,11 +86,11 @@ public:
     void filter(const PowerState& powerState)
     {
     	std::map<BatteryState::Descriptor, std::shared_ptr<DescriptorFilter>> descriptorFilters;
-    	descriptorFilters[BatteryState::Descriptor::TEMPERATURE] = std::make_shared<MedianDescriptorFilter>();
-    	descriptorFilters[BatteryState::Descriptor::VOLTAGE] = std::make_shared<MedianDescriptorFilter>();
+    	descriptorFilters[BatteryState::Descriptor::TEMPERATURE] = std::make_shared<MaxDescriptorFilter>();
+    	descriptorFilters[BatteryState::Descriptor::VOLTAGE] = std::make_shared<MinDescriptorFilter>();
     	descriptorFilters[BatteryState::Descriptor::AVERAGE_CURRENT] = std::make_shared<MedianDescriptorFilter>();
-    	descriptorFilters[BatteryState::Descriptor::INSTANTANEOUS_CURRENT] = std::make_shared<MedianDescriptorFilter>();
-    	descriptorFilters[BatteryState::Descriptor::CHARGED_PERCENTAGE] = std::make_shared<MedianDescriptorFilter>();
+    	descriptorFilters[BatteryState::Descriptor::INSTANTANEOUS_CURRENT] = std::make_shared<MinDescriptorFilter>();
+    	descriptorFilters[BatteryState::Descriptor::CHARGED_PERCENTAGE] = std::make_shared<MinDescriptorFilter>();
     	descriptorFilters[BatteryState::Descriptor::AVERAGE_TIME_TO_EMPTY] = std::make_shared<MedianDescriptorFilter>();
 
     	for(const auto& battery : powerState.batteries)
@@ -97,7 +117,7 @@ public:
 			{
 				float filteredValue = descriptorFilter->getFilteredValue();
 
-				ROS_ERROR("Battery Descriptor: %d, %f", descriptorId, filteredValue);
+				ROS_DEBUG("Battery Descriptor: %d, %f", descriptorId, filteredValue);
 
 				filteredPowerState.descriptors[descriptorId] = filteredValue;
 			}

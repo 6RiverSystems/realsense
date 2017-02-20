@@ -28,12 +28,12 @@ float PowerStateHandler::convertBatteryDescriptorValue(BatteryState::Descriptor 
 		case BatteryState::Descriptor::AVERAGE_CURRENT:
 		{
 			int16_t signed_val = (int16_t)value;
-			return (float)signed_val / 1000.0; // originally in mA
+			return (float)signed_val; // originally in A
 		}
 		case BatteryState::Descriptor::INSTANTANEOUS_CURRENT:
 		{
 			int16_t signed_val = (int16_t)value;
-			return (float)signed_val / 1000.0; // originally in mA
+			return (float)signed_val; // originally in A
 		}
 		case BatteryState::Descriptor::CHARGED_PERCENTAGE:
 			return (float)value / 100.0;  // originally in 0-100
@@ -67,9 +67,6 @@ void PowerStateHandler::receiveMessage(ros::Time currentTime, HardwareMessage& m
 	PowerStateMsg msgPowerState = msg.read<PowerStateMsg>();
 
 	PowerState powerState;
-
-	ROS_INFO_STREAM("Power state: " << (int)msgPowerState.numberOfBatteries << std::endl );
-	ROS_INFO_STREAM("Power state: " << (int)msgPowerState.numberOfBatteryDescriptors << std::endl );
 
 	for (int i = 0; i < msgPowerState.numberOfBatteries; i++)
 	{

@@ -26,32 +26,7 @@
     	<arg name="use_sim_time" value="$(arg use_sim_time)" />
 	</include>
 
-    <!-- Map server -->
-    <include file="$(find srsnode_map_server)/launch/node.launch">
-        <arg name="map_stack" value="$(find srsc_empty)/map/empty.yaml" />
-    </include>
-
-<!--
-    <include file="$(find srsnode_map_server)/launch/node.launch">
-        <arg name="map_stack" value="$(find srsc_6rshq_oneway)/map/6rshq_oneway.yaml" />
-    </include>
-
-    <include file="$(find srsnode_map_server)/launch/node.launch">
-        <arg name="map_stack" value="$(find srsc_barrett)/map/barrett.yaml" />
-    </include>
-
-    <include file="$(find srsnode_map_server)/launch/node.launch">
-        <arg name="map_stack" value="$(find srsc_empty)/map/empty.yaml" />
-    </include>
-
-    <include file="$(find srsnode_map_server)/launch/node.launch">
-        <arg name="map_stack" value="$(find srsnode_navigation)/test/data/one-way/one-way.yaml" />
-    </include>
-
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find srsc_empty)/map/empty.yaml" >
-        <remap from="map" to="/internal/state/map/ros_occupancy"/>
-        <remap from="map_metadata" to="/internal/state/map/info"/>
-    </node>
--->
+	<!-- Launch Map -->
+	<include file="$(find srsc_common)/launch/map.launch" />
 
 </launch>

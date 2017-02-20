@@ -8,28 +8,26 @@
 #include <string>
 using namespace std;
 
-#include <srslib_framework/MsgPowerState.h>
-
+#include <srslib_framework/MsgBatteryState.h>
 #include <srslib_framework/ros/channel/publisher/Publisher.hpp>
-#include <srslib_framework/robotics/device/PowerState.hpp>
 #include <srslib_framework/ros/message/PowerStateMessageFactory.hpp>
 
 namespace srs {
 
-class PublisherPowerState :
-    public Publisher<const PowerState&, srslib_framework::MsgPowerState>
+class PublisherPowerStateFiltered :
+    public Publisher<const BatteryState&, srslib_framework::MsgBatteryState>
 {
 public:
-	PublisherPowerState(string topic,
+	PublisherPowerStateFiltered(string topic,
         unsigned int buffer = 100,
         bool latched = false,
         string nameSpace = "~") :
             Publisher(topic, buffer, latched, nameSpace)
     {}
 
-	srslib_framework::MsgPowerState convertData(const PowerState& data)
+	srslib_framework::MsgBatteryState convertData(const BatteryState& data)
     {
-        return PowerStateMessageFactory::powerState2Msg(data);
+        return PowerStateMessageFactory::batteryState2Msg(data);
     }
 };
 

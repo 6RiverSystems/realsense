@@ -38,7 +38,8 @@ namespace driver {
     static const string BRAINSTEM_ODOMETRY_RPM = "/internal/sensors/odometry/rpm/raw";
     static const string BRAINSTEM_ODOMETRY_RPM_CMD = "/internal/sensors/odometry/rpm/cmd";
     static const string ODOMETRY_CMD_VELOCITY = "/internal/sensors/odometry/velocity/cmd";
-    static const string BRAINSTEM_STATE_POWER = "/info/power";
+    static const string BRAINSTEM_STATE_POWER_RAW = "/info/power/raw";
+    static const string BRAINSTEM_STATE_POWER_FILTERED = "/info/power/filtered";
     static const string BRAINSTEM_HARDWARE_INFO = "/info/hardware";
     static const string BRAINSTEM_OPERATIONAL_STATE = "/info/operational_state";
 } // namespace debug

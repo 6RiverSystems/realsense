@@ -7,8 +7,8 @@
   *
 -->
 <launch>
-  <remap from="/map" to="/internal/state/map/grid"/>
-  <remap from="/map_metadata" to="/internal/state/map/info"/>
+  <remap from="map" to="/internal/state/map/ros_occupancy"/>
+  <remap from="map_metadata" to="/internal/state/map/ros_metadata"/>
   <remap from="/initialpose" to="/request/initial_pose"/>
 
   <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">

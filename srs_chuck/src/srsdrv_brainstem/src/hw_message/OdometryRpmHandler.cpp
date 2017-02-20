@@ -1,4 +1,4 @@
-#include "../../include/srsdrv_brainstem/hw_message/OdometryRpmHandler.hpp"
+#include <hw_message/OdometryRpmHandler.hpp>
 
 #include <srslib_framework/OdometryRpm.h>
 

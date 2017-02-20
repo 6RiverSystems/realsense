@@ -1,4 +1,4 @@
-#include <srsdrv_brainstem/hw_message/HardwareInfoHandler.hpp>
+#include <hw_message/HardwareInfoHandler.hpp>
 
 namespace srs {
 
@@ -41,6 +41,8 @@ void HardwareInfoHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 
 		hardwareInfoMsg_.brainstemSwVersion = msg.readString();
 	}
+
+	hardwareInfoMsg_.batteryInfo.erase(hardwareInfoMsg_.batteryInfo.begin(), hardwareInfoMsg_.batteryInfo.end());
 
 	if (msg.checkBufferSize<uint8_t>())
 	{

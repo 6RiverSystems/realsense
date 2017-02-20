@@ -57,6 +57,8 @@ BrainStemMessageProcessor::BrainStemMessageProcessor() :
 	hardwareInfoChannel_(),
 	operationalStateChannel_(),
 	powerStateChannel_(),
+	powerStateFilteredChannel_(),
+	powerStateFilter_(powerStateFilteredChannel_),
     hardwareInfoHandler_(new HardwareInfoHandler(hardwareInfoChannel_)),
     operationalStateHandler_(new OperationalStateHandler(operationalStateChannel_)),
 	useBrainstemOdom_(false),
@@ -68,8 +70,10 @@ BrainStemMessageProcessor::BrainStemMessageProcessor() :
     addHardwareMessageHandler(hardwareInfoHandler_);
     addHardwareMessageHandler(operationalStateHandler_);
     addHardwareMessageHandler(HardwareMessageHandlerPtr(new LogHandler()));
-    addHardwareMessageHandler(HardwareMessageHandlerPtr(new PowerStateHandler(powerStateChannel_)));
     addHardwareMessageHandler(HardwareMessageHandlerPtr(new ButtonPressedHandler(buttonPressedChannel_)));
+    PowerStateHandler* powerStateHandler = new PowerStateHandler(powerStateChannel_);
+    powerStateHandler->setHook(std::bind(&PowerStateFilter::filter, &powerStateFilter_, std::placeholders::_1));
+    addHardwareMessageHandler(HardwareMessageHandlerPtr(powerStateHandler));
 
     addSoftwareMessage(SoftwareMessagePtr(new ResetHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new PingHandler(this)));

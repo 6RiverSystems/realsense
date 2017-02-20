@@ -1,4 +1,4 @@
-#include <srsdrv_brainstem/command/SetPhysicalDimension.hpp>
+#include <command/SetPhysicalDimension.hpp>
 
 namespace srs {
 

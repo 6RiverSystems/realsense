@@ -1,4 +1,4 @@
-#include "../../include/srsdrv_brainstem/hw_message/LogHandler.hpp"
+#include <hw_message/LogHandler.hpp>
 
 namespace srs {
 

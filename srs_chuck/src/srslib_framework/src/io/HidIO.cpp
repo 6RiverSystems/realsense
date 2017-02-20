@@ -447,7 +447,7 @@ void HidIO::readCompletedInternal(libusb_transfer* transfer)
 		{
 			if (sequence_ != counter)
 			{
-				ROS_ERROR_STREAM_NAMED(name_, "ReadData (size=" << (int)size << ", count=" << (int)counter << ", expected=" <<
+				ROS_ERROR_STREAM_NAMED(name_, "ReadData (sync index=" << (int)counter << ", expected sync=" <<
 					(int)sequence_ << " ): " <<
 					ToHex(std::vector<char>(message.begin(), message.end())));
 			}

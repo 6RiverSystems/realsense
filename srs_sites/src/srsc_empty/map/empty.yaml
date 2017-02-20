@@ -1,18 +1,23 @@
 #
-# (c) Copyright 2015-2016 River Systems, all rights reserved
+# (c) Copyright 2015-2017 River Systems, all rights reserved.
 #
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 {
-    occupancy: {
-        image: empty.pgm,
-        resolution: 0.100,
-        origin: [0, 0, 0],
-        negate: 0,
-        occupied_thresh: 0.65,
-        free_thresh: 0.196,
+    "language_version": "1.0",
+    "metadata": {
+        "map_name": "Empty",
+        "map_version": "1.0"
     },
-    logical: {
-        map: empty.geojson
+    "logical": {
+        "map": "Empty.geojson"
+    },
+    "occupancy": {
+        "map": "Empty.pgm",
+        "resolution": 0.05,
+        "origin": [0,0,0],
+        "negate": 0,
+        "occupied_thresh": 0.9,
+        "free_thresh": 0.1
     }
 }

@@ -1,0 +1,23 @@
+#
+# (c) Copyright 2015-2017 River Systems, all rights reserved.
+#
+# This is proprietary software, unauthorized distribution is not permitted.
+#
+{
+    "language_version": "1.0",
+    "metadata": {
+        "map_name": "6RS HQ One way",
+        "map_version": "1.0"
+    },
+    "logical": {
+        "map": "6RS HQ One way.geojson"
+    },
+    "occupancy": {
+        "map": "6RS HQ One way.pgm",
+        "resolution": 0.1,
+        "origin": [0,0,0],
+        "negate": 0,
+        "occupied_thresh": 0.9,
+        "free_thresh": 0.1
+    }
+}

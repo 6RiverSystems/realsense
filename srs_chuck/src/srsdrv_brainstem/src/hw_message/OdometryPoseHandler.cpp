@@ -30,6 +30,7 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 {
 	OdometryPoseData odometryPoseData = msg.read<OdometryPoseData>();
 
+	// store pose information while receiving message
 	tempRobotPose_ = odometryPoseData;
 
 	nav_msgs::Odometry odom;
@@ -37,6 +38,7 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 	odom.header.frame_id = ChuckTransforms::ODOMETRY;
 	odom.child_frame_id = ChuckTransforms::BASE_FOOTPRINT;
 
+	// rather than publish odometryPoseData directly, add the pose offset value instead
 	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( odometryPoseData.theta + offsetRobotPose_.theta);
 
 	// Position
@@ -74,7 +76,10 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 
 void OdometryPoseHandler::handlePoseReset()
 {
-	offsetRobotPose_ = tempRobotPose_;
+	// accumulate the offset each time when disconnect happen
+	offsetRobotPose_.x += tempRobotPose_.x;
+	offsetRobotPose_.y += tempRobotPose_.y;
+	offsetRobotPose_.theta += tempRobotPose_.theta;
 }
 
 } // namespace srs

@@ -23,6 +23,7 @@ public:
 
     void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
+    // update pose offset whenever brainstem reset is detected
     void handlePoseReset();
 
 private:

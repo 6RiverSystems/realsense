@@ -18,7 +18,9 @@ namespace srs {
 OdometryPoseHandler::OdometryPoseHandler(PublisherOdometryPose::Interface& publisher, bool useBrainstemOdom) :
 	HardwareMessageHandler(BRAIN_STEM_MSG::ODOMETRY_POSE),
 	publisher_(publisher),
-	useBrainstemOdom_(useBrainstemOdom)
+	useBrainstemOdom_(useBrainstemOdom),
+	tempRobotPose_(),
+	offsetRobotPose_()
 {
 
 }
@@ -28,16 +30,18 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 {
 	OdometryPoseData odometryPoseData = msg.read<OdometryPoseData>();
 
-	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( odometryPoseData.theta );
+	tempRobotPose_ = odometryPoseData;
 
 	nav_msgs::Odometry odom;
 	odom.header.stamp = currentTime;
 	odom.header.frame_id = ChuckTransforms::ODOMETRY;
 	odom.child_frame_id = ChuckTransforms::BASE_FOOTPRINT;
 
+	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( odometryPoseData.theta + offsetRobotPose_.theta);
+
 	// Position
-	odom.pose.pose.position.x = odometryPoseData.x;
-	odom.pose.pose.position.y = odometryPoseData.y;
+	odom.pose.pose.position.x = odometryPoseData.x + offsetRobotPose_.x;
+	odom.pose.pose.position.y = odometryPoseData.y + offsetRobotPose_.y;
 	odom.pose.pose.position.z = 0.0;
 	odom.pose.pose.orientation = odom_quat;
 
@@ -66,6 +70,11 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 
 		broadcaster_.sendTransform( odom_trans );
 	}
+}
+
+void OdometryPoseHandler::handlePoseReset()
+{
+	offsetRobotPose_ = tempRobotPose_;
 }
 
 } // namespace srs

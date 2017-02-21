@@ -196,6 +196,12 @@ void BrainStemMessageProcessor::setConnected(bool isConnected)
 
 			setupComplete_ = false;
 
+			// brainstem disconnect occurs, handle pose reset
+			if(odometryPoseHardwarewHandler_)
+			{
+				odometryPoseHardwarewHandler_->handlePoseReset();
+			}
+
 			hardwareInfoHandler_->reset();
 
 			operationalStateHandler_->reset();

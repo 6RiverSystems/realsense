@@ -23,6 +23,8 @@ public:
 
     void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
+    void handlePoseReset();
+
 private:
     HW_MESSAGE_BEGIN(OdometryPoseData)
 		uint8_t cmd;
@@ -33,6 +35,10 @@ private:
 		float y;
 		float theta;
 	HW_MESSAGE_END
+
+	OdometryPoseData tempRobotPose_;
+
+	OdometryPoseData offsetRobotPose_;
 
 	tf::TransformBroadcaster broadcaster_;
 

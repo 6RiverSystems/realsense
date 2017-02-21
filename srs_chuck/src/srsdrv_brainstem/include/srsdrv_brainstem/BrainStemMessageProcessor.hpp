@@ -17,6 +17,7 @@ using namespace std;
 #include <srslib_framework/ros/channel/ChannelBrainstemConnected.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemPowerState.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemPowerStateFiltered.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryPose.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryPoseBrainstem.hpp>
@@ -24,6 +25,8 @@ using namespace std;
 
 #include <BrainStemMessages.hpp>
 #include <BrainStemMessageProcessorInterface.hpp>
+
+#include <filters/PowerStateFilter.hpp>
 
 #include <hw_message/HardwareMessageHandler.hpp>
 #include <sw_message/SoftwareMessage.hpp>
@@ -129,10 +132,13 @@ private:
     ChannelBrainstemHardwareInfo hardwareInfoChannel_;
     ChannelBrainstemOperationalState operationalStateChannel_;
     ChannelBrainstemPowerState powerStateChannel_;
+    ChannelBrainstemPowerStateFiltered powerStateFilteredChannel_;
     ChannelBrainstemOdometryRpm odometryRpmChannel_;
     ChannelBrainstemOdometryPoseBrainstem odometryPoseBrainstemChannel_;
     ChannelBrainstemOdometryPose odometryPoseChannel_;
     ChannelBrainstemButtonPressed buttonPressedChannel_;
+
+    PowerStateFilter powerStateFilter_;
 
     std::shared_ptr<HardwareInfoHandler> hardwareInfoHandler_;
     std::shared_ptr<OperationalStateHandler> operationalStateHandler_;

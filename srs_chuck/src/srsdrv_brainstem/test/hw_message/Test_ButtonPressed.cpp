@@ -4,7 +4,8 @@
  * This is proprietary software, unauthorized distribution is not permitted.
  */
 
-#include <srsdrv_brainstem/hw_message/ButtonPressedHandler.hpp>
+#include <hw_message/ButtonPressedHandler.hpp>
+
 #include <hw_message/Test_HardwareMessage.hpp>
 
 class Test_ButtonPressed : public Test_HardwareMessage<const uint32_t&, std_msgs::UInt32>

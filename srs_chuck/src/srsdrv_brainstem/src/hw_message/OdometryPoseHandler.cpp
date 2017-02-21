@@ -39,11 +39,12 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 	odom.child_frame_id = ChuckTransforms::BASE_FOOTPRINT;
 
 	// rather than publish odometryPoseData directly, add the pose offset value instead
-	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( odometryPoseData.theta + offsetRobotPose_.theta);
+	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( odometryPoseData.theta + offsetRobotPose_.theta );
 
+	float theta = -offsetRobotPose_.theta;
 	// Position
-	odom.pose.pose.position.x = odometryPoseData.x + offsetRobotPose_.x;
-	odom.pose.pose.position.y = odometryPoseData.y + offsetRobotPose_.y;
+	odom.pose.pose.position.x = odometryPoseData.x * cos(theta) + odometryPoseData.y * sin(theta) + offsetRobotPose_.x;
+	odom.pose.pose.position.y = -odometryPoseData.x * sin(theta) + odometryPoseData.y * cos(theta) + offsetRobotPose_.y;
 	odom.pose.pose.position.z = 0.0;
 	odom.pose.pose.orientation = odom_quat;
 
@@ -77,8 +78,8 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 void OdometryPoseHandler::handlePoseReset()
 {
 	// accumulate the offset each time when disconnect happen
-	offsetRobotPose_.x += tempRobotPose_.x;
-	offsetRobotPose_.y += tempRobotPose_.y;
+	offsetRobotPose_.x += (tempRobotPose_.x * cos(-offsetRobotPose_.theta) + tempRobotPose_.y * sin(-offsetRobotPose_.theta));
+	offsetRobotPose_.y += (-tempRobotPose_.x * sin(-offsetRobotPose_.theta) + tempRobotPose_.y * cos(-offsetRobotPose_.theta));
 	offsetRobotPose_.theta += tempRobotPose_.theta;
 }
 

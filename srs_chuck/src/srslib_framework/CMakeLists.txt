@@ -110,6 +110,7 @@ set(TEST_SOURCES_MATH
     test/math/Test_AngleMath.cpp
     test/math/Test_BasicMath.cpp
     test/math/Test_PoseMath.cpp
+    test/math/Test_VelocityMath.cpp
 )
 
 set(TEST_SOURCES_PLANNING

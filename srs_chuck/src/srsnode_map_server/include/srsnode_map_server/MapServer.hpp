@@ -53,7 +53,7 @@ private:
 
     ChannelMapStack channelMapStack_;
     ChannelRosMapMetadata channelRosMapMetadata_;
-    ChannelRosLogicalGrid channelRosLogicalGrid_;
+//    ChannelRosLogicalGrid channelRosLogicalGrid_;
     ChannelRosOccupancyGrid channelRosOccupancyGrid_;
     ChannelRosAmclOccupancyGrid channelRosAmclOccupancyGrid_;
 

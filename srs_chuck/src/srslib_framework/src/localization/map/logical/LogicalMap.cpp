@@ -2,6 +2,7 @@
 
 #include <limits>
 
+#include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/utils/Filesystem.hpp>
 
 namespace srs {
@@ -10,67 +11,31 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap::LogicalMap(double widthM, double heightM, double resolution, Pose<> origin) :
-        BaseMap(widthM, heightM, resolution, origin)
+LogicalMap::LogicalMap(LogicalMetadata metadata, WeightedGrid2d* grid) :
+    BaseMap(grid, metadata.widthM, metadata.heightM, metadata.resolution, metadata.origin),
+    metadata_(metadata)
+{}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMap::addLabeledArea(Rectangle surface, string label, shared_ptr<MapNotes> notes)
 {
-    metadata_.heightCells = getHeightCells();
-    metadata_.heightM = getHeightM();
-    metadata_.resolution = getResolution();
-    metadata_.widthCells = getWidthCells();
-    metadata_.widthM = getWidthM();
+    LabeledArea labeledArea;
+    labeledArea.surface = surface;
+    labeledArea.label = label;
+    labeledArea.notes = notes;
+
+    labeledAreas_[label] = labeledArea;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap::LogicalMap(Grid2d* grid, double resolution, Pose<> origin) :
-    BaseMap(grid, resolution, origin)
-{
-    metadata_.heightCells = getHeightCells();
-    metadata_.heightM = getHeightM();
-    metadata_.resolution = getResolution();
-    metadata_.widthCells = getWidthCells();
-    metadata_.widthM = getWidthM();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap::LogicalMap(LogicalMetadata metadata) :
-    BaseMap(metadata.widthM, metadata.heightM, metadata.resolution, metadata.origin)
-{
-    metadata_.heightCells = getHeightCells();
-    metadata_.heightM = getHeightM();
-    metadata_.resolution = getResolution();
-    metadata_.widthCells = getWidthCells();
-    metadata_.widthM = getWidthM();
-
-    metadata_.loadTime = metadata.loadTime;
-    metadata_.logicalFilename = metadata.logicalFilename;
-    metadata_.origin = metadata.origin;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::addLabeledArea(unsigned int ciCells, unsigned int riCells,
-    unsigned int cfCells, unsigned int rfCells,
-    string label, shared_ptr<MapNotes> notes)
-{
-    LabeledArea area;
-    area.ci = ciCells;
-    area.ri = riCells;
-    area.cf = cfCells;
-    area.rf = rfCells;
-    area.label = label;
-    area.notes = notes;
-
-    labeledAreas_[label] = area;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::checkAreas(unsigned int cCells, unsigned int rCells, LabeledAreaMapType& areas) const
+void LogicalMap::checkAreas(unsigned int cCells, unsigned int rCells,
+    LabeledAreaMapType& areas) const
 {
     areas.clear();
 
     for (auto area : labeledAreas_)
     {
-        if (cCells >= area.second.ci &&  cCells <= area.second.cf &&
-            rCells >= area.second.ri && rCells <= area.second.rf)
+        if (area.second.surface.isIn(cCells, rCells))
         {
             areas[area.first] = area.second;
         }
@@ -88,9 +53,54 @@ void LogicalMap::checkAreas(double xM, double yM, LabeledAreaMapType& areas) con
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::maxCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost)
+void LogicalMap::costSet(unsigned int cCells, unsigned int rCells, WeightedGrid2d::BaseType cost)
 {
-    getGrid()->maxOnPayload(Grid2d::Location(cCells, rCells), cost);
+    getGrid()->payloadSet(Location(cCells, rCells), cost);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMap::costMax(unsigned int cCells, unsigned int rCells, WeightedGrid2d::BaseType cost)
+{
+    getGrid()->payloadMax(Location(cCells, rCells), cost);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+bool LogicalMap::getNeighbor(const Position& position, Position& result)
+{
+    return getGrid()->getNeighbor(position, result);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+WeightedGrid2d::BaseType LogicalMap::getCost(const Position& position) const
+{
+    return getGrid()->getPayload(position);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+WeightedGrid2d::BaseType LogicalMap::getCost(unsigned int cCells, unsigned int rCells) const
+{
+    return getGrid()->getPayload(Location(cCells, rCells));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+WeightedGrid2d::BaseType LogicalMap::getWeight(const Position& position) const
+{
+    return getGrid()->getWeight(position);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMap::getWeights(unsigned int cCells, unsigned int rCells,
+    WeightedGrid2d::BaseType& north, WeightedGrid2d::BaseType& east,
+    WeightedGrid2d::BaseType& south, WeightedGrid2d::BaseType& west)
+{
+    return getGrid()->getWeights(Location(cCells, rCells), north, east, south, west);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+WeightedGrid2d::BaseType LogicalMap::getWeights(unsigned int cCells, unsigned int rCells,
+    int orientation) const
+{
+    return getGrid()->getWeight(Position(cCells, rCells, orientation));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,8 +125,7 @@ bool operator==(const LogicalMap& lhs, const LogicalMap& rhs)
         return true;
     }
 
-    if (lhs.metadata_ == rhs.metadata_ &&
-        operator==(static_cast<const BaseMap&>(lhs), static_cast<const BaseMap&>(rhs)))
+    if (lhs.metadata_ == rhs.metadata_ && *lhs.getGrid() == *rhs.getGrid())
     {
         if (lhs.labeledAreas_.size() != rhs.labeledAreas_.size())
         {
@@ -146,25 +155,13 @@ bool operator==(const LogicalMap& lhs, const LogicalMap& rhs)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::setCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost)
-{
-    getGrid()->setPayload(Grid2d::Location(cCells, rCells), cost);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void LogicalMap::setObstacle(unsigned int cCells, unsigned int rCells)
-{
-    getGrid()->setPayload(Grid2d::Location(cCells, rCells), Grid2d::PAYLOAD_MAX);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::setWeights(unsigned int cCells, unsigned int rCells,
-    Grid2d::BaseType north,
-    Grid2d::BaseType east,
-    Grid2d::BaseType south,
-    Grid2d::BaseType west)
+    WeightedGrid2d::BaseType north,
+    WeightedGrid2d::BaseType east,
+    WeightedGrid2d::BaseType south,
+    WeightedGrid2d::BaseType west)
 {
-    getGrid()->setWeights(Grid2d::Location(cCells, rCells), north, east, south, west);
+    getGrid()->setWeights(Location(cCells, rCells), north, east, south, west);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

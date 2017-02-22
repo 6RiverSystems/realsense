@@ -75,7 +75,6 @@
 			<target name="odometry node" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
 				<buildArguments>-j8 --pkg srsnode_odometry  -DCMAKE_BUILD_TYPE=RelWithDebInfo</buildArguments>
-				<buildTarget/>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>false</runAllBuilders>
@@ -98,7 +97,6 @@
 			<target name="test" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
 				<buildArguments>-j8 run_tests  -DCMAKE_BUILD_TYPE=RelWithDebInfo</buildArguments>
-				<buildTarget/>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>false</runAllBuilders>
@@ -106,7 +104,6 @@
 			<target name="test framework" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>catkin_make</buildCommand>
 				<buildArguments>-j8 run_tests_srslib_framework -DCMAKE_BUILD_TYPE=RelWithDebInfo</buildArguments>
-				<buildTarget/>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>false</runAllBuilders>

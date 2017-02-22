@@ -15,8 +15,8 @@ using namespace std;
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/ros/message/OccupancyMapMessageFactory.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
-#include <srslib_framework/ros/topics/ChuckConfig.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckConfig.hpp>
 
 namespace srs {
 
@@ -70,17 +70,17 @@ void MapServer::publishMap()
     // Publish ROS compatible information
     channelRosMapMetadata_.publish(mapStack_->getOccupancyMap()->getMetadata());
     channelRosOccupancyGrid_.publish(mapStack_->getOccupancyMap());
-    channelRosLogicalGrid_.publish(mapStack_->getLogicalMap());
+//    channelRosLogicalGrid_.publish(mapStack_->getLogicalMap());
     channelRosAmclOccupancyGrid_.publish(mapStack_->getOccupancyMap());
 
     channelEastWeightsGrid_.publish(MapAdapter::weights2CostMap2D(
-        mapStack_->getLogicalMap(), Grid2d::ORIENTATION_EAST));
+        mapStack_->getLogicalMap(), WeightedGrid2d::ORIENTATION_EAST));
     channelNorthWeightsGrid_.publish(MapAdapter::weights2CostMap2D(
-        mapStack_->getLogicalMap(), Grid2d::ORIENTATION_NORTH));
+        mapStack_->getLogicalMap(), WeightedGrid2d::ORIENTATION_NORTH));
     channelSouthWeightsGrid_.publish(MapAdapter::weights2CostMap2D(
-        mapStack_->getLogicalMap(), Grid2d::ORIENTATION_SOUTH));
+        mapStack_->getLogicalMap(), WeightedGrid2d::ORIENTATION_SOUTH));
     channelWestWeightsGrid_.publish(MapAdapter::weights2CostMap2D(
-        mapStack_->getLogicalMap(), Grid2d::ORIENTATION_WEST));
+        mapStack_->getLogicalMap(), WeightedGrid2d::ORIENTATION_WEST));
 }
 
 } // namespace srs

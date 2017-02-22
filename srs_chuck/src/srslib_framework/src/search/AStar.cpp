@@ -1,13 +1,8 @@
 #include <srslib_framework/search/AStar.hpp>
 
-#define DEBUG_ASTAR 0
-#define YIELD_ENABLED 1
+// #define DEBUG_ASTAR 0
 
 #include <iostream>
-
-#ifdef YIELD_ENABLED
-    #include <thread>
-#endif
 
 using namespace std;
 
@@ -15,6 +10,22 @@ namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+AStar::AStar() :
+    lastNode_(nullptr),
+    startNode_(nullptr)
+{
+    closedSet_.reserve(CLOSED_HASH_RESERVE);
+
+    clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+AStar::~AStar()
+{
+    clear();
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void AStar::clear()
@@ -45,7 +56,12 @@ void AStar::clear()
 
     // Clear the last search and the yield counter
     lastNode_ = nullptr;
-    yieldCounter_ = 0;
+
+    // Reset the statistics counters
+    counterInserted_ = 0;
+    counterFoundInClosed_ = 0;
+    counterReplaced_ = 0;
+    counterPruned_ = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,7 +85,7 @@ void AStar::getPlan(Plan& plan)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool AStar::search(SearchNode* start, SearchGoal* goal, ConfigParameters parameters)
+bool AStar::search(SearchNode* start, SearchGoal* goal)
 {
     // Do not execute any search without complete information
     if (!start || !goal)
@@ -140,16 +156,6 @@ bool AStar::search(SearchNode* start, SearchGoal* goal, ConfigParameters paramet
 
         // Try to push the neighbors in the open queue
         pushNodes(nextSearchNodes);
-
-        // If the yield property has been set
-        #ifdef YIELD_ENABLED
-            yieldCounter_++;
-            if (parameters.useYield && yieldCounter_ > parameters.yieldFrequency)
-            {
-                yieldCounter_ = 0;
-                this_thread::yield();
-            }
-        #endif
     }
 
     return false;
@@ -174,8 +180,9 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
         cout << "-----------------------------------------------------------------------------------------------" << endl;
     #endif
 
-    for (auto node : nodes)
+    for (int i = 0; i < nodes.size(); i++)
     {
+        SearchNode* node = nodes[i];
 
         #if DEBUG_ASTAR
             cout << "Evaluating: " << *node;
@@ -191,6 +198,8 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
                 // the new one
                 if (inOpenQueue->getTotalCost() > node->getTotalCost())
                 {
+                    counterReplaced_++;
+
                     openQueue_.erase(inOpenQueue);
                     inOpenQueue->release();
 
@@ -202,6 +211,8 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
                 }
                 else
                 {
+                    counterPruned_++;
+
                     // If the latest node has a total cost that is greater
                     // than what we already have, delete the new node
                     // and do not do anything else
@@ -214,6 +225,8 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
             }
             else
             {
+                counterInserted_++;
+
                 // If the node is not in the open list
                 // add it right away
                 openQueue_.push(node->getTotalCost(), node);
@@ -225,6 +238,8 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
         }
         else
         {
+            counterFoundInClosed_++;
+
             // If the node is already in the closed list, there
             // is no need to add it again. It can be removed
             node->release();

@@ -13,6 +13,8 @@ set(${PROJECT_NAME}_SOURCES
     src/BrainStem.cpp
     src/BrainStemEmulator.cpp
 
+    src/command/SetPhysicalDimension.cpp
+
     src/hw_message/LogHandler.cpp
     src/hw_message/ButtonPressedHandler.cpp
     src/hw_message/OdometryRpmHandler.cpp
@@ -45,6 +47,8 @@ set(${PROJECT_NAME}_TEST_SOURCES
 	test/sw_message/Test_Shutdown.cpp
 	test/sw_message/Test_Sound.cpp
 	test/sw_message/Test_UpdateUI.cpp
+
+	test/filters/Test_PowerStateFilter.cpp
     
 	test/TestSuite_Brainstem.cpp
 )

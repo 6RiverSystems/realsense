@@ -11,7 +11,7 @@
 
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
-#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
+#include <srslib_framework/chuck/ChuckTransforms.hpp>
 
 namespace srs {
 

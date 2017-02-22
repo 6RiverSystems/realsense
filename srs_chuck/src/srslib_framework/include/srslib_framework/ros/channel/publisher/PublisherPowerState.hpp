@@ -11,11 +11,13 @@ using namespace std;
 #include <srslib_framework/MsgPowerState.h>
 
 #include <srslib_framework/ros/channel/publisher/Publisher.hpp>
+#include <srslib_framework/robotics/device/PowerState.hpp>
+#include <srslib_framework/ros/message/PowerStateMessageFactory.hpp>
 
 namespace srs {
 
 class PublisherPowerState :
-    public Publisher<const srslib_framework::MsgPowerState&, srslib_framework::MsgPowerState>
+    public Publisher<const PowerState&, srslib_framework::MsgPowerState>
 {
 public:
 	PublisherPowerState(string topic,
@@ -25,9 +27,9 @@ public:
             Publisher(topic, buffer, latched, nameSpace)
     {}
 
-    srslib_framework::MsgPowerState convertData(const srslib_framework::MsgPowerState& data)
+	srslib_framework::MsgPowerState convertData(const PowerState& data)
     {
-        return data;
+        return PowerStateMessageFactory::powerState2Msg(data);
     }
 };
 

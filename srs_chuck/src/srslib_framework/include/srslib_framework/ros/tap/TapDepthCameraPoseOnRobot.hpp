@@ -11,7 +11,7 @@
 
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/tap/subscriber/SingleDataSource.hpp>
-#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
+#include <srslib_framework/chuck/ChuckTransforms.hpp>
 
 namespace srs {
 

@@ -11,12 +11,12 @@ using namespace std;
 #include <nav_msgs/MapMetaData.h>
 
 #include <srslib_framework/ros/channel/publisher/Publisher.hpp>
-#include <srslib_framework/ros/message/MapStackMessageFactory.hpp>
+#include <srslib_framework/ros/message/OccupancyMapMessageFactory.hpp>
 
 namespace srs {
 
 class PublisherRosOccupancyGrid :
-    public Publisher<const BaseMap*, nav_msgs::OccupancyGrid>
+    public Publisher<const OccupancyMap*, nav_msgs::OccupancyGrid>
 {
 public:
     PublisherRosOccupancyGrid(string topic, string frameId,
@@ -27,9 +27,9 @@ public:
             frameId_(frameId)
     {}
 
-    nav_msgs::OccupancyGrid convertData(const BaseMap* data)
+    nav_msgs::OccupancyGrid convertData(const OccupancyMap* data)
     {
-        return MapStackMessageFactory::baseMap2RosMsg(data, frameId_);
+        return OccupancyMapMessageFactory::occupancyMap2RosMsg(data, frameId_);
     }
 
 private:

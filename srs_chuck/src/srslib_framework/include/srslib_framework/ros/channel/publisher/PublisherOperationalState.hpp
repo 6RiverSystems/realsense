@@ -10,12 +10,14 @@ using namespace std;
 
 #include <srslib_framework/MsgOperationalState.h>
 
+#include <srslib_framework/robotics/device/RobotState.hpp>
 #include <srslib_framework/ros/channel/publisher/Publisher.hpp>
+#include <srslib_framework/ros/message/RobotStateMessageFactory.hpp>
 
 namespace srs {
 
 class PublisherOperationalState :
-    public Publisher<const srslib_framework::MsgOperationalState&, srslib_framework::MsgOperationalState>
+    public Publisher<const RobotState&, srslib_framework::MsgOperationalState>
 {
 public:
     PublisherOperationalState(string topic,
@@ -25,9 +27,9 @@ public:
             Publisher(topic, buffer, latched, nameSpace)
     {}
 
-    srslib_framework::MsgOperationalState convertData(const srslib_framework::MsgOperationalState& data)
+    srslib_framework::MsgOperationalState convertData(const RobotState& data)
     {
-        return data;
+        return RobotStateMessageFactory::robotState2Msg(data);
     }
 };
 

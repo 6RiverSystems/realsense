@@ -6,8 +6,8 @@
 #pragma once
 
 #include <srslib_framework/ros/channel/publisher/PublisherRosAmclOccupancyGrid.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
-#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTransforms.hpp>
 
 namespace srs {
 

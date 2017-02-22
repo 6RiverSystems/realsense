@@ -6,7 +6,7 @@
 
 #include <BrainStemMessageProcessorInterface.hpp>
 
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
 
 #include <sw_message/SetVelocityHandler.hpp>
 

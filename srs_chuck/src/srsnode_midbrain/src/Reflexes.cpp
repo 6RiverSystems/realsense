@@ -26,7 +26,6 @@ namespace srs
 Reflexes::Reflexes() : tdr_("Reflexes")
 {
     readParams();
-    tapOperationalState_.connectTap();
 }
 
 Reflexes::~Reflexes( )
@@ -43,30 +42,62 @@ void Reflexes::readParams()
     hardStopReflex_.setFootprint(PolygonMessageFactory::points2Poses(footprint));
 
     // Get other params
+    //  Get the hard stop reflex params
     ros::NodeHandle privateNh("~");
     double linRate = 0.0;
-    if (privateNh.getParam("linear_deceleration_rate", linRate))
+    if (privateNh.getParam("hard_stop_reflex/linear_deceleration_rate", linRate))
     {
     	hardStopReflex_.setLinearDecelerationRate(linRate);
     }
     double angRate = 0.0;
-    if (privateNh.getParam("angular_deceleration_rate", angRate))
+    if (privateNh.getParam("hard_stop_reflex/angular_deceleration_rate", angRate))
     {
     	hardStopReflex_.setAngularDecelerationRate(angRate);
     }
     int maxDZViolations = 0;
-    if (privateNh.getParam("max_consecutive_danger_zone_violations", maxDZViolations))
+    if (privateNh.getParam("hard_stop_reflex/max_consecutive_danger_zone_violations", maxDZViolations))
     {
     	hardStopReflex_.setMaxConsecutiveDangerZoneViolations(maxDZViolations);
     }
     int numBadPoints = 0;
-    if (privateNh.getParam("num_bad_points_for_violation", numBadPoints))
+    if (privateNh.getParam("hard_stop_reflex/num_bad_points_for_violation", numBadPoints))
     {
     	hardStopReflex_.setNumBadPointsForViolation(numBadPoints);
     }
 
     privateNh.param("check_lidar_hard_stop", checkLidarHardStop_, checkLidarHardStop_);
     privateNh.param("check_depth_camera_hard_stop", checkDepthCameraHardStop_, checkDepthCameraHardStop_);
+
+    // Get the head on collision reflex params
+    double val = 0.0;
+    if (privateNh.getParam("head_on_collision_reflex/linear_decel_rate", val))
+    {
+        headOnCollisionReflex_.setLinearDecelerationRate(val);
+    }
+    if (privateNh.getParam("head_on_collision_reflex/time_window", val))
+    {
+        headOnCollisionReflex_.setTimeWindow(val);
+    }
+    if (privateNh.getParam("head_on_collision_reflex/min_distance_for_stop", val))
+    {
+        headOnCollisionReflex_.setMinDistanceForStop(val);
+    }
+    if (privateNh.getParam("head_on_collision_reflex/min_linear_velocity_for_check", val))
+    {
+        headOnCollisionReflex_.setMinLinearVelocityForCheck(val);
+    }
+    if (privateNh.getParam("head_on_collision_reflex/max_relative_tracking_velocity", val))
+    {
+        headOnCollisionReflex_.setMaxRelativeTrackingVelocity(val);
+    }
+    if (privateNh.getParam("head_on_collision_reflex/lidar_sector_half_width", val))
+    {
+        headOnCollisionReflex_.setLidarSectorHalfWidth(val);
+    }
+    if (privateNh.getParam("head_on_collision_reflex/max_angular_velocity_for_check", val))
+    {
+        headOnCollisionReflex_.setMaxAngularVelocityForCheck(val);
+    }
 }
 
 void Reflexes::execute()
@@ -75,7 +106,7 @@ void Reflexes::execute()
 
 
     // Update robot position
-    hardStopReflex_.setPose(tapRobotPose_.pop());
+    hardStopReflex_.setPose(tapRobotPose_.peek());
 
     // Update brainstem connected state
     brainstemConnected_ = tapBrainstemConnected_.pop();
@@ -83,20 +114,24 @@ void Reflexes::execute()
     // Update the robot state
     if (tapOperationalState_.newDataAvailable())
     {
-        hardStopReflex_.setRobotState(tapOperationalState_.getRobotState());
+        hardStopReflex_.setRobotState(tapOperationalState_.pop());
     }
 
+    // Check for laser scan.
+    if (tapFilteredLidar_.newDataAvailable())
+    {
+        headOnCollisionReflex_.setLaserScan(tapFilteredLidar_.peek());
+
+        if (checkLidarHardStop_)
+        {
+            hardStopReflex_.setLaserScan(tapFilteredLidar_.pop(), LaserScanType::LIDAR);
+        }
+    }
     // Set the lidar data
     if (checkLidarHardStop_)
     {
         // Get the lidar sensor position
         hardStopReflex_.setSensorPose(tapLidarPoseOnRobot_.pop(), LaserScanType::LIDAR);
-
-        // Check for laser scan.
-        if (tapFilteredLidar_.newDataAvailable())
-        {
-            hardStopReflex_.setLaserScan(tapFilteredLidar_.pop(), LaserScanType::LIDAR);
-        }
     }
 
     // Set the depth camera data
@@ -115,13 +150,14 @@ void Reflexes::execute()
     // Check for velocity.
     if (tapOdometryPose_.newDataAvailable())
     {
+        headOnCollisionReflex_.setVelocity(tapOdometryPose_.peekVelocity());
         hardStopReflex_.setVelocity(tapOdometryPose_.popVelocity());
     }
 
     if (brainstemConnected_)
     {
 		// Call for hard stop check.
-		if (hardStopReflex_.checkHardStop())
+		if (hardStopReflex_.checkHardStop() || headOnCollisionReflex_.checkHardStop())
 		{
 			srslib_framework::MsgSetOperationalState setOperationalState;
 			setOperationalState.state = true;

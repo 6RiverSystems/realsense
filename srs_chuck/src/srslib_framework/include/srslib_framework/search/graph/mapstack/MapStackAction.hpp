@@ -40,6 +40,12 @@ public:
     }
 
 private:
+    /*
+     * This parameter specifies when a new MapStackAction is pruned because its
+     * cost is too high to be considered even a possibility
+     */
+    static constexpr int PRUNING_THRESHOLD = 254;
+
     static constexpr int COMMAND_COSTS_LENGTH = 8;
 
     static unordered_map<int, string> ENUM_NAMES;

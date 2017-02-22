@@ -17,6 +17,7 @@ using namespace std;
 #include <srslib_framework/ros/channel/ChannelBrainstemConnected.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemHardwareInfo.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemPowerState.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemPowerStateFiltered.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryRpm.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryPose.hpp>
 #include <srslib_framework/ros/channel/ChannelBrainstemOdometryPoseBrainstem.hpp>
@@ -25,11 +26,15 @@ using namespace std;
 #include <BrainStemMessages.hpp>
 #include <BrainStemMessageProcessorInterface.hpp>
 
+#include <filters/PowerStateFilter.hpp>
+
 #include <hw_message/HardwareMessageHandler.hpp>
 #include <sw_message/SoftwareMessage.hpp>
 
 #include <hw_message/HardwareInfoHandler.hpp>
 #include <hw_message/OperationalStateHandler.hpp>
+
+#include <command/SetPhysicalDimension.hpp>
 
 namespace srs {
 
@@ -39,14 +44,6 @@ class MessageProcessor;
 class BrainStemMessageProcessor : public BrainStemMessageProcessorInterface
 {
 public:
-
-	enum class DIMENSION
-	{
-		WHEEL_BASE_LENGTH = 0,
-		LEFT_WHEEL_RADIUS = 1,
-		RIGHT_WHEEL_RADIUS = 2
-	};
-
 	void processHardwareMessage(vector<char> buffer);
 
     using HwMessageHandlerMapType = map<BRAIN_STEM_MSG, HardwareMessageHandlerPtr>;
@@ -72,7 +69,7 @@ public:
 
     void setUseBrainstemOdom(bool useBrainstemOdom);
 
-    void setDimension(DIMENSION dimension, float value);
+    void setDimension(SetPhysicalDimension::DimensionEnum dimension, float value);
 
 	void setConnected( bool isConnected );
 
@@ -80,10 +77,7 @@ public:
 
 	void getHardwareInformation( );
 
-    void shutdown( );
-
 private:
-
     void addHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler);
 
     void removeHardwareMessageHandler(HardwareMessageHandlerPtr hardwareMessageHandler);
@@ -101,6 +95,7 @@ private:
 	void getOperationalState(const ros::Time& now);
 
 	void sendDimensions();
+	void sendMaxAllowedVelocity();
 
 // Helper Methods
 
@@ -108,24 +103,9 @@ private:
 
 private:
 
-    HW_MESSAGE_BEGIN(CommandData)
-        uint8_t cmd;
-    HW_MESSAGE_END
-
-    HW_MESSAGE_BEGIN(OperationalStateData)
-    	uint8_t cmd;
-		uint8_t motionStatus;
-    HW_MESSAGE_END
-
-    HW_MESSAGE_BEGIN(DimensionData)
-    	uint8_t cmd;
-		uint8_t id;
-		float value;
-    HW_MESSAGE_END
-
 	static constexpr auto FAULT_TIMEOUT = 0.2f;
 
-	std::shared_ptr<IO> io_;
+    std::shared_ptr<IO> io_;
 
 	bool setupComplete_;
 
@@ -135,7 +115,7 @@ private:
 
 	bool isConnected_;
 
-	std::map<DIMENSION, float> dimensions_;
+    std::map<SetPhysicalDimension::DimensionEnum, float> dimensions_;
 
 	bool hasValidHardareInfo_;
 	ros::Time lastHardareInfoRequestTime_;
@@ -151,10 +131,13 @@ private:
     ChannelBrainstemHardwareInfo hardwareInfoChannel_;
     ChannelBrainstemOperationalState operationalStateChannel_;
     ChannelBrainstemPowerState powerStateChannel_;
+    ChannelBrainstemPowerStateFiltered powerStateFilteredChannel_;
     ChannelBrainstemOdometryRpm odometryRpmChannel_;
     ChannelBrainstemOdometryPoseBrainstem odometryPoseBrainstemChannel_;
     ChannelBrainstemOdometryPose odometryPoseChannel_;
     ChannelBrainstemButtonPressed buttonPressedChannel_;
+
+    PowerStateFilter powerStateFilter_;
 
     std::shared_ptr<HardwareInfoHandler> hardwareInfoHandler_;
     std::shared_ptr<OperationalStateHandler> operationalStateHandler_;
@@ -169,8 +152,6 @@ private:
 
     std::set<HardwareMessageHandlerPtr> hardwareHandlers_;
     std::set<SoftwareMessagePtr> softwareHandlers_;
-
-
 };
 
 } /* namespace srs */

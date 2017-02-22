@@ -17,6 +17,9 @@ MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKETS_MAX
     }
 
     emptyBucketsCounter_ = BUCKETS_INITIAL;
+
+    nodeIndex_.reserve(BUCKETS_MAX);
+    bucketIndex_.reserve(BUCKETS_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,13 +37,14 @@ MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKETS_MAX
     emptyBuckets_.clear();
 
     // Destroy all the non-empty buckets
-    for (auto bucket : queue_)
+    for (auto bucket : nodeQueue_)
     {
         delete bucket.second;
     }
-    queue_.clear();
+    nodeQueue_.clear();
 
-    index_.clear();
+    nodeIndex_.clear();
+    bucketIndex_.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,15 +55,16 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
     clear()
 {
     // Clear and recycle each occupied bucket
-    for (auto bucket : queue_)
+    for (auto bucket : nodeQueue_)
     {
         bucket.second->clear();
         recycleBucket(bucket.second);
     }
 
     // Clear all the references to the occupied buckets
-    queue_.clear();
-    index_.clear();
+    nodeQueue_.clear();
+    nodeIndex_.clear();
+    bucketIndex_.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,8 +74,8 @@ template<typename TYPE, typename PRIORITY,
 void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKETS_MAX>::
     erase(TYPE item)
 {
-    auto itemIterator = index_.find(item);
-    if (itemIterator == index_.end())
+    auto itemIterator = nodeIndex_.find(item);
+    if (itemIterator == nodeIndex_.end())
     {
         return;
     }
@@ -82,11 +87,12 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
 
     if (bucket->empty())
     {
-        queue_.erase(key);
+        nodeQueue_.erase(key);
+        bucketIndex_.erase(key);
         recycleBucket(bucket);
     }
 
-    index_.erase(itemIterator);
+    nodeIndex_.erase(itemIterator);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,8 +102,8 @@ template<typename TYPE, typename PRIORITY,
 TYPE MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKETS_MAX>::
     find(TYPE item) const
 {
-    auto result = index_.find(item);
-    if (result == index_.end())
+    auto result = nodeIndex_.find(item);
+    if (result == nodeIndex_.end())
     {
         return TYPE();
     }
@@ -112,13 +118,13 @@ template<typename TYPE, typename PRIORITY,
 bool MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKETS_MAX>::
     pop(TYPE& item)
 {
-    if (index_.empty())
+    if (nodeIndex_.empty())
     {
         return false;
     }
 
     // Find the bucket that contains the lowest priority
-    auto lowestBucketIterator = queue_.begin();
+    auto lowestBucketIterator = nodeQueue_.begin();
     BucketType* bucket = lowestBucketIterator->second;
     PRIORITY key = lowestBucketIterator->first;
 
@@ -130,12 +136,13 @@ bool MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
     bucket->pop_front();
     if (bucket->empty())
     {
-        queue_.erase(key);
+        nodeQueue_.erase(key);
+        bucketIndex_.erase(key);
         recycleBucket(bucket);
     }
 
     // Remove the item from the map index
-    index_.erase(item);
+    nodeIndex_.erase(item);
 
     return true;
 }
@@ -148,10 +155,10 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
     push(PRIORITY priority, TYPE item)
 {
     // Find the bucket that will contain the item
-    auto bucketIterator = queue_.find(priority);
+    auto bucketIterator = bucketIndex_.find(priority);
 
     BucketType* bucket;
-    if (bucketIterator != queue_.end())
+    if (bucketIterator != bucketIndex_.end())
     {
         bucket = bucketIterator->second;
     }
@@ -161,12 +168,13 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
         // from the original pool and link it
         // to the queue of priorities
         bucket = getAvailableBucket();
-        queue_[priority] = bucket;
+        nodeQueue_[priority] = bucket;
+        bucketIndex_[priority] = bucket;
     }
 
     // Add the item to the bucket and to the map index
     auto it = bucket->insert(bucket->end(), Node(priority, item, bucket));
-    index_[item] = it;
+    nodeIndex_[item] = it;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -182,7 +190,7 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
     int counter = 0;
 
     stream << "Buckets " << "{" << endl;
-    for (auto bucketIterator : queue_)
+    for (auto bucketIterator : nodeQueue_)
     {
         stream << bucketIterator.first << ": {" << endl;
         for (auto item : *bucketIterator.second)
@@ -204,7 +212,7 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
     int counter = 0;
 
     stream << "Index map {" << endl;
-    for (auto itemIterator : index_)
+    for (auto itemIterator : nodeIndex_)
     {
         stream << setw(4) << counter++ << ": [" <<
             setw(10) << itemIterator.second->priority << "] " <<

@@ -6,7 +6,7 @@
 #pragma once
 
 #include <srslib_framework/ros/channel/publisher/PublisherOperationalState.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
 
 namespace srs {
 
@@ -14,8 +14,8 @@ class ChannelBrainstemOperationalState :
     public PublisherOperationalState
 {
 public:
-	ChannelBrainstemOperationalState() :
-		PublisherOperationalState(ChuckTopics::driver::BRAINSTEM_OPERATIONAL_STATE, 1, true)
+    ChannelBrainstemOperationalState() :
+        PublisherOperationalState(ChuckTopics::driver::BRAINSTEM_OPERATIONAL_STATE, 1, true)
     {}
 };
 

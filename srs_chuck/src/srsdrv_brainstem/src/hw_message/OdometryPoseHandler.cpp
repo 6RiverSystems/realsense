@@ -41,10 +41,11 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 	// rather than publish odometryPoseData directly, add the pose offset value instead
 	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( odometryPoseData.theta + offsetRobotPose_.theta );
 
-	float theta = -offsetRobotPose_.theta;
+	float theta = offsetRobotPose_.theta * (-1);
 	// Position
+	// similar idea as handlePoseReset() transforming odometryPoseData into world frame
 	odom.pose.pose.position.x = odometryPoseData.x * cos(theta) + odometryPoseData.y * sin(theta) + offsetRobotPose_.x;
-	odom.pose.pose.position.y = -odometryPoseData.x * sin(theta) + odometryPoseData.y * cos(theta) + offsetRobotPose_.y;
+	odom.pose.pose.position.y = (-1) * odometryPoseData.x * sin(theta) + odometryPoseData.y * cos(theta) + offsetRobotPose_.y;
 	odom.pose.pose.position.z = 0.0;
 	odom.pose.pose.orientation = odom_quat;
 
@@ -78,8 +79,13 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 void OdometryPoseHandler::handlePoseReset()
 {
 	// accumulate the offset each time when disconnect happen
-	offsetRobotPose_.x += (tempRobotPose_.x * cos(-offsetRobotPose_.theta) + tempRobotPose_.y * sin(-offsetRobotPose_.theta));
-	offsetRobotPose_.y += (-tempRobotPose_.x * sin(-offsetRobotPose_.theta) + tempRobotPose_.y * cos(-offsetRobotPose_.theta));
+	// since brainstem reset to (x:0, y:0, theta:0) every time, we need to
+	// transform the pose into world frame
+
+	// the negtive sign is for projecting current pose frame back to world frame
+	float theta = offsetRobotPose_.theta * (-1);
+	offsetRobotPose_.x += (tempRobotPose_.x * cos(theta) + tempRobotPose_.y * sin(theta));
+	offsetRobotPose_.y += ((-1) * tempRobotPose_.x * sin(theta) + tempRobotPose_.y * cos(theta));
 	offsetRobotPose_.theta += tempRobotPose_.theta;
 }
 

@@ -257,7 +257,7 @@ geometry_msgs::Twist OdometryPositionEstimator::getEstimatedRobotVel(double repo
       ROS_DEBUG("Estimate dt: %f", estimate_dt);
       estimated_vel.linear.x = forwardEstimateVelocity(reported_linear_vel, cmd_vel.linear.x, linear_acceleration_rate_, estimate_dt);
       estimated_vel.angular.z = forwardEstimateVelocity(reported_angular_vel, cmd_vel.angular.z, angular_acceleration_rate_, estimate_dt);
-      ROS_DEBUG("Vels cmd: [%f, %f], est: [%f, %f], reported: [%f, %f]", cmd_vel.linear.x, cmd_vel.angular.x, estimated_vel.linear.x, reported_linear_vel, estimated_vel.angular.z, reported_angular_vel);
+      ROS_DEBUG("Vels cmd: [%f, %f], est: [%f, %f], reported: [%f, %f]", cmd_vel.linear.x, cmd_vel.angular.z, estimated_vel.linear.x, estimated_vel.angular.z, reported_linear_vel, reported_angular_vel);
     }
     return estimated_vel;
 }

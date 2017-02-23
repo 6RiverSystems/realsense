@@ -35,6 +35,21 @@ struct VelocityMath
         return BasicMath::equal(lhv.linear, rhv.linear, 0.001) &&
             AngleMath::equalRad(lhv.angular, rhv.angular, 0.001);
     }
+
+    /**
+     * @brief Return TRUE if either the linear or angular velocity of the left hand side is
+     * greater than the right-hand side.
+     *
+     * @param lhv Left hand velocity
+     * @param rhv Right-hand velocity
+     *
+     * @return TRUE if the lhv is greater than rhv
+     */
+    template<typename TYPE = double>
+    inline static bool greaterThanOr(const Velocity<TYPE>& lhv, const Velocity<TYPE>& rhv)
+    {
+        return (lhv.linear > rhv.linear) || (lhv.angular > rhv.angular);
+    }
 };
 
 } // namespace srs

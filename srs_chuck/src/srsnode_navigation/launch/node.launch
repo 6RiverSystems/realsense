@@ -23,7 +23,7 @@
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" launch-prefix="$(arg launch-prefix)">
         <remap from="/move_base_simple/goal" to="/request/goal"/>
         <remap from="/cmd_vel" to="/internal/sensors/odometry/velocity/cmd"/>
-        <remap from="/odom" to="/internal/sensors/odometry/velocity/estimate"/>
+        <remap from="/odom" to="/internal/sensors/odometry/pose"/>
 
         <param name="base_global_planner" value="global_planner/SrsPlannerPotentials"/>
 

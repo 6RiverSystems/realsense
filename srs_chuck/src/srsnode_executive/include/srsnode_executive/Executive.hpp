@@ -38,6 +38,9 @@ protected:
 private:
     constexpr static double REFRESH_RATE_HZ = 5; // [Hz]
 
+    // Threshold that determines if the robot is moving or not
+    static const Velocity<> MIN_MOVING_THRESHOLD;
+
     void readConfigurationParameters();
 
     void updateContext();

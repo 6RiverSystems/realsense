@@ -17,16 +17,14 @@ struct OccupancyMetadata
 {
 public:
     OccupancyMetadata() :
-        OccupancyMetadata(0, 0, 0, 0.0, 0.0, Pose<>::INVALID, 0.0, "", 0.9, 0.1, false)
+        OccupancyMetadata(0, 0, 0.0, 0.0, Pose<>::INVALID, 0.0, "", 0.9, 0.1, false)
     {}
 
-    OccupancyMetadata(double loadTime,
-            unsigned int widthCells, unsigned int heightCells,
+    OccupancyMetadata(unsigned int widthCells, unsigned int heightCells,
             Pose<> origin, double resolution,
             string occupancyFilename,
             double thresholdOccupied, double thresholdFree, bool negate) :
-                OccupancyMetadata(loadTime,
-                    widthCells, heightCells,
+                OccupancyMetadata(widthCells, heightCells,
                     MeasurementMath::cells2M(widthCells, resolution),
                     MeasurementMath::cells2M(heightCells, resolution),
                     origin, resolution,
@@ -35,13 +33,11 @@ public:
                     negate)
     {}
 
-    OccupancyMetadata(double loadTime,
-            double widthM, double heightM,
+    OccupancyMetadata(double widthM, double heightM,
             Pose<> origin, double resolution,
             string occupancyFilename,
             double thresholdOccupied, double thresholdFree, bool negate) :
-                OccupancyMetadata(loadTime,
-                    MeasurementMath::m2Cells(widthM, resolution),
+                OccupancyMetadata(MeasurementMath::m2Cells(widthM, resolution),
                     MeasurementMath::m2Cells(heightM, resolution),
                     widthM, heightM,
                     origin, resolution,
@@ -51,7 +47,6 @@ public:
     {}
 
     OccupancyMetadata(const OccupancyMetadata& other) :
-        loadTime(other.loadTime),
         heightCells(other.heightCells),
         widthCells(other.widthCells),
         heightM(other.heightM),
@@ -68,7 +63,6 @@ public:
     {
         return lhs.heightCells == rhs.heightCells &&
             BasicMath::equal(lhs.heightM, rhs.heightM, 0.001) &&
-            BasicMath::equal(lhs.loadTime, rhs.loadTime, 1e-10) &&
             lhs.negate == rhs.negate &&
             lhs.occupancyFilename == rhs.occupancyFilename &&
             PoseMath::equal(lhs.origin, rhs.origin) &&
@@ -80,13 +74,11 @@ public:
     }
 
 protected:
-    OccupancyMetadata(double loadTime,
-            unsigned int widthCells, unsigned int heightCells,
+    OccupancyMetadata(unsigned int widthCells, unsigned int heightCells,
             double widthM, double heightM,
             Pose<> origin, double resolution,
             string occupancyFilename,
             double thresholdOccupied, double thresholdFree, bool negate) :
-        loadTime(loadTime),
         widthCells(widthCells), heightCells(heightCells),
         widthM(widthM), heightM(heightM),
         origin(origin), resolution(resolution),
@@ -98,8 +90,6 @@ protected:
 public:
     unsigned int heightCells;
     double heightM;
-
-    double loadTime;
 
     bool negate;
 

@@ -4,8 +4,6 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 
-float32 loadTime
-
 float32 resolution
 
 uint32 widthCells

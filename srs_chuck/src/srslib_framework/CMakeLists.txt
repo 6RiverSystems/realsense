@@ -56,6 +56,7 @@ set(${PROJECT_NAME}_MSGS
     MapNote.msg
     MapNotes.msg
     MapStack.msg
+    MapStackMetadata.msg
     MsgHardwareInfo.msg
     MsgOperationalState.msg
     MsgSetOperationalState.msg

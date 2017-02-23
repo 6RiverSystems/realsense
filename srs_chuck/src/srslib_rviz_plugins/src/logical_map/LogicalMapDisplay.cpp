@@ -147,24 +147,24 @@ void LogicalMapDisplay::initializeLayers()
     unsigned int height = logicalMap_->getHeightCells();
     double resolution = logicalMap_->getResolution();
 
-    PixelLayerDisplay* background = createPixelLayer(BACKGROUND,
+    std::shared_ptr<PixelLayerDisplay> background = createPixelLayer(BACKGROUND,
         width, height, resolution, RGBA_WHITE);
-    PixelLayerDisplay* obstacles = createPixelLayer(OBSTACLES,
+    std::shared_ptr<PixelLayerDisplay> obstacles = createPixelLayer(OBSTACLES,
         width, height, resolution, RGBA_BLACK);
 
-    PixelLayerDisplay* weightsNorth = createPixelLayer(WEIGHTS_NORTH,
+    std::shared_ptr<PixelLayerDisplay> weightsNorth = createPixelLayer(WEIGHTS_NORTH,
         width, height, resolution, RGBA_ORANGE);
-    PixelLayerDisplay* weightsEast = createPixelLayer(WEIGHTS_EAST,
+    std::shared_ptr<PixelLayerDisplay> weightsEast = createPixelLayer(WEIGHTS_EAST,
         width, height, resolution, RGBA_ORANGE);
-    PixelLayerDisplay* weightsSouth = createPixelLayer(WEIGHTS_SOUTH,
+    std::shared_ptr<PixelLayerDisplay> weightsSouth = createPixelLayer(WEIGHTS_SOUTH,
         width, height, resolution, RGBA_ORANGE);
-    PixelLayerDisplay* weightsWest = createPixelLayer(WEIGHTS_WEST,
+    std::shared_ptr<PixelLayerDisplay> weightsWest = createPixelLayer(WEIGHTS_WEST,
         width, height, resolution, RGBA_ORANGE);
 
-    AreaLayerDisplay* playSound = createAreaLayer(PLAY_SOUND,
+    std::shared_ptr<AreaLayerDisplay> playSound = createAreaLayer(PLAY_SOUND,
         width, height, resolution, RGBA_GREEN);
 
-    AreaLayerDisplay* setMaxVelocity = createAreaLayer(SET_MAX_VELOCITY,
+    std::shared_ptr<AreaLayerDisplay> setMaxVelocity = createAreaLayer(SET_MAX_VELOCITY,
         width, height, resolution, RGBA_BLUE);
 
     // Background layer
@@ -272,22 +272,24 @@ void LogicalMapDisplay::reset()
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-PixelLayerDisplay* LogicalMapDisplay::createPixelLayer(unsigned int order,
+std::shared_ptr<PixelLayerDisplay> LogicalMapDisplay::createPixelLayer(unsigned int order,
     unsigned int width, unsigned int height,
     double resolution, Ogre::RGBA color)
 {
-    PixelLayerDisplay* layer = new PixelLayerDisplay(order, width, height, resolution, color);
+    std::shared_ptr<PixelLayerDisplay> layer = std::make_shared<PixelLayerDisplay>(order,
+        width, height, resolution, color);
     layer->connectTo(scene_manager_, scene_node_);
 
     return layer;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-AreaLayerDisplay* LogicalMapDisplay::createAreaLayer(unsigned int order,
+std::shared_ptr<AreaLayerDisplay> LogicalMapDisplay::createAreaLayer(unsigned int order,
     unsigned int width, unsigned int height,
     double resolution, Ogre::RGBA color)
 {
-    AreaLayerDisplay* layer = new AreaLayerDisplay(order, width, height, resolution, color);
+    std::shared_ptr<AreaLayerDisplay> layer = std::make_shared<AreaLayerDisplay>(order,
+        width, height, resolution, color);
     layer->connectTo(scene_manager_, scene_node_);
 
     return layer;
@@ -371,6 +373,11 @@ void LogicalMapDisplay::updateAlpha()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapDisplay::updateLayerSwitches()
 {
+    if (!logicalMap_ || !isEnabled())
+    {
+        return;
+    }
+
     layers_[BACKGROUND]->show(propertyLayerBackground_->getValue().toBool());
     layers_[OBSTACLES]->show(propertyLayerObstacles_->getValue().toBool());
     layers_[WEIGHTS_NORTH]->show(propertyLayerWeightsNorth_->getValue().toBool());

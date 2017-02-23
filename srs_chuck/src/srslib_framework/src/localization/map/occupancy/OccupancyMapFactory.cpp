@@ -16,8 +16,7 @@ namespace srs {
 OccupancyMap* OccupancyMapFactory::fromGrid2d(SimpleGrid2d* occupancy,
     Pose<> origin, double resolution)
 {
-    metadata_ = OccupancyMetadata(0,
-        occupancy->getWidth(), occupancy->getHeight(),
+    metadata_ = OccupancyMetadata(occupancy->getWidth(), occupancy->getHeight(),
         origin, resolution,
         "",
         0.9, 0.1, false);

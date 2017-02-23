@@ -54,7 +54,6 @@ struct LogicalMapMessageFactory
     {
         srslib_framework::LogicalMetadata msgLogicalMetaData;
 
-        msgLogicalMetaData.loadTime = metadata.loadTime;
         msgLogicalMetaData.heightCells = metadata.heightCells;
         msgLogicalMetaData.heightM = metadata.heightM;
         msgLogicalMetaData.logicalFilename = metadata.logicalFilename;
@@ -94,7 +93,6 @@ struct LogicalMapMessageFactory
     {
         LogicalMetadata metadata;
 
-        metadata.loadTime = message.loadTime;
         metadata.heightCells = message.heightCells;
         metadata.heightM = message.heightM;
         metadata.logicalFilename = message.logicalFilename;

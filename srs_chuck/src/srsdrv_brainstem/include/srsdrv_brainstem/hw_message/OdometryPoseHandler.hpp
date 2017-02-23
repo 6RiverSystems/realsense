@@ -37,9 +37,9 @@ private:
 		float theta;
 	HW_MESSAGE_END
 
-	OdometryPoseData tempRobotPose_;
+	tf::Transform globalTransform_;
 
-	OdometryPoseData offsetRobotPose_;
+	tf::Transform tempTransform_;
 
 	tf::TransformBroadcaster broadcaster_;
 

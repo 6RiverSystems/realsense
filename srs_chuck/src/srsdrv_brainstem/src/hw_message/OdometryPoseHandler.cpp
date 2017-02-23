@@ -18,11 +18,9 @@ namespace srs {
 OdometryPoseHandler::OdometryPoseHandler(PublisherOdometryPose::Interface& publisher, bool useBrainstemOdom) :
 	HardwareMessageHandler(BRAIN_STEM_MSG::ODOMETRY_POSE),
 	publisher_(publisher),
-	useBrainstemOdom_(useBrainstemOdom),
-	tempRobotPose_(),
-	offsetRobotPose_()
+	useBrainstemOdom_(useBrainstemOdom)
 {
-
+	globalTransform_.setIdentity();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,22 +28,29 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 {
 	OdometryPoseData odometryPoseData = msg.read<OdometryPoseData>();
 
-	// store pose information while receiving message
-	tempRobotPose_ = odometryPoseData;
+	// convert odometryPoseData into a tf::Transform
+	tf::Vector3 translation(odometryPoseData.x, odometryPoseData.y, 0.0);
+	tf::Quaternion rotation = tf::createQuaternionFromYaw(odometryPoseData.theta);
+	tempTransform_.setOrigin(translation);
+	tempTransform_.setRotation(rotation);
 
+	// calculate current pose
+	// use StampedTransform because it can be converted to geometry_msgs::TransformStamped directly
+	tf::StampedTransform currentTransform( globalTransform_ * tempTransform_, currentTime, ChuckTransforms::ODOMETRY, ChuckTransforms::BASE_FOOTPRINT);
+
+	// publish pose information
 	nav_msgs::Odometry odom;
 	odom.header.stamp = currentTime;
 	odom.header.frame_id = ChuckTransforms::ODOMETRY;
 	odom.child_frame_id = ChuckTransforms::BASE_FOOTPRINT;
 
-	// rather than publish odometryPoseData directly, add the pose offset value instead
-	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( odometryPoseData.theta + offsetRobotPose_.theta );
+	// convert tf::Quaternion to nav_msgs::Odometry Quaternion
+	geometry_msgs::Quaternion odom_quat;
+	tf::quaternionTFToMsg(currentTransform.getRotation(), odom_quat);
 
-	float theta = offsetRobotPose_.theta * (-1);
 	// Position
-	// similar idea as handlePoseReset() transforming odometryPoseData into world frame
-	odom.pose.pose.position.x = odometryPoseData.x * cos(theta) + odometryPoseData.y * sin(theta) + offsetRobotPose_.x;
-	odom.pose.pose.position.y = (-1) * odometryPoseData.x * sin(theta) + odometryPoseData.y * cos(theta) + offsetRobotPose_.y;
+	odom.pose.pose.position.x = currentTransform.getOrigin().x();
+	odom.pose.pose.position.y = currentTransform.getOrigin().y();
 	odom.pose.pose.position.z = 0.0;
 	odom.pose.pose.orientation = odom_quat;
 
@@ -63,14 +68,7 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 	{
 		// Publish the TF
 		geometry_msgs::TransformStamped odom_trans;
-		odom_trans.header.frame_id = ChuckTransforms::ODOMETRY;
-		odom_trans.child_frame_id = ChuckTransforms::BASE_FOOTPRINT;
-
-		odom_trans.header.stamp = currentTime;
-		odom_trans.transform.translation.x = odometryPoseData.linearVelocity;
-		odom_trans.transform.translation.y = odometryPoseData.angularVelocity;
-		odom_trans.transform.translation.z = 0.0;
-		odom_trans.transform.rotation = odom_quat;
+		tf::transformStampedTFToMsg(currentTransform, odom_trans);
 
 		broadcaster_.sendTransform( odom_trans );
 	}
@@ -78,15 +76,8 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 
 void OdometryPoseHandler::handlePoseReset()
 {
-	// accumulate the offset each time when disconnect happen
-	// since brainstem reset to (x:0, y:0, theta:0) every time, we need to
-	// transform the pose into world frame
-
-	// the negtive sign is for projecting current pose frame back to world frame
-	float theta = offsetRobotPose_.theta * (-1);
-	offsetRobotPose_.x += (tempRobotPose_.x * cos(theta) + tempRobotPose_.y * sin(theta));
-	offsetRobotPose_.y += ((-1) * tempRobotPose_.x * sin(theta) + tempRobotPose_.y * cos(theta));
-	offsetRobotPose_.theta += tempRobotPose_.theta;
+	// update the globalTransform when brainstem reset happens
+	globalTransform_ *= tempTransform_;
 }
 
 } // namespace srs

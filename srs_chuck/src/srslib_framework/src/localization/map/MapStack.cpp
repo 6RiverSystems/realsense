@@ -8,10 +8,13 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-MapStack::MapStack(LogicalMap* logical, OccupancyMap* occupancy, costmap_2d::Costmap2D* costMap2d) :
-    logical_(logical),
-    occupancy_(occupancy),
-    costMap2d_(costMap2d)
+MapStack::MapStack(MapStackMetadata metadata,
+    LogicalMap* logical, OccupancyMap* occupancy,
+    costmap_2d::Costmap2D* costMap2d) :
+        metadata_(metadata),
+        logical_(logical),
+        occupancy_(occupancy),
+        costMap2d_(costMap2d)
 {
 }
 
@@ -32,6 +35,12 @@ costmap_2d::Costmap2D* MapStack::getCostMap2d() const
 LogicalMap* MapStack::getLogicalMap() const
 {
     return logical_;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+MapStackMetadata MapStack::getMetadata() const
+{
+    return metadata_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

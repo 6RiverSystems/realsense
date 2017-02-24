@@ -13,6 +13,7 @@ using namespace std;
 
 #include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/localization/map/BaseMap.hpp>
+#include <srslib_framework/localization/map/MapStackMetadata.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMap.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMap.hpp>
 
@@ -21,13 +22,14 @@ namespace srs {
 class MapStack
 {
 public:
-    MapStack(LogicalMap* logical = nullptr,
+    MapStack(MapStackMetadata metadata, LogicalMap* logical = nullptr,
         OccupancyMap* occupancy = nullptr,
         costmap_2d::Costmap2D* costMap2d = nullptr);
     ~MapStack();
 
     costmap_2d::Costmap2D* getCostMap2d() const;
     LogicalMap* getLogicalMap() const;
+    MapStackMetadata getMetadata() const;
     bool getNeighbor(const Position& position, Position& result) const;
     OccupancyMap* getOccupancyMap() const;
     int getTotalCost(const Position& position,
@@ -41,6 +43,8 @@ private:
     costmap_2d::Costmap2D* costMap2d_;
 
     LogicalMap* logical_;
+
+    MapStackMetadata metadata_;
 
     OccupancyMap* occupancy_;
 };

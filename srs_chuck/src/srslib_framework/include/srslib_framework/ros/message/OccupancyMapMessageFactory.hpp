@@ -54,7 +54,6 @@ struct OccupancyMapMessageFactory
     {
         srslib_framework::OccupancyMetadata msgOccupancyMetaData;
 
-        msgOccupancyMetaData.loadTime = metadata.loadTime;
         msgOccupancyMetaData.heightCells = metadata.heightCells;
         msgOccupancyMetaData.heightM = metadata.heightM;
         msgOccupancyMetaData.occupancyFilename = metadata.occupancyFilename;
@@ -80,7 +79,7 @@ struct OccupancyMapMessageFactory
     {
         nav_msgs::MapMetaData msgRosMapMetaData;
 
-        msgRosMapMetaData.map_load_time = ros::Time(metadata.loadTime);
+        msgRosMapMetaData.map_load_time = ros::Time();
         msgRosMapMetaData.resolution = metadata.resolution;
         msgRosMapMetaData.width = metadata.widthCells;
         msgRosMapMetaData.height = metadata.heightCells;
@@ -130,7 +129,6 @@ struct OccupancyMapMessageFactory
     {
         OccupancyMetadata metadata;
 
-        metadata.loadTime = message.loadTime;
         metadata.heightCells = message.heightCells;
         metadata.heightM = message.heightM;
         metadata.occupancyFilename = message.occupancyFilename;
@@ -156,7 +154,6 @@ struct OccupancyMapMessageFactory
     {
         OccupancyMetadata metadata;
 
-        metadata.loadTime = message.map_load_time.toSec();
         metadata.resolution = message.resolution;
         metadata.widthCells = message.width;
         metadata.heightCells = message.height;

@@ -8,7 +8,6 @@
 #include <string>
 #include <sstream>
 #include <vector>
-using namespace std;
 
 #ifndef Q_MOC_RUN
 #include <OgreTexture.h>
@@ -81,6 +80,12 @@ Q_SIGNALS:
 private Q_SLOTS:
     void renderMapStack();
 
+    void synthesizeBackgroundLayer();
+    void synthesizeObstacleLayer(Location location);
+    void synthesizePlaySoundLayer(LogicalMap::LabeledArea area);
+    void synthesizeSetMaxVelocityLayer(LogicalMap::LabeledArea area);
+    void synthesizeWeightLayers(Location location);
+
     void updateAlpha();
     void updateLayerSwitches();
     void updateDrawUnder();
@@ -95,7 +100,8 @@ private:
         WEIGHTS_SOUTH = 4,
         WEIGHTS_WEST = 5,
         PLAY_SOUND = 6,
-        SET_MAX_VELOCITY = 7
+        SET_MAX_VELOCITY = 7,
+        LIMIT = 8
     } EnititesEnum;
 
     static constexpr Ogre::RGBA RGBA_BLACK = 0x000000FF;
@@ -104,9 +110,11 @@ private:
     static constexpr Ogre::RGBA RGBA_ORANGE = 0xF0BE48FF;
     static constexpr Ogre::RGBA RGBA_WHITE = 0xFFFFFFFF;
 
-    PixelLayerDisplay* createPixelLayer(unsigned int order, unsigned int width, unsigned int height,
+    std::shared_ptr<PixelLayerDisplay> createPixelLayer(unsigned int order,
+        unsigned int width, unsigned int height,
         double resolution, Ogre::RGBA color);
-    AreaLayerDisplay* createAreaLayer(unsigned int order, unsigned int width, unsigned int height,
+    std::shared_ptr<AreaLayerDisplay> createAreaLayer(unsigned int order,
+        unsigned int width, unsigned int height,
         double resolution, Ogre::RGBA color);
 
     void translateLogicalMap();
@@ -125,7 +133,7 @@ private:
     rviz::FloatProperty* propertyResolution_;
     rviz::IntProperty* propertyWidth_;
 
-    vector<PixelLayerDisplay*> layers_;
+    std::vector<shared_ptr<PixelLayerDisplay>> layers_;
     LogicalMap* logicalMap_;
 
     MapStack* mapStack_;

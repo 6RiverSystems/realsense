@@ -1,0 +1,71 @@
+#
+# (c) Copyright 2015-2017 River Systems, all rights reserved.
+#
+# This is proprietary software, unauthorized distribution is not permitted.
+#
+{
+    "_class": "MapStack",
+    "_object": {
+        "metadata": {
+            "_class": "MapStackMetadata",
+            "_object": {
+                "comments": "",
+                "heightPixels": 100,
+                "mapStackFilename": "Empty.yaml",
+                "mapName": "Empty",
+                "mapVersion": "1.0",
+                "originX": 0,
+                "originY": 0,
+                "resolution": 0.05,
+                "widthPixels": 200
+            }
+        },
+        "logical": {
+            "_class": "LogicalMap",
+            "_object": {
+                "metadata": {
+                    "_class": "LogicalMetadata",
+                    "_object": {
+                        "logicalFilename": "Empty.geojson"
+                    }
+                },
+                "layers": [
+                    {
+                        "_class": "Layer",
+                        "_object": {
+                            "id": 0,
+                            "name": "Border",
+                            "envelopeSize": 0,
+                            "envelopeCost": 0,
+                            "horizontalExpansion": 1,
+                            "verticalExpansion": 1,
+                            "comments": " ",
+                            "pngBase64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAABkCAYAAADDhn8LAAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4QIUFQEgjO+BPQAAAQZJREFUeNrt2TEKgCAYhuGMbuWakCd2cM1z2dBa0FCD9DxH+OCFXwz7uvUJuDSbAAQCAgGBgEBAICAQGFnovfsHgbtA3vwojLVYlGG1lJ1Y4A0CAgGBgEBAICAQEAgIBBAICAQEAgIBgYBAQCAgEBAICAQQCAgEBAICAYGAQEAgIBAQCAjEBCAQEAgIBAQCAgGBgEBAICAQQCAgEBAICAQEAgIBgYBAQCAgEEAgIBAQCAgEBAICAYGAQEAggEBAICAQEAgIBAQCAgGBgEBAIIBAQCAgEBAICAQEAgIBgcCfLCaAU6zl+0BaypbGiQUCAYEAAgGBgEBAICAQEAgIBAQCAgEEAk8cA/UPZGjo9GIAAAAASUVORK5CYII=",
+                            "policyType": {
+                                "_class": "PolicyBorderObstacle",
+                                "_object": {
+                                    
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "occupancy": {
+            "_class": "OccupancyMap",
+            "_object": {
+                "metadata": {
+                    "_class": "OccupancyMetadata",
+                    "_object": {
+                        "thresholdOccupied": 0.9,
+                        "thresholdFree": 0.1,
+                        "negate": false,
+                        "occupancyFilename": "Empty.pgm"
+                    }
+                },
+                "pgmBase64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAABkCAAAAADm7SDXAAAAcUlEQVR4nO3PMREAIAwAsfo3DSYYnl7iIDMA8Nb5jEiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSM3+CAAA7HQBMmxtfApveHoAAAAASUVORK5CYII="
+            }
+        }
+    }
+}

@@ -14,8 +14,8 @@
                 "mapStackFilename": "6RS_HQ.yaml",
                 "mapName": "6RS HQ",
                 "mapVersion": "1.0",
-                "originX": 0,
-                "originY": 0,
+                "originX": -10,
+                "originY": -10,
                 "resolution": 0.05,
                 "widthPixels": 789
             }

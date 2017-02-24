@@ -147,7 +147,6 @@ private:
     bool useBrainstemOdom_;
 
     HardwareMessageHandlerPtr odometryRpmHardwareHandler_;
-    //HardwareMessageHandlerPtr odometryPoseHardwarewHandler_;
 
     SoftwareMessagePtr velocitySoftwareHandler_;
     SoftwareMessagePtr odometryRpmSoftwareHandler_;

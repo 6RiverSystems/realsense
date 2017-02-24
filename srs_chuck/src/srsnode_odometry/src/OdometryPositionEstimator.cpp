@@ -181,7 +181,8 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 	odom_trans.transform.translation.z = 0.0;
 	odom_trans.transform.rotation = odom_quat;
 
-	broadcaster_.sendTransform( odom_trans );
+	// Disable publication of transform from odometry node and use brainstem to publish instead 
+	//broadcaster_.sendTransform( odom_trans );
 
 	nav_msgs::Odometry odom;
 	odom.header.stamp = currentTime;
@@ -202,8 +203,8 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 	odom.twist.twist.angular.y = 0.0;
 	odom.twist.twist.angular.z = angularVelocity;
 
-	// Publish the Odometry
-	odometryPosePub_.publish( odom );
+	// Disable publication of pose from odometry node and use brainstem to publish instead
+	//odometryPosePub_.publish( odom );
 
     // Get and publish the forward estimated velocities
     nav_msgs::Odometry odom_estimate;

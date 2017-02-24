@@ -61,7 +61,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor() :
 	powerStateFilter_(powerStateFilteredChannel_),
     hardwareInfoHandler_(new HardwareInfoHandler(hardwareInfoChannel_)),
     operationalStateHandler_(new OperationalStateHandler(operationalStateChannel_)),
-	useBrainstemOdom_(false),
+	useBrainstemOdom_(true),
 	odometryRpmHardwareHandler_(),
 	odometryPoseHardwarewHandler_(),
 	velocitySoftwareHandler_(),

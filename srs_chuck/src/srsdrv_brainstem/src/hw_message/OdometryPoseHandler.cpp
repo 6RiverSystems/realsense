@@ -20,7 +20,8 @@ OdometryPoseHandler::OdometryPoseHandler(PublisherOdometryPose::Interface& publi
 	publisher_(publisher),
 	useBrainstemOdom_(useBrainstemOdom)
 {
-	globalTransform_.setIdentity();
+	// initialize the brainstemTransform_ with an identity matrix
+	brainstemTransform_.setIdentity();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,15 +29,15 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 {
 	OdometryPoseData odometryPoseData = msg.read<OdometryPoseData>();
 
-	// convert odometryPoseData into a tf::Transform
+	// convert odometryPoseData into a tf::Transform in current frame
 	tf::Vector3 translation(odometryPoseData.x, odometryPoseData.y, 0.0);
 	tf::Quaternion rotation = tf::createQuaternionFromYaw(odometryPoseData.theta);
 	tempTransform_.setOrigin(translation);
 	tempTransform_.setRotation(rotation);
 
-	// calculate current pose
+	// calculate pose in GLOBAL frame
 	// use StampedTransform because it can be converted to geometry_msgs::TransformStamped directly
-	tf::StampedTransform currentTransform( globalTransform_ * tempTransform_, currentTime, ChuckTransforms::ODOMETRY, ChuckTransforms::BASE_FOOTPRINT);
+	tf::StampedTransform currentTransform( brainstemTransform_ * tempTransform_, currentTime, ChuckTransforms::ODOMETRY, ChuckTransforms::BASE_FOOTPRINT);
 
 	// publish pose information
 	nav_msgs::Odometry odom;
@@ -76,8 +77,8 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 
 void OdometryPoseHandler::handlePoseReset()
 {
-	// update the globalTransform when brainstem reset happens
-	globalTransform_ *= tempTransform_;
+	// update the brainstemTransform_ when brainstem reset happens
+	brainstemTransform_ *= tempTransform_;
 }
 
 } // namespace srs

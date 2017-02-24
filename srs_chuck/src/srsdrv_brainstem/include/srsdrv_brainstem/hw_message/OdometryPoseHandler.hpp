@@ -23,7 +23,7 @@ public:
 
     void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
-    // update pose offset whenever brainstem reset is detected
+    // update brainstemTransform_ whenever brainstem reset is detected
     void handlePoseReset();
 
 private:
@@ -37,9 +37,11 @@ private:
 		float theta;
 	HW_MESSAGE_END
 
-	tf::Transform globalTransform_;
-
+	// the temporary tf in current frame
 	tf::Transform tempTransform_;
+
+	// the overall tf convert current frame to global frame
+	tf::Transform brainstemTransform_;
 
 	tf::TransformBroadcaster broadcaster_;
 

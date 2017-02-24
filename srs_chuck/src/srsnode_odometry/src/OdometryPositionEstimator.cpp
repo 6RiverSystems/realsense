@@ -338,12 +338,12 @@ void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)
     {
         ROS_ERROR_STREAM( "Motion ping exceeded allowable delay: " << pingDelay );
     }
-
+	/*
 	double odomDelay = (ros::Time::now() - lastPoseTime_).toSec();
 
 	if (odomDelay > MAX_ALLOWED_ODOM_DELAY) {
 		ROS_ERROR_STREAM_THROTTLE( 5.0f, "Odometry topic not published in: " << odomDelay );
-	}
+	}*/
 }
 
 void OdometryPositionEstimator::cfgCallback(srsnode_odometry::RobotSetupConfig &config, uint32_t level)

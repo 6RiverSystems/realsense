@@ -20,7 +20,8 @@ OdometryPoseHandler::OdometryPoseHandler(PublisherOdometryPose::Interface& publi
 	publisher_(publisher),
 	useBrainstemOdom_(useBrainstemOdom)
 {
-
+	// initialize the brainstemTransform_ with an identity matrix
+	brainstemTransform_.setIdentity();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,16 +29,29 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 {
 	OdometryPoseData odometryPoseData = msg.read<OdometryPoseData>();
 
-	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw( odometryPoseData.theta );
+	// convert odometryPoseData into a tf::Transform in current frame
+	tf::Vector3 translation(odometryPoseData.x, odometryPoseData.y, 0.0);
+	tf::Quaternion rotation = tf::createQuaternionFromYaw(odometryPoseData.theta);
+	tempTransform_.setOrigin(translation);
+	tempTransform_.setRotation(rotation);
 
+	// calculate pose in GLOBAL frame
+	// use StampedTransform because it can be converted to geometry_msgs::TransformStamped directly
+	tf::StampedTransform currentTransform( brainstemTransform_ * tempTransform_, currentTime, ChuckTransforms::ODOMETRY, ChuckTransforms::BASE_FOOTPRINT);
+
+	// publish pose information
 	nav_msgs::Odometry odom;
 	odom.header.stamp = currentTime;
 	odom.header.frame_id = ChuckTransforms::ODOMETRY;
 	odom.child_frame_id = ChuckTransforms::BASE_FOOTPRINT;
 
+	// convert tf::Quaternion to nav_msgs::Odometry Quaternion
+	geometry_msgs::Quaternion odom_quat;
+	tf::quaternionTFToMsg(currentTransform.getRotation(), odom_quat);
+
 	// Position
-	odom.pose.pose.position.x = odometryPoseData.x;
-	odom.pose.pose.position.y = odometryPoseData.y;
+	odom.pose.pose.position.x = currentTransform.getOrigin().x();
+	odom.pose.pose.position.y = currentTransform.getOrigin().y();
 	odom.pose.pose.position.z = 0.0;
 	odom.pose.pose.orientation = odom_quat;
 
@@ -55,17 +69,16 @@ void OdometryPoseHandler::receiveMessage(ros::Time currentTime, HardwareMessage&
 	{
 		// Publish the TF
 		geometry_msgs::TransformStamped odom_trans;
-		odom_trans.header.frame_id = ChuckTransforms::ODOMETRY;
-		odom_trans.child_frame_id = ChuckTransforms::BASE_FOOTPRINT;
-
-		odom_trans.header.stamp = currentTime;
-		odom_trans.transform.translation.x = odometryPoseData.linearVelocity;
-		odom_trans.transform.translation.y = odometryPoseData.angularVelocity;
-		odom_trans.transform.translation.z = 0.0;
-		odom_trans.transform.rotation = odom_quat;
+		tf::transformStampedTFToMsg(currentTransform, odom_trans);
 
 		broadcaster_.sendTransform( odom_trans );
 	}
+}
+
+void OdometryPoseHandler::handlePoseReset()
+{
+	// update the brainstemTransform_ when brainstem reset happens
+	brainstemTransform_ *= tempTransform_;
 }
 
 } // namespace srs

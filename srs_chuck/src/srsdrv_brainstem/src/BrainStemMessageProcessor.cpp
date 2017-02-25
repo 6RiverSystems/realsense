@@ -61,7 +61,7 @@ BrainStemMessageProcessor::BrainStemMessageProcessor() :
 	powerStateFilter_(powerStateFilteredChannel_),
     hardwareInfoHandler_(new HardwareInfoHandler(hardwareInfoChannel_)),
     operationalStateHandler_(new OperationalStateHandler(operationalStateChannel_)),
-	useBrainstemOdom_(false),
+	useBrainstemOdom_(true),
 	odometryRpmHardwareHandler_(),
 	odometryPoseHardwarewHandler_(),
 	velocitySoftwareHandler_(),
@@ -199,6 +199,12 @@ void BrainStemMessageProcessor::setConnected(bool isConnected)
 			sentPing_ = false;
 
 			setupComplete_ = false;
+
+			// brainstem disconnection occurs, need to handle pose reset
+			if(odometryPoseHardwarewHandler_)
+			{
+				odometryPoseHardwarewHandler_->handlePoseReset();
+			}
 
 			hardwareInfoHandler_->reset();
 

@@ -33,6 +33,7 @@ using namespace std;
 
 #include <hw_message/HardwareInfoHandler.hpp>
 #include <hw_message/OperationalStateHandler.hpp>
+#include <hw_message/OdometryPoseHandler.hpp>
 
 #include <command/SetPhysicalDimension.hpp>
 
@@ -141,11 +142,11 @@ private:
 
     std::shared_ptr<HardwareInfoHandler> hardwareInfoHandler_;
     std::shared_ptr<OperationalStateHandler> operationalStateHandler_;
+    std::shared_ptr<OdometryPoseHandler> odometryPoseHardwarewHandler_;
 
     bool useBrainstemOdom_;
 
     HardwareMessageHandlerPtr odometryRpmHardwareHandler_;
-    HardwareMessageHandlerPtr odometryPoseHardwarewHandler_;
 
     SoftwareMessagePtr velocitySoftwareHandler_;
     SoftwareMessagePtr odometryRpmSoftwareHandler_;

@@ -37,6 +37,7 @@ struct MapStackMessageFactory
     {
         srslib_framework::MapStack msgMapStack;
 
+        msgMapStack.metadata = metadata2Msg(mapStack->getMetadata());
         msgMapStack.logical = LogicalMapMessageFactory::map2Msg(mapStack->getLogicalMap());
         msgMapStack.occupancy = OccupancyMapMessageFactory::map2Msg(mapStack->getOccupancyMap());
 

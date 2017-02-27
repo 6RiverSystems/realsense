@@ -47,6 +47,8 @@ MapStack* MapStackFactory::fromJsonFile(string jsonFilename, double loadTime)
     Context context;
     context.localDirectory = Filesystem::dirname(jsonFilename) + "/";
     context.jsonFilename = jsonFilename;
+
+    context.metadata.mapStackFilename = jsonFilename;
     context.metadata.loadTime = loadTime;
 
     checkLanguageVersion(context, mapStackDocument);

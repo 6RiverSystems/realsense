@@ -17,6 +17,7 @@
 #include <rviz/properties/int_property.h>
 #include <rviz/properties/property.h>
 #include <rviz/properties/ros_topic_property.h>
+#include <rviz/properties/string_property.h>
 #include <rviz/properties/vector_property.h>
 #include <rviz/validate_floats.h>
 #include <rviz/display_context.h>
@@ -90,6 +91,18 @@ LogicalMapDisplay::LogicalMapDisplay() :
         "Rendering option, enables/disables the play-sound layer.",
         this, SLOT(updateLayerSwitches()));
 
+    propertyMapFilename_ = new rviz::StringProperty( "Map file name", "",
+        "File name of the loaded map", this);
+    propertyMapFilename_->setReadOnly(true);
+
+    propertyMapName_ = new rviz::StringProperty( "Map name", "",
+        "Name assigned to the map", this);
+    propertyMapName_->setReadOnly(true);
+
+    propertyMapVersion_ = new rviz::StringProperty( "Map version", "",
+        "Version assigned to the map", this);
+    propertyMapVersion_->setReadOnly(true);
+
     propertyLayerSetMaxVelocity_ = new rviz::Property("Draw the set-max-velocity layer", true,
         "Rendering option, enables/disables the set-max-velocity layer.",
         this, SLOT(updateLayerSwitches()));
@@ -121,6 +134,10 @@ void LogicalMapDisplay::notified(Subscriber<srslib_framework::MapStack>* subject
         logicalMap_->getOrigin().x,
         logicalMap_->getOrigin().y,
         0));
+
+    propertyMapFilename_->setStdString(mapStack_->getMetadata().mapStackFilename);
+    propertyMapName_->setStdString(mapStack_->getMetadata().mapName);
+    propertyMapVersion_->setStdString(mapStack_->getMetadata().mapVersion);
 
     // Now that we know about the logical map,
     // the different layers can be constructed and initialized

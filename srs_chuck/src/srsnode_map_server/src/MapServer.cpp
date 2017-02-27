@@ -70,17 +70,7 @@ void MapServer::publishMap()
     // Publish ROS compatible information
     channelRosMapMetadata_.publish(mapStack_->getOccupancyMap()->getMetadata());
     channelRosOccupancyGrid_.publish(mapStack_->getOccupancyMap());
-//    channelRosLogicalGrid_.publish(mapStack_->getLogicalMap());
     channelRosAmclOccupancyGrid_.publish(mapStack_->getOccupancyMap());
-
-    channelEastWeightsGrid_.publish(MapAdapter::weights2CostMap2D(
-        mapStack_->getLogicalMap(), WeightedGrid2d::ORIENTATION_EAST));
-    channelNorthWeightsGrid_.publish(MapAdapter::weights2CostMap2D(
-        mapStack_->getLogicalMap(), WeightedGrid2d::ORIENTATION_NORTH));
-    channelSouthWeightsGrid_.publish(MapAdapter::weights2CostMap2D(
-        mapStack_->getLogicalMap(), WeightedGrid2d::ORIENTATION_SOUTH));
-    channelWestWeightsGrid_.publish(MapAdapter::weights2CostMap2D(
-        mapStack_->getLogicalMap(), WeightedGrid2d::ORIENTATION_WEST));
 }
 
 } // namespace srs

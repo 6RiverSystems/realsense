@@ -45,6 +45,7 @@ namespace rviz {
 class FloatProperty;
 class IntProperty;
 class Property;
+class StringProperty;
 class RosTopicProperty;
 class VectorProperty;
 
@@ -129,6 +130,9 @@ private:
     rviz::Property* propertyLayerWeightsEast_;
     rviz::Property* propertyLayerWeightsSouth_;
     rviz::Property* propertyLayerWeightsWest_;
+    rviz::StringProperty* propertyMapFilename_;
+    rviz::StringProperty* propertyMapName_;
+    rviz::StringProperty* propertyMapVersion_;
     rviz::VectorProperty* propertyOrigin_;
     rviz::FloatProperty* propertyResolution_;
     rviz::IntProperty* propertyWidth_;

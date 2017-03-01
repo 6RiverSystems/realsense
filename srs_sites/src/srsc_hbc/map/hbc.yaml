@@ -6,14 +6,14 @@
 {
     "language_version": "1.0",
     "metadata": {
-        "map_name": "HBC",
+        "map_name": "hbc",
         "map_version": "1.0"
     },
     "logical": {
-        "map": "HBC.geojson"
+        "map": "hbc.geojson"
     },
     "occupancy": {
-        "map": "HBC.pgm",
+        "map": "hbc.pgm",
         "resolution": 0.05,
         "origin": [
             -0.025,

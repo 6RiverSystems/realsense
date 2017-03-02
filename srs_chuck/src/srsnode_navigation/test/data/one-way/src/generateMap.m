@@ -15,7 +15,11 @@ layerOneWayWestEast = png2Map('/Users/fsantini/Projects/repos/ros/srs_chuck/src/
     RESOLUTION, ORIGIN);
 showMap(layerOneWayWestEast, 'West weight');
 
-layerOneWayWestEast = convertToWeightedArea(layerOneWayWestEast, 'all', 0, 0, 0, 100);
+layerOneWayWestEast = convertToWeightedArea(layerOneWayWestEast, 'all', ...
+    0, 0, ... % north, north-east
+    0, 0, ... % east, south-east
+    0, 100, ... % south, south-west
+    100, 100); % west, north-west
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Add the layers and generate the final map

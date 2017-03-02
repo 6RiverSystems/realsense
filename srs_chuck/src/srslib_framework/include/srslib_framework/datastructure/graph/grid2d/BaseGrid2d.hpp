@@ -27,9 +27,13 @@ public:
 
     enum {
         ORIENTATION_NORTH = 90,
+        ORIENTATION_NORTH_EAST = 45,
         ORIENTATION_EAST = 0,
+        ORIENTATION_SOUTH_EAST = 315,
         ORIENTATION_SOUTH = 270,
-        ORIENTATION_WEST = 180
+        ORIENTATION_SOUTH_WEST = 225,
+        ORIENTATION_WEST = 180,
+        ORIENTATION_NORTH_WEST = 135,
     };
 
     BaseGrid2d(unsigned int size) :
@@ -57,13 +61,33 @@ public:
     {
         switch (position.orientation)
         {
+            case ORIENTATION_NORTH:
+                result = Position(position.location.x, position.location.y + 1,
+                    position.orientation);
+                break;
+
+            case ORIENTATION_NORTH_EAST:
+                result = Position(position.location.x + 1, position.location.y + 1,
+                    position.orientation);
+                break;
+
             case ORIENTATION_EAST:
                 result = Position(position.location.x + 1, position.location.y,
                     position.orientation);
                 break;
 
-            case ORIENTATION_NORTH:
-                result = Position(position.location.x, position.location.y + 1,
+            case ORIENTATION_SOUTH_EAST:
+                result = Position(position.location.x + 1, position.location.y - 1,
+                    position.orientation);
+                break;
+
+            case ORIENTATION_SOUTH:
+                result = Position(position.location.x, position.location.y - 1,
+                    position.orientation);
+                break;
+
+            case ORIENTATION_SOUTH_WEST:
+                result = Position(position.location.x - 1, position.location.y - 1,
                     position.orientation);
                 break;
 
@@ -72,8 +96,8 @@ public:
                     position.orientation);
                 break;
 
-            case ORIENTATION_SOUTH:
-                result = Position(position.location.x, position.location.y - 1,
+            case ORIENTATION_NORTH_WEST:
+                result = Position(position.location.x - 1, position.location.y + 1,
                     position.orientation);
                 break;
 

@@ -49,10 +49,14 @@
                     },
                     "properties": {
                         "object": "weighted_area",
-                        "north": "max",
-                        "east": 77,
-                        "south": 222,
-                        "west": 111
+                        "n": "max",
+                        "ne": 33,
+                        "e": 77,
+                        "se": 78,
+                        "s": 222,
+                        "sw": 223,
+                        "w": 111,
+                        "nw": 112
                     }
                 }
             ]

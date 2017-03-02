@@ -90,10 +90,16 @@ WeightedGrid2d::BaseType LogicalMap::getWeight(const Position& position) const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::getWeights(unsigned int cCells, unsigned int rCells,
-    WeightedGrid2d::BaseType& north, WeightedGrid2d::BaseType& east,
-    WeightedGrid2d::BaseType& south, WeightedGrid2d::BaseType& west)
+    WeightedGrid2d::BaseType& north, WeightedGrid2d::BaseType& northEast,
+    WeightedGrid2d::BaseType& east, WeightedGrid2d::BaseType& southEast,
+    WeightedGrid2d::BaseType& south, WeightedGrid2d::BaseType& southWest,
+    WeightedGrid2d::BaseType& west, WeightedGrid2d::BaseType& northWest)
 {
-    return getGrid()->getWeights(Location(cCells, rCells), north, east, south, west);
+    return getGrid()->getWeights(Location(cCells, rCells),
+        north, northEast,
+        east, southEast,
+        south, southWest,
+        west, northWest);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -156,12 +162,16 @@ bool operator==(const LogicalMap& lhs, const LogicalMap& rhs)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMap::setWeights(unsigned int cCells, unsigned int rCells,
-    WeightedGrid2d::BaseType north,
-    WeightedGrid2d::BaseType east,
-    WeightedGrid2d::BaseType south,
-    WeightedGrid2d::BaseType west)
+    WeightedGrid2d::BaseType north, WeightedGrid2d::BaseType northEast,
+    WeightedGrid2d::BaseType east, WeightedGrid2d::BaseType southEast,
+    WeightedGrid2d::BaseType south, WeightedGrid2d::BaseType southWest,
+    WeightedGrid2d::BaseType west, WeightedGrid2d::BaseType northWest)
 {
-    getGrid()->setWeights(Location(cCells, rCells), north, east, south, west);
+    getGrid()->setWeights(Location(cCells, rCells),
+        north, northEast,
+        east, southEast,
+        south, southWest,
+        west, northWest);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

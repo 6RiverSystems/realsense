@@ -6,7 +6,11 @@
 
 int32 cost
 
-int32 north
-int32 east
-int32 south
-int32 west
+int32 n
+int32 ne
+int32 e
+int32 se
+int32 s
+int32 sw
+int32 w
+int32 nw

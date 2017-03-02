@@ -96,13 +96,16 @@ private:
     enum {
         BACKGROUND = 0,
         OBSTACLES = 1,
-        WEIGHTS_NORTH = 2,
-        WEIGHTS_EAST = 3,
-        WEIGHTS_SOUTH = 4,
-        WEIGHTS_WEST = 5,
-        PLAY_SOUND = 6,
-        SET_MAX_VELOCITY = 7,
-        LIMIT = 8
+        PLAY_SOUND = 2,
+        SET_MAX_VELOCITY = 3,
+        WEIGHTS_NORTH = 4,
+        WEIGHTS_NORTH_EAST = 5,
+        WEIGHTS_EAST = 6,
+        WEIGHTS_SOUTH_EAST = 7,
+        WEIGHTS_SOUTH = 8,
+        WEIGHTS_SOUTH_WEST = 9,
+        WEIGHTS_WEST = 10,
+        WEIGHTS_NORTH_WEST = 11,
     } EnititesEnum;
 
     static constexpr Ogre::RGBA RGBA_BLACK = 0x000000FF;
@@ -127,13 +130,17 @@ private:
     rviz::Property* propertyLayerPlaySound_;
     rviz::Property* propertyLayerSetMaxVelocity_;
     rviz::Property* propertyLayerWeightsNorth_;
+    rviz::Property* propertyLayerWeightsNorthEast_;
     rviz::Property* propertyLayerWeightsEast_;
+    rviz::Property* propertyLayerWeightsSouthEast_;
     rviz::Property* propertyLayerWeightsSouth_;
+    rviz::Property* propertyLayerWeightsSouthWest_;
     rviz::Property* propertyLayerWeightsWest_;
+	rviz::Property* propertyLayerWeightsNorthWest_;
     rviz::StringProperty* propertyMapFilename_;
     rviz::StringProperty* propertyMapName_;
     rviz::StringProperty* propertyMapVersion_;
-    rviz::VectorProperty* propertyOrigin_;
+	rviz::VectorProperty* propertyOrigin_;
     rviz::FloatProperty* propertyResolution_;
     rviz::IntProperty* propertyWidth_;
 

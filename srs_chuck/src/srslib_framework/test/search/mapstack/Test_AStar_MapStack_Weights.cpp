@@ -44,8 +44,8 @@ TEST(Test_AStar_MapStack_Weights, SmallSearchWithWeights)
     correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 8});
 
     WeightedGrid2d logical(GRID_SIZE, GRID_SIZE);
-    logical.setWeights(Location(2, 1), 0, 0, 0, 100);
-    logical.setWeights(Location(3, 1), 0, 0, 0, 100);
+    logical.setWeights(Location(2, 1), 0, 0, 0, 0, 0, 100, 100, 100);
+    logical.setWeights(Location(3, 1), 0, 0, 0, 0, 0, 100, 100, 100);
 
     MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
 
@@ -79,8 +79,8 @@ TEST(Test_AStar_MapStack_Weights, WeightsAndThisWalls)
     correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, -M_PI_2), Pose<>(1, 1, 0), 110});
 
     WeightedGrid2d logical(GRID_SIZE, GRID_SIZE);
-    logical.setWeights(Location(2, 1), 0, 0, 0, 100);
-    logical.setWeights(Location(3, 1), 0, 0, 0, 100);
+    logical.setWeights(Location(2, 1), 0, 0, 0, 0, 0, 100, 100, 100);
+    logical.setWeights(Location(3, 1), 0, 0, 0, 0, 0, 100, 100, 100);
     test::Grid2dUtils::addObstacle(logical, 3, 0, 3, 0);
     test::Grid2dUtils::addObstacle(logical, 3, 2, 3, 4);
 
@@ -112,8 +112,8 @@ TEST(Test_AStar_MapStack_Weights, WeightsAndThickWalls)
     correctSolution->push_back({Grid2dSolutionItem::ROTATE, Pose<>(1, 1, M_PI_2), Pose<>(1, 1, 0), 206});
 
     WeightedGrid2d logical(GRID_SIZE, GRID_SIZE);
-    logical.setWeights(Location(2, 1), 0, 0, 0, 100);
-    logical.setWeights(Location(3, 1), 0, 0, 0, 100);
+    logical.setWeights(Location(2, 1), 0, 0, 0, 0, 0, 100, 100, 100);
+    logical.setWeights(Location(3, 1), 0, 0, 0, 0, 0, 100, 100, 100);
     test::Grid2dUtils::addObstacle(logical, 2, 0, 2, 0);
     test::Grid2dUtils::addObstacle(logical, 2, 2, 2, 4);
     test::Grid2dUtils::addObstacle(logical, 3, 0, 3, 0);

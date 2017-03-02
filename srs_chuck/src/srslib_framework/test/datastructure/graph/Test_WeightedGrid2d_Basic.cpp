@@ -132,7 +132,7 @@ TEST(Test_WeightedGraph2d, BasicWeigths)
 
     grid.payloadSet(P_1_1, 10);
     grid.payloadSet(P_3_3, 30);
-    grid.setWeights(P_3_3, 11, 22, 33, 44);
+    grid.setWeights(P_3_3, 11, 12, 22, 23, 33, 34, 44, 45);
 
     ASSERT_EQ(WeightedGrid2d::WEIGHT_MIN,
         grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_NORTH))) <<
@@ -141,21 +141,36 @@ TEST(Test_WeightedGraph2d, BasicWeigths)
     ASSERT_EQ(11, grid.getWeight(Position(P_3_3, WeightedGrid2d::ORIENTATION_NORTH))) <<
         "North weight in location " << P_3_3 << " is not as expected";
 
-    grid.setWeights(P_1_1, 12, 23, 34, 45);
+    grid.setWeights(P_1_1, 12, 23, 34, 45, 56, 67, 78, 89);
 
     ASSERT_EQ(12, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_NORTH))) <<
         "North weight in location " << P_1_1 << " is not as expected";
 
-    ASSERT_EQ(23, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_EAST))) <<
+    ASSERT_EQ(23, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_NORTH_EAST))) <<
+        "North-East weight in location " << P_1_1 << " is not as expected";
+
+    ASSERT_EQ(34, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_EAST))) <<
         "East weight in location " << P_1_1 << " is not as expected";
 
-    ASSERT_EQ(34, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_SOUTH))) <<
+    ASSERT_EQ(45, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_SOUTH_EAST))) <<
+        "South-East weight in location " << P_1_1 << " is not as expected";
+
+    ASSERT_EQ(56, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_SOUTH))) <<
         "South weight in location " << P_1_1 << " is not as expected";
 
-    ASSERT_EQ(45, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_WEST))) <<
+    ASSERT_EQ(67, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_SOUTH_WEST))) <<
+        "South-West weight in location " << P_1_1 << " is not as expected";
+
+    ASSERT_EQ(78, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_WEST))) <<
         "West weight in location " << P_1_1 << " is not as expected";
 
-    grid.setWeights(P_2_2, WeightedGrid2d::WEIGHT_MIN, WeightedGrid2d::WEIGHT_MIN,
+    ASSERT_EQ(89, grid.getWeight(Position(P_1_1, WeightedGrid2d::ORIENTATION_NORTH_WEST))) <<
+        "North-West weight in location " << P_1_1 << " is not as expected";
+
+    grid.setWeights(P_2_2,
+        WeightedGrid2d::WEIGHT_MIN, WeightedGrid2d::WEIGHT_MIN,
+        WeightedGrid2d::WEIGHT_MIN, WeightedGrid2d::WEIGHT_MIN,
+        WeightedGrid2d::WEIGHT_MIN, WeightedGrid2d::WEIGHT_MIN,
         WeightedGrid2d::WEIGHT_MIN, WeightedGrid2d::WEIGHT_MIN);
 
     ASSERT_EQ(2, grid.getOccupiedCount()) <<
@@ -167,7 +182,7 @@ TEST(Test_WeightedGraph2d, BasicClear)
     WeightedGrid2d grid(10);
 
     grid.payloadSet(P_3_3, 30);
-    grid.setWeights(P_3_3, 11, 22, 33, 44);
+    grid.setWeights(P_3_3, 11, 0, 22, 0, 33, 0, 44, 0);
 
     ASSERT_EQ(30, grid.getPayload(P_3_3)) <<
         "Location payload in " << P_3_3 << " is not as expected";
@@ -300,13 +315,13 @@ TEST(Test_WeightedGraph2d, EqualOperator)
     correct.payloadSet(P_3_3, 3);
     correct.payloadSet(P_1_1, 1);
     correct.payloadSet(P_2_2, 2);
-    correct.setWeights(P_2_2, 10, 20, 30, 40);
+    correct.setWeights(P_2_2, 10, 11, 20, 21, 30, 31, 40, 41);
 
     WeightedGrid2d grid1(10);
     grid1.payloadSet(P_3_3, 3);
     grid1.payloadSet(P_1_1, 1);
     grid1.payloadSet(P_2_2, 2);
-    grid1.setWeights(P_2_2, 10, 20, 30, 40);
+    grid1.setWeights(P_2_2, 10, 11, 20, 21, 30, 31, 40, 41);
 
     ASSERT_EQ(grid1, grid1) << "The grid does not agree with itself";
     ASSERT_EQ(correct, grid1) << "The grids do not match";
@@ -320,7 +335,7 @@ TEST(Test_WeightedGraph2d, EqualOperator)
     grid3.payloadSet(P_3_3, 3);
     grid3.payloadSet(P_1_1, 1);
     grid3.payloadSet(P_2_2, 2);
-    grid3.setWeights(P_2_2, 10, 0, 30, 40);
+    grid3.setWeights(P_2_2, 10, 0, 20, 21, 30, 31, 40, 41);
 
     ASSERT_NE(correct, grid3) << "The grids do match";
 }
@@ -331,7 +346,7 @@ TEST(Test_WeightedGraph2d, CopyConstructor)
     correct.payloadSet(P_3_3, 3);
     correct.payloadSet(P_1_1, 1);
     correct.payloadSet(P_2_2, 2);
-    correct.setWeights(P_2_2, 10, 20, 30, 40);
+    correct.setWeights(P_2_2, 10, 11, 20, 21, 30, 31, 40, 41);
 
     WeightedGrid2d grid1 = correct;
 

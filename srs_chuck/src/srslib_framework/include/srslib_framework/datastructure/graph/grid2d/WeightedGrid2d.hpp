@@ -78,7 +78,10 @@ public:
 
     BaseType getWeight(const Position& position) const;
     void getWeights(const Location& location,
-        BaseType& north, BaseType& east, BaseType& south, BaseType& west) const;
+        BaseType& north, BaseType& northEast,
+        BaseType& east, BaseType& southEast,
+        BaseType& south, BaseType& southWest,
+        BaseType& west, BaseType& northWest) const;
 
     void payloadMax(const Location& location, BaseType otherPayload);
     void payloadSet(const Location& location, BaseType newPayload);
@@ -92,21 +95,26 @@ public:
     }
 
     void setWeights(const Location& location,
-        BaseType north, BaseType east, BaseType south, BaseType west);
+        BaseType north, BaseType northEast,
+        BaseType east, BaseType southEast,
+        BaseType south, BaseType southWest,
+        BaseType west, BaseType northWest);
 
 protected:
     struct Node
     {
         Node(Location location,
-            BaseType payload = PAYLOAD_MIN,
-            BaseType north = WEIGHT_MIN, BaseType east = WEIGHT_MIN,
-            BaseType south = WEIGHT_MIN, BaseType west = WEIGHT_MIN) :
+                BaseType payload = PAYLOAD_MIN,
+                BaseType north = WEIGHT_MIN, BaseType northEast = WEIGHT_MIN,
+                BaseType east = WEIGHT_MIN, BaseType southEast = WEIGHT_MIN,
+                BaseType south = WEIGHT_MIN, BaseType southWest = WEIGHT_MIN,
+                BaseType west = WEIGHT_MIN, BaseType northWest = WEIGHT_MIN) :
             location(location),
             payload(payload),
-            north(north),
-            east(east),
-            south(south),
-            west(west)
+            north(north), northEast(northEast),
+            east(east), southEast(southEast),
+            south(south), southWest(southWest),
+            west(west), northWest(northWest)
         {}
 
         ~Node()
@@ -117,10 +125,10 @@ protected:
             stream << "Node "<< hex << reinterpret_cast<long>(node) << dec << " {" << endl;
             stream << "l: " << node->location <<
                 ", p: " << node->payload <<
-                ", n: " << node->north <<
-                ", e: " << node->east <<
-                ", s: " << node->south <<
-                ", w: " << node->west << "}";
+                ", n: " << node->north << ", ne: " << node->northEast <<
+                ", e: " << node->east << ", se: " << node->southEast <<
+                ", s: " << node->south << ", sw: " << node->southWest <<
+                ", w: " << node->west << ", nw: " << node->northWest << "}";
             return stream;
         }
 
@@ -129,9 +137,13 @@ protected:
             return lhs.location == rhs.location &&
                 lhs.payload == rhs.payload &&
                 lhs.north == rhs.north &&
+                lhs.northEast == rhs.northEast &&
                 lhs.east == rhs.east &&
+                lhs.southEast == rhs.southEast &&
                 lhs.south == rhs.south &&
-                lhs.west == rhs.west;
+                lhs.southWest == rhs.southWest &&
+                lhs.west == rhs.west &&
+                lhs.northWest == rhs.northWest;
         }
 
         inline friend bool operator!=(const Node& lhs, const Node& rhs)
@@ -141,17 +153,23 @@ protected:
 
         inline bool zeroWeights()
         {
-            return north == WEIGHT_MIN && east == WEIGHT_MIN &&
-                south == WEIGHT_MIN && west == WEIGHT_MIN;
+            return north == WEIGHT_MIN && northEast == WEIGHT_MIN &&
+                east == WEIGHT_MIN && southEast == WEIGHT_MIN &&
+                south == WEIGHT_MIN && southWest == WEIGHT_MIN &&
+                west == WEIGHT_MIN && northWest == WEIGHT_MIN;
         }
 
         const Location location;
 
         BaseType payload;
         BaseType north;
+        BaseType northEast;
         BaseType east;
+        BaseType southEast;
         BaseType south;
+        BaseType southWest;
         BaseType west;
+        BaseType northWest;
     };
 
     inline Node* findNode(const int& x, const int& y) const
@@ -206,12 +224,17 @@ private:
 
     using MapType = unordered_map<Location, Node*, Hash, EqualTo>;
 
-    void addNode(const Location& location,
-        BaseType payload,
-        BaseType north, BaseType east,
-        BaseType south, BaseType west)
+    void addNode(const Location& location, BaseType payload,
+        BaseType north, BaseType northEast,
+        BaseType east, BaseType southEast,
+        BaseType south, BaseType southWest,
+        BaseType west, BaseType northWest)
     {
-        Node* node = new Node(location, payload, north, east, south, west);
+        Node* node = new Node(location, payload,
+            north, northEast,
+            east, southEast,
+            south, southWest,
+            west, northWest);
         grid_[location] = node;
     }
 

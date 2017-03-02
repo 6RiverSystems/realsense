@@ -22,7 +22,10 @@ WeightedGrid2d::WeightedGrid2d(const WeightedGrid2d& other) :
         Node* internalNode = node.second;
         addNode(internalNode->location,
             internalNode->payload,
-            internalNode->north, internalNode->east, internalNode->south, internalNode->west);
+            internalNode->north, internalNode->northEast,
+            internalNode->east, internalNode->southEast,
+            internalNode->south, internalNode->southWest,
+            internalNode->west, internalNode->northWest);
     }
 }
 
@@ -80,17 +83,29 @@ WeightedGrid2d::BaseType WeightedGrid2d::getWeight(const Position& position) con
     {
         switch (position.orientation)
         {
+            case ORIENTATION_NORTH:
+                return node->north;
+
+            case ORIENTATION_NORTH_EAST:
+                return node->northEast;
+
             case ORIENTATION_EAST:
                 return node->east;
 
-            case ORIENTATION_NORTH:
-                return node->north;
+            case ORIENTATION_SOUTH_EAST:
+                return node->southEast;
+
+            case ORIENTATION_SOUTH:
+                return node->south;
+
+            case ORIENTATION_SOUTH_WEST:
+                return node->southWest;
 
             case ORIENTATION_WEST:
                 return node->west;
 
-            case ORIENTATION_SOUTH:
-                return node->south;
+            case ORIENTATION_NORTH_WEST:
+                return node->northWest;
         }
     }
 
@@ -99,22 +114,33 @@ WeightedGrid2d::BaseType WeightedGrid2d::getWeight(const Position& position) con
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void WeightedGrid2d::getWeights(const Location& location,
-    BaseType& north, BaseType& east, BaseType& south, BaseType& west) const
+    BaseType& north, BaseType& northEast,
+    BaseType& east, BaseType& southEast,
+    BaseType& south, BaseType& southWest,
+    BaseType& west, BaseType& northWest) const
 {
     Node* node = findNode(location);
     if (node)
     {
         north = node->north;
+        northEast = node->northEast;
         east = node->east;
+        southEast = node->southEast;
         south = node->south;
+        southWest = node->southWest;
         west = node->west;
+        northWest = node->northWest;
     }
     else
     {
         north = WEIGHT_MIN;
+        northEast = WEIGHT_MIN;
         east = WEIGHT_MIN;
+        southEast = WEIGHT_MIN;
         south = WEIGHT_MIN;
+        southWest = WEIGHT_MIN;
         west = WEIGHT_MIN;
+        northWest = WEIGHT_MIN;
     }
 }
 
@@ -168,10 +194,24 @@ ostream& operator<<(ostream& stream, const WeightedGrid2d& grid)
         }
     );
 
+    grid.print(stream, "North-East Weights",
+        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
+        {
+            return node->northEast;
+        }
+    );
+
     grid.print(stream, "East Weights",
         [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
         {
             return node->east;
+        }
+    );
+
+    grid.print(stream, "South-East Weights",
+        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
+        {
+            return node->southEast;
         }
     );
 
@@ -182,10 +222,24 @@ ostream& operator<<(ostream& stream, const WeightedGrid2d& grid)
         }
     );
 
+    grid.print(stream, "South-West Weights",
+        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
+        {
+            return node->southWest;
+        }
+    );
+
     grid.print(stream, "West Weights",
         [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
         {
             return node->west;
+        }
+    );
+
+    grid.print(stream, "North-West Weights",
+        [] (WeightedGrid2d::Node* node) -> WeightedGrid2d::BaseType
+        {
+            return node->northWest;
         }
     );
 
@@ -234,12 +288,17 @@ bool operator==(const WeightedGrid2d& lhs, const WeightedGrid2d& rhs)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void WeightedGrid2d::setWeights(const Location& location,
-    BaseType north, BaseType east, BaseType south, BaseType west)
+    BaseType north, BaseType northEast,
+    BaseType east, BaseType southEast,
+    BaseType south, BaseType southWest,
+    BaseType west, BaseType northWest)
 {
     Node* node = findNode(location);
 
-    bool nonZeroWeights = north != WEIGHT_MIN || east != WEIGHT_MIN ||
-        south != WEIGHT_MIN || west != WEIGHT_MIN;
+    bool nonZeroWeights = north != WEIGHT_MIN || northEast != WEIGHT_MIN ||
+        east != WEIGHT_MIN || southEast != WEIGHT_MIN ||
+        south != WEIGHT_MIN || southWest != WEIGHT_MIN ||
+        west != WEIGHT_MIN || northWest != WEIGHT_MIN;
 
     if (!node)
     {
@@ -247,14 +306,22 @@ void WeightedGrid2d::setWeights(const Location& location,
         {
             return;
         }
-        addNode(location, PAYLOAD_MIN, north, east, south, west);
+        addNode(location, PAYLOAD_MIN,
+            north, northEast,
+            east, southEast,
+            south, southWest,
+            west, northWest);
     }
     else
     {
         node->north = north;
+        node->northEast = northEast;
         node->east = east;
+        node->southEast = southEast;
         node->south = south;
+        node->southWest = southWest;
         node->west = west;
+        node->northWest = northWest;
     }
 }
 
@@ -389,7 +456,11 @@ void WeightedGrid2d::updatePayload(const Location& location, BaseType newPayload
         // is not the minimum available payload
         if (finalPayload != PAYLOAD_MIN)
         {
-            addNode(location, finalPayload, WEIGHT_MIN, WEIGHT_MIN, WEIGHT_MIN, WEIGHT_MIN);
+            addNode(location, finalPayload,
+                WEIGHT_MIN, WEIGHT_MIN,
+                WEIGHT_MIN, WEIGHT_MIN,
+                WEIGHT_MIN, WEIGHT_MIN,
+                WEIGHT_MIN, WEIGHT_MIN);
         }
     }
 }

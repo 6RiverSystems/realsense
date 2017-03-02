@@ -60,10 +60,14 @@ const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_RESOLUTION = "resolution";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_WIDTH = "width";
 const string LogicalMapFactory::KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_COST = "envelope_cost";
 const string LogicalMapFactory::KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_SIZE = "envelope_size";
-const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_EAST = "east";
-const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH = "north";
-const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH = "south";
-const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_WEST = "west";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_EAST = "e";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH = "n";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH_EAST = "ne";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH_WEST = "nw";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH = "s";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH_EAST = "se";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH_WEST = "sw";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_WEST = "w";
 const string LogicalMapFactory::KEYWORD_TYPE = "type";
 const string LogicalMapFactory::KEYWORD_TYPE_POINT = "Point";
 const string LogicalMapFactory::KEYWORD_TYPE_MULTIPOINT = "MultiPoint";
@@ -188,10 +192,10 @@ void LogicalMapFactory::addObstacleArea(Pose<> origin, double widthM, double hei
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::addWeightArea(Pose<> origin, double widthM, double heightM,
-    WeightedGrid2d::BaseType north,
-    WeightedGrid2d::BaseType east,
-    WeightedGrid2d::BaseType south,
-    WeightedGrid2d::BaseType west)
+    WeightedGrid2d::BaseType north, WeightedGrid2d::BaseType northEast,
+    WeightedGrid2d::BaseType east, WeightedGrid2d::BaseType southEast,
+    WeightedGrid2d::BaseType south, WeightedGrid2d::BaseType southWest,
+    WeightedGrid2d::BaseType west, WeightedGrid2d::BaseType northWest)
 {
     unsigned int c0;
     unsigned int r0;
@@ -210,7 +214,10 @@ void LogicalMapFactory::addWeightArea(Pose<> origin, double widthM, double heigh
         {
             if (map_->isWithinBounds(c, r))
             {
-                map_->setWeights(c, r, north, east, south, west);
+                map_->setWeights(c, r, north, northEast,
+                    east, southEast,
+                    south, southWest,
+                    west, northWest);
             }
         }
     }
@@ -487,10 +494,14 @@ void LogicalMapFactory::ntEntityWeightArea(YAML::Node root)
 {
     YAML::Node properties = ntProperties(root);
 
-    WeightedGrid2d::BaseType northCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH], false);
-    WeightedGrid2d::BaseType eastCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_EAST], false);
-    WeightedGrid2d::BaseType southCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH], false);
-    WeightedGrid2d::BaseType westCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_WEST], false);
+    WeightedGrid2d::BaseType north = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH], false);
+    WeightedGrid2d::BaseType northEast = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH_EAST], false);
+    WeightedGrid2d::BaseType east = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_EAST], false);
+    WeightedGrid2d::BaseType southEast = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH_EAST], false);
+    WeightedGrid2d::BaseType south = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH], false);
+    WeightedGrid2d::BaseType southWest = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH_WEST], false);
+    WeightedGrid2d::BaseType west = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_WEST], false);
+    WeightedGrid2d::BaseType northWest = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH_WEST], false);
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 1, 2);
     Pose<> p1 = coordinates[0];
@@ -498,12 +509,18 @@ void LogicalMapFactory::ntEntityWeightArea(YAML::Node root)
     {
         Pose<> p2 = coordinates[1];
         addWeightArea(p1, abs(p1.x - p2.x), abs(p1.y - p2.y),
-            northCost, eastCost, southCost, westCost);
+            north, northEast,
+            east, southEast,
+            south, southWest,
+            west, northWest);
     }
     else if (coordinates.size() == 1)
     {
         addWeightArea(p1, metadata_.resolution, metadata_.resolution,
-            northCost, eastCost, southCost, westCost);
+            north, northEast,
+            east, southEast,
+            south, southWest,
+            west, northWest);
     }
 }
 

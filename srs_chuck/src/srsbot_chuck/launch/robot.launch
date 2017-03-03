@@ -27,8 +27,8 @@
     </include>
 
     <!-- Joystick -->
-    <include unless="$(arg use_sim_time)" file="$(find srsnode_joystick_adapter)/launch/node.launch" />
-
+    <!-- include unless="$(arg use_sim_time)" file="$(find srsnode_joystick_adapter)/launch/node.launch" / -->
+    <include file="$(find srsbot_chuck)/launch/joystick.launch" />
     <!-- Executive -->
     <include file="$(find srsnode_executive)/launch/node.launch" />
 

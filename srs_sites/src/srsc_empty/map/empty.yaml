@@ -4,20 +4,24 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 {
-    "language_version": "1.0",
-    "metadata": {
-        "map_name": "Empty",
-        "map_version": "1.0"
-    },
-    "logical": {
-        "map": "Empty.geojson"
-    },
-    "occupancy": {
-        "map": "Empty.pgm",
-        "resolution": 0.05,
-        "origin": [0,0,0],
-        "negate": 0,
-        "occupied_thresh": 0.9,
-        "free_thresh": 0.1
-    }
+	"language_version": "1.0",
+	"metadata": {
+		"map_name": "6RS HQ Empty",
+		"map_version": "1.0"
+	},
+	"logical": {
+		"map": "empty.geojson"
+	},
+	"occupancy": {
+		"map": "empty.pgm",
+		"resolution": 0.05,
+		"origin": [
+			-10,
+			-10,
+			0
+		],
+		"negate": 0,
+		"occupied_thresh": 0.9,
+		"free_thresh": 0.1
+	}
 }

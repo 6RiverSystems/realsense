@@ -28,7 +28,9 @@
 #include <srslib_framework/datastructure/graph/grid2d/WeightedGrid2d.hpp>
 #include <srslib_framework/chuck/ChuckTransforms.hpp>
 #include <srslib_framework/localization/map/mapnote/NotePlaySound.hpp>
+#include <srslib_framework/localization/map/mapnote/NoteQueue.hpp>
 #include <srslib_framework/localization/map/mapnote/NoteSetMaxVelocity.hpp>
+#include <srslib_framework/localization/map/mapnote/NoteStayOnTrack.hpp>
 
 namespace srs {
 
@@ -41,6 +43,8 @@ LogicalMapDisplay::LogicalMapDisplay() :
     logicalMap_(nullptr),
     mapStack_(nullptr)
 {
+    layers_ = std::vector<shared_ptr<PixelLayerDisplay>>(MAX_LAYERS, nullptr);
+
     propertyAlpha_ = new rviz::FloatProperty("Alpha", 1.0,
         "0 is fully transparent, 1.0 is fully opaque.",
         this, SLOT(updateAlpha()));
@@ -75,8 +79,16 @@ LogicalMapDisplay::LogicalMapDisplay() :
         "Rendering option, enables/disables the play-sound layer.",
         this, SLOT(updateLayerSwitches()));
 
+    propertyLayerQueue_ = new rviz::Property("Queue layer", true,
+        "Rendering option, enables/disables the queue layer.",
+        this, SLOT(updateLayerSwitches()));
+
     propertyLayerSetMaxVelocity_ = new rviz::Property("Set-max-velocity layer", true,
         "Rendering option, enables/disables the set-max-velocity layer.",
+        this, SLOT(updateLayerSwitches()));
+
+    propertyLayerStayOnTrack_ = new rviz::Property("Stay-on-track layer", true,
+        "Rendering option, enables/disables the stay-on-track layer.",
         this, SLOT(updateLayerSwitches()));
 
     propertyLayerWeightsNorth_ = new rviz::Property("North weights layer", true,
@@ -180,31 +192,29 @@ void LogicalMapDisplay::initializeLayers()
     unsigned int height = logicalMap_->getHeightCells();
     double resolution = logicalMap_->getResolution();
 
-    std::shared_ptr<PixelLayerDisplay> background = createPixelLayer(BACKGROUND,
-        width, height, resolution, RGBA_WHITE);
-
     // Background layer
-    background->fillAll();
+    layers_[BACKGROUND] = createPixelLayer(BACKGROUND, width, height, resolution, RGBA_WHITE);
+    layers_[BACKGROUND]->fillAll();
 
-    std::shared_ptr<PixelLayerDisplay> obstacles = createPixelLayer(OBSTACLES,
+    layers_[OBSTACLES] = createPixelLayer(OBSTACLES,
         width, height, resolution, RGBA_BLACK);
 
-    std::shared_ptr<PixelLayerDisplay> weightsNorth = createPixelLayer(WEIGHTS_NORTH,
-        width, height, resolution, RGBA_ORANGE);
-    std::shared_ptr<PixelLayerDisplay> weightsNorthEast = createPixelLayer(WEIGHTS_NORTH_EAST,
-        width, height, resolution, RGBA_ORANGE);
-    std::shared_ptr<PixelLayerDisplay> weightsEast = createPixelLayer(WEIGHTS_EAST,
-        width, height, resolution, RGBA_ORANGE);
-    std::shared_ptr<PixelLayerDisplay> weightsSouthEast = createPixelLayer(WEIGHTS_SOUTH_EAST,
-        width, height, resolution, RGBA_ORANGE);
-    std::shared_ptr<PixelLayerDisplay> weightsSouth = createPixelLayer(WEIGHTS_SOUTH,
-        width, height, resolution, RGBA_ORANGE);
-    std::shared_ptr<PixelLayerDisplay> weightsSouthWest = createPixelLayer(WEIGHTS_SOUTH_WEST,
-        width, height, resolution, RGBA_ORANGE);
-    std::shared_ptr<PixelLayerDisplay> weightsWest = createPixelLayer(WEIGHTS_WEST,
-        width, height, resolution, RGBA_ORANGE);
-    std::shared_ptr<PixelLayerDisplay> weightsNorthWest = createPixelLayer(WEIGHTS_NORTH_WEST,
-        width, height, resolution, RGBA_ORANGE);
+    layers_[WEIGHTS_NORTH] = createPixelLayer(WEIGHTS_NORTH,
+        width, height, resolution, RGBA_CREAM_CAN);
+    layers_[WEIGHTS_NORTH_EAST] = createPixelLayer(WEIGHTS_NORTH_EAST,
+        width, height, resolution, RGBA_CREAM_CAN);
+    layers_[WEIGHTS_EAST] = createPixelLayer(WEIGHTS_EAST,
+        width, height, resolution, RGBA_CREAM_CAN);
+    layers_[WEIGHTS_SOUTH_EAST] = createPixelLayer(WEIGHTS_SOUTH_EAST,
+        width, height, resolution, RGBA_CREAM_CAN);
+    layers_[WEIGHTS_SOUTH] = createPixelLayer(WEIGHTS_SOUTH,
+        width, height, resolution, RGBA_CREAM_CAN);
+    layers_[WEIGHTS_SOUTH_WEST] = createPixelLayer(WEIGHTS_SOUTH_WEST,
+        width, height, resolution, RGBA_CREAM_CAN);
+    layers_[WEIGHTS_WEST] = createPixelLayer(WEIGHTS_WEST,
+        width, height, resolution, RGBA_CREAM_CAN);
+    layers_[WEIGHTS_NORTH_WEST] = createPixelLayer(WEIGHTS_NORTH_WEST,
+        width, height, resolution, RGBA_CREAM_CAN);
 
     // Go through all defined cells in the grid and
     // populate the layers
@@ -215,7 +225,7 @@ void LogicalMapDisplay::initializeLayers()
         WeightedGrid2d::BaseType cost = grid->getPayload(location);
         if (cost == WeightedGrid2d::PAYLOAD_MAX)
         {
-            obstacles->fillLocation(location);
+            layers_[OBSTACLES]->fillLocation(location);
         }
 
         // Store the weights
@@ -234,43 +244,53 @@ void LogicalMapDisplay::initializeLayers()
             west, northWest);
         if (north > 0)
         {
-            weightsNorth->fillLocation(location, north);
+            layers_[WEIGHTS_NORTH]->fillLocation(location, north);
         }
         if (northEast > 0)
         {
-            weightsNorthEast->fillLocation(location, northEast);
+            layers_[WEIGHTS_NORTH_EAST]->fillLocation(location, northEast);
         }
         if (east > 0)
         {
-            weightsEast->fillLocation(location, east);
+            layers_[WEIGHTS_EAST]->fillLocation(location, east);
         }
         if (southEast > 0)
         {
-            weightsSouthEast->fillLocation(location, southEast);
+            layers_[WEIGHTS_SOUTH_EAST]->fillLocation(location, southEast);
         }
         if (south > 0)
         {
-            weightsSouth->fillLocation(location, south);
+            layers_[WEIGHTS_SOUTH]->fillLocation(location, south);
         }
         if (southWest > 0)
         {
-            weightsSouthWest->fillLocation(location, southWest);
+            layers_[WEIGHTS_SOUTH_WEST]->fillLocation(location, southWest);
         }
         if (west > 0)
         {
-            weightsWest->fillLocation(location, west);
+            layers_[WEIGHTS_WEST]->fillLocation(location, west);
         }
         if (northWest > 0)
         {
-            weightsNorthWest->fillLocation(location, northWest);
+            layers_[WEIGHTS_NORTH_WEST]->fillLocation(location, northWest);
         }
     }
 
     std::shared_ptr<AreaLayerDisplay> playSound = createAreaLayer(PLAY_SOUND,
-        width, height, resolution, RGBA_GREEN);
+        width, height, resolution, RGBA_SEA_GREEN);
+    layers_[PLAY_SOUND] = playSound;
+
+    std::shared_ptr<AreaLayerDisplay> queue = createAreaLayer(QUEUE,
+        width, height, resolution, RGBA_DEEP_KOAMARU);
+    layers_[QUEUE] = queue;
 
     std::shared_ptr<AreaLayerDisplay> setMaxVelocity = createAreaLayer(SET_MAX_VELOCITY,
-        width, height, resolution, RGBA_BLUE);
+        width, height, resolution, RGBA_DENIM);
+    layers_[SET_MAX_VELOCITY] = setMaxVelocity;
+
+    std::shared_ptr<AreaLayerDisplay> stayOnTrack = createAreaLayer(STAY_ON_TRACK,
+        width, height, resolution, RGBA_VIOLET_RED);
+    layers_[STAY_ON_TRACK] = stayOnTrack;
 
     for (auto labeledArea : logicalMap_->getAreas())
     {
@@ -284,6 +304,14 @@ void LogicalMapDisplay::initializeLayers()
             playSound->addArea(area.label, area.surface, notePlaySound);
         }
 
+        // Search for Queue notes
+        shared_ptr<NoteQueue> noteQueue =
+            area.notes->get<NoteQueue>(NoteQueue::TYPE);
+        if (noteQueue)
+        {
+            queue->addArea(area.label, area.surface, noteQueue);
+        }
+
         // Search for SetMaxVelocity notes
         shared_ptr<NoteSetMaxVelocity> noteSetMaxVelocity =
             area.notes->get<NoteSetMaxVelocity>(NoteSetMaxVelocity::TYPE);
@@ -291,21 +319,15 @@ void LogicalMapDisplay::initializeLayers()
         {
             setMaxVelocity->addArea(area.label, area.surface, noteSetMaxVelocity);
         }
-    }
 
-    // Add all the layers to the stack for rendering
-    layers_.push_back(background);
-    layers_.push_back(obstacles);
-    layers_.push_back(playSound);
-    layers_.push_back(setMaxVelocity);
-    layers_.push_back(weightsNorth);
-    layers_.push_back(weightsNorthEast);
-    layers_.push_back(weightsEast);
-    layers_.push_back(weightsSouthEast);
-    layers_.push_back(weightsSouth);
-    layers_.push_back(weightsSouthWest);
-    layers_.push_back(weightsWest);
-    layers_.push_back(weightsNorthWest);
+        // Search for StayOnTrack notes
+        shared_ptr<NoteStayOnTrack> noteStayOnTrack =
+            area.notes->get<NoteStayOnTrack>(NoteStayOnTrack::TYPE);
+        if (noteStayOnTrack)
+        {
+            stayOnTrack->addArea(area.label, area.surface, noteStayOnTrack);
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -316,6 +338,11 @@ void LogicalMapDisplay::onInitialize()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapDisplay::onEnable()
 {
+    if (!logicalMap_)
+    {
+        return;
+    }
+
     for (auto layer : layers_)
     {
         layer->show(true);
@@ -325,6 +352,11 @@ void LogicalMapDisplay::onEnable()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapDisplay::onDisable()
 {
+    if (!logicalMap_)
+    {
+        return;
+    }
+
     for (auto layer : layers_)
     {
         layer->show(false);
@@ -450,7 +482,9 @@ void LogicalMapDisplay::updateLayerSwitches()
     layers_[BACKGROUND]->show(propertyLayerBackground_->getValue().toBool());
     layers_[OBSTACLES]->show(propertyLayerObstacles_->getValue().toBool());
     layers_[PLAY_SOUND]->show(propertyLayerPlaySound_->getValue().toBool());
+    layers_[QUEUE]->show(propertyLayerQueue_->getValue().toBool());
     layers_[SET_MAX_VELOCITY]->show(propertyLayerSetMaxVelocity_->getValue().toBool());
+    layers_[STAY_ON_TRACK]->show(propertyLayerStayOnTrack_->getValue().toBool());
 
     layers_[WEIGHTS_NORTH]->show(propertyLayerWeightsNorth_->getValue().toBool());
     layers_[WEIGHTS_NORTH_EAST]->show(propertyLayerWeightsNorthEast_->getValue().toBool());

@@ -92,25 +92,30 @@ private Q_SLOTS:
     void updateDrawUnder();
 
 private:
-    // Explicitly set the order of the layer
+    // Explicitly set the order of the layer. The order is the same
+    // order with which the layers will be rendered (obstacles are always
+    // on top)
     enum {
         BACKGROUND = 0,
-        OBSTACLES = 1,
-        PLAY_SOUND = 2,
-        QUEUE = 3,
-        SET_MAX_VELOCITY = 4,
-        STAY_ON_TRACK = 5,
-        WEIGHTS_NORTH = 6,
-        WEIGHTS_NORTH_EAST = 7,
-        WEIGHTS_EAST = 8,
-        WEIGHTS_SOUTH_EAST = 9,
-        WEIGHTS_SOUTH = 10,
-        WEIGHTS_SOUTH_WEST = 11,
-        WEIGHTS_WEST = 12,
-        WEIGHTS_NORTH_WEST = 13
+        PLAY_SOUND = 1,
+        QUEUE = 2,
+        SET_MAX_VELOCITY = 3,
+        STAY_ON_TRACK = 4,
+        WEIGHTS_NORTH = 5,
+        WEIGHTS_NORTH_EAST = 6,
+        WEIGHTS_EAST = 7,
+        WEIGHTS_SOUTH_EAST = 8,
+        WEIGHTS_SOUTH = 9,
+        WEIGHTS_SOUTH_WEST = 10,
+        WEIGHTS_WEST = 11,
+        WEIGHTS_NORTH_WEST = 12,
+        COST_AREA = 13,
+        OBSTACLES = 14
     } EnititesEnum;
 
+    static constexpr Ogre::RGBA RGBA_AZALEA = 0xFFBCBEFF;
     static constexpr Ogre::RGBA RGBA_BLACK = 0x000000FF;
+    static constexpr Ogre::RGBA RGBA_BRICK_RED = 0xC44448FF;
     static constexpr Ogre::RGBA RGBA_DENIM = 0x2874C4FF;
     static constexpr Ogre::RGBA RGBA_DEEP_KOAMARU = 0x343074FF;
     static constexpr Ogre::RGBA RGBA_SEA_GREEN = 0x30845CFF;
@@ -118,7 +123,7 @@ private:
     static constexpr Ogre::RGBA RGBA_VIOLET_RED = 0xBC306CFF;
     static constexpr Ogre::RGBA RGBA_WHITE = 0xFFFFFFFF;
 
-    static constexpr int MAX_LAYERS = 14;
+    static constexpr int MAX_LAYERS = 15;
 
     std::shared_ptr<PixelLayerDisplay> createPixelLayer(unsigned int order,
         unsigned int width, unsigned int height,
@@ -132,6 +137,7 @@ private:
     rviz::FloatProperty* propertyAlpha_;
     rviz::IntProperty* propertyHeight_;
     rviz::Property* propertyLayerBackground_;
+    rviz::Property* propertyLayerCostArea_;
     rviz::Property* propertyLayerObstacles_;
     rviz::Property* propertyLayerPlaySound_;
     rviz::Property* propertyLayerQueue_;

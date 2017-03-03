@@ -71,6 +71,10 @@ LogicalMapDisplay::LogicalMapDisplay() :
         "Rendering option, enables/disables the background layer.",
         this, SLOT(updateLayerSwitches()));
 
+    propertyLayerCostArea_ = new rviz::Property("Cost area layer", true,
+        "Rendering option, enables/disables the cost area layer.",
+        this, SLOT(updateLayerSwitches()));
+
     propertyLayerObstacles_ = new rviz::Property("Obstacles layer", true,
         "Rendering option, enables/disables the obstacles layer.",
         this, SLOT(updateLayerSwitches()));
@@ -199,6 +203,9 @@ void LogicalMapDisplay::initializeLayers()
     layers_[OBSTACLES] = createPixelLayer(OBSTACLES,
         width, height, resolution, RGBA_BLACK);
 
+    layers_[COST_AREA] = createPixelLayer(COST_AREA,
+        width, height, resolution, RGBA_AZALEA);
+
     layers_[WEIGHTS_NORTH] = createPixelLayer(WEIGHTS_NORTH,
         width, height, resolution, RGBA_CREAM_CAN);
     layers_[WEIGHTS_NORTH_EAST] = createPixelLayer(WEIGHTS_NORTH_EAST,
@@ -226,6 +233,12 @@ void LogicalMapDisplay::initializeLayers()
         if (cost == WeightedGrid2d::PAYLOAD_MAX)
         {
             layers_[OBSTACLES]->fillLocation(location);
+        }
+
+        // Store the cost area
+        if (cost > 0)
+        {
+            layers_[COST_AREA]->fillLocation(location);
         }
 
         // Store the weights
@@ -480,6 +493,7 @@ void LogicalMapDisplay::updateLayerSwitches()
     }
 
     layers_[BACKGROUND]->show(propertyLayerBackground_->getValue().toBool());
+    layers_[COST_AREA]->show(propertyLayerCostArea_->getValue().toBool());
     layers_[OBSTACLES]->show(propertyLayerObstacles_->getValue().toBool());
     layers_[PLAY_SOUND]->show(propertyLayerPlaySound_->getValue().toBool());
     layers_[QUEUE]->show(propertyLayerQueue_->getValue().toBool());

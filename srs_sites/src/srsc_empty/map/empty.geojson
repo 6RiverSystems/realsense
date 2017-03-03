@@ -4,117 +4,121 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 {
-    "type": "FeatureCollection",
-    "properties": {
-        "language_version": "1.1"
-    },
-    "features": [
-        {
-            "type": "Feature",
-            "properties": {
-                "object": "map",
-                "origin": [0,0,0],
-                "resolution": 0.05,
-                "width": 10,
-                "height": 5
-            }
-        },
-        {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "id": 0,
-                    "geometry": {
-                        "type": "MultiPoint",
-                        "coordinates": [
-                            [
-                                0,
-                                4.5
-                            ],
-                            [
-                                9.95,
-                                5
-                            ]
-                        ]
-                    },
-                    "properties": {
-                        "object": "obstacle",
-                        "is_border": true,
-                        "envelope_size": 0,
-                        "envelope_cost": 0
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "id": 1,
-                    "geometry": {
-                        "type": "MultiPoint",
-                        "coordinates": [
-                            [
-                                0,
-                                -0.05
-                            ],
-                            [
-                                0.95,
-                                4.6
-                            ]
-                        ]
-                    },
-                    "properties": {
-                        "object": "obstacle",
-                        "is_border": true,
-                        "envelope_size": 0,
-                        "envelope_cost": 0
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "id": 2,
-                    "geometry": {
-                        "type": "MultiPoint",
-                        "coordinates": [
-                            [
-                                9.7,
-                                0.65
-                            ],
-                            [
-                                9.95,
-                                4.6
-                            ]
-                        ]
-                    },
-                    "properties": {
-                        "object": "obstacle",
-                        "is_border": true,
-                        "envelope_size": 0,
-                        "envelope_cost": 0
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "id": 3,
-                    "geometry": {
-                        "type": "MultiPoint",
-                        "coordinates": [
-                            [
-                                0.95,
-                                -0.05
-                            ],
-                            [
-                                9.95,
-                                0.75
-                            ]
-                        ]
-                    },
-                    "properties": {
-                        "object": "obstacle",
-                        "is_border": true,
-                        "envelope_size": 0,
-                        "envelope_cost": 0
-                    }
-                }
-            ]
-        }
-    ]
+	"type": "FeatureCollection",
+	"properties": {
+		"language_version": "1.2"
+	},
+	"features": [
+		{
+			"type": "Feature",
+			"properties": {
+				"object": "map",
+				"origin": [
+					-10,
+					-10,
+					0
+				],
+				"resolution": 0.05,
+				"width": 10,
+				"height": 5
+			}
+		},
+		{
+			"type": "FeatureCollection",
+			"features": [
+				{
+					"type": "Feature",
+					"id": 0,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								-10,
+								-5.5
+							],
+							[
+								-0.05,
+								-5
+							]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 1,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								-10,
+								-10.05
+							],
+							[
+								-9.05,
+								-5.4
+							]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 2,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								-0.3,
+								-9.35
+							],
+							[
+								-0.05,
+								-5.4
+							]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 3,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								-9.05,
+								-10.05
+							],
+							[
+								-0.05,
+								-9.25
+							]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
+					}
+				}
+			]
+		}
+	]
 }

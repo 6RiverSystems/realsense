@@ -72,7 +72,6 @@ namespace internal {
     static const string ODOMETRY_VELOCITY_ESTIMATE = "/internal/sensors/odometry/velocity/estimate";
 
     static const string ODOMETRY_INITIAL_POSE = "/request/odometry/initial_pose";
-    static const string SWCMD_INITIAL_POSE = "/internal/sw_cmd/initial_pose";
 
 } // namespace internal
 

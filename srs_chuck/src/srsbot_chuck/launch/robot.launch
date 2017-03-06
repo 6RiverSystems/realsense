@@ -26,10 +26,7 @@
         <arg name="emulation_mode" value="$(arg emulation_mode)"/>
     </include>
 
-    <!-- Joystick -->
-    <include unless="$(arg use_sim_time)" file="$(find srsnode_joystick_adapter)/launch/node.launch" />
-
-    <!-- Executive -->
+   <!-- Executive -->
     <include file="$(find srsnode_executive)/launch/node.launch" />
 
     <!-- Navigation -->

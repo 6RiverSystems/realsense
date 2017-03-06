@@ -17,9 +17,6 @@
         <arg name="emulation_mode" value="$(arg emulation_mode)" />
 	</include>
 
-    <!-- Launch the joystick -->
-    <include file="$(find srsbot_chuck)/launch/joystick.launch" />
-
     <!-- Launch Hector SLAM mapping -->
 	<include file="$(find srsnode_localization)/launch/hector_mapping.launch" />
 </launch>

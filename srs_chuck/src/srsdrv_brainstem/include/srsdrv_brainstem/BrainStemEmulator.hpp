@@ -6,51 +6,53 @@
 #pragma once
 
 #include <ros/ros.h>
+#include <tf/transform_broadcaster.h>
 
-#include <srslib_framework/OdometryRpm.h>
+#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+
+#include <srslib_framework/platform/observer/Observer.hpp>
+#include <srslib_framework/robotics/Pose.hpp>
+#include <srslib_framework/robotics/Velocity.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemOdometryPose.hpp>
+#include <srslib_framework/ros/tap/TapOdometryCmd_Velocity.hpp>
+#include <srslib_framework/ros/tap/TapInitialPose.hpp>
+#include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 
 namespace srs
 {
 
-class BrainStemEmulator
+class BrainStemEmulator :
+    public Observer<Subscriber<geometry_msgs::PoseWithCovarianceStamped>>
 {
-
 public:
-
-	BrainStemEmulator();
-
-	virtual ~BrainStemEmulator();
+    BrainStemEmulator();
+    virtual ~BrainStemEmulator();
 
 private:
+    static constexpr auto EMULATION_TICK_HZ = 150;
 
-	void CreateSubscribers();
+    Pose<> estimatePose(const Pose<>& pose0, float dfTimeDelta, const Velocity<>& velocity);
 
-	void CreatePublishers();
+    void notified(Subscriber<geometry_msgs::PoseWithCovarianceStamped>* subject);
 
-	void OnChangeVelocity(const srslib_framework::OdometryRpm::ConstPtr& velocity);
+    void publishOdometry();
+    void publishTransform();
 
-	void PublishOdometry(const ros::TimerEvent& event);
+    void tickEmulation(const ros::TimerEvent& event);
 
-private:
+    tf::Transform brainstemTransform_;
 
-	static constexpr auto ODOMETRY_RATE_HZ = 100;
+    ChannelBrainstemOdometryPose channelOdometryPose_;
+    Pose<> currentPose_;
+    ros::Time currentTime_;
+    tf::Transform currentTransform_;
+    Velocity<> currentVelocity_;
 
-	static constexpr auto VELOCITY_TOPIC = "/internal/sensors/odometry/rpm/cmd";
-
-	static constexpr auto ODOMETRY_TOPIC = "/internal/sensors/odometry/rpm/raw";
-
-	// TODO: Replace with framework classes
-	ros::NodeHandle 					m_rosNodeHandle;
-
-	ros::Timer							m_odometryTimer;
-
-	ros::Subscriber						m_velocitySubscriber;
-
-	ros::Publisher						m_odometryPublisher;
-
-	srslib_framework::OdometryRpm		m_velocity;
-
+    tf::TransformBroadcaster tfBroadcaster_;
+    ros::Timer tickTimer_;
+    TapOdometryCmd_Velocity tapCmdVelocity_;
+    TapInitialPose tapInitialPose_;
 };
 
 } // namespace srs
-

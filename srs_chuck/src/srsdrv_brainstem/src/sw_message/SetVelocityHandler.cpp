@@ -18,7 +18,7 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SetVelocityHandler::SetVelocityHandler(BrainStemMessageProcessorInterface* owner) :
 	SoftwareMessage(owner),
-	SubscriberRosTwist(ChuckTopics::driver::ODOMETRY_CMD_VELOCITY)
+	TapOdometryCmd_Velocity()
 {
 }
 

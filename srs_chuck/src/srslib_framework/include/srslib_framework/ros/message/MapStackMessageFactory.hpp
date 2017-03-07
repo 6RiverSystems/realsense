@@ -13,8 +13,9 @@
 #include <srslib_framework/OccupancyMap.h>
 #include <srslib_framework/OccupancyMetadata.h>
 
-#include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/BaseMap.hpp>
+#include <srslib_framework/localization/map/MapStack.hpp>
+#include <srslib_framework/localization/map/MapStackMetadata.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMap.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMap.hpp>
 
@@ -26,28 +27,6 @@ namespace srs {
 struct MapStackMessageFactory
 {
     /**
-     * @brief Convert a BaseMap type into a ROS OccupancyGrid message.
-     *
-     * @param map BaseMap to convert
-     * @param frameId Frame id of the occupancy map
-     *
-     * @return Ros OccupancyGrid message generated from the specified BaseMap
-     */
-    static nav_msgs::OccupancyGrid baseMap2RosMsg(const BaseMap* map, string frameId)
-    {
-        vector<int8_t> occupancy;
-        MapAdapter::baseMap2Vector(map, occupancy);
-
-        nav_msgs::OccupancyGrid msgOccupancyMap;
-
-        msgOccupancyMap.info = metadata2RosMsg(map);
-        msgOccupancyMap.data = occupancy;
-        msgOccupancyMap.header.frame_id = frameId;
-
-        return msgOccupancyMap;
-    }
-
-    /**
      * @brief Convert a MapStack type into a MapStack message.
      *
      * @param mapStack MapStack to convert
@@ -58,6 +37,7 @@ struct MapStackMessageFactory
     {
         srslib_framework::MapStack msgMapStack;
 
+        msgMapStack.metadata = metadata2Msg(mapStack->getMetadata());
         msgMapStack.logical = LogicalMapMessageFactory::map2Msg(mapStack->getLogicalMap());
         msgMapStack.occupancy = OccupancyMapMessageFactory::map2Msg(mapStack->getOccupancyMap());
 
@@ -65,23 +45,22 @@ struct MapStackMessageFactory
     }
 
     /**
-     * @brief Extract from a BaseMap, a ROS Map Metadata message.
+     * @brief Convert a MapStackMetadata into a MapStackMetadata message.
      *
-     * @param metadata BaseMap to use
+     * @param metadata Map stack metadata to convert
      *
      * @return newly generated message
      */
-    static nav_msgs::MapMetaData metadata2RosMsg(const BaseMap* map)
+    static srslib_framework::MapStackMetadata metadata2Msg(const MapStackMetadata& metadata)
     {
-        nav_msgs::MapMetaData msgRosMapMetaData;
+        srslib_framework::MapStackMetadata msgMapStackMetaData;
 
-        msgRosMapMetaData.map_load_time = ros::Time::now();
-        msgRosMapMetaData.resolution = map->getResolution();
-        msgRosMapMetaData.width = map->getWidthCells();
-        msgRosMapMetaData.height = map->getHeightCells();
-        msgRosMapMetaData.origin = PoseMessageFactory::pose2RosPose(map->getOrigin());
+        msgMapStackMetaData.loadTime = metadata.loadTime;
+        msgMapStackMetaData.mapStackFilename = metadata.mapStackFilename;
+        msgMapStackMetaData.mapName = metadata.mapName;
+        msgMapStackMetaData.mapVersion = metadata.mapVersion;
 
-        return msgRosMapMetaData;
+        return msgMapStackMetaData;
     }
 
     /**
@@ -93,10 +72,30 @@ struct MapStackMessageFactory
      */
     static MapStack* msg2MapStack(srslib_framework::MapStack::ConstPtr message)
     {
+        MapStackMetadata metadata = msg2Metadata(message->metadata);
         LogicalMap* logical = LogicalMapMessageFactory::msg2LogicalMap(message->logical);
         OccupancyMap* occupancy = OccupancyMapMessageFactory::msg2OccupancyMap(message->occupancy);
 
-        return new MapStack(logical, occupancy);
+        return new MapStack(metadata, logical, occupancy);
+    }
+
+    /**
+     * @brief Convert a MapStackMetadata message into a MapStackMetadata.
+     *
+     * @param message MapStackMetadata message to convert
+     *
+     * @return MapStackMetadata generated from the specified MapStackMetadata message
+     */
+    static MapStackMetadata msg2Metadata(const srslib_framework::MapStackMetadata& message)
+    {
+        MapStackMetadata metadata;
+
+        metadata.loadTime = message.loadTime;
+        metadata.mapStackFilename = message.mapStackFilename;
+        metadata.mapName = message.mapName;
+        metadata.mapVersion = message.mapVersion;
+
+        return metadata;
     }
 };
 

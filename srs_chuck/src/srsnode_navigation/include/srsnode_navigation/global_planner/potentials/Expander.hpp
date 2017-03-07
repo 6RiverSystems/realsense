@@ -7,7 +7,7 @@
 
 #include <costmap_2d/costmap_2d.h>
 
-#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/WeightedGrid2d.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMap.hpp>
 
 #include <srsnode_navigation/global_planner/potentials/PotentialCalculator.hpp>
@@ -106,7 +106,7 @@ protected:
     unsigned char* costGrid_;
 
     unsigned int lethalCost_;
-    Grid2d* logicalGrid_;
+    WeightedGrid2d* logicalGrid_;
     unsigned int logicalCostRatio_;
 
     int nx_;

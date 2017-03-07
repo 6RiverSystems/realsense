@@ -11,6 +11,7 @@ using namespace std;
 #include <srslib_framework/localization/map/logical/exception/FeatureExpectedException.hpp>
 #include <srslib_framework/localization/map/logical/exception/FeaturesExpectedException.hpp>
 #include <srslib_framework/localization/map/logical/exception/GeoJsonTypeUnsupportedException.hpp>
+#include <srslib_framework/localization/map/logical/exception/IncompatibleLanguageVersionException.hpp>
 #include <srslib_framework/localization/map/logical/exception/InvalidCostValueException.hpp>
 #include <srslib_framework/localization/map/logical/exception/InvalidMapNoteFlagException.hpp>
 #include <srslib_framework/localization/map/logical/exception/MapNoteExpectedException.hpp>
@@ -26,7 +27,11 @@ using namespace std;
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Public methods
+// Public constants
+const string LogicalMapFactory::LANGUAGE_VERSION = "1.2";
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Private constants
 const string LogicalMapFactory::KEYWORD_BOUNDARY = "boundary";
 const string LogicalMapFactory::KEYWORD_COORDINATES = "coordinates";
 const string LogicalMapFactory::KEYWORD_COST_AREA = "cost_area";
@@ -48,16 +53,21 @@ const string LogicalMapFactory::KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE = "envel
 const string LogicalMapFactory::KEYWORD_PROPERTY_FEATURE_OBJECT = "object";
 const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_LABEL = "label";
 const string LogicalMapFactory::KEYWORD_PROPERTY_LABEL_AREA_NOTES = "notes";
+const string LogicalMapFactory::KEYWORD_PROPERTY_LANGUAGE_VERSION = "language_version";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_HEIGHT = "height";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_ORIGIN = "origin";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_RESOLUTION = "resolution";
 const string LogicalMapFactory::KEYWORD_PROPERTY_MAP_WIDTH = "width";
 const string LogicalMapFactory::KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_COST = "envelope_cost";
 const string LogicalMapFactory::KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_SIZE = "envelope_size";
-const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_EAST = "east";
-const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH = "north";
-const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH = "south";
-const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_WEST = "west";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_EAST = "e";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH = "n";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH_EAST = "ne";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH_WEST = "nw";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH = "s";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH_EAST = "se";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH_WEST = "sw";
+const string LogicalMapFactory::KEYWORD_PROPERTY_WEIGHTED_AREA_WEST = "w";
 const string LogicalMapFactory::KEYWORD_TYPE = "type";
 const string LogicalMapFactory::KEYWORD_TYPE_POINT = "Point";
 const string LogicalMapFactory::KEYWORD_TYPE_MULTIPOINT = "MultiPoint";
@@ -65,35 +75,18 @@ const string LogicalMapFactory::KEYWORD_VERTEX = "vertex";
 const string LogicalMapFactory::KEYWORD_WEIGHTED_AREA = "weighted_area";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap* LogicalMapFactory::fromCostMap2D(costmap_2d::Costmap2D* costMap)
+LogicalMap* LogicalMapFactory::fromGrid2d(WeightedGrid2d* logical, Pose<> origin, double resolution)
 {
-    map_ = new LogicalMap(costMap->getSizeInMetersX(), costMap->getSizeInMetersY(),
-        costMap->getResolution(),
-        Pose<>(costMap->getOriginX(), costMap->getOriginY(), 0));
-    metadata_ = map_->getMetadata();
+    metadata_ = LogicalMetadata(logical->getWidth(), logical->getHeight(),
+        origin, resolution, "");
 
-    for (int row = 0; row < costMap->getSizeInCellsY(); row++)
-    {
-        for (int col = 0; col < costMap->getSizeInCellsX(); col++)
-        {
-            map_->setCost(col, row, costMap->getCost(col, row));
-        }
-    }
+    map_ = new LogicalMap(metadata_, logical);
 
     return map_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap* LogicalMapFactory::fromGrid2d(Grid2d* grid, double resolution, Pose<> origin)
-{
-    map_ = new LogicalMap(grid, resolution, origin);
-    metadata_ = map_->getMetadata();
-
-    return map_;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename, double loadTime)
+LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename)
 {
     YAML::Node jsonDocument;
     try
@@ -106,9 +99,7 @@ LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename, double loadTime
     }
 
     map_ = nullptr;
-
     metadata_ = LogicalMetadata();
-    metadata_.loadTime = loadTime;
     metadata_.logicalFilename = jsonFilename;
 
     ntEntry(jsonDocument);
@@ -117,7 +108,7 @@ LogicalMap* LogicalMapFactory::fromJsonFile(string jsonFilename, double loadTime
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-LogicalMap* LogicalMapFactory::fromString(string geoJson, double loadTime)
+LogicalMap* LogicalMapFactory::fromString(string geoJson)
 {
     YAML::Node jsonDocument;
     try
@@ -130,9 +121,7 @@ LogicalMap* LogicalMapFactory::fromString(string geoJson, double loadTime)
     }
 
     map_ = nullptr;
-
     metadata_ = LogicalMetadata();
-    metadata_.loadTime = loadTime;
 
     ntEntry(jsonDocument);
 
@@ -144,7 +133,7 @@ LogicalMap* LogicalMapFactory::fromString(string geoJson, double loadTime)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::addCostArea(Pose<> origin, double widthM, double heightM,
-    Grid2d::BaseType cost)
+    WeightedGrid2d::BaseType cost)
 {
     unsigned int c0;
     unsigned int r0;
@@ -163,7 +152,7 @@ void LogicalMapFactory::addCostArea(Pose<> origin, double widthM, double heightM
         {
             if (map_->isWithinBounds(c, r))
             {
-                map_->maxCost(c, r, cost);
+                map_->costMax(c, r, cost);
             }
         }
     }
@@ -181,12 +170,13 @@ void LogicalMapFactory::addLabelArea(Pose<> origin, double widthM, double height
 
     calculateArea(origin, widthM, heightM, c0, r0, widthCells, heightCells);
 
-    map_->addLabeledArea(c0, r0, c0 + widthCells, r0 + heightCells, label, notes);
+    Rectangle surface(c0, r0, c0 + widthCells, r0 + heightCells);
+    map_->addLabeledArea(surface, label, notes);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::addObstacleArea(Pose<> origin, double widthM, double heightM,
-    double sizeEnvelopeM, Grid2d::BaseType costEnvelope)
+    double sizeEnvelopeM, WeightedGrid2d::BaseType costEnvelope)
 {
     // First add the envelope, if specified
     if (sizeEnvelopeM > 0.0 && costEnvelope > 0)
@@ -197,15 +187,15 @@ void LogicalMapFactory::addObstacleArea(Pose<> origin, double widthM, double hei
     }
 
     // Add the static obstacle
-    addCostArea(origin, widthM, heightM, Grid2d::PAYLOAD_MAX);
+    addCostArea(origin, widthM, heightM, WeightedGrid2d::PAYLOAD_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::addWeightArea(Pose<> origin, double widthM, double heightM,
-    Grid2d::BaseType north,
-    Grid2d::BaseType east,
-    Grid2d::BaseType south,
-    Grid2d::BaseType west)
+    WeightedGrid2d::BaseType north, WeightedGrid2d::BaseType northEast,
+    WeightedGrid2d::BaseType east, WeightedGrid2d::BaseType southEast,
+    WeightedGrid2d::BaseType south, WeightedGrid2d::BaseType southWest,
+    WeightedGrid2d::BaseType west, WeightedGrid2d::BaseType northWest)
 {
     unsigned int c0;
     unsigned int r0;
@@ -224,7 +214,10 @@ void LogicalMapFactory::addWeightArea(Pose<> origin, double widthM, double heigh
         {
             if (map_->isWithinBounds(c, r))
             {
-                map_->setWeights(c, r, north, east, south, west);
+                map_->setWeights(c, r, north, northEast,
+                    east, southEast,
+                    south, southWest,
+                    west, northWest);
             }
         }
     }
@@ -254,13 +247,13 @@ void LogicalMapFactory::calculateArea(Pose<> origin, double widthM, double heigh
         y = 0;
     }
 
-    map_->convertM2Cells(x, c0);
-    map_->convertM2Cells(y, r0);
+    c0 = MeasurementMath::m2Cells(x, metadata_.resolution);
+    r0 = MeasurementMath::m2Cells(y, metadata_.resolution);
 
-    map_->convertM2Cells(newWidthM, widthCells);
+    widthCells = MeasurementMath::m2Cells(newWidthM, metadata_.resolution);
     widthCells = max<unsigned int>(0, widthCells);
 
-    map_->convertM2Cells(newHeightM, heightCells);
+    heightCells = MeasurementMath::m2Cells(newHeightM, metadata_.resolution);
     heightCells = max<unsigned int>(0, heightCells);
 }
 
@@ -379,7 +372,7 @@ void LogicalMapFactory::ntEntityBoundary(YAML::Node root)
     YAML::Node properties = root[KEYWORD_PROPERTIES];
 
     double envelopeSize = ntValueDouble(properties[KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_SIZE], false);
-    Grid2d::BaseType envelopeCost = ntValueCost(properties[KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_COST], false);
+    WeightedGrid2d::BaseType envelopeCost = ntValueCost(properties[KEYWORD_PROPERTY_BOUNDARY_ENVELOPE_COST], false);
 
     double widthM = map_->getWidthM();
     double heightM = map_->getHeightM();
@@ -410,7 +403,7 @@ void LogicalMapFactory::ntEntityCostArea(YAML::Node root)
 {
     YAML::Node properties = root[KEYWORD_PROPERTIES];
 
-    Grid2d::BaseType cost = ntValueCost(properties[KEYWORD_PROPERTY_COST_AREA_COST], true);
+    WeightedGrid2d::BaseType cost = ntValueCost(properties[KEYWORD_PROPERTY_COST_AREA_COST], true);
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
@@ -439,6 +432,7 @@ void LogicalMapFactory::ntEntityLabelArea(YAML::Node root)
     YAML::Node properties = ntProperties(root);
 
     string label = ntValueString(properties[KEYWORD_PROPERTY_LABEL_AREA_LABEL], true);
+
     shared_ptr<MapNotes> notes = ntValueMapNotes(properties[KEYWORD_PROPERTY_LABEL_AREA_NOTES], true);
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
@@ -460,8 +454,12 @@ void LogicalMapFactory::ntEntityMap(YAML::Node root)
     metadata_.widthM = ntValueDouble(properties[KEYWORD_PROPERTY_MAP_WIDTH], false);
     metadata_.heightM = ntValueDouble(properties[KEYWORD_PROPERTY_MAP_HEIGHT], false);
 
-    map_ = new LogicalMap(metadata_);
-    metadata_ = map_->getMetadata();
+    metadata_.widthCells = MeasurementMath::m2Cells(metadata_.widthM, metadata_.resolution);
+    metadata_.heightCells = MeasurementMath::m2Cells(metadata_.heightM, metadata_.resolution);
+
+    WeightedGrid2d* grid = new WeightedGrid2d(metadata_.widthCells, metadata_.heightCells);
+
+    map_ = new LogicalMap(metadata_, grid);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -470,7 +468,7 @@ void LogicalMapFactory::ntEntityObstacle(YAML::Node root)
     YAML::Node properties = root[KEYWORD_PROPERTIES];
 
     double envelopeSize = ntValueDouble(properties[KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_SIZE], false);
-    Grid2d::BaseType envelopeCost = ntValueCost(properties[KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_COST], false);
+    WeightedGrid2d::BaseType envelopeCost = ntValueCost(properties[KEYWORD_PROPERTY_OBSTACLE_ENVELOPE_COST], false);
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 
@@ -496,10 +494,14 @@ void LogicalMapFactory::ntEntityWeightArea(YAML::Node root)
 {
     YAML::Node properties = ntProperties(root);
 
-    Grid2d::BaseType northCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH], false);
-    Grid2d::BaseType eastCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_EAST], false);
-    Grid2d::BaseType southCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH], false);
-    Grid2d::BaseType westCost = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_WEST], false);
+    WeightedGrid2d::BaseType north = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH], false);
+    WeightedGrid2d::BaseType northEast = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH_EAST], false);
+    WeightedGrid2d::BaseType east = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_EAST], false);
+    WeightedGrid2d::BaseType southEast = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH_EAST], false);
+    WeightedGrid2d::BaseType south = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH], false);
+    WeightedGrid2d::BaseType southWest = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_SOUTH_WEST], false);
+    WeightedGrid2d::BaseType west = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_WEST], false);
+    WeightedGrid2d::BaseType northWest = ntValueCost(properties[KEYWORD_PROPERTY_WEIGHTED_AREA_NORTH_WEST], false);
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 1, 2);
     Pose<> p1 = coordinates[0];
@@ -507,18 +509,28 @@ void LogicalMapFactory::ntEntityWeightArea(YAML::Node root)
     {
         Pose<> p2 = coordinates[1];
         addWeightArea(p1, abs(p1.x - p2.x), abs(p1.y - p2.y),
-            northCost, eastCost, southCost, westCost);
+            north, northEast,
+            east, southEast,
+            south, southWest,
+            west, northWest);
     }
     else if (coordinates.size() == 1)
     {
         addWeightArea(p1, metadata_.resolution, metadata_.resolution,
-            northCost, eastCost, southCost, westCost);
+            north, northEast,
+            east, southEast,
+            south, southWest,
+            west, northWest);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::ntEntry(YAML::Node root)
 {
+    // Read the global properties of the logical map file, and
+    // check the language versions
+    ntZeroLevelProperties(root);
+
     YAML::Node features;
     if (findCollection(root, features))
     {
@@ -626,9 +638,9 @@ YAML::Node LogicalMapFactory::ntProperties(YAML::Node root)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Grid2d::BaseType LogicalMapFactory::ntValueCost(YAML::Node root, bool required)
+WeightedGrid2d::BaseType LogicalMapFactory::ntValueCost(YAML::Node root, bool required)
 {
-    int value = Grid2d::PAYLOAD_MIN;
+    int value = WeightedGrid2d::PAYLOAD_MIN;
 
     if (root)
     {
@@ -636,17 +648,17 @@ Grid2d::BaseType LogicalMapFactory::ntValueCost(YAML::Node root, bool required)
 
         try
         {
-            value = cost != KEYWORD_MAX ? root.as<int>() : Grid2d::PAYLOAD_MAX;
+            value = cost != KEYWORD_MAX ? root.as<int>() : WeightedGrid2d::PAYLOAD_MAX;
         }
         catch (exception& e)
         {
             throw CostExpectedException(metadata_);
         }
 
-        if (value < Grid2d::PAYLOAD_MIN || value > Grid2d::PAYLOAD_MAX)
+        if (value < WeightedGrid2d::PAYLOAD_MIN || value > WeightedGrid2d::PAYLOAD_MAX)
         {
             throw InvalidCostValueException(metadata_, value,
-                Grid2d::PAYLOAD_MIN, Grid2d::PAYLOAD_MAX);
+                WeightedGrid2d::PAYLOAD_MIN, WeightedGrid2d::PAYLOAD_MAX);
         }
     }
     else if (required)
@@ -654,7 +666,7 @@ Grid2d::BaseType LogicalMapFactory::ntValueCost(YAML::Node root, bool required)
         throw CostExpectedException(metadata_);
     }
 
-    return static_cast<Grid2d::BaseType>(value);
+    return static_cast<WeightedGrid2d::BaseType>(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -779,6 +791,22 @@ string LogicalMapFactory::ntValueString(YAML::Node root, bool required)
     }
 
     return value;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void LogicalMapFactory::ntZeroLevelProperties(YAML::Node root)
+{
+    YAML::Node properties = root[KEYWORD_PROPERTIES];
+
+    if (!properties)
+    {
+        throw PropertiesExpectedException(metadata_, "Level zero");
+    }
+
+    string languageVersion = ntValueString(properties[KEYWORD_PROPERTY_LANGUAGE_VERSION], true);
+    if (LANGUAGE_VERSION != languageVersion) {
+        throw IncompatibleLanguageVersionException(metadata_, LANGUAGE_VERSION, languageVersion);
+    }
 }
 
 } // namespace srs

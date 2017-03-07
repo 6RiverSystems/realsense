@@ -5,18 +5,15 @@
  */
 #pragma once
 
-#include <gtest/gtest.h>
-
-#include "../../include/srsdrv_brainstem/BrainStemMessages.hpp"
-
-using namespace std;
-using namespace srs;
-
-#include <srslib_test/utils/Compare.hpp>
+#include <BrainStemMessages.hpp>
 
 #include <hw_message/HardwareInfoHandler.hpp>
+
 #include <srslib_framework/ros/channel/publisher/PublisherInterface.hpp>
 
+#include <gtest/gtest.h>
+
+using namespace srs;
 using namespace srslib_framework;
 
 template<typename TYPE, typename MESSAGE>
@@ -25,7 +22,6 @@ class MockPublisher : public PublisherInterface<TYPE, MESSAGE>
 public:
 
 	typedef std::function<MESSAGE(TYPE)> ConvertFn;
-
 	MockPublisher(ConvertFn convert) :
 		convert_(convert) {}
 
@@ -58,6 +54,7 @@ public:
 			[](TYPE data) {
 		return data;
 	}) : publisher_(convert) {};
+
 	virtual ~Test_HardwareMessage() {};
 
 	virtual vector<MESSAGE>& getTestMsgs() = 0;

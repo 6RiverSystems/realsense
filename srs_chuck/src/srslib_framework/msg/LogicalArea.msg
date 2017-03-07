@@ -6,10 +6,10 @@
 
 string label
 
-uint16 ciCells
-uint16 riCells
+uint16 x0
+uint16 y0
 
-uint16 cfCells
-uint16 rfCells
+uint16 x1
+uint16 y1
 
 srslib_framework/MapNotes notes

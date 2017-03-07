@@ -10,12 +10,14 @@ set(PROJECT_MAIN src/midbrain_node.cpp)
 set(${PROJECT_NAME}_SOURCES
     src/Midbrain.cpp
     src/HardStopReflex.cpp
+    src/HeadOnCollisionReflex.cpp
     src/Reflexes.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES
     test/gtest_main.cpp
     test/Test_Reflexes_HardStopReflex.cpp
+    test/Test_Reflexes_HeadOnCollisionReflex.cpp
 )
 
 ####################################################################################################

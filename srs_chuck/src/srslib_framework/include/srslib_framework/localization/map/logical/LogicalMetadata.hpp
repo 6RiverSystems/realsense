@@ -7,6 +7,7 @@
 
 #include <srslib_framework/math/BasicMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
+#include <srslib_framework/math/MeasurementMath.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 
 namespace srs {
@@ -17,21 +18,42 @@ struct LogicalMetadata
 {
 public:
     LogicalMetadata() :
-        loadTime(0),
-        heightCells(0),
-        widthCells(0),
-        heightM(0.0),
-        widthM(0.0),
-        origin(Pose<>::INVALID),
-        resolution(0.0),
-        logicalFilename("")
+        LogicalMetadata(0, 0, 0.0, 0.0, Pose<>::INVALID, 0.0, "")
+    {}
+
+    LogicalMetadata(unsigned int widthCells, unsigned int heightCells,
+            Pose<> origin, double resolution,
+            string logicalFilename) :
+                LogicalMetadata(widthCells, heightCells,
+                    MeasurementMath::cells2M(widthCells, resolution),
+                    MeasurementMath::cells2M(heightCells, resolution),
+                    origin, resolution,
+                    logicalFilename)
+    {}
+
+    LogicalMetadata(double widthM, double heightM,
+            Pose<> origin, double resolution,
+            string logicalFilename) :
+                LogicalMetadata(MeasurementMath::m2Cells(widthM, resolution),
+                    MeasurementMath::m2Cells(heightM, resolution),
+                    widthM, heightM,
+                    origin, resolution, logicalFilename)
+    {}
+
+    LogicalMetadata(const LogicalMetadata& other) :
+        heightCells(other.heightCells),
+        widthCells(other.widthCells),
+        heightM(other.heightM),
+        widthM(other.widthM),
+        origin(other.origin),
+        resolution(other.resolution),
+        logicalFilename(other.logicalFilename)
     {}
 
     friend bool operator==(const LogicalMetadata& lhs, const LogicalMetadata& rhs)
     {
         return lhs.heightCells == rhs.heightCells &&
             BasicMath::equal(lhs.heightM, rhs.heightM, 0.001) &&
-            BasicMath::equal(lhs.loadTime, rhs.loadTime, 1e-10) &&
             lhs.logicalFilename == rhs.logicalFilename &&
             PoseMath::equal(lhs.origin, rhs.origin) &&
             BasicMath::equal(lhs.resolution, rhs.resolution, 0.001) &&
@@ -39,10 +61,21 @@ public:
             BasicMath::equal(lhs.widthM, rhs.widthM, 0.001);
     }
 
+protected:
+    LogicalMetadata(unsigned int widthCells, unsigned int heightCells,
+            double widthM, double heightM,
+            Pose<> origin, double resolution,
+            string logicalFilename) :
+        widthCells(heightCells), heightCells(widthCells),
+        widthM(widthM), heightM(heightM),
+        origin(origin), resolution(resolution),
+        logicalFilename(logicalFilename)
+    {}
+
+public:
     int heightCells;
     double heightM;
 
-    double loadTime;
     string logicalFilename;
 
     Pose<> origin;

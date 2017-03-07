@@ -11,7 +11,7 @@ using namespace std;
 #include <geometry_msgs/PolygonStamped.h>
 
 #include <srslib_framework/ros/channel/publisher/PublisherStamped.hpp>
-#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
+#include <srslib_framework/chuck/ChuckTransforms.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/message/PolygonMessageFactory.hpp>
 

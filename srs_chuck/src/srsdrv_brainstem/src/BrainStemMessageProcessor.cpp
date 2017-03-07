@@ -8,6 +8,7 @@
 
 #include <srslib_framework/io/IO.hpp>
 #include <srslib_framework/utils/Logging.hpp>
+#include <srslib_framework/chuck/ChuckLimits.hpp>
 
 #include <BrainStemMessages.hpp>
 #include <BrainStemMessageProcessor.hpp>
@@ -29,7 +30,10 @@
 #include <sw_message/SoundHandler.hpp>
 #include <sw_message/UpdateUIHandler.hpp>
 
-
+#include <command/GetHardwareInfo.hpp>
+#include <command/GetOperationalState.hpp>
+#include <command/SetPhysicalDimension.hpp>
+#include <command/SetMaxAllowedVelocity.hpp>
 
 namespace srs {
 
@@ -53,9 +57,11 @@ BrainStemMessageProcessor::BrainStemMessageProcessor() :
 	hardwareInfoChannel_(),
 	operationalStateChannel_(),
 	powerStateChannel_(),
+	powerStateFilteredChannel_(),
+	powerStateFilter_(powerStateFilteredChannel_),
     hardwareInfoHandler_(new HardwareInfoHandler(hardwareInfoChannel_)),
     operationalStateHandler_(new OperationalStateHandler(operationalStateChannel_)),
-	useBrainstemOdom_(false),
+	useBrainstemOdom_(true),
 	odometryRpmHardwareHandler_(),
 	odometryPoseHardwarewHandler_(),
 	velocitySoftwareHandler_(),
@@ -64,12 +70,15 @@ BrainStemMessageProcessor::BrainStemMessageProcessor() :
     addHardwareMessageHandler(hardwareInfoHandler_);
     addHardwareMessageHandler(operationalStateHandler_);
     addHardwareMessageHandler(HardwareMessageHandlerPtr(new LogHandler()));
-    addHardwareMessageHandler(HardwareMessageHandlerPtr(new PowerStateHandler(powerStateChannel_)));
     addHardwareMessageHandler(HardwareMessageHandlerPtr(new ButtonPressedHandler(buttonPressedChannel_)));
+    PowerStateHandler* powerStateHandler = new PowerStateHandler(powerStateChannel_);
+    powerStateHandler->setHook(std::bind(&PowerStateFilter::filter, &powerStateFilter_, std::placeholders::_1));
+    addHardwareMessageHandler(HardwareMessageHandlerPtr(powerStateHandler));
 
     addSoftwareMessage(SoftwareMessagePtr(new ResetHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new PingHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new SetMotionStateHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new SetVelocityHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new ShutdownHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new SoundHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new UpdateUIHandler(this)));
@@ -77,7 +86,6 @@ BrainStemMessageProcessor::BrainStemMessageProcessor() :
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor()
 {
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -94,7 +102,7 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 
 		ros::Time currentTime = ros::Time::now();
 
-		if (setupComplete_ ||
+		if (isSetupComplete() ||
 			eCommand == BRAIN_STEM_MSG::OPERATIONAL_STATE ||
 			eCommand == BRAIN_STEM_MSG::HARDWARE_INFO)
 		{
@@ -105,7 +113,6 @@ void BrainStemMessageProcessor::processHardwareMessage(vector<char> buffer)
 				try
 				{
 					handler->second->receiveData(currentTime, buffer);
-
 				}
 				catch(std::runtime_error& error)
 				{
@@ -137,26 +144,16 @@ void BrainStemMessageProcessor::getOperationalState()
 {
 	if (sentPing_)
 	{
-		ROS_DEBUG("Brainstem driver: GetOperationalState");
-
-		CommandData msg = { static_cast<uint8_t>(BRAIN_STEM_CMD::GET_OPERATIONAL_STATE) };
-
-		// Get the operational state
-		writeToSerialPort(reinterpret_cast<char*>(&msg), sizeof(msg));
+        GetOperationalState::send(this);
 	}
 }
 
 void BrainStemMessageProcessor::getHardwareInformation()
 {
-	if (sentPing_)
-	{
-		ROS_DEBUG("Brainstem driver: GetHardwareInformation");
-
-		CommandData msg = { static_cast<uint8_t>(BRAIN_STEM_CMD::GET_HARDWARE_INFO) };
-
-		// Get the hardware information (version, configuration, etc.)
-		writeToSerialPort(reinterpret_cast<char*>(&msg), sizeof(msg));
-	}
+    if (sentPing_)
+    {
+        GetHardwareInfo::send(this);
+    }
 }
 
 void BrainStemMessageProcessor::sendDimensions()
@@ -167,13 +164,12 @@ void BrainStemMessageProcessor::sendDimensions()
 	}
 }
 
-void BrainStemMessageProcessor::shutdown()
+void BrainStemMessageProcessor::sendMaxAllowedVelocity()
 {
-	ROS_INFO("Brainstem driver: Shutdown");
-
-	uint8_t cMessage = static_cast<uint8_t>(BRAIN_STEM_CMD::SHUTDOWN);
-
-	writeToSerialPort(reinterpret_cast<char*>(&cMessage), 1);
+    // Allow the hardware not to move faster than the specified velocity
+    SetMaxAllowedVelocity::send(this,
+        ChuckLimits::PHYSICAL_MAX_LINEAR,
+        ChuckLimits::PHYSICAL_MAX_ANGULAR);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -193,6 +189,7 @@ void BrainStemMessageProcessor::setConnected(bool isConnected)
 		if (isConnected)
 		{
 			checkSetupComplete();
+			sendMaxAllowedVelocity();
 		}
 		else
 		{
@@ -202,6 +199,12 @@ void BrainStemMessageProcessor::setConnected(bool isConnected)
 			sentPing_ = false;
 
 			setupComplete_ = false;
+
+			// brainstem disconnection occurs, need to handle pose reset
+			if(odometryPoseHardwarewHandler_)
+			{
+				odometryPoseHardwarewHandler_->handlePoseReset();
+			}
 
 			hardwareInfoHandler_->reset();
 
@@ -249,7 +252,7 @@ void BrainStemMessageProcessor::checkForBrainstemFaultTimer(const ros::TimerEven
 	{
 		if ((event.current_expected - lastMessageTime_).toSec() > FAULT_TIMEOUT)
 		{
-			brainstemTimeout = true;
+		    brainstemTimeout = true;
 		}
 	}
 
@@ -310,8 +313,9 @@ void BrainStemMessageProcessor::checkSetupComplete()
 			syncState_ = true;
 
 			sendDimensions();
+			sendMaxAllowedVelocity();
 
-			// If this is a reconnect sync the brainstem statate
+			// If this is a reconnect sync the brainstem state
 			if (resync)
 			{
 				ROS_INFO("Brainstem driver: Resyncing brainstem state");
@@ -330,8 +334,7 @@ void BrainStemMessageProcessor::checkSetupComplete()
 			{
 				ros::Time currentTime = ros::Time::now();
 
-				getHardwareInfo(currentTime);
-
+                getHardwareInfo(currentTime);
 				getOperationalState(currentTime);
 			}
 		}
@@ -394,30 +397,11 @@ void BrainStemMessageProcessor::setUseBrainstemOdom(bool useBrainstemOdom)
 	}
 }
 
-void BrainStemMessageProcessor::setDimension(DIMENSION dimension, float value)
+void BrainStemMessageProcessor::setDimension(SetPhysicalDimension::DimensionEnum dimension, float value)
 {
 	if (io_->isOpen())
 	{
-		static std::map<DIMENSION, std::string> mapDimensionName;
-
-		if (!mapDimensionName.size())
-		{
-			mapDimensionName[DIMENSION::WHEEL_BASE_LENGTH] = "wheel_base_length";
-			mapDimensionName[DIMENSION::LEFT_WHEEL_RADIUS] = "left_wheel_radius";
-			mapDimensionName[DIMENSION::RIGHT_WHEEL_RADIUS] = "right_wheel_radius";
-		};
-
-		DimensionData msg = {
-			static_cast<uint8_t>(BRAIN_STEM_CMD::SET_DIMENSION),
-			static_cast<uint8_t>(dimension),
-			static_cast<float>(value)
-		};
-
-		ROS_DEBUG("Brainstem driver: Setting dimension: %s => %f",
-			mapDimensionName[dimension].c_str(), value);
-
-		// Get the hardware information (version, configuration, etc.)
-		writeToSerialPort(reinterpret_cast<char*>(&msg), sizeof(msg));
+		SetPhysicalDimension::send(this, dimension, value);
 	}
 	else
 	{

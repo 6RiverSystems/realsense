@@ -64,7 +64,7 @@ bool SrsPlannerConventional::makePlan(
 
     StopWatch watch;
     Solution<Grid2dSolutionItem>* solution = Grid2dSolutionFactory::fromSingleGoal(
-        srsMapStack_, robotPose, target, astarConfigParameters_, nodeSearchParameters_);
+        srsMapStack_, robotPose, target, nodeSearchParameters_);
 
     ROS_INFO_STREAM_NAMED("srs_planner", "Global planner elpased time: " <<
         watch.elapsedMilliseconds() << "ms");
@@ -115,9 +115,6 @@ void SrsPlannerConventional::notified(Subscriber<srslib_framework::MapStack>* su
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlannerConventional::onConfigChange(srsnode_navigation::SrsPlannerConfig& config, uint32_t level)
 {
-    astarConfigParameters_.useYield = config.use_yield;
-    astarConfigParameters_.yieldFrequency = config.yield_frequency;
-
     nodeSearchParameters_.allowUnknown = config.allow_unknown;
     nodeSearchParameters_.costMapRatio = config.cost_map_ratio;
 }

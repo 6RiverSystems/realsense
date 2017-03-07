@@ -8,10 +8,13 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-MapStack::MapStack(LogicalMap* logical, OccupancyMap* occupancy, costmap_2d::Costmap2D* costMap2d) :
-    logical_(logical),
-    occupancy_(occupancy),
-    costMap2d_(costMap2d)
+MapStack::MapStack(MapStackMetadata metadata,
+    LogicalMap* logical, OccupancyMap* occupancy,
+    costmap_2d::Costmap2D* costMap2d) :
+        metadata_(metadata),
+        logical_(logical),
+        occupancy_(occupancy),
+        costMap2d_(costMap2d)
 {
 }
 
@@ -35,9 +38,15 @@ LogicalMap* MapStack::getLogicalMap() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool MapStack::getNeighbor(const Grid2d::Position& position, Grid2d::Position& result) const
+MapStackMetadata MapStack::getMetadata() const
 {
-    return logical_->getGrid()->getNeighbor(position, result);
+    return metadata_;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+bool MapStack::getNeighbor(const Position& position, Position& result) const
+{
+    return logical_->getNeighbor(position, result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +56,7 @@ OccupancyMap* MapStack::getOccupancyMap() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-int MapStack::getTotalCost(const Grid2d::Position& position,
+int MapStack::getTotalCost(const Position& position,
     bool allowUnknown,
     float costMapRatio) const
 {
@@ -55,22 +64,18 @@ int MapStack::getTotalCost(const Grid2d::Position& position,
 
     if (logical_)
     {
-        cost = logical_->getGrid()->getPayload(position);
-        if (cost == Grid2d::PAYLOAD_NO_INFORMATION)
-        {
-            cost = 0;
-        }
+        cost = logical_->getCost(position);
     }
 
     float costMap2d = 0;
     if (costMap2d_)
     {
-        costMap2d = costMap2d_->getCost(position.x, position.y) * costMapRatio;
+        costMap2d = costMap2d_->getCost(position.location.x, position.location.y) * costMapRatio;
         if (costMap2d == costmap_2d::NO_INFORMATION)
         {
             if (!allowUnknown)
             {
-                return Grid2d::PAYLOAD_MAX;
+                return SimpleGrid2d::PAYLOAD_MAX;
             }
             costMap2d = 0;
         }
@@ -80,16 +85,9 @@ int MapStack::getTotalCost(const Grid2d::Position& position,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-int MapStack::getWeight(const Grid2d::Position& position) const
+int MapStack::getWeight(const Position& position) const
 {
-    int cost = logical_->getGrid()->getWeight(position);
-
-    if (cost == Grid2d::WEIGHT_NO_INFORMATION)
-    {
-        cost = 0;
-    }
-
-    return cost;
+    return logical_->getWeight(position);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

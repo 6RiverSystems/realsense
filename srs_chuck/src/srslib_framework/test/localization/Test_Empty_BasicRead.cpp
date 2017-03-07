@@ -24,15 +24,15 @@ TEST(Test_Empty, BasicRead)
     LogicalMap* logical = stack->getLogicalMap();
     OccupancyMap* occupancy = stack->getOccupancyMap();
 
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(0, 0)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MAX, logical->getCost(0, 0)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(19, 14)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MAX, logical->getCost(19, 14)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(19, 90)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MAX, logical->getCost(19, 90)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(194, 14)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MAX, logical->getCost(194, 14)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_MAX, logical->getCost(194, 90)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MAX, logical->getCost(194, 90)) <<
         "The cost is not as expected";
 
     ASSERT_EQ(70, logical->getCost(21, 16)) <<
@@ -52,12 +52,12 @@ TEST(Test_Empty, BasicRead)
     ASSERT_EQ(70, logical->getCost(191, 87)) <<
         "The cost is not as expected";
 
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(24, 19)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, logical->getCost(24, 19)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(24, 86)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, logical->getCost(24, 86)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(190, 19)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, logical->getCost(190, 19)) <<
         "The cost is not as expected";
-    ASSERT_EQ(Grid2d::PAYLOAD_NO_INFORMATION, logical->getCost(190, 86)) <<
+    ASSERT_EQ(WeightedGrid2d::PAYLOAD_MIN, logical->getCost(190, 86)) <<
         "The cost is not as expected";
 }

@@ -8,7 +8,7 @@
 #include <srslib_framework/ros/tap/TapOdometryCmd_Velocity.hpp>
 #include <srslib_framework/ros/tap/TapRobotPose.hpp>
 #include <srslib_framework/ros/tap/TapMapStack.hpp>
-#include <srslib_framework/ros/tap/RosTapOperationalState.hpp>
+#include <srslib_framework/ros/tap/TapOperationalState.hpp>
 #include <srslib_framework/ros/unit/RosUnit.hpp>
 
 #include <srsnode_executive/ExecutiveContext.hpp>
@@ -38,6 +38,9 @@ protected:
 private:
     constexpr static double REFRESH_RATE_HZ = 5; // [Hz]
 
+    // Threshold that determines if the robot is moving or not
+    static const Velocity<> MIN_MOVING_THRESHOLD;
+
     void readConfigurationParameters();
 
     void updateContext();
@@ -45,7 +48,7 @@ private:
     ExecutiveContext context_;
 
     TapOdometryCmd_Velocity tapCommandedVelocity_;
-    RosTapOperationalState tapOperationalState_;
+    TapOperationalState tapOperationalState_;
     TapMapStack tapMapStack_;
     TapRobotPose tapRobotPose_;
     TaskDetectLabeledAreas taskDetectLabeledAreas_;

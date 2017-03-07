@@ -16,14 +16,14 @@
     <remap from="/map" to="/internal/state/map/ros_occupancy"/>
     <remap from="/initialpose" to="/request/initial_pose"/>
 
-    <arg name="launch-prefix" value="screen -d -m gdb --args" if="$(arg emulation_mode)"/>
+    <arg name="launch-prefix" value="" if="$(arg emulation_mode)"/>
     <arg name="launch-prefix" value="taskset -c 3" unless="$(arg emulation_mode)"/>
 
     <!--- Move Base -->
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" launch-prefix="$(arg launch-prefix)">
         <remap from="/move_base_simple/goal" to="/request/goal"/>
         <remap from="/cmd_vel" to="/internal/sensors/odometry/velocity/cmd"/>
-        <remap from="/odom" to="/internal/sensors/odometry/velocity/estimate"/>
+        <remap from="/odom" to="/internal/sensors/odometry/pose"/>
 
         <param name="base_global_planner" value="global_planner/SrsPlannerPotentials"/>
 
@@ -32,7 +32,7 @@
 
         <!-- Global Costmap -->
         <rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
-        <rosparam  file="$(find srsnode_navigation)/config/costmap_sensors.yaml" command="load" ns="global_costmap" />
+        <rosparam unless="$(arg use_sim_time)" file="$(find srsnode_navigation)/config/costmap_sensors.yaml" command="load" ns="global_costmap" />
         <rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
         <rosparam unless="$(arg use_sim_time)" file="$(find srsnode_navigation)/config/costmap_sensors.yaml" command="load" ns="local_costmap" />
         <rosparam file="$(find srsnode_navigation)/config/local_costmap_params.yaml" command="load" />

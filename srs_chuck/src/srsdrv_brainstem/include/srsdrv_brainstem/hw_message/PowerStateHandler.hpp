@@ -9,6 +9,9 @@
 #include <hw_message/HardwareMessageHandler.hpp>
 
 #include <srslib_framework/ros/channel/ChannelBrainstemPowerState.hpp>
+#include <srslib_framework/ros/channel/ChannelBrainstemPowerStateFiltered.hpp>
+
+#include <functional>
 
 namespace srs {
 
@@ -22,13 +25,16 @@ public:
 
     void receiveMessage(ros::Time currentTime, HardwareMessage& msg);
 
-private:
-    std::string getBatteryDescriptorName(uint8_t id);
+    void receiveMessage(srslib_framework::MsgPowerState& powerStateMessage);
 
-    float convertBatteryDescriptorValue(uint8_t id, uint16_t value);
+    void setHook(std::function<void(const PowerState&)> hook);
+
+private:
+
+    float convertBatteryDescriptorValue(BatteryState::Descriptor descriptor, uint16_t value);
 
 	void readBatteryDescriptorInfo(HardwareMessage& msg, int descriptorIndex,
-		srslib_framework::MsgPowerState& batteryState);
+		PowerState& batteryState);
 
     void publishPowerState(const srslib_framework::MsgPowerState& powerState);
 
@@ -43,9 +49,9 @@ private:
         uint16_t value;
     HW_MESSAGE_END
 
-    ChannelBrainstemPowerState::Interface& publisher_;
+	std::function<void(const PowerState&)> hook_;
 
-    set<BATTERY_DESCRIPTOR> validDescriptors_;
+    ChannelBrainstemPowerState::Interface& publisher_;
 };
 
 } // namespace srs

@@ -11,7 +11,10 @@
 #include <memory>
 using namespace std;
 
-#include <srslib_framework/datastructure/graph/grid2d/Grid2d.hpp>
+#include <srslib_framework/datastructure/graph/grid2d/WeightedGrid2d.hpp>
+#include <srslib_framework/datastructure/Location.hpp>
+#include <srslib_framework/datastructure/Position.hpp>
+#include <srslib_framework/datastructure/Rectangle.hpp>
 #include <srslib_framework/localization/map/BaseMap.hpp>
 #include <srslib_framework/localization/map/mapnote/MapNotes.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMetadata.hpp>
@@ -27,8 +30,7 @@ public:
         {
             return stream << "{" <<
                 "l: '" << labeledArea.label <<
-                "', a: [" << labeledArea.ci << ", " << labeledArea.ri << ", " <<
-                    labeledArea.cf << ", " << labeledArea.rf <<
+                "', s: " << labeledArea.surface <<
                 "], n: " << *labeledArea.notes <<
                 "}";
         }
@@ -37,46 +39,41 @@ public:
         {
             return lhs.label == rhs.label &&
                 lhs.notes == rhs.notes &&
-                lhs.ci == rhs.ci &&
-                lhs.ri == rhs.ri &&
-                lhs.cf == rhs.cf &&
-                lhs.rf== rhs.rf;
+                lhs.surface == rhs.surface;
         }
 
         string label;
 
         shared_ptr<MapNotes> notes;
 
-        unsigned int cf;
-        unsigned int ci;
-
-        unsigned int rf;
-        unsigned int ri;
+        Rectangle surface;
     };
 
     using LabeledAreaMapType = unordered_map<string, LabeledArea>;
 
-    LogicalMap(double widthM, double heightM, double resolution, Pose<> origin);
-    LogicalMap(Grid2d* grid, double resolution, Pose<> origin);
-    LogicalMap(LogicalMetadata metadata);
+    LogicalMap(LogicalMetadata metadata, WeightedGrid2d* grid);
     ~LogicalMap()
     {}
 
-    void addLabeledArea(unsigned int ciCells, unsigned int riCells,
-        unsigned int cfCells, unsigned int rfCells,
-        string label, shared_ptr<MapNotes> notes);
+    void addLabeledArea(Rectangle surface, string label, shared_ptr<MapNotes> notes);
 
     void checkAreas(unsigned int cCells, unsigned int rCells, LabeledAreaMapType& areas) const;
     void checkAreas(double xM, double yM, LabeledAreaMapType& areas) const;
+    void costSet(unsigned int cCells, unsigned int rCells, WeightedGrid2d::BaseType cost);
+    void costMax(unsigned int cCells, unsigned int rCells, WeightedGrid2d::BaseType cost);
 
     LabeledAreaMapType getAreas() const
     {
         return labeledAreas_;
     }
 
-    Grid2d::BaseType getCost(unsigned int cCells, unsigned int rCells) const
+    bool getNeighbor(const Position& position, Position& result);
+    WeightedGrid2d::BaseType getCost(const Position& position) const;
+    WeightedGrid2d::BaseType getCost(unsigned int cCells, unsigned int rCells) const;
+
+    inline WeightedGrid2d* getGrid() const
     {
-        return getGrid()->getPayload(Grid2d::Location(cCells, rCells));
+        return static_cast<WeightedGrid2d*>(grid_);
     }
 
     LogicalMetadata getMetadata() const
@@ -84,23 +81,23 @@ public:
         return metadata_;
     }
 
-    Grid2d::BaseType getWeights(unsigned int cCells, unsigned int rCells, int orientation) const
-    {
-        return getGrid()->getWeight(Grid2d::Position(cCells, rCells, orientation));
-    }
-
-    void maxCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost);
+    WeightedGrid2d::BaseType getWeight(const Position& position) const;
+    void getWeights(unsigned int cCells, unsigned int rCells,
+        WeightedGrid2d::BaseType& north, WeightedGrid2d::BaseType& northEast,
+        WeightedGrid2d::BaseType& east, WeightedGrid2d::BaseType& southEast,
+        WeightedGrid2d::BaseType& south, WeightedGrid2d::BaseType& southWest,
+        WeightedGrid2d::BaseType& west, WeightedGrid2d::BaseType& northWest);
+    WeightedGrid2d::BaseType getWeights(unsigned int cCells, unsigned int rCells,
+        int orientation) const;
 
     friend ostream& operator<<(ostream& stream, const LogicalMap& map);
     friend bool operator==(const LogicalMap& lhs, const LogicalMap& rhs);
 
-    void setCost(unsigned int cCells, unsigned int rCells, Grid2d::BaseType cost);
-    void setObstacle(unsigned int cCells, unsigned int rCells);
     void setWeights(unsigned int cCells, unsigned int rCells,
-        Grid2d::BaseType north,
-        Grid2d::BaseType east,
-        Grid2d::BaseType south,
-        Grid2d::BaseType west);
+        WeightedGrid2d::BaseType north, WeightedGrid2d::BaseType northEast,
+        WeightedGrid2d::BaseType east, WeightedGrid2d::BaseType southEast,
+        WeightedGrid2d::BaseType south, WeightedGrid2d::BaseType southWest,
+        WeightedGrid2d::BaseType west, WeightedGrid2d::BaseType northWest);
 
 private:
     LabeledAreaMapType labeledAreas_;

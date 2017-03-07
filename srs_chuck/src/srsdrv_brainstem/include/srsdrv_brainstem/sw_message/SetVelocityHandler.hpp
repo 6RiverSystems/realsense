@@ -10,7 +10,7 @@
 
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 #include <srslib_framework/platform/observer/Observer.hpp>
-#include <srslib_framework/ros/tap/subscriber/SubscriberRosTwist.hpp>
+#include <srslib_framework/ros/tap/TapOdometryCmd_Velocity.hpp>
 
 namespace srs {
 
@@ -18,7 +18,7 @@ class BrainStemMessageProcessorInterface;
 
 class SetVelocityHandler :
 	public SoftwareMessage,
-    public SubscriberRosTwist
+    public TapOdometryCmd_Velocity
 {
 public:
     SetVelocityHandler(BrainStemMessageProcessorInterface* owner);

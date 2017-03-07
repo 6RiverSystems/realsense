@@ -1,4 +1,4 @@
-<!-- 
+<!--
   *
   * (c) Copyright 2015-2016 River Systems, all rights reserved.
   *
@@ -6,13 +6,15 @@
   *
 -->
 <launch>
-    <arg name="use_sim_time" default="false"/>
+    <arg name="use_sim_time" default="false" />
     <arg name="start_bridge" default="true" />
+    <arg name="emulation_mode" default="false" />
 
     <!-- Chuck Stack -->
-	<include file="$(find srsbot_chuck)/launch/robot.launch" >
-    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+    <include file="$(find srsbot_chuck)/launch/robot.launch" >
+        <arg name="use_sim_time" value="$(arg use_sim_time)" />
         <arg name="start_bridge" value="$(arg start_bridge)" />
+        <arg name="emulation_mode" value="$(arg emulation_mode)" />
 	</include>
 
     <!-- Launch Hector SLAM mapping -->

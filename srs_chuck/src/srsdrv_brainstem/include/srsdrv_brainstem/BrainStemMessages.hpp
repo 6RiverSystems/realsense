@@ -55,12 +55,13 @@ enum class BRAIN_STEM_CMD : uint8_t
 	RESET_BATTERY_HOURS     = 0x62, // 'b'
 	RESET_WHEEL_METERS      = 0x77, // 'w'
 
-	SET_CONFIGURATION       = 0x66, // 'f'
+    SET_ALLOWED_MAX_VELOCITY= 0x6D, // 'm'
+    SET_CONFIGURATION       = 0x66, // 'f'
+    SET_DIMENSION           = 0x64, // 'd'
 	SET_MOTION_STATUS       = 0x32, // '2'
 	SET_TOTE_LIGHTS         = 0x39, // '9'
 	SET_VELOCITY            = 0x76, // 'v'
 	SET_VELOCITY_RPM        = 0x72, // 'r'
-	SET_DIMENSION			= 0x64, // 'd'
 	SHUTDOWN                = 0x78, // 'x'
 	SOUND_BUZZER            = 0x73, // 's'
 	STARTUP                 = 0x38, // '8'
@@ -116,21 +117,13 @@ enum MOTION_STATUS : uint8_t
 
 enum FAILURE_STATUS : uint8_t
 {
-	SAFETY_PROCESSOR	= 0,
-	BRAINSTEM			= 1,
-	BRAINSTEM_TIMEOUT	= 2,
-	RIGHT_MOTOR			= 3,
-	LEFT_MOTOR			= 4
-};
-
-enum class BATTERY_DESCRIPTOR : uint8_t
-{
-	TEMPERATURE				= 0x08,
-	VOLTAGE					= 0x9,
-	AVERAGE_CURRENT			= 0xB,
-	INSTANTANEOUS_CURRENT	= 0xA,
-	CHARGED_PERCENTAGE		= 0xD,
-	AVERAGE_TIME_TO_EMPTY	= 0x12
+    SAFETY_PROCESSOR_FAILURE = 0,
+    BRAINSTEM_FAILURE = 1,
+    BRAIN_TIMEOUT = 2,
+    RIGHT_MOTOR_CONTROLLER = 3,
+    LEFT_MOTOR_CONTROLLER = 4,
+    RPM_MESSAGE_TIMEOUT = 5,
+    VELOCITY_VIOLATION = 6
 };
 
 }

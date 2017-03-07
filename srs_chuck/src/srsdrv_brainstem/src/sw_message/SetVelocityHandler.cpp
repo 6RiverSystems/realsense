@@ -6,7 +6,7 @@
 
 #include <BrainStemMessageProcessorInterface.hpp>
 
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
 
 #include <sw_message/SetVelocityHandler.hpp>
 
@@ -18,7 +18,7 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SetVelocityHandler::SetVelocityHandler(BrainStemMessageProcessorInterface* owner) :
 	SoftwareMessage(owner),
-	SubscriberRosTwist(ChuckTopics::driver::ODOMETRY_CMD_VELOCITY)
+	TapOdometryCmd_Velocity()
 {
 }
 
@@ -34,10 +34,10 @@ void SetVelocityHandler::receiveData(const geometry_msgs::Twist::ConstPtr twist)
 		static_cast<float>( twist->angular.z )
 	};
 
-//	ROS_DEBUG_NAMED("velocity", "Brain => Brainstem: Set velocity: linear=%f, angular=%f",
-//		data->linear.x, data->angular.z);
+	//ROS_DEBUG_NAMED("velocity", "Brain => Brainstem: Set velocity: linear=%f, angular=%f",
+	//	twist->linear.x, twist->angular.z);
 
-//	sendCommand(reinterpret_cast<char*>( &msg ), sizeof(msg));
+	sendCommand(reinterpret_cast<char*>( &msg ), sizeof(msg));
 }
 
 void SetVelocityHandler::syncState()

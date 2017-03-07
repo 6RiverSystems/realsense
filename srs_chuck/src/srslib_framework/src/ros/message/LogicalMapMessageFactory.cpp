@@ -1,5 +1,8 @@
 #include <srslib_framework/ros/message/LogicalMapMessageFactory.hpp>
 
+#include <srslib_framework/datastructure/Location.hpp>
+#include <srslib_framework/datastructure/Position.hpp>
+
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,10 +18,10 @@ void LogicalMapMessageFactory::areas2Vector(const LogicalMap* map,
     {
         srslib_framework::LogicalArea msgArea;
         msgArea.label = area.second.label;
-        msgArea.ciCells = area.second.ci;
-        msgArea.riCells = area.second.ri;
-        msgArea.cfCells = area.second.cf;
-        msgArea.rfCells = area.second.rf;
+        msgArea.x0 = area.second.surface.x0;
+        msgArea.y0 = area.second.surface.y0;
+        msgArea.x1 = area.second.surface.x1;
+        msgArea.y1 = area.second.surface.y1;
         msgArea.notes = notes2Msg(area.second.notes);
 
         areas.push_back(msgArea);
@@ -31,31 +34,36 @@ void LogicalMapMessageFactory::map2Vector(const LogicalMap* map,
 {
     logical.clear();
 
-    Grid2d* grid = map->getGrid();
-    if (grid)
+    WeightedGrid2d* grid = map->getGrid();
+    for (int row = 0; row < grid->getHeight(); row++)
     {
-        for (int row = 0; row < grid->getHeight(); row++)
+        for (int col = 0; col < grid->getWidth(); col++)
         {
-            for (int col = 0; col < grid->getWidth(); col++)
-            {
-                srslib_framework::LogicalCell cell;
-                Grid2d::Location location = Grid2d::Location(col, row);
+            srslib_framework::LogicalCell cell;
+            Location location = Location(col, row);
 
-                // Transfer the cost
-                cell.cost = static_cast<int32_t>(grid->getPayload(location));
+            // Transfer the cost
+            cell.cost = static_cast<int32_t>(grid->getPayload(location));
 
-                // Transfer the weights
-                cell.north = static_cast<int32_t>(grid->getWeight(
-                    Grid2d::Position(col, row, Grid2d::ORIENTATION_NORTH)));
-                cell.east = static_cast<int32_t>(grid->getWeight(
-                    Grid2d::Position(col, row, Grid2d::ORIENTATION_EAST)));
-                cell.south = static_cast<int32_t>(grid->getWeight(
-                    Grid2d::Position(col, row, Grid2d::ORIENTATION_SOUTH)));
-                cell.west = static_cast<int32_t>(grid->getWeight(
-                    Grid2d::Position(col, row, Grid2d::ORIENTATION_WEST)));
+            // Transfer the weights
+            cell.n = static_cast<int32_t>(grid->getWeight(
+                Position(col, row, WeightedGrid2d::ORIENTATION_NORTH)));
+            cell.ne = static_cast<int32_t>(grid->getWeight(
+                Position(col, row, WeightedGrid2d::ORIENTATION_NORTH_EAST)));
+            cell.e = static_cast<int32_t>(grid->getWeight(
+                Position(col, row, WeightedGrid2d::ORIENTATION_EAST)));
+            cell.se = static_cast<int32_t>(grid->getWeight(
+                Position(col, row, WeightedGrid2d::ORIENTATION_SOUTH_EAST)));
+            cell.s = static_cast<int32_t>(grid->getWeight(
+                Position(col, row, WeightedGrid2d::ORIENTATION_SOUTH)));
+            cell.sw = static_cast<int32_t>(grid->getWeight(
+                Position(col, row, WeightedGrid2d::ORIENTATION_SOUTH_WEST)));
+            cell.w = static_cast<int32_t>(grid->getWeight(
+                Position(col, row, WeightedGrid2d::ORIENTATION_WEST)));
+            cell.nw = static_cast<int32_t>(grid->getWeight(
+                Position(col, row, WeightedGrid2d::ORIENTATION_NORTH_WEST)));
 
-                logical.push_back(cell);
-            }
+            logical.push_back(cell);
         }
     }
 }
@@ -97,8 +105,9 @@ void LogicalMapMessageFactory::vector2Areas(const vector<srslib_framework::Logic
     for (auto area : areas)
     {
         shared_ptr<MapNotes> notes = msg2Notes(area.notes);
-        logical->addLabeledArea(area.ciCells, area.riCells, area.cfCells, area.rfCells,
-            area.label, notes);
+
+        Rectangle surface(area.x0, area.y0, area.x1, area.y1);
+        logical->addLabeledArea(surface, area.label, notes);
     }
 }
 
@@ -106,19 +115,24 @@ void LogicalMapMessageFactory::vector2Areas(const vector<srslib_framework::Logic
 LogicalMap* LogicalMapMessageFactory::vector2Map(const LogicalMetadata& metadata,
     const vector<srslib_framework::LogicalCell>& logical)
 {
-    LogicalMap* logicalMap = new LogicalMap(metadata);
+    WeightedGrid2d* grid = new WeightedGrid2d(metadata.widthCells, metadata.heightCells);
+    LogicalMap* logicalMap = new LogicalMap(metadata, grid);
 
     auto logicalIterator = logical.begin();
     for (int row = 0; row < metadata.heightCells; row++)
     {
         for (int col = 0; col < metadata.widthCells; col++)
         {
-            logicalMap->setCost(col, row, static_cast<int>(logicalIterator->cost));
+            logicalMap->costSet(col, row, static_cast<int>(logicalIterator->cost));
             logicalMap->setWeights(col, row,
-                static_cast<Grid2d::BaseType>(logicalIterator->north),
-                static_cast<Grid2d::BaseType>(logicalIterator->east),
-                static_cast<Grid2d::BaseType>(logicalIterator->south),
-                static_cast<Grid2d::BaseType>(logicalIterator->west));
+                static_cast<WeightedGrid2d::BaseType>(logicalIterator->n),
+                static_cast<WeightedGrid2d::BaseType>(logicalIterator->ne),
+                static_cast<WeightedGrid2d::BaseType>(logicalIterator->e),
+                static_cast<WeightedGrid2d::BaseType>(logicalIterator->se),
+                static_cast<WeightedGrid2d::BaseType>(logicalIterator->s),
+                static_cast<WeightedGrid2d::BaseType>(logicalIterator->sw),
+                static_cast<WeightedGrid2d::BaseType>(logicalIterator->w),
+                static_cast<WeightedGrid2d::BaseType>(logicalIterator->nw));
 
             logicalIterator++;
         }

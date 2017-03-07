@@ -1,12 +1,23 @@
+#
+# (c) Copyright 2015-2017 River Systems, all rights reserved.
+#
+# This is proprietary software, unauthorized distribution is not permitted.
+#
 {
 	"type": "FeatureCollection",
+	"properties": {
+		"language_version": "1.2"
+	},
 	"features": [
 		{
 			"type": "Feature",
 			"properties": {
 				"object": "map",
-				"version": "1",
-				"origin": [-10,-10,0],
+				"origin": [
+					-10,
+					-10,
+					0
+				],
 				"resolution": 0.05,
 				"width": 39.45,
 				"height": 32.95
@@ -17,718 +28,435 @@
 			"features": [
 				{
 					"type": "Feature",
-					"id": "1",
+					"id": 0,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[-10,14.15],
-							[29.45,22.95]
+							[
+								-10,
+								14.15
+							],
+							[
+								29.4,
+								22.95
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "2",
+					"id": 1,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[-10,0.2],
-							[0.1,14.2]
+							[
+								-10,
+								0.2
+							],
+							[
+								0,
+								14.25
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "3",
+					"id": 2,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[-10,-10],
-							[16.2,0.35]
+							[
+								9.15,
+								10.1
+							],
+							[
+								19.35,
+								14.25
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "4",
+					"id": 3,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[9.15,10.1],
-							[19.4,14.2]
+							[
+								19.35,
+								1.65
+							],
+							[
+								29.4,
+								14.25
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "5",
+					"id": 4,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[12.75,9.3],
-							[19.4,10.15]
+							[
+								12.75,
+								9.3
+							],
+							[
+								19.35,
+								10.2
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "6",
+					"id": 5,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.1,-10],
-							[18.1,-1.9]
+							[
+								20,
+								-5.45
+							],
+							[
+								29.4,
+								1.75
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "7",
+					"id": 6,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[18.05,-10],
-							[29.45,-5.3]
+							[
+								-10,
+								-10.05
+							],
+							[
+								16.1,
+								0.3
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "8",
+					"id": 7,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[19.35,1.65],
-							[29.45,14.2]
+							[
+								16.1,
+								-10.05
+							],
+							[
+								18.05,
+								-1.95
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "9",
+					"id": 8,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[20,-5.45],
-							[29.45,1.7]
+							[
+								18.05,
+								-10.05
+							],
+							[
+								29.4,
+								-5.35
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 9,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								3.7,
+								10.75
+							],
+							[
+								6.75,
+								12.5
+							]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
 					"id": 10,
 					"geometry": {
-						"type": "Point",
-						"coordinates": [2.7,8.3]
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								3.6,
+								6.25
+							],
+							[
+								16.9,
+								7.6
+							]
+						]
 					},
 					"properties": {
-						"object": "vertex",
-						"name": "A"
+						"object": "obstacle",
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
 					"id": 11,
 					"geometry": {
-						"type": "Point",
-						"coordinates": [17.6,8.3]
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								6.25,
+								3.2
+							],
+							[
+								16.9,
+								4.55
+							]
+						]
 					},
 					"properties": {
-						"object": "vertex",
-						"name": "B"
+						"object": "obstacle",
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
 					"id": 12,
 					"geometry": {
-						"type": "Point",
-						"coordinates": [2.7,5.3]
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								6.25,
+								4.5
+							],
+							[
+								16.9,
+								6.3
+							]
+						]
 					},
 					"properties": {
-						"object": "vertex",
-						"name": "C"
+						"object": "weighted_area",
+						"n": 0,
+						"ne": 0,
+						"e": 0,
+						"se": 0,
+						"s": 0,
+						"sw": 100,
+						"w": 100,
+						"nw": 100,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
 					"id": 13,
 					"geometry": {
-						"type": "Point",
-						"coordinates": [5.3,5.3]
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								3.6,
+								3.2
+							],
+							[
+								6.2,
+								6.3
+							]
+						]
 					},
 					"properties": {
-						"object": "vertex",
-						"name": "D"
+						"object": "labeled_area",
+						"label": "smv13",
+						"notes": {
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
 					"id": 14,
 					"geometry": {
-						"type": "Point",
-						"coordinates": [17.6,5.3]
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								14.7,
+								4.5
+							],
+							[
+								18.45,
+								6.3
+							]
+						]
 					},
 					"properties": {
-						"object": "vertex",
-						"name": "E"
+						"object": "labeled_area",
+						"label": "smv14",
+						"notes": {
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
 					"id": 15,
 					"geometry": {
-						"type": "Point",
-						"coordinates": [2.7,2.25]
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								17,
+								1.75
+							],
+							[
+								18.45,
+								9.3
+							]
+						]
 					},
 					"properties": {
-						"object": "vertex",
-						"name": "F"
+						"object": "labeled_area",
+						"label": "ws15",
+						"notes": {
+							"play_sound": "warning"
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
 					"id": 16,
 					"geometry": {
-						"type": "Point",
-						"coordinates": [5.3,2.25]
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								3.6,
+								3.2
+							],
+							[
+								6.2,
+								6.3
+							]
+						]
 					},
 					"properties": {
-						"object": "vertex",
-						"name": "G"
+						"object": "labeled_area",
+						"label": "ws16",
+						"notes": {
+							"play_sound": "warning"
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
 					"id": 17,
 					"geometry": {
-						"type": "Point",
-						"coordinates": [17.6,2.25]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "H"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 18,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [2.7,8.85]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "AA"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 19,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [17.6,8.85]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "BB"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 20,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [2.7,1.6]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "FF"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 21,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [17.6,1.6]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "HH"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 22,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [9.7,8.65]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "rockyInduct",
-						"orientation": 0,
-						"labels": "induct",
-						"mfp_ids": "rocky"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 23,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [5,2.25]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "borisInduct",
-						"orientation": 0,
-						"labels": "induct",
-						"mfp_ids": "boris"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 24,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [13.7,8.65]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "bullInduct",
-						"orientation": 0,
-						"labels": "induct",
-						"mfp_ids": "bullwinkle"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 25,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [17.6,5.3]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "picking1",
-						"orientation": 180,
-						"labels": "picking",
-						"mfp_ids": "rocky"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 26,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [2.7,5.3]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "picking2",
-						"orientation": 0,
-						"labels": "picking"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 27,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [14.6,2.1]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "picking3",
-						"orientation": 180,
-						"labels": "picking"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 28,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [3.15,10]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "rockyPackout",
-						"orientation": 270,
-						"labels": "packout",
-						"mfp_ids": "rocky"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 29,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [2,3]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "borisPackout",
-						"orientation": 270,
-						"labels": "packout",
-						"mfp_ids": "boris"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 30,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [5.6,10]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "bullPackout",
-						"orientation": 270,
-						"labels": "packout",
-						"mfp_ids": "bullwinkle"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 31,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [2.15,3.15]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "lblInduct",
-						"orientation": 90,
-						"labels": "induct",
-						"mfp_ids": "leah"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 32,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [2.15,3.15]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "ahInduct",
-						"orientation": 90,
-						"labels": "induct",
-						"mfp_ids": "arroway"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 33,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [5,2.25]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "lblPackout",
-						"orientation": 180,
-						"labels": "packout",
-						"mfp_ids": "leah"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 34,
-					"geometry": {
-						"type": "Point",
-						"coordinates": [5,2.25]
-					},
-					"properties": {
-						"object": "vertex",
-						"name": "ahPackout",
-						"orientation": 180,
-						"labels": "packout",
-						"mfp_ids": "arroway"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 35,
-					"geometry": "null",
-					"properties": {
-						"object": "edge",
-						"name": "AB",
-						"from": "A",
-						"to": "B",
-						"direction": "none"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 36,
-					"geometry": "null",
-					"properties": {
-						"object": "edge",
-						"name": "CE",
-						"from": "C",
-						"to": "E",
-						"direction": "none"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 37,
-					"geometry": "null",
-					"properties": {
-						"object": "edge",
-						"name": "FH",
-						"from": "F",
-						"to": "H",
-						"direction": "none"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 38,
-					"geometry": "null",
-					"properties": {
-						"object": "edge",
-						"name": "AABB",
-						"from": "AA",
-						"to": "BB",
-						"direction": "none"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 39,
-					"geometry": "null",
-					"properties": {
-						"object": "edge",
-						"name": "FFHH",
-						"from": "FF",
-						"to": "HH",
-						"direction": "none"
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 40,
-					"geometry": "null",
-					"properties": {
-						"object": "graph",
-						"name": "6rshq_graph",
-						"vertices": [
-							"A",
-							"B",
-							"C",
-							"D",
-							"E",
-							"F",
-							"G",
-							"H",
-							"AA",
-							"BB",
-							"FF",
-							"HH",
-							"rockyInduct",
-							"borisInduct",
-							"bullInduct",
-							"picking1",
-							"picking2",
-							"picking3",
-							"rockyPackout",
-							"borisPackout",
-							"bullPackout",
-							"lblInduct",
-							"ahInduct",
-							"lblPackout",
-							"ahPackout"
-						],
-						"edges": [
-							"AB",
-							"CE",
-							"FH",
-							"AABB",
-							"FFHH"
-						]
-					}
-				},
-				{
-					"type": "Feature",
-					"id": "1",
-					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[3.6,6.25],
-							[16.95,7.55]
-						]
-					},
-					"properties": {
-						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
-					}
-				},
-				{
-					"type": "Feature",
-					"id": "2",
-					"geometry": {
-						"type": "MultiPoint",
-						"coordinates": [
-							[3.7,10.75],
-							[6.8,12.45]
-						]
-					},
-					"properties": {
-						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
-					}
-				},
-				{
-					"type": "Feature",
-					"id": "3",
-					"geometry": {
-						"type": "MultiPoint",
-						"coordinates": [
-							[6.25,3.2],
-							[16.95,4.5]
-						]
-					},
-					"properties": {
-						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 44,
-					"geometry": {
-						"type": "MultiPoint",
-						"coordinates": [
-							[3.6,3.2],
-							[6.25,6.25]
+							[
+								14.7,
+								4.5
+							],
+							[
+								16.9,
+								6.3
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws1",
+						"label": "ws17",
 						"notes": {
 							"play_sound": "warning"
-						}
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 45,
-					"geometry": {
-						"type": "MultiPoint",
-						"coordinates": [
-							[14.7,4.5],
-							[16.95,6.25]
-						]
-					},
-					"properties": {
-						"object": "labeled_area",
-						"label": "ws2",
-						"notes": {
-							"play_sound": "warning"
-						}
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 46,
-					"geometry": {
-						"type": "MultiPoint",
-						"coordinates": [
-							[17,1.75],
-							[18.5,9.25]
-						]
-					},
-					"properties": {
-						"object": "labeled_area",
-						"label": "ws3",
-						"notes": {
-							"play_sound": "warning"
-						}
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 47,
-					"geometry": {
-						"type": "MultiPoint",
-						"coordinates": [
-							[6.25,4.5],
-							[16.95,6.25]
-						]
-					},
-					"properties": {
-						"object": "weighted_area",
-						"north": 0,
-						"east": 0,
-						"south": 0,
-						"west": 100
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				}
 			]

@@ -5,6 +5,7 @@
 #include <yaml-cpp/yaml.h>
 #include <costmap_2d/cost_values.h>
 
+#include <srslib_framework/datastructure/Location.hpp>
 #include <srslib_framework/exception/io/FailedToOpenFileException.hpp>
 #include <srslib_framework/localization/map/occupancy/exception/InvalidChannelNumberException.hpp>
 
@@ -14,54 +15,35 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MapAdapter::baseMap2Vector(const BaseMap* map, vector<int8_t>& occupancy)
+void MapAdapter::costMap2D2Vector(const costmap_2d::Costmap2D* costmap, vector<int8_t>& int8Vector)
 {
-    occupancy.clear();
+    int8Vector.resize(costmap->getSizeInCellsX() * costmap->getSizeInCellsY(), 0);
 
-    Grid2d* grid = map->getGrid();
-    if (grid)
+    unsigned char* value = costmap->getCharMap();
+    for (int row = 0; row < costmap->getSizeInCellsY(); ++row)
     {
-        for (int row = 0; row < grid->getHeight(); row++)
+        for (int col = 0; col < costmap->getSizeInCellsX(); ++col)
         {
-            for (int col = 0; col < grid->getWidth(); col++)
-            {
-                int8_t cost = static_cast<int8_t>(grid->getPayload(Grid2d::Location(col, row)));
-                occupancy.push_back(cost);
-            }
+            int8Vector[costmap->getIndex(col, row)] = *(value++);
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MapAdapter::costMap2D2Vector(const costmap_2d::Costmap2D* map, vector<int8_t>& occupancy)
+costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(OccupancyMap* occupancy)
 {
-    occupancy.resize(map->getSizeInCellsX() * map->getSizeInCellsY(), 0);
-
-    unsigned char* value = map->getCharMap();
-    for (int row = 0; row < map->getSizeInCellsY(); ++row)
-    {
-        for (int col = 0; col < map->getSizeInCellsX(); ++col)
-        {
-            occupancy[map->getIndex(col, row)] = *(value++);
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(OccupancyMap* map)
-{
-    unsigned int rows = map->getHeightCells();
-    unsigned int columns = map->getWidthCells();
+    unsigned int rows = occupancy->getHeightCells();
+    unsigned int columns = occupancy->getWidthCells();
 
     costmap_2d::Costmap2D* costMap = new costmap_2d::Costmap2D(columns, rows,
-        map->getResolution(), 0, 0);
+        occupancy->getResolution(), 0, 0);
 
     for (int row = 0; row < rows; row++)
     {
         for (int col = 0; col < columns; col++)
         {
-            Grid2d::BaseType cost = map->getCost(col, row);
-            cost = cost == Grid2d::PAYLOAD_NO_INFORMATION ? costmap_2d::NO_INFORMATION : cost;
+            SimpleGrid2d::BaseType cost = occupancy->getCost(col, row);
+            cost = cost == SimpleGrid2d::PAYLOAD_NO_INFORMATION ? costmap_2d::NO_INFORMATION : cost;
 
             costMap->setCost(col, row, cost);
         }
@@ -71,76 +53,131 @@ costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(OccupancyMap* map)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void MapAdapter::occupancyMap2AmclVector(const OccupancyMap* map, vector<int8_t>& occupancy)
+costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(LogicalMap* logical)
 {
-    occupancy.clear();
-
-    Grid2d* grid = map->getGrid();
-    if (grid)
-    {
-        for (int row = 0; row < grid->getHeight(); row++)
-        {
-            for (int col = 0; col < grid->getWidth(); col++)
-            {
-                Grid2d::BaseType cost = grid->getPayload(Grid2d::Location(col, row));
-
-                int8_t adaptedCost = static_cast<int8_t>(cost);
-                if (cost == Grid2d::PAYLOAD_NO_INFORMATION)
-                {
-                    adaptedCost = -1;
-                }
-                else if (cost == Grid2d::PAYLOAD_MIN)
-                {
-                    adaptedCost = 0;
-                }
-                else if (cost == Grid2d::PAYLOAD_MAX)
-                {
-                    adaptedCost = 100;
-                }
-
-                occupancy.push_back(adaptedCost);
-            }
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-costmap_2d::Costmap2D* MapAdapter::weights2CostMap2D(BaseMap* map, int orientation)
-{
-    unsigned int rows = map->getHeightCells();
-    unsigned int columns = map->getWidthCells();
+    unsigned int rows = logical->getHeightCells();
+    unsigned int columns = logical->getWidthCells();
 
     costmap_2d::Costmap2D* costMap = new costmap_2d::Costmap2D(columns, rows,
-        map->getResolution(), map->getOrigin().x, map->getOrigin().y);
-
-    Grid2d::BaseType north;
-    Grid2d::BaseType east;
-    Grid2d::BaseType south;
-    Grid2d::BaseType west;
-    Grid2d::BaseType cost;
+        logical->getResolution(), 0, 0);
 
     for (int row = 0; row < rows; row++)
     {
         for (int col = 0; col < columns; col++)
         {
-            map->getWeights(col, row, north, east, south, west);
+            costMap->setCost(col, row, logical->getCost(col, row));
+        }
+    }
+
+    return costMap;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void MapAdapter::occupancyMap2AmclVector(const OccupancyMap* occupancy, vector<int8_t>& int8Vector)
+{
+    int8Vector.clear();
+
+    for (int row = 0; row < occupancy->getHeightCells(); row++)
+    {
+        for (int col = 0; col < occupancy->getWidthCells(); col++)
+        {
+            SimpleGrid2d::BaseType cost = occupancy->getCost(col, row);
+
+            int8_t adaptedCost = static_cast<int8_t>(cost);
+            if (cost == SimpleGrid2d::PAYLOAD_NO_INFORMATION)
+            {
+                adaptedCost = -1;
+            }
+            else if (cost == SimpleGrid2d::PAYLOAD_MIN)
+            {
+                adaptedCost = 0;
+            }
+            else if (cost == SimpleGrid2d::PAYLOAD_MAX)
+            {
+                adaptedCost = 100;
+            }
+
+            int8Vector.push_back(adaptedCost);
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void MapAdapter::occupancyMap2Vector(const OccupancyMap* occupancy, vector<int8_t>& int8Vector)
+{
+    int8Vector.clear();
+
+    for (int row = 0; row < occupancy->getHeightCells(); row++)
+    {
+        for (int col = 0; col < occupancy->getWidthCells(); col++)
+        {
+            int8_t cost = static_cast<int8_t>(occupancy->getCost(col, row));
+            int8Vector.push_back(cost);
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+costmap_2d::Costmap2D* MapAdapter::weights2CostMap2D(LogicalMap* occupancy, int orientation)
+{
+    unsigned int rows = occupancy->getHeightCells();
+    unsigned int columns = occupancy->getWidthCells();
+
+    costmap_2d::Costmap2D* costMap = new costmap_2d::Costmap2D(columns, rows,
+        occupancy->getResolution(), occupancy->getOrigin().x, occupancy->getOrigin().y);
+
+    WeightedGrid2d::BaseType north;
+    WeightedGrid2d::BaseType northEast;
+    WeightedGrid2d::BaseType east;
+    WeightedGrid2d::BaseType southEast;
+    WeightedGrid2d::BaseType south;
+    WeightedGrid2d::BaseType southWest;
+    WeightedGrid2d::BaseType west;
+    WeightedGrid2d::BaseType northWest;
+    WeightedGrid2d::BaseType cost;
+
+    for (int row = 0; row < rows; row++)
+    {
+        for (int col = 0; col < columns; col++)
+        {
+            occupancy->getWeights(col, row,
+                north, northEast,
+                east, southEast,
+                south, southWest,
+                west, northWest);
 
             switch (orientation)
             {
-                case Grid2d::ORIENTATION_NORTH:
+                case WeightedGrid2d::ORIENTATION_NORTH:
                     cost = north;
                     break;
 
-                case Grid2d::ORIENTATION_EAST:
+                case WeightedGrid2d::ORIENTATION_NORTH_EAST:
+                    cost = northEast;
+                    break;
+
+                case WeightedGrid2d::ORIENTATION_EAST:
                     cost = east;
                     break;
 
-                case Grid2d::ORIENTATION_SOUTH:
+                case WeightedGrid2d::ORIENTATION_SOUTH_EAST:
+                    cost = southEast;
+                    break;
+
+                case WeightedGrid2d::ORIENTATION_SOUTH:
                     cost = south;
                     break;
 
-                case Grid2d::ORIENTATION_WEST:
+                case WeightedGrid2d::ORIENTATION_SOUTH_WEST:
+                    cost = southWest;
+                    break;
+
+                case WeightedGrid2d::ORIENTATION_WEST:
                     cost = west;
+                    break;
+
+                case WeightedGrid2d::ORIENTATION_NORTH_WEST:
+                    cost = northWest;
                     break;
             }
 

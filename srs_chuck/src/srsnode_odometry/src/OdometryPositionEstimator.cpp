@@ -9,8 +9,8 @@
 #include <srslib_framework/math/TimeMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
-#include <srslib_framework/ros/topics/ChuckTransforms.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
+#include <srslib_framework/chuck/ChuckTransforms.hpp>
 
 namespace srs {
 
@@ -181,7 +181,8 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 	odom_trans.transform.translation.z = 0.0;
 	odom_trans.transform.rotation = odom_quat;
 
-	broadcaster_.sendTransform( odom_trans );
+	// Disable publication of transform from odometry node and use brainstem to publish instead 
+	//broadcaster_.sendTransform( odom_trans );
 
 	nav_msgs::Odometry odom;
 	odom.header.stamp = currentTime;
@@ -202,8 +203,8 @@ void OdometryPositionEstimator::CalculateRobotPose( const srslib_framework::Odom
 	odom.twist.twist.angular.y = 0.0;
 	odom.twist.twist.angular.z = angularVelocity;
 
-	// Publish the Odometry
-	odometryPosePub_.publish( odom );
+	// Disable publication of pose from odometry node and use brainstem to publish instead
+	//odometryPosePub_.publish( odom );
 
     // Get and publish the forward estimated velocities
     nav_msgs::Odometry odom_estimate;
@@ -257,7 +258,7 @@ geometry_msgs::Twist OdometryPositionEstimator::getEstimatedRobotVel(double repo
       ROS_DEBUG("Estimate dt: %f", estimate_dt);
       estimated_vel.linear.x = forwardEstimateVelocity(reported_linear_vel, cmd_vel.linear.x, linear_acceleration_rate_, estimate_dt);
       estimated_vel.angular.z = forwardEstimateVelocity(reported_angular_vel, cmd_vel.angular.z, angular_acceleration_rate_, estimate_dt);
-      ROS_DEBUG("Vels cmd: [%f, %f], est: [%f, %f], reported: [%f, %f]", cmd_vel.linear.x, cmd_vel.angular.x, estimated_vel.linear.x, reported_linear_vel, estimated_vel.angular.z, reported_angular_vel);
+      ROS_DEBUG("Vels cmd: [%f, %f], est: [%f, %f], reported: [%f, %f]", cmd_vel.linear.x, cmd_vel.angular.z, estimated_vel.linear.x, estimated_vel.angular.z, reported_linear_vel, reported_angular_vel);
     }
     return estimated_vel;
 }
@@ -337,12 +338,12 @@ void OdometryPositionEstimator::pingCallback(const ros::TimerEvent& event)
     {
         ROS_ERROR_STREAM( "Motion ping exceeded allowable delay: " << pingDelay );
     }
-
+	/*
 	double odomDelay = (ros::Time::now() - lastPoseTime_).toSec();
 
 	if (odomDelay > MAX_ALLOWED_ODOM_DELAY) {
 		ROS_ERROR_STREAM_THROTTLE( 5.0f, "Odometry topic not published in: " << odomDelay );
-	}
+	}*/
 }
 
 void OdometryPositionEstimator::cfgCallback(srsnode_odometry::RobotSetupConfig &config, uint32_t level)

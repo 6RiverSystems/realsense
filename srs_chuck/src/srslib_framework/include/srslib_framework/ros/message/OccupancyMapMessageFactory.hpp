@@ -32,13 +32,13 @@ struct OccupancyMapMessageFactory
      */
     static srslib_framework::OccupancyMap map2Msg(const OccupancyMap* map)
     {
-        vector<int8_t> occupancy;
-        MapAdapter::baseMap2Vector(map, occupancy);
+        vector<int8_t> int8Vector;
+        MapAdapter::occupancyMap2Vector(map, int8Vector);
 
         srslib_framework::OccupancyMap msgOccupancyMap;
 
         msgOccupancyMap.metadata = metadata2Msg(map->getMetadata());
-        msgOccupancyMap.data = occupancy;
+        msgOccupancyMap.data = int8Vector;
 
         return msgOccupancyMap;
     }
@@ -54,7 +54,6 @@ struct OccupancyMapMessageFactory
     {
         srslib_framework::OccupancyMetadata msgOccupancyMetaData;
 
-        msgOccupancyMetaData.loadTime = metadata.loadTime;
         msgOccupancyMetaData.heightCells = metadata.heightCells;
         msgOccupancyMetaData.heightM = metadata.heightM;
         msgOccupancyMetaData.occupancyFilename = metadata.occupancyFilename;
@@ -80,7 +79,7 @@ struct OccupancyMapMessageFactory
     {
         nav_msgs::MapMetaData msgRosMapMetaData;
 
-        msgRosMapMetaData.map_load_time = ros::Time(metadata.loadTime);
+        msgRosMapMetaData.map_load_time = ros::Time();
         msgRosMapMetaData.resolution = metadata.resolution;
         msgRosMapMetaData.width = metadata.widthCells;
         msgRosMapMetaData.height = metadata.heightCells;
@@ -130,7 +129,6 @@ struct OccupancyMapMessageFactory
     {
         OccupancyMetadata metadata;
 
-        metadata.loadTime = message.loadTime;
         metadata.heightCells = message.heightCells;
         metadata.heightM = message.heightM;
         metadata.occupancyFilename = message.occupancyFilename;
@@ -156,7 +154,6 @@ struct OccupancyMapMessageFactory
     {
         OccupancyMetadata metadata;
 
-        metadata.loadTime = message.map_load_time.toSec();
         metadata.resolution = message.resolution;
         metadata.widthCells = message.width;
         metadata.heightCells = message.height;
@@ -176,13 +173,13 @@ struct OccupancyMapMessageFactory
      */
     static nav_msgs::OccupancyGrid occupancyMap2RosAmclMsg(const OccupancyMap* map, string frameId)
     {
-        vector<int8_t> occupancy;
-        MapAdapter::occupancyMap2AmclVector(map, occupancy);
+        vector<int8_t> int8Vector;
+        MapAdapter::occupancyMap2AmclVector(map, int8Vector);
 
         nav_msgs::OccupancyGrid msgOccupancyMap;
 
         msgOccupancyMap.info = metadata2RosMsg(map->getMetadata());
-        msgOccupancyMap.data = occupancy;
+        msgOccupancyMap.data = int8Vector;
         msgOccupancyMap.header.frame_id = frameId;
 
         return msgOccupancyMap;
@@ -198,13 +195,13 @@ struct OccupancyMapMessageFactory
      */
     static nav_msgs::OccupancyGrid occupancyMap2RosMsg(const OccupancyMap* map, string frameId)
     {
-        vector<int8_t> occupancy;
-        MapAdapter::baseMap2Vector(map, occupancy);
+        vector<int8_t> int8Vector;
+        MapAdapter::occupancyMap2Vector(map, int8Vector);
 
         nav_msgs::OccupancyGrid msgOccupancyMap;
 
         msgOccupancyMap.info = metadata2RosMsg(map->getMetadata());
-        msgOccupancyMap.data = occupancy;
+        msgOccupancyMap.data = int8Vector;
         msgOccupancyMap.header.frame_id = frameId;
 
         return msgOccupancyMap;

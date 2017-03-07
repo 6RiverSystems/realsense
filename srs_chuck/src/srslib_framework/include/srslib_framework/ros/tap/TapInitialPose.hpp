@@ -5,17 +5,17 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/tap/subscriber/SubscriberPose.hpp>
-#include <srslib_framework/ros/topics/ChuckTopics.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberPoseWithCovarianceStamped.hpp>
+#include <srslib_framework/chuck/ChuckTopics.hpp>
 
 namespace srs {
 
 class TapInitialPose :
-    public SubscriberPose
+    public SubscriberPoseWithCovarianceStamped
 {
 public:
     TapInitialPose() :
-        SubscriberPose(ChuckTopics::internal::SWCMD_INITIAL_POSE)
+        SubscriberPoseWithCovarianceStamped(ChuckTopics::internal::ODOMETRY_INITIAL_POSE)
     {}
 };
 

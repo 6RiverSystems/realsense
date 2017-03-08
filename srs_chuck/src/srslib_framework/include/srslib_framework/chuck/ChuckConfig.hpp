@@ -33,6 +33,10 @@ namespace Parameters {
 
     static const string MAP_STACK = "map_stack";
     static const string MAX_VELOCITY = "max_vel_x";
+    static const string LP_MODE = "mode";
+    static const int LP_MODE_DEFAULT = 0;
+    static const int LP_MODE_SLOW_MOTION = 1;
+    static const int LP_MODE_QUEUE = 2;
 
 } // namespace Parameters
 

@@ -14,6 +14,7 @@
 #include <srsnode_executive/ExecutiveContext.hpp>
 #include <srsnode_executive/task/TaskDetectLabeledAreas.hpp>
 #include <srsnode_executive/task/TaskPlaySound.hpp>
+#include <srsnode_executive/task/TaskQueue.hpp>
 #include <srsnode_executive/task/TaskSetMaxVelocity.hpp>
 
 namespace srs {
@@ -53,6 +54,7 @@ private:
     TapRobotPose tapRobotPose_;
     TaskDetectLabeledAreas taskDetectLabeledAreas_;
     TaskPlaySound taskPlaySound_;
+    TaskQueue taskQueue_;
     TaskSetMaxVelocity taskSetMaxVelocity_;
 };
 

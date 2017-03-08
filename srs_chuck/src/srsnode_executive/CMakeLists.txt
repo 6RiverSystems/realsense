@@ -12,6 +12,7 @@ set(${PROJECT_NAME}_SOURCES
     src/Executive.cpp
     src/task/TaskDetectLabeledAreas.cpp
     src/task/TaskPlaySound.cpp
+    src/task/TaskQueue.cpp
     src/task/TaskSetMaxVelocity.cpp
 )
 

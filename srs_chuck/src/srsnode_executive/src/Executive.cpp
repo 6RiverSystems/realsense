@@ -33,6 +33,7 @@ void Executive::execute()
     taskDetectLabeledAreas_.run(context_);
     taskSetMaxVelocity_.run(context_);
     taskPlaySound_.run(context_);
+    taskQueue_.run(context_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

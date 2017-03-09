@@ -180,8 +180,6 @@ void AStarPotentials::addMapBorder()
 void AStarPotentials::clearQueues()
 {
     for (auto queue : queuesMap_) {
-
-        ROS_WARN_STREAM("cleaning " << queue.first);
         costMap_->setConvexPolygonCost(queue.second, 0);
     }
 }
@@ -200,10 +198,12 @@ void AStarPotentials::extractQueuePolygons()
         if (note)
         {
             // Convert the queue region into map coordinates
-            double x0 = MeasurementMath::cells2M(queue.surface.x0, logicalMap_->getResolution());
-            double y0 = MeasurementMath::cells2M(queue.surface.y0, logicalMap_->getResolution());
-            double x1 = MeasurementMath::cells2M(queue.surface.x1, logicalMap_->getResolution());
-            double y1 = MeasurementMath::cells2M(queue.surface.y1, logicalMap_->getResolution());
+            double x0;
+            double y0;
+            double x1;
+            double y1;
+            logicalMap_->transformCells2M(queue.surface.x0, queue.surface.y0, x0, y0);
+            logicalMap_->transformCells2M(queue.surface.x1, queue.surface.y1, x1, y1);
 
             // Create the polygon that represents the region of space of the queue
             PolygonType polygon;
@@ -215,21 +215,21 @@ void AStarPotentials::extractQueuePolygons()
             polygon.push_back(p1);
 
             geometry_msgs::Point p2;
-            p1.x = x1;
-            p1.y = y0;
-            p1.z = 0;
+            p2.x = x1;
+            p2.y = y0;
+            p2.z = 0;
             polygon.push_back(p2);
 
             geometry_msgs::Point p3;
-            p1.x = x1;
-            p1.y = y1;
-            p1.z = 0;
+            p3.x = x1;
+            p3.y = y1;
+            p3.z = 0;
             polygon.push_back(p3);
 
             geometry_msgs::Point p4;
-            p1.x = x0;
-            p1.y = y1;
-            p1.z = 0;
+            p4.x = x0;
+            p4.y = y1;
+            p4.z = 0;
             polygon.push_back(p4);
 
             ROS_WARN_STREAM("Queue: " <<

@@ -13,7 +13,7 @@
       <param name="enable_follower_trajectory_generator" value="true" />
       <param name="oscillation_reset_dist" value="0.0" />
       <param name="oscillation_reset_angle" value="0.0" />
-      <param name="max_vel_x" value="0.5" />
+      <param name="goal_distance_bias" value="0" />
     </group>
     <group ns="stay_on_path">
       <rosparam file="$(find srsnode_navigation)/config/local_planner_default_params.yaml" command="load"/>

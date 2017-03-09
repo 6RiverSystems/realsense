@@ -10,6 +10,7 @@ set(PROJECT_MAIN src/executive_node.cpp)
 set(${PROJECT_NAME}_SOURCES
 
     src/Executive.cpp
+    src/condition/ConditionNewGoal.cpp
     src/task/TaskDetectLabeledAreas.cpp
     src/task/TaskPlaySound.cpp
     src/task/TaskQueue.cpp

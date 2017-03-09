@@ -12,6 +12,7 @@
 #include <srslib_framework/ros/unit/RosUnit.hpp>
 
 #include <srsnode_executive/ExecutiveContext.hpp>
+#include <srsnode_executive/condition/ConditionNewGoal.hpp>
 #include <srsnode_executive/task/TaskDetectLabeledAreas.hpp>
 #include <srsnode_executive/task/TaskPlaySound.hpp>
 #include <srsnode_executive/task/TaskQueue.hpp>
@@ -46,6 +47,7 @@ private:
 
     void updateContext();
 
+    std::shared_ptr<ConditionNewGoal> conditionNewGoal_;
     ExecutiveContext context_;
 
     TapOdometryCmd_Velocity tapCommandedVelocity_;

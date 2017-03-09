@@ -52,7 +52,7 @@ void TaskSetMaxVelocity::run(ExecutiveContext& context)
     {
         ROS_INFO_STREAM_NAMED("executive", "Setting velocity to " << newMaxVelocity << "m/s");
 
-        ServiceCallConfig<double>::call(ChuckConfig::Entities::LOCAL_PLANNER,
+        ServiceCallConfig<double>::set(ChuckConfig::Entities::LOCAL_PLANNER,
             ChuckConfig::Parameters::MAX_VELOCITY, newMaxVelocity);
     }
 

@@ -2,6 +2,7 @@
 
 #include <srslib_test/utils/Print.hpp>
 
+#include <srslib_framework/math/MeasurementMath.hpp>
 #include <srslib_framework/localization/map/mapnote/NoteQueue.hpp>
 
 #include <srsnode_navigation/global_planner/potentials/QuadraticCalculator.hpp>
@@ -180,6 +181,7 @@ void AStarPotentials::clearQueues()
 {
     for (auto queue : queuesMap_) {
 
+        ROS_WARN_STREAM("cleaning " << queue.first);
         costMap_->setConvexPolygonCost(queue.second, 0);
     }
 }
@@ -197,32 +199,45 @@ void AStarPotentials::extractQueuePolygons()
         shared_ptr<NoteQueue> note = queue.notes->get<NoteQueue>(NoteQueue::TYPE);
         if (note)
         {
+            // Convert the queue region into map coordinates
+            double x0 = MeasurementMath::cells2M(queue.surface.x0, logicalMap_->getResolution());
+            double y0 = MeasurementMath::cells2M(queue.surface.y0, logicalMap_->getResolution());
+            double x1 = MeasurementMath::cells2M(queue.surface.x1, logicalMap_->getResolution());
+            double y1 = MeasurementMath::cells2M(queue.surface.y1, logicalMap_->getResolution());
+
             // Create the polygon that represents the region of space of the queue
             PolygonType polygon;
 
             geometry_msgs::Point p1;
-            p1.x = queue.surface.x0;
-            p1.y = queue.surface.y0;
+            p1.x = x0;
+            p1.y = y0;
             p1.z = 0;
             polygon.push_back(p1);
 
             geometry_msgs::Point p2;
-            p1.x = queue.surface.x1;
-            p1.y = queue.surface.y0;
+            p1.x = x1;
+            p1.y = y0;
             p1.z = 0;
             polygon.push_back(p2);
 
             geometry_msgs::Point p3;
-            p1.x = queue.surface.x1;
-            p1.y = queue.surface.y1;
+            p1.x = x1;
+            p1.y = y1;
             p1.z = 0;
             polygon.push_back(p3);
 
             geometry_msgs::Point p4;
-            p1.x = queue.surface.x0;
-            p1.y = queue.surface.y1;
+            p1.x = x0;
+            p1.y = y1;
             p1.z = 0;
             polygon.push_back(p4);
+
+            ROS_WARN_STREAM("Queue: " <<
+                "(" << x0 << ", " << y0 << ")" <<
+                "(" << x1 << ", " << y0 << ")" <<
+                "(" << x1 << ", " << y1 << ")" <<
+                "(" << x0 << ", " << y1 << ")"
+            );
 
             queuesMap_.insert({queue.label, polygon});
         }

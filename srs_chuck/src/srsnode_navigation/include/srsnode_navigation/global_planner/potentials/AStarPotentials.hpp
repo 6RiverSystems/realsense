@@ -8,6 +8,8 @@
 #include <vector>
 #include <algorithm>
 
+#include <geometry_msgs/Point.h>
+
 #include <costmap_2d/costmap_2d_ros.h>
 #include <costmap_2d/costmap_2d.h>
 
@@ -56,7 +58,13 @@ public:
     bool worldToMap(double wx, double wy, double& mx, double& my);
 
 private:
+    using PolygonType = std::vector<geometry_msgs::Point>;
+
     void addMapBorder();
+
+    void clearQueues();
+
+    void extractQueuePolygons();
 
     costmap_2d::Costmap2D* costMap_;
 
@@ -64,6 +72,8 @@ private:
 
     Traceback* pathBuilder_;
     PotentialCalculator* potentialCalculator_;
+
+    std::unordered_map<std::string, PolygonType> queuesMap_;
 
     Expander* stateExpander_;
 };

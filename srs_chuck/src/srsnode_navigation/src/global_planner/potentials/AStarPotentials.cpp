@@ -2,6 +2,8 @@
 
 #include <srslib_test/utils/Print.hpp>
 
+#include <srslib_framework/localization/map/mapnote/NoteQueue.hpp>
+
 #include <srsnode_navigation/global_planner/potentials/QuadraticCalculator.hpp>
 #include <srsnode_navigation/global_planner/potentials/GradientPath.hpp>
 #include <srsnode_navigation/global_planner/potentials/GridPath.hpp>
@@ -17,6 +19,9 @@ AStarPotentials::AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* 
 {
     costMap_ = costMap;
     logicalMap_ = logicalMap;
+
+    // Extract the polygons of the queues from the logical map
+    extractQueuePolygons();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,8 +87,14 @@ bool AStarPotentials::calculatePath(SearchParameters searchParams,
         return false;
     }
 
+    // Change the cost for specific areas in the cost map
+    //
+    // - The position of the robot
+    // - The borders of the map (set a lethal cost)
+    // - All the queues (set a 0 cost)
     costMap_->setCost(start_x_i, start_y_i, costmap_2d::FREE_SPACE);
     addMapBorder();
+    clearQueues();
 
     bool found = stateExpander_->calculatePotentials(start_x_d, start_y_d,
         goal_x_d, goal_y_d,
@@ -161,6 +172,60 @@ void AStarPotentials::addMapBorder()
     for (int i = 0; i < sizeY; i++, pc += sizeX)
     {
         *pc = costmap_2d::LETHAL_OBSTACLE;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void AStarPotentials::clearQueues()
+{
+    for (auto queue : queuesMap_) {
+
+        costMap_->setConvexPolygonCost(queue.second, 0);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void AStarPotentials::extractQueuePolygons()
+{
+    queuesMap_.clear();
+
+    // Go through all the areas and find the queues
+    for (auto area : logicalMap_->getAreas())
+    {
+        LogicalMap::LabeledArea queue = area.second;
+
+        shared_ptr<NoteQueue> note = queue.notes->get<NoteQueue>(NoteQueue::TYPE);
+        if (note)
+        {
+            // Create the polygon that represents the region of space of the queue
+            PolygonType polygon;
+
+            geometry_msgs::Point p1;
+            p1.x = queue.surface.x0;
+            p1.y = queue.surface.y0;
+            p1.z = 0;
+            polygon.push_back(p1);
+
+            geometry_msgs::Point p2;
+            p1.x = queue.surface.x1;
+            p1.y = queue.surface.y0;
+            p1.z = 0;
+            polygon.push_back(p2);
+
+            geometry_msgs::Point p3;
+            p1.x = queue.surface.x1;
+            p1.y = queue.surface.y1;
+            p1.z = 0;
+            polygon.push_back(p3);
+
+            geometry_msgs::Point p4;
+            p1.x = queue.surface.x0;
+            p1.y = queue.surface.y1;
+            p1.z = 0;
+            polygon.push_back(p4);
+
+            queuesMap_.insert({queue.label, polygon});
+        }
     }
 }
 

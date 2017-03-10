@@ -448,9 +448,9 @@
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "sot17",
+						"label": "sop17",
 						"notes": {
-							
+							"stay_on_path": 1
 						},
 						"envelope_size": 0,
 						"envelope_cost": 0

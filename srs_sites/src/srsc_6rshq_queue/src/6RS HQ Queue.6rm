@@ -142,7 +142,7 @@
 							"policyType": {
 								"_class": "PolicyLabeledArea",
 								"_object": {
-									"labelPrefix": "sot",
+									"labelPrefix": "sop",
 									"notes": {
 										"_class": "MapNoteStayOnPath",
 										"_object": {

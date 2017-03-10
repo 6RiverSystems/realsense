@@ -17,6 +17,7 @@
 #include <srsnode_executive/task/TaskPlaySound.hpp>
 #include <srsnode_executive/task/TaskQueue.hpp>
 #include <srsnode_executive/task/TaskSetMaxVelocity.hpp>
+#include <srsnode_executive/task/TaskStayOnPath.hpp>
 
 namespace srs {
 
@@ -58,6 +59,7 @@ private:
     TaskPlaySound taskPlaySound_;
     TaskQueue taskQueue_;
     TaskSetMaxVelocity taskSetMaxVelocity_;
+    TaskStayOnPath taskStayOnPath_;
 };
 
 } // namespace srs

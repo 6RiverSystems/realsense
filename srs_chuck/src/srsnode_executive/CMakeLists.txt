@@ -15,6 +15,7 @@ set(${PROJECT_NAME}_SOURCES
     src/task/TaskPlaySound.cpp
     src/task/TaskQueue.cpp
     src/task/TaskSetMaxVelocity.cpp
+    src/task/TaskStayOnPath.cpp
 )
 
 ####################################################################################################

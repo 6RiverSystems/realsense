@@ -36,6 +36,7 @@ void Executive::execute()
     taskSetMaxVelocity_.run(context_);
     taskPlaySound_.run(context_);
     taskQueue_.run(context_);
+    taskStayOnPath_.run(context_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

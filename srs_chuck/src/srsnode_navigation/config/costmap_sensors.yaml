@@ -24,7 +24,7 @@ obstruction_layer_realsense:
    clearing: true,
    min_obstacle_height: 0.0,
    max_obstacle_height: 3.0,
-   expected_update_rate: 0.25,
+   expected_update_rate: 0, # set to zero to prevent RS failure stops the robot from moving
    inf_is_valid: true
  }
 

@@ -99,7 +99,7 @@ private:
         BACKGROUND = 0,
         PLAY_SOUND = 1,
         SET_MAX_VELOCITY = 2,
-        STAY_ON_TRACK = 3,
+        STAY_ON_PATH = 3,
         WEIGHTS_NORTH = 4,
         WEIGHTS_NORTH_EAST = 5,
         WEIGHTS_EAST = 6,
@@ -142,7 +142,7 @@ private:
     rviz::Property* propertyLayerPlaySound_;
     rviz::Property* propertyLayerQueue_;
     rviz::Property* propertyLayerSetMaxVelocity_;
-    rviz::Property* propertyLayerStayOnTrack_;
+    rviz::Property* propertyLayerStayOnPath_;
     rviz::Property* propertyLayerWeightsNorth_;
     rviz::Property* propertyLayerWeightsNorthEast_;
     rviz::Property* propertyLayerWeightsEast_;

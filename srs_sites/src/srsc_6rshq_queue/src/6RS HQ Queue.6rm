@@ -1,4 +1,4 @@
-﻿#
+#
 # (c) Copyright 2015-2017 River Systems, all rights reserved.
 #
 # This is proprietary software, unauthorized distribution is not permitted.
@@ -144,9 +144,9 @@
 								"_object": {
 									"labelPrefix": "sot",
 									"notes": {
-										"_class": "MapNoteStayOnTrack",
+										"_class": "MapNoteStayOnPath",
 										"_object": {
-											
+
 										}
 									}
 								}

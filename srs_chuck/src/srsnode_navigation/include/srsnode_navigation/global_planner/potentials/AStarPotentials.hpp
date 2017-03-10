@@ -24,6 +24,9 @@ namespace srs {
 class AStarPotentials
 {
 public:
+    using PolygonType = std::vector<geometry_msgs::Point>;
+    using QueueMapType = std::unordered_map<std::string, PolygonType>;
+
     struct SearchParameters
     {
         SearchParameters() :
@@ -45,7 +48,7 @@ public:
         unsigned int logicalCostRatio;
     };
 
-    AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap);
+    AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap, QueueMapType queuesMap);
 
     bool calculatePath(SearchParameters searchParams,
         double start_x, double start_y,
@@ -58,13 +61,10 @@ public:
     bool worldToMap(double wx, double wy, double& mx, double& my);
 
 private:
-    using PolygonType = std::vector<geometry_msgs::Point>;
 
     void addMapBorder();
 
     void clearQueues();
-
-    void extractQueuePolygons();
 
     costmap_2d::Costmap2D* costMap_;
 
@@ -73,7 +73,7 @@ private:
     Traceback* pathBuilder_;
     PotentialCalculator* potentialCalculator_;
 
-    std::unordered_map<std::string, PolygonType> queuesMap_;
+    QueueMapType queuesMap_;
 
     Expander* stateExpander_;
 };

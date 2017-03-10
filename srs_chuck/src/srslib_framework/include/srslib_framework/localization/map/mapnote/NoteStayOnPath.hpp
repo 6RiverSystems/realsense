@@ -12,16 +12,16 @@
 
 namespace srs {
 
-class NoteStayOnTrack : public MapNote
+class NoteStayOnPath : public MapNote
 {
 public:
     static const string TYPE;
 
-    NoteStayOnTrack() :
+    NoteStayOnPath() :
         MapNote()
     {}
 
-    virtual ~NoteStayOnTrack()
+    virtual ~NoteStayOnPath()
     {}
 
     std::string getType() const

@@ -30,7 +30,7 @@
 #include <srslib_framework/localization/map/mapnote/NotePlaySound.hpp>
 #include <srslib_framework/localization/map/mapnote/NoteQueue.hpp>
 #include <srslib_framework/localization/map/mapnote/NoteSetMaxVelocity.hpp>
-#include <srslib_framework/localization/map/mapnote/NoteStayOnTrack.hpp>
+#include <srslib_framework/localization/map/mapnote/NoteStayOnPath.hpp>
 
 namespace srs {
 
@@ -91,8 +91,8 @@ LogicalMapDisplay::LogicalMapDisplay() :
         "Rendering option, enables/disables the set-max-velocity layer.",
         this, SLOT(updateLayerSwitches()));
 
-    propertyLayerStayOnTrack_ = new rviz::Property("Stay-on-track layer", true,
-        "Rendering option, enables/disables the stay-on-track layer.",
+    propertyLayerStayOnPath_ = new rviz::Property("Stay-on-path layer", true,
+        "Rendering option, enables/disables the stay-on-path layer.",
         this, SLOT(updateLayerSwitches()));
 
     propertyLayerWeightsNorth_ = new rviz::Property("North weights layer", true,
@@ -301,9 +301,9 @@ void LogicalMapDisplay::initializeLayers()
         width, height, resolution, RGBA_DENIM);
     layers_[SET_MAX_VELOCITY] = setMaxVelocity;
 
-    std::shared_ptr<AreaLayerDisplay> stayOnTrack = createAreaLayer(STAY_ON_TRACK,
+    std::shared_ptr<AreaLayerDisplay> stayOnPath = createAreaLayer(STAY_ON_PATH,
         width, height, resolution, RGBA_VIOLET_RED);
-    layers_[STAY_ON_TRACK] = stayOnTrack;
+    layers_[STAY_ON_PATH] = stayOnPath;
 
     for (auto labeledArea : logicalMap_->getAreas())
     {
@@ -333,12 +333,12 @@ void LogicalMapDisplay::initializeLayers()
             setMaxVelocity->addArea(area.label, area.surface, noteSetMaxVelocity);
         }
 
-        // Search for StayOnTrack notes
-        shared_ptr<NoteStayOnTrack> noteStayOnTrack =
-            area.notes->get<NoteStayOnTrack>(NoteStayOnTrack::TYPE);
-        if (noteStayOnTrack)
+        // Search for StayOnPath notes
+        shared_ptr<NoteStayOnPath> noteStayOnPath =
+            area.notes->get<NoteStayOnPath>(NoteStayOnPath::TYPE);
+        if (noteStayOnPath)
         {
-            stayOnTrack->addArea(area.label, area.surface, noteStayOnTrack);
+            stayOnPath->addArea(area.label, area.surface, noteStayOnPath);
         }
     }
 }
@@ -498,7 +498,7 @@ void LogicalMapDisplay::updateLayerSwitches()
     layers_[PLAY_SOUND]->show(propertyLayerPlaySound_->getValue().toBool());
     layers_[QUEUE]->show(propertyLayerQueue_->getValue().toBool());
     layers_[SET_MAX_VELOCITY]->show(propertyLayerSetMaxVelocity_->getValue().toBool());
-    layers_[STAY_ON_TRACK]->show(propertyLayerStayOnTrack_->getValue().toBool());
+    layers_[STAY_ON_PATH]->show(propertyLayerStayOnPath_->getValue().toBool());
 
     layers_[WEIGHTS_NORTH]->show(propertyLayerWeightsNorth_->getValue().toBool());
     layers_[WEIGHTS_NORTH_EAST]->show(propertyLayerWeightsNorthEast_->getValue().toBool());

@@ -9,8 +9,7 @@
 
 #include <srslib_framework/platform/SoftwareMessageHandler.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
-#include <srslib_framework/ros/channel/ChannelMoveBaseCmd_GotoGoal.hpp>
-#include <srslib_framework/ros/tap/TapRequestGoal.hpp>
+#include <srslib_framework/ros/tap/TapMoveBaseCurrentGoal.hpp>
 #include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
 
 #include <srsnode_executive/ExecutiveContext.hpp>
@@ -37,7 +36,7 @@ private:
 
     bool newGoalReceived_;
 
-    TapRequestGoal tapRequestGoal_;
+    TapMoveBaseCurrentGoal tapCurrentGoal_;
 };
 
 } // namespace srs

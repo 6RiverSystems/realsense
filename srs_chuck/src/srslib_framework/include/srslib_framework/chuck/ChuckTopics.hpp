@@ -83,7 +83,7 @@ namespace monitoring {
 
 namespace node {
 
-static const string MOVE_BASE_CMD_GOTO_GOAL = "/move_base_simple/goal";
+static const string MOVE_BASE_CURRENT_GOAL = "/move_base/current_goal";
 
 } // namespace node
 

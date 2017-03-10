@@ -13,7 +13,7 @@ namespace srs {
 ConditionNewGoal::ConditionNewGoal(Executive* owner) :
     SoftwareMessageHandler(owner)
 {
-    tapRequestGoal_.attach(this);
+    tapCurrentGoal_.attach(this);
 
     newGoalReceived_ = false;
     currentGoal_ = Pose<>::INVALID;
@@ -22,8 +22,8 @@ ConditionNewGoal::ConditionNewGoal(Executive* owner) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void ConditionNewGoal::notified(Subscriber<geometry_msgs::PoseStamped>* subject)
 {
-    TapRequestGoal* tapRequestGoal = static_cast<TapRequestGoal*>(subject);
-    currentGoal_ = tapRequestGoal->pop();
+    TapMoveBaseCurrentGoal* tapMoveBaseCurrentGoal = static_cast<TapMoveBaseCurrentGoal*>(subject);
+    currentGoal_ = tapMoveBaseCurrentGoal->pop();
     newGoalReceived_ = true;
 
     ROS_INFO_STREAM("Received goal request " << currentGoal_);

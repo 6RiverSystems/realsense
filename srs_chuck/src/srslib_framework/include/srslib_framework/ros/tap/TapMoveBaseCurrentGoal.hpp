@@ -5,17 +5,17 @@
  */
 #pragma once
 
-#include <srslib_framework/ros/channel/publisher/PublisherPoseStamped.hpp>
+#include <srslib_framework/ros/tap/subscriber/SubscriberPoseStamped.hpp>
 #include <srslib_framework/chuck/ChuckTopics.hpp>
 
 namespace srs {
 
-class ChannelMoveBaseCmd_GotoGoal :
-    public PublisherPoseStamped
+class TapMoveBaseCurrentGoal :
+    public SubscriberPoseStamped
 {
 public:
-    ChannelMoveBaseCmd_GotoGoal() :
-        PublisherPoseStamped(ChuckTopics::node::MOVE_BASE_CMD_GOTO_GOAL, 1)
+    TapMoveBaseCurrentGoal() :
+        SubscriberPoseStamped(ChuckTopics::node::MOVE_BASE_CURRENT_GOAL)
     {}
 };
 

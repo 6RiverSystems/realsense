@@ -8,7 +8,7 @@
   *
 -->
 <package>
-    <name>srsc_ac</name>
+    <name>srsc_qc</name>
     <version>1.0.0</version>
     <description>Customer package: QC - no constraints</description>
 

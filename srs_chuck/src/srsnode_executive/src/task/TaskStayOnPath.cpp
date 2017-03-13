@@ -15,7 +15,7 @@ void TaskStayOnPath::run(ExecutiveContext& context)
     for (auto detectedArea : context.activeLabeledAreas)
     {
         LogicalMap::LabeledArea area = detectedArea.first;
-        shared_ptr<NoteStayOnPath> note = area.notes->get<NoteQueue>(NoteStayOnPath::TYPE);
+        shared_ptr<NoteStayOnPath> note = area.notes->get<NoteStayOnPath>(NoteStayOnPath::TYPE);
 
         if (note)
         {

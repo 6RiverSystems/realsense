@@ -53,10 +53,12 @@ public:
         std::vector<geometry_msgs::PoseStamped>& plan);
 
 private:
-    void onConfigChange(srsnode_navigation::SrsPlannerConfig& config, uint32_t level);
+    void extractQueuePolygons();
 
     void getPlanFromPotential(std::vector<std::pair<float, float>>& path,
         std::vector<geometry_msgs::PoseStamped>& plan);
+
+    void onConfigChange(srsnode_navigation::SrsPlannerConfig& config, uint32_t level);
 
     void publishPlan(const std::vector<geometry_msgs::PoseStamped>& path);
     void publishPotential(float* potential);
@@ -85,6 +87,8 @@ private:
     float* potentialArray_;
     bool publishPotential_;
     int publishScale_;
+
+    AStarPotentials::QueueMapType queuesMap_;
 
     MapStack* srsMapStack_;
 

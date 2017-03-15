@@ -16,6 +16,7 @@ namespace ChuckTopics {
 namespace external {
 
     static const string RESPONSE_ARRIVED = "/response/arrived";
+    static const string REQUEST_GOAL = "/request/goal";
 
 } // namespace external
 
@@ -42,6 +43,7 @@ namespace driver {
     static const string BRAINSTEM_STATE_POWER_FILTERED = "/info/power/filtered";
     static const string BRAINSTEM_HARDWARE_INFO = "/info/hardware";
     static const string BRAINSTEM_OPERATIONAL_STATE = "/info/operational_state";
+
 } // namespace debug
 
 namespace internal {
@@ -55,8 +57,6 @@ namespace internal {
     static const string GOAL_GOAL = "/internal/state/goal/goal";
     static const string GOAL_PATH = "/internal/state/goal/path";
     static const string GOAL_TARGET_AREA = "/internal/state/goal/target_area";
-
-    static const string GOTO_GOAL = "/move_base_simple/goal";
 
     static const string MAP_ROS_AMCL_OCCUPANCY = "/internal/state/map/ros_amcl_occupancy";
     static const string MAP_ROS_LOGICAL = "/internal/state/map/ros_logical";
@@ -80,6 +80,12 @@ namespace monitoring {
     static const string TIMING_DATA = "/monitoring/timing_data";
 
 } // namespace monitoring
+
+namespace node {
+
+static const string MOVE_BASE_CURRENT_GOAL = "/move_base/current_goal";
+
+} // namespace node
 
 namespace sensor {
     static const string FILTERED_DEPTH_CAMERA = "/internal/sensors/rgbd/scan/filtered";

@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include <ros/ros.h>
 #include <nav_msgs/Path.h>
 
 #include <srslib_framework/Pose.h>

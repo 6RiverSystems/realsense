@@ -25,7 +25,7 @@ TEST(Test_Navigation_AStarPotentials, OneWay)
     LogicalMap* logical = mapStack->getLogicalMap();
     costmap_2d::Costmap2D* cost2d = MapAdapter::map2CostMap2D(mapStack->getOccupancyMap());
 
-    AStarPotentials astar(logical, cost2d);
+    AStarPotentials astar(logical, cost2d, AStarPotentials::QueueMapType());
     std::vector<std::pair<float, float>> path;
     float* potentials;
 

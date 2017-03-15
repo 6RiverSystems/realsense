@@ -31,6 +31,11 @@ namespace Parameters {
 
     static const string FRAME_ID = "frame_id";
 
+    static const string LP_MODE = "mode";
+    static const int LP_MODE_DEFAULT = 0;
+    static const int LP_MODE_QUEUE = 1;
+    static const int LP_MODE_STAY_ON_PATH = 2;
+
     static const string MAP_STACK = "map_stack";
     static const string MAX_VELOCITY = "max_vel_x";
 

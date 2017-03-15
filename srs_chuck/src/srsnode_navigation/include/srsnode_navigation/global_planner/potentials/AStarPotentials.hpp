@@ -8,6 +8,8 @@
 #include <vector>
 #include <algorithm>
 
+#include <geometry_msgs/Point.h>
+
 #include <costmap_2d/costmap_2d_ros.h>
 #include <costmap_2d/costmap_2d.h>
 
@@ -22,6 +24,9 @@ namespace srs {
 class AStarPotentials
 {
 public:
+    using PolygonType = std::vector<geometry_msgs::Point>;
+    using QueueMapType = std::unordered_map<std::string, PolygonType>;
+
     struct SearchParameters
     {
         SearchParameters() :
@@ -43,7 +48,7 @@ public:
         unsigned int logicalCostRatio;
     };
 
-    AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap);
+    AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap, QueueMapType queuesMap);
 
     bool calculatePath(SearchParameters searchParams,
         double start_x, double start_y,
@@ -56,7 +61,10 @@ public:
     bool worldToMap(double wx, double wy, double& mx, double& my);
 
 private:
+
     void addMapBorder();
+
+    void clearQueues();
 
     costmap_2d::Costmap2D* costMap_;
 
@@ -64,6 +72,8 @@ private:
 
     Traceback* pathBuilder_;
     PotentialCalculator* potentialCalculator_;
+
+    QueueMapType queuesMap_;
 
     Expander* stateExpander_;
 };

@@ -22,6 +22,8 @@ Executive::Executive(string name, int argc, char** argv) :
     context_.isRobotMoving = false;
     context_.isRobotPaused = false;
 
+    conditionNewGoal_ = std::make_shared<ConditionNewGoal>(this);
+
     readConfigurationParameters();
 }
 
@@ -33,6 +35,8 @@ void Executive::execute()
     taskDetectLabeledAreas_.run(context_);
     taskSetMaxVelocity_.run(context_);
     taskPlaySound_.run(context_);
+    taskQueue_.run(context_);
+    taskStayOnPath_.run(context_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +66,8 @@ void Executive::updateContext()
     context_.isRobotMoving = VelocityMath::greaterThanOr(context_.commandedVelocity,
         MIN_MOVING_THRESHOLD);
 
-    // The Pause state is handled by one of the commands
+    // The new goal condition sets some information about the goal in the context
+    conditionNewGoal_->evaluate(context_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

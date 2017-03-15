@@ -5,10 +5,14 @@
  */
 #pragma once
 
+#include <srslib_framework/platform/observer/Observer.hpp>
+#include <srslib_framework/ros/tap/subscriber/Subscriber.hpp>
+
 namespace srs {
 
-template<class OWNER>
-class SoftwareMessageHandler
+template<class OWNER, class MESSAGE_TYPE>
+class SoftwareMessageHandler :
+    public Observer<Subscriber<MESSAGE_TYPE>>
 {
 public:
     SoftwareMessageHandler(OWNER* owner) :
@@ -23,7 +27,11 @@ public:
         return owner_;
     }
 
-    virtual void attach() {};
+    virtual void attach()
+    {}
+
+    virtual void notified(Subscriber<MESSAGE_TYPE>* subject)
+    {}
 
 private:
 

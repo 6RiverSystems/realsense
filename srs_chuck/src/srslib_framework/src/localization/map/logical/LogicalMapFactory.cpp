@@ -3,6 +3,7 @@
 #include <algorithm>
 using namespace std;
 
+#include <srslib_framework/math/MeasurementMath.hpp>
 #include <srslib_framework/math/PoseMath.hpp>
 #include <srslib_framework/exception/io/FailedToOpenFileException.hpp>
 #include <srslib_framework/exception/yaml/FailedToParseJsonException.hpp>

@@ -98,17 +98,17 @@ private:
     enum {
         BACKGROUND = 0,
         PLAY_SOUND = 1,
-        QUEUE = 2,
-        SET_MAX_VELOCITY = 3,
-        STAY_ON_TRACK = 4,
-        WEIGHTS_NORTH = 5,
-        WEIGHTS_NORTH_EAST = 6,
-        WEIGHTS_EAST = 7,
-        WEIGHTS_SOUTH_EAST = 8,
-        WEIGHTS_SOUTH = 9,
-        WEIGHTS_SOUTH_WEST = 10,
-        WEIGHTS_WEST = 11,
-        WEIGHTS_NORTH_WEST = 12,
+        SET_MAX_VELOCITY = 2,
+        STAY_ON_PATH = 3,
+        WEIGHTS_NORTH = 4,
+        WEIGHTS_NORTH_EAST = 5,
+        WEIGHTS_EAST = 6,
+        WEIGHTS_SOUTH_EAST = 7,
+        WEIGHTS_SOUTH = 8,
+        WEIGHTS_SOUTH_WEST = 9,
+        WEIGHTS_WEST = 10,
+        WEIGHTS_NORTH_WEST = 11,
+        QUEUE = 12,
         COST_AREA = 13,
         OBSTACLES = 14
     } EnititesEnum;
@@ -142,7 +142,7 @@ private:
     rviz::Property* propertyLayerPlaySound_;
     rviz::Property* propertyLayerQueue_;
     rviz::Property* propertyLayerSetMaxVelocity_;
-    rviz::Property* propertyLayerStayOnTrack_;
+    rviz::Property* propertyLayerStayOnPath_;
     rviz::Property* propertyLayerWeightsNorth_;
     rviz::Property* propertyLayerWeightsNorthEast_;
     rviz::Property* propertyLayerWeightsEast_;

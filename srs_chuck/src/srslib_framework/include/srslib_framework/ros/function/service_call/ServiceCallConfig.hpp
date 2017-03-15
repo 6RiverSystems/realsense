@@ -10,35 +10,19 @@ using namespace std;
 
 #include <ros/ros.h>
 #include <dynamic_reconfigure/DoubleParameter.h>
+#include <dynamic_reconfigure/IntParameter.h>
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/Config.h>
 
 namespace srs {
 
-template<typename TYPE>
-struct ServiceCallConfig
+struct ServiceConfig
 {
-    static bool call(string node, string parameter, TYPE value)
-    {
-        return false;
-    }
-};
-
-template<>
-struct ServiceCallConfig<double>
-{
-    static bool call(string node, string parameter, double value)
+    static bool call(std::string node, dynamic_reconfigure::Config configuration)
     {
         ros::NodeHandle rosNodeHandle;
 
         string fullServiceName = node + "/set_parameters";
-
-        dynamic_reconfigure::Config configuration;
-
-        dynamic_reconfigure::DoubleParameter doubleParameter;
-        doubleParameter.name = parameter;
-        doubleParameter.value = value;
-        configuration.doubles.push_back(doubleParameter);
 
         dynamic_reconfigure::ReconfigureRequest request;
         request.config = configuration;
@@ -57,6 +41,47 @@ struct ServiceCallConfig<double>
             " did not respond to a set_parameters request.");
 
         return false;
+    }
+};
+
+template<typename TYPE>
+class ServiceCallConfig
+{
+    static bool set(string node, string parameter, TYPE value)
+    {
+        return false;
+    }
+};
+
+template<>
+struct ServiceCallConfig<int>
+{
+    static bool set(string node, string parameter, int value)
+    {
+        dynamic_reconfigure::IntParameter intParameter;
+        intParameter.name = parameter;
+        intParameter.value = value;
+
+        dynamic_reconfigure::Config configuration;
+        configuration.ints.push_back(intParameter);
+
+        return ServiceConfig::call(node, configuration);
+    }
+};
+
+template<>
+struct ServiceCallConfig<double>
+{
+    static bool set(string node, string parameter, double value)
+    {
+        dynamic_reconfigure::DoubleParameter doubleParameter;
+        doubleParameter.name = parameter;
+        doubleParameter.value = value;
+
+        dynamic_reconfigure::Config configuration;
+        configuration.doubles.push_back(doubleParameter);
+
+        return ServiceConfig::call(node, configuration);
     }
 };
 

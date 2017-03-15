@@ -1,11 +1,11 @@
-#include <srslib_framework/localization/map/mapnote/NoteStayOnTrack.hpp>
+#include <srslib_framework/localization/map/mapnote/NoteStayOnPath.hpp>
 
 namespace srs {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Constant declaration
 
-const string NoteStayOnTrack::TYPE = "stay-on-track";
+const string NoteStayOnPath::TYPE = "stay_on_path";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Public methods

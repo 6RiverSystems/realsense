@@ -15,6 +15,13 @@
 
 namespace srs {
 
+struct GoalContext
+{
+    Pose<> goal;
+    bool inQueue;
+    std::string queue;
+};
+
 struct ExecutiveContext
 {
     enum DirectionEnum {
@@ -26,6 +33,8 @@ struct ExecutiveContext
     vector<ActiveLabelType> activeLabeledAreas;
 
     Velocity<> commandedVelocity;
+
+    GoalContext goal;
 
     bool isRobotMoving;
     bool isRobotPaused;

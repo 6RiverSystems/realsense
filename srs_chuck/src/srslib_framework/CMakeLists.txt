@@ -160,7 +160,6 @@ project(${PROJECT_NAME})
 set(PROJECT_LIBRARY ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread ${CMAKE_CXX_FLAGS}")
-# set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
@@ -221,7 +220,7 @@ generate_messages(
 # Target
 
 catkin_package(
-    INCLUDE_DIRS src include
+	INCLUDE_DIRS src include
     LIBRARIES ${PROJECT_LIBRARY}
     DEPENDS
         opencv
@@ -246,6 +245,19 @@ target_link_libraries(${PROJECT_LIBRARY}
     ${UNWIND_LIBRARIES}
     ${catkin_LIBRARIES}
     usb-1.0
+)
+
+####################################################################################################
+# Installation
+
+install(TARGETS ${PROJECT_LIBRARY}
+	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/
+	DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
 ####################################################################################################

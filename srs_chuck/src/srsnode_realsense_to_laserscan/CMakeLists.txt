@@ -65,6 +65,17 @@ target_link_libraries(${PROJECT_NODE}
 )
 
 ####################################################################################################
+# Installation
+
+install(TARGETS ${PROJECT_NODE}
+	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY launch/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
+####################################################################################################
 # Tests
 #if (CATKIN_ENABLE_TESTING)
 #    catkin_add_gtest(TestSuite_RealsenseDriver

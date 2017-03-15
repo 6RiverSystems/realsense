@@ -95,19 +95,34 @@ target_link_libraries(srslib_global_planner
     ${srslib_framework_LIBRARIES}
 )
 
+ ####################################################################################################
+ # Installation
+ 
 install(TARGETS srslib_global_planner
-   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
-
+ 
 install(DIRECTORY
-    include/${PROJECT_NAME}/
-    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-    PATTERN ".svn" EXCLUDE
+	include/${PROJECT_NAME}/
+	DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+	PATTERN ".svn" EXCLUDE
 )
-
-install(FILES bgp_plugin.xml
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+ 
+ install(FILES bgp_plugin.xml
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+ 
+install(DIRECTORY launch/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+ 
+ install(DIRECTORY config/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+ 
+install(DIRECTORY cfg/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cfg
 )
 
 ####################################################################################################

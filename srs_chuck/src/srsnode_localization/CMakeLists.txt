@@ -21,10 +21,8 @@ include_directories(include
 )
 
 ####################################################################################################
-# Target
+# Installation
 
-catkin_package(
+install(DIRECTORY launch/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
-
-####################################################################################################
-# Tests

@@ -65,4 +65,19 @@ target_link_libraries(${PROJECT_NODE}
 )
 
 ####################################################################################################
+# Installation
+
+install(TARGETS ${PROJECT_LIBRARY}
+	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY launch/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
+install(DIRECTORY cfg/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cfg
+)
+
+####################################################################################################
 # Tests

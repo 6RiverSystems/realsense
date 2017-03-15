@@ -19,7 +19,6 @@ project(${PROJECT_NAME})
 set(PROJECT_LIBRARY ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
-# set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
@@ -48,6 +47,17 @@ add_library(${PROJECT_LIBRARY}
 target_link_libraries(${PROJECT_LIBRARY}
     ${roscpp_LIBRARIES}
     ${OpenCV_LIBRARIES}
+)
+
+####################################################################################################
+# Installation
+
+install(TARGETS ${PROJECT_LIBRARY}
+	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/
+	DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
 ####################################################################################################

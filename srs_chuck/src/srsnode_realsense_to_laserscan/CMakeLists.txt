@@ -69,10 +69,16 @@ target_link_libraries(${PROJECT_NODE}
 
 install(TARGETS ${PROJECT_NODE}
 	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
 install(DIRECTORY launch/
 	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
+install(FILES nodelets.xml
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/nodelets.xml
 )
 
 ####################################################################################################

@@ -59,6 +59,12 @@ catkin_package(
 ####################################################################################################
 # Installation
 
+install(TARGETS ${PROJECT_NODE}
+	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/
 	DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )

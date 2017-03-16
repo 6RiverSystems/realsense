@@ -18,6 +18,8 @@ find_package(catkin REQUIRED COMPONENTS
     xacro
 )
 
+catkin_package()
+
 ####################################################################################################
 # Installation
 

@@ -37,18 +37,6 @@ include_directories(include
     ${srslib_test_INCLUDE_DIRS}
 )
 
-
-####################################################################################################
-# Installation
-
-install(TARGETS ${PROJECT_LIBRARY}
-	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-install(DIRECTORY launch/
-	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
-)
-
 ####################################################################################################
 # Target
 
@@ -64,6 +52,19 @@ add_executable(${PROJECT_NODE}
 target_link_libraries(${PROJECT_NODE}
     ${catkin_LIBRARIES}
     ${srslib_framework_LIBRARIES}
+)
+
+####################################################################################################
+# Installation
+
+install(TARGETS ${PROJECT_NODE}
+	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
+install(DIRECTORY launch/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
 
 ####################################################################################################

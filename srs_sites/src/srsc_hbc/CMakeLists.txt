@@ -19,8 +19,8 @@ catkin_package()
 ####################################################################################################
 # Installation
 
-install(DIRECTORY map/
-	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/m
+install(DIRECTORY rviz/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/rviz
 )
 
 install(DIRECTORY map/

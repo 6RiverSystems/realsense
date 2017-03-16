@@ -7,7 +7,7 @@
 	"language_version": "1.0",
 	"metadata": {
 		"map_name": "HBC Queue",
-		"map_version": "1.1"
+		"map_version": "1.2"
 	},
 	"logical": {
 		"map": "hbc.geojson"

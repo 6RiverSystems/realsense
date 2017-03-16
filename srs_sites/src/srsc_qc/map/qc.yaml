@@ -6,7 +6,7 @@
 {
 	"language_version": "1.0",
 	"metadata": {
-		"map_name": "QC",
+		"map_name": "QC Map",
 		"map_version": "1.0"
 	},
 	"logical": {
@@ -16,8 +16,8 @@
 		"map": "qc.pgm",
 		"resolution": 0.05,
 		"origin": [
-			-10,
-			-10,
+			-4.05,
+			-7.1,
 			0
 		],
 		"negate": 0,

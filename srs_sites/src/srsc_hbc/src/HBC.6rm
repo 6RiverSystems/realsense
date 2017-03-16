@@ -9,11 +9,11 @@
 		"metadata": {
 			"_class": "MapStackMetadata",
 			"_object": {
-				"comments": "Pack-out 1 added on the East side. (1.1) Moved the queue 0.5m West",
+				"comments": "Pack-out 1 added on the East side. (1.1) Moved the queue 0.5m West. Added cost area in front of the supervisor's desk.",
 				"heightPixels": 1394,
 				"mapStackFilename": "hbc.yaml",
 				"mapName": "HBC Queue",
-				"mapVersion": "1.1",
+				"mapVersion": "1.2",
 				"originX": -0.025,
 				"originY": -0.025,
 				"resolution": 0.05,

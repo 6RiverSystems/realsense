@@ -1,0 +1,28 @@
+<launch>
+  <group ns="DWAPlannerROS">
+    <rosparam param="modes">[default, queue, stay_on_path]</rosparam>
+    
+    <!-- Load each mode using default params, then do overrides -->
+    <group ns="default">
+      <rosparam file="$(find srsnode_navigation)/config/local_planner_default_params.yaml" command="load"/>
+    </group>
+
+    <group ns="queue">
+      <rosparam file="$(find srsnode_navigation)/config/local_planner_default_params.yaml" command="load"/>
+      <param name="always_use_euclidean_goal_distance" value="true" />
+      <param name="enable_simple_trajectory_generator" value="false" />
+      <param name="enable_stationary_trajectory_generator" value="true" />
+      <param name="enable_follower_trajectory_generator" value="true" />
+      <param name="oscillation_reset_dist" value="0.0" />
+      <param name="oscillation_reset_angle" value="0.0" />
+      <param name="goal_distance_bias" value="0" />
+    </group>
+
+    <group ns="stay_on_path">
+      <rosparam file="$(find srsnode_navigation)/config/local_planner_default_params.yaml" command="load"/>
+      <param name="goal_distance_bias" value="0.0" />
+      <param name="heading_critic_half_angle" value="3.2" />
+      <param name="euclidean_distance_scale" value="0.0" />
+    </group>
+  </group>
+</launch>

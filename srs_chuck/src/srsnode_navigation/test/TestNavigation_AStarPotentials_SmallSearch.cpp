@@ -25,7 +25,7 @@ TEST(Test_Navigation_AStarPotentials, SmallSearch)
     WeightedGrid2d logical(GRID_SIZE, GRID_SIZE);
     MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
 
-    AStarPotentials astar(mapStack->getLogicalMap(), mapStack->getCostMap2d());
+    AStarPotentials astar(mapStack->getLogicalMap(), mapStack->getCostMap2d(), AStarPotentials::QueueMapType());
 
     std::vector<std::pair<float, float>> path;
     float* potentials;

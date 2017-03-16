@@ -3,7 +3,7 @@
 #include <srslib_framework/localization/map/mapnote/NotePlaySound.hpp>
 #include <srslib_framework/localization/map/mapnote/NoteQueue.hpp>
 #include <srslib_framework/localization/map/mapnote/NoteSetMaxVelocity.hpp>
-#include <srslib_framework/localization/map/mapnote/NoteStayOnTrack.hpp>
+#include <srslib_framework/localization/map/mapnote/NoteStayOnPath.hpp>
 
 namespace srs {
 
@@ -30,9 +30,9 @@ MapNote::BaseMapNoteType MapNoteFactory::instanceOf(const string& field, const s
     {
         note = shared_ptr<NoteQueue>(new NoteQueue(value));
     }
-    else if (field == NoteStayOnTrack::TYPE)
+    else if (field == NoteStayOnPath::TYPE)
     {
-        note = shared_ptr<NoteStayOnTrack>(new NoteStayOnTrack());
+        note = shared_ptr<NoteStayOnPath>(new NoteStayOnPath());
     }
 
     return note;

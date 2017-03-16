@@ -9,11 +9,12 @@
 
 namespace srs {
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-AStarPotentials::AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap) :
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+AStarPotentials::AStarPotentials(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap, QueueMapType queuesMap) :
     potentialCalculator_(nullptr),
     pathBuilder_(nullptr),
-    stateExpander_(nullptr)
+    stateExpander_(nullptr),
+    queuesMap_(queuesMap)
 {
     costMap_ = costMap;
     logicalMap_ = logicalMap;
@@ -82,8 +83,14 @@ bool AStarPotentials::calculatePath(SearchParameters searchParams,
         return false;
     }
 
+    // Change the cost for specific areas in the cost map
+    //
+    // - The position of the robot
+    // - The borders of the map (set a lethal cost)
+    // - All the queues (set a 0 cost)
     costMap_->setCost(start_x_i, start_y_i, costmap_2d::FREE_SPACE);
     addMapBorder();
+    clearQueues();
 
     bool found = stateExpander_->calculatePotentials(start_x_d, start_y_d,
         goal_x_d, goal_y_d,
@@ -161,6 +168,14 @@ void AStarPotentials::addMapBorder()
     for (int i = 0; i < sizeY; i++, pc += sizeX)
     {
         *pc = costmap_2d::LETHAL_OBSTACLE;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void AStarPotentials::clearQueues()
+{
+    for (auto queue : queuesMap_) {
+        costMap_->setConvexPolygonCost(queue.second, 0);
     }
 }
 

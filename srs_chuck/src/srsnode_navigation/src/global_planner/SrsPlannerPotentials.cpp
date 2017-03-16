@@ -9,6 +9,8 @@
 #include <costmap_2d/costmap_2d.h>
 
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
+#include <srslib_framework/localization/map/mapnote/NoteQueue.hpp>
+#include <srslib_framework/math/MeasurementMath.hpp>
 
 #include <srsnode_navigation/global_planner/potentials/QuadraticCalculator.hpp>
 #include <srsnode_navigation/global_planner/potentials/GradientPath.hpp>
@@ -150,7 +152,7 @@ bool SrsPlannerPotentials::makePlan(
         return false;
     }
 
-    astar_ = new AStarPotentials(srsMapStack_->getLogicalMap(), costMap_);
+    astar_ = new AStarPotentials(srsMapStack_->getLogicalMap(), costMap_, queuesMap_);
 
     tf::Stamped<tf::Pose> start_pose;
     tf::poseStampedMsgToTF(start, start_pose);
@@ -195,7 +197,6 @@ bool SrsPlannerPotentials::makePlan(
         costMap_->saveMap("cost_map.pgm");
     }
 
-
     delete potentialArray_;
     potentialArray_ = nullptr;
 
@@ -204,8 +205,63 @@ bool SrsPlannerPotentials::makePlan(
 
     return !path.empty();
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void SrsPlannerPotentials::extractQueuePolygons()
+{
+    queuesMap_.clear();
+
+    LogicalMap* logicalMap = srsMapStack_->getLogicalMap();
+
+    // Go through all the areas and find the queues
+    for (auto area : logicalMap->getAreas())
+    {
+        LogicalMap::LabeledArea queue = area.second;
+
+        shared_ptr<NoteQueue> note = queue.notes->get<NoteQueue>(NoteQueue::TYPE);
+        if (note)
+        {
+            // Convert the queue region into map coordinates
+            double x0;
+            double y0;
+            double x1;
+            double y1;
+            logicalMap->transformCells2M(queue.surface.x0, queue.surface.y0, x0, y0);
+            logicalMap->transformCells2M(queue.surface.x1, queue.surface.y1, x1, y1);
+
+            // Create the polygon that represents the region of space of the queue
+            AStarPotentials::PolygonType polygon;
+
+            geometry_msgs::Point p1;
+            p1.x = x0;
+            p1.y = y0;
+            p1.z = 0;
+            polygon.push_back(p1);
+
+            geometry_msgs::Point p2;
+            p2.x = x1;
+            p2.y = y0;
+            p2.z = 0;
+            polygon.push_back(p2);
+
+            geometry_msgs::Point p3;
+            p3.x = x1;
+            p3.y = y1;
+            p3.z = 0;
+            polygon.push_back(p3);
+
+            geometry_msgs::Point p4;
+            p4.x = x0;
+            p4.y = y1;
+            p4.z = 0;
+            polygon.push_back(p4);
+
+            queuesMap_.insert({queue.label, polygon});
+        }
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlannerPotentials::getPlanFromPotential(
@@ -337,6 +393,8 @@ void SrsPlannerPotentials::updateMapStack(costmap_2d::Costmap2D* rosCostMap)
     {
         delete srsMapStack_;
         srsMapStack_ = tapMapStack_.pop();
+
+        extractQueuePolygons();
     }
 }
 

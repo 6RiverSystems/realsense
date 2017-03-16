@@ -14,5 +14,4 @@
         <remap from="map" to="/internal/state/map/ros_occupancy"/>
         <remap from="map_metadata" to="/internal/state/map/ros_metadata"/>
     </include>
-
 </launch>

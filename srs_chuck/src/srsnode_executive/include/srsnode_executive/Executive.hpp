@@ -12,9 +12,12 @@
 #include <srslib_framework/ros/unit/RosUnit.hpp>
 
 #include <srsnode_executive/ExecutiveContext.hpp>
+#include <srsnode_executive/condition/ConditionNewGoal.hpp>
 #include <srsnode_executive/task/TaskDetectLabeledAreas.hpp>
 #include <srsnode_executive/task/TaskPlaySound.hpp>
+#include <srsnode_executive/task/TaskQueue.hpp>
 #include <srsnode_executive/task/TaskSetMaxVelocity.hpp>
+#include <srsnode_executive/task/TaskStayOnPath.hpp>
 
 namespace srs {
 
@@ -45,6 +48,7 @@ private:
 
     void updateContext();
 
+    std::shared_ptr<ConditionNewGoal> conditionNewGoal_;
     ExecutiveContext context_;
 
     TapOdometryCmd_Velocity tapCommandedVelocity_;
@@ -53,7 +57,9 @@ private:
     TapRobotPose tapRobotPose_;
     TaskDetectLabeledAreas taskDetectLabeledAreas_;
     TaskPlaySound taskPlaySound_;
+    TaskQueue taskQueue_;
     TaskSetMaxVelocity taskSetMaxVelocity_;
+    TaskStayOnPath taskStayOnPath_;
 };
 
 } // namespace srs

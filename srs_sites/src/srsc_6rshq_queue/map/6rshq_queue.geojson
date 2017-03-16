@@ -284,12 +284,12 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[
-								3.6,
-								3.2
+								2,
+								9.8
 							],
 							[
-								6.2,
-								6.3
+								7,
+								10.7
 							]
 						]
 					},
@@ -310,11 +310,11 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[
-								14.7,
-								4.5
+								3.6,
+								3.2
 							],
 							[
-								18.45,
+								6.2,
 								6.3
 							]
 						]
@@ -336,20 +336,20 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[
-								17,
-								1.75
+								14.7,
+								4.5
 							],
 							[
 								18.45,
-								9.3
+								6.3
 							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws13",
+						"label": "smv13",
 						"notes": {
-							"play_sound": "warning"
+							"set_max_velocity": 0.6
 						},
 						"envelope_size": 0,
 						"envelope_cost": 0
@@ -362,12 +362,12 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[
-								3.6,
-								3.2
+								17,
+								1.75
 							],
 							[
-								6.2,
-								6.3
+								18.45,
+								9.3
 							]
 						]
 					},
@@ -388,11 +388,11 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[
-								14.7,
-								4.5
+								3.6,
+								3.2
 							],
 							[
-								16.9,
+								6.2,
 								6.3
 							]
 						]
@@ -414,17 +414,20 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[
-								1.5,
-								9.5
+								14.7,
+								4.5
 							],
-							[7,11]
+							[
+								16.9,
+								6.3
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "sot16",
+						"label": "ws16",
 						"notes": {
-							
+							"play_sound": "warning"
 						},
 						"envelope_size": 0,
 						"envelope_cost": 0
@@ -433,6 +436,29 @@
 				{
 					"type": "Feature",
 					"id": 17,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								1.5,
+								9.5
+							],
+							[7,11]
+						]
+					},
+					"properties": {
+						"object": "labeled_area",
+						"label": "sop17",
+						"notes": {
+							"stay_on_path": 1
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 18,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
@@ -448,7 +474,7 @@
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "q17",
+						"label": "q18",
 						"notes": {
 							"queue": "queue1"
 						},
@@ -458,12 +484,12 @@
 				},
 				{
 					"type": "Feature",
-					"id": 18,
+					"id": 19,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
 							[
-								6.85,
+								2,
 								9.9
 							],
 							[
@@ -488,7 +514,7 @@
 				},
 				{
 					"type": "Feature",
-					"id": 19,
+					"id": 20,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
@@ -506,11 +532,11 @@
 						"object": "weighted_area",
 						"n": 100,
 						"ne": 100,
-						"e": 0,
+						"e": 100,
 						"se": 0,
 						"s": 0,
 						"sw": 0,
-						"w": 0,
+						"w": 100,
 						"nw": 100,
 						"envelope_size": 0,
 						"envelope_cost": 0
@@ -518,7 +544,7 @@
 				},
 				{
 					"type": "Feature",
-					"id": 20,
+					"id": 21,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
@@ -536,11 +562,11 @@
 						"object": "weighted_area",
 						"n": 0,
 						"ne": 0,
-						"e": 0,
+						"e": 100,
 						"se": 100,
 						"s": 100,
 						"sw": 100,
-						"w": 0,
+						"w": 100,
 						"nw": 0,
 						"envelope_size": 0,
 						"envelope_cost": 0

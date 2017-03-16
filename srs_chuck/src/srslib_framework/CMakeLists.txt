@@ -24,7 +24,7 @@ set(${PROJECT_NAME}_SOURCES
     src/localization/map/mapnote/NotePlaySound.cpp
     src/localization/map/mapnote/NoteQueue.cpp
     src/localization/map/mapnote/NoteSetMaxVelocity.cpp
-    src/localization/map/mapnote/NoteStayOnTrack.cpp
+    src/localization/map/mapnote/NoteStayOnPath.cpp
     src/localization/map/logical/LogicalMap.cpp
     src/localization/map/logical/LogicalMapFactory.cpp
     src/localization/map/occupancy/OccupancyMap.cpp

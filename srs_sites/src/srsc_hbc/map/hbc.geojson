@@ -5996,41 +5996,11 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[
-								61.875,
-								46.975
-							],
-							[
-								63.575,
-								47.625
-							]
-						]
-					},
-					"properties": {
-						"object": "weighted_area",
-						"n": 0,
-						"ne": 0,
-						"e": 0,
-						"se": 100,
-						"s": 100,
-						"sw": 100,
-						"w": 0,
-						"nw": 0,
-						"envelope_size": 0,
-						"envelope_cost": 0
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 244,
-					"geometry": {
-						"type": "MultiPoint",
-						"coordinates": [
-							[
-								68.375,
+								67.975,
 								27.325
 							],
 							[
-								68.575,
+								68.175,
 								39.875
 							]
 						]
@@ -6051,16 +6021,16 @@
 				},
 				{
 					"type": "Feature",
-					"id": 245,
+					"id": 244,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
 							[
-								68.625,
+								68.125,
 								27.325
 							],
 							[
-								69.325,
+								68.825,
 								39.875
 							]
 						]
@@ -6081,25 +6051,51 @@
 				},
 				{
 					"type": "Feature",
-					"id": 246,
+					"id": 245,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
 							[
-								68.625,
+								68.125,
 								27.325
 							],
 							[
-								69.325,
+								68.825,
 								39.875
 							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "q246",
+						"label": "q245",
 						"notes": {
 							"queue": "packout1"
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 246,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								68.125,
+								27.325
+							],
+							[
+								68.825,
+								39.875
+							]
+						]
+					},
+					"properties": {
+						"object": "labeled_area",
+						"label": "smv246",
+						"notes": {
+							"set_max_velocity": 0.6
 						},
 						"envelope_size": 0,
 						"envelope_cost": 0
@@ -6112,20 +6108,20 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[
-								68.625,
+								67.425,
 								27.325
 							],
 							[
-								69.325,
-								39.875
+								69.575,
+								40.375
 							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "smv247",
+						"label": "sop247",
 						"notes": {
-							"set_max_velocity": 0.6
+							"stay_on_path": 1
 						},
 						"envelope_size": 0,
 						"envelope_cost": 0
@@ -6138,37 +6134,11 @@
 						"type": "MultiPoint",
 						"coordinates": [
 							[
-								67.875,
+								68.775,
 								27.325
 							],
 							[
-								69.575,
-								40.375
-							]
-						]
-					},
-					"properties": {
-						"object": "labeled_area",
-						"label": "sop248",
-						"notes": {
-							"stay_on_path": 1
-						},
-						"envelope_size": 0,
-						"envelope_cost": 0
-					}
-				},
-				{
-					"type": "Feature",
-					"id": 249,
-					"geometry": {
-						"type": "MultiPoint",
-						"coordinates": [
-							[
-								69.375,
-								27.325
-							],
-							[
-								69.575,
+								68.975,
 								39.875
 							]
 						]

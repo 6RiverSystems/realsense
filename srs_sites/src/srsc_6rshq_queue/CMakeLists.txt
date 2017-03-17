@@ -5,5 +5,28 @@
 #
 cmake_minimum_required(VERSION 2.8.3)
 
-project(srsc_6rshq_queue)
+set(PROJECT_NAME srsc_6rshq_queue)
 
+####################################################################################################
+# Project
+
+project(${PROJECT_NAME})
+
+find_package(catkin REQUIRED COMPONENTS)
+
+catkin_package()
+
+####################################################################################################
+# Installation
+
+install(DIRECTORY rviz/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/rviz
+)
+
+install(DIRECTORY map/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/map
+)
+
+install(DIRECTORY launch/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)

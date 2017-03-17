@@ -18,15 +18,19 @@ find_package(catkin REQUIRED COMPONENTS
     xacro
 )
 
-include_directories(include
-    ${catkin_INCLUDE_DIRS}
-)
+catkin_package()
 
 ####################################################################################################
-# Target
+# Installation
 
-catkin_package(
+install(DIRECTORY launch/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
 
-####################################################################################################
-# Tests
+install(DIRECTORY urdf/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf
+)
+
+install(DIRECTORY rviz/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/rviz
+)

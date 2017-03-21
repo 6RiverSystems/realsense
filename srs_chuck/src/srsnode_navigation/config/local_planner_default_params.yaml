@@ -35,7 +35,7 @@ forward_point_distance: 0.325 # how far along to place an additional scoring poi
 stop_time_buffer: 0.2         # amount of time a robot must stop in before colliding for a valid traj.
 scaling_speed: 0.1          # absolute velocity at which to start scaling the robot's footprint
 max_scaling_factor: 3.0       # how much to scale the robot's footprint when at speed.
-cheat_factor: 25
+close_to_goal_range: 1.5
 jerk_scale: 0.1
 # Oscillation Prevention Parameters
 oscillation_reset_dist: 0.05  # how far to travel before resetting oscillation flags

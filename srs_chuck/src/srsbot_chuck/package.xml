@@ -9,7 +9,7 @@
 
 <package>
     <name>srsbot_chuck</name>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
     <description>Robot package: Chuck</description>
 
     <author email="dan@6river.com">Dan Winkler</author>

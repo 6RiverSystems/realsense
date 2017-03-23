@@ -34,13 +34,7 @@ function buildChuck() {
 
   pushd "$baseDirectory/srs_chuck" &&
   taskset -c 0-3 catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo -j8 &&
-  source devel/setup.bash &&
-  popd &&
-  pushd "$baseDirectory/srs_sites" &&
-  taskset -c 0-3 catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo -j8 &&
-  source devel/setup.bash &&
-
-  source "$baseDirectory/srs_sites/devel/setup.bash"
+  source devel/setup.bash
 
   popd
 }
@@ -48,7 +42,7 @@ function buildChuck() {
 function runChuck() {
   getChuckDirectory &&
 
-  pushd "$baseDirectory/srs_sites" &&
+  pushd "$baseDirectory/srs_chuck" &&
   source devel/setup.bash &&
   popd
 
@@ -68,10 +62,6 @@ function cleanChuck() {
 
   source /opt/ros/indigo/setup.bash
   pushd "$baseDirectory/srs_chuck" &&
-  rm -rf build/ devel/ install &&
-  popd &&
-
-  pushd "$baseDirectory/srs_sites" &&
   rm -rf build/ devel/ install &&
   popd
 }

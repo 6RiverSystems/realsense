@@ -7,4 +7,4 @@ export ROSLISP_PACKAGE_DIRECTORIES=
 unset GTK_IM_MODULE
 source ~/ros/.bash_aliases
 source /opt/ros/indigo/setup.bash
-source ~/ros/srs_sites/devel/setup.bash
+source ~/ros/srs_chuck/devel/setup.bash

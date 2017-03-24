@@ -24,4 +24,7 @@
 
     <!-- Launch AMCL Localization -->
 	<include file="$(find srsnode_localization)/launch/amcl.launch" />
+	
+	<!-- Launch Map -->
+    <include file="$(find srsbot_chuck)/launch/map.launch" />
 </launch>

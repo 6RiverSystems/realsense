@@ -23,7 +23,8 @@ static const int TRIALS = 10;
 
 TEST(Test_AStar_Grid2d_Barrett, BigSearch)
 {
-    MapStack* mapStack = MapStackFactory::fromJsonFile("data/barrett/barrett.yaml");
+    MapStack* mapStack = MapStackFactory::fromJsonFile(
+        "data/barrett/barrett.yaml");
 
     // Looking for a path between
     // Pose {@: 1.4686e+09, x: 14.0, y: 10.0, t: 1.53943} (140, 100, 90)

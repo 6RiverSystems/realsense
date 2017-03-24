@@ -1,4 +1,4 @@
-<!-- 
+<!--
   *
   * (c) Copyright 2015-2016 River Systems, all rights reserved.
   *
@@ -24,7 +24,7 @@
 
     <!-- Launch AMCL Localization -->
 	<include file="$(find srsnode_localization)/launch/amcl.launch" />
-	
+
 	<!-- Launch Map -->
-    <include file="$(find srsbot_chuck)/launch/map.launch" />
+	<include file="$(find srsbot_chuck)/launch/map.launch" />
 </launch>

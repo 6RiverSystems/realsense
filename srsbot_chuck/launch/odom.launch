@@ -1,4 +1,4 @@
-<!-- 
+<!--
   *
   * (c) Copyright 2015-2016 River Systems, all rights reserved.
   *
@@ -26,5 +26,5 @@
     </include>
 
     <!-- Launch Map -->
-    <include file="$(find srsc_common)/launch/map.launch" />
+    <include file="$(find srsbot_chuck)/launch/map.launch" />
 </launch>

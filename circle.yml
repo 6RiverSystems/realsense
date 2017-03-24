@@ -38,7 +38,6 @@ test:
     - cd ~/mfp_workspace/src && catkin_make run_tests
     - catkin_test_results ~/mfp_workspace/src/$CIRCLE_PROJECT_REPONAME/build/test_results
 
-test:
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
     - find ~/mfp_workspace/src/$CIRCLE_PROJECT_REPONAME/build/test_results -type f -name '*.xml' -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;

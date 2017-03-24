@@ -31,6 +31,7 @@ checkout:
   post:
     - mkdir -p ~/mfp_workspace/src
     - mv ../$CIRCLE_PROJECT_REPONAME ~/mfp_workspace/src
+    - mkdir -p ./$CIRCLE_TEST_REPORTS
 
 test:
   override:

@@ -14,11 +14,8 @@ DEVEL_SETUP=~/mfp_workspace/devel/setup.bash
 INSTALL_SETUP=~/mfp_workspace/install/setup.bash
 
 if [ -f $DEVEL_SETUP ]; then
-    echo "Sourcing: $DEVEL_SETUP"
     source $DEVEL_SETUP
 elif [ -f $INSTALL_SETUP ]; then
-    echo "Sourcing: $INSTALL_SETUP"
     source $INSTALL_SETUP
-else
-    echo "Chuck ros stack not installed: Can not find $BASH_ALIASES"
 fi
+

@@ -4,7 +4,7 @@ function getChuckDirectory() {
   YELLOW='\033[0;33m'
   NC='\033[0m' # No Color
 
-  baseDirectory=~/ros
+  baseDirectory=~/mfp_workspace
 
   logFile="/var/log/upstart/mfp-ros.log"
 }
@@ -32,11 +32,7 @@ function buildChuck() {
   getChuckDirectory &&
   printInfo
 
-  pushd "$baseDirectory/srs_chuck" &&
-  taskset -c 0-3 catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo -j8 &&
-  source devel/setup.bash &&
-  popd &&
-  pushd "$baseDirectory/srs_sites" &&
+  pushd "$baseDirectory" &&
   taskset -c 0-3 catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo -j8 &&
   source devel/setup.bash &&
 
@@ -67,11 +63,7 @@ function cleanChuck() {
   printInfo &&
 
   source /opt/ros/indigo/setup.bash
-  pushd "$baseDirectory/srs_chuck" &&
-  rm -rf build/ devel/ install &&
-  popd &&
-
-  pushd "$baseDirectory/srs_sites" &&
+  pushd "$baseDirectory" &&
   rm -rf build/ devel/ install &&
   popd
 }
@@ -84,7 +76,7 @@ function showChuck() {
 
   export DISPLAY=:0
 
-  rviz -d ~/ros/srs_chuck/src/srsbot_chuck/rviz/config.rviz
+  rviz -d "$baseDirectory/srsbot_chuck/rviz/config.rviz"
 }
 
 function stopChuck() {

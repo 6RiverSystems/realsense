@@ -1,0 +1,14 @@
+export ROS_HOSTNAME=$ROBOT_NAME
+export ROSCONSOLE_CONFIG_FILE=$HOME/srs_chuck/share/srsbot_chuck/scripts/rosconsole.config
+export ROS_LANG_DISABLE=genlisp
+unset GTK_IM_MODULE
+
+if [ -f $HOME/srs_chuck/share/srsbot_chuck/scripts/bash_aliases ]; then
+    source $HOME/srs_chuck/share/srsbot_chuck/scripts/bash_aliases
+fi
+
+if [ -f $HOME/srs_chuck/setup.bash ]; then
+   source $HOME/srs_chuck/setup.bash
+else
+    echo "Chuck ros stack not installed: Can not find $HOME/srs_chuck/setup.bash"
+fi

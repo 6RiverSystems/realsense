@@ -36,7 +36,7 @@ checkout:
 test:
   override:
     - cd ~/mfp_workspace && catkin_make run_tests
-    - catkin_test_results ~/mfp_workspace/src/$CIRCLE_PROJECT_REPONAME/build/test_results
+    - catkin_test_results ~/mfp_workspace/build/test_results
 
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/

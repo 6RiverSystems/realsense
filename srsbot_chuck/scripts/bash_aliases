@@ -36,7 +36,7 @@ function buildChuck() {
   taskset -c 0-3 catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo -j8 &&
   source devel/setup.bash &&
 
-  source "$baseDirectory/srs_sites/devel/setup.bash"
+  source "$baseDirectory/devel/setup.bash"
 
   popd
 }
@@ -44,7 +44,7 @@ function buildChuck() {
 function runChuck() {
   getChuckDirectory &&
 
-  pushd "$baseDirectory/srs_sites" &&
+  pushd "$baseDirectory" &&
   source devel/setup.bash &&
   popd
 

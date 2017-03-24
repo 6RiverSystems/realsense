@@ -24,13 +24,18 @@ dependencies:
     - echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:${PYTHONPATH}" >> ~/.bashrc
     - echo "export PATH=/usr/lib/ccache:$PATH" >> ~/.bashrc
     - echo "export ROS_PARALLEL_JOBS=-j8" >> ~/.bashrc
+    - mkdir -p ~/mfp_workspace/src
 
-  override:
-    - cd ~/ros/srs_chuck && catkin_make run_tests
+checkout:
+  post:
+    - mkdir -p ~/mfp_workspace/src
+    - cd ~/mfp_workspace/src
+    - catkin_init_workspace 
+    - mv ../$CIRCLE_PROJECT_REPONAME ~/mfp_workspace/src
 
 test:
   override:
-    - cd ~/ros/srs_chuck && catkin_make run_tests
+    - cd ~/mfp_workspace/src && catkin_make run_tests
     - catkin_test_results ~/ros/srs_chuck/build/test_results
 
 test:

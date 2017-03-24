@@ -1,5 +1,4 @@
 export ROS_HOSTNAME=$ROBOT_NAME
-export ROSCONSOLE_CONFIG_FILE=$HOME/mfp_workspace/src/mfp_chuck/srsbot_chuck/scripts/rosconsole.config
 export ROS_LANG_DISABLE=genlisp
 unset GTK_IM_MODULE
 

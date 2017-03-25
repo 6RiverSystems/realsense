@@ -6,7 +6,7 @@
   *
 -->
 <launch>
-    <arg name="sites_directory" value="$(optenv SITES_DIRECTORY /home/rivs/mfp_sites)" />
+    <arg name="sites_directory" value="$(optenv SITES_DIRECTORY /home/$(optenv USER rivs)/mfp_sites)" />
     <arg name="customer_site" value="$(optenv CUSTOMER_SITE empty)" />
     <arg name="customer_map" value="$(optenv CUSTOMER_MAP empty)" />
 

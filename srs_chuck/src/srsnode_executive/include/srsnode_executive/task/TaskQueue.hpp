@@ -19,6 +19,14 @@ public:
     {}
 
     void run(ExecutiveContext& context);
+
+    void setDefaultRealsenseDecayTime(float defaultRealsenseDecayTime)
+    {
+        defaultRealsenseDecayTime_ = defaultRealsenseDecayTime;
+    }
+
+private:
+    float defaultRealsenseDecayTime_;
 };
 
 } // namespace srs

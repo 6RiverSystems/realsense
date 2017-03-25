@@ -32,10 +32,7 @@ void TaskQueue::run(ExecutiveContext& context)
                         ChuckConfig::Parameters::LP_MODE, ChuckConfig::Parameters::LP_MODE_QUEUE);
 
                     // Shorten Realsense decay half-life in order to resolve queue noise issue
-                    ServiceCallConfig<double>::set(ChuckConfig::Entities::LOCAL_COSTMAP,
-                        ChuckConfig::Parameters::RS_DECAY_HALFLIFE, ChuckConfig::Parameters::RS_DECAY_HALFLIFE_QUEUE);
-
-                    ServiceCallConfig<double>::set(ChuckConfig::Entities::GLOBAL_COSTMAP,
+                    ServiceCallConfig<double>::set(ChuckConfig::Entities::LOCAL_COSTMAP_OBSTRUCTION_LAYER_REALSENSE,
                         ChuckConfig::Parameters::RS_DECAY_HALFLIFE, ChuckConfig::Parameters::RS_DECAY_HALFLIFE_QUEUE);
 
                     break;
@@ -50,11 +47,8 @@ void TaskQueue::run(ExecutiveContext& context)
                         ServiceCallConfig<int>::set(ChuckConfig::Entities::LOCAL_PLANNER,
                             ChuckConfig::Parameters::LP_MODE, ChuckConfig::Parameters::LP_MODE_DEFAULT);
 
-                        ServiceCallConfig<double>::set(ChuckConfig::Entities::LOCAL_COSTMAP,
-                            ChuckConfig::Parameters::RS_DECAY_HALFLIFE, ChuckConfig::Parameters::RS_DECAY_HALFLIFE_DEFAULT);
-
-                        ServiceCallConfig<double>::set(ChuckConfig::Entities::GLOBAL_COSTMAP,
-                            ChuckConfig::Parameters::RS_DECAY_HALFLIFE, ChuckConfig::Parameters::RS_DECAY_HALFLIFE_DEFAULT);
+                        ServiceCallConfig<double>::set(ChuckConfig::Entities::LOCAL_COSTMAP_OBSTRUCTION_LAYER_REALSENSE,
+                            ChuckConfig::Parameters::RS_DECAY_HALFLIFE, defaultRealsenseDecayTime_);
                     }
 
                     break;
@@ -66,11 +60,8 @@ void TaskQueue::run(ExecutiveContext& context)
                     ServiceCallConfig<int>::set(ChuckConfig::Entities::LOCAL_PLANNER,
                         ChuckConfig::Parameters::LP_MODE, ChuckConfig::Parameters::LP_MODE_DEFAULT);
 
-                    ServiceCallConfig<double>::set(ChuckConfig::Entities::LOCAL_COSTMAP,
-                        ChuckConfig::Parameters::RS_DECAY_HALFLIFE, ChuckConfig::Parameters::RS_DECAY_HALFLIFE_DEFAULT);
-
-                    ServiceCallConfig<double>::set(ChuckConfig::Entities::GLOBAL_COSTMAP,
-                        ChuckConfig::Parameters::RS_DECAY_HALFLIFE, ChuckConfig::Parameters::RS_DECAY_HALFLIFE_DEFAULT);
+                    ServiceCallConfig<double>::set(ChuckConfig::Entities::LOCAL_COSTMAP_OBSTRUCTION_LAYER_REALSENSE,
+                        ChuckConfig::Parameters::RS_DECAY_HALFLIFE, defaultRealsenseDecayTime_);
 
                     break;
             }

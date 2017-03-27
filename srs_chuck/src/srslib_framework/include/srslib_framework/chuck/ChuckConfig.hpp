@@ -39,7 +39,7 @@ namespace Parameters {
     static const int LP_MODE_STAY_ON_PATH = 2;
 
     static const string RS_DECAY_HALFLIFE = "obstruction_half_life";
-    static const double RS_DECAY_HALFLIFE_QUEUE = 1.0;
+    static const string RS_DECAY_HALFLIFE_QUEUE = "obstruction_half_life_queue";
 
     static const string MAP_STACK = "map_stack";
     static const string MAX_VELOCITY = "max_vel_x";

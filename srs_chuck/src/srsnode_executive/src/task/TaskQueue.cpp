@@ -33,7 +33,7 @@ void TaskQueue::run(ExecutiveContext& context)
 
                     // Shorten Realsense decay half-life in order to resolve queue noise issue
                     ServiceCallConfig<double>::set(ChuckConfig::Entities::LOCAL_COSTMAP_OBSTRUCTION_LAYER_REALSENSE,
-                        ChuckConfig::Parameters::RS_DECAY_HALFLIFE, ChuckConfig::Parameters::RS_DECAY_HALFLIFE_QUEUE);
+                        ChuckConfig::Parameters::RS_DECAY_HALFLIFE, queueRealsenseDecayTime_);
 
                     break;
 

@@ -1,6 +1,9 @@
 {
 	"type": "FeatureCollection",
-	"features": [
+    "properties": {
+        "language_version": "1.2"
+    },
+    "features": [
 		{
 			"type": "Feature",
 			"properties": {
@@ -30,7 +33,7 @@
 						"label": "test1",
 						"notes": {
 							"play_sound": "warning"
-						}
+					    }
 					}
 				},
 				{
@@ -47,7 +50,7 @@
 						"object": "obstacle",
 						"envelope_size": 0.3,
 						"envelope_cost": 70,
-						"is_border": 0
+						"is_border": false
 					}
 				}
 			]

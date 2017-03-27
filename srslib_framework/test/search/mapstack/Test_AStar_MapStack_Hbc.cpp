@@ -26,7 +26,7 @@ using namespace srs;
 
 TEST(Test_AStar_MapStack_Hbc, BigSearch)
 {
-    MapStack* mapStack = MapStackFactory::fromJsonFile("data/Hbc/Hbc.yaml");
+    MapStack* mapStack = MapStackFactory::fromJsonFile("data/hbc/hbc.yaml");
 
     // Looking for a path between
     // {x: 6.570, y: 8.912, t: 0} (131, 178, 0)

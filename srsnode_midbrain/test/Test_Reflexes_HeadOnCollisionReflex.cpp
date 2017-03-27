@@ -63,7 +63,7 @@ TEST(Test_Reflexes_HeadOnCollisionReflex, BasicVelocityTest)
     hocr.setLaserScan(createLaserScan(1.0, 0.0));
     ASSERT_FALSE(hocr.checkHardStop());
 
-    hocr.setLaserScan(createLaserScan(0.5, 0.1));
+    hocr.setLaserScan(createLaserScan(0.5, 0.5));
     ASSERT_TRUE(hocr.checkHardStop());
 }
 

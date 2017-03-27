@@ -97,31 +97,31 @@ target_link_libraries(srslib_global_planner
 
  ####################################################################################################
  # Installation
- 
+
 install(TARGETS srslib_global_planner
 	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
- 
+
 install(DIRECTORY
 	include/${PROJECT_NAME}/
 	DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 	PATTERN ".svn" EXCLUDE
 )
- 
+
 install(FILES srsnode_navigation_plugins.xml
 	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
- 
+
 install(DIRECTORY launch/
 	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
- 
+
  install(DIRECTORY config/
 	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
 )
- 
+
 install(DIRECTORY cfg/
 	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cfg
 )
@@ -135,7 +135,7 @@ if (CATKIN_ENABLE_TESTING)
         test/TestSuite_Navigation.cpp
         ${${PROJECT_NAME}_TEST_SOURCES}
         ${${PROJECT_NAME}_SOURCES}
-        WORKING_DIRECTORY ${TEST_WORKING_DIR}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
     )
     add_dependencies(${TestSuite_Navigation}
         ${catkin_EXPORTED_TARGETS}

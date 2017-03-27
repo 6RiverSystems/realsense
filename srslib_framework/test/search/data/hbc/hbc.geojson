@@ -1,12 +1,23 @@
+#
+# (c) Copyright 2015-2017 River Systems, all rights reserved.
+#
+# This is proprietary software, unauthorized distribution is not permitted.
+#
 {
 	"type": "FeatureCollection",
+	"properties": {
+		"language_version": "1.2"
+	},
 	"features": [
 		{
 			"type": "Feature",
 			"properties": {
 				"object": "map",
-				"version": "1",
-				"origin": [-0.025,-0.025,0],
+				"origin": [
+					-0.025,
+					-0.025,
+					0
+				],
 				"resolution": 0.05,
 				"width": 84.45,
 				"height": 69.7
@@ -17,1634 +28,2158 @@
 			"features": [
 				{
 					"type": "Feature",
-					"id": "1",
+					"id": 0,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[-0.025,48.825],
-							[70.925,69.675]
+							[
+								-0.025,
+								48.825
+							],
+							[
+								70.825,
+								69.675
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "2",
+					"id": 1,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[-0.025,29.425],
-							[11.675,48.875]
+							[
+								70.825,
+								7.175
+							],
+							[
+								84.375,
+								69.675
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "3",
+					"id": 2,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[-0.025,26.325],
-							[10.725,29.475]
+							[
+								-0.025,
+								29.575
+							],
+							[
+								11.575,
+								48.925
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "4",
+					"id": 3,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[-0.025,9.925],
-							[5.725,26.375]
+							[
+								11.575,
+								34.125
+							],
+							[
+								12.725,
+								38.325
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "5",
+					"id": 4,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[-0.025,-0.025],
-							[4.625,10.075]
+							[
+								-0.025,
+								26.325
+							],
+							[
+								10.625,
+								29.675
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "6",
+					"id": 5,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[4.525,-0.025],
-							[6.675,6.725]
+							[
+								70.425,
+								27.325
+							],
+							[
+								70.825,
+								29.675
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "7",
+					"id": 6,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[5.625,22.575],
-							[9.275,24.625]
+							[
+								-0.025,
+								9.925
+							],
+							[
+								5.625,
+								26.425
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "8",
+					"id": 7,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[6.625,-0.025],
-							[84.425,7.325]
+							[
+								5.625,
+								22.575
+							],
+							[
+								9.225,
+								26.425
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "9",
+					"id": 8,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[7.675,21.875],
-							[8.525,22.625]
+							[
+								7.675,
+								21.875
+							],
+							[
+								8.475,
+								22.675
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "10",
+					"id": 9,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11.575,34.125],
-							[12.775,38.275]
+							[
+								-0.025,
+								-0.075
+							],
+							[
+								4.525,
+								10.025
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "11",
+					"id": 10,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[70.425,27.325],
-							[70.875,29.625]
+							[
+								6.625,
+								-0.075
+							],
+							[
+								84.375,
+								7.275
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "12",
+					"id": 11,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[70.825,7.175],
-							[84.425,69.675]
+							[
+								4.525,
+								-0.075
+							],
+							[
+								6.625,
+								6.675
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 1
+						"is_border": true,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "1",
+					"id": 12,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[8.375,9.875],
-							[8.625,10.125]
+							[
+								11.625,
+								47.575
+							],
+							[
+								12.575,
+								48.875
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "2",
+					"id": 13,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[8.425,19.025],
-							[8.675,19.275]
+							[
+								66.825,
+								48.075
+							],
+							[
+								70.775,
+								48.875
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "3",
+					"id": 14,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[8.425,17.225],
-							[8.675,17.475]
+							[
+								14.425,
+								29.675
+							],
+							[
+								16.125,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "4",
+					"id": 15,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[8.425,15.275],
-							[8.675,15.525]
+							[
+								17.625,
+								29.675
+							],
+							[
+								18.975,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "5",
+					"id": 16,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[8.425,13.475],
-							[8.675,13.725]
+							[
+								20.725,
+								29.675
+							],
+							[
+								22.025,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "6",
+					"id": 17,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[8.425,11.625],
-							[8.675,11.875]
+							[
+								23.875,
+								29.675
+							],
+							[
+								25.025,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "7",
+					"id": 18,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[8.475,20.875],
-							[8.725,21.125]
+							[
+								27.075,
+								29.675
+							],
+							[
+								28.275,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "8",
+					"id": 19,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11.425,9.925],
-							[11.725,10.175]
+							[
+								29.925,
+								29.675
+							],
+							[
+								31.125,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "9",
+					"id": 20,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11.475,24.975],
-							[11.725,25.225]
+							[
+								32.975,
+								29.675
+							],
+							[
+								34.225,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "10",
+					"id": 21,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11.475,20.825],
-							[11.725,21.075]
+							[
+								36.175,
+								29.675
+							],
+							[
+								37.325,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "11",
+					"id": 22,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11.475,18.975],
-							[11.725,19.225]
+							[
+								39.125,
+								29.675
+							],
+							[
+								40.575,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "12",
+					"id": 23,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11.475,17.125],
-							[11.725,17.375]
+							[
+								42.225,
+								29.675
+							],
+							[
+								43.375,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "13",
+					"id": 24,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11.475,15.275],
-							[11.725,15.525]
+							[
+								45.275,
+								29.675
+							],
+							[
+								46.525,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "14",
+					"id": 25,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11.475,13.475],
-							[11.725,13.725]
+							[
+								48.375,
+								29.675
+							],
+							[
+								49.575,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "15",
+					"id": 26,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11.475,11.575],
-							[11.725,11.825]
+							[
+								51.475,
+								29.675
+							],
+							[
+								52.925,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "16",
+					"id": 27,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11.525,26.275],
-							[11.775,26.525]
+							[
+								54.475,
+								29.675
+							],
+							[
+								55.875,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "17",
+					"id": 28,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11.525,23.825],
-							[11.775,24.075]
+							[
+								57.525,
+								29.675
+							],
+							[
+								58.825,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "18",
+					"id": 29,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[11.525,22.025],
-							[11.775,22.275]
+							[
+								60.575,
+								29.675
+							],
+							[
+								61.825,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "19",
+					"id": 30,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[14.425,29.675],
-							[16.175,47.575]
+							[
+								63.625,
+								29.675
+							],
+							[
+								65.075,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "20",
+					"id": 31,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[14.425,8.775],
-							[16.175,26.725]
+							[
+								66.625,
+								46.175
+							],
+							[
+								66.825,
+								46.475
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "21",
+					"id": 32,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[17.625,29.675],
-							[19.025,47.575]
+							[
+								69.625,
+								46.175
+							],
+							[
+								69.825,
+								46.475
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "22",
+					"id": 33,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[17.625,8.775],
-							[18.875,26.725]
+							[
+								66.675,
+								44.425
+							],
+							[
+								66.875,
+								44.725
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "23",
+					"id": 34,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[20.725,29.675],
-							[22.075,47.575]
+							[
+								69.725,
+								44.375
+							],
+							[
+								69.925,
+								44.675
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "24",
+					"id": 35,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[20.775,8.775],
-							[22.025,26.725]
+							[
+								66.625,
+								42.575
+							],
+							[
+								66.825,
+								42.875
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "25",
+					"id": 36,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[23.875,29.675],
-							[25.075,47.575]
+							[
+								69.725,
+								42.575
+							],
+							[
+								69.925,
+								42.875
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "26",
+					"id": 37,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[23.875,8.775],
-							[25.075,26.725]
+							[
+								66.625,
+								40.725
+							],
+							[
+								66.825,
+								41.025
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "27",
+					"id": 38,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[26.975,8.775],
-							[28.325,26.725]
+							[
+								69.675,
+								40.725
+							],
+							[
+								69.875,
+								41.025
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "28",
+					"id": 39,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[27.075,29.675],
-							[28.325,47.575]
+							[
+								66.575,
+								38.925
+							],
+							[
+								66.775,
+								39.225
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "29",
+					"id": 40,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[29.925,29.675],
-							[31.175,47.575]
+							[
+								69.675,
+								38.875
+							],
+							[
+								69.875,
+								39.175
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "30",
+					"id": 41,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[29.975,8.775],
-							[31.175,26.725]
+							[
+								66.575,
+								37.075
+							],
+							[
+								66.775,
+								37.375
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "31",
+					"id": 42,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[32.925,8.775],
-							[34.325,26.725]
+							[
+								69.675,
+								37.025
+							],
+							[
+								69.875,
+								37.325
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "32",
+					"id": 43,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[32.975,29.675],
-							[34.275,47.575]
+							[
+								66.525,
+								35.225
+							],
+							[
+								66.725,
+								35.525
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "33",
+					"id": 44,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[35.975,8.775],
-							[37.325,26.725]
+							[
+								69.625,
+								35.225
+							],
+							[
+								69.825,
+								35.525
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "34",
+					"id": 45,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[36.175,29.675],
-							[37.375,47.575]
+							[
+								69.625,
+								33.375
+							],
+							[
+								69.825,
+								33.675
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "35",
+					"id": 46,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[39.125,29.675],
-							[40.625,47.575]
+							[
+								66.575,
+								33.325
+							],
+							[
+								66.775,
+								33.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "36",
+					"id": 47,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[39.225,8.775],
-							[40.525,26.725]
+							[
+								69.625,
+								27.375
+							],
+							[
+								70.775,
+								31.875
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "37",
+					"id": 48,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[42.125,8.775],
-							[43.425,26.725]
+							[
+								66.575,
+								31.525
+							],
+							[
+								66.775,
+								31.825
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "38",
+					"id": 49,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[42.225,29.675],
-							[43.425,47.575]
+							[
+								66.625,
+								29.725
+							],
+							[
+								66.825,
+								30.025
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "39",
+					"id": 50,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[45.225,8.775],
-							[46.475,26.725]
+							[
+								67.875,
+								7.225
+							],
+							[
+								70.775,
+								27.375
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "40",
+					"id": 51,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[45.275,29.675],
-							[46.575,47.575]
+							[
+								66.575,
+								26.575
+							],
+							[
+								66.775,
+								26.875
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "41",
+					"id": 52,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[48.325,8.775],
-							[49.525,26.725]
+							[
+								14.425,
+								8.775
+							],
+							[
+								16.125,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "42",
+					"id": 53,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[48.375,29.675],
-							[49.625,47.575]
+							[
+								17.625,
+								8.775
+							],
+							[
+								18.825,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "43",
+					"id": 54,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[51.275,8.775],
-							[52.875,26.725]
+							[
+								20.775,
+								8.775
+							],
+							[
+								21.975,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "44",
+					"id": 55,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[51.475,29.675],
-							[52.975,47.575]
+							[
+								23.875,
+								8.775
+							],
+							[
+								25.025,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "45",
+					"id": 56,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[54.475,29.675],
-							[55.925,47.575]
+							[
+								26.975,
+								8.775
+							],
+							[
+								28.275,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "46",
+					"id": 57,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[54.525,8.775],
-							[55.725,26.725]
+							[
+								29.975,
+								8.775
+							],
+							[
+								31.125,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "47",
+					"id": 58,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[57.525,29.675],
-							[58.875,47.575]
+							[
+								32.925,
+								8.775
+							],
+							[
+								34.275,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "48",
+					"id": 59,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[57.525,8.775],
-							[58.675,26.725]
+							[
+								35.975,
+								8.775
+							],
+							[
+								37.275,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "49",
+					"id": 60,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[60.575,29.675],
-							[61.875,47.575]
+							[
+								39.225,
+								8.775
+							],
+							[
+								40.475,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "50",
+					"id": 61,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[60.625,8.775],
-							[61.825,26.725]
+							[
+								42.125,
+								8.775
+							],
+							[
+								43.375,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "51",
+					"id": 62,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[63.625,29.675],
-							[65.125,47.575]
+							[
+								45.225,
+								8.775
+							],
+							[
+								46.425,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "52",
+					"id": 63,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[63.625,8.775],
-							[65.125,26.725]
+							[
+								48.325,
+								8.775
+							],
+							[
+								49.475,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "53",
+					"id": 64,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.525,35.225],
-							[66.775,35.475]
+							[
+								51.275,
+								8.775
+							],
+							[
+								52.825,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "54",
+					"id": 65,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.525,25.225],
-							[66.775,25.475]
+							[
+								54.525,
+								8.775
+							],
+							[
+								55.675,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "55",
+					"id": 66,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.525,15.525],
-							[66.775,15.775]
+							[
+								57.525,
+								8.775
+							],
+							[
+								58.625,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "56",
+					"id": 67,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.575,38.925],
-							[66.825,39.175]
+							[
+								60.625,
+								8.775
+							],
+							[
+								61.775,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "57",
+					"id": 68,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.575,37.075],
-							[66.825,37.325]
+							[
+								63.625,
+								8.775
+							],
+							[
+								65.075,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "58",
+					"id": 69,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.575,33.325],
-							[66.825,33.575]
+							[
+								11.525,
+								26.275
+							],
+							[
+								11.725,
+								26.575
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "59",
+					"id": 70,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.575,31.525],
-							[66.825,31.775]
+							[
+								5.675,
+								15.275
+							],
+							[
+								9.175,
+								26.375
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "60",
+					"id": 71,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.575,26.575],
-							[66.825,26.825]
+							[
+								66.525,
+								25.225
+							],
+							[
+								66.725,
+								25.525
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "61",
+					"id": 72,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.575,24.075],
-							[66.825,24.325]
+							[
+								11.475,
+								24.975
+							],
+							[
+								11.675,
+								25.275
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "62",
+					"id": 73,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.575,22.275],
-							[66.825,22.575]
+							[
+								66.575,
+								24.075
+							],
+							[
+								66.775,
+								24.375
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "63",
+					"id": 74,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.575,19.225],
-							[66.875,19.475]
+							[
+								11.525,
+								23.825
+							],
+							[
+								11.725,
+								24.125
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "64",
+					"id": 75,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.575,13.675],
-							[66.825,13.925]
+							[
+								66.575,
+								22.275
+							],
+							[
+								66.775,
+								22.625
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "65",
+					"id": 76,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.625,46.175],
-							[66.875,46.425]
+							[
+								11.525,
+								22.025
+							],
+							[
+								11.725,
+								22.325
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "66",
+					"id": 77,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.625,42.575],
-							[66.875,42.825]
+							[
+								66.625,
+								21.025
+							],
+							[
+								66.825,
+								21.325
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "67",
+					"id": 78,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.625,40.725],
-							[66.875,40.975]
+							[
+								11.475,
+								20.825
+							],
+							[
+								11.675,
+								21.125
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "68",
+					"id": 79,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.625,29.725],
-							[66.875,29.975]
+							[
+								66.575,
+								19.225
+							],
+							[
+								66.825,
+								19.525
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "69",
+					"id": 80,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.625,21.025],
-							[66.875,21.275]
+							[
+								11.475,
+								18.975
+							],
+							[
+								11.675,
+								19.275
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "70",
+					"id": 81,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.625,17.275],
-							[66.875,17.525]
+							[
+								66.625,
+								17.275
+							],
+							[
+								66.825,
+								17.575
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "71",
+					"id": 82,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.625,11.825],
-							[66.875,12.075]
+							[
+								11.475,
+								17.125
+							],
+							[
+								11.675,
+								17.425
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "72",
+					"id": 83,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.625,10.175],
-							[66.875,10.425]
+							[
+								66.525,
+								15.525
+							],
+							[
+								66.725,
+								15.825
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "73",
+					"id": 84,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[66.675,44.425],
-							[66.925,44.675]
+							[
+								11.475,
+								15.275
+							],
+							[
+								11.675,
+								15.575
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "74",
+					"id": 85,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[67.875,7.225],
-							[70.825,27.325]
+							[
+								66.575,
+								13.675
+							],
+							[
+								66.775,
+								13.975
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "75",
+					"id": 86,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[69.625,46.175],
-							[69.875,46.425]
+							[
+								8.425,
+								13.475
+							],
+							[
+								8.625,
+								13.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "76",
+					"id": 87,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[69.625,35.225],
-							[69.875,35.475]
+							[
+								11.475,
+								13.475
+							],
+							[
+								11.675,
+								13.775
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "77",
+					"id": 88,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[69.625,33.375],
-							[69.875,33.625]
+							[
+								66.625,
+								11.825
+							],
+							[
+								66.825,
+								12.125
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "78",
+					"id": 89,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[69.625,31.575],
-							[69.875,31.825]
+							[
+								8.425,
+								11.625
+							],
+							[
+								8.625,
+								11.925
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "79",
+					"id": 90,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[69.675,40.725],
-							[69.925,40.975]
+							[
+								11.475,
+								11.575
+							],
+							[
+								11.675,
+								11.875
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "80",
+					"id": 91,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[69.675,38.875],
-							[69.925,39.125]
+							[
+								66.625,
+								10.175
+							],
+							[
+								66.825,
+								10.475
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "81",
+					"id": 92,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[69.675,37.025],
-							[69.925,37.275]
+							[
+								11.425,
+								9.925
+							],
+							[
+								11.675,
+								10.225
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "82",
+					"id": 93,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[69.725,44.375],
-							[69.975,44.625]
+							[
+								8.375,
+								9.875
+							],
+							[
+								8.575,
+								10.175
+							]
 						]
 					},
 					"properties": {
 						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "83",
+					"id": 94,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[69.725,42.575],
-							[69.975,42.825]
+							[
+								14.775,
+								27.525
+							],
+							[
+								57.525,
+								28.375
+							]
 						]
 					},
 					"properties": {
-						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"object": "cost_area",
+						"cost": 10,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "84",
+					"id": 95,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[69.725,29.275],
-							[70.175,29.925]
+							[
+								66.675,
+								7.175
+							],
+							[
+								67.825,
+								27.375
+							]
 						]
 					},
 					"properties": {
-						"object": "obstacle",
-						"envelope_size": 0.5,
-						"envelope_cost": 70,
-						"is_border": 0
+						"object": "cost_area",
+						"cost": 10,
+						"envelope_size": 0,
+						"envelope_cost": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 96,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								63.625,
+								26.725
+							],
+							[
+								65.075,
+								29.725
+							]
+						]
+					},
+					"properties": {
+						"object": "weighted_area",
+						"n": 0,
+						"ne": 100,
+						"e": 100,
+						"se": 100,
+						"s": 0,
+						"sw": 0,
+						"w": 0,
+						"nw": 0,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1653,17 +2188,28 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[12.975,46.975],
-							[14.425,47.575]
+							[
+								63.625,
+								47.575
+							],
+							[
+								65.075,
+								48.925
+							]
 						]
 					},
 					"properties": {
-						"object": "labeled_area",
-						"label": "rs1",
-						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+						"object": "weighted_area",
+						"n": 0,
+						"ne": 0,
+						"e": 0,
+						"se": 0,
+						"s": 0,
+						"sw": 100,
+						"w": 100,
+						"nw": 100,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1672,17 +2218,28 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[12.975,29.075],
-							[14.425,30.675]
+							[
+								63.625,
+								7.175
+							],
+							[
+								65.075,
+								8.825
+							]
 						]
 					},
 					"properties": {
-						"object": "labeled_area",
-						"label": "rs2",
-						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+						"object": "weighted_area",
+						"n": 0,
+						"ne": 0,
+						"e": 0,
+						"se": 0,
+						"s": 0,
+						"sw": 100,
+						"w": 100,
+						"nw": 100,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1691,17 +2248,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[12.975,25.675],
-							[14.425,27.325]
+							[
+								12.975,
+								46.975
+							],
+							[
+								14.375,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs3",
+						"label": "smv99",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1710,17 +2274,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[12.975,8.775],
-							[14.425,9.375]
+							[
+								16.175,
+								46.975
+							],
+							[
+								17.575,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs4",
+						"label": "smv100",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1729,17 +2300,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.175,46.975],
-							[17.625,47.575]
+							[
+								19.025,
+								46.975
+							],
+							[
+								20.675,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs5",
+						"label": "smv101",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1748,17 +2326,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.175,29.075],
-							[17.625,30.675]
+							[
+								22.075,
+								46.975
+							],
+							[
+								23.825,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs6",
+						"label": "smv102",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1767,17 +2352,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.175,25.675],
-							[17.625,27.325]
+							[
+								25.075,
+								46.975
+							],
+							[
+								27.025,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs7",
+						"label": "smv103",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1786,17 +2378,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.175,8.775],
-							[17.625,9.375]
+							[
+								28.325,
+								46.975
+							],
+							[
+								29.875,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs8",
+						"label": "smv104",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1805,17 +2404,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[18.875,25.675],
-							[20.775,27.325]
+							[
+								31.175,
+								46.975
+							],
+							[
+								32.925,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs9",
+						"label": "smv105",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1824,17 +2430,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[18.875,8.775],
-							[20.775,9.375]
+							[
+								34.275,
+								46.975
+							],
+							[
+								36.125,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs10",
+						"label": "smv106",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1843,17 +2456,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[19.025,46.975],
-							[20.725,47.575]
+							[
+								37.375,
+								46.975
+							],
+							[
+								39.075,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs11",
+						"label": "smv107",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1862,17 +2482,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[19.025,29.075],
-							[20.725,30.675]
+							[
+								40.625,
+								46.975
+							],
+							[
+								42.175,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs12",
+						"label": "smv108",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1881,17 +2508,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[22.025,25.675],
-							[23.875,27.325]
+							[
+								43.425,
+								46.975
+							],
+							[
+								45.225,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs13",
+						"label": "smv109",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1900,17 +2534,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[22.025,8.775],
-							[23.875,9.375]
+							[
+								46.575,
+								46.975
+							],
+							[
+								48.325,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs14",
+						"label": "smv110",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1919,17 +2560,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[22.075,46.975],
-							[23.875,47.575]
+							[
+								49.625,
+								46.975
+							],
+							[
+								51.425,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs15",
+						"label": "smv111",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1938,17 +2586,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[22.075,29.075],
-							[23.875,30.675]
+							[
+								52.975,
+								46.975
+							],
+							[
+								54.425,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs16",
+						"label": "smv112",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1957,17 +2612,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[25.025,29.075],
-							[27.075,30.675]
+							[
+								55.925,
+								46.975
+							],
+							[
+								57.475,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs17",
+						"label": "smv113",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1976,17 +2638,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[25.075,46.975],
-							[27.075,47.575]
+							[
+								58.875,
+								46.975
+							],
+							[
+								60.525,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs18",
+						"label": "smv114",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -1995,17 +2664,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[25.075,25.675],
-							[26.975,27.325]
+							[
+								61.875,
+								46.975
+							],
+							[
+								63.575,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs19",
+						"label": "smv115",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2014,17 +2690,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[25.075,8.775],
-							[26.975,9.375]
+							[
+								65.125,
+								46.975
+							],
+							[
+								66.525,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs20",
+						"label": "smv116",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2033,17 +2716,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.325,46.975],
-							[29.925,47.575]
+							[
+								12.975,
+								29.075
+							],
+							[
+								14.375,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs21",
+						"label": "smv117",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2052,17 +2742,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.325,29.075],
-							[29.925,30.675]
+							[
+								16.175,
+								29.075
+							],
+							[
+								17.575,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs22",
+						"label": "smv118",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2071,17 +2768,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.325,25.675],
-							[29.975,27.325]
+							[
+								19.025,
+								29.075
+							],
+							[
+								20.675,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs23",
+						"label": "smv119",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2090,17 +2794,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.325,8.775],
-							[29.975,9.375]
+							[
+								22.075,
+								29.075
+							],
+							[
+								23.825,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs24",
+						"label": "smv120",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2109,17 +2820,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[31.175,46.975],
-							[32.975,47.575]
+							[
+								25.025,
+								29.075
+							],
+							[
+								27.025,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs25",
+						"label": "smv121",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2128,17 +2846,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[31.175,29.075],
-							[32.975,30.675]
+							[
+								28.325,
+								29.075
+							],
+							[
+								29.875,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs26",
+						"label": "smv122",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2147,17 +2872,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[31.175,25.675],
-							[32.925,27.325]
+							[
+								31.175,
+								29.075
+							],
+							[
+								32.925,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs27",
+						"label": "smv123",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2166,17 +2898,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[31.175,8.775],
-							[32.925,9.375]
+							[
+								34.275,
+								29.075
+							],
+							[
+								36.125,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs28",
+						"label": "smv124",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2185,17 +2924,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[34.275,46.975],
-							[36.175,47.575]
+							[
+								37.375,
+								29.075
+							],
+							[
+								39.075,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs29",
+						"label": "smv125",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2204,17 +2950,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[34.275,29.075],
-							[36.175,30.675]
+							[
+								40.625,
+								29.075
+							],
+							[
+								42.175,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs30",
+						"label": "smv126",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2223,17 +2976,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[34.325,25.675],
-							[35.975,27.325]
+							[
+								43.425,
+								29.075
+							],
+							[
+								45.225,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs31",
+						"label": "smv127",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2242,17 +3002,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[34.325,8.775],
-							[35.975,9.375]
+							[
+								46.575,
+								29.075
+							],
+							[
+								48.325,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs32",
+						"label": "smv128",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2261,17 +3028,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[37.325,25.675],
-							[39.225,27.325]
+							[
+								49.625,
+								29.075
+							],
+							[
+								51.425,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs33",
+						"label": "smv129",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2280,17 +3054,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[37.325,8.775],
-							[39.225,9.375]
+							[
+								52.975,
+								29.075
+							],
+							[
+								54.425,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs34",
+						"label": "smv130",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2299,17 +3080,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[37.375,46.975],
-							[39.125,47.575]
+							[
+								55.925,
+								29.075
+							],
+							[
+								57.475,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs35",
+						"label": "smv131",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2318,17 +3106,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[37.375,29.075],
-							[39.125,30.675]
+							[
+								58.875,
+								29.075
+							],
+							[
+								60.525,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs36",
+						"label": "smv132",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2337,17 +3132,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[40.525,25.675],
-							[42.125,27.275]
+							[
+								61.875,
+								29.075
+							],
+							[
+								63.575,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs37",
+						"label": "smv133",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2356,17 +3158,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[40.525,8.775],
-							[42.125,9.375]
+							[
+								65.125,
+								29.075
+							],
+							[
+								66.525,
+								30.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs38",
+						"label": "smv134",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2375,17 +3184,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[40.625,46.975],
-							[42.225,47.575]
+							[
+								12.975,
+								25.675
+							],
+							[
+								14.375,
+								27.375
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs39",
+						"label": "smv135",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2394,17 +3210,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[40.625,29.075],
-							[42.225,30.675]
+							[
+								16.175,
+								25.675
+							],
+							[
+								17.575,
+								27.375
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs40",
+						"label": "smv136",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2413,17 +3236,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[43.425,46.975],
-							[45.275,47.575]
+							[
+								18.875,
+								25.675
+							],
+							[
+								20.725,
+								27.375
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs41",
+						"label": "smv137",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2432,17 +3262,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[43.425,29.075],
-							[45.275,30.675]
+							[
+								22.025,
+								25.675
+							],
+							[
+								23.825,
+								27.375
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs42",
+						"label": "smv138",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2451,17 +3288,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[43.425,25.675],
-							[45.225,27.275]
+							[
+								25.075,
+								25.675
+							],
+							[
+								26.925,
+								27.375
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs43",
+						"label": "smv139",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2470,17 +3314,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[43.425,8.775],
-							[45.225,9.375]
+							[
+								28.325,
+								25.675
+							],
+							[
+								29.925,
+								27.375
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs44",
+						"label": "smv140",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2489,17 +3340,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[46.475,25.675],
-							[48.325,27.275]
+							[
+								31.175,
+								25.675
+							],
+							[
+								32.875,
+								27.375
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs45",
+						"label": "smv141",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2508,17 +3366,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[46.475,8.775],
-							[48.325,9.375]
+							[
+								34.325,
+								25.675
+							],
+							[
+								35.925,
+								27.375
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs46",
+						"label": "smv142",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2527,17 +3392,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[46.575,46.975],
-							[48.375,47.575]
+							[
+								37.325,
+								25.675
+							],
+							[
+								39.175,
+								27.375
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs47",
+						"label": "smv143",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2546,17 +3418,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[46.575,29.075],
-							[48.375,30.675]
+							[
+								40.525,
+								25.675
+							],
+							[
+								42.075,
+								27.325
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs48",
+						"label": "smv144",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2565,17 +3444,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[49.525,25.675],
-							[51.275,27.275]
+							[
+								43.425,
+								25.675
+							],
+							[
+								45.175,
+								27.325
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs49",
+						"label": "smv145",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2584,17 +3470,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[49.525,8.775],
-							[51.275,9.375]
+							[
+								46.475,
+								25.675
+							],
+							[
+								48.275,
+								27.325
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs50",
+						"label": "smv146",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2603,17 +3496,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[49.625,46.975],
-							[51.475,47.575]
+							[
+								49.525,
+								25.675
+							],
+							[
+								51.225,
+								27.325
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs51",
+						"label": "smv147",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2622,17 +3522,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[49.625,29.075],
-							[51.475,30.675]
+							[
+								52.875,
+								25.675
+							],
+							[
+								54.475,
+								27.325
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs52",
+						"label": "smv148",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2641,17 +3548,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[52.875,25.675],
-							[54.525,27.275]
+							[
+								55.725,
+								25.675
+							],
+							[
+								57.475,
+								27.325
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs53",
+						"label": "smv149",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2660,17 +3574,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[52.875,8.775],
-							[54.525,9.375]
+							[
+								58.675,
+								25.675
+							],
+							[
+								60.575,
+								27.325
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs54",
+						"label": "smv150",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2679,17 +3600,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[52.975,46.975],
-							[54.475,47.575]
+							[
+								61.825,
+								25.675
+							],
+							[
+								63.575,
+								27.325
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs55",
+						"label": "smv151",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2698,17 +3626,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[52.975,29.075],
-							[54.475,30.675]
+							[
+								65.125,
+								25.675
+							],
+							[
+								66.525,
+								27.325
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs56",
+						"label": "smv152",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2717,17 +3652,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[55.725,25.675],
-							[57.525,27.275]
+							[
+								12.975,
+								8.775
+							],
+							[
+								14.375,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs57",
+						"label": "smv153",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2736,17 +3678,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[55.725,8.775],
-							[57.525,9.375]
+							[
+								16.175,
+								8.775
+							],
+							[
+								17.575,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs58",
+						"label": "smv154",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2755,17 +3704,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[55.925,46.975],
-							[57.525,47.575]
+							[
+								18.875,
+								8.775
+							],
+							[
+								20.725,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs59",
+						"label": "smv155",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2774,17 +3730,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[55.925,29.075],
-							[57.525,30.675]
+							[
+								22.025,
+								8.775
+							],
+							[
+								23.825,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs60",
+						"label": "smv156",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2793,17 +3756,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[58.675,25.675],
-							[60.625,27.275]
+							[
+								25.075,
+								8.775
+							],
+							[
+								26.925,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs61",
+						"label": "smv157",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2812,17 +3782,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[58.675,8.775],
-							[60.625,9.375]
+							[
+								28.325,
+								8.775
+							],
+							[
+								29.925,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs62",
+						"label": "smv158",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2831,17 +3808,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[58.875,46.975],
-							[60.575,47.575]
+							[
+								31.175,
+								8.775
+							],
+							[
+								32.875,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs63",
+						"label": "smv159",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2850,17 +3834,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[58.875,29.075],
-							[60.575,30.675]
+							[
+								34.325,
+								8.775
+							],
+							[
+								35.925,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs64",
+						"label": "smv160",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2869,17 +3860,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[61.825,25.675],
-							[63.625,27.275]
+							[
+								37.325,
+								8.775
+							],
+							[
+								39.175,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs65",
+						"label": "smv161",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2888,17 +3886,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[61.825,8.775],
-							[63.625,9.375]
+							[
+								40.525,
+								8.775
+							],
+							[
+								42.075,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs66",
+						"label": "smv162",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2907,17 +3912,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[61.875,46.975],
-							[63.625,47.575]
+							[
+								43.425,
+								8.775
+							],
+							[
+								45.175,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs67",
+						"label": "smv163",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2926,17 +3938,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[61.875,29.075],
-							[63.625,30.675]
+							[
+								46.475,
+								8.775
+							],
+							[
+								48.275,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs68",
+						"label": "smv164",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2945,17 +3964,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[65.125,46.975],
-							[66.575,47.575]
+							[
+								49.525,
+								8.775
+							],
+							[
+								51.225,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs69",
+						"label": "smv165",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2964,17 +3990,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[65.125,29.075],
-							[66.575,30.675]
+							[
+								52.875,
+								8.775
+							],
+							[
+								54.475,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs70",
+						"label": "smv166",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -2983,17 +4016,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[65.125,25.675],
-							[66.575,27.275]
+							[
+								55.725,
+								8.775
+							],
+							[
+								57.475,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs71",
+						"label": "smv167",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3002,17 +4042,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[65.125,8.775],
-							[66.575,9.375]
+							[
+								58.675,
+								8.775
+							],
+							[
+								60.575,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "rs72",
+						"label": "smv168",
 						"notes": {
-							"set_max_velocity": 0.4,
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3021,16 +4068,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[10.625,26.775],
-							[11.125,29.625]
+							[
+								61.825,
+								8.775
+							],
+							[
+								63.575,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws1",
+						"label": "smv169",
 						"notes": {
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3039,16 +4094,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[12.175,26.775],
-							[67.825,29.625]
+							[
+								65.125,
+								8.775
+							],
+							[
+								66.525,
+								9.425
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws2",
+						"label": "smv170",
 						"notes": {
-							"play_sound": "warning"
-						}
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3057,16 +4120,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[12.775,29.675],
-							[14.375,48.875]
+							[
+								12.775,
+								29.675
+							],
+							[
+								14.325,
+								48.925
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws3",
+						"label": "ps171",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3075,16 +4146,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[12.775,7.175],
-							[14.375,26.725]
+							[
+								14.425,
+								47.625
+							],
+							[
+								65.075,
+								48.925
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws4",
+						"label": "ps172",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3093,16 +4172,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[14.425,47.625],
-							[65.125,48.875]
+							[
+								65.175,
+								29.675
+							],
+							[
+								66.625,
+								48.925
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws5",
+						"label": "ps173",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3111,16 +4198,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[14.425,7.175],
-							[65.125,8.725]
+							[
+								16.175,
+								44.575
+							],
+							[
+								17.575,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws6",
+						"label": "ps174",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3129,16 +4224,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.175,44.575],
-							[17.625,47.575]
+							[
+								19.025,
+								44.575
+							],
+							[
+								20.675,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws7",
+						"label": "ps175",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3147,16 +4250,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.175,29.675],
-							[17.625,32.675]
+							[
+								22.075,
+								44.575
+							],
+							[
+								23.825,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws8",
+						"label": "ps176",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3165,16 +4276,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.175,23.725],
-							[17.625,26.725]
+							[
+								25.075,
+								44.575
+							],
+							[
+								27.025,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws9",
+						"label": "ps177",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3183,16 +4302,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[16.175,8.775],
-							[17.625,11.775]
+							[
+								28.325,
+								44.575
+							],
+							[
+								29.875,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws10",
+						"label": "ps178",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3201,16 +4328,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[18.875,23.725],
-							[20.775,26.725]
+							[
+								31.175,
+								44.575
+							],
+							[
+								32.925,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws11",
+						"label": "ps179",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3219,16 +4354,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[18.875,8.775],
-							[20.775,11.775]
+							[
+								34.275,
+								44.575
+							],
+							[
+								36.125,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws12",
+						"label": "ps180",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3237,16 +4380,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[19.025,44.575],
-							[20.725,47.575]
+							[
+								37.375,
+								44.575
+							],
+							[
+								39.075,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws13",
+						"label": "ps181",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3255,16 +4406,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[19.025,29.675],
-							[20.725,32.675]
+							[
+								40.625,
+								44.575
+							],
+							[
+								42.175,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws14",
+						"label": "ps182",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3273,16 +4432,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[22.025,23.725],
-							[23.875,26.725]
+							[
+								43.425,
+								44.575
+							],
+							[
+								45.225,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws15",
+						"label": "ps183",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3291,16 +4458,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[22.025,8.775],
-							[23.875,11.775]
+							[
+								46.575,
+								44.575
+							],
+							[
+								48.325,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws16",
+						"label": "ps184",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3309,16 +4484,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[22.075,44.575],
-							[23.875,47.575]
+							[
+								49.625,
+								44.575
+							],
+							[
+								51.425,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws17",
+						"label": "ps185",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3327,16 +4510,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[22.075,29.675],
-							[23.875,32.675]
+							[
+								52.975,
+								44.575
+							],
+							[
+								54.425,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws18",
+						"label": "ps186",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3345,16 +4536,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[25.025,29.675],
-							[27.075,32.675]
+							[
+								55.925,
+								44.575
+							],
+							[
+								57.475,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws19",
+						"label": "ps187",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3363,16 +4562,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[25.075,44.575],
-							[27.075,47.575]
+							[
+								58.875,
+								44.575
+							],
+							[
+								60.525,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws20",
+						"label": "ps188",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3381,16 +4588,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[25.075,23.725],
-							[26.975,26.725]
+							[
+								61.875,
+								44.575
+							],
+							[
+								63.575,
+								47.625
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws21",
+						"label": "ps189",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3399,16 +4614,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[25.075,8.775],
-							[26.975,11.775]
+							[
+								67.875,
+								27.375
+							],
+							[
+								69.575,
+								46.475
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws22",
+						"label": "ps190",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3417,16 +4640,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.325,44.575],
-							[29.925,47.575]
+							[
+								16.175,
+								29.675
+							],
+							[
+								17.575,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws23",
+						"label": "ps191",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3435,16 +4666,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.325,29.675],
-							[29.925,32.675]
+							[
+								19.025,
+								29.675
+							],
+							[
+								20.675,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws24",
+						"label": "ps192",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3453,16 +4692,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.325,23.725],
-							[29.975,26.725]
+							[
+								22.075,
+								29.675
+							],
+							[
+								23.825,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws25",
+						"label": "ps193",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3471,16 +4718,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[28.325,8.775],
-							[29.975,11.775]
+							[
+								25.025,
+								29.675
+							],
+							[
+								27.025,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws26",
+						"label": "ps194",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3489,16 +4744,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[31.175,44.575],
-							[32.975,47.575]
+							[
+								28.325,
+								29.675
+							],
+							[
+								29.875,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws27",
+						"label": "ps195",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3507,16 +4770,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[31.175,29.675],
-							[32.975,32.675]
+							[
+								31.175,
+								29.675
+							],
+							[
+								32.925,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws28",
+						"label": "ps196",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3525,16 +4796,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[31.175,23.725],
-							[32.925,26.725]
+							[
+								34.275,
+								29.675
+							],
+							[
+								36.125,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws29",
+						"label": "ps197",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3543,16 +4822,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[31.175,8.775],
-							[32.925,11.775]
+							[
+								37.375,
+								29.675
+							],
+							[
+								39.075,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws30",
+						"label": "ps198",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3561,16 +4848,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[34.275,44.575],
-							[36.175,47.575]
+							[
+								40.625,
+								29.675
+							],
+							[
+								42.175,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws31",
+						"label": "ps199",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3579,16 +4874,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[34.275,29.675],
-							[36.175,32.675]
+							[
+								43.425,
+								29.675
+							],
+							[
+								45.225,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws32",
+						"label": "ps200",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3597,16 +4900,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[34.325,23.725],
-							[35.975,26.725]
+							[
+								46.575,
+								29.675
+							],
+							[
+								48.325,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws33",
+						"label": "ps201",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3615,16 +4926,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[34.325,8.775],
-							[35.975,11.775]
+							[
+								49.625,
+								29.675
+							],
+							[
+								51.425,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws34",
+						"label": "ps202",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3633,16 +4952,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[37.325,23.725],
-							[39.225,26.725]
+							[
+								52.975,
+								29.675
+							],
+							[
+								54.425,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws35",
+						"label": "ps203",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3651,16 +4978,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[37.325,8.775],
-							[39.225,11.775]
+							[
+								55.925,
+								29.675
+							],
+							[
+								57.475,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws36",
+						"label": "ps204",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3669,16 +5004,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[37.375,44.575],
-							[39.125,47.575]
+							[
+								58.875,
+								29.675
+							],
+							[
+								60.525,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws37",
+						"label": "ps205",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3687,16 +5030,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[37.375,29.675],
-							[39.125,32.675]
+							[
+								61.875,
+								29.675
+							],
+							[
+								63.575,
+								32.725
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws38",
+						"label": "ps206",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3705,16 +5056,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[40.525,23.725],
-							[42.125,26.725]
+							[
+								10.625,
+								26.775
+							],
+							[
+								11.075,
+								29.675
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws39",
+						"label": "ps207",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3723,16 +5082,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[40.525,8.775],
-							[42.125,11.775]
+							[
+								12.175,
+								26.775
+							],
+							[
+								67.775,
+								29.675
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws40",
+						"label": "ps208",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3741,16 +5108,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[40.625,44.575],
-							[42.225,47.575]
+							[
+								12.775,
+								7.175
+							],
+							[
+								14.325,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws41",
+						"label": "ps209",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3759,16 +5134,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[40.625,29.675],
-							[42.225,32.675]
+							[
+								16.175,
+								23.725
+							],
+							[
+								17.575,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws42",
+						"label": "ps210",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3777,16 +5160,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[43.425,44.575],
-							[45.275,47.575]
+							[
+								18.875,
+								23.725
+							],
+							[
+								20.725,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws43",
+						"label": "ps211",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3795,16 +5186,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[43.425,29.675],
-							[45.275,32.675]
+							[
+								22.025,
+								23.725
+							],
+							[
+								23.825,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws44",
+						"label": "ps212",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3813,16 +5212,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[43.425,23.725],
-							[45.225,26.725]
+							[
+								25.075,
+								23.725
+							],
+							[
+								26.925,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws45",
+						"label": "ps213",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3831,16 +5238,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[43.425,8.775],
-							[45.225,11.775]
+							[
+								28.325,
+								23.725
+							],
+							[
+								29.925,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws46",
+						"label": "ps214",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3849,16 +5264,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[46.475,23.725],
-							[48.325,26.725]
+							[
+								31.175,
+								23.725
+							],
+							[
+								32.875,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws47",
+						"label": "ps215",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3867,16 +5290,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[46.475,8.775],
-							[48.325,11.775]
+							[
+								34.325,
+								23.725
+							],
+							[
+								35.925,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws48",
+						"label": "ps216",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3885,16 +5316,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[46.575,44.575],
-							[48.375,47.575]
+							[
+								37.325,
+								23.725
+							],
+							[
+								39.175,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws49",
+						"label": "ps217",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3903,16 +5342,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[46.575,29.675],
-							[48.375,32.675]
+							[
+								40.525,
+								23.725
+							],
+							[
+								42.075,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws50",
+						"label": "ps218",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3921,16 +5368,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[49.525,23.725],
-							[51.275,26.725]
+							[
+								43.425,
+								23.725
+							],
+							[
+								45.175,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws51",
+						"label": "ps219",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3939,16 +5394,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[49.525,8.775],
-							[51.275,11.775]
+							[
+								46.475,
+								23.725
+							],
+							[
+								48.275,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws52",
+						"label": "ps220",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3957,16 +5420,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[49.625,44.575],
-							[51.475,47.575]
+							[
+								49.525,
+								23.725
+							],
+							[
+								51.225,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws53",
+						"label": "ps221",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3975,16 +5446,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[49.625,29.675],
-							[51.475,32.675]
+							[
+								52.875,
+								23.725
+							],
+							[
+								54.475,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws54",
+						"label": "ps222",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -3993,16 +5472,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[52.875,23.725],
-							[54.525,26.725]
+							[
+								55.725,
+								23.725
+							],
+							[
+								57.475,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws55",
+						"label": "ps223",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4011,16 +5498,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[52.875,8.775],
-							[54.525,11.775]
+							[
+								58.675,
+								23.725
+							],
+							[
+								60.575,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws56",
+						"label": "ps224",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4029,16 +5524,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[52.975,44.575],
-							[54.475,47.575]
+							[
+								61.825,
+								23.725
+							],
+							[
+								63.575,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws57",
+						"label": "ps225",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4047,16 +5550,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[52.975,29.675],
-							[54.475,32.675]
+							[
+								65.175,
+								7.175
+							],
+							[
+								66.625,
+								26.775
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws58",
+						"label": "ps226",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4065,16 +5576,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[55.725,23.725],
-							[57.525,26.725]
+							[
+								16.175,
+								8.775
+							],
+							[
+								17.575,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws59",
+						"label": "ps227",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4083,16 +5602,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[55.725,8.775],
-							[57.525,11.775]
+							[
+								18.875,
+								8.775
+							],
+							[
+								20.725,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws60",
+						"label": "ps228",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4101,16 +5628,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[55.925,44.575],
-							[57.525,47.575]
+							[
+								22.025,
+								8.775
+							],
+							[
+								23.825,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws61",
+						"label": "ps229",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4119,16 +5654,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[55.925,29.675],
-							[57.525,32.675]
+							[
+								25.075,
+								8.775
+							],
+							[
+								26.925,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws62",
+						"label": "ps230",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4137,16 +5680,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[58.675,23.725],
-							[60.625,26.725]
+							[
+								28.325,
+								8.775
+							],
+							[
+								29.925,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws63",
+						"label": "ps231",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4155,16 +5706,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[58.675,8.775],
-							[60.625,11.775]
+							[
+								31.175,
+								8.775
+							],
+							[
+								32.875,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws64",
+						"label": "ps232",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4173,16 +5732,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[58.875,44.575],
-							[60.575,47.575]
+							[
+								34.325,
+								8.775
+							],
+							[
+								35.925,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws65",
+						"label": "ps233",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4191,16 +5758,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[58.875,29.675],
-							[60.575,32.675]
+							[
+								37.325,
+								8.775
+							],
+							[
+								39.175,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws66",
+						"label": "ps234",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4209,16 +5784,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[61.825,23.725],
-							[63.625,26.725]
+							[
+								40.525,
+								8.775
+							],
+							[
+								42.075,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws67",
+						"label": "ps235",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4227,16 +5810,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[61.825,8.775],
-							[63.625,11.775]
+							[
+								43.425,
+								8.775
+							],
+							[
+								45.175,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws68",
+						"label": "ps236",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4245,16 +5836,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[61.875,44.575],
-							[63.625,47.575]
+							[
+								46.475,
+								8.775
+							],
+							[
+								48.275,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws69",
+						"label": "ps237",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4263,16 +5862,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[61.875,29.675],
-							[63.625,32.675]
+							[
+								49.525,
+								8.775
+							],
+							[
+								51.225,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws70",
+						"label": "ps238",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4281,16 +5888,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[65.175,29.675],
-							[66.675,48.875]
+							[
+								52.875,
+								8.775
+							],
+							[
+								54.475,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws71",
+						"label": "ps239",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4299,16 +5914,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[65.175,7.175],
-							[66.675,26.725]
+							[
+								55.725,
+								8.775
+							],
+							[
+								57.475,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws72",
+						"label": "ps240",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4317,16 +5940,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[67.875,27.375],
-							[69.625,46.425]
+							[
+								58.675,
+								8.775
+							],
+							[
+								60.575,
+								11.825
+							]
 						]
 					},
 					"properties": {
 						"object": "labeled_area",
-						"label": "ws73",
+						"label": "ps241",
 						"notes": {
 							"play_sound": "warning"
-						}
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4335,16 +5966,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[63.625,47.575],
-							[65.125,48.875]
+							[
+								61.825,
+								8.775
+							],
+							[
+								63.575,
+								11.825
+							]
 						]
 					},
 					"properties": {
-						"object": "weighted_area",
-						"north": 0,
-						"east": 0,
-						"south": 0,
-						"west": 100
+						"object": "labeled_area",
+						"label": "ps242",
+						"notes": {
+							"play_sound": "warning"
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4353,16 +5992,24 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[63.625,7.175],
-							[65.125,8.775]
+							[
+								14.425,
+								7.175
+							],
+							[
+								65.075,
+								8.775
+							]
 						]
 					},
 					"properties": {
-						"object": "weighted_area",
-						"north": 0,
-						"east": 0,
-						"south": 0,
-						"west": 100
+						"object": "labeled_area",
+						"label": "ps243",
+						"notes": {
+							"play_sound": "warning"
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4371,16 +6018,28 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[63.625,26.725],
-							[65.125,29.675]
+							[
+								67.975,
+								27.325
+							],
+							[
+								68.175,
+								39.875
+							]
 						]
 					},
 					"properties": {
 						"object": "weighted_area",
-						"north": 0,
-						"east": 100,
-						"south": 0,
-						"west": 0
+						"n": 0,
+						"ne": 100,
+						"e": 100,
+						"se": 100,
+						"s": 0,
+						"sw": 0,
+						"w": 0,
+						"nw": 0,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4389,16 +6048,28 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[68.375,27.375],
-							[68.675,44.925]
+							[
+								68.125,
+								27.325
+							],
+							[
+								68.825,
+								39.875
+							]
 						]
 					},
 					"properties": {
 						"object": "weighted_area",
-						"north": 0,
-						"east": 100,
-						"south": 0,
-						"west": 0
+						"n": 100,
+						"ne": 100,
+						"e": 0,
+						"se": 0,
+						"s": 0,
+						"sw": 0,
+						"w": 0,
+						"nw": 100,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
@@ -4407,31 +6078,106 @@
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[68.675,27.375],
-							[70.925,44.925]
+							[
+								68.125,
+								27.325
+							],
+							[
+								68.825,
+								39.875
+							]
 						]
 					},
 					"properties": {
-						"object": "weighted_area",
-						"north": 100,
-						"east": 0,
-						"south": 0,
-						"west": 0
+						"object": "labeled_area",
+						"label": "q246",
+						"notes": {
+							"queue": "packout1"
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				},
 				{
 					"type": "Feature",
-					"id": "1",
+					"id": 247,
 					"geometry": {
 						"type": "MultiPoint",
 						"coordinates": [
-							[14.775,27.525],
-							[57.575,28.325]
+							[
+								68.125,
+								27.325
+							],
+							[
+								68.825,
+								39.875
+							]
 						]
 					},
 					"properties": {
-						"object": "cost_area",
-						"cost": 10
+						"object": "labeled_area",
+						"label": "smv247",
+						"notes": {
+							"set_max_velocity": 0.6
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 248,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								67.425,
+								27.325
+							],
+							[
+								69.575,
+								40.375
+							]
+						]
+					},
+					"properties": {
+						"object": "labeled_area",
+						"label": "sop248",
+						"notes": {
+							"stay_on_path": 1
+						},
+						"envelope_size": 0,
+						"envelope_cost": 0
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 249,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[
+								68.775,
+								27.325
+							],
+							[
+								68.975,
+								39.875
+							]
+						]
+					},
+					"properties": {
+						"object": "weighted_area",
+						"n": 0,
+						"ne": 0,
+						"e": 0,
+						"se": 0,
+						"s": 0,
+						"sw": 100,
+						"w": 100,
+						"nw": 100,
+						"envelope_size": 0,
+						"envelope_cost": 0
 					}
 				}
 			]

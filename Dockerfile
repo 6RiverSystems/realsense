@@ -15,6 +15,8 @@ RUN ln -sf /usr/bin/clang-3.6 /usr/bin/clang
 
 RUN dpkg --purge libhttp-parser-dev
 
+RUN update-locale LANG=C LANGUAGE=C LC_ALL=C LC_MESSAGES=POSIX
+
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 RUN apt-get update
@@ -41,9 +43,5 @@ ADD ./ /catkin_ws/src/project
 RUN /bin/bash -c "cd /catkin_ws/src"
 RUN /bin/bash -c "catkin_init_workspace"
 RUN /bin/bash -c "cd /catkin_ws"
-#RUN /bin/bash -c "catkin_make run_tests -j4"
-#RUN /bin/bash -c "catkin_test_results ~/catkin_ws/build/test_results"
-
-#RUN /bin/bash -c "catkin_make install -j4"
 
 RUN [ "cross-build-end" ]

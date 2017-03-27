@@ -17,10 +17,11 @@ RUN dpkg --purge libhttp-parser-dev
 
 RUN update-locale LANG=C LANGUAGE=C LC_ALL=C LC_MESSAGES=POSIX
 
-RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+RUN sh -c 'echo "deb http:/catkin_test_results build/test_results/packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 RUN apt-get update
-RUN apt-get install ros-indigo-desktop -y
+RUN apt-get install ros-indigo-de
+RUN sh -c 'echo "deb http:/catkinsktop -y
 RUN apt-get install ros-indigo-navigation -y
 RUN apt-get install ros-indigo-rgbd-launch -y
 RUN apt-get install ros-indigo-depthimage-to-laserscan -y
@@ -34,14 +35,8 @@ RUN apt-get install python-gevent=1.0-1ubuntu1 -y
 RUN apt-get install libunwind8-dev -y
 RUN apt-get install expect-dev -y
 
-RUN /bin/bash -c "source /opt/ros/indigo/setup.bash"
-RUN /bin/bash -c "export PATH=/usr/lib/ccache:$PATH"
-RUN /bin/bash -c "export ROS_PARALLEL_JOBS=-j4"
-
 ADD ./ /catkin_ws/src/project
 
-RUN /bin/bash -c "cd /catkin_ws/src"
-RUN /bin/bash -c "catkin_init_workspace"
-RUN /bin/bash -c "cd /catkin_ws"
+RUN sh -c './scripts/build_workspace.sh'
 
 RUN [ "cross-build-end" ]

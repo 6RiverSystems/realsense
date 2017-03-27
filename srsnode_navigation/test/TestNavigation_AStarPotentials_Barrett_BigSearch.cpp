@@ -34,7 +34,7 @@ TEST(Test_Navigation_AStarPotentials, Barrett_BigSearch)
     StopWatch timer;
 
     ASSERT_TRUE(astar.calculatePath(AStarPotentials::SearchParameters(),
-        14.000, 10.000, 73.000, 178.000, path, potentials)) <<
+        7.000, 5.000, 36.500, 89.000, path, potentials)) <<
         "A plan was not found";
 
     cout << "Elapsed time: " << timer.elapsedMilliseconds() << "ms" << endl;

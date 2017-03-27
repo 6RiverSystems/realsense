@@ -49,7 +49,7 @@ TEST(Test_AStar_MapStack_SamePlaceOnMap, SamePositionOnMap)
 TEST(Test_AStar_MapStack_SamePlaceOnMap, SameLocationOnMap)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile(
-        "search/data/6rshq/6rshq.yaml");
+        "data/6rshq/6rshq.yaml");
 
     AStar algorithm;
 

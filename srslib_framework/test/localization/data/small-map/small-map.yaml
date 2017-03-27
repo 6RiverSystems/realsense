@@ -4,15 +4,25 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 {
-    occupancy: {
-        image: small-map.pgm,
-        resolution: 0.100,
-        origin: [0, 0, 0],
-        negate: 0,
-        occupied_thresh: 0.65,
-        free_thresh: 0.196,
+
+    "language_version": "1.0",
+    "metadata": {
+        "map_name": "Small map",
+        "map_version": "1.0"
     },
-    logical: {
-        map: small-map.geojson
+    "logical": {
+        "map": "small-map.geojson"
+    },
+    "occupancy": {
+        "map": "small-map.pgm",
+        "resolution": 0.1,
+        "origin": [
+            0,
+            0,
+            0
+        ],
+        "negate": 0,
+        "occupied_thresh": 0.65,
+        "free_thresh": 0.196
     }
 }

@@ -1,7 +1,9 @@
 FROM ioft/armhf-ubuntu:trusty
 MAINTAINER Adam Ierymenko <adam.ierymenko@zerotier.com>
 
-ADD qemu-arm-static /usr/bin/
+ENV QEMU_EXECVE 1
+COPY qemu/cross-build-end qemu/cross-build-start qemu/qemu-arm-static qemu/sh-shim /usr/bin/
+RUN [ "cross-build-start" ]
 
 RUN apt-get update -y
 RUN apt-get upgrade -y
@@ -43,3 +45,5 @@ RUN /bin/bash -c "cd /catkin_ws"
 #RUN /bin/bash -c "catkin_test_results ~/catkin_ws/build/test_results"
 
 #RUN /bin/bash -c "catkin_make install -j4"
+
+RUN [ "cross-build-end" ]

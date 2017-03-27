@@ -1,6 +1,6 @@
 machine:
   pre:
-    - sudo apt-get apt-get -y install docker.io
+    - sudo apt-get -y install docker.io
   services:
     - docker
 
@@ -9,13 +9,13 @@ dependencies:
 #    - "~/.apt-cache"
 #    - "~/.ccache"
   override:
-    - docker info
-    - docker build -t ros-build-debian-armhf .
+    - sudo docker info
+    - sudo docker build -t ros-build-debian-armhf .
 
 checkout:
   post:
     - git submodule sync
-    - git submodule update --init
+    - git submodule update --init --recursive
 
 test:
   override:

@@ -37,6 +37,6 @@ RUN apt-get install expect-dev -y
 
 ADD ./ /catkin_ws/src/project
 
-RUN sh -c './scripts/build_workspace.sh'
+RUN sh -c './catkin_ws/src/project/srsbot_chuck/scripts/build_workspace.sh'
 
 RUN [ "cross-build-end" ]

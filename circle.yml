@@ -10,8 +10,9 @@ dependencies:
     - "~/.apt-cache"
     - "~/.ccache"
   override:
-    - sudo docker info
-    - sudo docker build -t ros-build-debian-armhf .
+    - if [[ -e ~/docker/image.tar ]]; then docker load -i ~/docker/image.tar; fi
+    - docker build -t ros-build-debian-armhf .
+    - mkdir -p ~/docker; docker save ros-build-debian-armhf > ~/docker/image.tar
 
 checkout:
   post:

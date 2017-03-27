@@ -2,20 +2,8 @@ export ROS_HOSTNAME=$ROBOT_NAME
 export ROS_LANG_DISABLE=genlisp
 unset GTK_IM_MODULE
 
-BASH_ALIASES=$HOME/mfp_workspace/src/mfp_chuck/srsbot_chuck/scripts/bash_aliases
+roscd srsbot_chuck
 
-if [ -f $BASH_ALIASES ]; then
-    source $BASH_ALIASES
-else
-    echo "Chuck ros stack not installed: Can not find $BASH_ALIASES"
-fi
+export BASH_ALIASES=$PWD/scripts/bash_aliases
 
-DEVEL_SETUP=~/mfp_workspace/devel/setup.bash
-INSTALL_SETUP=~/mfp_workspace/install/setup.bash
-
-if [ -f $DEVEL_SETUP ]; then
-    source $DEVEL_SETUP
-elif [ -f $INSTALL_SETUP ]; then
-    source $INSTALL_SETUP
-fi
-
+source $BASH_ALIASES

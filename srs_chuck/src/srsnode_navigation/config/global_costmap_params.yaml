@@ -11,6 +11,10 @@ global_costmap:
     inflation:
         inflation_radius: 0.60
         cost_scaling_factor: 2.0
+  obstruction_layer:
+    inflation_radius: 0.6
+  obstruction_layer_realsense:
+    inflation_radius: 0.6
   plugins:
    - {name: static_layer, type: "costmap_2d::StaticLayerWithInflation"}
    - {name: obstruction_layer, type: "costmap_2d::ObstructionLayer"}

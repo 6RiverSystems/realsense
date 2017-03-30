@@ -1,0 +1,25 @@
+<!--
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+<launch>
+    <arg name="use_sim_time" default="true"/>
+    <arg name="start_bridge" default="true" />
+    <arg name="emulation_mode" default="true" />
+
+    <!-- Chuck Stack -->
+	<include file="$(find srsbot_chuck)/launch/robot.launch" >
+    	<arg name="use_sim_time" value="$(arg use_sim_time)" />
+        <arg name="start_bridge" value="$(arg start_bridge)" />
+        <arg name="emulation_mode" value="$(arg emulation_mode)" />
+    </include>
+
+    <!-- Launch Map -->
+    <include file="$(find srsc_common)/launch/map.launch" />
+
+	<!-- Fixed /odom frame to /map frame TF -->
+	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 /map /odom 100" />
+</launch>

@@ -1,4 +1,5 @@
 .catkin_workspace
+CMakeLists.txt
 .DS_Store
 .pydevproject
 **/.metadata

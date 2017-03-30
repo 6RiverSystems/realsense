@@ -1,0 +1,9 @@
+SrsPlanner:
+    allow_unknown: false
+    yield_frequency: 2000
+    use_yield: true
+
+####################################################################################################
+    use_quadratic: true
+    use_grid_path: true
+    neutral_cost: 50

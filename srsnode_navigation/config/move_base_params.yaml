@@ -1,0 +1,23 @@
+controller_frequency: 15.0
+controller_patience: 1.0
+controller_thread_affinity: 3
+
+planner_frequency: 1.0
+planner_patience: 5.0
+planner_thread_affinity: 2
+
+recovery_behavior_enabled: true
+clearing_rotation_allowed: false
+
+move_backwards_enabled: true
+move_backwards_distance: 0.15
+move_backwards_velocity: -0.05
+
+shutdown_costmaps: false
+
+oscillation_timeout: 0.0
+oscillation_distance: 0.5
+
+conservative_reset_dist: 3.0
+
+base_local_planner: "dwa_local_planner/DWAPlannerROS"

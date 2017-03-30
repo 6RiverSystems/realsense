@@ -1,0 +1,68 @@
+{
+    "type": "FeatureCollection",
+    "properties": {
+        "language_version": "1.2"
+    },
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "object": "map",
+                "version": "1",
+                "origin": [0.0, 0.0, 0.0],
+                "resolution": 0.100,
+                "width": 0.300,
+                "height": 0.300
+            }
+        },
+        {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "id": "1",
+                    "geometry": {
+                        "type": "MultiPoint",
+                        "coordinates": [[0.000, 0.000], [0.100, 0.100]]
+                    },
+                    "properties": {
+                        "object": "obstacle",
+                        "envelope_size": 0.100,
+                        "envelope_cost": 111
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "id": "First Cost Area",
+                    "geometry": {
+                        "type": "MultiPoint",
+                        "coordinates": [[0.200, 0.200], [0.200, 0.200]]
+                    },
+                    "properties": {
+                        "object": "cost_area",
+                        "cost": 128
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "id": "Weighted area",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [0.200, 0.000]
+                    },
+                    "properties": {
+                        "object": "weighted_area",
+                        "n": "max",
+                        "ne": 33,
+                        "e": 77,
+                        "se": 78,
+                        "s": 222,
+                        "sw": 223,
+                        "w": 111,
+                        "nw": 112
+                    }
+                }
+            ]
+        }
+    ]
+}

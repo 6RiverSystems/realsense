@@ -1,0 +1,16 @@
+<!-- 
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+<launch>
+    <node name="joy" pkg="joy" type="joy_node" required="true" />
+
+    <node name="srsnode_joystick_adapter"
+            pkg="srsnode_joystick_adapter" type="srsnode_joystick_adapter"
+            output="screen" >
+    	<remap from="/internal/sensors/joystick/velocity" to="/internal/sensors/odometry/velocity/cmd"/>
+    </node>
+</launch>

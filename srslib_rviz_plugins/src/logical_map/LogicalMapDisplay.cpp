@@ -422,7 +422,7 @@ void LogicalMapDisplay::translateLogicalMap()
 
     geometry_msgs::Pose origin;
     origin.position.x = logicalMap_->getOrigin().x;
-    origin.position.y = logicalMap_->getOrigin().x;
+    origin.position.y = logicalMap_->getOrigin().y;
     origin.position.z = 0;
     origin.orientation.x = 0.0;
     origin.orientation.y = 0.0;

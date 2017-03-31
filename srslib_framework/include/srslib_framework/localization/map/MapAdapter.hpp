@@ -45,7 +45,7 @@ struct MapAdapter
      *
      * @return Pointer to the Cost Map
      */
-    static costmap_2d::Costmap2D* map2CostMap2D(LogicalMap* logical);
+    static costmap_2d::Costmap2D* map2CostMap2D(const LogicalMap* logical);
 
     /**
      * @brief Convert a Occupancy Map type into a vector of integers with values
@@ -63,6 +63,14 @@ struct MapAdapter
      * @param int8Vector Reference to the vector of integers
      */
     static void occupancyMap2Vector(const OccupancyMap* occupancy, vector<int8_t>& int8Vector);
+
+    /**
+     * @brief Convert a Logical Map type into a vector of integers.
+     *
+     * @param occupancy Logical Map to convert
+     * @param int8Vector Reference to the vector of integers
+     */
+    static void logicalMap2OccupancyVector(const LogicalMap* map, vector<int8_t>& int8Vector);
 
     /**
      * @brief Convert a vector of integers into a Occupancy Map.

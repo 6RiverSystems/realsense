@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- 
+<!--
   *
   * (c) Copyright 2015-2016 River Systems, all rights reserved.
   *
@@ -9,7 +9,7 @@
 
 <package>
     <name>srsbot_chuck</name>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <description>Robot package: Chuck</description>
 
     <author email="dan@6river.com">Dan Winkler</author>

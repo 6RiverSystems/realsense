@@ -12,10 +12,9 @@ using namespace std;
 #include <nav_msgs/GetMap.h>
 
 #include <srslib_framework/localization/map/MapStack.hpp>
-#include <srslib_framework/ros/channel/ChannelRosLogicalGrid.hpp>
 #include <srslib_framework/ros/channel/ChannelMapStack.hpp>
 #include <srslib_framework/ros/channel/ChannelRosMapMetadata.hpp>
-#include <srslib_framework/ros/channel/ChannelRosOccupancyGrid.hpp>
+#include <srslib_framework/ros/channel/ChannelRosLogicalOccupancyGrid.hpp>
 #include <srslib_framework/ros/channel/ChannelRosAmclOccupancyGrid.hpp>
 #include <srslib_framework/ros/channel/publisher/PublisherRosCostGrid.hpp>
 #include <srslib_framework/ros/function/RosTriggerShutdown.hpp>
@@ -49,7 +48,7 @@ private:
 
     ChannelMapStack channelMapStack_;
     ChannelRosMapMetadata channelRosMapMetadata_;
-    ChannelRosOccupancyGrid channelRosOccupancyGrid_;
+    ChannelRosLogicalOccupancyGrid channelRosLogicalOccupancyGrid_;
     ChannelRosAmclOccupancyGrid channelRosAmclOccupancyGrid_;
 
     RosTriggerShutdown triggerShutdown_;

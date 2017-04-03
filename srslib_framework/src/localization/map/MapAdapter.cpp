@@ -53,7 +53,7 @@ costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(OccupancyMap* occupancy)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(LogicalMap* logical)
+costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(const LogicalMap* logical)
 {
     unsigned int rows = logical->getHeightCells();
     unsigned int columns = logical->getWidthCells();
@@ -112,6 +112,24 @@ void MapAdapter::occupancyMap2Vector(const OccupancyMap* occupancy, vector<int8_
         for (int col = 0; col < occupancy->getWidthCells(); col++)
         {
             int8_t cost = static_cast<int8_t>(occupancy->getCost(col, row));
+            int8Vector.push_back(cost);
+        }
+    }
+}
+
+void MapAdapter::logicalMap2OccupancyVector(const LogicalMap* logical, vector<int8_t>& int8Vector)
+{
+    int8Vector.clear();
+
+    for (int row = 0; row < logical->getHeightCells(); row++)
+    {
+        for (int col = 0; col < logical->getWidthCells(); col++)
+        {
+            uint32_t rawCost = static_cast<uint32_t>(logical->getCost(col, row));
+
+            int8_t cost = static_cast<int8_t>((rawCost - WeightedGrid2d::PAYLOAD_MIN)
+                / (WeightedGrid2d::PAYLOAD_MAX - WeightedGrid2d::PAYLOAD_MIN) * 100);
+
             int8Vector.push_back(cost);
         }
     }

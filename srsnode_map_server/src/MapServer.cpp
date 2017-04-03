@@ -13,8 +13,7 @@ using namespace std;
 #include <tf/LinearMath/Quaternion.h>
 
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
-#include <srslib_framework/localization/map/MapAdapter.hpp>
-#include <srslib_framework/ros/message/OccupancyMapMessageFactory.hpp>
+#include <srslib_framework/localization/map/exception/MapStackException.hpp>
 #include <srslib_framework/chuck/ChuckTopics.hpp>
 #include <srslib_framework/chuck/ChuckConfig.hpp>
 
@@ -34,7 +33,12 @@ MapServer::MapServer(string name, int argc, char** argv) :
     getLocalParameter(ChuckConfig::Parameters::FRAME_ID, frameId_, ChuckConfig::Transforms::MAP);
     ROS_INFO_STREAM("Frame id: " << frameId_);
 
-    mapStack_ = MapStackFactory::fromJsonFile(mapStackFilename_);
+    try {
+        mapStack_ = MapStackFactory::fromJsonFile(mapStackFilename_);
+    } catch (runtime_error& e) {
+        ROS_FATAL("%s", e.what());
+        throw;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,7 +73,7 @@ void MapServer::publishMap()
 
     // Publish ROS compatible information
     channelRosMapMetadata_.publish(mapStack_->getOccupancyMap()->getMetadata());
-    channelRosOccupancyGrid_.publish(mapStack_->getOccupancyMap());
+    channelRosLogicalOccupancyGrid_.publish(mapStack_->getLogicalMap());
     channelRosAmclOccupancyGrid_.publish(mapStack_->getOccupancyMap());
 }
 

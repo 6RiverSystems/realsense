@@ -5,14 +5,11 @@ function getChuckDirectory() {
   NC='\033[0m' # No Color
 
   baseDirectory=~/mfp_workspace
-
-  logFile="/var/log/upstart/mfp-ros.log"
 }
 
 function printInfo() {
   echo -e "${BLUE}*************************************************************"
   echo -e "${BLUE}*** ${YELLOW}ROS directory: $baseDirectory"
-  echo -e "${BLUE}*** ${YELLOW}Log file: $logFile"
   echo -e "${BLUE}*************************************************************"
   echo -e "${NC}"
 }
@@ -102,9 +99,7 @@ function restartChuck() {
 }
 
 logChuck() {
-  getChuckDirectory &&
-
-  sudo tail -n 1000 -f "$logFile" -f /var/log/upstart/mfp-bridge.log
+  tail -n 1000 -f /var/log/mfp/*.log | bunyan -o short  --color --time local
 }
 
 recordChuck() {

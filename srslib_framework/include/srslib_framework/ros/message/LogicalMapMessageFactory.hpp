@@ -12,8 +12,10 @@
 
 #include <srslib_framework/localization/map/logical/LogicalMap.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMetadata.hpp>
+#include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/robotics/Pose.hpp>
 #include <srslib_framework/ros/message/PoseMessageFactory.hpp>
+#include <srslib_framework/ros/message/CostMap2DMessageFactory.hpp>
 
 namespace srs {
 
@@ -66,6 +68,26 @@ struct LogicalMapMessageFactory
     }
 
     /**
+     * @brief Convert a LogicalMetadata into a ROS Map Metadata message.
+     *
+     * @param metadata Logical metadata to convert
+     *
+     * @return newly generated message
+     */
+    static nav_msgs::MapMetaData metadata2RosMsg(const LogicalMetadata& metadata)
+    {
+        nav_msgs::MapMetaData msgRosMapMetaData;
+
+        msgRosMapMetaData.map_load_time = ros::Time();
+        msgRosMapMetaData.resolution = metadata.resolution;
+        msgRosMapMetaData.width = metadata.widthCells;
+        msgRosMapMetaData.height = metadata.heightCells;
+        msgRosMapMetaData.origin = PoseMessageFactory::pose2RosPose(metadata.origin);
+
+        return msgRosMapMetaData;
+    }
+
+    /**
      * @brief Convert a LogicalMap message into a LogicalMap.
      *
      * @param message LogicalMap to convert
@@ -102,6 +124,28 @@ struct LogicalMapMessageFactory
         metadata.widthM = message.widthM;
 
         return metadata;
+    }
+
+    /**
+     * @brief Convert a Logical Map type into a ROS OccupancyGrid message.
+     *
+     * @param map Logical map to convert
+     * @param frameId Frame id of the logical map
+     *
+     * @return Ros OccupancyGrid message generated from the specified occupancy map
+     */
+    static nav_msgs::OccupancyGrid logicalMap2RosMsg(const LogicalMap* map, string frameId)
+    {
+        vector<int8_t> int8Vector;
+        MapAdapter::logicalMap2OccupancyVector(map, int8Vector);
+
+        nav_msgs::OccupancyGrid msgOccupancyMap;
+
+        msgOccupancyMap.info = metadata2RosMsg(map->getMetadata());
+        msgOccupancyMap.data = int8Vector;
+        msgOccupancyMap.header.frame_id = frameId;
+
+        return msgOccupancyMap;
     }
 
 private:

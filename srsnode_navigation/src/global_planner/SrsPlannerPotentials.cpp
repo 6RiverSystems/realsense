@@ -62,6 +62,7 @@ SrsPlannerPotentials::SrsPlannerPotentials(string name, costmap_2d::Costmap2DROS
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlannerPotentials::~SrsPlannerPotentials()
 {
+    delete configServer_;
     delete srsMapStack_;
 }
 
@@ -75,14 +76,16 @@ void SrsPlannerPotentials::initialize(std::string name, costmap_2d::Costmap2D* c
 
         orientationFilter_ = new OrientationFilter();
 
-        configServer_.setCallback(boost::bind(&SrsPlannerPotentials::onConfigChange, this, _1, _2));
+
+        ros::NodeHandle private_nh("~/" + name);
+        configServer_ = new dynamic_reconfigure::Server<srsnode_navigation::SrsPlannerConfig>(private_nh);
+        configServer_->setCallback(boost::bind(&SrsPlannerPotentials::onConfigChange, this, _1, _2));
 
         updateMapStack(costmap);
 
         costMap_ = costmap;
         tfFrameid_ = frame_id;
 
-        ros::NodeHandle private_nh("~/" + name);
 
         planPublisher_ = private_nh.advertise<nav_msgs::Path>("plan", 1);
         potentialPublisher_ = private_nh.advertise<nav_msgs::OccupancyGrid>("potential", 1);

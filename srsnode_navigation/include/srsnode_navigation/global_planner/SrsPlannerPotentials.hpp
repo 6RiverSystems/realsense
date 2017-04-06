@@ -68,7 +68,7 @@ private:
     bool allowUnknown_;
     AStarPotentials* astar_;
 
-    dynamic_reconfigure::Server<srsnode_navigation::SrsPlannerConfig> configServer_;
+    dynamic_reconfigure::Server<srsnode_navigation::SrsPlannerConfig>* configServer_;
     costmap_2d::Costmap2D* costMap_;
 
     bool initialized_;

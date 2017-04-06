@@ -37,6 +37,7 @@ SrsPlannerConventional::SrsPlannerConventional(string name, costmap_2d::Costmap2
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 SrsPlannerConventional::~SrsPlannerConventional()
 {
+    delete configServer_;
     delete srsMapStack_;
 }
 

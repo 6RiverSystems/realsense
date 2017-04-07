@@ -1,4 +1,4 @@
-SrsPlanner:
+SrsPlannerPotentials:
     allow_unknown: false
     yield_frequency: 2000
     use_yield: true

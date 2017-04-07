@@ -23,10 +23,10 @@
         <remap from="/cmd_vel" to="/internal/sensors/odometry/velocity/cmd"/>
         <remap from="/odom" to="/internal/sensors/odometry/pose"/>
         <param name="base_global_planner" value="global_planner/SrsPlannerPotentials"/>
-        
+
         <!-- Move Base -->
         <rosparam file="$(find srsnode_navigation)/config/move_base_params.yaml" command="load" />
-        
+
         <!-- Global Costmap -->
         <rosparam file="$(find srsnode_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
         <rosparam unless="$(arg use_sim_time)" file="$(find srsnode_navigation)/config/costmap_sensors.yaml" command="load" ns="global_costmap" />

@@ -35,8 +35,9 @@ RUN apt-get install python-gevent=1.0-1ubuntu1 -y
 RUN apt-get install libunwind8-dev -y
 RUN apt-get install expect-dev -y
 
-ADD ./ /catkin_ws/src/project
+ADD ./ /mfp_workspace/src
 
-RUN sh -c './catkin_ws/src/project/srsbot_chuck/scripts/build_workspace.sh'
+RUN sh -c 'chmod +x ./mfp_workspace/src/srsbot_chuck/scripts/build_workspace.sh'
+RUN sh -c './mfp_workspace/src/srsbot_chuck/scripts/build_workspace.sh'
 
 RUN [ "cross-build-end" ]

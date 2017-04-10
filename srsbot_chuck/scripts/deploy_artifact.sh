@@ -7,6 +7,8 @@ if [[ -z "${ARTIFACTORY_API_KEY:-}" ]]; then
 	exit 100
 fi
 
+cd ~/mfp_workspace
+
 PACKAGE_FILE=mfp_chuck
 
 VERSION_FILE=./install/share/srsbot_chuck/package.xml

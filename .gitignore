@@ -11,3 +11,4 @@ CMakeLists.txt
 **/.ptp*
 **/bags
 .catkin_tools
+.idea

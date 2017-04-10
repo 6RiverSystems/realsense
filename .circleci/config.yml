@@ -14,26 +14,26 @@ jobs:
           name: Run unit tests
           command:
             /bin/bash /mfp_workspace/src/srsbot_chuck/scripts/run_unit_tests.sh
-      - run:
-          name: Save test results as junit format
-          command:
-            mkdir -p $TEST_RESULTS
-            find /mfp_workspace/build/test_results -type f -name '*.xml' -exec cp {} $TEST_RESULTS/ \;
-      - run:
-          name: Build Install
-          command:
-            /bin/bash /mfp_workspace/src/srsbot_chuck/scripts/build_install.sh
-      - save_cache:
-          key: ros-ccache
-          paths:
-            - /.ccache
-      - store_artifacts:
-          path: /mfp_workspace/artifacts
-          destination: raw-test-output
-      - store_test_results:
-          path: /mfp_workspace/build/test_resultss
-      - deploy:
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              /bin/bash mfp_workspace/src/srsbot_chuck/scripts/deploy_artifacts.sh
-            fi
+#      - run:
+#          name: Save test results as junit format
+#          command:
+#            mkdir -p $TEST_RESULTS
+#            find /mfp_workspace/build/test_results -type f -name '*.xml' -exec cp {} $TEST_RESULTS/ \;
+#      - run:
+#          name: Build Install
+#          command:
+#            /bin/bash /mfp_workspace/src/srsbot_chuck/scripts/build_install.sh
+#      - save_cache:
+#          key: ros-ccache
+#          paths:
+#            - /.ccache
+#      - store_artifacts:
+#          path: /mfp_workspace/artifacts
+#          destination: raw-test-output
+#      - store_test_results:
+#          path: /mfp_workspace/build/test_resultss
+#      - deploy:
+#          command: |
+#            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+#              /bin/bash mfp_workspace/src/srsbot_chuck/scripts/deploy_artifacts.sh
+#            fi

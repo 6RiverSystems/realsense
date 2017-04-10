@@ -6,7 +6,7 @@ if [[ -z "${ARTIFACTORY_API_KEY:-}" ]]; then
 	exit 100
 fi
 
-pushd mfp_workspace
+cd /mfp_workspace
 
 PACKAGE_FILE=mfp_chuck
 
@@ -30,5 +30,3 @@ curl \
 	-H "X-JFrog-Art-Api: ${ARTIFACTORY_API_KEY}" \
 	-T "${ARTIFACT_PATH}" \
  	"https://sixriver.jfrog.io/sixriver/binaries/mfp_chuck/${ARTIFACT_NAME}"
-
-popd

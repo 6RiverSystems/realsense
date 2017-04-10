@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: 6river/rosbuild-armhf
-#    working_directory: /mfp_workspace/src
+    working_directory: /mfp_workspace/src
 #    environment:
 #      TEST_RESULTS: /mfp_workspace/build/test_results/junit
     steps:

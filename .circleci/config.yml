@@ -23,9 +23,6 @@ jobs:
           name: Build Install
           command:
             /bin/bash mfp_workspace/src/srsbot_chuck/scripts/build_install.sh
-      - run:
-          name: Deploy Artifacts
-          command:
       - save_cache:
           key: ros-ccache
           paths:

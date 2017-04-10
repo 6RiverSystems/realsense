@@ -9,7 +9,7 @@ dependencies:
     - "~/.ccache"
   override:
     - docker info
-    - docker pull 6river/rosbuild-armhf .
+    - docker pull 6river/rosbuild-armhf
 
 checkout:
   post:

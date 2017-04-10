@@ -3,9 +3,9 @@ jobs:
   build:
     docker:
       - image: 6river/rosbuild-armhf
-    working_directory: mfp_workspace/src
+    working_directory: /mfp_workspace/src
     environment:
-      TEST_RESULTS: mfp_workspace/build/test_results/junit
+      TEST_RESULTS: /mfp_workspace/build/test_results/junit
     steps:
       - checkout
       - restore_cache:
@@ -13,7 +13,7 @@ jobs:
       - run:
           name: Run unit tests
           command:
-            /bin/bash mfp_workspace/src/srsbot_chuck/scripts/run_unit_tests.sh
+            /bin/bash /mfp_workspace/src/srsbot_chuck/scripts/run_unit_tests.sh
       - run:
           name: Save test results as junit format
           command:
@@ -22,7 +22,7 @@ jobs:
       - run:
           name: Build Install
           command:
-            /bin/bash mfp_workspace/src/srsbot_chuck/scripts/build_install.sh
+            /bin/bash /mfp_workspace/src/srsbot_chuck/scripts/build_install.sh
       - save_cache:
           key: ros-ccache
           paths:

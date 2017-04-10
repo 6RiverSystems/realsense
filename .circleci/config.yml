@@ -8,12 +8,14 @@ jobs:
       TEST_RESULTS: /mfp_workspace/build/test_results/junit
     steps:
       - checkout
-      - restore_cache:
-          key: ros-ccache
+      - run:
+          name: Create test directory
+          command:
+            mkdir -p $TEST_RESULTS
       - run:
           name: Run unit tests
           command:
-            /bin/bash /mfp_workspace/src/srsbot_chuck/scripts/run_unit_tests.sh
+            /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/run_unit_tests.sh"
 #      - run:
 #          name: Save test results as junit format
 #          command:

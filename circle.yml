@@ -9,7 +9,7 @@ dependencies:
     - "~/.ccache"
   override:
     - docker info
-    - docker pull 6river/rosbuild-armhf
+    - sudo docker pull 6river/rosbuild-armhf
 
 checkout:
   post:
@@ -20,8 +20,8 @@ checkout:
 
 test:
   override:
-    - docker run -v $CIRCLE_TEST_REPORTS/junit:/mfp_workspace/build/test_results/junit -v $PWD/:/mfp_workspace/src -v $PWD/.ccache:/ccache -e CCACHE_DIR=/ccache --privileged -it 6river/rosbuild-armhf /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/run_unit_tests.sh"
-    - docker run -v $PWD/install:/mfp_workspace/install -v $PWD/:/mfp_workspace/src -v $PWD/.ccache:/ccache -e CCACHE_DIR=/ccache --privileged -it 6river/rosbuild-armhf /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/build_install.sh"
+    - sudo docker run -v $CIRCLE_TEST_REPORTS/junit:/mfp_workspace/build/test_results/junit -v $PWD/:/mfp_workspace/src -v $PWD/.ccache:/ccache -e CCACHE_DIR=/ccache --privileged -it 6river/rosbuild-armhf /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/run_unit_tests.sh"
+    - sudo docker run -v $PWD/install:/mfp_workspace/install -v $PWD/:/mfp_workspace/src -v $PWD/.ccache:/ccache -e CCACHE_DIR=/ccache --privileged -it 6river/rosbuild-armhf /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/build_install.sh"
 
 deployment:
   branch: master

@@ -3,11 +3,11 @@ jobs:
   build:
     docker:
       - image: 6river/rosbuild-armhf
-    working_directory: /mfp_workspace/src
-    environment:
-      TEST_RESULTS: /mfp_workspace/build/test_results/junit
+#    working_directory: /mfp_workspace/src
+#    environment:
+#      TEST_RESULTS: /mfp_workspace/build/test_results/junit
     steps:
-      - checkout
+#      - checkout
 #      - run:
 #          name: Create test directory
 #          command:

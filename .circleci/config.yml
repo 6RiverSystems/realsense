@@ -9,7 +9,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-            key: ros-ccache
+          key: ros-ccache
       - run:
           name: Run unit tests
           command:

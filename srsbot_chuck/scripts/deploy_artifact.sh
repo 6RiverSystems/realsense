@@ -1,16 +1,14 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-if [[ -z "${ARTIFACTORY_API_KEY:-}" ]]; then
-	echo "ARTIFACTORY_API_KEY environment variable not set" >&2
-	exit 100
-fi
-
-cd /mfp_workspace
-
 PACKAGE_FILE=mfp_chuck
 
 VERSION_FILE=./install/share/srsbot_chuck/package.xml
+
+if [ ! -f $VERSION_FILE ]; then
+	echo "Version file ($VERSION_FILE) does not exist" >&2
+	exit 100
+fi
 
 OUTPUT_DIR=`pwd`/artifacts
 VERSION=`xmllint --xpath 'string(//package/version)' $VERSION_FILE`
@@ -23,6 +21,11 @@ mkdir -p "${OUTPUT_DIR}"
 
 # Create artifact
 tar -cvf $ARTIFACT_PATH -C "${ARTIFACT_SOURCE_PATH}" .
+
+if [[ -z "${ARTIFACTORY_API_KEY:-}" ]]; then
+	echo "ARTIFACTORY_API_KEY environment variable not set" >&2
+	exit 100
+fi
 
 # Upload the zipped ros packages to Artifactory
 echo 'deploying artifact to artifactory'

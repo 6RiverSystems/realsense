@@ -1,6 +1,6 @@
 source /opt/ros/indigo/setup.bash
 export PATH=/usr/lib/ccache:$PATH
-export ROS_PARALLEL_JOBS='-j8 -l8'
+export ROS_PARALLEL_JOBS='-j4 -l4'
 export ROS_LANG_DISABLE=genlisp:roslisp
 
 if [ ! -f /mfp_workspace/src/CMakeLists.txt ]; then

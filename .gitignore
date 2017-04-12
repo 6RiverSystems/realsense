@@ -11,3 +11,8 @@ CMakeLists.txt
 **/.ptp*
 **/bags
 .catkin_tools
+.idea
+.ccache
+install/
+test_results/
+artifacts/

@@ -10,6 +10,8 @@ if [ ! -f $VERSION_FILE ]; then
 	exit 100
 fi
 
+chmod +x ./install/share/srsbot_chuck/scripts/*.sh
+
 OUTPUT_DIR=`pwd`/artifacts
 VERSION=`xmllint --xpath 'string(//package/version)' $VERSION_FILE`
 ARTIFACT=$PACKAGE_FILE-linux-armhf

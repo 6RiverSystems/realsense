@@ -17,7 +17,7 @@ VERSION=`xmllint --xpath 'string(//package/version)' $VERSION_FILE`
 ARTIFACT=$PACKAGE_FILE-linux-armhf
 ARTIFACT_SOURCE_PATH="./install"
 ARTIFACT_NAME="${ARTIFACT}-${VERSION}.tar.gz"
-export ARTIFACT_PATH="${OUTPUT_DIR}/${ARTIFACT_NAME}"
+ARTIFACT_PATH="${OUTPUT_DIR}/${ARTIFACT_NAME}"
 
 mkdir -p "${OUTPUT_DIR}"
 

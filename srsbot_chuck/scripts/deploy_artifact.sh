@@ -7,7 +7,7 @@ VERSION_FILE=./install/share/srsbot_chuck/package.xml
 
 if [ ! -f $VERSION_FILE ]; then
 	echo "Version file ($VERSION_FILE) does not exist" >&2
-	exit 100
+	exit 101
 fi
 
 chmod +x ./install/share/srsbot_chuck/scripts/*.sh

@@ -1,6 +1,7 @@
-set -e
-docker run -v $PWD:/mfp_workspace/src -v $PWD/.ccache:/ccache -e CCACHE_DIR=/ccache --privileged -it ros-build-debian-armhf /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/run_unit_tests.sh"
+set -euo pipefail
 
-docker run -v $PWD:/mfp_workspace/src -v $PWD/.ccache:/ccache -e CCACHE_DIR=/ccache --privileged -it ros-build-debian-armhf /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/build_install.sh"
+export ROS_BUILD_IMAGE=6river/rosbuild-armhf
 
-srsbot_chuck/scripts/deploy_artifact.sh
+docker pull $ROS_BUILD_IMAGE
+
+docker run --rm -v $PWD:/mfp_workspace/src -v $PWD/artifacts:/mfp_workspace/artifacts -v $PWD/.ccache:/ccache -e CCACHE_DIR=/ccache --privileged -it $ROS_BUILD_IMAGE /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/build.sh"

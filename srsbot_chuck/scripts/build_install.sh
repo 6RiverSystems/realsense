@@ -15,9 +15,5 @@ fi
 # compile and run unit tests
 rm -rf build/ devel/ install/
 
-time catkin_make -DCMAKE_BUILD_TYPE=Release run_tests
+time catkin_make -DCMAKE_BUILD_TYPE=Release install
 
-# generate unified test results
-time catkin_test_results build/test_results
-
-popd

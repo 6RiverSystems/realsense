@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot name="caster" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <xacro:include filename="common/inertia.xacro" />
+    <xacro:include filename="$(find srsbot_chuck)/urdf/common/inertia.xacro" />
 
     <xacro:macro name="caster" params="fb parent translateX translateY translateZ">
     

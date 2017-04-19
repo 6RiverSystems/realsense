@@ -10,6 +10,7 @@ set(PROJECT_NAME srsnode_navigation)
 set(${PROJECT_NAME}_SOURCES
     src/global_planner/SrsPlannerConventional.cpp
     src/global_planner/SrsPlannerPotentials.cpp
+    src/global_planner/PlannerUtilities.cpp
     src/global_planner/potentials/AStarPotentials.cpp
     src/global_planner/potentials/AStarPotentials.cpp
     src/global_planner/potentials/QuadraticCalculator.cpp
@@ -26,6 +27,7 @@ set(${PROJECT_NAME}_TEST_SOURCES
     test/TestNavigation_AStarPotentials_Barrett_BigSearch.cpp
     test/TestNavigation_AStarPotentials_SmallSearch.cpp
     test/TestNavigation_AStarPotentials_OneWay.cpp
+    test/TestNavigation_Utilities.cpp
 )
 
 ####################################################################################################

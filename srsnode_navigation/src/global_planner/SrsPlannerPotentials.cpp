@@ -7,6 +7,7 @@
 #include <tf/transform_listener.h>
 #include <costmap_2d/cost_values.h>
 #include <costmap_2d/costmap_2d.h>
+#include <costmap_2d/costmap_utilities.h>
 
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
 #include <srslib_framework/localization/map/mapnote/NoteQueue.hpp>
@@ -34,7 +35,8 @@ SrsPlannerPotentials::SrsPlannerPotentials() :
     allowUnknown_(true),
     publishPotential_(true),
     lethalCost_(253),
-    neutralCost_(50)
+    neutralCost_(50),
+    goalShiftDistance_(0.0)
 {
     ROS_WARN("SrsPlannerPotentials::SrsPlannerPotentials() called");
 
@@ -52,7 +54,8 @@ SrsPlannerPotentials::SrsPlannerPotentials(string name, costmap_2d::Costmap2DROS
     allowUnknown_(true),
     publishPotential_(true),
     lethalCost_(253),
-    neutralCost_(50)
+    neutralCost_(50),
+    goalShiftDistance_(0.0)
 {
     ROS_WARN("SrsPlannerPotentials::SrsPlannerPotentials(...) called");
 
@@ -155,6 +158,8 @@ bool SrsPlannerPotentials::makePlan(
         return false;
     }
 
+    geometry_msgs::PoseStamped shiftedGoal = costmap_2d::shiftGoalToMinima(goal, *costMap_, goalShiftDistance_);
+
     astar_ = new AStarPotentials(srsMapStack_->getLogicalMap(), costMap_, queuesMap_);
 
     tf::Stamped<tf::Pose> start_pose;
@@ -173,7 +178,7 @@ bool SrsPlannerPotentials::makePlan(
 
     bool found = astar_->calculatePath(searchParams,
         start.pose.position.x, start.pose.position.y,
-        goal.pose.position.x, goal.pose.position.y,
+        shiftedGoal.pose.position.x, shiftedGoal.pose.position.y,
         plan,
         potentialArray_);
 
@@ -186,7 +191,7 @@ bool SrsPlannerPotentials::makePlan(
     {
         getPlanFromPotential(plan, path);
 
-        geometry_msgs::PoseStamped goal_copy = goal;
+        geometry_msgs::PoseStamped goal_copy = shiftedGoal;
         goal_copy.header.stamp = ros::Time::now();
         path.push_back(goal_copy);
 
@@ -308,6 +313,7 @@ void SrsPlannerPotentials::onConfigChange(srsnode_navigation::SrsPlannerConfig& 
     publishPotential_ = config.publish_potential;
     weightRatio_ = config.weight_ratio;
     logicalCostRatio_ = config.logical_cost_ratio;
+    goalShiftDistance_ = config.goal_shift_distance;
     orientationFilter_->setMode(config.orientation_mode);
 }
 

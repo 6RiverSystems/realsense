@@ -100,6 +100,8 @@ private:
     bool useQuadratic_;
 
     unsigned int weightRatio_;
+
+    double goalShiftDistance_;
 };
 
 } // namespace srs

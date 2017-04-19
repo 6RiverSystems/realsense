@@ -7,7 +7,7 @@
 #include <tf/transform_listener.h>
 #include <costmap_2d/cost_values.h>
 #include <costmap_2d/costmap_2d.h>
-#include <costmap_2d/costmap_utilities.h>
+#include <srsnode_navigation/global_planner/PlannerUtilities.h>
 
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
 #include <srslib_framework/localization/map/mapnote/NoteQueue.hpp>
@@ -158,7 +158,7 @@ bool SrsPlannerPotentials::makePlan(
         return false;
     }
 
-    geometry_msgs::PoseStamped shiftedGoal = costmap_2d::shiftGoalToMinima(goal, *costMap_, goalShiftDistance_);
+    geometry_msgs::PoseStamped shiftedGoal = shiftGoalToMinima(goal, *costMap_, goalShiftDistance_);
 
     astar_ = new AStarPotentials(srsMapStack_->getLogicalMap(), costMap_, queuesMap_);
 

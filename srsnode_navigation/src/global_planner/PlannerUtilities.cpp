@@ -19,7 +19,7 @@ geometry_msgs::PoseStamped shiftGoalToMinima(geometry_msgs::PoseStamped goal_pos
     double goal_y = goal_pose.pose.position.y;
     double goal_yaw = tf::getYaw(goal_pose.pose.orientation);
     // If the goal is not on the costmap, return the original goal
-    unsigned int goal_mx, goal_my;
+    unsigned int goal_mx = 0, goal_my = 0;
     if (!costmap.worldToMap(goal_x, goal_y, goal_mx, goal_my))
     {
         ROS_DEBUG("Goal is not on the map.  Cannot shift.");
@@ -43,8 +43,8 @@ geometry_msgs::PoseStamped shiftGoalToMinima(geometry_msgs::PoseStamped goal_pos
     unsigned char current_cost = goal_cost;
     double current_shift = max_shift;
 
-    double wx, wy;
-    unsigned int mx, my;
+    double wx = 0.0, wy = 0.0;
+    unsigned int mx = 0, my = 0;
 
 
     for (double shift_sign : {-1, 1})

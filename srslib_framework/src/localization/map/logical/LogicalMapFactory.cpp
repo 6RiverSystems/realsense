@@ -45,7 +45,6 @@ const string LogicalMapFactory::KEYWORD_ID = "id";
 const string LogicalMapFactory::KEYWORD_LABELED_AREA = "labeled_area";
 const string LogicalMapFactory::KEYWORD_MAP = "map";
 const string LogicalMapFactory::KEYWORD_MAX = "max";
-const string LogicalMapFactory::KEYWORD_NULL = "null";
 const string LogicalMapFactory::KEYWORD_OBSTACLE = "obstacle";
 const string LogicalMapFactory::KEYWORD_PROPERTIES = "properties";
 const string LogicalMapFactory::KEYWORD_PROPERTY_COST_AREA_COST = "cost";
@@ -609,16 +608,7 @@ vector<Pose<>> LogicalMapFactory::ntGeometry(YAML::Node root, int minNumber, int
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void LogicalMapFactory::ntGeometryNull(YAML::Node root)
 {
-    if (root.IsScalar())
-    {
-        string value = root.as<string>();
-        if (value != KEYWORD_NULL)
-        {
-            throw UnexpectedValueException(metadata_, value);
-        }
-    }
-    else
-    {
+    if (!root.IsNull()) {
         throw UnexpectedGeometryException(metadata_);
     }
 }

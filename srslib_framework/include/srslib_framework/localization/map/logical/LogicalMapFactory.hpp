@@ -44,7 +44,6 @@ private:
     static const string KEYWORD_LABELED_AREA;
     static const string KEYWORD_MAP;
     static const string KEYWORD_MAX;
-    static const string KEYWORD_NULL;
     static const string KEYWORD_OBJECT;
     static const string KEYWORD_OBSTACLE;
     static const string KEYWORD_PROPERTIES;

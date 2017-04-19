@@ -100,7 +100,7 @@
                 {
                     "type": "Feature",
                     "id": "5",
-                    "geometry": "null",
+                    "geometry": null,
                     "properties": {
                         "object": "edge",
                         "name": "F01T_SamInduct",
@@ -112,7 +112,7 @@
                 {
                     "type": "Feature",
                     "id": "6",
-                    "geometry": "null",
+                    "geometry": null,
                     "properties": {
                         "object": "edge",
                         "name": "F01T_A01T",
@@ -124,7 +124,7 @@
                 {
                     "type": "Feature",
                     "id": "7",
-                    "geometry": "null",
+                    "geometry": null,
                     "properties": {
                         "object": "graph",
                         "name": "graph1",

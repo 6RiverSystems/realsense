@@ -112,10 +112,3 @@ TEST(Test_Navigation_Utilities, goal_shift)
     srs::shiftGoalToMinima(goal, *cm, 0.0)));
   delete cm;
 }
-
-// int main(int argc, char** argv)
-// {
-//   testing::InitGoogleTest( &argc, argv );
-//   return RUN_ALL_TESTS();
-// }
-

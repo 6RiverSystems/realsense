@@ -25,11 +25,19 @@ geometry_msgs::PoseStamped shiftGoalToMinima(geometry_msgs::PoseStamped goal_pos
         ROS_DEBUG("Goal is not on the map.  Cannot shift.");
         return goal_pose;
     }
+
+    if (max_shift < 0)
+    {
+        ROS_DEBUG("Max shift is negative.  Cannot shift.");
+        return goal_pose;
+    }
+
     // Check to see if the cost at the goal is 0.  If so, return.
     unsigned char goal_cost = costmap.getCost(goal_mx, goal_my);
     if (goal_cost == 0)
     {
         ROS_DEBUG("Goal is already at a 0 cost location.  Not shifting.");
+        return goal_pose;
     }
 
     // Shift the goal orthogonal to its heading to a local minima.
@@ -57,7 +65,7 @@ geometry_msgs::PoseStamped shiftGoalToMinima(geometry_msgs::PoseStamped goal_pos
             wy = goal_y + shift * shift_vector_y;
             if (!costmap.worldToMap(wx, wy, mx, my))
             {
-                ROS_WARN("Shift check goes off of the map");
+                ROS_INFO("Shift check goes off of the map");
                 continue;
             }
             unsigned char cost = costmap.getCost(mx, my);

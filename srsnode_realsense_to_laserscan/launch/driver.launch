@@ -48,6 +48,7 @@
         <!-- launch depthimage_to_laserscan nodelet -->
         <node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet $(arg camera)/nodelet_manager" respawn="true" respawn_delay="30">
         <remap from="$(arg camera)/image" to="/internal/sensors/rgbd/depth/image_filtered"/>
+        <remap from="$(arg camera)/camera_info" to="/internal/sensors/rgbd/depth/camera_info"/>
         <remap from="$(arg camera)/scan"  to="/internal/sensors/rgbd/scan/raw"/>
         <rosparam>
             output_frame_id: laser_frame

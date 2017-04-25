@@ -57,7 +57,7 @@ public:
 
     /**
      * Set the current state of the robot.
-     * @param velocity the current velocity
+     * @param state the robot state
      */
     void setRobotState(const RobotState& state)
     {

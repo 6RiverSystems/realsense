@@ -1,0 +1,27 @@
+#
+# (c) Copyright 2015-2016 River Systems, all rights reserved
+#
+# This is proprietary software, unauthorized distribution is not permitted.
+#
+{
+    "language_version": "1.0",
+    "metadata": {
+        "map_name": "Micro map aisles",
+        "map_version": "1.0"
+    },
+    "logical": {
+        "map": "micro-map-aisles.geojson"
+    },
+    "occupancy": {
+        "map": "micro-map-aisles.pgm",
+        "resolution": 0.1,
+        "origin": [
+            0,
+            0,
+            0
+        ],
+        "negate": 0,
+        "occupied_thresh": 0.65,
+        "free_thresh": 0.196
+    }
+}

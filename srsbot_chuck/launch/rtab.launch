@@ -1,0 +1,21 @@
+<!-- 
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+<launch>
+    <arg name="simulation" default="false" />
+   	<remap from="map" to="/internal/state/map/grid"/>
+   	<remap from="map_metadata" to="/internal/state/map/info"/>
+
+    <!-- Chuck Stack -->
+	<include file="$(find srsbot_chuck)/launch/robot.launch" />
+
+	<!-- Sensors -->
+	<include file="$(find srsbot_chuck)/launch/sensors.launch" />
+
+    <!-- Launch RTAB SLAM -->
+	<include file="$(find srsnode_localization)/launch/rtab.launch" />
+</launch>

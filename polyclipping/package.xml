@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+    <name>polyclipping</name>
+    <version>22.0.0</version>
+    <description>Catkinized version of polyclipping library (for ease of install). Code:  http://www.angusj.com/delphi/clipper.php
+    This should become an installed system library in the future.</description>
+
+    <author>Angus Johnson</author>
+    <maintainer email="dgrieneisen@6river.com">Daniel Grieneisen</maintainer>
+    <license>Boost</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+</package>
+

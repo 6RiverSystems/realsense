@@ -1,0 +1,19 @@
+<!--
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+<launch>
+    <arg name="user" value="$(optenv USER rivs)" />
+    <arg name="sites_directory" value="$(optenv SITES_DIRECTORY mfp_sites)" />
+    <arg name="customer_site" value="$(optenv CUSTOMER_SITE empty)" />
+    <arg name="customer_map" value="$(optenv CUSTOMER_MAP empty)" />
+
+    <include file="$(find srsnode_map_server)/launch/node.launch">
+        <arg name="map_stack" value="/home/$(arg user)/$(arg sites_directory)/$(arg customer_site)/map/$(arg customer_map).yaml" />
+        <remap from="map" to="/internal/state/map/ros_occupancy"/>
+        <remap from="map_metadata" to="/internal/state/map/ros_metadata"/>
+    </include>
+</launch>

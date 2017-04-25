@@ -1,4 +1,5 @@
 .catkin_workspace
+CMakeLists.txt
 .DS_Store
 .pydevproject
 **/.metadata
@@ -10,3 +11,8 @@
 **/.ptp*
 **/bags
 .catkin_tools
+.idea
+.ccache
+install/
+test_results/
+artifacts/

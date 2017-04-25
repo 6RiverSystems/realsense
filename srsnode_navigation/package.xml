@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+
+<package>
+    <name>srsnode_navigation</name>
+    <version>1.0.0</version>
+    <description>Node package: Navigation</description>
+
+    <author email="dan@6river.com">Dan Winkler</author>
+    <maintainer email="dan@6river.com">Dan Winkler</maintainer>
+
+    <license>Proprietary</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <build_depend>roscpp</build_depend>
+    <run_depend>roscpp</run_depend>
+
+    <build_depend>pluginlib</build_depend>
+    <run_depend>pluginlib</run_depend>
+
+    <build_depend>costmap_2d</build_depend>
+    <run_depend>costmap_2d</run_depend>
+
+    <build_depend>move_base</build_depend>
+    <run_depend>move_base</run_depend>
+
+    <build_depend>nav_core</build_depend>
+    <run_depend>nav_core</run_depend>
+
+    <build_depend>base_local_planner</build_depend>
+    <run_depend>base_local_planner</run_depend>
+
+    <build_depend>srslib_timing</build_depend>
+    <run_depend>srslib_timing</run_depend>
+
+    <build_depend>srslib_framework</build_depend>
+    <run_depend>srslib_framework</run_depend>
+
+    <build_depend>tf</build_depend>
+    <run_depend>tf</run_depend>
+
+    <build_depend>eigen</build_depend>
+    <run_depend>eigen</run_depend>
+
+    <export>
+        <nav_core plugin="${prefix}/srsnode_navigation_plugins.xml" />
+    </export>
+
+    <test_depend>rosunit</test_depend>
+    <test_depend>srslib_test</test_depend>
+</package>

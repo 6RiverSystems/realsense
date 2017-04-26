@@ -10,7 +10,7 @@
 
 namespace srs {
 
-const std::string MapStackFactory::LANGUAGE_VERSION = "1.0";
+const std::string MapStackFactory::LANGUAGE_VERSION = "1.1.0";
 
 const std::string MapStackFactory::TAG_LANGUAGE_VERSION = "language_version";
 

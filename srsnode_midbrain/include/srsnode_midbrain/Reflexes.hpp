@@ -65,13 +65,9 @@ private:
     HardStopReflex hardStopReflex_;
     HeadOnCollisionReflex headOnCollisionReflex_;
 
-
     bool brainstemConnected_ = false;
 
     bool enableHardStopDebugPlotting_ = false;
-
-    bool checkDepthCameraHardStop_ = false;
-    bool checkLidarHardStop_ = true;
 };
 
 } /* namespace srs */

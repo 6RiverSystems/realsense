@@ -45,6 +45,12 @@ void HeadOnCollisionReflex::setLaserScan(const sensor_msgs::LaserScan& scan)
 
 bool HeadOnCollisionReflex::checkHardStop()
 {
+    // If the robot is paused, do not trigger the stop
+    if (robotState_.freeSpin && disableOnPause_)
+    {
+        return false;
+    }
+
     // Check the buffer and compare the distance
     if (buffer_.size() < 2)
     {

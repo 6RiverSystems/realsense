@@ -57,6 +57,17 @@ public:
     };
 
     /**
+     * Enable a specified laser scan type
+     * @param type the type of scan
+     * @param enabled whether to enable this type of scan
+     */
+    void enableLaserScanType(LaserScanType type, bool enabled)
+    {
+        createLaserMapEntryIfMissing(type);
+        laserScansMap_[type].enabled = enabled;
+    };
+
+    /**
      * Set the current velocity of the robot.
      * @param velocity the current velocity
      */
@@ -112,7 +123,6 @@ public:
      */
     PoseVector getFailedLaserScanForDisplay() const;
 
-
     /**
      * Set the robot's footprint
      * @param footprint the footprint
@@ -155,6 +165,14 @@ public:
     void setNumBadPointsForViolation(uint32_t val)
     {
         numBadPointsForViolation_ = val;
+    }
+
+    /**
+     * Sets whether the reflex should be disable when the robot is paused
+     */
+    void setDisableOnPause(bool val)
+    {
+        disableOnPause_ = val;
     }
 
 private:
@@ -210,6 +228,7 @@ private:
     {
         tf::Transform pose = tf::Transform::getIdentity();
         clPath scan;
+        bool enabled = true;
     };
 
     Pose<> latestPose_ = Pose<>::INVALID;
@@ -222,6 +241,8 @@ private:
 
     uint32_t maxConsecutiveDangerZoneViolations_ = 1;
     uint32_t numConsecutiveDangerZoneViolations_ = 0;
+
+    bool disableOnPause_ = true;
 
     PoseVector footprint_;
 

@@ -1,0 +1,80 @@
+{
+	"type": "FeatureCollection",
+    "properties": {
+        "language_version": "1.2"
+    },
+	"features": [
+		{
+			"type": "Feature",
+			"properties": {
+				"object": "map",
+				"version": "1",
+				"origin": [0,0,0],
+				"resolution": 1,
+				"width": 150,
+				"height": 100
+			}
+		},
+		{
+			"type": "FeatureCollection",
+			"features": [
+				{
+					"type": "Feature",
+					"id": "1",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[0,0],
+							[150,10]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.5,
+						"envelope_cost": 70,
+						"is_border": false
+					}
+				},
+				{
+					"type": "Feature",
+					"id": "2",
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[19,72],
+							[132,85]
+						]
+					},
+					"properties": {
+						"object": "obstacle",
+						"envelope_size": 0.5,
+						"envelope_cost": 70,
+						"is_border": false
+					}
+				},
+				{
+					"type": "Feature",
+					"id": 3,
+					"geometry": {
+						"type": "MultiPoint",
+						"coordinates": [
+							[0,9],
+							[150,23]
+						]
+					},
+					"properties": {
+						"object": "weighted_area",
+						"n": 0,
+						"ne": 0,
+						"e": 0,
+						"se": 0,
+						"s": 0,
+						"sw": 100,
+						"w": 100,
+						"nw": 100
+					}
+				}
+			]
+		}
+	]
+}

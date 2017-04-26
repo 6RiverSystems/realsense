@@ -1,0 +1,36 @@
+machine:
+  pre:
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+  services:
+    - docker
+
+dependencies:
+  cache_directories:
+    - "~/docker"
+    - "~/.apt-cache"
+    - "~/.ccache"
+  override:
+    - if [[ -e ~/docker/image.tar ]]; then docker load -i ~/docker/image.tar; fi
+    - docker build -t ros-build-debian-armhf .
+    - mkdir -p ~/docker; docker save ros-build-debian-armhf > ~/docker/image.tar
+
+checkout:
+  post:
+    - git submodule sync
+    - git submodule update --init --recursive
+
+test:
+  override:
+    - docker run --rm --privileged -it ros-build-debian-armhf /bin/bash -c "catkin_make run_tests"
+    - docker run --rm --privileged -it ros-build-debian-armhf /bin/bash -c "catkin_test_results build/test_results"
+    - docker run --rm --privileged -it ros-build-debian-armhf /bin/bash -c "catkin_make install"
+
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find build/test_results -type f -name '*.xml' -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+    
+deployment:
+  development:
+    branch: develop
+    commands:
+      - /bin/bash scripts/deploy_artifact.bash

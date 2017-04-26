@@ -1,0 +1,21 @@
+<!--
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+<launch>
+    <arg name="emulation_mode" />
+
+    <arg name="launch-prefix" value="" if="$(arg emulation_mode)"/>
+    <arg name="launch-prefix" value="taskset -c 3 " unless="$(arg emulation_mode)"/>
+
+    <remap from="/request/odometry/initial_pose" to="/request/initial_pose" if="$(arg emulation_mode)"/>
+    <node name="srsdrv_brainstem"
+        pkg="srsdrv_brainstem"
+        type="srsdrv_brainstem"
+        output="screen" launch-prefix="$(arg launch-prefix)">
+      <param name="use_emulator" value="$(arg emulation_mode)"/>
+    </node>
+</launch>

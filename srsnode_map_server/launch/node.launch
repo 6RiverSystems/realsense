@@ -1,0 +1,17 @@
+<!-- 
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+<launch>
+    <arg name="map_stack" />
+
+    <node name="srsnode_map_server"
+        pkg="srsnode_map_server" 
+        type="srsnode_map_server"
+        output="screen">
+        <param name="map_stack" type="str" value="$(arg map_stack)" />
+    </node>
+</launch>

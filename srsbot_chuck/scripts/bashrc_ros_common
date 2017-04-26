@@ -1,0 +1,9 @@
+export ROS_HOSTNAME=$ROBOT_NAME
+export ROS_LANG_DISABLE=genlisp
+unset GTK_IM_MODULE
+
+roscd srsbot_chuck
+
+export BASH_ALIASES=$PWD/scripts/bash_aliases
+
+source $BASH_ALIASES

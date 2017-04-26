@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+  *
+  * (c) Copyright 2015-2016 River Systems, all rights reserved.
+  *
+  * This is proprietary software, unauthorized distribution is not permitted.
+  *
+-->
+
+<package>
+    <name>srsbot_chuck</name>
+    <version>1.0.16</version>
+    <description>Robot package: Chuck</description>
+
+    <author email="dan@6river.com">Dan Winkler</author>
+    <author email="fsantini@6river.com">Fabrizio Santini</author>
+    <maintainer email="dan@6river.com">Dan Winkler</maintainer>
+    <maintainer email="fsantini@6river.com">Fabrizio Santini</maintainer>
+
+    <license>TODO</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+</package>

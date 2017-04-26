@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+
+<robot name="sensor_r200" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Following values measured on the 3d model -->
+  <xacro:property name="r200_cam_x_size" value="0.00759" />
+  <xacro:property name="r200_cam_y_size" value="0.130" />
+  <xacro:property name="r200_cam_z_size" value="0.01936" />
+
+  <!-- Following values measured on the 3d model -->
+  <xacro:property name="r200_cam_rgb_x_offset" value="0.00425"/>
+  <xacro:property name="r200_cam_rgb_y_offset" value="0.01954"/>
+  <xacro:property name="r200_cam_rgb_z_offset" value="0.01334"/>
+  <xacro:property name="r200_cam_depth_offset" value="0.0274"/>
+
+  <!-- Also parameterised in part by the values in turtlebot_properties.urdf.xacro -->
+
+  <!--
+  Seems like this weird organization is required for move_base to work properly...
+  parent > camera_rgb_frame
+  -->
+
+  <xacro:macro name="sensor_r200" params="parent r200_cam_px r200_cam_py r200_cam_pz r200_cam_y_rotation">
+
+    <!-- Placing the camera joint -->
+    <joint name="camera_joint" type="fixed">
+      <origin xyz="${r200_cam_px} ${r200_cam_py} ${r200_cam_pz}" rpy="${r200_cam_y_rotation} 0 0"/>
+      <parent link="${parent}"/>
+      <child link="camera_link"/>
+    </joint>
+
+    <!-- Mounting the camera at the right position -->
+    <link name="camera_link">
+      <visual>
+       <origin xyz="0 0 0" rpy="${M_PI/2} 0 ${M_PI/2}"/>
+        <geometry>
+          <box size="${r200_cam_x_size} ${r200_cam_y_size} ${r200_cam_z_size}"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="${r200_cam_x_size/2} ${r200_cam_y_size/2} ${r200_cam_z_size/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${r200_cam_x_size} ${r200_cam_y_size} ${r200_cam_z_size}"/>
+        </geometry>
+      </collision>
+      <!-- This inertial field needs doesn't contain reliable data!! -->
+      <inertial>
+        <mass value="0.564" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.003881243" ixy="0.0" ixz="0.0"
+                 iyy="0.000498940" iyz="0.0"
+                 izz="0.003879257" />
+      </inertial>
+    </link>
+
+    <!--
+    ==  RGB joints & links ==
+    -->
+    <joint name="camera_rgb_joint" type="fixed">
+      <origin xyz="${r200_cam_rgb_x_offset} ${r200_cam_rgb_y_offset} ${r200_cam_rgb_z_offset}" rpy="0 0 0"/>
+      <parent link="camera_link"/>
+      <child link="camera_rgb_frame" />
+    </joint>
+    <link name="camera_rgb_frame">
+      <visual>
+       <origin xyz="0 0 0" rpy="${M_PI/2} 0 ${M_PI/2}"/>
+        <geometry>
+         <sphere radius="0.005"/>
+        </geometry>
+        <material name="green">
+          <color rgba="0 1 0 1"/>
+        </material>
+      </visual>
+    </link>
+
+    <joint name="camera_rgb_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
+      <parent link="camera_rgb_frame" />
+      <child link="camera_rgb_optical_frame" />
+    </joint>
+    <link name="camera_rgb_optical_frame"/>
+
+    <!--
+    ==  Depth joints & links ==
+    -->
+  	<joint name="camera_depth_joint" type="fixed">
+  	  <origin xyz="${r200_cam_rgb_x_offset} ${r200_cam_rgb_y_offset+r200_cam_depth_offset} ${r200_cam_rgb_z_offset}" rpy="0 0 0" />
+  	  <parent link="camera_link" />
+  	  <child link="camera_depth_frame" />
+  	</joint>
+  	<link name="camera_depth_frame">
+  	  <visual>
+       <origin xyz="0 0 0" rpy="${M_PI/2} 0 ${M_PI/2}"/>
+        <geometry>
+         <sphere radius="0.005"/>
+        </geometry>
+        <material name="green">
+          <color rgba="0 0 1 1"/>
+        </material>
+      </visual>
+  	</link>
+
+  	<joint name="camera_depth_optical_joint" type="fixed">
+  	  <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
+  	  <parent link="camera_depth_frame" />
+  	  <child link="camera_depth_optical_frame" />
+  	</joint>
+  	<link name="camera_depth_optical_frame"/>
+
+  </xacro:macro>
+</robot>

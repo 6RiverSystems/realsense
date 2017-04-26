@@ -75,8 +75,13 @@ void Executive::readConfigurationParameters()
 {
     getGlobalParameter(ChuckConfig::Entities::LOCAL_PLANNER, ChuckConfig::Parameters::MAX_VELOCITY,
         context_.maxVelocity, 1.0f);
+    getGlobalParameter(ChuckConfig::Entities::LOCAL_COSTMAP_OBSTRUCTION_LAYER_REALSENSE, ChuckConfig::Parameters::RS_DECAY_HALFLIFE,
+        context_.defaultRealsenseDecayTime, 20.0f);
+    getGlobalParameter(ChuckConfig::Entities::LOCAL_COSTMAP_OBSTRUCTION_LAYER_REALSENSE, ChuckConfig::Parameters::RS_DECAY_HALFLIFE_QUEUE,
+        context_.queueRealsenseDecayTime, 2.0f);
 
     taskSetMaxVelocity_.setDefaultMaxVelocity(context_.maxVelocity);
+    taskQueue_.setRealsenseDecayTime(context_.defaultRealsenseDecayTime, context_.queueRealsenseDecayTime);
 }
 
 } // namespace srs

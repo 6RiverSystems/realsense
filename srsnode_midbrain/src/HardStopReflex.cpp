@@ -39,7 +39,6 @@ void HardStopReflex::setLaserScan(const sensor_msgs::LaserScan& scan, LaserScanT
     }
     tf::Transform lidarToMap = PoseMessageFactory::pose2Transform(latestPose_) * laserScan.pose;
 
-
     // Iterate over the scan and convert into the map frame.
     laserScan.scan.clear();
     laserScan.scan.reserve(scan.ranges.size());
@@ -73,9 +72,14 @@ void HardStopReflex::createLaserMapEntryIfMissing(LaserScanType type)
     }
 }
 
-
 bool HardStopReflex::checkHardStop()
 {
+    // If the robot is paused, do not hard stop.
+    if (robotState_.freeSpin && disableOnPause_)
+    {
+        return false;
+    }
+
     bool dangerZoneViolation = checkForDangerZoneViolation();
     if (dangerZoneViolation)
     {
@@ -121,13 +125,16 @@ bool HardStopReflex::checkForDangerZoneViolation()
     uint32_t numBadPoints = 0;
     for (auto const& kv : laserScansMap_)
     {
-        for (auto const& pt : kv.second.scan)
+        if (kv.second.enabled)
         {
-            if (ClipperLib::PointInPolygon(pt, dangerZone_))
+            for (auto const& pt : kv.second.scan)
             {
-                ROS_DEBUG("Found a point in the danger zone at [%f, %f].  Robot at [%f, %f, th: %f].",
-                    pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, latestPose_.x, latestPose_.y, latestPose_.theta);
-                numBadPoints++;
+                if (ClipperLib::PointInPolygon(pt, dangerZone_))
+                {
+                    ROS_DEBUG("Found a point in the danger zone at [%f, %f].  Robot at [%f, %f, th: %f].",
+                        pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, latestPose_.x, latestPose_.y, latestPose_.theta);
+                    numBadPoints++;
+                }
             }
         }
     }

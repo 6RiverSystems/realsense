@@ -65,8 +65,21 @@ void Reflexes::readParams()
     	hardStopReflex_.setNumBadPointsForViolation(numBadPoints);
     }
 
-    privateNh.param("check_lidar_hard_stop", checkLidarHardStop_, checkLidarHardStop_);
-    privateNh.param("check_depth_camera_hard_stop", checkDepthCameraHardStop_, checkDepthCameraHardStop_);
+    bool checkLidarHardStop = true;
+    if (privateNh.getParam("hard_stop_reflex/check_lidar_hard_stop", checkLidarHardStop))
+    {
+        hardStopReflex_.enableLaserScanType(LaserScanType::LIDAR, checkLidarHardStop);
+    }
+    bool checkDepthCameraHardStop = true;
+    if (privateNh.getParam("hard_stop_reflex/check_depth_camera_hard_stop", checkDepthCameraHardStop))
+    {
+        hardStopReflex_.enableLaserScanType(LaserScanType::DEPTH_CAMERA, checkDepthCameraHardStop);
+    }
+    bool hsrDisableOnPause = true;
+    if (privateNh.getParam("hard_stop_reflex/disable_on_pause", hsrDisableOnPause))
+    {
+        hardStopReflex_.setDisableOnPause(hsrDisableOnPause);
+    }
 
     // Get the head on collision reflex params
     double val = 0.0;
@@ -98,12 +111,16 @@ void Reflexes::readParams()
     {
         headOnCollisionReflex_.setMaxAngularVelocityForCheck(val);
     }
+    bool hocrDisableOnPause = true;
+    if (privateNh.getParam("head_on_collision_reflex/disable_on_pause", hocrDisableOnPause))
+    {
+        headOnCollisionReflex_.setDisableOnPause(hocrDisableOnPause);
+    }
 }
 
 void Reflexes::execute()
 {
     srs::ScopedTimingSampleRecorder stsr(tdr_.getRecorder("-Loop"));
-
 
     // Update robot position
     hardStopReflex_.setPose(tapRobotPose_.peek());
@@ -114,37 +131,27 @@ void Reflexes::execute()
     // Update the robot state
     if (tapOperationalState_.newDataAvailable())
     {
-        hardStopReflex_.setRobotState(tapOperationalState_.pop());
+        hardStopReflex_.setRobotState(tapOperationalState_.peek());
+        headOnCollisionReflex_.setRobotState(tapOperationalState_.pop());
     }
 
     // Check for laser scan.
     if (tapFilteredLidar_.newDataAvailable())
     {
         headOnCollisionReflex_.setLaserScan(tapFilteredLidar_.peek());
-
-        if (checkLidarHardStop_)
-        {
-            hardStopReflex_.setLaserScan(tapFilteredLidar_.pop(), LaserScanType::LIDAR);
-        }
-    }
-    // Set the lidar data
-    if (checkLidarHardStop_)
-    {
-        // Get the lidar sensor position
-        hardStopReflex_.setSensorPose(tapLidarPoseOnRobot_.pop(), LaserScanType::LIDAR);
+        hardStopReflex_.setLaserScan(tapFilteredLidar_.pop(), LaserScanType::LIDAR);
     }
 
-    // Set the depth camera data
-    if (checkDepthCameraHardStop_)
-    {
-        // Get the lidar sensor position
-        hardStopReflex_.setSensorPose(tapDepthCameraPoseOnRobot_.pop(), LaserScanType::DEPTH_CAMERA);
+    // Get the lidar sensor position
+    hardStopReflex_.setSensorPose(tapLidarPoseOnRobot_.pop(), LaserScanType::LIDAR);
 
-        // Check for laser scan.
-        if (tapFilteredDepthCamera_.newDataAvailable())
-        {
-            hardStopReflex_.setLaserScan(tapFilteredDepthCamera_.pop(), LaserScanType::DEPTH_CAMERA);
-        }
+    // Get the camera sensor position
+    hardStopReflex_.setSensorPose(tapDepthCameraPoseOnRobot_.pop(), LaserScanType::DEPTH_CAMERA);
+
+    // Check for camera scan.
+    if (tapFilteredDepthCamera_.newDataAvailable())
+    {
+        hardStopReflex_.setLaserScan(tapFilteredDepthCamera_.pop(), LaserScanType::DEPTH_CAMERA);
     }
 
     // Check for velocity.

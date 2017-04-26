@@ -16,6 +16,7 @@ obstruction_layer:
   inflation_radius: 0.75
   cost_scaling_factor: 2.0
   obstruction_half_life: 20
+  obstruction_half_life_queue: 20
   num_obstruction_levels: 3
 
 obstruction_layer_realsense:
@@ -25,4 +26,5 @@ obstruction_layer_realsense:
   inflation_radius: 0.75
   cost_scaling_factor: 2.0
   obstruction_half_life: 20
+  obstruction_half_life_queue: 2
   num_obstruction_levels: 3

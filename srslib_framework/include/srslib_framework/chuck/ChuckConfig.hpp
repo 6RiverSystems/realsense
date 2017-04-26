@@ -13,6 +13,8 @@ namespace Entities {
 
     static const string LOCAL_PLANNER = "/move_base/DWAPlannerROS";
 
+    static const string LOCAL_COSTMAP_OBSTRUCTION_LAYER_REALSENSE = "/move_base/local_costmap/obstruction_layer_realsense";
+
 } // Entities
 
 namespace Transforms {
@@ -35,6 +37,9 @@ namespace Parameters {
     static const int LP_MODE_DEFAULT = 0;
     static const int LP_MODE_QUEUE = 1;
     static const int LP_MODE_STAY_ON_PATH = 2;
+
+    static const string RS_DECAY_HALFLIFE = "obstruction_half_life";
+    static const string RS_DECAY_HALFLIFE_QUEUE = "obstruction_half_life_queue";
 
     static const string MAP_STACK = "map_stack";
     static const string MAX_VELOCITY = "max_vel_x";

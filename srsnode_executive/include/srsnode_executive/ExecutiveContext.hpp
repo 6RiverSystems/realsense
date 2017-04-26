@@ -41,6 +41,8 @@ struct ExecutiveContext
 
     MapStack* mapStack;
     float maxVelocity;
+    float defaultRealsenseDecayTime;
+    float queueRealsenseDecayTime;
 
     vector<ActiveLabelType> previousLabeledAreas;
 

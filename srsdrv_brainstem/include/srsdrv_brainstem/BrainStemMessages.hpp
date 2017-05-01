@@ -60,6 +60,7 @@ enum class BRAIN_STEM_CMD : uint8_t
     SET_DIMENSION           = 0x64, // 'd'
 	SET_MOTION_STATUS       = 0x32, // '2'
 	SET_TOTE_LIGHTS         = 0x39, // '9'
+	SET_BODY_LIGHTS         = 0x6C, // 'l'
 	SET_VELOCITY            = 0x76, // 'v'
 	SET_VELOCITY_RPM        = 0x72, // 'r'
 	SHUTDOWN                = 0x78, // 'x'
@@ -105,6 +106,32 @@ enum class LED_MODE : uint8_t
 	UNKNOWN
 };
 
+enum class BODY_LIGHTS_ENTITIES
+{
+	ACTION 		= 100,
+	PAUSE  		= 101,
+	SOFT_POWER	= 102,
+	TAIL_LEFT  	= 201,
+	TAIL_RIGHT 	= 202,
+	SCANNER 	= 203,
+	HEAD_LEFT	= 204,
+	HEAD_RIGHT	= 205,
+	UNKNOWN
+};
+
+enum class LED_COMMAND : uint8_t
+{
+	OFF 		= 0,
+	SOLID 		= 1,
+	RAMP 		= 2,
+	RAMP_BIDIR 	= 3,
+	BLINK 		= 4,
+	SAWTOOTH_RIGHT 	= 5,
+	SAWTOOTH_LEFT 	= 6,
+	GRADIENT 	= 7,
+	UNKNOWN
+};
+
 enum MOTION_STATUS : uint8_t
 {
 	FRONT_E_STOP = 0,
@@ -125,5 +152,14 @@ enum FAILURE_STATUS : uint8_t
     RPM_MESSAGE_TIMEOUT = 5,
     VELOCITY_VIOLATION = 6
 };
+
+// A struct which includes entity attributes
+typedef struct
+{
+	LED_COMMAND lightCmd;
+	uint8_t startColor[3];
+	uint8_t endColor[3];
+	float frequency;
+} ENTITY_STATE;
 
 }

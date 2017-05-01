@@ -69,7 +69,10 @@ set(${PROJECT_NAME}_MSGS
     MsgBatteryState.msg
     MsgPowerState.msg
     MsgUpdateUI.msg
+    MsgUpdateBodyLights.msg
+    MsgUpdateToteLights.msg
     MsgUIState.msg
+    MsgBodyLightsState.msg
     OccupancyMap.msg
     OccupancyMetadata.msg
     Pose.msg

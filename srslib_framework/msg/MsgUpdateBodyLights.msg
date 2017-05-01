@@ -4,4 +4,4 @@
 # This is proprietary software, unauthorized distribution is not permitted.
 #
 
-MsgUIState[] uiUpdates
+MsgBodyLightsState[] bodyLightUpdates

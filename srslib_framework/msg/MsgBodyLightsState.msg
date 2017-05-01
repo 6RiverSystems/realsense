@@ -3,5 +3,8 @@
 #
 # This is proprietary software, unauthorized distribution is not permitted.
 #
-
-MsgUIState[] uiUpdates
+uint8 entity
+uint8 lightCmd
+std_msgs/ColorRGBA startColor
+std_msgs/ColorRGBA endColor
+float32 frequency

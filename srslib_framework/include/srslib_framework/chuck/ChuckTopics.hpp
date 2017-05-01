@@ -31,6 +31,8 @@ namespace driver {
 	static const string BRAINSTEM_CMD_SHUTDOWN = "/internal/drivers/brainstem/cmd/shutdown";
     static const string BRAINSTEM_CMD_SOUND = "/internal/drivers/brainstem/cmd/sound";
     static const string BRAINSTEM_CMD_UPDATE_LIGHTS = "/internal/drivers/brainstem/cmd/update_ui";
+    static const string BRAINSTEM_CMD_UPDATE_BODY_LIGHTS = "/internal/drivers/brainstem/cmd/update_body_lights";
+    static const string BRAINSTEM_CMD_UPDATE_TOTE_LIGHTS = "/internal/drivers/brainstem/cmd/update_tote_lights";
     static const string BRAINSTEM_CMD_PING = "/internal/drivers/brainstem/cmd/ping";
     static const string BRAINSTEM_CMD_RESET = "/internal/drivers/brainstem/cmd/reset";
     static const string BRAINSTEM_CMD_SET_MOTION_STATE = "/internal/drivers/brainstem/cmd/set_motion_state";

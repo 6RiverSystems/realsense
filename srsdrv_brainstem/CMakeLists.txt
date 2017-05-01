@@ -31,6 +31,8 @@ set(${PROJECT_NAME}_SOURCES
     src/sw_message/SetMotionStateHandler.cpp
     src/sw_message/SetVelocityHandler.cpp
     src/sw_message/UpdateUIHandler.cpp
+    src/sw_message/UpdateBodyLightsHandler.cpp
+    src/sw_message/UpdateToteLightsHandler.cpp
 )
 
 set(${PROJECT_NAME}_TEST_SOURCES
@@ -46,7 +48,9 @@ set(${PROJECT_NAME}_TEST_SOURCES
 	test/sw_message/Test_SetOdometryRpm.cpp
 	test/sw_message/Test_Shutdown.cpp
 	test/sw_message/Test_Sound.cpp
-	test/sw_message/Test_UpdateUI.cpp
+    test/sw_message/Test_UpdateUI.cpp
+	test/sw_message/Test_UpdateBodyLights.cpp
+    test/sw_message/Test_UpdateToteLights.cpp
 
 	test/filters/Test_PowerStateFilter.cpp
     

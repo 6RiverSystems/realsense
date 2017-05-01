@@ -29,6 +29,8 @@
 #include <sw_message/ShutdownHandler.hpp>
 #include <sw_message/SoundHandler.hpp>
 #include <sw_message/UpdateUIHandler.hpp>
+#include <sw_message/UpdateToteLightsHandler.hpp>
+#include <sw_message/UpdateBodyLightsHandler.hpp>
 
 #include <command/GetHardwareInfo.hpp>
 #include <command/GetOperationalState.hpp>
@@ -82,6 +84,8 @@ BrainStemMessageProcessor::BrainStemMessageProcessor() :
     addSoftwareMessage(SoftwareMessagePtr(new ShutdownHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new SoundHandler(this)));
     addSoftwareMessage(SoftwareMessagePtr(new UpdateUIHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new UpdateBodyLightsHandler(this)));
+    addSoftwareMessage(SoftwareMessagePtr(new UpdateToteLightsHandler(this)));
 }
 
 BrainStemMessageProcessor::~BrainStemMessageProcessor()

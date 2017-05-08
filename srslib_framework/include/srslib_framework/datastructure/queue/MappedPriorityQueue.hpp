@@ -99,7 +99,7 @@ public:
     }
 
 private:
-    class Node;
+    struct Node;
 
     using BucketType = list<Node>;
     using QueueType = map<PRIORITY, BucketType*, less<PRIORITY>>;

@@ -16,7 +16,7 @@ using namespace std;
 
 namespace srs {
 
-class MapStackNode;
+struct MapStackNode;
 
 class MapStackAction
 {

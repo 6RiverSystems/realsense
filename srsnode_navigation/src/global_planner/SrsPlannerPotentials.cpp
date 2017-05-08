@@ -252,7 +252,7 @@ void SrsPlannerPotentials::extractQueuePolygons()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlannerPotentials::getPlanFromPotential(
-    std::vector<std::pair<float, float>>& path,
+    const std::vector<std::pair<float, float>>& path,
     std::vector<geometry_msgs::PoseStamped>& plan)
 {
     plan.clear();
@@ -317,7 +317,7 @@ void SrsPlannerPotentials::publishPlan(const std::vector<geometry_msgs::PoseStam
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerPotentials::publishPotential(float* potential)
+void SrsPlannerPotentials::publishPotential(const float* potential)
 {
     int nx = costMap_->getSizeInCellsX();
     int ny = costMap_->getSizeInCellsY();

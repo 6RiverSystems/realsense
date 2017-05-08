@@ -55,13 +55,13 @@ public:
 private:
     void extractQueuePolygons();
 
-    void getPlanFromPotential(std::vector<std::pair<float, float>>& path,
+    void getPlanFromPotential(const std::vector<std::pair<float, float>>& path,
         std::vector<geometry_msgs::PoseStamped>& plan);
 
     void onConfigChange(srsnode_navigation::SrsPlannerConfig& config, uint32_t level);
 
     void publishPlan(const std::vector<geometry_msgs::PoseStamped>& path);
-    void publishPotential(float* potential);
+    void publishPotential(const float* potential);
 
     void updateMapStack(costmap_2d::Costmap2D* rosCostMap);
 

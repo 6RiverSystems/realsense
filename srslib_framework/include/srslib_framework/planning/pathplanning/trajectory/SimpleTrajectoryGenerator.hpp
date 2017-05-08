@@ -132,7 +132,6 @@ private:
         double directionX = calculateDirection(fromWaypoint.x, toWaypoint.x);
         double directionY = calculateDirection(fromWaypoint.y, toWaypoint.y);
 
-        double distanceFromStart = 0.0;
         double distanceToEnd = PoseMath::euclidean(fromWaypoint, toWaypoint);
 
         // Begin from the initial waypoint

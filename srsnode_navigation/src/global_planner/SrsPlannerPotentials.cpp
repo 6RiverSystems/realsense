@@ -105,7 +105,7 @@ bool SrsPlannerPotentials::makePlan(
     // Make sure that we get the latest Map Stack
     updateMapStack(nullptr);
 
-    return makePlan(start, goal, 0, plan);
+    return makePlan(start, goal, 0.0, plan);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -224,25 +224,25 @@ void SrsPlannerPotentials::extractQueuePolygons()
             geometry_msgs::Point p1;
             p1.x = x0;
             p1.y = y0;
-            p1.z = 0;
+            p1.z = 0.0;
             polygon.push_back(p1);
 
             geometry_msgs::Point p2;
             p2.x = x1;
             p2.y = y0;
-            p2.z = 0;
+            p2.z = 0.0;
             polygon.push_back(p2);
 
             geometry_msgs::Point p3;
             p3.x = x1;
             p3.y = y1;
-            p3.z = 0;
+            p3.z = 0.0;
             polygon.push_back(p3);
 
             geometry_msgs::Point p4;
             p4.x = x0;
             p4.y = y1;
-            p4.z = 0;
+            p4.z = 0.0;
             polygon.push_back(p4);
 
             queuesMap_.insert({queue.label, polygon});

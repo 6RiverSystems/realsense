@@ -110,7 +110,7 @@ bool SrsPlannerPotentials::makePlan(
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 bool SrsPlannerPotentials::makePlan(
     const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal,
-    double tolerance, std::vector<geometry_msgs::PoseStamped>& path)
+    double tolerance, std::vector<geometry_msgs::PoseStamped>& plan)
 {
     boost::mutex::scoped_lock lock(mutex_);
 
@@ -120,7 +120,7 @@ bool SrsPlannerPotentials::makePlan(
         return false;
     }
 
-    path.clear();
+    plan.clear();
 
     if (tf::resolve(tfPrefix_, goal.header.frame_id) != tf::resolve(tfPrefix_, tfFrameid_))
     {
@@ -143,7 +143,7 @@ bool SrsPlannerPotentials::makePlan(
     tf::Stamped<tf::Pose> start_pose;
     tf::poseStampedMsgToTF(start, start_pose);
 
-    std::vector<std::pair<float, float>> plan;
+    std::vector<std::pair<float, float>> potentialPlan;
 
     AStarPotentials::SearchParameters searchParams;
     searchParams.useQuadratic = useQuadratic_;
@@ -159,7 +159,7 @@ bool SrsPlannerPotentials::makePlan(
     bool found = astar_->calculatePath(searchParams,
         start.pose.position.x, start.pose.position.y,
         shiftedGoal.pose.position.x, shiftedGoal.pose.position.y,
-        plan,
+        potentialPlan,
         potentialArray);
 
     if (publishPotential_)
@@ -171,15 +171,15 @@ bool SrsPlannerPotentials::makePlan(
 
     if (found)
     {
-        getPlanFromPotential(plan, path);
+        getPlanFromPotential(potentialPlan, plan);
 
         geometry_msgs::PoseStamped goal_copy = shiftedGoal;
         goal_copy.header.stamp = ros::Time::now();
-        path.push_back(goal_copy);
+        plan.push_back(goal_copy);
 
-        orientationFilter_->processPath(start, path);
+        orientationFilter_->processPath(start, plan);
 
-        publishPlan(path);
+        publishPlan(plan);
     }
     else
     {
@@ -190,7 +190,7 @@ bool SrsPlannerPotentials::makePlan(
     delete astar_;
     astar_ = nullptr;
 
-    return !path.empty();
+    return !plan.empty();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods

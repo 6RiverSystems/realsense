@@ -73,7 +73,7 @@ Visualization Manager:
           Value: true
         imu_link:
           Value: true
-        map2:
+        map:
           Value: true
         odom:
           Value: true
@@ -85,7 +85,7 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        map2:
+        map:
           odom:
             base_link:
               horizontal_laser_link:
@@ -133,7 +133,7 @@ Visualization Manager:
       Visual Enabled: true
     - Class: Submaps
       Enabled: true
-      Map frame: map2
+      Map frame: map
       Name: Submaps
       Submap query service: /submap_query
       Topic: /submap_list
@@ -173,7 +173,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 100; 100; 100
-    Fixed Frame: map2
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:

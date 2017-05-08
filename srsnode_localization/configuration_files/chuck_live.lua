@@ -16,7 +16,7 @@ include "map_builder.lua"
 
 options = {
   map_builder = MAP_BUILDER,
-  map_frame = "map2",
+  map_frame = "map",
   tracking_frame = "base_footprint",
   published_frame = "base_footprint",
   odom_frame = "odom",
@@ -37,6 +37,8 @@ TRAJECTORY_BUILDER_2D.use_imu_data = false
 TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.15
 TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.angular_search_window = math.rad(35.)
 
-SPARSE_POSE_GRAPH.optimization_problem.huber_scale = 1e2
+SPARSE_POSE_GRAPH.optimization_problem.huber_scale = 1e1
+SPARSE_POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.linear_search_window = 1.5
+SPARSE_POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.angular_search_window = math.rad(30.)
 
 return options

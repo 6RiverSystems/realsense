@@ -78,6 +78,8 @@ private:
                 case Grid2dSolutionItem::ROTATE:
                     rotations.push_back(solutionNode.toPose);
                     break;
+                case Grid2dSolutionItem::NONE:
+                    break;
             }
         }
 

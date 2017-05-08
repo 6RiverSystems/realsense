@@ -20,9 +20,9 @@ void MapAdapter::costMap2D2Vector(const costmap_2d::Costmap2D* costmap, vector<i
     int8Vector.resize(costmap->getSizeInCellsX() * costmap->getSizeInCellsY(), 0);
 
     unsigned char* value = costmap->getCharMap();
-    for (int row = 0; row < costmap->getSizeInCellsY(); ++row)
+    for (size_t row = 0; row < costmap->getSizeInCellsY(); ++row)
     {
-        for (int col = 0; col < costmap->getSizeInCellsX(); ++col)
+        for (size_t col = 0; col < costmap->getSizeInCellsX(); ++col)
         {
             int8Vector[costmap->getIndex(col, row)] = *(value++);
         }
@@ -32,15 +32,15 @@ void MapAdapter::costMap2D2Vector(const costmap_2d::Costmap2D* costmap, vector<i
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(OccupancyMap* occupancy)
 {
-    unsigned int rows = occupancy->getHeightCells();
-    unsigned int columns = occupancy->getWidthCells();
+    size_t rows = occupancy->getHeightCells();
+    size_t columns = occupancy->getWidthCells();
 
     costmap_2d::Costmap2D* costMap = new costmap_2d::Costmap2D(columns, rows,
         occupancy->getResolution(), 0, 0);
 
-    for (int row = 0; row < rows; row++)
+    for (size_t row = 0; row < rows; row++)
     {
-        for (int col = 0; col < columns; col++)
+        for (size_t col = 0; col < columns; col++)
         {
             SimpleGrid2d::BaseType cost = occupancy->getCost(col, row);
             cost = cost == SimpleGrid2d::PAYLOAD_NO_INFORMATION ? costmap_2d::NO_INFORMATION : cost;
@@ -61,9 +61,9 @@ costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(const LogicalMap* logical)
     costmap_2d::Costmap2D* costMap = new costmap_2d::Costmap2D(columns, rows,
         logical->getResolution(), 0, 0);
 
-    for (int row = 0; row < rows; row++)
+    for (size_t row = 0; row < rows; row++)
     {
-        for (int col = 0; col < columns; col++)
+        for (size_t col = 0; col < columns; col++)
         {
             costMap->setCost(col, row, logical->getCost(col, row));
         }
@@ -138,8 +138,8 @@ void MapAdapter::logicalMap2OccupancyVector(const LogicalMap* logical, vector<in
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 costmap_2d::Costmap2D* MapAdapter::weights2CostMap2D(LogicalMap* occupancy, int orientation)
 {
-    unsigned int rows = occupancy->getHeightCells();
-    unsigned int columns = occupancy->getWidthCells();
+    int rows = occupancy->getHeightCells();
+    int columns = occupancy->getWidthCells();
 
     costmap_2d::Costmap2D* costMap = new costmap_2d::Costmap2D(columns, rows,
         occupancy->getResolution(), occupancy->getOrigin().x, occupancy->getOrigin().y);
@@ -152,7 +152,7 @@ costmap_2d::Costmap2D* MapAdapter::weights2CostMap2D(LogicalMap* occupancy, int 
     WeightedGrid2d::BaseType southWest;
     WeightedGrid2d::BaseType west;
     WeightedGrid2d::BaseType northWest;
-    WeightedGrid2d::BaseType cost;
+    WeightedGrid2d::BaseType cost = 0;
 
     for (int row = 0; row < rows; row++)
     {

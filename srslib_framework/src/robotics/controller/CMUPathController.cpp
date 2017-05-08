@@ -177,7 +177,7 @@ int CMUPathController::findVelocityChange(double fromVelocity, int fromIndex)
         return currentTrajectory_.size() - 1;
     }
 
-    for (int i = fromIndex; i < currentTrajectory_.size(); i++)
+    for (size_t i = fromIndex; i < currentTrajectory_.size(); i++)
     {
         double velocity = getMaxVelocity(i);
         if (!BasicMath::equal(fromVelocity, velocity, robot_.physicalMinLinearVelocity))

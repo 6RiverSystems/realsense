@@ -345,7 +345,7 @@ void SerialIO::onReadComplete(const boost::system::error_code& error, std::size_
 				cCRC_ += cChar;
 			};
 
-		for(int i = 0; i < size; i++)
+		for(size_t i = 0; i < size; i++)
 		{
 			#if defined(ENABLE_TEST_FIXTURE)
 

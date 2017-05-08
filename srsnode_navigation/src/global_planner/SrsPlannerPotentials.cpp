@@ -258,9 +258,9 @@ void SrsPlannerPotentials::getPlanFromPotential(
     plan.clear();
 
     ros::Time plan_time = ros::Time::now();
-    for (int i = path.size() - 1; i>=0; i--)
+    for (auto iter = path.rbegin( ); iter != path.rend( ); iter++)
     {
-        std::pair<float, float> point = path[i];
+        std::pair<float, float> point = *iter;
 
         double world_x;
         double world_y;
@@ -308,7 +308,7 @@ void SrsPlannerPotentials::publishPlan(const std::vector<geometry_msgs::PoseStam
         gui_path.header.stamp = path[0].header.stamp;
     }
 
-    for (unsigned int i = 0; i < path.size(); i++)
+    for (size_t i = 0; i < path.size(); i++)
     {
         gui_path.poses[i] = path[i];
     }
@@ -344,7 +344,7 @@ void SrsPlannerPotentials::publishPotential(float* potential)
     grid.data.resize(nx * ny);
 
     float max = 0.0;
-    for (unsigned int i = 0; i < grid.data.size(); i++)
+    for (size_t i = 0; i < grid.data.size(); i++)
     {
         float potential = potentialArray_[i];
         if (potential < PotentialCalculator::MAX_POTENTIAL)
@@ -356,7 +356,7 @@ void SrsPlannerPotentials::publishPotential(float* potential)
         }
     }
 
-    for (unsigned int i = 0; i < grid.data.size(); i++)
+    for (size_t i = 0; i < grid.data.size(); i++)
     {
         if (potentialArray_[i] >= PotentialCalculator::MAX_POTENTIAL)
         {

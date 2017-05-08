@@ -65,43 +65,43 @@ private:
 
     void updateMapStack(costmap_2d::Costmap2D* rosCostMap);
 
-    bool allowUnknown_;
-    AStarPotentials* astar_;
+    bool allowUnknown_                      { true };
+    AStarPotentials* astar_                 { nullptr };
 
-    dynamic_reconfigure::Server<srsnode_navigation::SrsPlannerConfig>* configServer_;
-    costmap_2d::Costmap2D* costMap_;
+    dynamic_reconfigure::Server<srsnode_navigation::SrsPlannerConfig>* configServer_    { nullptr };  /// ???
+    costmap_2d::Costmap2D* costMap_         { nullptr };
 
-    bool initialized_;
+    bool initialized_                       { false };
 
-    unsigned int lethalCost_;
-    unsigned int logicalCostRatio_;
+    unsigned int lethalCost_                { 253 };
+    unsigned int logicalCostRatio_          { 0 };        /// ???
 
-    boost::mutex mutex_;
+    boost::mutex mutex_                     { };          /// ???
 
-    unsigned int neutralCost_;
+    unsigned int neutralCost_               { 50 };
 
-    OrientationFilter* orientationFilter_;
+    OrientationFilter* orientationFilter_   { nullptr };  /// ???
 
-    ros::Publisher planPublisher_;
-    ros::Publisher potentialPublisher_;
-    float* potentialArray_;
-    bool publishPotential_;
-    int publishScale_;
+    ros::Publisher planPublisher_           { };          /// ???
+    ros::Publisher potentialPublisher_      { };          /// ???
+    float* potentialArray_                  { nullptr };
+    bool publishPotential_                  { true };
+    int publishScale_                       { false };    /// ???
 
-    AStarPotentials::QueueMapType queuesMap_;
+    AStarPotentials::QueueMapType queuesMap_ { };         /// ???
 
-    MapStack* srsMapStack_;
+    MapStack* srsMapStack_                  { nullptr };
 
-    TapMapStack tapMapStack_;
-    std::string tfFrameid_;
-    std::string tfPrefix_;
+    TapMapStack tapMapStack_                { };          /// ???
+    std::string tfFrameid_                  { "" };       /// ???
+    std::string tfPrefix_                   { "" };       /// ???
 
-    bool useGridPath_;
-    bool useQuadratic_;
+    bool useGridPath_                       { true };
+    bool useQuadratic_                      { true };
 
-    unsigned int weightRatio_;
+    unsigned int weightRatio_               { 0 };        /// ???
 
-    double goalShiftDistance_;
+    double goalShiftDistance_               { 0.0 };
 };
 
 } // namespace srs

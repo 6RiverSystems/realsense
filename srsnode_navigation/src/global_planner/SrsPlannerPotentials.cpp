@@ -25,18 +25,7 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-SrsPlannerPotentials::SrsPlannerPotentials() :
-    srsMapStack_(nullptr),
-    costMap_(nullptr),
-    initialized_(false),
-    astar_(nullptr),
-    useQuadratic_(true),
-    useGridPath_(true),
-    allowUnknown_(true),
-    publishPotential_(true),
-    lethalCost_(253),
-    neutralCost_(50),
-    goalShiftDistance_(0.0)
+SrsPlannerPotentials::SrsPlannerPotentials()
 {
     ROS_WARN("SrsPlannerPotentials::SrsPlannerPotentials() called");
 
@@ -44,18 +33,7 @@ SrsPlannerPotentials::SrsPlannerPotentials() :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-SrsPlannerPotentials::SrsPlannerPotentials(string name, costmap_2d::Costmap2DROS* rosCostMap) :
-    srsMapStack_(nullptr),
-    costMap_(nullptr),
-    initialized_(false),
-    astar_(nullptr),
-    useQuadratic_(true),
-    useGridPath_(true),
-    allowUnknown_(true),
-    publishPotential_(true),
-    lethalCost_(253),
-    neutralCost_(50),
-    goalShiftDistance_(0.0)
+SrsPlannerPotentials::SrsPlannerPotentials(string name, costmap_2d::Costmap2DROS* rosCostMap)
 {
     ROS_WARN("SrsPlannerPotentials::SrsPlannerPotentials(...) called");
 

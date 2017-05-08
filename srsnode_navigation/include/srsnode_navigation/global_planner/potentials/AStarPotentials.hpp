@@ -66,16 +66,16 @@ private:
 
     void clearQueues();
 
-    costmap_2d::Costmap2D* costMap_;
+    costmap_2d::Costmap2D* costMap_		{ nullptr };
 
-    LogicalMap* logicalMap_;
+    LogicalMap* logicalMap_			{ nullptr };
 
-    PotentialCalculator* potentialCalculator_;
-    Traceback* pathBuilder_;
+    PotentialCalculator* potentialCalculator_	{ nullptr };
+    Traceback* pathBuilder_			{ nullptr };
 
-    Expander* stateExpander_;
+    Expander* stateExpander_			{ nullptr };
 
-    QueueMapType queuesMap_;
+    QueueMapType queuesMap_			{ };
 };
 
 }

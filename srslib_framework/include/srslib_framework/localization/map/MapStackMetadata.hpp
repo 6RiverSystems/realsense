@@ -29,8 +29,8 @@ public:
 public:
     double loadTime;
 
-    std::string mapName;
     std::string mapStackFilename;
+    std::string mapName;
     std::string mapVersion;
 };
 

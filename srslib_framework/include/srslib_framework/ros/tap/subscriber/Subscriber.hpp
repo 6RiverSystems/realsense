@@ -88,15 +88,16 @@ protected:
     }
 
 private:
-    ros::Subscriber dataSubscriber_;
+    string topic_;
 
     bool hasNeverReported_;
 
     bool newData_;
 
+    ros::Subscriber dataSubscriber_;
+
     ros::NodeHandle rosNodeHandle_;
 
-    string topic_;
 };
 
 } // namespace srs

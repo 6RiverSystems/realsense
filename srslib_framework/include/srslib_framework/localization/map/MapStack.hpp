@@ -40,13 +40,13 @@ public:
     void setCostMap2d(costmap_2d::Costmap2D* costMap2d);
 
 private:
-    costmap_2d::Costmap2D* costMap2d_;
+    MapStackMetadata metadata_;
 
     LogicalMap* logical_;
 
-    MapStackMetadata metadata_;
-
     OccupancyMap* occupancy_;
+
+    costmap_2d::Costmap2D* costMap2d_;
 };
 
 } // namespace srs

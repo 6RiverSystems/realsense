@@ -162,16 +162,13 @@ protected:
     {}
 
 private:
-    SearchGoal* goal_;
     MapStack* stack_;
-    int g_;
-
-    int h_;
-
     MapStackAction::ActionEnum parentAction_;
     MapStackNode* parentNode_;
     Position position_;
-
+    int g_;
+    SearchGoal* goal_;
+    int h_;
     SearchParameters searchParameters_;
 };
 

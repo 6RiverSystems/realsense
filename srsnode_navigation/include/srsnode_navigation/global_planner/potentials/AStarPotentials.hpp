@@ -70,12 +70,12 @@ private:
 
     LogicalMap* logicalMap_;
 
-    Traceback* pathBuilder_;
     PotentialCalculator* potentialCalculator_;
-
-    QueueMapType queuesMap_;
+    Traceback* pathBuilder_;
 
     Expander* stateExpander_;
+
+    QueueMapType queuesMap_;
 };
 
 }

@@ -98,13 +98,13 @@ protected:
     BaseGrid2d* grid_;
 
 private:
-    double heightM_;
-
-    Pose<> origin_;
-
     double resolution_;
 
     double widthM_;
+
+    double heightM_;
+
+    Pose<> origin_;
 };
 
 } // namespace srs

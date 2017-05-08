@@ -55,13 +55,14 @@ private:
 
     ChannelRosPath channelRosPath_;
     dynamic_reconfigure::Server<srsnode_navigation::SrsPlannerConfig>* configServer_;
-    costmap_2d::Costmap2D* costMap2d_;
 
     MapStackNode::SearchParameters nodeSearchParameters_;
 
     MapStack* srsMapStack_;
 
     TapMapStack tapMapStack_;
+
+    costmap_2d::Costmap2D* costMap2d_;
 };
 
 } // namespace srs

@@ -37,8 +37,8 @@ private:
     void extractRGBChannel(SDL_Surface* image);
     void extractRGBAChannel(SDL_Surface* image);
 
-    OccupancyMetadata metadata_;
     OccupancyMap* map_;
+    OccupancyMetadata metadata_;
 };
 
 } // namespace srs

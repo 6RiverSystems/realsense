@@ -41,10 +41,10 @@ public:
     {}
 
     LogicalMetadata(const LogicalMetadata& other) :
-        heightCells(other.heightCells),
         widthCells(other.widthCells),
-        heightM(other.heightM),
+        heightCells(other.heightCells),
         widthM(other.widthM),
+        heightM(other.heightM),
         origin(other.origin),
         resolution(other.resolution),
         logicalFilename(other.logicalFilename)
@@ -73,17 +73,13 @@ protected:
     {}
 
 public:
-    int heightCells;
-    double heightM;
-
-    string logicalFilename;
-
-    Pose<> origin;
-
-    double resolution;
-
     int widthCells;
+    int heightCells;
     double widthM;
+    double heightM;
+    Pose<> origin;
+    double resolution;
+    string logicalFilename;
 };
 
 } // namespace srs

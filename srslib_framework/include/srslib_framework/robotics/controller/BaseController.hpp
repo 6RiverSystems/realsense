@@ -24,16 +24,7 @@ class BaseController
 {
 public:
     BaseController(string name) :
-        terminated_(false),
-        executingCommand_(Velocity<>::ZERO),
-        firstRun_(true),
-        goal_(Pose<>::ZERO),
-        goalReached_(false),
-        Kv_(1.0),
-        Kw_(1.0),
-        isRobotMoving_(false),
-        name_(name),
-        robot_()
+        name_(name)
     {}
 
     virtual ~BaseController()
@@ -121,25 +112,26 @@ protected:
         Kw_ = Kw;
     }
 
-    RobotProfile robot_;
-    vector<Pose<>> goalLanding_;
+    RobotProfile    robot_{ };
+    vector<Pose<>>  goalLanding_{ };
 
 private:
-    bool terminated_;
 
-    Velocity<> executingCommand_;
+    bool            terminated_{ false };
 
-    bool firstRun_;
+    Velocity<>      executingCommand_{ Velocity<>::ZERO };
 
-    Pose<> goal_;
-    bool goalReached_;
+    bool            firstRun_{ true };
 
-    bool isRobotMoving_;
+    Pose<>          goal_{ Pose<>::ZERO };
+    bool            goalReached_{ false };
 
-    double Kv_;
-    double Kw_;
+    bool            isRobotMoving_{ false };
 
-    string name_;
+    double          Kv_{ 1.0 };
+    double          Kw_{ 1.0 };
+
+    string          name_{ "" };
 };
 
 } // namespace srs

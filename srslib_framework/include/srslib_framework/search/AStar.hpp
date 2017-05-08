@@ -79,17 +79,18 @@ private:
 
     void pushNodes(vector<SearchNode*>& nodes);
 
-    ClosedSetType closedSet_;
-    unsigned int counterFoundInClosed_;
-    unsigned int counterInserted_;
-    unsigned int counterPruned_;
-    unsigned int counterReplaced_;
+    unsigned int counterFoundInClosed_  { 0 };
+    unsigned int counterInserted_       { 0 };
+    unsigned int counterPruned_         { 0 };
+    unsigned int counterReplaced_       { 0 };
 
-    SearchNode* lastNode_;
+    SearchNode* lastNode_               { nullptr };
 
-    OpenSetType openQueue_;
+    SearchNode* startNode_              { nullptr };
 
-    SearchNode* startNode_;
+    ClosedSetType closedSet_            { };
+
+    OpenSetType openQueue_              { };
 };
 
 } // namespace srs

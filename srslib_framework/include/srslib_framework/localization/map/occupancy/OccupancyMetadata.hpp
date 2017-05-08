@@ -47,10 +47,10 @@ public:
     {}
 
     OccupancyMetadata(const OccupancyMetadata& other) :
-        heightCells(other.heightCells),
         widthCells(other.widthCells),
-        heightM(other.heightM),
+        heightCells(other.heightCells),
         widthM(other.widthM),
+        heightM(other.heightM),
         origin(other.origin),
         resolution(other.resolution),
         occupancyFilename(other.occupancyFilename),
@@ -88,21 +88,17 @@ protected:
     {}
 
 public:
+    unsigned int widthCells;
     unsigned int heightCells;
+    double widthM;
     double heightM;
-
+    Pose<> origin;
+    double resolution;
+    string occupancyFilename;
+    double thresholdOccupied;
+    double thresholdFree;
     bool negate;
 
-    string occupancyFilename;
-    Pose<> origin;
-
-    double resolution;
-
-    double thresholdFree;
-    double thresholdOccupied;
-
-    unsigned int widthCells;
-    double widthM;
 };
 
 } // namespace srs

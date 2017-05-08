@@ -85,16 +85,9 @@ private:
 
 	std::string								name_;
 
-    int32_t									vid_;
-
-    int32_t									pid_;
-
 	std::string								vendor_;
 
 	std::string								product_;
-
-	bool									open_;
-	libusb_device_handle*					deviceHandle_;
 
 	libusb_hotplug_callback_handle			hotplugHandle_;
 
@@ -109,6 +102,13 @@ private:
 	std::set<libusb_transfer*>				transfers_;
 
     ConnectionCallbackFn					connetionCallback_;
+
+	bool									open_;
+	libusb_device_handle*					deviceHandle_;
+
+    int32_t									vid_;
+
+    int32_t									pid_;
 
     ReadCallbackFn							readCallback_;
 

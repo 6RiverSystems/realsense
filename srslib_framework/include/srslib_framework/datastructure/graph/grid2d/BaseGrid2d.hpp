@@ -129,9 +129,9 @@ public:
     virtual void payloadSet(const Location& location, BaseType newPayload) = 0;
 
 private:
-    unsigned int height_;
-
     unsigned int width_;
+
+    unsigned int height_;
 };
 
 } // namespace srs

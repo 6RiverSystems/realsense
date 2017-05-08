@@ -77,7 +77,6 @@ void SrsPlannerPotentials::initialize(std::string name, costmap_2d::Costmap2D* c
         ros::NodeHandle prefix_nh;
         tfPrefix_ = tf::getPrefixParam(prefix_nh);
 
-        potentialArray_ = nullptr;
         initialized_ = true;
     }
     else
@@ -155,16 +154,20 @@ bool SrsPlannerPotentials::makePlan(
     searchParams.weightRatio = weightRatio_;
     searchParams.logicalCostRatio = logicalCostRatio_;
 
+    float* potentialArray = nullptr;
+
     bool found = astar_->calculatePath(searchParams,
         start.pose.position.x, start.pose.position.y,
         shiftedGoal.pose.position.x, shiftedGoal.pose.position.y,
         plan,
-        potentialArray_);
+        potentialArray);
 
     if (publishPotential_)
     {
-        publishPotential(potentialArray_);
+        publishPotential(potentialArray);
     }
+
+    delete [] potentialArray;
 
     if (found)
     {
@@ -183,9 +186,6 @@ bool SrsPlannerPotentials::makePlan(
         ROS_ERROR("Failed to get a plan. Saving map.");
         costMap_->saveMap("cost_map.pgm");
     }
-
-    delete potentialArray_;
-    potentialArray_ = nullptr;
 
     delete astar_;
     astar_ = nullptr;
@@ -317,7 +317,7 @@ void SrsPlannerPotentials::publishPlan(const std::vector<geometry_msgs::PoseStam
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerPotentials::publishPotential(const float* potential)
+void SrsPlannerPotentials::publishPotential(const float* potentialArray)
 {
     int nx = costMap_->getSizeInCellsX();
     int ny = costMap_->getSizeInCellsY();
@@ -328,8 +328,6 @@ void SrsPlannerPotentials::publishPotential(const float* potential)
     grid.header.frame_id = tfFrameid_;
     grid.header.stamp = ros::Time::now();
     grid.info.resolution = resolution;
-    grid.info.origin.position.x = costMap_->getOriginX();
-    grid.info.origin.position.y = costMap_->getOriginY();
     grid.info.width = nx;
     grid.info.height = ny;
 
@@ -346,7 +344,7 @@ void SrsPlannerPotentials::publishPotential(const float* potential)
     float max = 0.0;
     for (size_t i = 0; i < grid.data.size(); i++)
     {
-        float potential = potentialArray_[i];
+        float potential = potentialArray[i];
         if (potential < PotentialCalculator::MAX_POTENTIAL)
         {
             if (potential > max)
@@ -358,13 +356,13 @@ void SrsPlannerPotentials::publishPotential(const float* potential)
 
     for (size_t i = 0; i < grid.data.size(); i++)
     {
-        if (potentialArray_[i] >= PotentialCalculator::MAX_POTENTIAL)
+        if (potentialArray[i] >= PotentialCalculator::MAX_POTENTIAL)
         {
             grid.data[i] = -1;
         }
         else
         {
-            grid.data[i] = potentialArray_[i] * publishScale_ / max;
+            grid.data[i] = potentialArray[i] * publishScale_ / max;
         }
     }
 

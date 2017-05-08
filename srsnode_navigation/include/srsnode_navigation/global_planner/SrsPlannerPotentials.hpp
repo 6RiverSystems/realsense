@@ -84,7 +84,6 @@ private:
 
     ros::Publisher planPublisher_           { };          /// ???
     ros::Publisher potentialPublisher_      { };          /// ???
-    float* potentialArray_                  { nullptr };
     bool publishPotential_                  { true };
     int publishScale_                       { false };    /// ???
 

@@ -39,6 +39,9 @@ void HardStopReflex::setLaserScan(const sensor_msgs::LaserScan& scan, LaserScanT
     }
     tf::Transform lidarToMap = PoseMessageFactory::pose2Transform(latestPose_) * laserScan.pose;
 
+    // Save the current time
+    laserScan.receivedTime = scan.header.stamp.toSec();
+
     // Iterate over the scan and convert into the map frame.
     laserScan.scan.clear();
     laserScan.scan.reserve(scan.ranges.size());
@@ -72,7 +75,7 @@ void HardStopReflex::createLaserMapEntryIfMissing(LaserScanType type)
     }
 }
 
-bool HardStopReflex::checkHardStop()
+bool HardStopReflex::checkHardStop(double checkTime)
 {
     // If the robot is paused, do not hard stop.
     if (robotState_.freeSpin && disableOnPause_)
@@ -80,7 +83,7 @@ bool HardStopReflex::checkHardStop()
         return false;
     }
 
-    bool dangerZoneViolation = checkForDangerZoneViolation();
+    bool dangerZoneViolation = checkForDangerZoneViolation(checkTime);
     if (dangerZoneViolation)
     {
         numConsecutiveDangerZoneViolations_++;
@@ -97,11 +100,12 @@ bool HardStopReflex::checkHardStop()
         failedDangerZone_ = dangerZone_;
         // failedLaserScan_ = laserScan_;
         waitingForClear_ = true;
+        dumpDataToLog();
     }
     return shouldHardStop;
 }
 
-bool HardStopReflex::checkForDangerZoneViolation()
+bool HardStopReflex::checkForDangerZoneViolation(double checkTime)
 {
     if (!updateDangerZone())
     {
@@ -125,13 +129,18 @@ bool HardStopReflex::checkForDangerZoneViolation()
     uint32_t numBadPoints = 0;
     for (auto const& kv : laserScansMap_)
     {
-        if (kv.second.enabled)
+        bool timedOut = checkTime - kv.second.receivedTime > scanTimeout_;
+        if (timedOut)
+        {
+            ROS_DEBUG_THROTTLE(5, "Scan %d timed out. Skipping.", kv.first);
+        }
+        if (kv.second.enabled && !timedOut)
         {
             for (auto const& pt : kv.second.scan)
             {
                 if (ClipperLib::PointInPolygon(pt, dangerZone_))
                 {
-                    ROS_DEBUG("Found a point in the danger zone at [%f, %f].  Robot at [%f, %f, th: %f].",
+                    ROS_DEBUG("Scan %d.  Found a point in the danger zone at [%f, %f].  Robot at [%f, %f, th: %f].", kv.first,
                         pt.X / CL_SCALE_FACTOR, pt.Y / CL_SCALE_FACTOR, latestPose_.x, latestPose_.y, latestPose_.theta);
                     numBadPoints++;
                 }

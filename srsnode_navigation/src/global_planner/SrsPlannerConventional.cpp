@@ -42,7 +42,7 @@ SrsPlannerConventional::~SrsPlannerConventional()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerConventional::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostMap)
+void SrsPlannerConventional::initialize(string name, costmap_2d::Costmap2DROS* rosCostMap)
 {
     ros::NodeHandle privateNh("~/" + name);
 

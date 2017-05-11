@@ -49,8 +49,8 @@ SrsPlannerPotentials::~SrsPlannerPotentials()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerPotentials::initialize(std::string name, costmap_2d::Costmap2D* costmap,
-    std::string frame_id)
+void SrsPlannerPotentials::initialize(string name, costmap_2d::Costmap2D* costmap,
+    string frame_id)
 {
     if (!initialized_)
     {
@@ -86,7 +86,7 @@ void SrsPlannerPotentials::initialize(std::string name, costmap_2d::Costmap2D* c
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerPotentials::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostMap)
+void SrsPlannerPotentials::initialize(string name, costmap_2d::Costmap2DROS* rosCostMap)
 {
     ROS_WARN("SrsPlanner::initialize() called");
 

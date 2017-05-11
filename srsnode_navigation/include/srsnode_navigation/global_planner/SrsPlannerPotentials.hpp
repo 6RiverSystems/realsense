@@ -39,13 +39,13 @@ public:
     SrsPlannerPotentials(string name, costmap_2d::Costmap2DROS* rosCostMap);
     virtual ~SrsPlannerPotentials();
 
-    void initialize(string name, costmap_2d::Costmap2DROS* rosCostMap);
+    virtual void initialize(std::string name, costmap_2d::Costmap2DROS* rosCostMap) override;
     void initialize(std::string name, costmap_2d::Costmap2D* costmap, std::string frame_id);
 
-    bool makePlan(
+    virtual bool makePlan(
         const geometry_msgs::PoseStamped& start,
         const geometry_msgs::PoseStamped& goal,
-        vector<geometry_msgs::PoseStamped>& plan);
+        vector<geometry_msgs::PoseStamped>& plan) override;
     bool makePlan(
         const geometry_msgs::PoseStamped& start,
         const geometry_msgs::PoseStamped& goal,

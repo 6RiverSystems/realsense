@@ -15,7 +15,7 @@ public:
     QuadraticCalculator(int nx, int ny): PotentialCalculator(nx,ny)
     {}
 
-    float calculatePotential(float* potentials, unsigned int cost, int n, float prev_potential);
+    virtual float calculatePotential(float* potentials, unsigned int cost, int n, float prev_potential) override;
 };
 
 }

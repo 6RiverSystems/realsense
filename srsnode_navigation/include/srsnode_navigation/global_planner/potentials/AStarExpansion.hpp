@@ -39,11 +39,11 @@ public:
     AStarExpansion(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap,
         PotentialCalculator* pCalculator);
 
-    bool calculatePotentials(
+    virtual bool calculatePotentials(
         double start_x, double start_y,
         double end_x, double end_y,
         int cycles,
-        float* potentials);
+        float* potentials) override;
 
 private:
     void add(float* potentials,

@@ -33,7 +33,8 @@ struct GreaterThan
     }
 };
 
-class AStarExpansion : public Expander
+class AStarExpansion :
+    public Expander
 {
 public:
     AStarExpansion(LogicalMap* logicalMap, costmap_2d::Costmap2D* costMap,

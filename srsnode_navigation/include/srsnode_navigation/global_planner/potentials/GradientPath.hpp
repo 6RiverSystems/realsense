@@ -13,7 +13,8 @@ using namespace std;
 
 namespace srs {
 
-class GradientPath : public Traceback
+class GradientPath :
+    public Traceback
 {
     public:
         GradientPath(PotentialCalculator* p_calc);

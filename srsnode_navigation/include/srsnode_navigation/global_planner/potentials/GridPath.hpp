@@ -10,7 +10,8 @@
 
 namespace srs {
 
-class GridPath : public Traceback
+class GridPath :
+    public Traceback
 {
 public:
     GridPath(PotentialCalculator* p_calc):

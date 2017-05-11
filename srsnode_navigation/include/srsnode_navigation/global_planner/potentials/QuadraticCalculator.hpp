@@ -9,7 +9,8 @@
 
 namespace srs {
 
-class QuadraticCalculator : public PotentialCalculator
+class QuadraticCalculator :
+    public PotentialCalculator
 {
 public:
     QuadraticCalculator(int nx, int ny): PotentialCalculator(nx,ny)

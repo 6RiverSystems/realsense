@@ -32,7 +32,8 @@ using namespace srs;
 
 namespace srs {
 
-class SrsPlannerPotentials : public nav_core::BaseGlobalPlanner
+class SrsPlannerPotentials :
+    public nav_core::BaseGlobalPlanner
 {
 public:
     SrsPlannerPotentials();

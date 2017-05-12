@@ -89,11 +89,10 @@ geometry_msgs::PoseStamped shiftGoalToMinima(geometry_msgs::PoseStamped goal_pos
     ROS_INFO("Updated goal position from (%f, %f, %f: %d) to (%f, %f, %f: %d)",
         goal_x, goal_y, goal_yaw, goal_cost, current_x, current_y, goal_yaw, current_cost);
 
-   geometry_msgs::PoseStamped output = goal_pose;
-   output.pose.position.x = current_x;
-   output.pose.position.y = current_y;
+    goal_pose.pose.position.x = current_x;
+    goal_pose.pose.position.y = current_y;
 
-   return output;
+    return goal_pose;
 }
 
 }

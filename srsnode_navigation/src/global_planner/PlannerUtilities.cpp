@@ -75,7 +75,7 @@ geometry_msgs::PoseStamped shiftGoalToMinima(geometry_msgs::PoseStamped goal_pos
             }
 
             if (cost < current_cost
-                || (cost < goal_cost && cost == current_cost && std::fabs(shift) < std::fabs(current_shift)))
+                || (cost == current_cost && abs_shift < std::fabs(current_shift)))
             {
                 current_shift = shift;
                 current_cost = cost;

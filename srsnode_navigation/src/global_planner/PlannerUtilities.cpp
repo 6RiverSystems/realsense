@@ -51,18 +51,16 @@ geometry_msgs::PoseStamped shiftGoalToMinima(geometry_msgs::PoseStamped goal_pos
     unsigned char current_cost = goal_cost;
     double current_shift = max_shift;
 
-    double wx = 0.0, wy = 0.0;
-    unsigned int mx = 0, my = 0;
-
-
     for (double shift_sign : {-1, 1})
     {
         for (double abs_shift = 0; abs_shift <= max_shift; abs_shift += resolution)
         {
             double shift = abs_shift * shift_sign;
 
-            wx = goal_x + shift * shift_vector_x;
-            wy = goal_y + shift * shift_vector_y;
+            unsigned int mx = 0, my = 0;
+
+            double wx = goal_x + shift * shift_vector_x;
+            double wy = goal_y + shift * shift_vector_y;
             if (!costmap.worldToMap(wx, wy, mx, my))
             {
                 ROS_INFO("Shift check goes off of the map");

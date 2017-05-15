@@ -22,3 +22,21 @@
 # export ROS_BUILD_IMAGE=ros-$ROS_DISTRO-build-debian-$ARCH
 #
 # sudo docker run --rm -v /home/dan/mfp_workspace/$ROS_DISTRO-$ARCH:/mfp_workspace -v $PWD:/mfp_workspace/src -e CCACHE_DIR=/mfp_workspace/ccache --privileged -it $ROS_BUILD_IMAGE /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/build.sh"
+
+
+# qemu build
+#
+# armhf
+#
+# mkdir build
+# cd build
+# ../configure --target-list=arm-softmmu,x86_64-softmmu --enable-kvm
+# make j
+#
+# aarch64 (arm64)
+#
+# mkdir build
+# cd build
+# ../configure --target-list=arm-softmmu,arm-linux-user --enable-kvm
+# make j
+#

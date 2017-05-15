@@ -10,6 +10,7 @@
 #include <utility>
 
 #include <ros/ros.h>
+#include <srslib_timing/TimingData.h>
 #include <srslib_timing/TimingDataSample.h>
 #include <srslib_timing/TimingData.hpp>
 

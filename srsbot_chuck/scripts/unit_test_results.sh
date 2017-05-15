@@ -18,17 +18,5 @@ cd /mfp_workspace
 
 pushd src
 
-if [ ! -f ./CMakeLists.txt ]; then
-    catkin_init_workspace
-fi
-
-# update submodules
-git submodule init
-git submodule update --recursive
-
-popd
-    
-# remove any older builds
-rm -rf build/ devel/ install/
-
-time catkin_make -DCMAKE_BUILD_TYPE=Release install
+# generate unified test results
+time catkin_test_results output/build/test_results

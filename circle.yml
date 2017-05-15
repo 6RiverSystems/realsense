@@ -1,43 +1,26 @@
+machine:
+  pre:
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+  services:
+    - docker
+  environment:
+    ARCH: x86_64
+    ROS_DISTRO: indigo
+    ROS_BUILD_IMAGE: 6river/rosbuild-$ROS_DISTRO-$ARCH
+
 dependencies:
   cache_directories:
-    - "~/.apt-cache"
-    - "~/.ccache"
-  pre:
-    - sudo rm -rf /var/cache/apt/archives && sudo ln -s ~/.apt-cache /var/cache/apt/archives && mkdir -p ~/.apt-cache/partial
-    - sudo apt-key add ~/mfp_workspace/src/$CIRCLE_PROJECT_REPONAME/gpg_keys/ros.key
-    - sudo apt-key add ~/mfp_workspace/src/$CIRCLE_PROJECT_REPONAME/gpg_keys/ubuntu.key
-    - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-    - sudo apt-get update
-    - sudo apt-get install ros-indigo-desktop-full
-    - sudo apt-get install ros-indigo-navigation
-    - sudo apt-get install ros-indigo-rgbd-launch
-    - sudo apt-get install ros-indigo-depthimage-to-laserscan
-    - sudo rosdep init
-    - rosdep update
-    - sudo apt-get install libsdl-image1.2-dev
-    - sudo apt-get install socat
-    - sudo apt-get install ccache
-    - sudo apt-get install python-gevent=1.0-1ubuntu1
-    - sudo apt-get install libunwind8-dev
-    - sudo apt-get install expect-dev
-    - echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
-    - echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:${PYTHONPATH}" >> ~/.bashrc
-    - echo "export PATH=/usr/lib/ccache:$PATH" >> ~/.bashrc
-    - echo "export ROS_PARALLEL_JOBS=-j8" >> ~/.bashrc
-    - cd ~/mfp_workspace/src
-    - catkin_init_workspace 
+    - output/.ccache
+  post:
+    - docker run -v $PWD/output:/mfp_workspace -v $PWD:/mfp_workspace/src -e CCACHE_DIR=/mfp_workspace/.ccache -it $ROS_BUILD_IMAGE /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/run_unit_tests.sh"
 
 checkout:
   post:
-    - mkdir -p ~/mfp_workspace/src
-    - mv ../$CIRCLE_PROJECT_REPONAME ~/mfp_workspace/src
-    - mkdir -p ./$CIRCLE_PROJECT_REPONAME
+    - mkdir -p $PWD/output
 
 test:
   override:
-    - cd ~/mfp_workspace && catkin_make run_tests
-    - catkin_test_results ~/mfp_workspace/build/test_results
-
+    - docker run -v $PWD/output:/mfp_workspace -v $PWD:/mfp_workspace/src -e CCACHE_DIR=/mfp_workspace/.ccache -it $ROS_BUILD_IMAGE /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/unit_test_results.sh"
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
-    - find ~/mfp_workspace/build/test_results -type f -name '*.xml' -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+    - find $PWD/output/build/test_results -type f -name '*.xml' -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;

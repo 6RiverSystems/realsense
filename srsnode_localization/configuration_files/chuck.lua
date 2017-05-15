@@ -39,7 +39,7 @@ TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.angular_search_window =
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 30
 
 
-SPARSE_POSE_GRAPH.optimization_problem.huber_scale = 1e1
+SPARSE_POSE_GRAPH.optimization_problem.huber_scale = 5e2
 SPARSE_POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.linear_search_window = 1.5
 SPARSE_POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.angular_search_window = math.rad(30.)
 

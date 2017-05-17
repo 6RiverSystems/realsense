@@ -16,10 +16,7 @@ MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKETS_MAX
         emptyBuckets_.push_front(new BucketType());
     }
 
-    emptyBucketsCounter_ = BUCKETS_INITIAL;
-
     nodeIndex_.reserve(BUCKETS_MAX);
-    bucketIndex_.reserve(BUCKETS_MAX);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +41,6 @@ MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKETS_MAX
     nodeQueue_.clear();
 
     nodeIndex_.clear();
-    bucketIndex_.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +60,6 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
     // Clear all the references to the occupied buckets
     nodeQueue_.clear();
     nodeIndex_.clear();
-    bucketIndex_.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,15 +75,14 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
         return;
     }
 
-    PRIORITY key = itemIterator->second->priority;
     BucketType* bucket = itemIterator->second->bucket;
     auto it = itemIterator->second;
     bucket->erase(it);
 
     if (bucket->empty())
     {
+        PRIORITY key = itemIterator->second->priority;
         nodeQueue_.erase(key);
-        bucketIndex_.erase(key);
         recycleBucket(bucket);
     }
 
@@ -126,7 +120,6 @@ bool MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
     // Find the bucket that contains the lowest priority
     auto lowestBucketIterator = nodeQueue_.begin();
     BucketType* bucket = lowestBucketIterator->second;
-    PRIORITY key = lowestBucketIterator->first;
 
     // Find the first element of the bucket and return it
     item = bucket->begin()->info;
@@ -136,8 +129,8 @@ bool MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
     bucket->pop_front();
     if (bucket->empty())
     {
+        PRIORITY key = lowestBucketIterator->first;
         nodeQueue_.erase(key);
-        bucketIndex_.erase(key);
         recycleBucket(bucket);
     }
 
@@ -155,10 +148,10 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
     push(PRIORITY priority, TYPE item)
 {
     // Find the bucket that will contain the item
-    auto bucketIterator = bucketIndex_.find(priority);
+    auto bucketIterator = nodeQueue_.find(priority);
 
     BucketType* bucket;
-    if (bucketIterator != bucketIndex_.end())
+    if (bucketIterator != nodeQueue_.end())
     {
         bucket = bucketIterator->second;
     }
@@ -169,11 +162,10 @@ void MappedPriorityQueue<TYPE, PRIORITY, HASH, EQUAL_TO, BUCKETS_INITIAL, BUCKET
         // to the queue of priorities
         bucket = getAvailableBucket();
         nodeQueue_[priority] = bucket;
-        bucketIndex_[priority] = bucket;
     }
 
     // Add the item to the bucket and to the map index
-    auto it = bucket->insert(bucket->end(), Node(priority, item, bucket));
+    auto it = bucket->emplace( bucket->end(), priority, item, bucket );
     nodeIndex_[item] = it;
 }
 

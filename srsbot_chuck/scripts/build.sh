@@ -29,6 +29,8 @@ git submodule update --recursive
 
 popd
 
+echo $ROS_BUILD_IMAGE
+
 sudo docker run \
     --rm \
     -v $PWD/$ROS_DISTRO-$ARCHITECTURE:/mfp_workspace \

@@ -148,8 +148,6 @@ OccupancyMap* OccupancyMapFactory::fromMetadataRawCost(const OccupancyMetadata& 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OccupancyMapFactory::extractMonoChannel(SDL_Surface* image)
 {
-    const unsigned char maxPixelLevel = numeric_limits<unsigned char>::max();
-
     unsigned char* imagePixels = (unsigned char*)(image->pixels);
     int pitch = image->pitch;
 
@@ -171,8 +169,6 @@ void OccupancyMapFactory::extractMonoChannel(SDL_Surface* image)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OccupancyMapFactory::extractMonoChannelRaw(SDL_Surface* image)
 {
-    const unsigned char maxPixelLevel = numeric_limits<unsigned char>::max();
-
     unsigned char* imagePixels = (unsigned char*)(image->pixels);
     int pitch = image->pitch;
 

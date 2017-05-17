@@ -318,8 +318,6 @@ void SerialIO::onReadComplete(const boost::system::error_code& error, std::size_
 		// Add room for the new data
 		message_.reserve(message_.size() + size);
 
-		size_t messageStart = 0;
-
 		auto changeState =
 			[&](const READ_STATE& eNewState)
 			{

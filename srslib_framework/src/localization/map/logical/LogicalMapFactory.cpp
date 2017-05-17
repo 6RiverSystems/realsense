@@ -376,7 +376,6 @@ void LogicalMapFactory::ntEntityBoundary(YAML::Node root)
 
     double widthM = map_->getWidthM();
     double heightM = map_->getHeightM();
-    double resolution = map_->getResolution();
 
     vector<Pose<>> coordinates = ntGeometry(root[KEYWORD_GEOMETRY], 2, 2);
 

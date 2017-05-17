@@ -74,9 +74,9 @@ void OrientationFilter::interpolate(std::vector<geometry_msgs::PoseStamped>& pat
            end_yaw   = getYaw(path[end_index  ]);
     double diff = angles::shortest_angular_distance(start_yaw, end_yaw);
     double increment = diff/(end_index-start_index);
-    for (int i = start_index; i <= end_index; i++)
+    for (int i = start_index+1; i <= end_index; i++)
     {
-        double angle = start_yaw + increment * i;
+        double angle = start_yaw + increment * (i-start_index);
         set_angle(&path[i], angle);
     }
 }

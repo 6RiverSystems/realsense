@@ -17,7 +17,7 @@ class OrientationFilter
 {
 public:
     OrientationFilter() : omode_(NONE) {}
-    ~OrientationFilter();
+    ~OrientationFilter() {}
 
     void processPath(const geometry_msgs::PoseStamped& start,
                              std::vector<geometry_msgs::PoseStamped>& path);

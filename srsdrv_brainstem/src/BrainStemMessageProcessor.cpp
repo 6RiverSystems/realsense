@@ -274,6 +274,7 @@ void BrainStemMessageProcessor::removeHardwareMessageHandler(HardwareMessageHand
 {
 	if (hardwareMessageHandler)
 	{
+		hwMessageHandlers_.erase(hardwareMessageHandler->getKey());
 		hardwareHandlers_.erase(hardwareMessageHandler);
 	}
 }

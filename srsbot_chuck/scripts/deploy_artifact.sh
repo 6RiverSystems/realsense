@@ -1,25 +1,16 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-LINUX_DISTRO=$(lsb_release -sc)
-ARCH=$(uname -i)
-
-if [ "$LINUX_DISTRO" = "trusty" ]; then
-    ROS_DISTRO=indigo
-elif [ "$LINUX_DISTRO" = "xenial" ]; then
-    ROS_DISTRO=kinetic
-fi
-
 PACKAGE_FILE=mfp_chuck
 
-VERSION_FILE=/mfp_workspace/install/share/srsbot_chuck/package.xml
+VERSION_FILE=install/share/srsbot_chuck/package.xml
 
 if [ ! -f $VERSION_FILE ]; then
 	echo "Version file ($VERSION_FILE) does not exist" >&2
 	exit 101
 fi
 
-chmod +x /mfp_workspace/install/share/srsbot_chuck/scripts/*.sh
+chmod +x install/share/srsbot_chuck/scripts/*.sh
 
 OUTPUT_DIR=/mfp_workspace/artifacts
 VERSION=`xmllint --xpath 'string(//package/version)' $VERSION_FILE`
@@ -40,7 +31,7 @@ fi
 
 # Upload the zipped ros packages to Artifactory
 echo 'deploying artifact to artifactory'
-curl \
+time curl \
 	-H "X-JFrog-Art-Api: ${ARTIFACTORY_API_KEY}" \
 	-T "${ARTIFACT_PATH}" \
  	"https://sixriver.jfrog.io/sixriver/binaries/mfp_chuck/${ARTIFACT_NAME}"

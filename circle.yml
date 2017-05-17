@@ -14,7 +14,7 @@ dependencies:
   post:
     - git submodule init
     - git submodule update --recursive
-    - docker run -v $PWD/output:/mfp_workspace -v $PWD:/mfp_workspace/src -e CCACHE_DIR=/mfp_workspace/.ccache -it $ROS_BUILD_IMAGE /bin/bash -C "cd /mfp_workspace && /mfp_workspace/src/srsbot_chuck/scripts/run_unit_tests.sh"
+    - docker run -v $PWD/output:/mfp_workspace -v $PWD:/mfp_workspace/src -e CCACHE_DIR=/mfp_workspace/.ccache -it $ROS_BUILD_IMAGE /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/run_unit_tests.sh"
 
 checkout:
   post:
@@ -22,7 +22,7 @@ checkout:
 
 test:
   override:
-    - docker run -v $PWD/output:/mfp_workspace -v $PWD:/mfp_workspace/src -e CCACHE_DIR=/mfp_workspace/.ccache -it $ROS_BUILD_IMAGE /bin/bash -C "/mfp_workspace && /mfp_workspace/src/srsbot_chuck/scripts/unit_test_results.sh"
+    - docker run -v $PWD/output:/mfp_workspace -v $PWD:/mfp_workspace/src -e CCACHE_DIR=/mfp_workspace/.ccache -it $ROS_BUILD_IMAGE /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/unit_test_results.sh"
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
     - find $PWD/output/build/test_results -type f -name '*.xml' -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;

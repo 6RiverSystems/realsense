@@ -1,6 +1,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+cd /mfp_workspace
+
 PACKAGE_FILE=mfp_chuck
 
 VERSION_FILE=install/share/srsbot_chuck/package.xml

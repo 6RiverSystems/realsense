@@ -2,7 +2,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 LINUX_DISTRO=$(lsb_release -sc)
-ARCH=$(uname -a)
+ARCH=$(uname -i)
 
 if [ "$LINUX_DISTRO" = "trusty" ]; then
     ROS_DISTRO=indigo

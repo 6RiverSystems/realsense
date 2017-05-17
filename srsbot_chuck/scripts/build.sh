@@ -1,9 +1,14 @@
-set -euo pipefail
-
 cd ~/mfp_workspace/src
 
-export ARCH=x86_64
-export ROS_DISTRO=indigo
+if [[ -z "$1" || -z "$2" ]]; then
+	echo "Usage build.sh <ARCHITECTURE> <ROS_DISTRO>" >&2
+	exit 101
+fi
+
+set -euo pipefail
+
+export ARCH=$1
+export ROS_DISTRO=$2
 
 export ROS_BUILD_IMAGE=6river/rosbuild-$ROS_DISTRO-$ARCH
 

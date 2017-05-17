@@ -11,8 +11,11 @@ export ARCH=$1
 export ROS_DISTRO=$2
 
 export ROS_BUILD_IMAGE=6river/rosbuild-$ROS_DISTRO-$ARCH
+export ROS_WORKSPACE=~/mfp_workspace
 
-sudo docker run --rm -v /home/dan/mfp_workspace/$ROS_DISTRO-$ARCH:/mfp_workspace -v $PWD:/mfp_workspace/src -e CCACHE_DIR=/mfp_workspace/ccache -it $ROS_BUILD_IMAGE /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/build_all.sh"
+cd "$ROS_WORKSPACE"
+
+sudo docker run --rm -v $PWD/$ROS_DISTRO-$ARCH:/mfp_workspace -v $PWD/src:/mfp_workspace/src -e CCACHE_DIR=/mfp_workspace/ccache -it $ROS_BUILD_IMAGE /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/build_all.sh"
 
 # Correct permissions from docker build
-sudo chown dan:dan -R ~/mfp_workspace
+sudo chown $USER:$USER -R "$ROS_WORKSPACE"

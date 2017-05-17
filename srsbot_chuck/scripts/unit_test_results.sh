@@ -19,4 +19,4 @@ cd /mfp_workspace
 pushd src
 
 # generate unified test results
-time catkin_test_results build/test_results
+time catkin_test_results /mfp_workspace/build/test_results

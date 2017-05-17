@@ -1,8 +1,10 @@
 set -euo pipefail
 
-if [ "$(lsb_release -sc)" = "trusty" ]; then
+ARCH=$(lsb_release -sc)
+
+if [ "$ARCH" = "trusty" ]; then
     ROS_DISTRO=indigo
-elif [ "$(lsb_release -sc)" = "xenial" ]; then
+elif [ "$ARCH" = "xenial" ]; then
     ROS_DISTRO=kinetic
 fi
 
@@ -29,6 +31,7 @@ git submodule update --recursive
 popd
     
 # remove any older builds
-rm -rf build/ devel/ install/
+#rm -rf build/ devel/ install/
 
 time catkin_make -DCMAKE_BUILD_TYPE=Release install
+

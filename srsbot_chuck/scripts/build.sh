@@ -1,9 +1,12 @@
 set -euo pipefail
 
-/bin/bash "/mfp_workspace/src/srsbot_chuck/scripts/run_unit_tests.sh"
+cd ~/mfp_workspace/src
 
-/bin/bash "/mfp_workspace/src/srsbot_chuck/scripts/unit_test_results.sh"
+export ARCH=x86_64
+export ROS_DISTRO=indigo
 
-/bin/bash "/mfp_workspace/src/srsbot_chuck/scripts/build_install.sh"
+export ROS_BUILD_IMAGE=6river/rosbuild-$ROS_DISTRO-$ARCH
 
-/bin/bash "/mfp_workspace/src/srsbot_chuck/scripts/deploy_artifact.sh"
+sudo docker run --rm -v /home/dan/mfp_workspace/$ROS_DISTRO-$ARCH:/mfp_workspace -v $PWD:/mfp_workspace/src -e CCACHE_DIR=/mfp_workspace/ccache -it $ROS_BUILD_IMAGE /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/build_all.sh"
+
+sudo chmod dan:dan -R ~/mfp_workspace/artifacts

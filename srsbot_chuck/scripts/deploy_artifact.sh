@@ -1,21 +1,29 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+ARCH=$(lsb_release -sc)
+
+if [ "$ARCH" = "trusty" ]; then
+    ROS_DISTRO=indigo
+elif [ "$ARCH" = "xenial" ]; then
+    ROS_DISTRO=kinetic
+fi
+
 PACKAGE_FILE=mfp_chuck
 
-VERSION_FILE=./install/share/srsbot_chuck/package.xml
+VERSION_FILE=/mfp_workspace/install/share/srsbot_chuck/package.xml
 
 if [ ! -f $VERSION_FILE ]; then
 	echo "Version file ($VERSION_FILE) does not exist" >&2
 	exit 101
 fi
 
-chmod +x ./install/share/srsbot_chuck/scripts/*.sh
+chmod +x /mfp_workspace/install/share/srsbot_chuck/scripts/*.sh
 
-OUTPUT_DIR=`pwd`/artifacts
+OUTPUT_DIR=/mfp_workspace/artifacts
 VERSION=`xmllint --xpath 'string(//package/version)' $VERSION_FILE`
-ARTIFACT=$PACKAGE_FILE-linux-armhf
-ARTIFACT_SOURCE_PATH="./install"
+ARTIFACT=$PACKAGE_FILE-linux-$ROS_DISTRO-$ARCH
+ARTIFACT_SOURCE_PATH="/mfp_workspace/install"
 ARTIFACT_NAME="${ARTIFACT}-${VERSION}.tar.gz"
 ARTIFACT_PATH="${OUTPUT_DIR}/${ARTIFACT_NAME}"
 

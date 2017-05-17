@@ -127,8 +127,8 @@ void MapAdapter::logicalMap2OccupancyVector(const LogicalMap* logical, vector<in
         {
             uint32_t rawCost = static_cast<uint32_t>(logical->getCost(col, row));
 
-            int8_t cost = static_cast<int8_t>((rawCost - WeightedGrid2d::PAYLOAD_MIN)
-                / (WeightedGrid2d::PAYLOAD_MAX - WeightedGrid2d::PAYLOAD_MIN) * 100);
+            int8_t cost = static_cast<int8_t>(100 * (rawCost - WeightedGrid2d::PAYLOAD_MIN)
+                / (WeightedGrid2d::PAYLOAD_MAX - WeightedGrid2d::PAYLOAD_MIN));
 
             int8Vector.push_back(cost);
         }

@@ -70,6 +70,8 @@ add_library(${PROJECT_NAME}
     ${${PROJECT_NAME}_SOURCES}
 )
 
+add_dependencies(${PROJECT_LIBRARY} ${catkin_EXPORTED_TARGETS})
+
 target_link_libraries(${PROJECT_LIBRARY}
     ${PROJECT_LIBRARIES}
     ${UNWIND_LIBRARIES}

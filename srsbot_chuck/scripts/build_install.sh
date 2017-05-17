@@ -1,34 +1,7 @@
 set -euo pipefail
 
-if [ "$(lsb_release -sc)" = "trusty" ]; then
-    ROS_DISTRO=indigo
-elif [ "$(lsb_release -sc)" = "xenial" ]; then
-    ROS_DISTRO=kinetic
-fi
-
-export TMPDIR=/tmp
-export ROS_MASTER_URI=http://localhost:11311
-export PATH=/usr/lib/ccache:$PATH
-export ROS_PARALLEL_JOBS='-j4 -l4'
-export ROS_LANG_DISABLE=genlisp
-
-source /opt/ros/$ROS_DISTRO/setup.bash
-
-cd /mfp_workspace
-
-pushd src
-
-if [ ! -f ./CMakeLists.txt ]; then
-    catkin_init_workspace
-fi
-
-# update submodules
-git submodule init
-git submodule update --recursive
-
-popd
-    
-# remove any older builds
-rm -rf build/ devel/ install/
+# setup environment
+source /mfp_workspace/src/srsbot_chuck/scripts/build_env.sh
 
 time catkin_make -DCMAKE_BUILD_TYPE=Release install
+

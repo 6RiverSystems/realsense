@@ -6,6 +6,8 @@ export ROS_LANG_DISABLE=genlisp
 
 source /opt/ros/$ROS_DISTRO/setup.bash
 
+cd /mfp_workspace
+
 pushd src
 
 if [ ! -f ./CMakeLists.txt ]; then

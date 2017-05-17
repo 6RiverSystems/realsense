@@ -16,7 +16,7 @@ chmod +x install/share/srsbot_chuck/scripts/*.sh
 
 OUTPUT_DIR=/mfp_workspace/artifacts
 VERSION=`xmllint --xpath 'string(//package/version)' $VERSION_FILE`
-ARTIFACT=$PACKAGE_FILE-linux-$ROS_DISTRO-ARCHITECTURE
+ARTIFACT=$PACKAGE_FILE-linux-$ROS_DISTRO-$ARCHITECTURE
 ARTIFACT_SOURCE_PATH="/mfp_workspace/install"
 ARTIFACT_NAME="${ARTIFACT}-${VERSION}.tar.gz"
 ARTIFACT_PATH="${OUTPUT_DIR}/${ARTIFACT_NAME}"

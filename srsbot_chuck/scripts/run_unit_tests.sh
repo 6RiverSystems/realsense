@@ -1,10 +1,10 @@
 set -euo pipefail
 
-ARCH=$(lsb_release -sc)
+LINUX_DISTRO=$(lsb_release -sc)
 
-if [ "$ARCH" = "trusty" ]; then
+if [ "$LINUX_DISTRO" = "trusty" ]; then
     ROS_DISTRO=indigo
-elif [ "$ARCH" = "xenial" ]; then
+elif [ "$LINUX_DISTRO" = "xenial" ]; then
     ROS_DISTRO=kinetic
 fi
 

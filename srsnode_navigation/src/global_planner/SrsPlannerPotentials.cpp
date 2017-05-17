@@ -66,6 +66,7 @@ SrsPlannerPotentials::SrsPlannerPotentials(string name, costmap_2d::Costmap2DROS
 SrsPlannerPotentials::~SrsPlannerPotentials()
 {
     delete configServer_;
+    delete orientationFilter_;
     delete srsMapStack_;
 }
 

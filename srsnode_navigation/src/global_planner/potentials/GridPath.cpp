@@ -77,15 +77,14 @@ bool GridPath::getPath(float* potential,
             return false;
         }
 
-        current.first = min_x;
-        current.second = min_y;
-        path.push_back(current);
-
         if (c++>ns*4)
         {
             return false;
         }
 
+        current.first = min_x;
+        current.second = min_y;
+        path.push_back(current);
     }
 
     return true;

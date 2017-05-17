@@ -182,7 +182,7 @@ bool GradientPath::getPath(float* potential,
             // get interpolated gradient
             float x1 = (1.0 - dx) * gradx_[stc] + dx * gradx_[stc + 1];
             float x2 = (1.0 - dx) * gradx_[stcnx] + dx * gradx_[stcnx + 1];
-            float x = (1.0 - dy) * x1 + dy * x2; // interpolated x
+            float x = (1.0 - dx) * x1 + dx * x2; // interpolated x
             float y1 = (1.0 - dx) * grady_[stc] + dx * grady_[stc + 1];
             float y2 = (1.0 - dx) * grady_[stcnx] + dx * grady_[stcnx + 1];
             float y = (1.0 - dy) * y1 + dy * y2; // interpolated y

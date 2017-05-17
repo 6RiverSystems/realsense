@@ -308,11 +308,11 @@ public:
 				// Make sure time constraints are met
 				if( i == 1 )
 				{
-					ASSERT_GE( messageTiming[i].count( )*1.1, firstByteDelay.count( ) );
+					ASSERT_GE( messageTiming[i].count( )*1.2, firstByteDelay.count( ) );
 				}
 				else if( i > 1)
 				{
-					ASSERT_GE( messageTiming[i].count( )*1.1, byteDelay.count( ) );
+					ASSERT_GE( messageTiming[i].count( )*1.2, byteDelay.count( ) );
 				}
 			}
 		}

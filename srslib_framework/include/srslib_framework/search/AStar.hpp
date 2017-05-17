@@ -45,25 +45,29 @@ public:
 
     void getPlan(Plan& plan);
 
-    unsigned int getFoundInClosed() const
-    {
-        return counterFoundInClosed_;
-    }
+    #if DIAGNOSTICS_ASTAR
 
-    unsigned int getInserted() const
-    {
-        return counterInserted_;
-    }
+        unsigned int getFoundInClosed() const
+        {
+            return counterFoundInClosed_;
+        }
 
-    unsigned int getPruned() const
-    {
-        return counterPruned_;
-    }
+        unsigned int getInserted() const
+        {
+            return counterInserted_;
+        }
 
-    unsigned int getReplaced() const
-    {
-        return counterReplaced_;
-    }
+        unsigned int getPruned() const
+        {
+            return counterPruned_;
+        }
+
+        unsigned int getReplaced() const
+        {
+            return counterReplaced_;
+        }
+
+    #endif
 
     bool hasSolution() const
     {
@@ -79,18 +83,20 @@ private:
 
     void pushNodes(vector<SearchNode*>& nodes);
 
-    unsigned int counterFoundInClosed_  { 0 };
-    unsigned int counterInserted_       { 0 };
-    unsigned int counterPruned_         { 0 };
-    unsigned int counterReplaced_       { 0 };
+    #if DIAGNOSTICS_ASTAR
+        unsigned int counterFoundInClosed_  { 0 };
+        unsigned int counterInserted_       { 0 };
+        unsigned int counterPruned_         { 0 };
+        unsigned int counterReplaced_       { 0 };
+    #endif
 
-    SearchNode* lastNode_               { nullptr };
+    SearchNode* lastNode_                   { nullptr };
 
-    SearchNode* startNode_              { nullptr };
+    SearchNode* startNode_                  { nullptr };
 
-    ClosedSetType closedSet_            { };
+    ClosedSetType closedSet_                { };
 
-    OpenSetType openQueue_              { };
+    OpenSetType openQueue_                  { };
 };
 
 } // namespace srs

@@ -63,13 +63,10 @@ TEST(Test_AStar_MapStack_Hbc, BigSearch)
     cout << "total: " << totalNodes << " nodes" << endl;
     cout << "velocity: " << totalNodes / totalElapsed << " kn/s" << endl;
 
-    unsigned int counterFoundInClosed_;
-    unsigned int counterInserted_;
-    unsigned int counterPruned_;
-    unsigned int counterReplaced_;
-
-    cout << "replaced: " << algorithm.getReplaced() << " nodes" << endl;
-    cout << "inserted: " << algorithm.getInserted() << " nodes" << endl;
-    cout << "found in closed: " << algorithm.getFoundInClosed() << " nodes" << endl;
-    cout << "pruned: " << algorithm.getPruned() << " nodes" << endl << endl;
+    #if DIAGNOSTICS_ASTAR
+        cout << "replaced: " << algorithm.getReplaced() << " nodes" << endl;
+        cout << "inserted: " << algorithm.getInserted() << " nodes" << endl;
+        cout << "found in closed: " << algorithm.getFoundInClosed() << " nodes" << endl;
+        cout << "pruned: " << algorithm.getPruned() << " nodes" << endl << endl;
+    #endif
 }

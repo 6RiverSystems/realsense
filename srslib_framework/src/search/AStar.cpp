@@ -53,11 +53,13 @@ void AStar::clear()
     // Clear the last search and the yield counter
     lastNode_ = nullptr;
 
-    // Reset the statistics counters
-    counterInserted_ = 0;
-    counterFoundInClosed_ = 0;
-    counterReplaced_ = 0;
-    counterPruned_ = 0;
+    #if DIAGNOSTICS_ASTAR
+        // Reset the statistics counters
+        counterInserted_ = 0;
+        counterFoundInClosed_ = 0;
+        counterReplaced_ = 0;
+        counterPruned_ = 0;
+    #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,7 +178,7 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
         cout << "-----------------------------------------------------------------------------------------------" << endl;
     #endif
 
-    for (int i = 0; i < nodes.size(); i++)
+    for (size_t i = 0; i < nodes.size(); i++)
     {
         SearchNode* node = nodes[i];
 
@@ -194,7 +196,9 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
                 // the new one
                 if (inOpenQueue->getTotalCost() > node->getTotalCost())
                 {
-                    counterReplaced_++;
+                    #if DIAGNOSTICS_ASTAR
+                        counterReplaced_++;
+                    #endif
 
                     openQueue_.erase(inOpenQueue);
                     inOpenQueue->release();
@@ -207,7 +211,9 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
                 }
                 else
                 {
-                    counterPruned_++;
+                    #if DIAGNOSTICS_ASTAR
+                        counterPruned_++;
+                    #endif
 
                     // If the latest node has a total cost that is greater
                     // than what we already have, delete the new node
@@ -221,7 +227,9 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
             }
             else
             {
-                counterInserted_++;
+                #if DIAGNOSTICS_ASTAR
+                    counterInserted_++;
+                #endif
 
                 // If the node is not in the open list
                 // add it right away
@@ -234,7 +242,9 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
         }
         else
         {
-            counterFoundInClosed_++;
+            #if DIAGNOSTICS_ASTAR
+                counterFoundInClosed_++;
+            #endif
 
             // If the node is already in the closed list, there
             // is no need to add it again. It can be removed

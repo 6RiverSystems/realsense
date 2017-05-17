@@ -21,6 +21,14 @@ export ROS_WORKSPACE=~/mfp_workspace
 
 cd "$ROS_WORKSPACE"
 
+pushd "$ROS_WORKSPACE/src"
+
+# Update all submodules
+git submodule init
+git submodule update --recursive
+
+popd
+
 sudo docker run \
     --rm \
     -v $PWD/$ROS_DISTRO-$ARCHITECTURE:/mfp_workspace \

@@ -14,4 +14,5 @@ export ROS_BUILD_IMAGE=6river/rosbuild-$ROS_DISTRO-$ARCH
 
 sudo docker run --rm -v /home/dan/mfp_workspace/$ROS_DISTRO-$ARCH:/mfp_workspace -v $PWD:/mfp_workspace/src -e CCACHE_DIR=/mfp_workspace/ccache -it $ROS_BUILD_IMAGE /bin/bash -C "/mfp_workspace/src/srsbot_chuck/scripts/build_all.sh"
 
-sudo chmod dan:dan -R ~/mfp_workspace/artifacts
+# Correct permissions from docker build
+sudo chown dan:dan -R ~/mfp_workspace

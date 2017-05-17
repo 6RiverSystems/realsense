@@ -55,14 +55,14 @@ sensor_msgs::LaserScan createLaserScan(float val)
 TEST(Test_Reflexes_HardStopReflex, Construction)
 {
     HardStopReflex hsr = setUpHSR();
-    ASSERT_FALSE(hsr.checkHardStop());
+    ASSERT_FALSE(hsr.checkHardStop(0));
     hsr.setLaserScan(createLaserScan(0.3), LaserScanType::LIDAR);
-    ASSERT_FALSE(hsr.checkHardStop());
+    ASSERT_FALSE(hsr.checkHardStop(0));
 
     // Clear the footprint and check again
     std::vector<Pose<>> footprint;
     hsr.setFootprint(footprint);
-    ASSERT_TRUE(hsr.checkHardStop());
+    ASSERT_TRUE(hsr.checkHardStop(0));
 }
 
 TEST(Test_Reflexes_HardStopReflex, ZeroVelocity)
@@ -72,7 +72,7 @@ TEST(Test_Reflexes_HardStopReflex, ZeroVelocity)
     hsr.setVelocity(Velocity<>(0.0, 0.0));
     hsr.setLaserScan(createLaserScan(1.3), LaserScanType::LIDAR);
 
-    ASSERT_FALSE(hsr.checkHardStop());
+    ASSERT_FALSE(hsr.checkHardStop(0));
 }
 
 TEST(Test_Reflexes_HardStopReflex, ForwardVelocity)
@@ -80,13 +80,13 @@ TEST(Test_Reflexes_HardStopReflex, ForwardVelocity)
     HardStopReflex hsr = setUpHSR();
     hsr.setVelocity(Velocity<>(0.1, 0.0));
     hsr.setLaserScan(createLaserScan(1.4), LaserScanType::LIDAR);
-    ASSERT_FALSE(hsr.checkHardStop());
+    ASSERT_FALSE(hsr.checkHardStop(0));
 
     hsr.setVelocity(Velocity<>(1.0, 0.0));
-    ASSERT_TRUE(hsr.checkHardStop());
+    ASSERT_TRUE(hsr.checkHardStop(0));
 
     hsr.setLaserScan(createLaserScan(5.0), LaserScanType::LIDAR);
-    ASSERT_FALSE(hsr.checkHardStop());
+    ASSERT_FALSE(hsr.checkHardStop(0));
 }
 
 TEST(Test_Reflexes_HardStopReflex, Arc)
@@ -95,10 +95,10 @@ TEST(Test_Reflexes_HardStopReflex, Arc)
     hsr.setVelocity(Velocity<>(1.0, 0.5));
 
     hsr.setLaserScan(createLaserScan(5.0), LaserScanType::LIDAR);
-    ASSERT_FALSE(hsr.checkHardStop());
+    ASSERT_FALSE(hsr.checkHardStop(0));
 
     hsr.setLaserScan(createLaserScan(0.75), LaserScanType::LIDAR);
-    ASSERT_TRUE(hsr.checkHardStop());
+    ASSERT_TRUE(hsr.checkHardStop(0));
 
 }
 
@@ -108,10 +108,10 @@ TEST(Test_Reflexes_HardStopReflex, TurnInPlace)
     hsr.setVelocity(Velocity<>(0.01, 0.5));
 
     hsr.setLaserScan(createLaserScan(5.0), LaserScanType::LIDAR);
-    ASSERT_FALSE(hsr.checkHardStop());
+    ASSERT_FALSE(hsr.checkHardStop(0));
 
     hsr.setLaserScan(createLaserScan(0.25), LaserScanType::LIDAR);
-    ASSERT_TRUE(hsr.checkHardStop());
+    ASSERT_TRUE(hsr.checkHardStop(0));
 
 }
 
@@ -120,10 +120,10 @@ TEST(Test_Reflexes_HardStopReflex, DifferentPose)
     HardStopReflex hsr = setUpHSR();
     hsr.setVelocity(Velocity<>(0.01, 0.0));
     hsr.setLaserScan(createLaserScan(1.3), LaserScanType::LIDAR);
-    ASSERT_FALSE(hsr.checkHardStop());
+    ASSERT_FALSE(hsr.checkHardStop(0));
 
     hsr.setPose(Pose<>(1.0, 0.0, 0.0));
-    ASSERT_TRUE(hsr.checkHardStop());
+    ASSERT_TRUE(hsr.checkHardStop(0));
 }
 
 TEST(Test_Reflexes_HardStopReflex, WildlyDifferentPose)
@@ -132,13 +132,13 @@ TEST(Test_Reflexes_HardStopReflex, WildlyDifferentPose)
     hsr.setPose(Pose<>(5, 5, -1.5));
     hsr.setVelocity(Velocity<>(0.01, 0.0));
     hsr.setLaserScan(createLaserScan(1.3), LaserScanType::LIDAR);
-    ASSERT_FALSE(hsr.checkHardStop());
+    ASSERT_FALSE(hsr.checkHardStop(0));
 
     hsr.setVelocity(Velocity<>(1.0, 0.0));
-    ASSERT_TRUE(hsr.checkHardStop());
+    ASSERT_TRUE(hsr.checkHardStop(0));
 
     hsr.setPose(Pose<>(1.0, 0.0, 0.0));
-    ASSERT_FALSE(hsr.checkHardStop());
+    ASSERT_FALSE(hsr.checkHardStop(0));
 }
 
 TEST(Test_Reflexes_HardStopReflex, MultipleChecksForTrigger)
@@ -149,10 +149,10 @@ TEST(Test_Reflexes_HardStopReflex, MultipleChecksForTrigger)
 
     hsr.setMaxConsecutiveDangerZoneViolations(2);
     // Hard stop should be true on try > 2;
-    ASSERT_FALSE(hsr.checkHardStop());
-    ASSERT_FALSE(hsr.checkHardStop());
-    ASSERT_TRUE(hsr.checkHardStop());
-    ASSERT_TRUE(hsr.checkHardStop());
+    ASSERT_FALSE(hsr.checkHardStop(0));
+    ASSERT_FALSE(hsr.checkHardStop(0));
+    ASSERT_TRUE(hsr.checkHardStop(0));
+    ASSERT_TRUE(hsr.checkHardStop(0));
 }
 
 TEST(Test_Reflexes_HardStopReflex, ClearStopCondition)
@@ -164,7 +164,7 @@ TEST(Test_Reflexes_HardStopReflex, ClearStopCondition)
 
     // Clearing the hard stop shouldn't happen before a hard stop has been set.
     ASSERT_FALSE(hsr.checkForClear());
-    ASSERT_TRUE(hsr.checkHardStop());
+    ASSERT_TRUE(hsr.checkHardStop(0));
 
     // Clearing the hard stop should not happen while the velocity is high.
     ASSERT_FALSE(hsr.checkForClear());
@@ -175,6 +175,19 @@ TEST(Test_Reflexes_HardStopReflex, ClearStopCondition)
 
     // Clear the hard stop should not happen twice in a row.
     ASSERT_FALSE(hsr.checkForClear());
+}
+
+TEST(Test_Reflexes_HardStopReflex, Timeout)
+{
+    HardStopReflex hsr = setUpHSR();
+    hsr.setVelocity(Velocity<>(0.1, 0.0));
+    hsr.setLaserScan(createLaserScan(1.4), LaserScanType::LIDAR);
+    ASSERT_FALSE(hsr.checkHardStop(0));
+
+    hsr.setVelocity(Velocity<>(1.0, 0.0));
+    ASSERT_TRUE(hsr.checkHardStop(0));
+    hsr.setScanTimeout(0.5);
+    ASSERT_FALSE(hsr.checkHardStop(0.55));
 }
 
 }

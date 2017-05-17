@@ -54,6 +54,11 @@ void Reflexes::readParams()
     {
     	hardStopReflex_.setAngularDecelerationRate(angRate);
     }
+    double scanTimeout = 0.0;
+    if (privateNh.getParam("hard_stop_reflex/scan_timeout", scanTimeout))
+    {
+        hardStopReflex_.setScanTimeout(scanTimeout);
+    }
     int maxDZViolations = 0;
     if (privateNh.getParam("hard_stop_reflex/max_consecutive_danger_zone_violations", maxDZViolations))
     {
@@ -123,7 +128,7 @@ void Reflexes::execute()
     srs::ScopedTimingSampleRecorder stsr(tdr_.getRecorder("-Loop"));
 
     // Update robot position
-    hardStopReflex_.setPose(tapRobotPose_.peek());
+    hardStopReflex_.setPose(tapRobotPose_.pop());
 
     // Update brainstem connected state
     brainstemConnected_ = tapBrainstemConnected_.pop();
@@ -164,7 +169,7 @@ void Reflexes::execute()
     if (brainstemConnected_)
     {
 		// Call for hard stop check.
-		if (hardStopReflex_.checkHardStop() || headOnCollisionReflex_.checkHardStop())
+		if (hardStopReflex_.checkHardStop(ros::Time::now().toSec()) || headOnCollisionReflex_.checkHardStop())
 		{
 			srslib_framework::MsgSetOperationalState setOperationalState;
 			setOperationalState.state = true;

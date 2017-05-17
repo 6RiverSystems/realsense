@@ -95,9 +95,10 @@ public:
     /**
      * Check to see if a hard stop should be triggered.
      * Also sets a flag if hard stop was needed.
+     * @param checkTime the time that the check is occuring
      * @return true if a hard stop should be triggered.
      */
-    bool checkHardStop();
+    bool checkHardStop(double checkTime);
 
     /**
      * Check to see if the hard stop should be cleared.
@@ -151,6 +152,15 @@ public:
     };
 
     /**
+     * Set the timeout on scans.  If a scan is older, ignore it
+     * @param timeout the timeout
+     */
+    void setScanTimeout(double timeout)
+    {
+        scanTimeout_ = timeout;
+    };
+
+    /**
      * Sets the number of times the danger zone must be violated consecutively to trigger a hard stop.
      * @param val the limit
      */
@@ -178,9 +188,10 @@ public:
 private:
     /**
      * Determine if the danger zone has been violated
+     * @param checkTime the time that the check is occuring
      * @return true if a hard stop is appropriate
      */
-    bool checkForDangerZoneViolation();
+    bool checkForDangerZoneViolation(double checkTime);
 
     /**
      * Update the danger zone with the latest velocity data.
@@ -229,6 +240,7 @@ private:
         tf::Transform pose = tf::Transform::getIdentity();
         clPath scan;
         bool enabled = true;
+        double receivedTime = 0;
     };
 
     Pose<> latestPose_ = Pose<>::INVALID;
@@ -236,6 +248,8 @@ private:
 
     double nominalDecelRate_ = 0.7;  // m/s^2
     double angularDecelRate_ = 1.0;  // r/s^2
+
+    double scanTimeout_ = 0.25; // s
 
     uint32_t numBadPointsForViolation_ = 2;
 

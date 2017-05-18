@@ -14,7 +14,7 @@ using namespace std;
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_timing/StopWatch.hpp>
-#include <srslib_framework/search/AStar.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackAStar.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
 using namespace srs;
@@ -32,12 +32,10 @@ TEST(Test_AStar_MapStack_Barrett, BigSearch)
     // Pose {@: 1.4686e+09, x: 14.0, y: 10.0, t: 1.53943} (140, 100, 90)
     // and
     // Pose {@: 1.4686e+09, x: 73.0, y: 178.0, t: 1.5708} (730, 1780, 90)
-    Position startPosition(140, 100, 90);
-    Position goalPosition(730, 1780, 90);
+    Position start(140, 100, 90);
+    Position goal(730, 1780, 90);
 
-    AStar algorithm;
-    MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
-    MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
+    MapStackAStar algorithm(mapStack);
 
     StopWatch timer;
 

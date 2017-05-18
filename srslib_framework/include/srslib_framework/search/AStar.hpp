@@ -29,7 +29,7 @@ public:
     static constexpr int CLOSED_HASH_RESERVE = 400000;
 
     AStar();
-    ~AStar();
+    virtual ~AStar();
 
     void clear();
 

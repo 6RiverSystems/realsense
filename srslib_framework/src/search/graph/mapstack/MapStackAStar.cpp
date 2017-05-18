@@ -23,6 +23,7 @@ MapStackAStar::MapStackAStar(MapStack* stack, const MapStackSearchParameters& se
 
 MapStackAStar::~MapStackAStar()
 {
+    clear();
     startNode_->release();
 }
 

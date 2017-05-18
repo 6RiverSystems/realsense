@@ -10,15 +10,14 @@
 #include <iomanip>
 using namespace std;
 
-#include <srslib_framework/search/SearchNode.hpp>
-
 namespace srs {
 
-class Plan : public list<SearchNode*>
+template <typename NODETYPE>
+class Plan : public list<NODETYPE*>
 {
 public:
     Plan() :
-        list<SearchNode*>(),
+        list<NODETYPE*>(),
         closedNodesCount_(0),
         openNodesCount_(0),
         totalCost_(0),
@@ -27,7 +26,7 @@ public:
 
     void clear()
     {
-        list<SearchNode*>::clear();
+        list<NODETYPE*>::clear();
 
         closedNodesCount_ = 0;
         openNodesCount_ = 0;
@@ -39,9 +38,9 @@ public:
         return closedNodesCount_;
     }
 
-    SearchNode* getGoal() const
+    NODETYPE* getGoal() const
     {
-        return list<SearchNode*>::back();
+        return list<NODETYPE*>::back();
     }
 
     unsigned int getOpenNodesCount() const
@@ -49,9 +48,9 @@ public:
         return openNodesCount_;
     }
 
-    SearchNode* getStart() const
+    NODETYPE* getStart() const
     {
-        return list<SearchNode*>::front();
+        return list<NODETYPE*>::front();
     }
 
     int getTotalCost() const

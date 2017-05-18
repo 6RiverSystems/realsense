@@ -12,23 +12,26 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-AStar::AStar()
+template <typename NODETYPE>
+AStar<NODETYPE>::AStar()
 {
     closedSet_.reserve(CLOSED_HASH_RESERVE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-AStar::~AStar()
+template <typename NODETYPE>
+AStar<NODETYPE>::~AStar()
 {
     clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void AStar::clear()
+template <typename NODETYPE>
+void AStar<NODETYPE>::clear()
 {
     // Pop all the nodes out of the priority queue and
     // release them
-    SearchNode* node = nullptr;
+    NODETYPE* node = nullptr;
     while (!openQueue_.empty())
     {
         openQueue_.pop(node);
@@ -63,7 +66,8 @@ void AStar::clear()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void AStar::getPlan(Plan& plan)
+template <typename NODETYPE>
+void AStar<NODETYPE>::getPlan(Plan<NODETYPE>& plan)
 {
     plan.clear();
 
@@ -74,7 +78,7 @@ void AStar::getPlan(Plan& plan)
 
     // Explore the tree backward to
     // reconstruct the solution
-    SearchNode* node = lastNode_;
+    NODETYPE* node = lastNode_;
     while (node)
     {
         plan.push_front(node);
@@ -83,7 +87,8 @@ void AStar::getPlan(Plan& plan)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool AStar::search(SearchNode* start, SearchGoal* goal)
+template <typename NODETYPE>
+bool AStar<NODETYPE>::search(NODETYPE* start, SearchGoal<NODETYPE>* goal)
 {
     // Do not execute any search without complete information
     if (!start || !goal)
@@ -102,9 +107,9 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
     // Add the starting node to the open queue
     openQueue_.push(startNode_->getTotalCost(), startNode_);
 
-    vector<SearchNode*> nextSearchNodes;
+    vector<NODETYPE*> nextSearchNodes;
 
-    SearchNode* currentNode = nullptr;
+    NODETYPE* currentNode = nullptr;
     while (!openQueue_.empty())
     {
         #if DEBUG_ASTAR
@@ -141,7 +146,7 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
 
         // Collect all the valid next states from
         // from the current node
-        currentNode->getExploredNodes(nextSearchNodes);
+        getExploredNodes(currentNode, nextSearchNodes);
 
         #if DEBUG_ASTAR
             cout << "NEXT ------------------------------------------------------------------------------------------" << endl;
@@ -163,7 +168,8 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void AStar::pushNodes(vector<SearchNode*>& nodes)
+template <typename NODETYPE>
+void AStar<NODETYPE>::pushNodes(vector<NODETYPE*>& nodes)
 {
     #if DEBUG_ASTAR
         cout << "OPEN ------------------------------------------------------------------------------------------" << endl;
@@ -180,7 +186,7 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
 
     for (size_t i = 0; i < nodes.size(); i++)
     {
-        SearchNode* node = nodes[i];
+        NODETYPE* node = nodes[i];
 
         #if DEBUG_ASTAR
             cout << "Evaluating: " << *node;
@@ -188,7 +194,7 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
 
         if (closedSet_.find(node) == closedSet_.end())
         {
-            SearchNode* inOpenQueue = openQueue_.find(node);
+            NODETYPE* inOpenQueue = openQueue_.find(node);
             if (inOpenQueue)
             {
                 // If the total cost of the node is greater than the

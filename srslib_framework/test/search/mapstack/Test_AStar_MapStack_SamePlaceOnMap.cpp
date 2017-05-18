@@ -31,7 +31,7 @@ TEST(Test_AStar_MapStack_SamePlaceOnMap, SamePositionOnMap)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    Plan plan;
+    Plan<MapStackNode> plan;
     algorithm.getPlan(plan);
     cout << plan << endl;
 
@@ -56,7 +56,7 @@ TEST(Test_AStar_MapStack_SamePlaceOnMap, SameLocationOnMap)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    Plan plan;
+    Plan<MapStackNode> plan;
     algorithm.getPlan(plan);
     cout << plan << endl;
 

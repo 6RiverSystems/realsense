@@ -40,7 +40,7 @@ TEST(Test_AStar_MapStack_Unknown, AllowUnknown)
 {
     MapStack* mapStack = generateMapStackWithUnknown();
 
-    MapStackAStar::SearchParameters searchParams;
+    MapStackSearchParameters searchParams;
     searchParams.allowUnknown = true;
 
     MapStackAStar algorithm(mapStack, searchParams);
@@ -51,7 +51,7 @@ TEST(Test_AStar_MapStack_Unknown, AllowUnknown)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    Plan plan;
+    Plan<MapStackNode> plan;
     algorithm.getPlan(plan);
     cout << plan << endl;
 
@@ -65,7 +65,7 @@ TEST(Test_AStar_MapStack_Unknown, NotAllowUnknown)
 {
     MapStack* mapStack = generateMapStackWithUnknown();
 
-    MapStackAStar::SearchParameters searchParams;
+    MapStackSearchParameters searchParams;
     searchParams.allowUnknown = false;
 
     MapStackAStar algorithm(mapStack, searchParams);

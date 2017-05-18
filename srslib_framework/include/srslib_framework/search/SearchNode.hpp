@@ -10,7 +10,7 @@
 using namespace std;
 
 namespace srs {
-
+/*
 struct SearchGoal;
 
 struct SearchNode
@@ -60,5 +60,5 @@ struct SearchNode
         }
     };
 };
-
+*/
 } // namespace srs

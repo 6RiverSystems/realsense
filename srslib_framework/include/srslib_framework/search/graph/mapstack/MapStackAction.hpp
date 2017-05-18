@@ -12,11 +12,11 @@
 using namespace std;
 
 #include <srslib_framework/localization/map/MapStack.hpp>
-#include <srslib_framework/search/SearchGoal.hpp>
 
 namespace srs {
 
 struct MapStackNode;
+struct MapStackSearchParameters;
 
 class MapStackAction
 {
@@ -29,9 +29,9 @@ public:
         START
     };
 
-    static MapStackNode* exploreBackward(MapStack* stack, MapStackNode* fromNode);
-    static MapStackNode* exploreForward(MapStack* stack, MapStackNode* fromNode);
-    static MapStackNode* exploreRotation(MapStack* stack, MapStackNode* fromNode,
+    static MapStackNode* exploreBackward(MapStack* stack, const MapStackSearchParameters& searchParameters, MapStackNode* fromNode);
+    static MapStackNode* exploreForward(MapStack* stack, const MapStackSearchParameters& searchParameters, MapStackNode* fromNode);
+    static MapStackNode* exploreRotation(MapStack* stack, const MapStackSearchParameters& searchParameters, MapStackNode* fromNode,
         ActionEnum action, int angle);
 
     friend ostream& operator<<(ostream& stream, const ActionEnum& action)
@@ -49,6 +49,7 @@ private:
     static constexpr int COMMAND_COSTS_LENGTH = 8;
 
     static unordered_map<int, string> ENUM_NAMES;
+
     static const int COMMAND_COSTS[ActionEnum::START + 1];
 };
 

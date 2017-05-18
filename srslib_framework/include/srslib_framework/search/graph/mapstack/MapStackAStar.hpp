@@ -7,38 +7,30 @@
 
 #include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/search/AStar.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
 
 namespace srs {
 
 class MapStack;
 
 class MapStackAStar :
-    public AStar
+    public AStar<MapStackNode>
 {
 public:
 
-    struct SearchParameters
-    {
-        SearchParameters() :
-            allowUnknown(false),
-            costMapRatio(1.0)
-        {}
-
-        bool allowUnknown;
-        float costMapRatio;
-    };
-
-    MapStackAStar(MapStack* stack, const SearchParameters& searchParameters = {});
+    MapStackAStar(MapStack* stack, const MapStackSearchParameters& searchParameters = {});
     ~MapStackAStar();
 
     bool search(const Position& start, const Position& goal);
 
-    bool goalReached( );
-    
+protected:
+
+    virtual void getExploredNodes(MapStackNode*, std::vector<MapStackNode*>& ) final;
+
 private:
 
-    MapStack*           stack_              { nullptr };
-    SearchParameters    searchParameters_   { };
+    MapStack*                   stack_              { nullptr };
+    MapStackSearchParameters    searchParameters_   { };
 
 };
 

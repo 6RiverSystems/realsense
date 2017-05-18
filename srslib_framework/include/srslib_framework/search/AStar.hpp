@@ -13,10 +13,11 @@ using namespace std;
 
 #include <srslib_framework/datastructure/queue/MappedPriorityQueue.hpp>
 #include <srslib_framework/search/Plan.hpp>
-#include <srslib_framework/search/SearchNode.hpp>
+#include <srslib_framework/search/SearchGoal.hpp>
 
 namespace srs {
 
+template <typename NODETYPE>
 class AStar
 {
 public:
@@ -43,7 +44,7 @@ public:
         return openQueue_.size();
     }
 
-    void getPlan(Plan& plan);
+    void getPlan(Plan<NODETYPE>& plan);
 
     #if DIAGNOSTICS_ASTAR
 
@@ -74,14 +75,15 @@ public:
         return lastNode_;
     }
 
-    bool search(SearchNode* start, SearchGoal* goal);
+    bool search(NODETYPE* start, SearchGoal<NODETYPE>* goal);
 
-private:
-    using ClosedSetType = unordered_set<SearchNode*, SearchNode::Hash, SearchNode::EqualTo>;
-    using OpenSetType = MappedPriorityQueue<SearchNode*, unsigned int,
-        SearchNode::Hash, SearchNode::EqualTo>;
+protected:
+    using ClosedSetType = unordered_set<NODETYPE*, typename NODETYPE::Hash, typename NODETYPE::EqualTo>;
+    using OpenSetType = MappedPriorityQueue<NODETYPE*, unsigned int, typename NODETYPE::Hash, typename NODETYPE::EqualTo>;
 
-    void pushNodes(vector<SearchNode*>& nodes);
+    void pushNodes(vector<NODETYPE*>& nodes);
+
+    virtual void getExploredNodes(NODETYPE*, std::vector<NODETYPE*>& ) = 0;
 
     #if DIAGNOSTICS_ASTAR
         unsigned int counterFoundInClosed_  { 0 };
@@ -90,9 +92,9 @@ private:
         unsigned int counterReplaced_       { 0 };
     #endif
 
-    SearchNode* lastNode_                   { nullptr };
+    NODETYPE* lastNode_                     { nullptr };
 
-    SearchNode* startNode_                  { nullptr };
+    NODETYPE* startNode_                    { nullptr };
 
     ClosedSetType closedSet_                { };
 

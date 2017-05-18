@@ -50,7 +50,7 @@ TEST(Test_AStar_MapStack_Basic, SmallSearchOnEmptyGrid)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    Plan plan;
+    Plan<MapStackNode> plan;
     algorithm.getPlan(plan);
     cout << plan << endl;
 
@@ -72,7 +72,7 @@ TEST(Test_AStar_MapStack_Basic, Corner2CornerSearchOnEmptyGrid)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    Plan plan;
+    Plan<MapStackNode> plan;
     algorithm.getPlan(plan);
     cout << plan << endl;
 
@@ -94,7 +94,7 @@ TEST(Test_AStar_MapStack_Basic, SearchAroundObstacle)
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    Plan plan;
+    Plan<MapStackNode> plan;
     algorithm.getPlan(plan);
     cout << plan << endl;
 

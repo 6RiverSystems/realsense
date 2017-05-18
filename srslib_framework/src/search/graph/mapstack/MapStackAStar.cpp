@@ -7,10 +7,15 @@
 #include <srslib_framework/search/graph/mapstack/MapStackAStar.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackAction.hpp>
+
+#include "../../AStar.cpp"
 
 namespace srs {
 
-MapStackAStar::MapStackAStar(MapStack* stack, const SearchParameters& searchParameters) :
+template class AStar<MapStackNode>;
+
+MapStackAStar::MapStackAStar(MapStack* stack, const MapStackSearchParameters& searchParameters) :
     stack_{ stack },
     searchParameters_{ searchParameters }
 {
@@ -18,21 +23,44 @@ MapStackAStar::MapStackAStar(MapStack* stack, const SearchParameters& searchPara
 
 MapStackAStar::~MapStackAStar()
 {
-    delete startNode_;
+    startNode_->release();
 }
 
 bool MapStackAStar::search(const Position& start, const Position& goal)
 {
-    MapStackNode::SearchParameters searchParams;
-
-    searchParams.allowUnknown = searchParameters_.allowUnknown;
-    searchParams.costMapRatio = searchParameters_.costMapRatio;
-
-    MapStackNode* startNode = MapStackNode::instanceOfStart(stack_, start, searchParams);
+    MapStackNode* startNode = MapStackNode::instanceOfStart(stack_, start, searchParameters_);
 
     MapStackSingleGoal* goalNode = MapStackSingleGoal::instanceOf(goal);
 
-    return AStar::search(startNode, goalNode);
+    bool ret = AStar::search(startNode, goalNode);
+
+    goalNode->release();
+
+    return ret;
+}
+
+void MapStackAStar::getExploredNodes(MapStackNode* node, std::vector<MapStackNode*>& nextNodes)
+{
+    // Find if the next action is allowed
+    MapStackNode* neighborNode = MapStackAction::exploreForward(stack_, searchParameters_, node);
+    if (neighborNode)
+    {
+        nextNodes.push_back(neighborNode);
+    }
+
+    // Find if the next action is allowed
+    neighborNode = MapStackAction::exploreRotation(stack_, searchParameters_, node, MapStackAction::ROTATE_N90, -90);
+    if (neighborNode)
+    {
+        nextNodes.push_back(neighborNode);
+    }
+
+    // Find if the next action is allowed
+    neighborNode = MapStackAction::exploreRotation(stack_, searchParameters_, node, MapStackAction::ROTATE_P90, +90);
+    if (neighborNode)
+    {
+        nextNodes.push_back(neighborNode);
+    }
 }
 
 } // namespace srs

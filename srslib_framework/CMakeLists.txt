@@ -41,7 +41,6 @@ set(${PROJECT_NAME}_SOURCES
 
     src/ros/message/LogicalMapMessageFactory.cpp
 
-    src/search/AStar.cpp
     src/search/graph/mapstack/MapStackAStar.cpp
     src/search/graph/mapstack/MapStackAction.cpp
     src/search/graph/mapstack/MapStackNode.cpp

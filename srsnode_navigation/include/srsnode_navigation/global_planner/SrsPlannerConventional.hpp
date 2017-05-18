@@ -56,7 +56,7 @@ private:
     ChannelRosPath channelRosPath_;
     dynamic_reconfigure::Server<srsnode_navigation::SrsPlannerConfig>* configServer_;
 
-    MapStackNode::SearchParameters nodeSearchParameters_;
+    MapStackSearchParameters nodeSearchParameters_;
 
     MapStack* srsMapStack_;
 

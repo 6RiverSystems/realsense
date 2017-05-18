@@ -184,10 +184,8 @@ void AStar<NODETYPE>::pushNodes(vector<NODETYPE*>& nodes)
         cout << "-----------------------------------------------------------------------------------------------" << endl;
     #endif
 
-    for (size_t i = 0; i < nodes.size(); i++)
+    for (auto node : nodes)
     {
-        NODETYPE* node = nodes[i];
-
         #if DEBUG_ASTAR
             cout << "Evaluating: " << *node;
         #endif

@@ -84,6 +84,7 @@ protected:
     void pushNodes(vector<NODETYPE*>& nodes);
 
     virtual void getExploredNodes(NODETYPE*, std::vector<NODETYPE*>& ) = 0;
+    virtual void releaseNode(NODETYPE*) = 0;
 
     #if DIAGNOSTICS_ASTAR
         unsigned int counterFoundInClosed_  { 0 };

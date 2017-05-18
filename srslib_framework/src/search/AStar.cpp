@@ -37,7 +37,7 @@ void AStar<NODETYPE>::clear()
         openQueue_.pop(node);
         if (node != startNode_)
         {
-            node->release();
+            releaseNode(node);
         }
     }
 
@@ -48,7 +48,7 @@ void AStar<NODETYPE>::clear()
     {
         if (node != startNode_)
         {
-            node->release();
+            releaseNode(node);
         }
     }
     closedSet_.clear();
@@ -207,7 +207,7 @@ void AStar<NODETYPE>::pushNodes(vector<NODETYPE*>& nodes)
                     #endif
 
                     openQueue_.erase(inOpenQueue);
-                    inOpenQueue->release();
+                    releaseNode(inOpenQueue);
 
                     openQueue_.push(node->getTotalCost(), node);
 
@@ -224,7 +224,7 @@ void AStar<NODETYPE>::pushNodes(vector<NODETYPE*>& nodes)
                     // If the latest node has a total cost that is greater
                     // than what we already have, delete the new node
                     // and do not do anything else
-                    node->release();
+                    releaseNode(node);
 
                     #if DEBUG_ASTAR
                         cout << endl << "Worse solution: pruned (freed)" << endl;
@@ -254,7 +254,7 @@ void AStar<NODETYPE>::pushNodes(vector<NODETYPE*>& nodes)
 
             // If the node is already in the closed list, there
             // is no need to add it again. It can be removed
-            node->release();
+            releaseNode(node);
 
             #if DEBUG_ASTAR
                 cout << endl << "In the closed list: pruned (freed)" << endl;

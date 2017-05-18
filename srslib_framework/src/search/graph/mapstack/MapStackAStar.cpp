@@ -39,6 +39,11 @@ bool MapStackAStar::search(const Position& start, const Position& goal)
     return ret;
 }
 
+void MapStackAStar::releaseNode(MapStackNode* node)
+{
+	node->release();
+}
+
 void MapStackAStar::getExploredNodes(MapStackNode* node, std::vector<MapStackNode*>& nextNodes)
 {
     // Find if the next action is allowed

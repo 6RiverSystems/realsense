@@ -26,6 +26,7 @@ public:
 protected:
 
     virtual void getExploredNodes(MapStackNode*, std::vector<MapStackNode*>& ) final;
+    virtual void releaseNode(MapStackNode*) final;
 
 private:
 

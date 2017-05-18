@@ -5,8 +5,6 @@
  */
 #pragma once
 
-#include <srslib_framework/search/SearchNode.hpp>
-
 namespace srs {
 
 template <typename SEARCHNODE>

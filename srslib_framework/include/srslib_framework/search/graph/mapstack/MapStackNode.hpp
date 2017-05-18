@@ -10,7 +10,6 @@ using namespace std;
 
 #include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/search/SearchGoal.hpp>
-#include <srslib_framework/search/SearchNode.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackAction.hpp>
 
 namespace srs {

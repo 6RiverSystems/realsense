@@ -31,8 +31,7 @@ struct MapStackNode
     {
         constexpr bool operator()(const MapStackNode* lhs, const MapStackNode* rhs) const
         {
-            return lhs == rhs ||
-                lhs->position_ == rhs->position_;
+            return lhs->ehash_ == rhs->ehash_;
         }
     };
 
@@ -40,7 +39,7 @@ struct MapStackNode
     {
         size_t operator()(const MapStackNode*node) const
         {
-            return node->position_.hash();
+            return node->ehash_;
         }
     };
 
@@ -146,8 +145,10 @@ protected:
         h_(h),
         parentNode_(parentNode),
         parentAction_(parentAction),
-        goal_(goal)
-    {}
+        goal_(goal),
+        ehash_((position_.location.x * 65536LL + position_.location.y) * 360 + position_.orientation)
+    {
+    }
 
     ~MapStackNode()
     {}
@@ -160,6 +161,7 @@ private:
     MapStackNode*               parentNode_     { nullptr };
     MapStackAction::ActionEnum  parentAction_   { MapStackAction::NONE };
     SearchGoal<MapStackNode>*   goal_           { nullptr };
+    size_t                      ehash_          { 0 };
 };
 
 } // namespace srs

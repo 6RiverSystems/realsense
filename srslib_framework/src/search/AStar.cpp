@@ -195,10 +195,10 @@ void AStar<NODETYPE>::pushNodes(vector<NODETYPE*>& nodes)
             NODETYPE* inOpenQueue = openQueue_.find(node);
             if (inOpenQueue)
             {
-                // If the total cost of the node is greater than the
+                // If the local cost of the node is greater than the
                 // latest found node, remove the old one and insert
                 // the new one
-                if (inOpenQueue->getTotalCost() > node->getTotalCost())
+                if (inOpenQueue->getLocalCost() > node->getLocalCost())
                 {
                     #if DIAGNOSTICS_ASTAR
                         counterReplaced_++;
@@ -219,7 +219,7 @@ void AStar<NODETYPE>::pushNodes(vector<NODETYPE*>& nodes)
                         counterPruned_++;
                     #endif
 
-                    // If the latest node has a total cost that is greater
+                    // If the latest node has a local cost that is greater
                     // than what we already have, delete the new node
                     // and do not do anything else
                     releaseNode(node);

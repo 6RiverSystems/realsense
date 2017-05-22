@@ -13,13 +13,14 @@ using namespace std;
 
 namespace srs {
 
-class GradientPath : public Traceback
+class GradientPath :
+    public Traceback
 {
     public:
         GradientPath(PotentialCalculator* p_calc);
         ~GradientPath();
 
-        void setSize(int xs, int ys);
+        virtual void setSize(int xs, int ys) override;
 
         //
         // Path construction
@@ -31,7 +32,7 @@ class GradientPath : public Traceback
         //  2. Doesn't get near goal
         //  3. Surrounded by high potentials
         //
-        bool getPath(float* potential, double start_x, double start_y, double end_x, double end_y, std::vector<std::pair<float, float> >& path);
+        virtual bool getPath(float* potential, double start_x, double start_y, double end_x, double end_y, std::vector<std::pair<float, float> >& path) override;
     private:
         inline int getNearestPoint(int stc, float dx, float dy)
         {

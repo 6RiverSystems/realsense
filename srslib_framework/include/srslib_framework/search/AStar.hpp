@@ -13,10 +13,11 @@ using namespace std;
 
 #include <srslib_framework/datastructure/queue/MappedPriorityQueue.hpp>
 #include <srslib_framework/search/Plan.hpp>
-#include <srslib_framework/search/SearchNode.hpp>
+#include <srslib_framework/search/SearchGoal.hpp>
 
 namespace srs {
 
+template <typename NODETYPE>
 class AStar
 {
 public:
@@ -29,7 +30,7 @@ public:
     static constexpr int CLOSED_HASH_RESERVE = 400000;
 
     AStar();
-    ~AStar();
+    virtual ~AStar();
 
     void clear();
 
@@ -43,53 +44,62 @@ public:
         return openQueue_.size();
     }
 
-    void getPlan(Plan& plan);
+    void getPlan(Plan<NODETYPE>& plan);
 
-    unsigned int getFoundInClosed() const
-    {
-        return counterFoundInClosed_;
-    }
+    #if DIAGNOSTICS_ASTAR
 
-    unsigned int getInserted() const
-    {
-        return counterInserted_;
-    }
+        unsigned int getFoundInClosed() const
+        {
+            return counterFoundInClosed_;
+        }
 
-    unsigned int getPruned() const
-    {
-        return counterPruned_;
-    }
+        unsigned int getInserted() const
+        {
+            return counterInserted_;
+        }
 
-    unsigned int getReplaced() const
-    {
-        return counterReplaced_;
-    }
+        unsigned int getPruned() const
+        {
+            return counterPruned_;
+        }
+
+        unsigned int getReplaced() const
+        {
+            return counterReplaced_;
+        }
+
+    #endif
 
     bool hasSolution() const
     {
         return lastNode_;
     }
 
-    bool search(SearchNode* start, SearchGoal* goal);
+    bool search(NODETYPE* start, SearchGoal<NODETYPE>* goal);
 
-private:
-    using ClosedSetType = unordered_set<SearchNode*, SearchNode::Hash, SearchNode::EqualTo>;
-    using OpenSetType = MappedPriorityQueue<SearchNode*, unsigned int,
-        SearchNode::Hash, SearchNode::EqualTo>;
+protected:
+    using ClosedSetType = unordered_set<NODETYPE*, typename NODETYPE::Hash, typename NODETYPE::EqualTo>;
+    using OpenSetType = MappedPriorityQueue<NODETYPE*, unsigned int, typename NODETYPE::Hash, typename NODETYPE::EqualTo>;
 
-    void pushNodes(vector<SearchNode*>& nodes);
+    void pushNodes(vector<NODETYPE*>& nodes);
 
-    ClosedSetType closedSet_;
-    unsigned int counterFoundInClosed_;
-    unsigned int counterInserted_;
-    unsigned int counterPruned_;
-    unsigned int counterReplaced_;
+    virtual void getExploredNodes(NODETYPE*, std::vector<NODETYPE*>& ) = 0;
+    virtual void releaseNode(NODETYPE*) = 0;
 
-    SearchNode* lastNode_;
+    #if DIAGNOSTICS_ASTAR
+        unsigned int counterFoundInClosed_  { 0 };
+        unsigned int counterInserted_       { 0 };
+        unsigned int counterPruned_         { 0 };
+        unsigned int counterReplaced_       { 0 };
+    #endif
 
-    OpenSetType openQueue_;
+    NODETYPE* lastNode_                     { nullptr };
 
-    SearchNode* startNode_;
+    NODETYPE* startNode_                    { nullptr };
+
+    ClosedSetType closedSet_                { };
+
+    OpenSetType openQueue_                  { };
 };
 
 } // namespace srs

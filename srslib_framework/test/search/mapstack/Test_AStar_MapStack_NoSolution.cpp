@@ -14,7 +14,7 @@ using namespace std;
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMapFactory.hpp>
-#include <srslib_framework/search/AStar.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackAStar.hpp>
 #include <srslib_framework/search/Plan.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
@@ -33,13 +33,10 @@ TEST(Test_AStar_MapStack_NoSolution, NoSolution)
 
     MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
 
-    AStar algorithm;
+    MapStackAStar algorithm(mapStack);
 
-    Position startPosition(0, 0, 0);
-    MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
-
-    Position goalPosition(1, 1, 0);
-    MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
+    Position start(0, 0, 0);
+    Position goal(1, 1, 0);
 
     ASSERT_FALSE(algorithm.search(start, goal)) <<
         "A solution was found";
@@ -57,13 +54,10 @@ TEST(Test_AStar_MapStack_NoSolution, ForbiddenGoal)
 
     MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
 
-    AStar algorithm;
+    MapStackAStar algorithm(mapStack);
 
-    Position startPosition(0, 0, 0);
-    MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
-
-    Position goalPosition(GRID_SIZE - 1, 0, 0);
-    MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
+    Position start(0, 0, 0);
+    Position goal(GRID_SIZE - 1, 0, 0);
 
     ASSERT_FALSE(algorithm.search(start, goal)) <<
         "A solution was found";
@@ -81,13 +75,10 @@ TEST(Test_AStar_MapStack_NoSolution, UnreachableGoal)
 
     MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
 
-    AStar algorithm;
+    MapStackAStar algorithm(mapStack);
 
-    Position startPosition(0, 0, 0);
-    MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
-
-    Position goalPosition(GRID_SIZE - 1, 0, 0);
-    MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
+    Position start(0, 0, 0);
+    Position goal(GRID_SIZE - 1, 0, 0);
 
     ASSERT_FALSE(algorithm.search(start, goal)) <<
         "A solution was found";

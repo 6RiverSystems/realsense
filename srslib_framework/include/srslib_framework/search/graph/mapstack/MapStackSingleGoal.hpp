@@ -11,29 +11,29 @@
 
 namespace srs {
 
-struct MapStackSingleGoal : public SearchGoal
+struct MapStackSingleGoal : public SearchGoal<MapStackNode>
 {
     static MapStackSingleGoal* instanceOf(Position position)
     {
         return new MapStackSingleGoal(position);
     }
 
-    int heuristic(const SearchNode* node) const
+    virtual int heuristic(const MapStackNode* node) const final
     {
-        return heuristic((reinterpret_cast<const MapStackNode*>(node))->getPosition());
+        return heuristic(node->getPosition());
     }
 
-    bool reached(const SearchNode* node) const
+    virtual bool reached(const MapStackNode* node) const final
     {
-        return goalPosition_ == reinterpret_cast<const MapStackNode*>(node)->getPosition();
+        return goalPosition_ == node->getPosition();
     }
 
-    void release()
+    virtual void release() final
     {
         delete this;
     }
 
-    ostream& toString(ostream& stream) const
+    virtual ostream& toString(ostream& stream) const final
     {
         return stream << hex << reinterpret_cast<const void*>(this) << dec << " {"
             "p: " << goalPosition_ <<
@@ -41,14 +41,14 @@ struct MapStackSingleGoal : public SearchGoal
     }
 
 private:
-    MapStackSingleGoal(Position position) :
+    MapStackSingleGoal(const Position& position) :
         goalPosition_(position)
     {}
 
     ~MapStackSingleGoal()
     {}
 
-    int heuristic(Position toPosition) const
+    int heuristic(const Position& toPosition) const
     {
         return abs(goalPosition_.location.x - toPosition.location.x) +
             abs(goalPosition_.location.y - toPosition.location.y);

@@ -45,6 +45,20 @@ struct AngleMath
     }
 
     /**
+     * @brief Convert radians to degrees.
+     *
+     * @tparam TYPE Basic type of the operation
+     * @param rad Angle to convert [radians]
+     *
+     * @return converted angle [degrees]
+     */
+    template<typename TYPE = double>
+    constexpr inline static TYPE rad2Deg(TYPE rad)
+    {
+        return rad * TYPE(180) / TYPE(M_PI);
+    }
+
+    /**
      * @brief Normalize the specified angle to a [0, 360) range.
      *
      * @tparam TYPE Basic type of the operation
@@ -132,20 +146,6 @@ struct AngleMath
     inline static double normalizeRad2Rad90(double rad)
     {
         return AngleMath::deg2Rad<double>(AngleMath::normalizeRad2Deg90(rad));
-    }
-
-    /**
-     * @brief Convert radians to degrees.
-     *
-     * @tparam TYPE Basic type of the operation
-     * @param rad Angle to convert [radians]
-     *
-     * @return converted angle [degrees]
-     */
-    template<typename TYPE = double>
-    constexpr inline static TYPE rad2Deg(TYPE rad)
-    {
-        return rad * TYPE(180) / TYPE(M_PI);
     }
 };
 

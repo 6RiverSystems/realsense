@@ -46,6 +46,8 @@ public:
         data_ = TYPE();
     }
 
+    using Subscriber<MESSAGE>::set;
+
     virtual void set(TYPE data)
     {
         Subscriber<MESSAGE>::set();

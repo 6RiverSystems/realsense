@@ -25,18 +25,7 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-SrsPlannerPotentials::SrsPlannerPotentials() :
-    srsMapStack_(nullptr),
-    costMap_(nullptr),
-    initialized_(false),
-    astar_(nullptr),
-    useQuadratic_(true),
-    useGridPath_(true),
-    allowUnknown_(true),
-    publishPotential_(true),
-    lethalCost_(253),
-    neutralCost_(50),
-    goalShiftDistance_(0.0)
+SrsPlannerPotentials::SrsPlannerPotentials()
 {
     ROS_WARN("SrsPlannerPotentials::SrsPlannerPotentials() called");
 
@@ -44,18 +33,7 @@ SrsPlannerPotentials::SrsPlannerPotentials() :
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-SrsPlannerPotentials::SrsPlannerPotentials(string name, costmap_2d::Costmap2DROS* rosCostMap) :
-    srsMapStack_(nullptr),
-    costMap_(nullptr),
-    initialized_(false),
-    astar_(nullptr),
-    useQuadratic_(true),
-    useGridPath_(true),
-    allowUnknown_(true),
-    publishPotential_(true),
-    lethalCost_(253),
-    neutralCost_(50),
-    goalShiftDistance_(0.0)
+SrsPlannerPotentials::SrsPlannerPotentials(string name, costmap_2d::Costmap2DROS* rosCostMap)
 {
     ROS_WARN("SrsPlannerPotentials::SrsPlannerPotentials(...) called");
 
@@ -71,8 +49,8 @@ SrsPlannerPotentials::~SrsPlannerPotentials()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerPotentials::initialize(std::string name, costmap_2d::Costmap2D* costmap,
-    std::string frame_id)
+void SrsPlannerPotentials::initialize(string name, costmap_2d::Costmap2D* costmap,
+    string frame_id)
 {
     if (!initialized_)
     {
@@ -99,7 +77,6 @@ void SrsPlannerPotentials::initialize(std::string name, costmap_2d::Costmap2D* c
         ros::NodeHandle prefix_nh;
         tfPrefix_ = tf::getPrefixParam(prefix_nh);
 
-        potentialArray_ = nullptr;
         initialized_ = true;
     }
     else
@@ -109,7 +86,7 @@ void SrsPlannerPotentials::initialize(std::string name, costmap_2d::Costmap2D* c
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerPotentials::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostMap)
+void SrsPlannerPotentials::initialize(string name, costmap_2d::Costmap2DROS* rosCostMap)
 {
     ROS_WARN("SrsPlanner::initialize() called");
 
@@ -127,13 +104,13 @@ bool SrsPlannerPotentials::makePlan(
     // Make sure that we get the latest Map Stack
     updateMapStack(nullptr);
 
-    return makePlan(start, goal, 0, plan);
+    return makePlan(start, goal, 0.0, plan);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 bool SrsPlannerPotentials::makePlan(
     const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal,
-    double tolerance, std::vector<geometry_msgs::PoseStamped>& path)
+    double tolerance, std::vector<geometry_msgs::PoseStamped>& plan)
 {
     boost::mutex::scoped_lock lock(mutex_);
 
@@ -143,7 +120,7 @@ bool SrsPlannerPotentials::makePlan(
         return false;
     }
 
-    path.clear();
+    plan.clear();
 
     if (tf::resolve(tfPrefix_, goal.header.frame_id) != tf::resolve(tfPrefix_, tfFrameid_))
     {
@@ -166,7 +143,7 @@ bool SrsPlannerPotentials::makePlan(
     tf::Stamped<tf::Pose> start_pose;
     tf::poseStampedMsgToTF(start, start_pose);
 
-    std::vector<std::pair<float, float>> plan;
+    std::vector<std::pair<float, float>> potentialPlan;
 
     AStarPotentials::SearchParameters searchParams;
     searchParams.useQuadratic = useQuadratic_;
@@ -177,28 +154,32 @@ bool SrsPlannerPotentials::makePlan(
     searchParams.weightRatio = weightRatio_;
     searchParams.logicalCostRatio = logicalCostRatio_;
 
+    float* potentialArray = nullptr;
+
     bool found = astar_->calculatePath(searchParams,
         start.pose.position.x, start.pose.position.y,
         shiftedGoal.pose.position.x, shiftedGoal.pose.position.y,
-        plan,
-        potentialArray_);
+        potentialPlan,
+        potentialArray);
 
     if (publishPotential_)
     {
-        publishPotential(potentialArray_);
+        publishPotential(potentialArray);
     }
+
+    delete [] potentialArray;
 
     if (found)
     {
-        getPlanFromPotential(plan, path);
+        getPlanFromPotential(potentialPlan, plan);
 
         geometry_msgs::PoseStamped goal_copy = shiftedGoal;
         goal_copy.header.stamp = ros::Time::now();
-        path.push_back(goal_copy);
+        plan.push_back(goal_copy);
 
-        orientationFilter_->processPath(start, path);
+        orientationFilter_->processPath(start, plan);
 
-        publishPlan(path);
+        publishPlan(plan);
     }
     else
     {
@@ -206,13 +187,10 @@ bool SrsPlannerPotentials::makePlan(
         costMap_->saveMap("cost_map.pgm");
     }
 
-    delete potentialArray_;
-    potentialArray_ = nullptr;
-
     delete astar_;
     astar_ = nullptr;
 
-    return !path.empty();
+    return !plan.empty();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
@@ -246,25 +224,25 @@ void SrsPlannerPotentials::extractQueuePolygons()
             geometry_msgs::Point p1;
             p1.x = x0;
             p1.y = y0;
-            p1.z = 0;
+            p1.z = 0.0;
             polygon.push_back(p1);
 
             geometry_msgs::Point p2;
             p2.x = x1;
             p2.y = y0;
-            p2.z = 0;
+            p2.z = 0.0;
             polygon.push_back(p2);
 
             geometry_msgs::Point p3;
             p3.x = x1;
             p3.y = y1;
-            p3.z = 0;
+            p3.z = 0.0;
             polygon.push_back(p3);
 
             geometry_msgs::Point p4;
             p4.x = x0;
             p4.y = y1;
-            p4.z = 0;
+            p4.z = 0.0;
             polygon.push_back(p4);
 
             queuesMap_.insert({queue.label, polygon});
@@ -274,15 +252,15 @@ void SrsPlannerPotentials::extractQueuePolygons()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SrsPlannerPotentials::getPlanFromPotential(
-    std::vector<std::pair<float, float>>& path,
+    const std::vector<std::pair<float, float>>& path,
     std::vector<geometry_msgs::PoseStamped>& plan)
 {
     plan.clear();
 
     ros::Time plan_time = ros::Time::now();
-    for (int i = path.size() - 1; i>=0; i--)
+    for (auto iter = path.rbegin( ); iter != path.rend( ); iter++)
     {
-        std::pair<float, float> point = path[i];
+        std::pair<float, float> point = *iter;
 
         double world_x;
         double world_y;
@@ -330,7 +308,7 @@ void SrsPlannerPotentials::publishPlan(const std::vector<geometry_msgs::PoseStam
         gui_path.header.stamp = path[0].header.stamp;
     }
 
-    for (unsigned int i = 0; i < path.size(); i++)
+    for (size_t i = 0; i < path.size(); i++)
     {
         gui_path.poses[i] = path[i];
     }
@@ -339,7 +317,7 @@ void SrsPlannerPotentials::publishPlan(const std::vector<geometry_msgs::PoseStam
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerPotentials::publishPotential(float* potential)
+void SrsPlannerPotentials::publishPotential(const float* potentialArray)
 {
     int nx = costMap_->getSizeInCellsX();
     int ny = costMap_->getSizeInCellsY();
@@ -350,8 +328,6 @@ void SrsPlannerPotentials::publishPotential(float* potential)
     grid.header.frame_id = tfFrameid_;
     grid.header.stamp = ros::Time::now();
     grid.info.resolution = resolution;
-    grid.info.origin.position.x = costMap_->getOriginX();
-    grid.info.origin.position.y = costMap_->getOriginY();
     grid.info.width = nx;
     grid.info.height = ny;
 
@@ -366,9 +342,9 @@ void SrsPlannerPotentials::publishPotential(float* potential)
     grid.data.resize(nx * ny);
 
     float max = 0.0;
-    for (unsigned int i = 0; i < grid.data.size(); i++)
+    for (size_t i = 0; i < grid.data.size(); i++)
     {
-        float potential = potentialArray_[i];
+        float potential = potentialArray[i];
         if (potential < PotentialCalculator::MAX_POTENTIAL)
         {
             if (potential > max)
@@ -378,15 +354,15 @@ void SrsPlannerPotentials::publishPotential(float* potential)
         }
     }
 
-    for (unsigned int i = 0; i < grid.data.size(); i++)
+    for (size_t i = 0; i < grid.data.size(); i++)
     {
-        if (potentialArray_[i] >= PotentialCalculator::MAX_POTENTIAL)
+        if (potentialArray[i] >= PotentialCalculator::MAX_POTENTIAL)
         {
             grid.data[i] = -1;
         }
         else
         {
-            grid.data[i] = potentialArray_[i] * publishScale_ / max;
+            grid.data[i] = potentialArray[i] * publishScale_ / max;
         }
     }
 

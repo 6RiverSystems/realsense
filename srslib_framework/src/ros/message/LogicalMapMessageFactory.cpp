@@ -35,9 +35,9 @@ void LogicalMapMessageFactory::map2Vector(const LogicalMap* map,
     logical.clear();
 
     WeightedGrid2d* grid = map->getGrid();
-    for (int row = 0; row < grid->getHeight(); row++)
+    for (size_t row = 0; row < grid->getHeight(); row++)
     {
-        for (int col = 0; col < grid->getWidth(); col++)
+        for (size_t col = 0; col < grid->getWidth(); col++)
         {
             srslib_framework::LogicalCell cell;
             Location location = Location(col, row);

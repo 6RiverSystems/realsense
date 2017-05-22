@@ -13,7 +13,7 @@ using namespace std;
 #include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
-#include <srslib_framework/search/AStar.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackAStar.hpp>
 #include <srslib_framework/search/Plan.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
@@ -23,18 +23,15 @@ TEST(Test_AStar_MapStack_SamePlaceOnMap, SamePositionOnMap)
 {
     MapStack* mapStack = MapStackFactory::fromJsonFile("data/6rshq/6rshq.yaml");
 
-    AStar algorithm;
+    MapStackAStar algorithm(mapStack);
 
-    Position startPosition(220, 260, 0);
-    MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
-
-    Position goalPosition(220, 260, 0);
-    MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
+    Position start(220, 260, 0);
+    Position goal(220, 260, 0);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    Plan plan;
+    Plan<MapStackNode> plan;
     algorithm.getPlan(plan);
     cout << plan << endl;
 
@@ -51,18 +48,15 @@ TEST(Test_AStar_MapStack_SamePlaceOnMap, SameLocationOnMap)
     MapStack* mapStack = MapStackFactory::fromJsonFile(
         "data/6rshq/6rshq.yaml");
 
-    AStar algorithm;
+    MapStackAStar algorithm(mapStack);
 
-    Position startPosition(220, 260, 0);
-    MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
-
-    Position goalPosition(220, 260, 90);
-    MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
+    Position start(220, 260, 0);
+    Position goal(220, 260, 90);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    Plan plan;
+    Plan<MapStackNode> plan;
     algorithm.getPlan(plan);
     cout << plan << endl;
 

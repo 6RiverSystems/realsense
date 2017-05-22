@@ -156,7 +156,6 @@ private:
     static int getFileAndLine (unw_word_t addr, char *file, size_t flen, int *line)
     {
         static char buf[256];
-        char *p;
 
         // prepare command to be executed
         // our program need to be passed after the -e parameter
@@ -177,7 +176,6 @@ private:
 
         if (buf[0] != '?')
         {
-            int l;
             char *p = buf;
 
             // file name is until ':'
@@ -258,8 +256,6 @@ private:
             {
                 unw_get_reg( &cursor, UNW_REG_IP, &ip );
                 unw_get_reg( &cursor, UNW_REG_SP, &sp );
-
-                char* stringBuffer = nullptr;
 
                 if( getFileAndLine( (long) ip, function, file, lineNumber ) )
                 {

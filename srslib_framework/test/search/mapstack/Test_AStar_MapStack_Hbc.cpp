@@ -14,7 +14,7 @@ using namespace std;
 #include <srslib_framework/localization/map/MapStack.hpp>
 #include <srslib_framework/localization/map/MapStackFactory.hpp>
 #include <srslib_timing/StopWatch.hpp>
-#include <srslib_framework/search/AStar.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackAStar.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
 using namespace srs;
@@ -32,12 +32,10 @@ TEST(Test_AStar_MapStack_Hbc, BigSearch)
     // {x: 6.570, y: 8.912, t: 0} (131, 178, 0)
     // and
     // {x: 68.255, y: 47.726, t: 0} (1365, 955, 0)
-    Position startPosition(131, 178, 0);
-    Position goalPosition(1365, 955, 0);
+    Position start(131, 178, 0);
+    Position goal(1365, 955, 0);
 
-    AStar algorithm;
-    MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
-    MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
+    MapStackAStar algorithm(mapStack);
 
     StopWatch timer;
 
@@ -63,13 +61,10 @@ TEST(Test_AStar_MapStack_Hbc, BigSearch)
     cout << "total: " << totalNodes << " nodes" << endl;
     cout << "velocity: " << totalNodes / totalElapsed << " kn/s" << endl;
 
-    unsigned int counterFoundInClosed_;
-    unsigned int counterInserted_;
-    unsigned int counterPruned_;
-    unsigned int counterReplaced_;
-
-    cout << "replaced: " << algorithm.getReplaced() << " nodes" << endl;
-    cout << "inserted: " << algorithm.getInserted() << " nodes" << endl;
-    cout << "found in closed: " << algorithm.getFoundInClosed() << " nodes" << endl;
-    cout << "pruned: " << algorithm.getPruned() << " nodes" << endl << endl;
+    #if DIAGNOSTICS_ASTAR
+        cout << "replaced: " << algorithm.getReplaced() << " nodes" << endl;
+        cout << "inserted: " << algorithm.getInserted() << " nodes" << endl;
+        cout << "found in closed: " << algorithm.getFoundInClosed() << " nodes" << endl;
+        cout << "pruned: " << algorithm.getPruned() << " nodes" << endl << endl;
+    #endif
 }

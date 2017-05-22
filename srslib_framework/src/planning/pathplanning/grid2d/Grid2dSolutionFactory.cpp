@@ -1,7 +1,7 @@
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionFactory.hpp>
 
 #include <srslib_framework/planning/pathplanning/grid2d/UnexpectedSearchActionException.hpp>
-#include <srslib_framework/search/SearchNode.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackAStar.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackAction.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
@@ -14,7 +14,7 @@ namespace srs {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(MapStack* stack,
     Pose<> start, vector<Pose<>> goals,
-    MapStackNode::SearchParameters searchParameters)
+    MapStackSearchParameters searchParameters)
 {
     Solution<Grid2dSolutionItem>* globalSolution =
         Solution<Grid2dSolutionItem>::instanceOfValidEmpty();
@@ -46,21 +46,18 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromConsecutiveGoals(MapSta
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* stack,
     Position& start, Position& goal,
-    MapStackNode::SearchParameters searchParameters)
+    MapStackSearchParameters searchParameters)
 {
     if (!stack)
     {
         return nullptr;
     }
 
-    MapStackNode* startNode = MapStackNode::instanceOfStart(stack, start, searchParameters);
-    MapStackSingleGoal* goalNode = MapStackSingleGoal::instanceOf(goal);
+    MapStackAStar algorithm(stack, searchParameters);
 
-    AStar algorithm;
-
-    if (algorithm.search(startNode, goalNode))
+    if (algorithm.search(start, goal))
     {
-        Plan plan;
+        Plan<MapStackNode> plan;
         algorithm.getPlan(plan);
 
         return fromSearch(stack->getLogicalMap(), plan);
@@ -72,7 +69,7 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* st
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSingleGoal(MapStack* stack,
     Pose<> fromPose, Pose<> toPose,
-    MapStackNode::SearchParameters searchParameters)
+    MapStackSearchParameters searchParameters)
 {
     if (!stack)
     {
@@ -109,7 +106,7 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromRotation(
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map, Plan& plan)
+Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map, Plan<MapStackNode>& plan)
 {
     if (!map)
     {
@@ -132,8 +129,8 @@ Solution<Grid2dSolutionItem>* Grid2dSolutionFactory::fromSearch(BaseMap* map, Pl
     double toY = 0;
     double toTheta = 0;
 
-    Plan::const_iterator fromCursor = plan.begin();
-    Plan::const_iterator toCursor = next(fromCursor, 1);
+    Plan<MapStackNode>::const_iterator fromCursor = plan.begin();
+    Plan<MapStackNode>::const_iterator toCursor = next(fromCursor, 1);
 
     while (toCursor != plan.end())
     {

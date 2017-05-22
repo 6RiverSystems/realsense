@@ -337,11 +337,12 @@ void WeightedGrid2d::printGrid(ostream& stream, string title,
         stream << endl << title << endl;
     }
 
-    for (int y = getHeight() - 1; y >= 0; --y)
+    size_t maxHeight = getHeight() - 1;
+    for (size_t y = 0; y < getHeight(); ++y)
     {
-        for (int x = 0; x < getWidth(); ++x)
+        for (size_t x = 0; x < getWidth(); ++x)
         {
-            WeightedGrid2d::Node* node = findNode(x, y);
+            WeightedGrid2d::Node* node = findNode(x, maxHeight-y);
             if (node)
             {
                 BaseType payload = fieldSelection(node);
@@ -386,18 +387,19 @@ void WeightedGrid2d::print(ostream& stream, string title,
 
     const int WIDTH = 4;
     stream << right << setw(WIDTH) << ' ';
-    for (int x = 0; x < getWidth(); ++x)
+    for (size_t x = 0; x < getWidth(); ++x)
     {
         stream << right << setw(WIDTH) << x;
     }
     stream << endl;
 
-    for (int y = getHeight() - 1; y >= 0; --y)
+    size_t maxHeight = getHeight() - 1;
+    for (size_t y = 0; y < getHeight(); ++y)
     {
         stream << right << setw(WIDTH) << y;
-        for (int x = 0; x < getWidth(); ++x)
+        for (size_t x = 0; x < getWidth(); ++x)
         {
-            WeightedGrid2d::Node* node = findNode(x, y);
+            WeightedGrid2d::Node* node = findNode(x, maxHeight-y);
             if (node)
             {
                 BaseType info = fieldSelection(node);

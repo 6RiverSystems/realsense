@@ -10,50 +10,55 @@ using namespace std;
 
 #include <srslib_framework/datastructure/Position.hpp>
 #include <srslib_framework/search/SearchGoal.hpp>
-#include <srslib_framework/search/SearchNode.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackAction.hpp>
 
 namespace srs {
 
-struct MapStackNode : public SearchNode
+struct MapStackSearchParameters
 {
-    struct SearchParameters
-    {
-        SearchParameters() :
-            allowUnknown(false),
-            costMapRatio(1.0)
-        {}
+    MapStackSearchParameters() :
+        allowUnknown(false),
+        costMapRatio(1.0)
+    {}
 
-        bool allowUnknown;
-        float costMapRatio;
+    bool allowUnknown;
+    float costMapRatio;
+};
+
+struct MapStackNode
+{
+    struct EqualTo
+    {
+        constexpr bool operator()(const MapStackNode* lhs, const MapStackNode* rhs) const
+        {
+            return lhs->ehash_ == rhs->ehash_;
+        }
     };
 
-    static MapStackNode* instanceOfStart(MapStack* stack,
-        Position position,
-        SearchParameters searchParameters = SearchParameters())
+    struct Hash
     {
-        return instanceOf(stack,
+        size_t operator()(const MapStackNode*node) const
+        {
+            return node->ehash_;
+        }
+    };
+
+    static MapStackNode* instanceOfStart(MapStack*stack, Position position, const MapStackSearchParameters& searchParameters)
+    {
+        return instanceOf(
             nullptr, MapStackAction::START,
             position,
             stack->getTotalCost(position,
                 searchParameters.allowUnknown, searchParameters.costMapRatio),
-            0, nullptr,
-            searchParameters);
+            0, nullptr);
     }
 
-    static MapStackNode* instanceOf(MapStack* grid,
+    static MapStackNode* instanceOf(
         MapStackNode* parentNode, MapStackAction::ActionEnum parentAction,
         Position position, int g, int h,
-        SearchGoal* goal,
-        SearchParameters searchParameters);
+        SearchGoal<MapStackNode>* goal);
 
-    bool equals(SearchNode* const& rhs) const
-    {
-        return this == rhs ||
-            position_ == reinterpret_cast<const MapStackNode*>(rhs)->getPosition();
-    }
-
-    SearchGoal* getGoal()
+    SearchGoal<MapStackNode>* getGoal() const
     {
         return goal_;
     }
@@ -63,51 +68,39 @@ struct MapStackNode : public SearchNode
         return h_;
     }
 
-    void getExploredNodes(vector<SearchNode*>& exploredNodes);
-
     int getLocalCost() const
     {
         return g_;
     }
 
-    SearchNode* getParent()
+    MapStackNode* getParent() const
     {
         return parentNode_;
     }
 
-    MapStackAction::ActionEnum getParentAction()
+    MapStackAction::ActionEnum getParentAction() const
     {
         return parentAction_;
     }
 
-    inline Position getPosition() const
+    const Position& getPosition() const
     {
         return position_;
     }
 
-    SearchParameters getSearchParameters() const
-    {
-        return searchParameters_;
-    }
-
-    inline int getTotalCost() const
+    int getTotalCost() const
     {
         return g_ + h_;
     }
 
     bool goalReached() const
     {
-        return goal_->reached(reinterpret_cast<const MapStackNode*>(this));
-    }
-
-    inline std::size_t hash() const
-    {
-        return position_.hash();
+        return goal_->reached(this);
     }
 
     void release();
 
-    void setGoal(SearchGoal* goal)
+    void setGoal(SearchGoal<MapStackNode>* goal)
     {
         if (goal)
         {
@@ -143,36 +136,32 @@ struct MapStackNode : public SearchNode
     }
 
 protected:
-    MapStackNode(MapStack* stack,
+    MapStackNode(
         MapStackNode* parentNode, MapStackAction::ActionEnum parentAction,
             Position position, int g, int h,
-            SearchGoal* goal,
-            SearchParameters searchParameters) :
-        stack_(stack),
-        parentAction_(parentAction),
-        parentNode_(parentNode),
+            SearchGoal<MapStackNode>* goal) :
         position_(position),
         g_(g),
-        goal_(goal),
         h_(h),
-        searchParameters_(searchParameters)
-    {}
+        parentNode_(parentNode),
+        parentAction_(parentAction),
+        goal_(goal),
+        ehash_((position_.location.x * 65536LL + position_.location.y) * 360 + position_.orientation)
+    {
+    }
 
     ~MapStackNode()
     {}
 
 private:
-    SearchGoal* goal_;
-    MapStack* stack_;
-    int g_;
 
-    int h_;
-
-    MapStackAction::ActionEnum parentAction_;
-    MapStackNode* parentNode_;
-    Position position_;
-
-    SearchParameters searchParameters_;
+    Position                    position_       { };
+    int                         g_              { 0 };
+    int                         h_              { 0 };
+    MapStackNode*               parentNode_     { nullptr };
+    MapStackAction::ActionEnum  parentAction_   { MapStackAction::NONE };
+    SearchGoal<MapStackNode>*   goal_           { nullptr };
+    size_t                      ehash_          { 0 };
 };
 
 } // namespace srs

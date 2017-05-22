@@ -19,9 +19,9 @@ const int MapStackAction::COMMAND_COSTS[] = {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-MapStackNode* MapStackAction::exploreBackward(MapStack* stack, MapStackNode* fromNode)
+MapStackNode* MapStackAction::exploreBackward(MapStack* stack, const MapStackSearchParameters& searchParameters, MapStackNode* fromNode)
 {
-    Position fromPosition = fromNode->getPosition();
+    const Position& fromPosition = fromNode->getPosition();
 
     int directionMovement = AngleMath::normalizeDeg<int>(fromPosition.orientation + 180);
     Position motion = Position(fromPosition.location, directionMovement);
@@ -29,8 +29,6 @@ MapStackNode* MapStackAction::exploreBackward(MapStack* stack, MapStackNode* fro
     Position neighbor;
     if (stack->getNeighbor(motion, neighbor))
     {
-        MapStackNode::SearchParameters searchParameters = fromNode->getSearchParameters();
-
         // Calculate the motion cost
         int motionCost = COMMAND_COSTS[MapStackAction::BACKWARD];
         motionCost += stack->getWeight(fromPosition);
@@ -42,12 +40,10 @@ MapStackNode* MapStackAction::exploreBackward(MapStack* stack, MapStackNode* fro
         {
             // Create a neighbor node with all the relative data
             MapStackNode* neighborNode = MapStackNode::instanceOf(
-                stack,
                 fromNode, MapStackAction::BACKWARD,
                 motion,
                 fromNode->getLocalCost() + motionCost, 0,
-                nullptr,
-                searchParameters);
+                nullptr);
 
             // Finally, calculate the heuristic function value
             // from this node to the goal
@@ -61,15 +57,13 @@ MapStackNode* MapStackAction::exploreBackward(MapStack* stack, MapStackNode* fro
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-MapStackNode* MapStackAction::exploreForward(MapStack* stack, MapStackNode* fromNode)
+MapStackNode* MapStackAction::exploreForward(MapStack* stack, const MapStackSearchParameters& searchParameters, MapStackNode* fromNode)
 {
-    Position fromPosition = fromNode->getPosition();
+    const Position& fromPosition = fromNode->getPosition();
 
     Position motion;
     if (stack->getNeighbor(fromPosition, motion))
     {
-        MapStackNode::SearchParameters searchParameters = fromNode->getSearchParameters();
-
         // Calculate the motion cost
         int motionCost = COMMAND_COSTS[MapStackAction::FORWARD];
         motionCost += stack->getWeight(fromPosition);
@@ -81,12 +75,10 @@ MapStackNode* MapStackAction::exploreForward(MapStack* stack, MapStackNode* from
         {
             // Create a neighbor node with all the relative data
             MapStackNode* neighborNode = MapStackNode::instanceOf(
-                stack,
                 fromNode, MapStackAction::FORWARD,
                 motion,
                 fromNode->getLocalCost() + motionCost, 0,
-                nullptr,
-                searchParameters);
+                nullptr);
 
             // Finally, calculate the heuristic function value
             // from this node to the goal
@@ -100,15 +92,13 @@ MapStackNode* MapStackAction::exploreForward(MapStack* stack, MapStackNode* from
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-MapStackNode* MapStackAction::exploreRotation(MapStack* stack, MapStackNode* fromNode,
+MapStackNode* MapStackAction::exploreRotation(MapStack* stack, const MapStackSearchParameters& searchParameters, MapStackNode* fromNode,
     ActionEnum action, int angle)
 {
-    Position fromPosition = fromNode->getPosition();
+    const Position& fromPosition = fromNode->getPosition();
 
     int newOrientation = AngleMath::normalizeDeg<int>(fromPosition.orientation + angle);
     Position motion = Position(fromPosition.location, newOrientation);
-
-    MapStackNode::SearchParameters searchParameters = fromNode->getSearchParameters();
 
     // Calculate the motion cost
     int motionCost = COMMAND_COSTS[action];
@@ -120,12 +110,10 @@ MapStackNode* MapStackAction::exploreRotation(MapStack* stack, MapStackNode* fro
     {
         // Create a neighbor node with all the relative data
         MapStackNode* neighborNode = MapStackNode::instanceOf(
-            stack,
             fromNode, action,
             motion,
             fromNode->getLocalCost() + motionCost, 0,
-            nullptr,
-            searchParameters);
+            nullptr);
 
         // Finally, calculate the heuristic function value
         // from this node to the goal

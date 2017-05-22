@@ -137,7 +137,7 @@ void HidIO::write(const std::vector<char>& buffer)
 {
 	if(isOpen())
 	{
-		if (buffer.size() > txMaxPacketSize_ - 1)
+		if (buffer.size() + 1 > txMaxPacketSize_)
 		{
 			throw std::runtime_error("Invalid buffer size");
 		}

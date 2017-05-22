@@ -37,14 +37,14 @@ public:
     SrsPlannerConventional(string name, costmap_2d::Costmap2DROS* rosCostMap);
     virtual ~SrsPlannerConventional();
 
-    void initialize(string name, costmap_2d::Costmap2DROS* rosCostMap);
+    virtual void initialize(string name, costmap_2d::Costmap2DROS* rosCostMap) override;
 
-    bool makePlan(const geometry_msgs::PoseStamped& start,
+    virtual bool makePlan(const geometry_msgs::PoseStamped& start,
         const geometry_msgs::PoseStamped& goal,
-        vector<geometry_msgs::PoseStamped>& plan);
+        vector<geometry_msgs::PoseStamped>& plan) override;
 
 private:
-    void notified(Subscriber<srslib_framework::MapStack>* subject);
+    virtual void notified(Subscriber<srslib_framework::MapStack>* subject) override;
 
     void onConfigChange(srsnode_navigation::SrsPlannerConfig& config, uint32_t level);
 
@@ -55,13 +55,14 @@ private:
 
     ChannelRosPath channelRosPath_;
     dynamic_reconfigure::Server<srsnode_navigation::SrsPlannerConfig>* configServer_;
-    costmap_2d::Costmap2D* costMap2d_;
 
-    MapStackNode::SearchParameters nodeSearchParameters_;
+    MapStackSearchParameters nodeSearchParameters_;
 
     MapStack* srsMapStack_;
 
     TapMapStack tapMapStack_;
+
+    costmap_2d::Costmap2D* costMap2d_;
 };
 
 } // namespace srs

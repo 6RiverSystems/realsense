@@ -14,7 +14,7 @@ namespace srs {
 class UnexpectedSearchActionException: public SrsRuntimeErrorException
 {
 public:
-    UnexpectedSearchActionException(Plan& plan) :
+    UnexpectedSearchActionException(Plan<MapStackNode>& plan) :
         SrsRuntimeErrorException("Unexpected valid search action in this plan " +
             plan.toString())
     {}

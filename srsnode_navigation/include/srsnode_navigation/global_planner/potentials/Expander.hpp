@@ -20,18 +20,13 @@ public:
     Expander(LogicalMap* logicalMap,
         costmap_2d::Costmap2D* costMap,
         PotentialCalculator* pCalculator) :
-            lethalCost_(253),
-            neutralCost_(50),
-            logicalGrid_(logicalMap->getGrid()),
             costGrid_(costMap->getCharMap()),
-            pCalculator_(pCalculator),
-            weightRatio_(100),
-            logicalCostRatio_(100),
-            allowUnknown_(true)
+            logicalGrid_(logicalMap->getGrid()),
+            nx_(costMap->getSizeInCellsX()),
+            ny_(costMap->getSizeInCellsY()),
+            ns_(nx_*ny_),
+            pCalculator_(pCalculator)
     {
-        nx_ = costMap->getSizeInCellsX();
-        ny_ = costMap->getSizeInCellsY();
-        ns_ = nx_ * ny_;
     }
 
     virtual ~Expander()
@@ -101,22 +96,22 @@ protected:
         return x + nx_ * y;
     }
 
-    bool allowUnknown_;
+    bool allowUnknown_			{ true };
 
-    unsigned char* costGrid_;
+    unsigned char* costGrid_		{ nullptr };
 
-    unsigned int lethalCost_;
-    WeightedGrid2d* logicalGrid_;
-    unsigned int logicalCostRatio_;
+    unsigned int lethalCost_		{ 253 };
+    WeightedGrid2d* logicalGrid_	{ nullptr };
+    unsigned int logicalCostRatio_	{ 100 };
 
-    int nx_;
-    int ny_;
-    int ns_;
-    unsigned int neutralCost_;
+    int nx_				{ -1 };
+    int ny_				{ -1 };
+    int ns_				{ -1 };
+    unsigned int neutralCost_		{ 50 };
 
-    PotentialCalculator* pCalculator_;
+    PotentialCalculator* pCalculator_	{ nullptr };
 
-    unsigned int weightRatio_;
+    unsigned int weightRatio_		{ 100 };
 };
 
 }

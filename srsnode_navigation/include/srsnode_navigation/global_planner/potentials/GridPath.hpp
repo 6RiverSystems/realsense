@@ -10,16 +10,17 @@
 
 namespace srs {
 
-class GridPath : public Traceback
+class GridPath :
+    public Traceback
 {
 public:
     GridPath(PotentialCalculator* p_calc):
         Traceback(p_calc)
     {}
 
-    bool getPath(float* potential,
+    virtual bool getPath(float* potential,
         double start_x, double start_y, double end_x, double end_y,
-        std::vector<std::pair<float, float> >& path);
+        std::vector<std::pair<float, float> >& path) override;
 
 private:
     inline bool checkP(int x0, int y0, float* potentials, float& minValue)

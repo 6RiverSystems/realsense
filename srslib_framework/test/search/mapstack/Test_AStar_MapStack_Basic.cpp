@@ -14,8 +14,8 @@ using namespace std;
 #include <srslib_framework/localization/map/MapAdapter.hpp>
 #include <srslib_framework/localization/map/logical/LogicalMapFactory.hpp>
 #include <srslib_framework/localization/map/occupancy/OccupancyMapFactory.hpp>
-#include <srslib_framework/search/AStar.hpp>
 #include <srslib_framework/search/Plan.hpp>
+#include <srslib_framework/search/graph/mapstack/MapStackAStar.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackNode.hpp>
 #include <srslib_framework/search/graph/mapstack/MapStackSingleGoal.hpp>
 
@@ -42,18 +42,15 @@ TEST(Test_AStar_MapStack_Basic, SmallSearchOnEmptyGrid)
 {
     MapStack* mapStack = generateMapStack();
 
-    AStar algorithm;
+    MapStackAStar algorithm(mapStack);
 
-    Position startPosition(0, 0, 0);
-    MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
-
-    Position goalPosition(1, 1, 0);
-    MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
+    Position start(0, 0, 0);
+    Position goal(1, 1, 0);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    Plan plan;
+    Plan<MapStackNode> plan;
     algorithm.getPlan(plan);
     cout << plan << endl;
 
@@ -67,18 +64,15 @@ TEST(Test_AStar_MapStack_Basic, Corner2CornerSearchOnEmptyGrid)
 {
     MapStack* mapStack = generateMapStack();
 
-    AStar algorithm;
+    MapStackAStar algorithm(mapStack);
 
-    Position startPosition(0, 0, 0);
-    MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
-
-    Position goalPosition(GRID_SIZE - 1, GRID_SIZE - 1, 0);
-    MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
+    Position start(0, 0, 0);
+    Position goal(GRID_SIZE - 1, GRID_SIZE - 1, 0);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    Plan plan;
+    Plan<MapStackNode> plan;
     algorithm.getPlan(plan);
     cout << plan << endl;
 
@@ -92,18 +86,15 @@ TEST(Test_AStar_MapStack_Basic, SearchAroundObstacle)
 {
     MapStack* mapStack = generateMapStack();
 
-    AStar algorithm;
+    MapStackAStar algorithm(mapStack);
 
-    Position startPosition(0, 0, 0);
-    MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
-
-    Position goalPosition(GRID_SIZE - 1, 0, 0);
-    MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
+    Position start(0, 0, 0);
+    Position goal(GRID_SIZE - 1, 0, 0);
 
     ASSERT_TRUE(algorithm.search(start, goal)) <<
         "A plan was not found";
 
-    Plan plan;
+    Plan<MapStackNode> plan;
     algorithm.getPlan(plan);
     cout << plan << endl;
 
@@ -117,14 +108,12 @@ TEST(Test_AStar_MapStack_Basic, MemoryLeaks)
 {
     MapStack* mapStack = generateMapStack();
 
-    Position startPosition(0, 0, 0);
-    Position goalPosition(1, 1, 0);
+    Position start(0, 0, 0);
+    Position goal(1, 1, 0);
 
     test::MemoryWatch memoryWatch;
 
-    AStar* algorithm = new AStar();
-    MapStackNode* start = MapStackNode::instanceOfStart(mapStack, startPosition);
-    MapStackSingleGoal* goal = MapStackSingleGoal::instanceOf(goalPosition);
+    MapStackAStar* algorithm = new MapStackAStar((mapStack));
 
     ASSERT_TRUE(algorithm->search(start, goal)) <<
         "A plan was not found";
@@ -136,8 +125,6 @@ TEST(Test_AStar_MapStack_Basic, MemoryLeaks)
 
     algorithm->clear();
 
-    start->release();
-    goal->release();
     delete algorithm;
 
     ASSERT_TRUE(memoryWatch.isZero()) << "Memory leaks occurred";

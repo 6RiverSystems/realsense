@@ -60,11 +60,11 @@ struct Grid2dSolutionItem
 
     ActionEnum actionType;
 
-    int cost;
-
     Pose<> fromPose;
 
     Pose<> toPose;
+
+    int cost;
 
 private:
     static unordered_map<int, string> ENUM_NAMES;

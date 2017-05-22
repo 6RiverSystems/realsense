@@ -23,6 +23,8 @@ void OrientationFilter::processPath(const geometry_msgs::PoseStamped& start,
 {
     int n = path.size();
     switch(omode_) {
+        case NONE:
+            break;
         case FORWARD:
             for(int i=0;i<n-1;i++){
                 pointToNext(path, i);

@@ -93,9 +93,9 @@ OccupancyMap* OccupancyMapFactory::fromMetadata(const OccupancyMetadata& metadat
 
     auto occupancyIterator = occupancy.begin();
 
-    for (int row = 0; row < metadata_.heightCells; row++)
+    for (size_t row = 0; row < metadata_.heightCells; row++)
     {
-        for (int col = 0; col < metadata_.widthCells; col++)
+        for (size_t col = 0; col < metadata_.widthCells; col++)
         {
             // Convert the 8 bit cost into an integer cost and store it
             int8_t grayLevel = *occupancyIterator;
@@ -148,8 +148,6 @@ OccupancyMap* OccupancyMapFactory::fromMetadataRawCost(const OccupancyMetadata& 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OccupancyMapFactory::extractMonoChannel(SDL_Surface* image)
 {
-    const unsigned char maxPixelLevel = numeric_limits<unsigned char>::max();
-
     unsigned char* imagePixels = (unsigned char*)(image->pixels);
     int pitch = image->pitch;
 
@@ -171,8 +169,6 @@ void OccupancyMapFactory::extractMonoChannel(SDL_Surface* image)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void OccupancyMapFactory::extractMonoChannelRaw(SDL_Surface* image)
 {
-    const unsigned char maxPixelLevel = numeric_limits<unsigned char>::max();
-
     unsigned char* imagePixels = (unsigned char*)(image->pixels);
     int pitch = image->pitch;
 

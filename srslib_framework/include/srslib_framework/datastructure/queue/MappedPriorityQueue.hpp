@@ -10,9 +10,8 @@
 #include <iomanip>
 #include <map>
 #include <unordered_map>
-#include <unordered_set>
-#include <forward_list>
 #include <list>
+#include <deque>
 using namespace std;
 
 #include <srslib_framework/platform/Template.hpp>
@@ -80,7 +79,7 @@ public:
 
     size_t sizeEmptyBuckets() const
     {
-        return emptyBucketsCounter_;
+        return emptyBuckets_.size();
     }
 
     size_t sizeInitialBuckets() const
@@ -99,14 +98,13 @@ public:
     }
 
 private:
-    class Node;
+    struct Node;
 
     using BucketType = list<Node>;
     using QueueType = map<PRIORITY, BucketType*, less<PRIORITY>>;
     using IndexType = unordered_map<TYPE, typename BucketType::iterator, HASH, EQUAL_TO>;
     using BucketIndexType = unordered_map<PRIORITY, BucketType*>;
-
-    using BucketPoolType = forward_list<BucketType*>;
+    using BucketPoolType = deque<BucketType*>;
 
     struct Node
     {
@@ -131,8 +129,6 @@ private:
         BucketType* bucket = nullptr;
         if (!emptyBuckets_.empty())
         {
-            emptyBucketsCounter_--;
-
             bucket = emptyBuckets_.front();
             emptyBuckets_.pop_front();
         }
@@ -152,10 +148,8 @@ private:
         // Recycle the bucket only if the number of empty
         // buckets in the queue is less than the
         // specified threshold
-        if (emptyBucketsCounter_ < BUCKETS_MAX)
+        if (emptyBuckets_.size() < BUCKETS_MAX)
         {
-            emptyBucketsCounter_++;
-
             emptyBuckets_.push_front(bucket);
         }
         else
@@ -167,7 +161,6 @@ private:
     BucketIndexType bucketIndex_;
 
     BucketPoolType emptyBuckets_;
-    int emptyBucketsCounter_;
 
     IndexType nodeIndex_;
     QueueType nodeQueue_;

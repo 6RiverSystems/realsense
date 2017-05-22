@@ -42,7 +42,7 @@ SrsPlannerConventional::~SrsPlannerConventional()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void SrsPlannerConventional::initialize(std::string name, costmap_2d::Costmap2DROS* rosCostMap)
+void SrsPlannerConventional::initialize(string name, costmap_2d::Costmap2DROS* rosCostMap)
 {
     ros::NodeHandle privateNh("~/" + name);
 
@@ -130,21 +130,9 @@ void SrsPlannerConventional::populatePath(const geometry_msgs::PoseStamped& star
 
     for (auto waypoint : trajectory)
     {
-        Pose<> currentPose = waypoint.first;
+        const Pose<>& currentPose = waypoint.first;
 
-        // Create the stamped pose and the quaternion for the
-        // trajectory step
-        tf::Quaternion quaternion = tf::createQuaternionFromYaw(currentPose.theta);
-        geometry_msgs::PoseStamped step = PoseMessageFactory::pose2PoseStamped(currentPose);
-
-        step.pose.position.x = currentPose.x;
-        step.pose.position.y = currentPose.y;
-        step.pose.orientation.x = quaternion.x();
-        step.pose.orientation.y = quaternion.y();
-        step.pose.orientation.z = quaternion.z();
-        step.pose.orientation.w = quaternion.w();
-
-        plan.push_back(step);
+        plan.push_back(PoseMessageFactory::pose2PoseStamped(currentPose));
     }
 
     plan.push_back(goal);

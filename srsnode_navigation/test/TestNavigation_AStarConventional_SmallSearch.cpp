@@ -18,7 +18,6 @@ using namespace std;
 #include <srslib_framework/planning/pathplanning/grid2d/Grid2dSolutionItem.hpp>
 #include <srslib_framework/planning/pathplanning/trajectory/SimpleTrajectoryGenerator.hpp>
 #include <srslib_framework/planning/pathplanning/trajectory/Trajectory.hpp>
-#include <srslib_framework/search/AStar.hpp>
 
 #include <srslib_test/localization/map/MapStackUtils.hpp>
 
@@ -44,8 +43,6 @@ TEST(Test_Navigation_AStarConventional, SmallSearch)
 
     WeightedGrid2d logical(GRID_SIZE, GRID_SIZE);
     MapStack* mapStack = test::MapStackUtils::grid2d2MapStack(Pose<>::ZERO, 1, &logical);
-
-    AStar algorithm;
 
     Position start(1, 1, 0);
     Position goal(5, 5, 0);

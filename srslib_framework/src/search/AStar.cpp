@@ -12,33 +12,31 @@ namespace srs {
 // Public methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-AStar::AStar() :
-    lastNode_(nullptr),
-    startNode_(nullptr)
+template <typename NODETYPE>
+AStar<NODETYPE>::AStar()
 {
     closedSet_.reserve(CLOSED_HASH_RESERVE);
-
-    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-AStar::~AStar()
+template <typename NODETYPE>
+AStar<NODETYPE>::~AStar()
 {
-    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void AStar::clear()
+template <typename NODETYPE>
+void AStar<NODETYPE>::clear()
 {
     // Pop all the nodes out of the priority queue and
     // release them
-    SearchNode* node = nullptr;
+    NODETYPE* node = nullptr;
     while (!openQueue_.empty())
     {
         openQueue_.pop(node);
         if (node != startNode_)
         {
-            node->release();
+            releaseNode(node);
         }
     }
 
@@ -49,7 +47,7 @@ void AStar::clear()
     {
         if (node != startNode_)
         {
-            node->release();
+            releaseNode(node);
         }
     }
     closedSet_.clear();
@@ -57,15 +55,18 @@ void AStar::clear()
     // Clear the last search and the yield counter
     lastNode_ = nullptr;
 
-    // Reset the statistics counters
-    counterInserted_ = 0;
-    counterFoundInClosed_ = 0;
-    counterReplaced_ = 0;
-    counterPruned_ = 0;
+    #if DIAGNOSTICS_ASTAR
+        // Reset the statistics counters
+        counterInserted_ = 0;
+        counterFoundInClosed_ = 0;
+        counterReplaced_ = 0;
+        counterPruned_ = 0;
+    #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void AStar::getPlan(Plan& plan)
+template <typename NODETYPE>
+void AStar<NODETYPE>::getPlan(Plan<NODETYPE>& plan)
 {
     plan.clear();
 
@@ -76,7 +77,7 @@ void AStar::getPlan(Plan& plan)
 
     // Explore the tree backward to
     // reconstruct the solution
-    SearchNode* node = lastNode_;
+    NODETYPE* node = lastNode_;
     while (node)
     {
         plan.push_front(node);
@@ -85,7 +86,8 @@ void AStar::getPlan(Plan& plan)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-bool AStar::search(SearchNode* start, SearchGoal* goal)
+template <typename NODETYPE>
+bool AStar<NODETYPE>::search(NODETYPE* start, SearchGoal<NODETYPE>* goal)
 {
     // Do not execute any search without complete information
     if (!start || !goal)
@@ -104,9 +106,9 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
     // Add the starting node to the open queue
     openQueue_.push(startNode_->getTotalCost(), startNode_);
 
-    vector<SearchNode*> nextSearchNodes;
+    vector<NODETYPE*> nextSearchNodes;
 
-    SearchNode* currentNode = nullptr;
+    NODETYPE* currentNode = nullptr;
     while (!openQueue_.empty())
     {
         #if DEBUG_ASTAR
@@ -143,7 +145,7 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
 
         // Collect all the valid next states from
         // from the current node
-        currentNode->getExploredNodes(nextSearchNodes);
+        getExploredNodes(currentNode, nextSearchNodes);
 
         #if DEBUG_ASTAR
             cout << "NEXT ------------------------------------------------------------------------------------------" << endl;
@@ -165,7 +167,8 @@ bool AStar::search(SearchNode* start, SearchGoal* goal)
 // Private methods
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void AStar::pushNodes(vector<SearchNode*>& nodes)
+template <typename NODETYPE>
+void AStar<NODETYPE>::pushNodes(vector<NODETYPE*>& nodes)
 {
     #if DEBUG_ASTAR
         cout << "OPEN ------------------------------------------------------------------------------------------" << endl;
@@ -180,28 +183,28 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
         cout << "-----------------------------------------------------------------------------------------------" << endl;
     #endif
 
-    for (int i = 0; i < nodes.size(); i++)
+    for (auto node : nodes)
     {
-        SearchNode* node = nodes[i];
-
         #if DEBUG_ASTAR
             cout << "Evaluating: " << *node;
         #endif
 
         if (closedSet_.find(node) == closedSet_.end())
         {
-            SearchNode* inOpenQueue = openQueue_.find(node);
+            NODETYPE* inOpenQueue = openQueue_.find(node);
             if (inOpenQueue)
             {
-                // If the total cost of the node is greater than the
+                // If the local cost of the node is greater than the
                 // latest found node, remove the old one and insert
                 // the new one
-                if (inOpenQueue->getTotalCost() > node->getTotalCost())
+                if (inOpenQueue->getLocalCost() > node->getLocalCost())
                 {
-                    counterReplaced_++;
+                    #if DIAGNOSTICS_ASTAR
+                        counterReplaced_++;
+                    #endif
 
                     openQueue_.erase(inOpenQueue);
-                    inOpenQueue->release();
+                    releaseNode(inOpenQueue);
 
                     openQueue_.push(node->getTotalCost(), node);
 
@@ -211,12 +214,14 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
                 }
                 else
                 {
-                    counterPruned_++;
+                    #if DIAGNOSTICS_ASTAR
+                        counterPruned_++;
+                    #endif
 
-                    // If the latest node has a total cost that is greater
+                    // If the latest node has a local cost that is greater
                     // than what we already have, delete the new node
                     // and do not do anything else
-                    node->release();
+                    releaseNode(node);
 
                     #if DEBUG_ASTAR
                         cout << endl << "Worse solution: pruned (freed)" << endl;
@@ -225,7 +230,9 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
             }
             else
             {
-                counterInserted_++;
+                #if DIAGNOSTICS_ASTAR
+                    counterInserted_++;
+                #endif
 
                 // If the node is not in the open list
                 // add it right away
@@ -238,11 +245,13 @@ void AStar::pushNodes(vector<SearchNode*>& nodes)
         }
         else
         {
-            counterFoundInClosed_++;
+            #if DIAGNOSTICS_ASTAR
+                counterFoundInClosed_++;
+            #endif
 
             // If the node is already in the closed list, there
             // is no need to add it again. It can be removed
-            node->release();
+            releaseNode(node);
 
             #if DEBUG_ASTAR
                 cout << endl << "In the closed list: pruned (freed)" << endl;

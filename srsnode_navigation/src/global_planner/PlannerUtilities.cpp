@@ -51,18 +51,16 @@ geometry_msgs::PoseStamped shiftGoalToMinima(geometry_msgs::PoseStamped goal_pos
     unsigned char current_cost = goal_cost;
     double current_shift = max_shift;
 
-    double wx = 0.0, wy = 0.0;
-    unsigned int mx = 0, my = 0;
-
-
     for (double shift_sign : {-1, 1})
     {
         for (double abs_shift = 0; abs_shift <= max_shift; abs_shift += resolution)
         {
             double shift = abs_shift * shift_sign;
 
-            wx = goal_x + shift * shift_vector_x;
-            wy = goal_y + shift * shift_vector_y;
+            unsigned int mx = 0, my = 0;
+
+            double wx = goal_x + shift * shift_vector_x;
+            double wy = goal_y + shift * shift_vector_y;
             if (!costmap.worldToMap(wx, wy, mx, my))
             {
                 ROS_INFO("Shift check goes off of the map");
@@ -77,7 +75,7 @@ geometry_msgs::PoseStamped shiftGoalToMinima(geometry_msgs::PoseStamped goal_pos
             }
 
             if (cost < current_cost
-                || (cost < goal_cost && cost == current_cost && std::fabs(shift) < std::fabs(current_shift)))
+                || (cost == current_cost && abs_shift < std::fabs(current_shift)))
             {
                 current_shift = shift;
                 current_cost = cost;
@@ -91,11 +89,10 @@ geometry_msgs::PoseStamped shiftGoalToMinima(geometry_msgs::PoseStamped goal_pos
     ROS_INFO("Updated goal position from (%f, %f, %f: %d) to (%f, %f, %f: %d)",
         goal_x, goal_y, goal_yaw, goal_cost, current_x, current_y, goal_yaw, current_cost);
 
-   geometry_msgs::PoseStamped output = goal_pose;
-   output.pose.position.x = current_x;
-   output.pose.position.y = current_y;
+    goal_pose.pose.position.x = current_x;
+    goal_pose.pose.position.y = current_y;
 
-   return output;
+    return goal_pose;
 }
 
 }

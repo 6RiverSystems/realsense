@@ -16,39 +16,7 @@ namespace srs
 
 SerialIO::SerialIO(const char* pszName, const char* pszSerialPort) :
 	name_(pszName),
-	strSerialPort_(pszSerialPort),
-	isSynced_(false),
-	strDebug_("io." + name_),
-	thread_(),
-	serialThreadId_(),
-	work_(ioService_),
-	serialPort_(ioService_),
-	isSerialOpen_(false),
-	retryTimeout_(1.0),
-	isWriting_(false),
-	readBuffer_(1024),
-	writeBuffer_(),
-	message_(),
-	readState_(READ_STATE::DEFAULT),
-	cCRC_(0),
-	readCallback_(),
-	enableCRC_(false),
-	hasLeading_(false),
-	leading_(0),
-	hasTerminating_(false),
-	terminating_(0),
-	hasEscape_(false),
-	cEscape_(0),
-	firstByteDelay_(),
-	byteDelay_(),
-	interByteDelay_()
-#if defined(ENABLE_TEST_FIXTURE)
-	,
-	highrezclk_(),
-	lastTime_(std::chrono::milliseconds(0)),
-	messageTiming_(),
-	vecMessageTiming_()
-#endif
+	strSerialPort_(pszSerialPort)
 {
 	timer_.reset(new boost::asio::deadline_timer(ioService_));
 
@@ -350,8 +318,6 @@ void SerialIO::onReadComplete(const boost::system::error_code& error, std::size_
 		// Add room for the new data
 		message_.reserve(message_.size() + size);
 
-		size_t messageStart = 0;
-
 		auto changeState =
 			[&](const READ_STATE& eNewState)
 			{
@@ -377,7 +343,7 @@ void SerialIO::onReadComplete(const boost::system::error_code& error, std::size_
 				cCRC_ += cChar;
 			};
 
-		for(int i = 0; i < size; i++)
+		for(size_t i = 0; i < size; i++)
 		{
 			#if defined(ENABLE_TEST_FIXTURE)
 

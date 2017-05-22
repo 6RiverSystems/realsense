@@ -115,23 +115,23 @@ public:
 
     inline bool isWithinBounds(const Location& location) const
     {
-        return (0 <= location.x && location.x < width_) &&
-            (0 <= location.y && location.y < height_);
+        return (0 <= location.x && static_cast<unsigned int>(location.x) < width_) &&
+            (0 <= location.y && static_cast<unsigned int>(location.y) < height_);
     }
 
     inline bool isWithinBounds(const Position& position) const
     {
-        return (0 <= position.location.x && position.location.x < width_) &&
-            (0 <= position.location.y && position.location.y < height_);
+        return (0 <= position.location.x && static_cast<unsigned int>(position.location.x) < width_) &&
+            (0 <= position.location.y && static_cast<unsigned int>(position.location.y) < height_);
     }
 
     virtual void payloadMax(const Location& location, BaseType otherPayload) = 0;
     virtual void payloadSet(const Location& location, BaseType newPayload) = 0;
 
 private:
-    unsigned int height_;
-
     unsigned int width_;
+
+    unsigned int height_;
 };
 
 } // namespace srs

@@ -24,18 +24,18 @@ struct Grid2dSolutionFactory
 {
     static Solution<Grid2dSolutionItem>* fromConsecutiveGoals(MapStack* stack,
         Pose<> start, vector<Pose<>> goals,
-        MapStackNode::SearchParameters searchParameters = MapStackNode::SearchParameters());
+        MapStackSearchParameters searchParameters = MapStackSearchParameters());
     static Solution<Grid2dSolutionItem>* fromRotation(Pose<> pose,
         double theta0, double thetaf);
     static Solution<Grid2dSolutionItem>* fromSingleGoal(MapStack* stack,
         Position& start, Position& goal,
-        MapStackNode::SearchParameters searchParameters = MapStackNode::SearchParameters());
+        MapStackSearchParameters searchParameters = MapStackSearchParameters());
     static Solution<Grid2dSolutionItem>* fromSingleGoal(MapStack* stack,
         Pose<> start, Pose<> goal,
-        MapStackNode::SearchParameters searchParameters = MapStackNode::SearchParameters());
+        MapStackSearchParameters searchParameters = MapStackSearchParameters());
 
 private:
-    static Solution<Grid2dSolutionItem>* fromSearch(BaseMap* map, Plan& plan);
+    static Solution<Grid2dSolutionItem>* fromSearch(BaseMap* map, Plan<MapStackNode>& plan);
 
     static Position pose2Map(BaseMap* map, Pose<> pose);
 };

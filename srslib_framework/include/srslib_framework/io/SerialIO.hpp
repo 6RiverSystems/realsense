@@ -99,75 +99,75 @@ private:
 
 private:
 
-	std::string								name_;
+	std::string								name_{ "" };
 
-	bool									isSynced_;
+	bool									isSynced_{ false };
 
-	std::string								strDebug_;
+	std::string								strDebug_{ "io." + name_ };
 
-    std::shared_ptr<std::thread>			thread_;
+    std::shared_ptr<std::thread>			thread_{ };
 
-    std::thread::id							serialThreadId_;
+    std::thread::id							serialThreadId_{ };
 
-	boost::asio::io_service					ioService_;
+	boost::asio::io_service					ioService_{ };
 
-	boost::asio::io_service::work			work_;
+	boost::asio::io_service::work			work_{ ioService_ };
 
-	ConnectionTimer							timer_;
+	ConnectionTimer							timer_{ };
 
-    boost::asio::serial_port				serialPort_;
+    boost::asio::serial_port				serialPort_{ ioService_ };
 
-    bool									isSerialOpen_;
+    bool									isSerialOpen_{ false };
 
-	std::string								strSerialPort_;
+	std::string								strSerialPort_{ };
 
-	float									retryTimeout_;
+	float									retryTimeout_{ 1.0f };
 
-    bool									isWriting_;
+    bool									isWriting_{ false };
 
-    std::vector<char>						readBuffer_;
+    std::vector<char>						readBuffer_{ std::vector<char>( 1024 ) };
 
-    std::vector<char>						writeBuffer_;
+    std::vector<char>						writeBuffer_{ };
 
-    std::vector<char>						message_;
+    std::vector<char>						message_{ };
 
-	READ_STATE								readState_;
+	READ_STATE								readState_{ READ_STATE::DEFAULT };
 
-	uint8_t									cCRC_;
+	uint8_t									cCRC_{ 0 };
 
-    ConnectionCallbackFn					connectionCallback_;
+    ConnectionCallbackFn					connectionCallback_{ };
 
-    ReadCallbackFn							readCallback_;
+    ReadCallbackFn							readCallback_{ };
 
-	bool									enableCRC_;
+	bool									enableCRC_{ false };
 
-	bool									hasLeading_;
+	bool									hasLeading_{ false };
 
-	char									leading_;
+	char									leading_{ 0 };
 
-	bool									hasTerminating_;
+	bool									hasTerminating_{ false };
 
-	char									terminating_;
+	char									terminating_{ 0 };
 
-	bool									hasEscape_;
+	bool									hasEscape_{ false };
 
-	char									cEscape_;
+	char									cEscape_{ 0 };
 
-	std::chrono::microseconds				firstByteDelay_;
+	std::chrono::microseconds				firstByteDelay_{ };
 
-	std::chrono::microseconds				byteDelay_;
+	std::chrono::microseconds				byteDelay_{ };
 
-	std::chrono::microseconds				interByteDelay_;
+	std::chrono::microseconds				interByteDelay_{ };
 
 #if defined(ENABLE_TEST_FIXTURE)
 
-	std::chrono::high_resolution_clock				highrezclk_;
+	std::chrono::high_resolution_clock				highrezclk_{ };
 
-	std::chrono::high_resolution_clock::time_point	lastTime_;
+	std::chrono::high_resolution_clock::time_point	lastTime_{ std::chrono::milliseconds(0) };
 
-	MessageTiming									messageTiming_;
+	MessageTiming									messageTiming_{ };
 
-	std::vector<MessageTiming>						vecMessageTiming_;
+	std::vector<MessageTiming>						vecMessageTiming_{ };
 
 #endif
 

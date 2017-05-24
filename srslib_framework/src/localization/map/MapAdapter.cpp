@@ -36,7 +36,7 @@ costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(OccupancyMap* occupancy)
     size_t columns = occupancy->getWidthCells();
 
     costmap_2d::Costmap2D* costMap = new costmap_2d::Costmap2D(columns, rows,
-        occupancy->getResolution(), 0, 0);
+        occupancy->getResolution(), occupancy->getOrigin().x, occupancy->getOrigin().y);
 
     for (size_t row = 0; row < rows; row++)
     {
@@ -59,7 +59,7 @@ costmap_2d::Costmap2D* MapAdapter::map2CostMap2D(const LogicalMap* logical)
     unsigned int columns = logical->getWidthCells();
 
     costmap_2d::Costmap2D* costMap = new costmap_2d::Costmap2D(columns, rows,
-        logical->getResolution(), 0, 0);
+        logical->getResolution(), logical->getOrigin().x, logical->getOrigin().y);
 
     for (size_t row = 0; row < rows; row++)
     {

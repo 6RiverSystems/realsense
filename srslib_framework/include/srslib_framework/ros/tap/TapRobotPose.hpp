@@ -54,10 +54,15 @@ private:
         try
         {
             tf::StampedTransform robotTransform;
-            tfListener_.lookupTransform(ChuckTransforms::MAP, ChuckTransforms::BASE_FOOTPRINT,
-                ros::Time(0), robotTransform);
+            if (tfListener_.canTransform(ChuckTransforms::MAP, ChuckTransforms::BASE_FOOTPRINT,
+                ros::Time(0))) {
+                tfListener_.lookupTransform(ChuckTransforms::MAP, ChuckTransforms::BASE_FOOTPRINT,
+                    ros::Time(0), robotTransform);
 
-            data_ = PoseMessageFactory::transform2Pose(robotTransform);
+                data_ = PoseMessageFactory::transform2Pose(robotTransform);
+            } else {
+                data_ = Pose<>::INVALID;
+            }
 
             ROS_DEBUG_STREAM_THROTTLE_NAMED(1.0, "tap_robot_pose", "Robot pose" << data_);
         }

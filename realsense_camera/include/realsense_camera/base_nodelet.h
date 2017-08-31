@@ -94,7 +94,6 @@ protected:
   // Member Variables.
   ros::NodeHandle nh_;
   ros::NodeHandle pnh_;
-  ros::Time camera_start_ts_;
   ros::Publisher pointcloud_publisher_;
   ros::ServiceServer get_options_service_;
   ros::ServiceServer set_power_service_;

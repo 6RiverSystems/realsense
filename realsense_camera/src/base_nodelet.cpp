@@ -681,6 +681,7 @@ namespace realsense_camera
   {
     rs_intrinsics intrinsic;
     rs_get_stream_intrinsics(rs_device_, stream_index, &intrinsic, &rs_error_);
+
     if (rs_error_)
     {
       ROS_ERROR_STREAM(nodelet_name_ << " - Verify camera firmware version and/or calibration data!");
@@ -781,7 +782,6 @@ namespace realsense_camera
         ROS_ERROR_STREAM(nodelet_name_ << " - Couldn't start camera -- " << e.what());
         ros::shutdown();
       }
-      camera_start_ts_ = ros::Time::now();
       return "Camera Started Successfully";
     }
     return "Camera is already Started";
@@ -867,7 +867,7 @@ namespace realsense_camera
    */
   ros::Time BaseNodelet::getTimestamp(rs_stream stream_index, double frame_ts)
   {
-    return ros::Time(camera_start_ts_) + ros::Duration(frame_ts * 0.001);
+    return ros::Time::now();
   }
 
   /*

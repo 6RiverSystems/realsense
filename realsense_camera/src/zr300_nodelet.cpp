@@ -551,7 +551,7 @@ namespace realsense_camera
         if (prev_imu_ts_ != imu_ts_)
         {
           sensor_msgs::Imu imu_msg = sensor_msgs::Imu();
-          imu_msg.header.stamp = ros::Time(camera_start_ts_) + ros::Duration(imu_ts_ * 0.001);
+          imu_msg.header.stamp = ros::Time::now();
           imu_msg.header.frame_id = imu_optical_frame_id_;
 
           // Setting just the first element to -1.0 because device does not give orientation data

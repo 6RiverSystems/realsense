@@ -794,6 +794,10 @@ namespace realsense_camera
   {
     if (rs_is_device_streaming(rs_device_, 0) == 1)
     {
+      camera_publisher_[RS_STREAM_COLOR].shutdown();
+      camera_publisher_[RS_STREAM_DEPTH].shutdown();
+      camera_publisher_[RS_STREAM_INFRARED].shutdown();
+      pointcloud_publisher_.shutdown();camera_publisher_[RS_STREAM_INFRARED2].shutdown();
       ROS_INFO_STREAM(nodelet_name_ << " - Stopping camera");
       try
       {

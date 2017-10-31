@@ -86,7 +86,7 @@ if(USE_SYSTEM_LIBREALSENSE)
 else()
   catkin_package(
     INCLUDE_DIRS include
-    CATKIN_DEPENDS std_msgs message_runtime sensor_msgs librealsense
+    CATKIN_DEPENDS std_msgs message_runtime sensor_msgs librealsense libgpu_kernel_library
     LIBRARIES ${PROJECT_NAME}_nodelet
   )
 endif()
@@ -100,11 +100,11 @@ include_directories(
 add_library(${PROJECT_NAME}_nodelet src/base_nodelet.cpp src/sync_nodelet.cpp src/r200_nodelet.cpp src/f200_nodelet.cpp src/sr300_nodelet.cpp
   src/zr300_nodelet.cpp)
 target_link_libraries(${PROJECT_NAME}_nodelet
-  ${catkin_LIBRARIES}
+        gpu_kernel_library ${catkin_LIBRARIES}
 )
 if(USE_SYSTEM_LIBREALSENSE)
   target_link_libraries(${PROJECT_NAME}_nodelet
-    ${realsense_LIBRARY}
+    ${realsense_LIBRARY} gpu_kernel_library
     )
 endif()
 
@@ -128,17 +128,16 @@ if (CATKIN_ENABLE_TESTING)
 
   add_executable(tests_camera_core test/camera_core.cpp)
   target_link_libraries(tests_camera_core
-    ${catkin_LIBRARIES}
-    ${GTEST_LIBRARIES}
-    )
+    ${GTEST_LIBRARIES} gpu_kernel_library     ${catkin_LIBRARIES}
+          )
   add_dependencies(tests_camera_core ${PROJECT_NAME}_generate_messages_cpp ${PROJECT_NAME}_gencfg)
   add_dependencies(tests_camera_core ${catkin_EXPORTED_TARGETS})
 
   add_executable(tests_rgbd_topics test/rgbd_topics.cpp)
   target_link_libraries(tests_rgbd_topics
-    ${catkin_LIBRARIES}
-    ${GTEST_LIBRARIES}
-    )
+    ${GTEST_LIBRARIES} gpu_kernel_library     ${catkin_LIBRARIES}
+
+          )
   add_dependencies(tests_rgbd_topics ${PROJECT_NAME}_generate_messages_cpp)
   add_dependencies(tests_rgbd_topics ${catkin_EXPORTED_TARGETS})
 endif()

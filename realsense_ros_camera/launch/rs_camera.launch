@@ -11,7 +11,7 @@
 
   <arg name="fisheye_width"       default="640" />
   <arg name="fisheye_height"      default="480" />
-  <arg name="enable_fisheye"      default="true" />
+  <arg name="enable_fisheye"      default="false" />
 
   <arg name="depth_width"         default="640" />
   <arg name="depth_height"        default="480" />
@@ -19,11 +19,11 @@
 
   <arg name="infra1_width"        default="640" />
   <arg name="infra1_height"       default="480" />
-  <arg name="enable_infra1"       default="true" />
+  <arg name="enable_infra1"       default="false" />
 
   <arg name="infra2_width"        default="640" />
   <arg name="infra2_height"       default="480" />
-  <arg name="enable_infra2"       default="true" />
+  <arg name="enable_infra2"       default="false" />
 
   <arg name="color_width"         default="640" />
   <arg name="color_height"        default="480" />
@@ -38,11 +38,17 @@
   <arg name="accel_fps"           default="1000" />
   <arg name="enable_imu"          default="true" />
 
-  <arg name="enable_pointcloud"   default="false" />
+  <arg name="enable_pointcloud"   default="true" />
   <arg name="enable_sync"         default="false" />
 
-  <node pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" output="screen"/> 
+  <!--node pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" output="screen"/-->
   <node pkg="nodelet" type="nodelet" name="realsense_ros_$(arg camera)" args="load realsense_ros_camera/RealSenseCameraNodelet $(arg manager)" output="screen">
+
+    <remap from="camera/depth/image_raw"   to="depth/image_raw" />
+    <remap from="camera/depth/camera_info" to="depth/camera_info" />
+    <remap from="camera/color/image_raw"   to="rgb/image_raw" />
+    <remap from="camera/color/camera_info" to="rgb/camera_info" />
+    <remap from="camera/points"            to="depth/points" />
 
     <param name="enable_pointcloud"        type="bool" value="$(arg enable_pointcloud)" />
     <param name="enable_sync"              type="bool" value="$(arg enable_sync)" />
@@ -76,6 +82,9 @@
     <param name="accel_fps"                type="int"  value="$(arg accel_fps)" />
     <param name="enable_imu"               type="bool" value="$(arg enable_imu)" />
 
+    <param name="base_frame_id"            type="str"  value="$(arg camera)_link" />
+    <param name="depth_frame_id"           type="str"  value="$(arg camera)_depth_frame" />
+    <param name="color_frame_id"           type="str"  value="$(arg camera)_rgb_frame" />
     <param name="depth_optical_frame_id"   type="str"  value="$(arg camera)_depth_optical_frame" />
     <param name="infra1_optical_frame_id"  type="str"  value="$(arg camera)_infra1_optical_frame" />
     <param name="infra2_optical_frame_id"  type="str"  value="$(arg camera)_infra2_optical_frame" />

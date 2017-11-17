@@ -304,6 +304,7 @@ namespace realsense_ros_camera
         void setupPublishers()
         {
             ROS_INFO("setupPublishers...");
+            _node_handle = getNodeHandle();
             image_transport::ImageTransport image_transport(getNodeHandle());
 
             if (true == _enable[DEPTH])
@@ -312,7 +313,7 @@ namespace realsense_ros_camera
                 _info_publisher[DEPTH] = _node_handle.advertise<sensor_msgs::CameraInfo>("camera/depth/camera_info", 1);
 
                 if (_pointcloud)
-                    _pointcloud_publisher = _node_handle.advertise<sensor_msgs::PointCloud2>("/camera/points", 1);
+                    _pointcloud_publisher = _node_handle.advertise<sensor_msgs::PointCloud2>("camera/points", 1);
             }
 
             if (true == _enable[INFRA1])
@@ -875,7 +876,9 @@ namespace realsense_ros_camera
             auto depth_intrinsics = _stream_intrinsics[DEPTH];
             sensor_msgs::PointCloud2 msg_pointcloud;
             msg_pointcloud.header.stamp = t;
-            msg_pointcloud.header.frame_id = _optical_frame_id[DEPTH];
+            // TODO: change back to correct frame
+            // For testing purpose only
+            msg_pointcloud.header.frame_id = _optical_frame_id[COLOR];
             msg_pointcloud.width = depth_intrinsics.width;
             msg_pointcloud.height = depth_intrinsics.height;
             msg_pointcloud.is_dense = true;

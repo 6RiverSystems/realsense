@@ -33,7 +33,7 @@
   <arg name="depth_fps"           default="30" />
   <arg name="infra1_fps"          default="30" />
   <arg name="infra2_fps"          default="30" />
-  <arg name="color_fps"           default="30" />
+  <arg name="color_fps"           default="60" />
   <arg name="gyro_fps"            default="1000" />
   <arg name="accel_fps"           default="1000" />
   <arg name="enable_imu"          default="true" />

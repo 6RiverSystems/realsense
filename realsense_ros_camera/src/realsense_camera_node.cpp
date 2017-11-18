@@ -146,7 +146,7 @@ namespace realsense_ros_camera
             if (_pointcloud)
                 _sync_frames = true;
 
-            _pnh.param("serial_no", _serial_no);
+            _pnh.param<std::string>("serial_no", _serial_no, "");
 
             _pnh.param("depth_width", _width[DEPTH], DEPTH_WIDTH);
             _pnh.param("depth_height", _height[DEPTH], DEPTH_HEIGHT);
@@ -213,7 +213,27 @@ namespace realsense_ros_camera
 
                 // Take the first device in the list.
                 // TODO: Add an ability to get the specific device to work with from outside
-                _dev = list.front();
+
+                // Add ability to launch multiple cameras with serial number
+                ROS_INFO("%lu camera(s) detected in the usb bus", list.size());
+
+                for(size_t i=0; i< list.size(); i++){
+                    ROS_DEBUG("camera serial number: %s", list[i].get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+                    if(_serial_no.compare(list[i].get_info(RS2_CAMERA_INFO_SERIAL_NUMBER)) == 0)
+                    {
+                        ROS_INFO("Find the assigned camera");
+                        _dev = list[i];
+                        break;
+                    }
+                }
+
+                if(!_dev)
+                {
+                    ROS_ERROR("Can't find the camera listed in launch file");
+                    ros::shutdown();
+                    exit(1);
+                }
+
                 _ctx->set_devices_changed_callback([this](rs2::event_information& info)
                 {
                     if (info.was_removed(_dev))

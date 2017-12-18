@@ -173,9 +173,7 @@ namespace realsense_camera
       if (stream_index == RS_STREAM_DEPTH)
       {
         // fill depth buffer
-        image_depth16_ = reinterpret_cast<const uint16_t *>(rs_get_frame_data(rs_device_,
-          RS_STREAM_DEPTH_ALIGNED_TO_RECTIFIED_COLOR, 0));
-
+        image_depth16_ = reinterpret_cast<const uint16_t *>(rs_get_frame_data(rs_device_, stream_index, 0));
         float depth_scale_meters = rs_get_device_depth_scale(rs_device_, &rs_error_);
         if (depth_scale_meters == MILLIMETER_METERS)
         {
@@ -192,7 +190,7 @@ namespace realsense_camera
       }
       else if (stream_index == RS_STREAM_COLOR)
       {
-        image_[stream_index].data = (unsigned char *) (rs_get_frame_data(rs_device_, RS_STREAM_RECTIFIED_COLOR, 0));
+         image_[stream_index].data = (unsigned char *) (rs_get_frame_data(rs_device_, RS_STREAM_RECTIFIED_COLOR, 0));
       }
       else
       {

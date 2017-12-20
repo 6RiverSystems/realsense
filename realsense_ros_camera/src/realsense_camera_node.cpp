@@ -58,6 +58,7 @@ namespace realsense_ros_camera
     public:
         RealSenseCameraNodelet() :
             _serial_no(""),
+            _usb_port_id(""),
             _base_frame_id(""),
             _intialize_time_base(false)
         {
@@ -146,7 +147,8 @@ namespace realsense_ros_camera
             if (_pointcloud)
                 _sync_frames = true;
 
-            _pnh.param<std::string>("serial_no", _serial_no, "");
+            // get usb port number to launch correct camera
+            _pnh.param<std::string>("usb_port_id", _usb_port_id, "");
 
             _pnh.param("depth_width", _width[DEPTH], DEPTH_WIDTH);
             _pnh.param("depth_height", _height[DEPTH], DEPTH_HEIGHT);
@@ -211,17 +213,15 @@ namespace realsense_ros_camera
                     exit(1);
                 }
 
-                // Take the first device in the list.
-                // TODO: Add an ability to get the specific device to work with from outside
-
-                // Add ability to launch multiple cameras with serial number
+                // add ability to launch multiple cameras with usb port number
                 ROS_INFO("%lu camera(s) detected in the usb bus", list.size());
 
-                for(size_t i=0; i< list.size(); i++){
-                    ROS_DEBUG("camera serial number: %s", list[i].get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
-                    if(_serial_no.compare(list[i].get_info(RS2_CAMERA_INFO_SERIAL_NUMBER)) == 0)
+                for(size_t i = 0; i < list.size(); i++){
+                    std::string port_id = parseUsbPortId(list[i].get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
+
+                    if(_usb_port_id.compare(port_id) == 0)
                     {
-                        ROS_INFO("Find the assigned camera");
+                        ROS_INFO("Camera found in usb port: %s", port_id.c_str());
                         _dev = list[i];
                         break;
                     }
@@ -229,7 +229,7 @@ namespace realsense_ros_camera
 
                 if(!_dev)
                 {
-                    ROS_ERROR("Can't find the camera listed in launch file");
+                    ROS_ERROR("Can't find camera in usb port: %s", _usb_port_id.c_str());
                     ros::shutdown();
                     exit(1);
                 }
@@ -319,6 +319,26 @@ namespace realsense_ros_camera
                 ROS_ERROR_STREAM("Unknown exception has occured!");
                 throw;
             }
+        }
+
+        std::string parseUsbPortId(std::string usb_path)
+        {
+            // split the string
+            std::string delimiter = "/";
+            std::string temp;
+            std::vector<std::string> split;
+            size_t pos = 0;
+
+            // store split substring in a vector
+            while((pos = usb_path.find(delimiter)) != std::string::npos) {
+                temp = usb_path.substr(0, pos);
+                split.push_back(temp);
+                usb_path.erase(0, pos + delimiter.length());
+            }
+
+            // replace 2-1.1 to 2-1-1 for consistency
+            std::string port_id = split[6].replace(3, 1, "-");
+            return port_id;
         }
 
         void setupPublishers()
@@ -1124,6 +1144,7 @@ namespace realsense_ros_camera
         std::map<stream_index_pair, std::unique_ptr<rs2::sensor>> _sensors;
 
         std::string _serial_no;
+        std::string _usb_port_id;
         float _depth_scale_meters;
 
         std::map<stream_index_pair, rs2_intrinsics> _stream_intrinsics;

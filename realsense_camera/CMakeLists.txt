@@ -28,6 +28,7 @@ set(REALSENSE_CATKIN_BASED_DEPS
   std_msgs
   sensor_msgs
   pcl_ros
+  flann
 )
 
 if(USE_SYSTEM_LIBREALSENSE)
@@ -112,9 +113,9 @@ add_dependencies(${PROJECT_NAME}_nodelet ${PROJECT_NAME}_generate_messages_cpp $
 add_dependencies(${PROJECT_NAME}_nodelet ${catkin_EXPORTED_TARGETS})
 
 add_executable(get_debug_info src/get_debug_info.cpp)
-target_link_libraries(get_debug_info ${catkin_LIBRARIES})
+target_link_libraries(get_debug_info ${catkin_LIBRARIES} flann_cuda flann_cuda_s)
 if(USE_SYSTEM_LIBREALSENSE)
-  target_link_libraries(get_debug_info PRIVATE realsense::realsense)
+  target_link_libraries(get_debug_info PRIVATE realsense::realsense flann_cuda flann_cuda_s)
 endif()
 
 if (CATKIN_ENABLE_TESTING)
@@ -128,18 +129,18 @@ if (CATKIN_ENABLE_TESTING)
 
   add_executable(tests_camera_core test/camera_core.cpp)
   target_link_libraries(tests_camera_core
-    ${GTEST_LIBRARIES} gpu_kernel_library     ${catkin_LIBRARIES}
+    ${GTEST_LIBRARIES} gpu_kernel_library     ${catkin_LIBRARIES} flann_cuda flann_cuda_s
           )
   add_dependencies(tests_camera_core ${PROJECT_NAME}_generate_messages_cpp ${PROJECT_NAME}_gencfg)
   add_dependencies(tests_camera_core ${catkin_EXPORTED_TARGETS})
 
   add_executable(tests_rgbd_topics test/rgbd_topics.cpp)
   target_link_libraries(tests_rgbd_topics
-    ${GTEST_LIBRARIES} gpu_kernel_library     ${catkin_LIBRARIES}
+    ${GTEST_LIBRARIES} gpu_kernel_library     ${catkin_LIBRARIES} flann_cuda flann_cuda_s
 
           )
   add_dependencies(tests_rgbd_topics ${PROJECT_NAME}_generate_messages_cpp)
-  add_dependencies(tests_rgbd_topics ${catkin_EXPORTED_TARGETS})
+  add_dependencies(tests_rgbd_topics ${catkin_EXPORTED_TARGETS} flann_cuda flann_cuda_s)
 endif()
 
 # Install nodelet library

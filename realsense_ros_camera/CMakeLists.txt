@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(realsense_ros_camera)
 
-find_package(catkin REQUIRED COMPONENTS
+option(USE_SYSTEM_LIBREALSENSE2 "Build realsense_ros_camera against system librealsense2, not the one built with catkin" OFF)
+
+set(REALSENSE2_CATKIN_BASED_DEPS
     message_generation
     roscpp
     sensor_msgs
@@ -10,12 +12,22 @@ find_package(catkin REQUIRED COMPONENTS
     cv_bridge
     image_transport
     tf
-    )
+)
 
-find_package(realsense2)
-if(NOT realsense2_FOUND)
-    message(FATAL_ERROR "\n\n Intel RealSense SDK 2.0 is missing, please install it from https://github.com/IntelRealSense/librealsense/releases\n\n")
+if(USE_SYSTEM_LIBREALSENSE2)
+  find_package(realsense2 REQUIRED)
+else()
+  list(APPEND REALSENSE2_CATKIN_BASED_DEPS librealsense2)
 endif()
+
+find_package(catkin REQUIRED COMPONENTS
+  ${REALSENSE2_CATKIN_BASED_DEPS}
+)
+
+#find_package(realsense2)
+#if(NOT realsense2_FOUND)
+#    message(FATAL_ERROR "\n\n Intel RealSense SDK 2.0 is missing, please install it from https://github.com/IntelRealSense/librealsense/releases\n\n")
+#endif()
 
 if (CMAKE_BUILD_TYPE EQUAL "RELEASE")
     message(STATUS "Create Release Build.")

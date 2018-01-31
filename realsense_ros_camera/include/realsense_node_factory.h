@@ -67,6 +67,8 @@ namespace realsense_ros_camera
     private:
         virtual void onInit() override;
         void tryGetLogSeverity(rs2_log_severity& severity) const;
+        std::string parseUsbPortId(std::string usb_path) const;
+
 
         std::unique_ptr<InterfaceRealSenseNode> _realSenseNode;
         rs2::device _device;

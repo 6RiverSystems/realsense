@@ -40,25 +40,33 @@ void RealSenseNodeFactory::onInit()
             exit(1);
         }
 
+        // add ability to launch multiple cameras with usb port number
+        ROS_INFO("%lu camera(s) detected in the usb bus", list.size());
+
         auto privateNh = getPrivateNodeHandle();
         auto nh = getNodeHandle();
         std::string serial_no("");
+        std::string usb_port_id("");
         privateNh.param("serial_no", serial_no, std::string(""));
+        privateNh.param("usb_port_id", usb_port_id, std::string(""));
         bool found = false;
         for (auto&& dev : list)
         {
             auto sn = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
-            ROS_DEBUG_STREAM("Device with serial number " << sn << " was found.");
-            if (serial_no.empty())
+            auto port_id = parseUsbPortId(dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
+            ROS_DEBUG_STREAM("Device connected with USB port: " << port_id << " was found.");
+            if (usb_port_id.empty())
             {
                 _device = dev;
+                usb_port_id = port_id;
                 serial_no = sn;
                 found = true;
                 break;
             }
-            else if (sn == serial_no)
+            else if (port_id == usb_port_id)
             {
                 _device = dev;
+                serial_no = sn;
                 found = true;
                 break;
             }
@@ -66,7 +74,7 @@ void RealSenseNodeFactory::onInit()
 
         if (!found)
         {
-            ROS_FATAL_STREAM("The requested device with serial number " << serial_no << " is NOT found!");
+            ROS_FATAL_STREAM("The requested device at USB port: " << usb_port_id << " is NOT found!");
             ros::shutdown();
             exit(1);
         }
@@ -146,6 +154,26 @@ void RealSenseNodeFactory::onInit()
         ROS_ERROR_STREAM("Unknown exception has occured!");
         throw;
     }
+}
+
+std::string RealSenseNodeFactory::parseUsbPortId(std::string usb_path) const
+{
+    // split the string
+    std::string delimiter = "/";
+    std::string temp;
+    std::vector<std::string> split;
+    size_t pos = 0;
+
+    // store split substring in a vector
+    while((pos = usb_path.find(delimiter)) != std::string::npos) {
+        temp = usb_path.substr(0, pos);
+        split.push_back(temp);
+        usb_path.erase(0, pos + delimiter.length());
+    }
+
+    // replace 2-1.1 to 2-1-1 for consistency
+    std::string port_id = split[6].replace(3, 1, "-");
+    return port_id;
 }
 
 void RealSenseNodeFactory::tryGetLogSeverity(rs2_log_severity& severity) const

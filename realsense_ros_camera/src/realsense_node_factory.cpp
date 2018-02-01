@@ -45,20 +45,20 @@ void RealSenseNodeFactory::onInit()
 
         auto privateNh = getPrivateNodeHandle();
         auto nh = getNodeHandle();
+
         std::string serial_no("");
         std::string usb_port_id("");
         privateNh.param("serial_no", serial_no, std::string(""));
         privateNh.param("usb_port_id", usb_port_id, std::string(""));
+
         bool found = false;
         for (auto&& dev : list)
         {
             auto sn = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
             auto port_id = parseUsbPortId(dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
-            ROS_DEBUG_STREAM("Device connected with USB port: " << port_id << " was found.");
             if (usb_port_id.empty())
             {
                 _device = dev;
-                usb_port_id = port_id;
                 serial_no = sn;
                 found = true;
                 break;
@@ -66,8 +66,8 @@ void RealSenseNodeFactory::onInit()
             else if (port_id == usb_port_id)
             {
                 _device = dev;
-                serial_no = sn;
                 found = true;
+                ROS_INFO_STREAM("Device connected with USB port: " << port_id << " (serial number: " << sn << ") was found.");
                 break;
             }
         }

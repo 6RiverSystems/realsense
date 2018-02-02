@@ -11,8 +11,10 @@ RS435Node::RS435Node(ros::NodeHandle& nodeHandle,
 
 void RS435Node::registerDynamicReconfigCb()
 {
+    ros::NodeHandle pnh("~");
+    _server.reset(new dynamic_reconfigure::Server<rs435_paramsConfig>(pnh));
     _f = boost::bind(&RS435Node::callback, this, _1, _2);
-    _server.setCallback(_f);
+    _server->setCallback(_f);
 }
 
 void RS435Node::setParam(rs435_paramsConfig &config, rs435_param param)

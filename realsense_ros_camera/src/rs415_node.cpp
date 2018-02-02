@@ -11,10 +11,11 @@ RS415Node::RS415Node(ros::NodeHandle& nodeHandle,
 
 void RS415Node::registerDynamicReconfigCb()
 {
+    ros::NodeHandle pnh("~");
+    _server.reset(new dynamic_reconfigure::Server<rs415_paramsConfig>(pnh));
     _f = boost::bind(&RS415Node::callback, this, _1, _2);
-    _server.setCallback(_f);
+    _server->setCallback(_f);
 }
-
 
 void RS415Node::setParam(rs415_paramsConfig &config, rs415_param param)
 {

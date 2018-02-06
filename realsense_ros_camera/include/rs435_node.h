@@ -39,10 +39,10 @@ namespace realsense_ros_camera
         virtual void registerDynamicReconfigCb() override;
 
     private:
-            void callback(rs435_paramsConfig &config, uint32_t level);
-            void setParam(rs435_paramsConfig &config, rs435_param param);
+        void callback(rs435_paramsConfig &config, uint32_t level);
+        void setParam(rs435_paramsConfig &config, rs435_param param);
 
-            boost::shared_ptr<dynamic_reconfigure::Server<rs435_paramsConfig>> _server;
-            dynamic_reconfigure::Server<rs435_paramsConfig>::CallbackType _f;
+        boost::shared_ptr<dynamic_reconfigure::Server<rs435_paramsConfig>> _server;
+        dynamic_reconfigure::Server<rs435_paramsConfig>::CallbackType _f;
     };
 }

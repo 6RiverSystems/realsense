@@ -42,6 +42,8 @@ namespace realsense_ros_camera
         void callback(rs435_paramsConfig &config, uint32_t level);
         void setParam(rs435_paramsConfig &config, rs435_param param);
 
+        ros::NodeHandle& _pnh;
+
         boost::shared_ptr<dynamic_reconfigure::Server<rs435_paramsConfig>> _server;
         dynamic_reconfigure::Server<rs435_paramsConfig>::CallbackType _f;
     };

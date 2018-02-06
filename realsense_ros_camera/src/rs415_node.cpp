@@ -5,14 +5,14 @@ using namespace realsense_ros_camera;
 
 RS415Node::RS415Node(ros::NodeHandle& nodeHandle,
                      ros::NodeHandle& privateNodeHandle,
-                     rs2::device dev, const std::string& serial_no)
-    : BaseD400Node(nodeHandle, privateNodeHandle, dev, serial_no)
+                     rs2::device dev, const std::string& serial_no):
+    BaseD400Node(nodeHandle, privateNodeHandle, dev, serial_no),
+    _pnh(privateNodeHandle)
 {}
 
 void RS415Node::registerDynamicReconfigCb()
 {
-    ros::NodeHandle pnh("~");
-    _server.reset(new dynamic_reconfigure::Server<rs415_paramsConfig>(pnh));
+    _server.reset(new dynamic_reconfigure::Server<rs415_paramsConfig>(_pnh));
     _f = boost::bind(&RS415Node::callback, this, _1, _2);
     _server->setCallback(_f);
 }

@@ -79,6 +79,49 @@ void RealSenseNodeFactory::onInit()
             exit(1);
         }
 
+        // we found the device. Restart the device and wait for it to come up again
+
+        ROS_INFO_STREAM("RESETING DEVICE: " << usb_port_id);
+        _device.hardware_reset();
+        ros::Duration(5).sleep();
+        ROS_INFO_STREAM("Attempting to reacquire");
+
+        list = _ctx.query_devices();
+        if (0 == list.size())
+        {
+            ROS_ERROR("No RealSense devices were found! Terminating RealSense Node...");
+            ros::shutdown();
+            exit(1);
+        }
+        found = false;
+        for (auto&& dev : list)
+        {
+            auto sn = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
+            auto port_id = parseUsbPortId(dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
+            if (usb_port_id.empty())
+            {
+                _device = dev;
+                serial_no = sn;
+                found = true;
+                break;
+            }
+            else if (port_id == usb_port_id)
+            {
+                _device = dev;
+                found = true;
+                ROS_INFO_STREAM("Device connected with USB port: " << port_id << " (serial number: " << sn << ") was found.");
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            ROS_FATAL_STREAM("The requested device at USB port: " << usb_port_id << " is NOT found!");
+            ros::shutdown();
+            exit(1);
+        }
+
+
         _ctx.set_devices_changed_callback([this](rs2::event_information& info)
         {
             if (info.was_removed(_device))

@@ -51,15 +51,18 @@ void RealSenseNodeFactory::onInit()
         privateNh.param("serial_no", serial_no, std::string(""));
         privateNh.param("usb_port_id", usb_port_id, std::string(""));
 
+
+        std::string serial_number;
+        std::string port_id;
         bool found = false;
         for (auto&& dev : list)
         {
-            auto sn = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
-            auto port_id = parseUsbPortId(dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
+            serial_number = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
+            port_id = parseUsbPortId(dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
             if (usb_port_id.empty())
             {
                 _device = dev;
-                serial_no = sn;
+                serial_no = serial_number;
                 found = true;
                 break;
             }
@@ -67,7 +70,7 @@ void RealSenseNodeFactory::onInit()
             {
                 _device = dev;
                 found = true;
-                ROS_INFO_STREAM("Device connected with USB port: " << port_id << " (serial number: " << sn << ") was found.");
+                ROS_INFO_STREAM("Device connected with USB port: " << port_id << " (serial number: " << serial_number << ") was found.");
                 break;
             }
         }
@@ -81,7 +84,7 @@ void RealSenseNodeFactory::onInit()
 
         // we found the device. Restart the device and wait for it to come up again
 
-        ROS_INFO_STREAM("RESETING DEVICE: " << usb_port_id);
+        ROS_INFO_STREAM("RESETING DEVICE: " << port_id << " with serial number: " << serial_no);
         _device.hardware_reset();
         ros::Duration(5).sleep();
         ROS_INFO_STREAM("Attempting to reacquire");
@@ -98,18 +101,11 @@ void RealSenseNodeFactory::onInit()
         {
             auto sn = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
             auto port_id = parseUsbPortId(dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
-            if (usb_port_id.empty())
+            if (sn == serial_no && port_id == usb_port_id)
             {
                 _device = dev;
                 serial_no = sn;
                 found = true;
-                break;
-            }
-            else if (port_id == usb_port_id)
-            {
-                _device = dev;
-                found = true;
-                ROS_INFO_STREAM("Device connected with USB port: " << port_id << " (serial number: " << sn << ") was found.");
                 break;
             }
         }

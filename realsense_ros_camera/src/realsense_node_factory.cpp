@@ -104,7 +104,6 @@ void RealSenseNodeFactory::onInit()
             if (sn == serial_no )
             {
                 _device = dev;
-                serial_no = sn;
                 found = true;
                 break;
             }

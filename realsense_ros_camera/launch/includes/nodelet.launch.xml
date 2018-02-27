@@ -4,6 +4,7 @@
   <arg name="usb_port_id"         default=""/>
   <arg name="serial_no"           default=""/>
   <arg name="json_file_path"      default=""/>
+
   <arg name="depth"               default="depth"/>
   <arg name="infra1"              default="infra1"/>
   <arg name="infra2"              default="infra2"/>
@@ -45,6 +46,8 @@
   <arg name="enable_sync"         default="false"/>
   <arg name="align_depth"         default="false"/>
 
+  <arg name="depth_exposure"      default="800"/>
+
   <node pkg="nodelet" type="nodelet" name="realsense_ros_camera" args="load realsense_ros_camera/RealSenseNodeFactory $(arg manager)">
     <param name="camera"                   type="str"  value="$(arg camera)"/>
     <param name="usb_port_id"              type="str"  value="$(arg usb_port_id)"/>
@@ -83,6 +86,8 @@
     <param name="gyro_fps"                 type="int"  value="$(arg gyro_fps)"/>
     <param name="accel_fps"                type="int"  value="$(arg accel_fps)"/>
     <param name="enable_imu"               type="bool" value="$(arg enable_imu)"/>
+
+    <param name="depth_exposure"           type="int"  value="$(arg depth_exposure)"/>
 
     <param name="base_frame_id"            type="str"  value="$(arg camera)_link"/>
     <param name="depth_frame_id"           type="str"  value="$(arg camera)_$(arg depth)_frame"/>

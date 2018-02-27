@@ -51,7 +51,6 @@ void RealSenseNodeFactory::onInit()
         privateNh.param("serial_no", serial_no, std::string(""));
         privateNh.param("usb_port_id", usb_port_id, std::string(""));
 
-
         std::string serial_number;
         std::string port_id;
         bool found = false;

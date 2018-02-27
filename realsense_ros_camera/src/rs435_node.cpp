@@ -8,7 +8,11 @@ RS435Node::RS435Node(ros::NodeHandle& nodeHandle,
                      rs2::device dev, const std::string& serial_no):
     BaseD400Node(nodeHandle, privateNodeHandle, dev, serial_no),
     _pnh(privateNodeHandle)
-{}
+{
+    // if depth_exposure is not provided, use the default value from cfg file
+    _pnh.param("depth_exposure", _depth_exposure, -1);
+    ROS_INFO("depth_exposure is set to %d", _depth_exposure);
+}
 
 void RS435Node::registerDynamicReconfigCb()
 {
@@ -82,9 +86,17 @@ void RS435Node::setParam(rs435_paramsConfig &config, rs435_param param)
         break;
     case rs435_depth_exposure:
     {
+        // use _depth_exposure to initialize the depth exposure for the first time
         static const auto rs435_depth_exposure_factor = 20;
-        ROS_DEBUG_STREAM("rs435_depth_exposure: " << config.rs435_depth_exposure * rs435_depth_exposure_factor);
-        _sensors[DEPTH].set_option(rs2_option::RS2_OPTION_EXPOSURE, config.rs435_depth_exposure * rs435_depth_exposure_factor);
+        if(_depth_exposure < 0)
+        {
+            ROS_DEBUG_STREAM("rs435_depth_exposure: " << config.rs435_depth_exposure * rs435_depth_exposure_factor);
+            _sensors[DEPTH].set_option(rs2_option::RS2_OPTION_EXPOSURE, config.rs435_depth_exposure * rs435_depth_exposure_factor);
+        } else {
+            ROS_DEBUG_STREAM("rs435_depth_exposure: " << _depth_exposure * rs435_depth_exposure_factor);
+            _sensors[DEPTH].set_option(rs2_option::RS2_OPTION_EXPOSURE, _depth_exposure * rs435_depth_exposure_factor);
+            _depth_exposure = -1;
+        }
     }
         break;
     case rs435_depth_laser_power:

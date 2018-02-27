@@ -44,6 +44,8 @@ namespace realsense_ros_camera
 
         ros::NodeHandle& _pnh;
 
+        int _depth_exposure{0};
+
         boost::shared_ptr<dynamic_reconfigure::Server<rs435_paramsConfig>> _server;
         dynamic_reconfigure::Server<rs435_paramsConfig>::CallbackType _f;
     };

@@ -87,7 +87,9 @@ void BaseRealSenseNode::publishTopics()
     setupDevice();
     setupPublishers();
     setupStreams();
-    publishStaticTransforms();
+    if (_enable_tf) {
+        publishStaticTransforms();
+    }
     ROS_INFO_STREAM("RealSense Node Is Up!");
 }
 
@@ -102,6 +104,7 @@ void BaseRealSenseNode::getParameters()
 
     _pnh.param("align_depth", _align_depth, ALIGN_DEPTH);
     _pnh.param("enable_pointcloud", _pointcloud, POINTCLOUD);
+    _pnh.param("enable_tf", _enable_tf, ENABLE_TF);
     _pnh.param("enable_sync", _sync_frames, SYNC_FRAMES);
     if (_pointcloud || _align_depth)
         _sync_frames = true;

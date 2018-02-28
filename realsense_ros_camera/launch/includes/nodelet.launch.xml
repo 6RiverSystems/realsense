@@ -43,6 +43,7 @@
   <arg name="enable_imu"          default="true"/>
 
   <arg name="enable_pointcloud"   default="false"/>
+  <arg name="enable_tf"   default="false"/>
   <arg name="enable_sync"         default="false"/>
   <arg name="align_depth"         default="false"/>
 
@@ -55,6 +56,7 @@
     <param name="json_file_path"           type="str"  value="$(arg json_file_path)"/>
 
     <param name="enable_pointcloud"        type="bool" value="$(arg enable_pointcloud)"/>
+    <param name="enable_tf"                type="bool" value="$(arg enable_tf)"/>
     <param name="enable_sync"              type="bool" value="$(arg enable_sync)"/>
     <param name="align_depth"              type="bool" value="$(arg align_depth)"/>
 

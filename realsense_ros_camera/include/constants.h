@@ -35,6 +35,7 @@ namespace realsense_ros_camera
     const bool ALIGN_DEPTH    = false;
     const bool POINTCLOUD     = false;
     const bool SYNC_FRAMES    = false;
+    const bool ENABLE_TF      = false;
 
     const int DEPTH_WIDTH     = 640;
     const int DEPTH_HEIGHT    = 480;

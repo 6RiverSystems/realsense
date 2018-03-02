@@ -9,6 +9,7 @@
 namespace realsense_ros_camera
 {
     enum rs435_param{
+        rs435_depth_visual_preset = 3,
         rs435_depth_exposure = 9,
         rs435_depth_laser_power,
         rs435_depth_emitter_enabled,
@@ -45,6 +46,7 @@ namespace realsense_ros_camera
         ros::NodeHandle& _pnh;
 
         int _depth_exposure{0};
+        int _depth_preset{0};
 
         boost::shared_ptr<dynamic_reconfigure::Server<rs435_paramsConfig>> _server;
         dynamic_reconfigure::Server<rs435_paramsConfig>::CallbackType _f;

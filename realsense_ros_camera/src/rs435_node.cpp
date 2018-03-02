@@ -9,9 +9,9 @@ RS435Node::RS435Node(ros::NodeHandle& nodeHandle,
     BaseD400Node(nodeHandle, privateNodeHandle, dev, serial_no),
     _pnh(privateNodeHandle)
 {
-    // if depth_exposure is not provided, use the default value from cfg file
+    // if depth_exposure and depth_exposure are not provided, use the default values from cfg file
     _pnh.param("depth_exposure", _depth_exposure, -1);
-    ROS_INFO("depth_exposure is set to %d", _depth_exposure);
+    _pnh.param("depth_preset", _depth_preset, -1);
 }
 
 void RS435Node::registerDynamicReconfigCb()
@@ -88,15 +88,14 @@ void RS435Node::setParam(rs435_paramsConfig &config, rs435_param param)
     {
         // use _depth_exposure to initialize the depth exposure for the first time
         static const auto rs435_depth_exposure_factor = 20;
-        if(_depth_exposure < 0)
+        if(_depth_exposure > 0)
         {
-            ROS_DEBUG_STREAM("rs435_depth_exposure: " << config.rs435_depth_exposure * rs435_depth_exposure_factor);
-            _sensors[DEPTH].set_option(rs2_option::RS2_OPTION_EXPOSURE, config.rs435_depth_exposure * rs435_depth_exposure_factor);
-        } else {
-            ROS_DEBUG_STREAM("rs435_depth_exposure: " << _depth_exposure * rs435_depth_exposure_factor);
-            _sensors[DEPTH].set_option(rs2_option::RS2_OPTION_EXPOSURE, _depth_exposure * rs435_depth_exposure_factor);
+            config.rs435_depth_exposure = _depth_exposure;
             _depth_exposure = -1;
         }
+
+        ROS_INFO("Set rs435_depth_exposure to %d", config.rs435_depth_exposure);
+        _sensors[DEPTH].set_option(rs2_option::RS2_OPTION_EXPOSURE, config.rs435_depth_exposure * rs435_depth_exposure_factor);
     }
         break;
     case rs435_depth_laser_power:
@@ -109,6 +108,16 @@ void RS435Node::setParam(rs435_paramsConfig &config, rs435_param param)
     case rs435_depth_emitter_enabled:
         ROS_DEBUG_STREAM("rs435_depth_emitter_enabled: " << config.rs435_depth_emitter_enabled);
         _sensors[DEPTH].set_option(rs2_option::RS2_OPTION_EMITTER_ENABLED, config.rs435_depth_emitter_enabled);
+        break;
+    case rs435_depth_visual_preset:
+
+        if(_depth_preset > 0)
+        {
+            config.rs435_depth_visual_preset = _depth_preset;
+            _depth_preset = -1;
+        }
+        ROS_INFO("Set visual preset to %d", config.rs435_depth_visual_preset);
+        BaseD400Node::setParam(config, (base_depth_param)param);
         break;
     default:
         BaseD400Node::setParam(config, (base_depth_param)param);

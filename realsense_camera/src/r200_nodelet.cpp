@@ -275,7 +275,7 @@ namespace realsense_camera
   {
     BaseNodelet::publishStaticTransforms();
 
-    tf::Quaternion q_i2io;
+    /*tf::Quaternion q_i2io;
     geometry_msgs::TransformStamped b2i_msg;
     geometry_msgs::TransformStamped i2io_msg;
 
@@ -304,7 +304,7 @@ namespace realsense_camera
     i2io_msg.transform.rotation.y = q_i2io.getY();
     i2io_msg.transform.rotation.z = q_i2io.getZ();
     i2io_msg.transform.rotation.w = q_i2io.getW();
-    static_tf_broadcaster_.sendTransform(i2io_msg);
+    static_tf_broadcaster_.sendTransform(i2io_msg);*/
   }
 
   /*
@@ -318,7 +318,7 @@ namespace realsense_camera
     BaseNodelet::publishDynamicTransforms();
 
     // Transform base frame to infrared2 frame
-    tr.setOrigin(tf::Vector3(
+    /*tr.setOrigin(tf::Vector3(
            color2ir2_extrinsic_.translation[2],
           -color2ir2_extrinsic_.translation[0],
           -color2ir2_extrinsic_.translation[1]));
@@ -332,5 +332,6 @@ namespace realsense_camera
     tr.setRotation(q);
     dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
           frame_id_[RS_STREAM_INFRARED2], optical_frame_id_[RS_STREAM_INFRARED2]));
+    */
   }
 }  // namespace realsense_camera

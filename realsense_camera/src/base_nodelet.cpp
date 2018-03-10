@@ -1068,7 +1068,7 @@ namespace realsense_camera
     tf::Quaternion q_i2io;
     geometry_msgs::TransformStamped c2d_msg;
     geometry_msgs::TransformStamped d2do_msg;
-    //geometry_msgs::TransformStamped b2c_msg;
+    // geometry_msgs::TransformStamped b2c_msg;
     geometry_msgs::TransformStamped c2co_msg;
     geometry_msgs::TransformStamped c2i_msg;
     geometry_msgs::TransformStamped i2io_msg;
@@ -1077,7 +1077,7 @@ namespace realsense_camera
     transform_ts_ = ros::Time::now();
 
     // Transform color frame to color optical frame
-    if(enable_[RS_STREAM_COLOR])
+    if (enable_[RS_STREAM_COLOR])
     {
       q_c2co.setRPY(-M_PI/2, 0.0, -M_PI/2);
       c2co_msg.header.stamp = transform_ts_;
@@ -1093,7 +1093,7 @@ namespace realsense_camera
       static_tf_broadcaster_.sendTransform(c2co_msg);
     }
 
-    if(enable_[RS_STREAM_DEPTH])
+    if (enable_[RS_STREAM_DEPTH])
     {
       // Transform color frame to depth frame
       c2d_msg.header.stamp = transform_ts_;
@@ -1123,7 +1123,7 @@ namespace realsense_camera
       static_tf_broadcaster_.sendTransform(d2do_msg);
     }
 
-    if(enable_[RS_STREAM_INFRARED])
+    if (enable_[RS_STREAM_INFRARED])
     {
       // Transform base frame to infrared frame
       c2i_msg.header.stamp = transform_ts_;
@@ -1171,7 +1171,7 @@ namespace realsense_camera
     dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
           base_frame_id_, frame_id_[RS_STREAM_COLOR]));*/
 
-    if(enable_[RS_STREAM_COLOR])
+    if (enable_[RS_STREAM_COLOR])
     {
       // Transform color frame to color optical frame
       tr.setOrigin(tf::Vector3(0, 0, 0));
@@ -1181,7 +1181,7 @@ namespace realsense_camera
             frame_id_[RS_STREAM_COLOR], optical_frame_id_[RS_STREAM_COLOR]));
     }
 
-    if(enable_[RS_STREAM_DEPTH])
+    if (enable_[RS_STREAM_DEPTH])
     {
       // Transform color frame to depth frame
       tr.setOrigin(tf::Vector3(
@@ -1200,7 +1200,7 @@ namespace realsense_camera
             frame_id_[RS_STREAM_DEPTH], optical_frame_id_[RS_STREAM_DEPTH]));
     }
 
-    if(enable_[RS_STREAM_INFRARED])
+    if (enable_[RS_STREAM_INFRARED])
     {
       // Transform base frame to infrared frame
       tr.setOrigin(tf::Vector3(

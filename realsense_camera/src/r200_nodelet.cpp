@@ -275,7 +275,7 @@ namespace realsense_camera
   {
     BaseNodelet::publishStaticTransforms();
 
-    if(enable_[RS_STREAM_INFRARED2])
+    if (enable_[RS_STREAM_INFRARED2])
     {
       tf::Quaternion q_i2io;
       geometry_msgs::TransformStamped b2i_msg;
@@ -320,7 +320,7 @@ namespace realsense_camera
 
     BaseNodelet::publishDynamicTransforms();
 
-    if(enable_[RS_STREAM_INFRARED2])
+    if (enable_[RS_STREAM_INFRARED2])
     {
       // Transform base frame to infrared2 frame
       tr.setOrigin(tf::Vector3(

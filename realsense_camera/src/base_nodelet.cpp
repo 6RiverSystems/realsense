@@ -1065,98 +1065,93 @@ namespace realsense_camera
 
     tf::Quaternion q_c2co;
     tf::Quaternion q_d2do;
-    //tf::Quaternion q_i2io;
+    tf::Quaternion q_i2io;
     geometry_msgs::TransformStamped c2d_msg;
     geometry_msgs::TransformStamped d2do_msg;
     //geometry_msgs::TransformStamped b2c_msg;
     geometry_msgs::TransformStamped c2co_msg;
-    //geometry_msgs::TransformStamped c2i_msg;
-    //geometry_msgs::TransformStamped i2io_msg;
+    geometry_msgs::TransformStamped c2i_msg;
+    geometry_msgs::TransformStamped i2io_msg;
 
     // Get the current timestamp for all static transforms
     transform_ts_ = ros::Time::now();
 
-    // The color frame is used as the base frame.
-    // Hence no additional transformation is done from base frame to color frame.
-    /*b2c_msg.header.stamp = transform_ts_;
-    b2c_msg.header.frame_id = base_frame_id_;
-    b2c_msg.child_frame_id = frame_id_[RS_STREAM_COLOR];
-    b2c_msg.transform.translation.x = 0;
-    b2c_msg.transform.translation.y = 0;
-    b2c_msg.transform.translation.z = 0;
-    b2c_msg.transform.rotation.x = 0;
-    b2c_msg.transform.rotation.y = 0;
-    b2c_msg.transform.rotation.z = 0;
-    b2c_msg.transform.rotation.w = 1;
-    static_tf_broadcaster_.sendTransform(b2c_msg);*/
-
     // Transform color frame to color optical frame
-    q_c2co.setRPY(-M_PI/2, 0.0, -M_PI/2);
-    c2co_msg.header.stamp = transform_ts_;
-    c2co_msg.header.frame_id = frame_id_[RS_STREAM_COLOR];
-    c2co_msg.child_frame_id = optical_frame_id_[RS_STREAM_COLOR];
-    c2co_msg.transform.translation.x = 0;
-    c2co_msg.transform.translation.y = 0;
-    c2co_msg.transform.translation.z = 0;
-    c2co_msg.transform.rotation.x = q_c2co.getX();
-    c2co_msg.transform.rotation.y = q_c2co.getY();
-    c2co_msg.transform.rotation.z = q_c2co.getZ();
-    c2co_msg.transform.rotation.w = q_c2co.getW();
-    static_tf_broadcaster_.sendTransform(c2co_msg);
+    if(enable_[RS_STREAM_COLOR])
+    {
+      q_c2co.setRPY(-M_PI/2, 0.0, -M_PI/2);
+      c2co_msg.header.stamp = transform_ts_;
+      c2co_msg.header.frame_id = frame_id_[RS_STREAM_COLOR];
+      c2co_msg.child_frame_id = optical_frame_id_[RS_STREAM_COLOR];
+      c2co_msg.transform.translation.x = 0;
+      c2co_msg.transform.translation.y = 0;
+      c2co_msg.transform.translation.z = 0;
+      c2co_msg.transform.rotation.x = q_c2co.getX();
+      c2co_msg.transform.rotation.y = q_c2co.getY();
+      c2co_msg.transform.rotation.z = q_c2co.getZ();
+      c2co_msg.transform.rotation.w = q_c2co.getW();
+      static_tf_broadcaster_.sendTransform(c2co_msg);
+    }
 
-    // Transform color frame to depth frame
-    c2d_msg.header.stamp = transform_ts_;
-    c2d_msg.header.frame_id = frame_id_[RS_STREAM_COLOR];
-    c2d_msg.child_frame_id = frame_id_[RS_STREAM_DEPTH];
-    c2d_msg.transform.translation.x =  color2depth_extrinsic_.translation[2];
-    c2d_msg.transform.translation.y = -color2depth_extrinsic_.translation[0];
-    c2d_msg.transform.translation.z = -color2depth_extrinsic_.translation[1];
-    c2d_msg.transform.rotation.x = 0;
-    c2d_msg.transform.rotation.y = 0;
-    c2d_msg.transform.rotation.z = 0;
-    c2d_msg.transform.rotation.w = 1;
-    static_tf_broadcaster_.sendTransform(c2d_msg);
+    if(enable_[RS_STREAM_DEPTH])
+    {
+      // Transform color frame to depth frame
+      c2d_msg.header.stamp = transform_ts_;
+      c2d_msg.header.frame_id = frame_id_[RS_STREAM_COLOR];
+      c2d_msg.child_frame_id = frame_id_[RS_STREAM_DEPTH];
+      c2d_msg.transform.translation.x =  color2depth_extrinsic_.translation[2];
+      c2d_msg.transform.translation.y = -color2depth_extrinsic_.translation[0];
+      c2d_msg.transform.translation.z = -color2depth_extrinsic_.translation[1];
+      c2d_msg.transform.rotation.x = 0;
+      c2d_msg.transform.rotation.y = 0;
+      c2d_msg.transform.rotation.z = 0;
+      c2d_msg.transform.rotation.w = 1;
+      static_tf_broadcaster_.sendTransform(c2d_msg);
 
-    // Transform depth frame to depth optical frame
-    q_d2do.setRPY(-M_PI/2, 0.0, -M_PI/2);
-    d2do_msg.header.stamp = transform_ts_;
-    d2do_msg.header.frame_id = frame_id_[RS_STREAM_DEPTH];
-    d2do_msg.child_frame_id = optical_frame_id_[RS_STREAM_DEPTH];
-    d2do_msg.transform.translation.x = 0;
-    d2do_msg.transform.translation.y = 0;
-    d2do_msg.transform.translation.z = 0;
-    d2do_msg.transform.rotation.x = q_d2do.getX();
-    d2do_msg.transform.rotation.y = q_d2do.getY();
-    d2do_msg.transform.rotation.z = q_d2do.getZ();
-    d2do_msg.transform.rotation.w = q_d2do.getW();
-    static_tf_broadcaster_.sendTransform(d2do_msg);
+      // Transform depth frame to depth optical frame
+      q_d2do.setRPY(-M_PI/2, 0.0, -M_PI/2);
+      d2do_msg.header.stamp = transform_ts_;
+      d2do_msg.header.frame_id = frame_id_[RS_STREAM_DEPTH];
+      d2do_msg.child_frame_id = optical_frame_id_[RS_STREAM_DEPTH];
+      d2do_msg.transform.translation.x = 0;
+      d2do_msg.transform.translation.y = 0;
+      d2do_msg.transform.translation.z = 0;
+      d2do_msg.transform.rotation.x = q_d2do.getX();
+      d2do_msg.transform.rotation.y = q_d2do.getY();
+      d2do_msg.transform.rotation.z = q_d2do.getZ();
+      d2do_msg.transform.rotation.w = q_d2do.getW();
+      static_tf_broadcaster_.sendTransform(d2do_msg);
+    }
 
-    // Transform base frame to infrared frame
-    /*b2i_msg.header.stamp = transform_ts_;
-    b2i_msg.header.frame_id = base_frame_id_;
-    b2i_msg.child_frame_id = frame_id_[RS_STREAM_INFRARED];
-    b2i_msg.transform.translation.x =  color2ir_extrinsic_.translation[2];
-    b2i_msg.transform.translation.y = -color2ir_extrinsic_.translation[0];
-    b2i_msg.transform.translation.z = -color2ir_extrinsic_.translation[1];
-    b2i_msg.transform.rotation.x = 0;
-    b2i_msg.transform.rotation.y = 0;
-    b2i_msg.transform.rotation.z = 0;
-    b2i_msg.transform.rotation.w = 1;
-    static_tf_broadcaster_.sendTransform(b2i_msg);
+    if(enable_[RS_STREAM_INFRARED])
+    {
+      // Transform base frame to infrared frame
+      c2i_msg.header.stamp = transform_ts_;
+      c2i_msg.header.frame_id = base_frame_id_;
+      c2i_msg.child_frame_id = frame_id_[RS_STREAM_INFRARED];
+      c2i_msg.transform.translation.x =  color2ir_extrinsic_.translation[2];
+      c2i_msg.transform.translation.y = -color2ir_extrinsic_.translation[0];
+      c2i_msg.transform.translation.z = -color2ir_extrinsic_.translation[1];
+      c2i_msg.transform.rotation.x = 0;
+      c2i_msg.transform.rotation.y = 0;
+      c2i_msg.transform.rotation.z = 0;
+      c2i_msg.transform.rotation.w = 1;
+      static_tf_broadcaster_.sendTransform(c2i_msg);
 
-    // Transform infrared frame to infrared optical frame
-    q_i2io.setRPY(-M_PI/2, 0.0, -M_PI/2);
-    i2io_msg.header.stamp = transform_ts_;
-    i2io_msg.header.frame_id = frame_id_[RS_STREAM_INFRARED];
-    i2io_msg.child_frame_id = optical_frame_id_[RS_STREAM_INFRARED];
-    i2io_msg.transform.translation.x = 0;
-    i2io_msg.transform.translation.y = 0;
-    i2io_msg.transform.translation.z = 0;
-    i2io_msg.transform.rotation.x = q_i2io.getX();
-    i2io_msg.transform.rotation.y = q_i2io.getY();
-    i2io_msg.transform.rotation.z = q_i2io.getZ();
-    i2io_msg.transform.rotation.w = q_i2io.getW();
-    static_tf_broadcaster_.sendTransform(i2io_msg); */
+      // Transform infrared frame to infrared optical frame
+      q_i2io.setRPY(-M_PI/2, 0.0, -M_PI/2);
+      i2io_msg.header.stamp = transform_ts_;
+      i2io_msg.header.frame_id = frame_id_[RS_STREAM_INFRARED];
+      i2io_msg.child_frame_id = optical_frame_id_[RS_STREAM_INFRARED];
+      i2io_msg.transform.translation.x = 0;
+      i2io_msg.transform.translation.y = 0;
+      i2io_msg.transform.translation.z = 0;
+      i2io_msg.transform.rotation.x = q_i2io.getX();
+      i2io_msg.transform.rotation.y = q_i2io.getY();
+      i2io_msg.transform.rotation.z = q_i2io.getZ();
+      i2io_msg.transform.rotation.w = q_i2io.getW();
+      static_tf_broadcaster_.sendTransform(i2io_msg);
+    }
   }
 
   /*
@@ -1167,6 +1162,7 @@ namespace realsense_camera
     tf::Transform tr;
     tf::Quaternion q;
 
+    // In our URDF, we provide camera_link to color_frame
     // The color frame is used as the base frame.
     // Hence no additional transformation is done from base frame to color frame.
     /*
@@ -1175,44 +1171,53 @@ namespace realsense_camera
     dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
           base_frame_id_, frame_id_[RS_STREAM_COLOR]));*/
 
-    // Transform color frame to color optical frame
-    tr.setOrigin(tf::Vector3(0, 0, 0));
-    q.setRPY(-M_PI/2, 0.0, -M_PI/2);
-    tr.setRotation(q);
-    dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
-          frame_id_[RS_STREAM_COLOR], optical_frame_id_[RS_STREAM_COLOR]));
+    if(enable_[RS_STREAM_COLOR])
+    {
+      // Transform color frame to color optical frame
+      tr.setOrigin(tf::Vector3(0, 0, 0));
+      q.setRPY(-M_PI/2, 0.0, -M_PI/2);
+      tr.setRotation(q);
+      dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
+            frame_id_[RS_STREAM_COLOR], optical_frame_id_[RS_STREAM_COLOR]));
+    }
 
-    // Transform color frame to depth frame
-    tr.setOrigin(tf::Vector3(
-           color2depth_extrinsic_.translation[2],
-          -color2depth_extrinsic_.translation[0],
-          -color2depth_extrinsic_.translation[1]));
-    tr.setRotation(tf::Quaternion(0, 0, 0, 1));
-    dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
-          frame_id_[RS_STREAM_COLOR], frame_id_[RS_STREAM_DEPTH]));
+    if(enable_[RS_STREAM_DEPTH])
+    {
+      // Transform color frame to depth frame
+      tr.setOrigin(tf::Vector3(
+             color2depth_extrinsic_.translation[2],
+            -color2depth_extrinsic_.translation[0],
+            -color2depth_extrinsic_.translation[1]));
+      tr.setRotation(tf::Quaternion(0, 0, 0, 1));
+      dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
+            frame_id_[RS_STREAM_COLOR], frame_id_[RS_STREAM_DEPTH]));
 
-    // Transform depth frame to depth optical frame
-    tr.setOrigin(tf::Vector3(0, 0, 0));
-    q.setRPY(-M_PI/2, 0.0, -M_PI/2);
-    tr.setRotation(q);
-    dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
-          frame_id_[RS_STREAM_DEPTH], optical_frame_id_[RS_STREAM_DEPTH]));
+      // Transform depth frame to depth optical frame
+      tr.setOrigin(tf::Vector3(0, 0, 0));
+      q.setRPY(-M_PI/2, 0.0, -M_PI/2);
+      tr.setRotation(q);
+      dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
+            frame_id_[RS_STREAM_DEPTH], optical_frame_id_[RS_STREAM_DEPTH]));
+    }
 
-    // Transform base frame to infrared frame
-    /*tr.setOrigin(tf::Vector3(
-           color2ir_extrinsic_.translation[2],
-          -color2ir_extrinsic_.translation[0],
-          -color2ir_extrinsic_.translation[1]));
-    tr.setRotation(tf::Quaternion(0, 0, 0, 1));
-    dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
-          frame_id_[RS_STREAM_COLOR], frame_id_[RS_STREAM_INFRARED]));
+    if(enable_[RS_STREAM_INFRARED])
+    {
+      // Transform base frame to infrared frame
+      tr.setOrigin(tf::Vector3(
+             color2ir_extrinsic_.translation[2],
+            -color2ir_extrinsic_.translation[0],
+            -color2ir_extrinsic_.translation[1]));
+      tr.setRotation(tf::Quaternion(0, 0, 0, 1));
+      dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
+            frame_id_[RS_STREAM_COLOR], frame_id_[RS_STREAM_INFRARED]));
 
-    // Transform infrared frame to infrared optical frame
-    tr.setOrigin(tf::Vector3(0, 0, 0));
-    q.setRPY(-M_PI/2, 0.0, -M_PI/2);
-    tr.setRotation(q);
-    dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
-          frame_id_[RS_STREAM_INFRARED], optical_frame_id_[RS_STREAM_INFRARED]));*/
+      // Transform infrared frame to infrared optical frame
+      tr.setOrigin(tf::Vector3(0, 0, 0));
+      q.setRPY(-M_PI/2, 0.0, -M_PI/2);
+      tr.setRotation(q);
+      dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
+            frame_id_[RS_STREAM_INFRARED], optical_frame_id_[RS_STREAM_INFRARED]));
+    }
   }
 
   /*

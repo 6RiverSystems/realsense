@@ -8,6 +8,8 @@
 #include <realsense_ros_camera/base_d400_paramsConfig.h>
 #include <realsense_ros_camera/rs415_paramsConfig.h>
 #include <realsense_ros_camera/rs435_paramsConfig.h>
+#include <tf/transform_broadcaster.h>
+#include <boost/thread.hpp>
 
 
 namespace realsense_ros_camera
@@ -67,6 +69,8 @@ namespace realsense_ros_camera
                                const std::string& from,
                                const std::string& to);
         void publishStaticTransforms();
+        void prepareTransforms();
+        void publishDynamicTransforms();
         void publishRgbToDepthPCTopic(const ros::Time& t, const std::map<stream_index_pair, bool>& is_frame_arrived);
         Extrinsics rsExtrinsicsToMsg(const rs2_extrinsics& extrinsics, const std::string& frame_id) const;
         rs2_extrinsics getRsExtrinsics(const stream_index_pair& from_stream, const stream_index_pair& to_stream);
@@ -109,6 +113,8 @@ namespace realsense_ros_camera
         std::map<stream_index_pair, bool> _enable;
         std::map<stream_index_pair, std::string> _stream_name;
         tf2_ros::StaticTransformBroadcaster _static_tf_broadcaster;
+        tf::TransformBroadcaster _dynamic_tf_broadcaster;
+        boost::shared_ptr<boost::thread> _transform_thread;
 
         std::map<stream_index_pair, image_transport::Publisher> _image_publishers;
         std::map<stream_index_pair, ros::Publisher> _imu_publishers;
@@ -135,6 +141,8 @@ namespace realsense_ros_camera
         bool _sync_frames;
         bool _pointcloud;
         bool _enable_tf;
+        bool _enable_tf_dynamic;
+        int _tf_publication_rate;
         rs2::asynchronous_syncer _syncer;
 
         std::map<stream_index_pair, cv::Mat> _depth_aligned_image;

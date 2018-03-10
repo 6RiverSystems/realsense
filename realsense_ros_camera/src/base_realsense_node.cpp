@@ -88,7 +88,13 @@ void BaseRealSenseNode::publishTopics()
     setupPublishers();
     setupStreams();
     if (_enable_tf) {
-        publishStaticTransforms();
+        if (_enable_tf_dynamic) {
+            _transform_thread =
+                boost::shared_ptr<boost::thread>(new boost::thread (boost::bind(&BaseRealSenseNode::prepareTransforms, this)));
+        }
+        else {
+            publishStaticTransforms();
+        }
     }
     ROS_INFO_STREAM("RealSense Node Is Up!");
 }
@@ -105,6 +111,8 @@ void BaseRealSenseNode::getParameters()
     _pnh.param("align_depth", _align_depth, ALIGN_DEPTH);
     _pnh.param("enable_pointcloud", _pointcloud, POINTCLOUD);
     _pnh.param("enable_tf", _enable_tf, ENABLE_TF);
+    _pnh.param("enable_tf_dynamic", _enable_tf_dynamic, ENABLE_TF_DYNAMIC);
+    _pnh.param("tf_publication_rate", _tf_publication_rate, TF_PUBLICATION_RATE);
     _pnh.param("enable_sync", _sync_frames, SYNC_FRAMES);
     if (_pointcloud || _align_depth)
         _sync_frames = true;
@@ -927,21 +935,153 @@ void BaseRealSenseNode::publish_static_tf(const ros::Time& t,
     _static_tf_broadcaster.sendTransform(msg);
 }
 
+void BaseRealSenseNode::prepareTransforms()
+{
+    // Publish transforms for the cameras
+    ros::Rate loop_rate(_tf_publication_rate);
+
+    while (ros::ok())
+    {
+      publishDynamicTransforms();
+
+      loop_rate.sleep();
+    }
+}
+
+void BaseRealSenseNode::publishDynamicTransforms()
+{
+    // depth frame is the reference frame for all other frames
+    ros::Time transform_ts_ = ros::Time::now();
+    tf::Transform tr_;
+    tf::Transform tr_optical_;
+
+    tf::Quaternion q_optical_;
+    q_optical_.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
+    tr_optical_.setOrigin(tf::Vector3(0, 0, 0));
+    tr_optical_.setRotation(q_optical_);
+
+    _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_optical_, transform_ts_,
+        _frame_id[DEPTH], _optical_frame_id[DEPTH]));
+
+    if (_enable[COLOR])
+    {
+        // Transform depth to color
+        auto& ex = (_align_depth)?(_i_ex):(getRsExtrinsics(DEPTH, COLOR));
+        auto Q = rotationMatrixToQuaternion(ex.rotation);
+
+        tr_.setOrigin(tf::Vector3(ex.translation[0], ex.translation[1], ex.translation[2]));
+        tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
+        tr_.setRotation(q);
+
+        _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_, transform_ts_,
+            _frame_id[DEPTH], _frame_id[COLOR]));
+
+        // Transform color frame to color optical frame
+        _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_optical_, transform_ts_,
+            _frame_id[COLOR], _optical_frame_id[COLOR]));
+
+        if (_align_depth)
+        {
+            _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_, transform_ts_,
+                _frame_id[DEPTH], _depth_aligned_frame_id[COLOR]));
+
+            _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_optical_, transform_ts_,
+                _depth_aligned_frame_id[COLOR], _optical_frame_id[COLOR]));
+        }
+    }
+
+    if (_enable[INFRA1])
+    {
+        auto& ex = (_align_depth)?(_i_ex):(getRsExtrinsics(DEPTH, INFRA1));
+        auto Q = rotationMatrixToQuaternion(ex.rotation);
+
+        // Transform base to infra1
+        tr_.setOrigin(tf::Vector3(ex.translation[0], ex.translation[1], ex.translation[2]));
+        tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
+        tr_.setRotation(q);
+
+        _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_, transform_ts_,
+            _frame_id[DEPTH], _frame_id[INFRA1]));
+
+        // Transform infra1 frame to infra1 optical frame
+        _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_optical_, transform_ts_,
+            _frame_id[INFRA1], _optical_frame_id[INFRA1]));
+
+        if (_align_depth)
+        {
+            _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_, transform_ts_,
+                _frame_id[DEPTH], _depth_aligned_frame_id[INFRA1]));
+
+            _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_optical_, transform_ts_,
+                _depth_aligned_frame_id[INFRA1], _optical_frame_id[INFRA1]));
+        }
+    }
+
+    if (_enable[INFRA2])
+    {
+        auto& ex = (_align_depth)?(_i_ex):(getRsExtrinsics(DEPTH, INFRA2));
+        auto Q = rotationMatrixToQuaternion(ex.rotation);
+
+        // Transform base to infra1
+        tr_.setOrigin(tf::Vector3(ex.translation[0], ex.translation[1], ex.translation[2]));
+        tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
+        tr_.setRotation(q);
+
+        _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_, transform_ts_,
+            _frame_id[DEPTH], _frame_id[INFRA2]));
+
+        // Transform infra1 frame to infra1 optical frame
+        _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_optical_, transform_ts_,
+            _frame_id[INFRA2], _optical_frame_id[INFRA2]));
+
+        if (_align_depth)
+        {
+            _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_, transform_ts_,
+                _frame_id[DEPTH], _depth_aligned_frame_id[INFRA2]));
+
+            _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_optical_, transform_ts_,
+                _depth_aligned_frame_id[INFRA2], _optical_frame_id[INFRA2]));
+        }
+    }
+
+    if (_enable[FISHEYE])
+    {
+        auto& ex = (_align_depth)?(_i_ex):(getRsExtrinsics(DEPTH, FISHEYE));
+        auto Q = rotationMatrixToQuaternion(ex.rotation);
+
+        // Transform base to infra1
+        tr_.setOrigin(tf::Vector3(ex.translation[0], ex.translation[1], ex.translation[2]));
+        tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
+        tr_.setRotation(q);
+
+        _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_, transform_ts_,
+            _frame_id[DEPTH], _frame_id[FISHEYE]));
+
+        // Transform infra1 frame to infra1 optical frame
+        _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_optical_, transform_ts_,
+            _frame_id[FISHEYE], _optical_frame_id[FISHEYE]));
+
+        if (_align_depth)
+        {
+            _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_, transform_ts_,
+                _frame_id[DEPTH], _depth_aligned_frame_id[FISHEYE]));
+
+            _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_optical_, transform_ts_,
+                _depth_aligned_frame_id[FISHEYE], _optical_frame_id[FISHEYE]));
+        }
+    }
+}
+
 void BaseRealSenseNode::publishStaticTransforms()
 {
     ROS_INFO("publishStaticTransforms...");
     // Publish static transforms
     tf::Quaternion quaternion_optical;
     quaternion_optical.setRPY(-M_PI / 2, 0.0, -M_PI / 2);
+    float3 zero_trans{0, 0, 0};
 
     // Get the current timestamp for all static transforms
     ros::Time transform_ts_ = ros::Time::now();
-
-    // The depth frame is used as the base link.
-    // Hence no additional transformation is done from base link to depth frame.
-    // Transform base link to depth frame
-    float3 zero_trans{0, 0, 0};
-    publish_static_tf(transform_ts_, zero_trans, quaternion{0, 0, 0, 1}, _base_frame_id, _frame_id[DEPTH]);
 
     // Transform depth frame to depth optical frame
     quaternion q{quaternion_optical.getX(), quaternion_optical.getY(), quaternion_optical.getZ(), quaternion_optical.getW()};

@@ -950,7 +950,14 @@ void BaseRealSenseNode::prepareTransforms()
 
 void BaseRealSenseNode::publishDynamicTransforms()
 {
-    // depth frame is the reference frame for all other frames
+    // For single camera, we can use publishStaticTransforms() to publish static transform.
+    // However, for multiple cameras we must use publishDynamicTransforms().
+
+    // In our URDF, we provide the tf from camera_link to camera_depth_frame. The driver
+    // considers depth frame as reference frame and provides other tf publication,
+    // which are tf from depth to color, color to color_optical,  depth to depth_optical,
+    // depth to ir and ir to ir_optical
+
     ros::Time transform_ts_ = ros::Time::now();
     tf::Transform tr_;
     tf::Transform tr_optical_;
@@ -969,7 +976,7 @@ void BaseRealSenseNode::publishDynamicTransforms()
         auto& ex = (_align_depth)?(_i_ex):(getRsExtrinsics(DEPTH, COLOR));
         auto Q = rotationMatrixToQuaternion(ex.rotation);
 
-        tr_.setOrigin(tf::Vector3(ex.translation[0], ex.translation[1], ex.translation[2]));
+        tr_.setOrigin(tf::Vector3(ex.translation[2], -ex.translation[0], -ex.translation[1]));
         tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
         tr_.setRotation(q);
 
@@ -995,8 +1002,8 @@ void BaseRealSenseNode::publishDynamicTransforms()
         auto& ex = (_align_depth)?(_i_ex):(getRsExtrinsics(DEPTH, INFRA1));
         auto Q = rotationMatrixToQuaternion(ex.rotation);
 
-        // Transform base to infra1
-        tr_.setOrigin(tf::Vector3(ex.translation[0], ex.translation[1], ex.translation[2]));
+        // Transform depth to infra1
+        tr_.setOrigin(tf::Vector3(ex.translation[2], -ex.translation[0], -ex.translation[1]));
         tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
         tr_.setRotation(q);
 
@@ -1022,15 +1029,15 @@ void BaseRealSenseNode::publishDynamicTransforms()
         auto& ex = (_align_depth)?(_i_ex):(getRsExtrinsics(DEPTH, INFRA2));
         auto Q = rotationMatrixToQuaternion(ex.rotation);
 
-        // Transform base to infra1
-        tr_.setOrigin(tf::Vector3(ex.translation[0], ex.translation[1], ex.translation[2]));
+        // Transform depth to infra2
+        tr_.setOrigin(tf::Vector3(ex.translation[2], -ex.translation[0], -ex.translation[1]));
         tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
         tr_.setRotation(q);
 
         _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_, transform_ts_,
             _frame_id[DEPTH], _frame_id[INFRA2]));
 
-        // Transform infra1 frame to infra1 optical frame
+        // Transform infra2 frame to infra2 optical frame
         _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_optical_, transform_ts_,
             _frame_id[INFRA2], _optical_frame_id[INFRA2]));
 
@@ -1049,15 +1056,15 @@ void BaseRealSenseNode::publishDynamicTransforms()
         auto& ex = (_align_depth)?(_i_ex):(getRsExtrinsics(DEPTH, FISHEYE));
         auto Q = rotationMatrixToQuaternion(ex.rotation);
 
-        // Transform base to infra1
-        tr_.setOrigin(tf::Vector3(ex.translation[0], ex.translation[1], ex.translation[2]));
+        // Transform dpeth to fisheye
+        tr_.setOrigin(tf::Vector3(ex.translation[2], -ex.translation[0], -ex.translation[1]));
         tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
         tr_.setRotation(q);
 
         _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_, transform_ts_,
             _frame_id[DEPTH], _frame_id[FISHEYE]));
 
-        // Transform infra1 frame to infra1 optical frame
+        // Transform fisheye frame to fisheye optical frame
         _dynamic_tf_broadcaster.sendTransform(tf::StampedTransform(tr_optical_, transform_ts_,
             _frame_id[FISHEYE], _optical_frame_id[FISHEYE]));
 
@@ -1074,6 +1081,14 @@ void BaseRealSenseNode::publishDynamicTransforms()
 
 void BaseRealSenseNode::publishStaticTransforms()
 {
+    // For single camera, we can use publishStaticTransforms() to publish static transform.
+    // However, for multiple cameras we must use publishDynamicTransforms().
+
+    // In our URDF, we provide the tf from camera_link to camera_depth_frame. The driver
+    // considers depth frame as reference frame and provides other tf publication,
+    // which are tf from depth to color, color to color_optical,  depth to depth_optical,
+    // depth to ir and ir to ir_optical
+
     ROS_INFO("publishStaticTransforms...");
     // Publish static transforms
     tf::Quaternion quaternion_optical;
@@ -1104,7 +1119,7 @@ void BaseRealSenseNode::publishStaticTransforms()
 
         float3 trans{ex.translation[0], ex.translation[1], ex.translation[2]};
         quaternion q1{Q.x(), Q.y(), Q.z(), Q.w()};
-        publish_static_tf(transform_ts_, trans, q1, _base_frame_id, _frame_id[COLOR]);
+        publish_static_tf(transform_ts_, trans, q1, _frame_id[DEPTH], _frame_id[COLOR]);
 
         // Transform color frame to color optical frame
         quaternion q2{quaternion_optical.getX(), quaternion_optical.getY(), quaternion_optical.getZ(), quaternion_optical.getW()};
@@ -1112,7 +1127,7 @@ void BaseRealSenseNode::publishStaticTransforms()
 
         if (_align_depth)
         {
-            publish_static_tf(transform_ts_, trans, q1, _base_frame_id, _depth_aligned_frame_id[COLOR]);
+            publish_static_tf(transform_ts_, trans, q1, _frame_id[DEPTH], _depth_aligned_frame_id[COLOR]);
             publish_static_tf(transform_ts_, zero_trans, q2, _depth_aligned_frame_id[COLOR], _optical_frame_id[COLOR]);
         }
     }
@@ -1125,7 +1140,7 @@ void BaseRealSenseNode::publishStaticTransforms()
         // Transform base to infra1
         float3 trans{ex.translation[0], ex.translation[1], ex.translation[2]};
         quaternion q1{Q.x(), Q.y(), Q.z(), Q.w()};
-        publish_static_tf(transform_ts_, trans, q1, _base_frame_id, _frame_id[INFRA1]);
+        publish_static_tf(transform_ts_, trans, q1, _frame_id[DEPTH], _frame_id[INFRA1]);
 
         // Transform infra1 frame to infra1 optical frame
         quaternion q2{quaternion_optical.getX(), quaternion_optical.getY(), quaternion_optical.getZ(), quaternion_optical.getW()};
@@ -1133,7 +1148,7 @@ void BaseRealSenseNode::publishStaticTransforms()
 
         if (_align_depth)
         {
-            publish_static_tf(transform_ts_, trans, q1, _base_frame_id, _depth_aligned_frame_id[INFRA1]);
+            publish_static_tf(transform_ts_, trans, q1, _frame_id[DEPTH], _depth_aligned_frame_id[INFRA1]);
             publish_static_tf(transform_ts_, zero_trans, q2, _depth_aligned_frame_id[INFRA1], _optical_frame_id[INFRA1]);
         }
     }
@@ -1146,7 +1161,7 @@ void BaseRealSenseNode::publishStaticTransforms()
         // Transform base to infra2
         float3 trans{ex.translation[0], ex.translation[1], ex.translation[2]};
         quaternion q1{Q.x(), Q.y(), Q.z(), Q.w()};
-        publish_static_tf(transform_ts_, trans, q1, _base_frame_id, _frame_id[INFRA2]);
+        publish_static_tf(transform_ts_, trans, q1, _frame_id[DEPTH], _frame_id[INFRA2]);
 
         // Transform infra2 frame to infra1 optical frame
         quaternion q2{quaternion_optical.getX(), quaternion_optical.getY(), quaternion_optical.getZ(), quaternion_optical.getW()};
@@ -1154,7 +1169,7 @@ void BaseRealSenseNode::publishStaticTransforms()
 
         if (_align_depth)
         {
-            publish_static_tf(transform_ts_, trans, q1, _base_frame_id, _depth_aligned_frame_id[INFRA2]);
+            publish_static_tf(transform_ts_, trans, q1, _frame_id[DEPTH], _depth_aligned_frame_id[INFRA2]);
             publish_static_tf(transform_ts_, zero_trans, q2, _depth_aligned_frame_id[INFRA2], _optical_frame_id[INFRA2]);
         }
     }
@@ -1167,7 +1182,7 @@ void BaseRealSenseNode::publishStaticTransforms()
         // Transform base to infra2
         float3 trans{ex.translation[0], ex.translation[1], ex.translation[2]};
         quaternion q1{Q.x(), Q.y(), Q.z(), Q.w()};
-        publish_static_tf(transform_ts_, trans, q1, _base_frame_id, _frame_id[FISHEYE]);
+        publish_static_tf(transform_ts_, trans, q1, _frame_id[DEPTH], _frame_id[FISHEYE]);
 
         // Transform infra2 frame to infra1 optical frame
         quaternion q2{quaternion_optical.getX(), quaternion_optical.getY(), quaternion_optical.getZ(), quaternion_optical.getW()};
@@ -1175,7 +1190,7 @@ void BaseRealSenseNode::publishStaticTransforms()
 
         if (_align_depth)
         {
-            publish_static_tf(transform_ts_, trans, q1, _base_frame_id, _depth_aligned_frame_id[FISHEYE]);
+            publish_static_tf(transform_ts_, trans, q1, _frame_id[DEPTH], _depth_aligned_frame_id[FISHEYE]);
             publish_static_tf(transform_ts_, zero_trans, q2, _depth_aligned_frame_id[FISHEYE], _optical_frame_id[FISHEYE]);
         }
     }

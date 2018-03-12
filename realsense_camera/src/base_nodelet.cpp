@@ -1063,15 +1063,22 @@ namespace realsense_camera
     // Publish transforms for the cameras
     ROS_INFO_STREAM(nodelet_name_ << " - Publishing camera transforms (/tf_static)");
 
+    // For single camera, we can use publishStaticTransforms() to publish static transform.
+    // However, for multiple cameras we must use publishDynamicTransforms().
+
+    // In our URDF, we provide the tf from camera_link to camera_rgb_frame. The driver
+    // considers color frame as reference frame and provides other tf publication,
+    // which are tf from color to depth, color to color_optical,  depth to depth_optical,
+    // color to ir and ir to ir_optical
+
     tf::Quaternion q_c2co;
     tf::Quaternion q_d2do;
     tf::Quaternion q_i2io;
-    geometry_msgs::TransformStamped c2d_msg;
-    geometry_msgs::TransformStamped d2do_msg;
-    // geometry_msgs::TransformStamped b2c_msg;
-    geometry_msgs::TransformStamped c2co_msg;
-    geometry_msgs::TransformStamped c2i_msg;
-    geometry_msgs::TransformStamped i2io_msg;
+    geometry_msgs::TransformStamped c2d_msg;  // color to depth
+    geometry_msgs::TransformStamped d2do_msg;  // depth to depth_optical
+    geometry_msgs::TransformStamped c2co_msg;  // color to color_optical
+    geometry_msgs::TransformStamped c2i_msg;  // color to ir
+    geometry_msgs::TransformStamped i2io_msg;  // ir to ir_optical
 
     // Get the current timestamp for all static transforms
     transform_ts_ = ros::Time::now();
@@ -1125,7 +1132,7 @@ namespace realsense_camera
 
     if (enable_[RS_STREAM_INFRARED])
     {
-      // Transform base frame to infrared frame
+      // Transform color frame to infrared frame
       c2i_msg.header.stamp = transform_ts_;
       c2i_msg.header.frame_id = base_frame_id_;
       c2i_msg.child_frame_id = frame_id_[RS_STREAM_INFRARED];
@@ -1159,17 +1166,15 @@ namespace realsense_camera
    */
   void BaseNodelet::publishDynamicTransforms()
   {
+    // For single camera, we can use publishStaticTransforms() to publish static transform.
+    // However, for multiple cameras we must use publishDynamicTransforms().
+
+    // In our URDF, we provide the tf from camera_link to camera_rgb_frame. The driver
+    // considers color frame as reference frame and provides other tf publication,
+    // which are tf from color to depth, color to color_optical,  depth to depth_optical,
+    // color to ir and ir to ir_optical
     tf::Transform tr;
     tf::Quaternion q;
-
-    // In our URDF, we provide camera_link to color_frame
-    // The color frame is used as the base frame.
-    // Hence no additional transformation is done from base frame to color frame.
-    /*
-    tr.setOrigin(tf::Vector3(0, 0, 0));
-    tr.setRotation(tf::Quaternion(0, 0, 0, 1));
-    dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
-          base_frame_id_, frame_id_[RS_STREAM_COLOR]));*/
 
     if (enable_[RS_STREAM_COLOR])
     {
@@ -1202,7 +1207,7 @@ namespace realsense_camera
 
     if (enable_[RS_STREAM_INFRARED])
     {
-      // Transform base frame to infrared frame
+      // Transform color frame to infrared frame
       tr.setOrigin(tf::Vector3(
              color2ir_extrinsic_.translation[2],
             -color2ir_extrinsic_.translation[0],

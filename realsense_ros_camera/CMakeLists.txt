@@ -127,6 +127,11 @@ install(DIRECTORY launch/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
     )
 
+#Install cfg files
+install(DIRECTORY cfg/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cfg
+    )
+
 # Install rviz files
 install(DIRECTORY rviz/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/rviz

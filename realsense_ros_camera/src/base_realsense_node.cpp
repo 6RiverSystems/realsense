@@ -924,9 +924,13 @@ void BaseRealSenseNode::publish_static_tf(const ros::Time& t,
     msg.header.stamp = t;
     msg.header.frame_id = from;
     msg.child_frame_id = to;
-    msg.transform.translation.x = -trans.z;
-    msg.transform.translation.y = trans.x;
-    msg.transform.translation.z = trans.y;
+    // TODO: change sign if the bug is fixed
+    // Currently there is a bug in either librealsense2 or realsense2 driver
+    // that it publishes negated translation (maybe rotation)
+    // https://github.com/intel-ros/realsense/issues/327
+    msg.transform.translation.x = -trans.z; // msg.transform.translation.x = trans.z;
+    msg.transform.translation.y = trans.x;  // msg.transform.translation.y = -trans.x;
+    msg.transform.translation.z = trans.y;  // msg.transform.translation.z = -trans.y;
     msg.transform.rotation.x = q.x;
     msg.transform.rotation.y = q.y;
     msg.transform.rotation.z = q.z;
@@ -962,6 +966,7 @@ void BaseRealSenseNode::publishDynamicTransforms()
         auto& ex = (_align_depth)?(_i_ex):(getRsExtrinsics(DEPTH, COLOR));
         auto Q = rotationMatrixToQuaternion(ex.rotation);
 
+        // TODO: change sign if the bug is fixed
         tr.setOrigin(tf::Vector3(-ex.translation[2], ex.translation[0], ex.translation[1]));
         tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
         tr.setRotation(q);
@@ -989,6 +994,7 @@ void BaseRealSenseNode::publishDynamicTransforms()
         auto Q = rotationMatrixToQuaternion(ex.rotation);
 
         // Transform depth to infra1
+        // TODO: change sign if the bug is fixed
         tr.setOrigin(tf::Vector3(-ex.translation[2], ex.translation[0], ex.translation[1]));
         tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
         tr.setRotation(q);
@@ -1016,6 +1022,7 @@ void BaseRealSenseNode::publishDynamicTransforms()
         auto Q = rotationMatrixToQuaternion(ex.rotation);
 
         // Transform depth to infra2
+        // TODO: change sign if the bug is fixed
         tr.setOrigin(tf::Vector3(-ex.translation[2], ex.translation[0], ex.translation[1]));
         tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
         tr.setRotation(q);
@@ -1043,6 +1050,7 @@ void BaseRealSenseNode::publishDynamicTransforms()
         auto Q = rotationMatrixToQuaternion(ex.rotation);
 
         // Transform dpeth to fisheye
+        // TODO: change sign if the bug is fixed
         tr.setOrigin(tf::Vector3(-ex.translation[2], ex.translation[0], ex.translation[1]));
         tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
         tr.setRotation(q);

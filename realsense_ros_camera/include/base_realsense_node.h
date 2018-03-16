@@ -9,8 +9,6 @@
 #include <realsense_ros_camera/rs415_paramsConfig.h>
 #include <realsense_ros_camera/rs435_paramsConfig.h>
 #include <tf/transform_broadcaster.h>
-#include <boost/thread.hpp>
-
 
 namespace realsense_ros_camera
 {
@@ -114,7 +112,6 @@ namespace realsense_ros_camera
         std::map<stream_index_pair, std::string> _stream_name;
         tf2_ros::StaticTransformBroadcaster _static_tf_broadcaster;
         tf::TransformBroadcaster _dynamic_tf_broadcaster;
-        boost::shared_ptr<boost::thread> _transform_thread;
 
         std::map<stream_index_pair, image_transport::Publisher> _image_publishers;
         std::map<stream_index_pair, ros::Publisher> _imu_publishers;

@@ -51,6 +51,11 @@ namespace realsense_camera
   {
     try
     {
+      if (enable_tf_ == true && enable_tf_dynamic_ == true)
+      {
+        transform_thread_->join();
+      }
+
       stopCamera();
 
       if (rs_context_)
@@ -111,10 +116,19 @@ namespace realsense_camera
     startCamera();
 
     // Start transforms thread
-    if (enable_tf_ && !enable_tf_dynamic_)
+    if (enable_tf_ == true)
     {
       getCameraExtrinsics();
-      publishStaticTransforms();
+
+      if (enable_tf_dynamic_ == true)
+      {
+        transform_thread_ =
+          boost::shared_ptr<boost::thread>(new boost::thread (boost::bind(&BaseNodelet::prepareTransforms, this)));
+      }
+      else
+      {
+        publishStaticTransforms();
+      }
     }
 
     // Start dynamic reconfigure callback
@@ -574,11 +588,6 @@ namespace realsense_camera
   */
   void BaseNodelet::setFrameCallbacks()
   {
-    if (enable_tf_ && enable_tf_dynamic_)
-    {
-      publishDynamicTransforms();
-    }
-
     depth_frame_handler_ = [&](rs::frame frame)  // NOLINT(build/c++11)
     {
       publishTopic(RS_STREAM_DEPTH, frame);
@@ -1213,6 +1222,27 @@ namespace realsense_camera
       tr.setRotation(q);
       dynamic_tf_broadcaster_.sendTransform(tf::StampedTransform(tr, transform_ts_,
             frame_id_[RS_STREAM_INFRARED], optical_frame_id_[RS_STREAM_INFRARED]));
+    }
+  }
+
+  /*
+   * Prepare transforms.
+   */
+  void BaseNodelet::prepareTransforms()
+  {
+    // Publish transforms for the cameras
+    ROS_INFO_STREAM(nodelet_name_ << " - Publishing camera transforms (/tf)");
+
+    ros::Rate loop_rate(tf_publication_rate_);
+
+    while (ros::ok())
+    {
+      // update the time stamp for publication
+      transform_ts_ = ros::Time::now();
+
+      publishDynamicTransforms();
+
+      loop_rate.sleep();
     }
   }
 

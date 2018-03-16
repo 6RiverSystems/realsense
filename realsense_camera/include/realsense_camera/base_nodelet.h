@@ -132,7 +132,6 @@ protected:
   cv::Mat cvWrapper_;
   std::mutex frame_mutex_[STREAM_COUNT];
 
-  boost::shared_ptr<boost::thread> transform_thread_;
   ros::Time transform_ts_;
   tf2_ros::StaticTransformBroadcaster static_tf_broadcaster_;
   tf::TransformBroadcaster dynamic_tf_broadcaster_;
@@ -174,7 +173,6 @@ protected:
   virtual void getCameraExtrinsics();
   virtual void publishStaticTransforms();
   virtual void publishDynamicTransforms();
-  virtual void prepareTransforms();
   virtual void checkError();
   virtual bool checkForSubscriber();
   virtual void wrappedSystem(const std::vector<std::string>& string_argv);

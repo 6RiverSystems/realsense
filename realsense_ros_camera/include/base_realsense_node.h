@@ -67,7 +67,6 @@ namespace realsense_ros_camera
                                const std::string& from,
                                const std::string& to);
         void publishStaticTransforms();
-        void prepareTransforms();
         void publishDynamicTransforms();
         void publishRgbToDepthPCTopic(const ros::Time& t, const std::map<stream_index_pair, bool>& is_frame_arrived);
         Extrinsics rsExtrinsicsToMsg(const rs2_extrinsics& extrinsics, const std::string& frame_id) const;

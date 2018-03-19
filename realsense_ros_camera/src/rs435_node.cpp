@@ -111,7 +111,7 @@ void RS435Node::setParam(rs435_paramsConfig &config, rs435_param param)
         break;
     case rs435_depth_visual_preset:
 
-        if(_depth_preset > 0)
+        if(_depth_preset >= 0)
         {
             config.rs435_depth_visual_preset = _depth_preset;
             _depth_preset = -1;

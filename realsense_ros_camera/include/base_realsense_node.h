@@ -138,6 +138,7 @@ namespace realsense_ros_camera
         bool _pointcloud;
         bool _enable_tf;
         bool _enable_tf_dynamic;
+        bool _enable_post_processing;
         int _tf_publication_rate;
         rs2::asynchronous_syncer _syncer;
 
@@ -150,6 +151,11 @@ namespace realsense_ros_camera
         std::map<stream_index_pair, std::string> _depth_aligned_frame_id;
         std::map<stream_index_pair, ros::Publisher> _depth_to_other_extrinsics_publishers;
         std::map<stream_index_pair, rs2_extrinsics> _depth_to_other_extrinsics;
+
+        std::shared_ptr<rs2::spatial_filter> _spatial_filter; // edge-preserving spatial smoothing
+        std::shared_ptr<rs2::temporal_filter> _temporal_filter; // reduces temporal noise
+        std::shared_ptr<rs2::disparity_transform> _depth_to_disparity;
+        std::shared_ptr<rs2::disparity_transform> _disparity_to_depth;
 
         std::map<stream_index_pair, bool> _is_frame_arrived;
         const std::string _namespace;

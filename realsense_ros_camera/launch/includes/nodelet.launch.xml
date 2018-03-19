@@ -46,6 +46,7 @@
   <arg name="enable_tf"           default="false"/>
   <arg name="enable_tf_dynamic"   default="false"/>
   <arg name="tf_publication_rate" default="100"/>
+  <arg name="enable_post_processing" default="true"/>
   <arg name="enable_sync"         default="false"/>
   <arg name="align_depth"         default="false"/>
 
@@ -62,6 +63,7 @@
     <param name="enable_tf"                type="bool" value="$(arg enable_tf)"/>
     <param name="enable_tf_dynamic"        type="bool" value="$(arg enable_tf_dynamic)"/>
     <param name="tf_publication_rate"      type="int"  value="$(arg tf_publication_rate)"/>
+    <param name="enable_post_processing"   type="bool" value="$(arg enable_post_processing)"/>
     <param name="enable_sync"              type="bool" value="$(arg enable_sync)"/>
     <param name="align_depth"              type="bool" value="$(arg align_depth)"/>
 

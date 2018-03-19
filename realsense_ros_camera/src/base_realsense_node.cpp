@@ -79,6 +79,11 @@ BaseRealSenseNode::BaseRealSenseNode(ros::NodeHandle& nodeHandle,
     _encoding[ACCEL] = sensor_msgs::image_encodings::TYPE_8UC1; // ROS message type
     _unit_step_size[ACCEL] = sizeof(uint8_t); // sensor_msgs::ImagePtr row step size
     _stream_name[ACCEL] = "accel";
+
+    _depth_to_disparity = std::make_shared<rs2::disparity_transform>(true);
+    _disparity_to_depth = std::make_shared<rs2::disparity_transform>(false);
+    _temporal_filter = std::make_shared<rs2::temporal_filter>();
+    _spatial_filter = std::make_shared<rs2::spatial_filter>();
 }
 
 void BaseRealSenseNode::publishTopics()
@@ -108,6 +113,7 @@ void BaseRealSenseNode::getParameters()
     _pnh.param("enable_tf", _enable_tf, ENABLE_TF);
     _pnh.param("enable_tf_dynamic", _enable_tf_dynamic, ENABLE_TF_DYNAMIC);
     _pnh.param("tf_publication_rate", _tf_publication_rate, TF_PUBLICATION_RATE);
+    _pnh.param("enable_post_processing", _enable_post_processing, ENABLE_POST_PROCESSING);
     _pnh.param("enable_sync", _sync_frames, SYNC_FRAMES);
     if (_pointcloud || _align_depth)
         _sync_frames = true;
@@ -572,6 +578,16 @@ void BaseRealSenseNode::setupStreams()
 
                         ROS_DEBUG("Frameset contain (%s, %d) frame. frame_number: %llu ; frame_TS: %f ; ros_TS(NSec): %lu",
                                   rs2_stream_to_string(stream_type), stream_index, frame.get_frame_number(), frame.get_timestamp(), t.toNSec());
+
+                        // Apply post-processing filter
+                        if (_enable_post_processing && stream_type == RS2_STREAM_DEPTH)
+                        {
+                            ROS_INFO_THROTTLE(5.0, "Post processing depth image");
+                            f = _depth_to_disparity->process(f);
+                            f = _spatial_filter->process(f);
+                            f = _temporal_filter->process(f);
+                            f = _disparity_to_depth->process(f);
+                        }
 
                         stream_index_pair sip{stream_type,stream_index};
                         publishFrame(f, t,

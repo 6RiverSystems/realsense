@@ -1246,8 +1246,9 @@ namespace realsense_camera
     while (ros::ok())
     {
       // update the time stamp for publication
-      // add 100 ms in the future to avoid tf extrapolation error
-      transform_ts_ = ros::Time::now() + ros::Duration(0.1);
+      // add 2 times of publication interval in the future to avoid tf extrapolation error
+      float futureDate = 2.0 * (1.0 / tf_publication_rate_);
+      transform_ts_ = ros::Time::now() + ros::Duration(futureDate);
 
       publishDynamicTransforms();
 

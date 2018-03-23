@@ -948,7 +948,8 @@ void BaseRealSenseNode::publishDynamicTransforms()
     // which are tf from depth to color, color to color_optical,  depth to depth_optical,
     // depth to ir and ir to ir_optical
 
-    ros::Time transform_ts = ros::Time::now();
+    // add 100 ms in the future to avoid tf extrapolation error
+    ros::Time transform_ts = ros::Time::now() + ros::Duration(0.1);
     tf::Transform tr;
     tf::Transform tr_optical;
 

@@ -210,6 +210,12 @@ std::string RealSenseNodeFactory::parseUsbPortId(std::string usb_path) const
         usb_path.erase(0, pos + delimiter.length());
     }
 
+    if(split.size() < 3)
+    {
+        ROS_ERROR("The USB port path is incorrect, return a empty string");
+        return std::string();
+    }
+
     // port id is the thrid element from last
     size_t port_id_index = split.size() - 3;
 

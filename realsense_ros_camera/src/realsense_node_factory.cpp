@@ -6,6 +6,7 @@
 #include "../include/rs415_node.h"
 #include "../include/rs435_node.h"
 #include <iostream>
+#include <algorithm>
 #include <map>
 
 using namespace realsense_ros_camera;
@@ -56,6 +57,7 @@ void RealSenseNodeFactory::onInit()
         bool found = false;
         for (auto&& dev : list)
         {
+            ROS_DEBUG("Port ID: %s", dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
             serial_number = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
             port_id = parseUsbPortId(dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
             if (usb_port_id.empty())
@@ -208,9 +210,12 @@ std::string RealSenseNodeFactory::parseUsbPortId(std::string usb_path) const
         usb_path.erase(0, pos + delimiter.length());
     }
 
-    // replace 2-1.1 to 2-1-1 for consistency
-    std::string port_id = split[6].replace(3, 1, "-");
-    return port_id;
+    // port id is the thrid element from last
+    size_t port_id_index = split.size() - 3;
+
+    // replace all '.' with '-' for consistency
+    std::replace(split[port_id_index].begin(), split[port_id_index].end(), '.', '-');
+    return split[port_id_index];
 }
 
 void RealSenseNodeFactory::tryGetLogSeverity(rs2_log_severity& severity) const

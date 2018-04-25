@@ -1,7 +1,7 @@
 #include "../include/base_realsense_node.h"
 #include "../include/sr300_node.h"
 
-using namespace realsense_ros_camera;
+using namespace realsense2_camera;
 
 std::string BaseRealSenseNode::getNamespaceStr()
 {
@@ -91,6 +91,7 @@ void BaseRealSenseNode::publishTopics()
     if (_enable_tf && !_enable_tf_dynamic) {
         publishStaticTransforms();
     }
+
     ROS_INFO_STREAM("RealSense Node Is Up!");
 }
 
@@ -108,6 +109,7 @@ void BaseRealSenseNode::getParameters()
     _pnh.param("enable_tf", _enable_tf, ENABLE_TF);
     _pnh.param("enable_tf_dynamic", _enable_tf_dynamic, ENABLE_TF_DYNAMIC);
     _pnh.param("tf_publication_rate", _tf_publication_rate, TF_PUBLICATION_RATE);
+
     _pnh.param("enable_sync", _sync_frames, SYNC_FRAMES);
     if (_pointcloud || _align_depth)
         _sync_frames = true;
@@ -211,7 +213,8 @@ void BaseRealSenseNode::setupDevice()
         ROS_INFO_STREAM("Device FW version: " << fw_ver);
 
         auto pid = _dev.get_info(RS2_CAMERA_INFO_PRODUCT_ID);
-        ROS_INFO_STREAM("Device Product ID: " << pid);
+
+        ROS_INFO_STREAM("Device Product ID: 0x" << pid);
 
         ROS_INFO_STREAM("Enable PointCloud: " << ((_pointcloud)?"On":"Off"));
         ROS_INFO_STREAM("Align Depth: " << ((_align_depth)?"On":"Off"));
@@ -309,7 +312,8 @@ void BaseRealSenseNode::setupPublishers()
             image_raw << _stream_name[stream] << "/image_" << ((rectified_image)?"rect_":"") << "raw";
             camera_info << _stream_name[stream] << "/camera_info";
 
-            _image_publishers[stream] = image_transport.advertise(image_raw.str(), 1);
+            std::shared_ptr<FrequencyDiagnostics> frequency_diagnostics(new FrequencyDiagnostics(_fps[stream], _stream_name[stream], _serial_no));
+            _image_publishers[stream] = {image_transport.advertise(image_raw.str(), 1), frequency_diagnostics};
             _info_publisher[stream] = _node_handle.advertise<sensor_msgs::CameraInfo>(camera_info.str(), 1);
 
             if (_align_depth && (stream != DEPTH))
@@ -318,7 +322,9 @@ void BaseRealSenseNode::setupPublishers()
                 aligned_image_raw << "aligned_depth_to_" << _stream_name[stream] << "/image_raw";
                 aligned_camera_info << "aligned_depth_to_" << _stream_name[stream] << "/camera_info";
 
-                _depth_aligned_image_publishers[stream] = image_transport.advertise(aligned_image_raw.str(), 1);
+                std::string aligned_stream_name = "aligned_depth_to_" + _stream_name[stream];
+                std::shared_ptr<FrequencyDiagnostics> frequency_diagnostics(new FrequencyDiagnostics(_fps[stream], aligned_stream_name, _serial_no));
+                _depth_aligned_image_publishers[stream] = {image_transport.advertise(aligned_image_raw.str(), 1), frequency_diagnostics};
                 _depth_aligned_info_publisher[stream] = _node_handle.advertise<sensor_msgs::CameraInfo>(aligned_camera_info.str(), 1);
             }
 
@@ -373,6 +379,8 @@ void BaseRealSenseNode::alignFrame(const rs2_intrinsics& from_intrin,
                                    const rs2_extrinsics& from_to_other,
                                    std::vector<uint8_t>& out_vec)
 {
+    static const auto meter_to_mm = 0.001f;
+
     uint8_t* p_out_frame = out_vec.data();
     auto from_vid_frame = from_image.as<rs2::video_frame>();
     auto from_bytes_per_pixel = from_vid_frame.get_bytes_per_pixel();
@@ -422,7 +430,8 @@ void BaseRealSenseNode::alignFrame(const rs2_intrinsics& from_intrin,
                         {
                             const auto out_offset = out_pixel_index * output_image_bytes_per_pixel + i;
                             const auto from_offset = from_pixel_index * output_image_bytes_per_pixel + i;
-                            p_out_frame[out_offset] = p_from_frame[from_offset];
+
+                            p_out_frame[out_offset] = p_from_frame[from_offset] * (depth_units / meter_to_mm);
                         }
                     }
                 }
@@ -454,21 +463,28 @@ void BaseRealSenseNode::publishAlignedDepthToOthers(rs2::frame depth_frame, cons
 
         auto stream_index = other_frame.get_profile().stream_index();
         stream_index_pair sip{stream_type, stream_index};
-        auto from_image_frame = depth_frame.as<rs2::video_frame>();
-        auto& out_vec = _aligned_depth_images[sip];
-        alignFrame(_stream_intrinsics[DEPTH], _stream_intrinsics[sip],
-                   depth_frame, from_image_frame.get_bytes_per_pixel(),
-                   _depth_to_other_extrinsics[sip], out_vec);
 
-        auto& from_image = _depth_aligned_image[sip];
-        from_image.data = out_vec.data();
+        auto& info_publisher = _depth_aligned_info_publisher.at(sip);
+        auto& image_publisher = _depth_aligned_image_publishers.at(sip);
+        if(0 != info_publisher.getNumSubscribers() ||
+           0 != image_publisher.first.getNumSubscribers())
+        {
+            auto from_image_frame = depth_frame.as<rs2::video_frame>();
+            auto& out_vec = _aligned_depth_images[sip];
+            alignFrame(_stream_intrinsics[DEPTH], _stream_intrinsics[sip],
+                       depth_frame, from_image_frame.get_bytes_per_pixel(),
+                       _depth_to_other_extrinsics[sip], out_vec);
 
-        publishFrame(depth_frame, t, sip,
-                     _depth_aligned_image,
-                     _depth_aligned_info_publisher,
-                     _depth_aligned_image_publishers, _depth_aligned_seq,
-                     _depth_aligned_camera_info, _optical_frame_id,
-                     _depth_aligned_encoding, false);
+            auto& from_image = _depth_aligned_image[sip];
+            from_image.data = out_vec.data();
+
+            publishFrame(depth_frame, t, sip,
+                         _depth_aligned_image,
+                         _depth_aligned_info_publisher,
+                         _depth_aligned_image_publishers, _depth_aligned_seq,
+                         _depth_aligned_camera_info, _optical_frame_id,
+                         _depth_aligned_encoding, false);
+        }
     }
 }
 
@@ -560,6 +576,7 @@ void BaseRealSenseNode::setupStreams()
                     {
                         publishDynamicTransforms();
                     }
+
                     bool is_depth_arrived = false;
                     rs2::frame depth_frame;
                     auto frameset = frame.as<rs2::frameset>();
@@ -924,6 +941,7 @@ void BaseRealSenseNode::publish_static_tf(const ros::Time& t,
     msg.header.stamp = t;
     msg.header.frame_id = from;
     msg.child_frame_id = to;
+
     // TODO: change sign if the bug is fixed
     // Currently there is a bug in either librealsense2 or realsense2 driver
     // that it publishes negated translation (maybe rotation)
@@ -1084,7 +1102,6 @@ void BaseRealSenseNode::publishStaticTransforms()
     // considers depth frame as reference frame and provides other tf publication,
     // which are tf from depth to color, color to color_optical,  depth to depth_optical,
     // depth to ir and ir to ir_optical
-
     ROS_INFO("publishStaticTransforms...");
     // Publish static transforms
     tf::Quaternion quaternion_optical;
@@ -1344,7 +1361,7 @@ void BaseRealSenseNode::publishFrame(rs2::frame f, const ros::Time& t,
                                      const stream_index_pair& stream,
                                      std::map<stream_index_pair, cv::Mat>& images,
                                      const std::map<stream_index_pair, ros::Publisher>& info_publishers,
-                                     const std::map<stream_index_pair, image_transport::Publisher>& image_publishers,
+                                     const std::map<stream_index_pair, ImagePublisherWithFrequencyDiagnostics>& image_publishers,
                                      std::map<stream_index_pair, int>& seq,
                                      std::map<stream_index_pair, sensor_msgs::CameraInfo>& camera_info,
                                      const std::map<stream_index_pair, std::string>& optical_frame_id,
@@ -1361,7 +1378,7 @@ void BaseRealSenseNode::publishFrame(rs2::frame f, const ros::Time& t,
     auto& info_publisher = info_publishers.at(stream);
     auto& image_publisher = image_publishers.at(stream);
     if(0 != info_publisher.getNumSubscribers() ||
-       0 != image_publisher.getNumSubscribers())
+       0 != image_publisher.first.getNumSubscribers())
     {
         auto width = 0;
         auto height = 0;
@@ -1389,7 +1406,9 @@ void BaseRealSenseNode::publishFrame(rs2::frame f, const ros::Time& t,
         cam_info.header.seq = seq[stream];
         info_publisher.publish(cam_info);
 
-        image_publisher.publish(img);
+        image_publisher.first.publish(img);
+        image_publisher.second->update();
+
         ROS_DEBUG("%s stream published", rs2_stream_to_string(f.get_profile().stream_type()));
     }
 }

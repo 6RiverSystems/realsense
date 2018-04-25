@@ -8,12 +8,12 @@
 #include <iostream>
 #include <map>
 
-using namespace realsense_ros_camera;
+using namespace realsense2_camera;
 
 #define REALSENSE_ROS_EMBEDDED_VERSION_STR (VAR_ARG_STRING(VERSION: REALSENSE_ROS_MAJOR_VERSION.REALSENSE_ROS_MINOR_VERSION.REALSENSE_ROS_PATCH_VERSION))
 constexpr auto realsense_ros_camera_version = REALSENSE_ROS_EMBEDDED_VERSION_STR;
 
-PLUGINLIB_EXPORT_CLASS(realsense_ros_camera::RealSenseNodeFactory, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(realsense2_camera::RealSenseNodeFactory, nodelet::Nodelet)
 
 RealSenseNodeFactory::RealSenseNodeFactory()
 {
@@ -115,7 +115,6 @@ void RealSenseNodeFactory::onInit()
             exit(1);
         }
 
-
         _ctx.set_devices_changed_callback([this](rs2::event_information& info)
         {
             if (info.was_removed(_device))
@@ -172,7 +171,7 @@ void RealSenseNodeFactory::onInit()
             _realSenseNode = std::unique_ptr<BaseD400Node>(new BaseD400Node(nh, privateNh, _device, serial_no));
             break;
         default:
-            ROS_FATAL_STREAM("Unsupported device!" << "Product ID: " << pid_str);
+            ROS_FATAL_STREAM("Unsupported device!" << " Product ID: 0x" << pid_str);
             ros::shutdown();
             exit(1);
         }

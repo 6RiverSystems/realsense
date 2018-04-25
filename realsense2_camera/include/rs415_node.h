@@ -1,12 +1,12 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2017 Intel Corporation. All Rights Reserved
+// Copyright(c) 2018 Intel Corporation. All Rights Reserved
 
 #pragma once
 
 #include "../include/base_realsense_node.h"
-#include <realsense_ros_camera/rs415_paramsConfig.h>
+#include <realsense2_camera/rs415_paramsConfig.h>
 
-namespace realsense_ros_camera
+namespace realsense2_camera
 {
     enum rs415_param{
         rs415_depth_enable_auto_white_balance = 9,

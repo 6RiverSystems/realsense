@@ -1,7 +1,6 @@
 #include "../include/rs435_node.h"
 
-using namespace realsense_ros_camera;
-
+using namespace realsense2_camera;
 
 RS435Node::RS435Node(ros::NodeHandle& nodeHandle,
                      ros::NodeHandle& privateNodeHandle,

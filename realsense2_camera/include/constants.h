@@ -1,5 +1,5 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2017 Intel Corporation. All Rights Reserved
+// Copyright(c) 2018 Intel Corporation. All Rights Reserved
 
 #pragma once
 
@@ -7,14 +7,14 @@
 
 #define REALSENSE_ROS_MAJOR_VERSION    2
 #define REALSENSE_ROS_MINOR_VERSION    0
-#define REALSENSE_ROS_PATCH_VERSION    2
+#define REALSENSE_ROS_PATCH_VERSION    3
 
 #define STRINGIFY(arg) #arg
 #define VAR_ARG_STRING(arg) STRINGIFY(arg)
 /* Return version in "X.Y.Z" format */
 #define REALSENSE_ROS_VERSION_STR (VAR_ARG_STRING(REALSENSE_ROS_MAJOR_VERSION.REALSENSE_ROS_MINOR_VERSION.REALSENSE_ROS_PATCH_VERSION))
 
-namespace realsense_ros_camera
+namespace realsense2_camera
 {
     const uint16_t SR300_PID        = 0x0aa5; // SR300
     const uint16_t RS400_PID        = 0x0ad1; // PSR
@@ -95,4 +95,4 @@ namespace realsense_ros_camera
     const std::string DEFAULT_ALIGNED_DEPTH_TO_FISHEYE_FRAME_ID = "camera_aligned_depth_to_fisheye_frame";
 
     using stream_index_pair = std::pair<rs2_stream, int>;
-}  // namespace realsense_ros_camera
+}  // namespace realsense2_camera

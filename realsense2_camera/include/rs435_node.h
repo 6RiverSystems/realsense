@@ -1,12 +1,12 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2017 Intel Corporation. All Rights Reserved
+// Copyright(c) 2018 Intel Corporation. All Rights Reserved
 
 #pragma once
 
 #include "../include/base_realsense_node.h"
-#include <realsense_ros_camera/rs435_paramsConfig.h>
+#include <realsense2_camera/rs435_paramsConfig.h>
 
-namespace realsense_ros_camera
+namespace realsense2_camera
 {
     enum rs435_param{
         rs435_depth_visual_preset = 3,
@@ -50,5 +50,6 @@ namespace realsense_ros_camera
 
         boost::shared_ptr<dynamic_reconfigure::Server<rs435_paramsConfig>> _server;
         dynamic_reconfigure::Server<rs435_paramsConfig>::CallbackType _f;
+
     };
 }

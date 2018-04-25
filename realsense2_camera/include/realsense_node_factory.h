@@ -1,5 +1,5 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2017 Intel Corporation. All Rights Reserved
+// Copyright(c) 2018 Intel Corporation. All Rights Reserved
 
 #pragma once
 
@@ -17,17 +17,16 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/point_cloud2_iterator.h>
 #include <constants.h>
-#include <realsense_ros_camera/Extrinsics.h>
+#include <realsense2_camera/Extrinsics.h>
 #include <tf/transform_broadcaster.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <sensor_msgs/Imu.h>
-#include <realsense_ros_camera/IMUInfo.h>
+#include <realsense2_camera/IMUInfo.h>
 #include <csignal>
 #include <eigen3/Eigen/Geometry>
 #include <fstream>
 
-
-namespace realsense_ros_camera
+namespace realsense2_camera
 {
     const stream_index_pair COLOR{RS2_STREAM_COLOR, 0};
     const stream_index_pair DEPTH{RS2_STREAM_DEPTH, 0};

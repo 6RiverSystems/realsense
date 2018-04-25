@@ -52,7 +52,7 @@
   <arg name="depth_exposure"      default="800"/>
   <arg name="depth_preset"        default="3"/>
 
-  <node pkg="nodelet" type="nodelet" name="realsense_ros_camera" args="load realsense_ros_camera/RealSenseNodeFactory $(arg manager)">
+  <node pkg="nodelet" type="nodelet" name="realsense2_camera" args="load realsense2_camera/RealSenseNodeFactory $(arg manager)">
     <param name="camera"                   type="str"  value="$(arg camera)"/>
     <param name="usb_port_id"              type="str"  value="$(arg usb_port_id)"/>
     <param name="serial_no"                type="str"  value="$(arg serial_no)"/>
@@ -62,6 +62,7 @@
     <param name="enable_tf"                type="bool" value="$(arg enable_tf)"/>
     <param name="enable_tf_dynamic"        type="bool" value="$(arg enable_tf_dynamic)"/>
     <param name="tf_publication_rate"      type="int"  value="$(arg tf_publication_rate)"/>
+
     <param name="enable_sync"              type="bool" value="$(arg enable_sync)"/>
     <param name="align_depth"              type="bool" value="$(arg align_depth)"/>
 
@@ -118,4 +119,3 @@
     <param name="camera_aligned_depth_to_fisheye_frame_id" type="str"  value="$(arg camera)_aligned_$(arg depth)_to_$(arg fisheye)_frame"/>
   </node>
 </launch>
-

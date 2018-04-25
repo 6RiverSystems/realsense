@@ -1,12 +1,12 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2017 Intel Corporation. All Rights Reserved
+// Copyright(c) 2018 Intel Corporation. All Rights Reserved
 
 #pragma once
 
 #include "../include/base_realsense_node.h"
-#include <realsense_ros_camera/sr300_paramsConfig.h>
+#include <realsense2_camera/sr300_paramsConfig.h>
 
-namespace realsense_ros_camera
+namespace realsense2_camera
 {
     enum sr300_param{
         sr300_param_color_backlight_compensation = 1,

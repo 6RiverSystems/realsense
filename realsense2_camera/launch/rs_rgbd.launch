@@ -19,7 +19,7 @@ A launch file, derived from rgbd_launch and customized for Realsense ROS driver,
 to publish XYZRGB point cloud like an OpenNI camera.
 
 To launch Realsense with software registeration (ROS Image Pipeline and rgbd_launch):
-    $ roslaunch realsense_ros_camera rs_rgbd.launch
+    $ roslaunch realsense2_camera rs_rgbd.launch
 Processing enabled by ROS driver:
     # depth rectification
 Processing enabled by this node:
@@ -28,7 +28,7 @@ Processing enabled by this node:
     # pointcloud_xyzrgb generation
 
 To launch Realsense with hardware registeration (ROS Realsense depth alignment):
-    $ roslaunch realsense_ros_camera rs_rgbd.launch align_depth:=true
+    $ roslaunch realsense2_camera rs_rgbd.launch align_depth:=true
 Processing enabled by ROS driver:
     # depth rectification
     # depth registration
@@ -39,7 +39,7 @@ Processing enabled by this node:
 
 <launch>
   <arg name="namespace"           default="camera"/>
-  <arg name="manager"             default="realsense_ros_camera_manager"/>
+  <arg name="manager"             default="realsense2_camera_manager"/>
 
   <!-- Camera device specific arguments -->
 
@@ -110,7 +110,7 @@ Processing enabled by this node:
   <group ns="$(arg namespace)">
 
     <!-- Launch the camera device nodelet-->
-    <include file="$(find realsense_ros_camera)/launch/includes/nodelet.launch.xml">
+    <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">
       <arg name="manager"                  value="$(arg manager)"/>
       <arg name="serial_no"                value="$(arg serial_no)"/>
       <arg name="json_file_path"           value="$(arg json_file_path)"/>

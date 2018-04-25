@@ -1,13 +1,13 @@
 #include "../include/rs415_node.h"
 
-using namespace realsense_ros_camera;
-
+using namespace realsense2_camera;
 
 RS415Node::RS415Node(ros::NodeHandle& nodeHandle,
                      ros::NodeHandle& privateNodeHandle,
                      rs2::device dev, const std::string& serial_no):
     BaseD400Node(nodeHandle, privateNodeHandle, dev, serial_no),
     _pnh(privateNodeHandle)
+
 {}
 
 void RS415Node::registerDynamicReconfigCb()

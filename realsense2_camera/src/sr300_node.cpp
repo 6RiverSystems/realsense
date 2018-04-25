@@ -1,6 +1,6 @@
 #include "../include/sr300_node.h"
 
-using namespace realsense_ros_camera;
+using namespace realsense2_camera;
 
 SR300Node::SR300Node(ros::NodeHandle& nodeHandle, ros::NodeHandle& privateNodeHandle, rs2::device dev, const std::string& serial_no)
     : BaseRealSenseNode(nodeHandle, privateNodeHandle, dev, serial_no)

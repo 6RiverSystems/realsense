@@ -50,6 +50,5 @@ namespace realsense2_camera
 
         boost::shared_ptr<dynamic_reconfigure::Server<rs435_paramsConfig>> _server;
         dynamic_reconfigure::Server<rs435_paramsConfig>::CallbackType _f;
-
     };
 }

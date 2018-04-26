@@ -95,7 +95,6 @@ namespace realsense2_camera
                                const std::string& to);
         void publishStaticTransforms();
         void publishDynamicTransforms();
-
         void publishRgbToDepthPCTopic(const ros::Time& t, const std::map<stream_index_pair, bool>& is_frame_arrived);
         Extrinsics rsExtrinsicsToMsg(const rs2_extrinsics& extrinsics, const std::string& frame_id) const;
         rs2_extrinsics getRsExtrinsics(const stream_index_pair& from_stream, const stream_index_pair& to_stream);
@@ -139,6 +138,7 @@ namespace realsense2_camera
         std::map<stream_index_pair, std::string> _stream_name;
         tf2_ros::StaticTransformBroadcaster _static_tf_broadcaster;
         tf::TransformBroadcaster _dynamic_tf_broadcaster;
+
         std::map<stream_index_pair, ImagePublisherWithFrequencyDiagnostics> _image_publishers;
         std::map<stream_index_pair, ros::Publisher> _imu_publishers;
         std::map<stream_index_pair, int> _image_format;
@@ -166,7 +166,6 @@ namespace realsense2_camera
         bool _enable_tf;
         bool _enable_tf_dynamic;
         int _tf_publication_rate;
-
         rs2::asynchronous_syncer _syncer;
 
         std::map<stream_index_pair, cv::Mat> _depth_aligned_image;

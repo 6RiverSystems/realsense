@@ -3,7 +3,6 @@
   <arg name="serial_no_camera2"    default=""/> <!-- Note: Replace with actual serial number -->
 
   <group ns="camera1">
-
     <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">
       <arg name="serial_no"    value="$(arg serial_no_camera1)"/>
     </include>

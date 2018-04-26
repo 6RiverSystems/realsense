@@ -91,7 +91,6 @@ void BaseRealSenseNode::publishTopics()
     if (_enable_tf && !_enable_tf_dynamic) {
         publishStaticTransforms();
     }
-
     ROS_INFO_STREAM("RealSense Node Is Up!");
 }
 
@@ -109,7 +108,6 @@ void BaseRealSenseNode::getParameters()
     _pnh.param("enable_tf", _enable_tf, ENABLE_TF);
     _pnh.param("enable_tf_dynamic", _enable_tf_dynamic, ENABLE_TF_DYNAMIC);
     _pnh.param("tf_publication_rate", _tf_publication_rate, TF_PUBLICATION_RATE);
-
     _pnh.param("enable_sync", _sync_frames, SYNC_FRAMES);
     if (_pointcloud || _align_depth)
         _sync_frames = true;
@@ -213,7 +211,6 @@ void BaseRealSenseNode::setupDevice()
         ROS_INFO_STREAM("Device FW version: " << fw_ver);
 
         auto pid = _dev.get_info(RS2_CAMERA_INFO_PRODUCT_ID);
-
         ROS_INFO_STREAM("Device Product ID: 0x" << pid);
 
         ROS_INFO_STREAM("Enable PointCloud: " << ((_pointcloud)?"On":"Off"));
@@ -380,7 +377,6 @@ void BaseRealSenseNode::alignFrame(const rs2_intrinsics& from_intrin,
                                    std::vector<uint8_t>& out_vec)
 {
     static const auto meter_to_mm = 0.001f;
-
     uint8_t* p_out_frame = out_vec.data();
     auto from_vid_frame = from_image.as<rs2::video_frame>();
     auto from_bytes_per_pixel = from_vid_frame.get_bytes_per_pixel();
@@ -430,7 +426,6 @@ void BaseRealSenseNode::alignFrame(const rs2_intrinsics& from_intrin,
                         {
                             const auto out_offset = out_pixel_index * output_image_bytes_per_pixel + i;
                             const auto from_offset = from_pixel_index * output_image_bytes_per_pixel + i;
-
                             p_out_frame[out_offset] = p_from_frame[from_offset] * (depth_units / meter_to_mm);
                         }
                     }
@@ -463,7 +458,6 @@ void BaseRealSenseNode::publishAlignedDepthToOthers(rs2::frame depth_frame, cons
 
         auto stream_index = other_frame.get_profile().stream_index();
         stream_index_pair sip{stream_type, stream_index};
-
         auto& info_publisher = _depth_aligned_info_publisher.at(sip);
         auto& image_publisher = _depth_aligned_image_publishers.at(sip);
         if(0 != info_publisher.getNumSubscribers() ||
@@ -576,7 +570,6 @@ void BaseRealSenseNode::setupStreams()
                     {
                         publishDynamicTransforms();
                     }
-
                     bool is_depth_arrived = false;
                     rs2::frame depth_frame;
                     auto frameset = frame.as<rs2::frameset>();
@@ -1102,6 +1095,7 @@ void BaseRealSenseNode::publishStaticTransforms()
     // considers depth frame as reference frame and provides other tf publication,
     // which are tf from depth to color, color to color_optical,  depth to depth_optical,
     // depth to ir and ir to ir_optical
+
     ROS_INFO("publishStaticTransforms...");
     // Publish static transforms
     tf::Quaternion quaternion_optical;
@@ -1408,7 +1402,6 @@ void BaseRealSenseNode::publishFrame(rs2::frame f, const ros::Time& t,
 
         image_publisher.first.publish(img);
         image_publisher.second->update();
-
         ROS_DEBUG("%s stream published", rs2_stream_to_string(f.get_profile().stream_type()));
     }
 }

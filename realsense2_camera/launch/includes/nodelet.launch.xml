@@ -49,8 +49,8 @@
   <arg name="enable_sync"         default="false"/>
   <arg name="align_depth"         default="false"/>
 
-  <arg name="depth_exposure"      default="800"/>
-  <arg name="depth_preset"        default="3"/>
+  <arg name="depth_exposure"      default="425"/>
+  <arg name="depth_preset"        default="0"/>
 
   <node pkg="nodelet" type="nodelet" name="realsense2_camera" args="load realsense2_camera/RealSenseNodeFactory $(arg manager)">
     <param name="camera"                   type="str"  value="$(arg camera)"/>

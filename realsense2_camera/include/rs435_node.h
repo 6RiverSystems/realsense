@@ -47,6 +47,7 @@ namespace realsense2_camera
 
         int _depth_exposure{0};
         int _depth_preset{0};
+        double _depth_laser_power{0.0};
 
         boost::shared_ptr<dynamic_reconfigure::Server<rs435_paramsConfig>> _server;
         dynamic_reconfigure::Server<rs435_paramsConfig>::CallbackType _f;

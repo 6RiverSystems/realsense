@@ -51,6 +51,7 @@
 
   <arg name="depth_exposure"      default="425"/>
   <arg name="depth_preset"        default="0"/>
+  <arg name="depth_laser_power"   default="1.0"/>
 
   <node pkg="nodelet" type="nodelet" name="realsense2_camera" args="load realsense2_camera/RealSenseNodeFactory $(arg manager)">
     <param name="camera"                   type="str"  value="$(arg camera)"/>
@@ -97,6 +98,7 @@
 
     <param name="depth_exposure"           type="int"  value="$(arg depth_exposure)"/>
     <param name="depth_preset"             type="int"  value="$(arg depth_preset)"/>
+    <param name="depth_laser_power"        type="double" value="$(arg depth_laser_power)"/>
 
     <param name="base_frame_id"            type="str"  value="$(arg camera)_link"/>
     <param name="depth_frame_id"           type="str"  value="$(arg camera)_$(arg depth)_frame"/>

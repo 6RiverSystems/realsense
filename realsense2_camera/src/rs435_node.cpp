@@ -11,6 +11,7 @@ RS435Node::RS435Node(ros::NodeHandle& nodeHandle,
     // if depth_exposure and depth_exposure are not provided, use the default values from cfg file
     _pnh.param("depth_exposure", _depth_exposure, -1);
     _pnh.param("depth_preset", _depth_preset, -1);
+    _pnh.param("depth_laser_power", _depth_laser_power, -1.0);
 }
 
 void RS435Node::registerDynamicReconfigCb()
@@ -100,6 +101,11 @@ void RS435Node::setParam(rs435_paramsConfig &config, rs435_param param)
     case rs435_depth_laser_power:
     {
         static const auto rs435_depth_laser_power_factor = 30;
+        if(_depth_laser_power > 0)
+        {
+            config.rs435_depth_laser_power = _depth_laser_power;
+            _depth_laser_power = -1.0;
+        }
         ROS_DEBUG_STREAM("rs435_depth_laser_power: " << config.rs435_depth_laser_power * rs435_depth_laser_power_factor);
         _sensors[DEPTH].set_option(rs2_option::RS2_OPTION_LASER_POWER, config.rs435_depth_laser_power * rs435_depth_laser_power_factor);
     }

@@ -51,7 +51,7 @@
 
   <arg name="depth_exposure"      default="425"/>
   <arg name="depth_preset"        default="0"/>
-  <arg name="depth_laser_power"   default="1.0"/>
+  <arg name="depth_laser_power"   default="3.0"/>
 
   <node pkg="nodelet" type="nodelet" name="realsense2_camera" args="load realsense2_camera/RealSenseNodeFactory $(arg manager)">
     <param name="camera"                   type="str"  value="$(arg camera)"/>

@@ -53,7 +53,7 @@
   <arg name="depth_preset"        default="0"/>
   <arg name="depth_laser_power"   default="3.0"/>
 
-  <node pkg="nodelet" type="nodelet" name="realsense2_camera" args="load realsense2_camera/RealSenseNodeFactory $(arg manager)">
+  <node pkg="nodelet" type="nodelet" name="realsense2_camera" respawn="true" args="load realsense2_camera/RealSenseNodeFactory $(arg manager)">
     <param name="camera"                   type="str"  value="$(arg camera)"/>
     <param name="usb_port_id"              type="str"  value="$(arg usb_port_id)"/>
     <param name="serial_no"                type="str"  value="$(arg serial_no)"/>

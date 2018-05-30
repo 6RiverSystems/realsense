@@ -107,7 +107,7 @@ void RS435Node::setParam(rs435_paramsConfig &config, rs435_param param)
             config.rs435_depth_laser_power = _depth_laser_power;
             _depth_laser_power = -1.0;
         }
-        ROS_INFO("Set laser power to %f" << config.rs435_depth_laser_power);
+        ROS_INFO("Set laser power to %f", config.rs435_depth_laser_power);
         _sensors[DEPTH].set_option(rs2_option::RS2_OPTION_LASER_POWER, config.rs435_depth_laser_power * rs435_depth_laser_power_factor);
     }
         break;

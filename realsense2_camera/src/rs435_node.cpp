@@ -158,8 +158,10 @@ void RS435Node::callback(rs435_paramsConfig &config, uint32_t level)
     if (set_default_dynamic_reconfig_values == level)
     {
         ROS_INFO("Inside callback if, level: %u", level);
+        ROS_INFO("Outside for loop: rs435_param_count: %d", rs435_param_count);
         for (int i = 1 ; i < rs435_param_count ; ++i)
         {
+            ROS_INFO("rs435_param_count: %d", rs435_param_count);
             ROS_DEBUG_STREAM("rs435_param = " << i);
             ROS_INFO("%d and %d", i, (rs435_param)i);
             setParam(config ,(rs435_param)i);

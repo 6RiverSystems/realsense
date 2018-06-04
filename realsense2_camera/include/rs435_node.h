@@ -11,7 +11,7 @@ namespace realsense2_camera
     enum rs435_param{
         rs435_depth_visual_preset = 3,
         rs435_depth_exposure = 9,
-        rs435_depth_laser_power,
+        rs435_depth_laser_power = 10,
         rs435_depth_emitter_enabled,
         rs435_color_backlight_compensation,
         rs435_color_brightness,

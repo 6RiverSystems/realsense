@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>realsense_camera</name>
+  <name>realsense2_camera</name>
   <version>1.8.1</version>
   <description>RealSense Camera package allowing access to Intel 3D cameras and advanced modules</description>
 

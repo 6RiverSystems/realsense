@@ -64,6 +64,7 @@ namespace realsense2_camera
         virtual ~RealSenseNodeFactory() {}
 
     private:
+        rs2::device getDevice(std::string& serial_no);
         virtual void onInit() override;
         void tryGetLogSeverity(rs2_log_severity& severity) const;
         std::string parseUsbPortId(std::string usb_path) const;

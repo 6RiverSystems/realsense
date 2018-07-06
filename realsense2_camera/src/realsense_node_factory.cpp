@@ -6,7 +6,6 @@
 #include "../include/rs415_node.h"
 #include "../include/rs435_node.h"
 #include <iostream>
-#include <algorithm>
 #include <map>
 
 using namespace realsense2_camera;
@@ -84,37 +83,34 @@ void RealSenseNodeFactory::onInit()
             exit(1);
         }
 
-        // we found the device. Restart the device and wait for it to come up again
+    return retDev;
+}
 
-        ROS_INFO_STREAM("RESETING DEVICE: " << port_id << " with serial number: " << serial_no);
-        _device.hardware_reset();
-        ros::Duration(5).sleep();
-        ROS_INFO_STREAM("Attempting to reacquire device: " << port_id << " with serial number: " << serial_no);
-
-        list = _ctx.query_devices();
-        if (0 == list.size())
+void RealSenseNodeFactory::onInit()
+{
+    try
+    {
+        std::mutex mtx;
+        std::condition_variable cv;
+        rs2::device dev;
+        _ctx.set_devices_changed_callback([&dev, &cv](rs2::event_information& info)
         {
-            ROS_ERROR("No RealSense devices were found! Terminating RealSense Node...");
-            ros::shutdown();
-            exit(1);
-        }
-        found = false;
-        for (auto&& dev : list)
-        {
-            auto sn = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
-            if (sn == serial_no )
+            if (info.was_removed(dev))
             {
-                _device = dev;
-                found = true;
-                break;
+                cv.notify_one();
             }
-        }
+        });
 
-        if (!found)
+        auto privateNh = getPrivateNodeHandle();
+        std::string serial_no("");
+        privateNh.param("serial_no", serial_no, std::string(""));
+        _device = getDevice(serial_no);
+        ROS_INFO("Resetting device...");
+        dev.hardware_reset();
+
         {
-            ROS_FATAL_STREAM("The requested device at USB port: " << usb_port_id << " is NOT found!");
-            ros::shutdown();
-            exit(1);
+             std::unique_lock<std::mutex> lk(mtx);
+             cv.wait(lk);
         }
 
         _ctx.set_devices_changed_callback([this](rs2::event_information& info)
@@ -127,7 +123,6 @@ void RealSenseNodeFactory::onInit()
             }
         });
 
-        // TODO
         auto pid_str = _device.get_info(RS2_CAMERA_INFO_PRODUCT_ID);
         uint16_t pid;
         std::stringstream ss;

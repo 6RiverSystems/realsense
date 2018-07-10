@@ -49,7 +49,7 @@ void RealSenseNodeFactory::onInit()
 
                 for (auto&& dev : info.get_new_devices())
                 {
-                    if (deviceMatches(dev))
+                    if (deviceMatches(dev, usb_port_id))
                     {
                         addDevice(dev);
                     }
@@ -59,7 +59,7 @@ void RealSenseNodeFactory::onInit()
             // Initial population of the device list
             for (auto&& dev : _context.query_devices())
             {
-                if (deviceMatches(dev))
+                if (deviceMatches(dev, usb_port_id))
                 {
                     addDevice(dev);
                 }
@@ -136,6 +136,8 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
     // See if we already have the correct device attached
     if (_device)
     {
+        ROS_INFO("REALSENSE: Device already added %s", _device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
+
         return;
     }
 

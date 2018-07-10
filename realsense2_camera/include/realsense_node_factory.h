@@ -25,6 +25,7 @@
 #include <csignal>
 #include <eigen3/Eigen/Geometry>
 #include <fstream>
+#include <mutex>
 
 namespace realsense2_camera
 {
@@ -67,9 +68,15 @@ namespace realsense2_camera
         virtual void onInit() override;
         void tryGetLogSeverity(rs2_log_severity& severity) const;
         std::string parseUsbPortId(std::string usb_path) const;
+        bool deviceMatches(rs2::device& dev, std::string& usb_port);
+        void addDevice(rs2::device dev);
+        void removeDevice(const rs2::event_information& info);
+        void resetAndShutdown();
 
         std::unique_ptr<InterfaceRealSenseNode> _realSenseNode;
+        std::mutex _deviceLock;
         rs2::device _device;
-        rs2::context _ctx;
+
+        rs2::context _context;
     };
 }//end namespace

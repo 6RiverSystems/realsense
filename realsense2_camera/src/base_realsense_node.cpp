@@ -1431,8 +1431,6 @@ BaseD400Node::BaseD400Node(ros::NodeHandle& nodeHandle,
 
 void BaseD400Node::callback(base_d400_paramsConfig &config, uint32_t level)
 {
-    return;
-
     ROS_DEBUG_STREAM("D400 - Level: " << level);
 
     if (set_default_dynamic_reconfig_values == level)

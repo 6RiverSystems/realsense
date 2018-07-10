@@ -23,6 +23,8 @@ void RS435Node::registerDynamicReconfigCb()
 
 void RS435Node::setParam(rs435_paramsConfig &config, rs435_param param)
 {
+    return;
+
     // W/O for zero param
     if (0 == param)
         return;

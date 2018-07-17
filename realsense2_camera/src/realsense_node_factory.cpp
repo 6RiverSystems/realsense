@@ -64,7 +64,7 @@ void RealSenseNodeFactory::onInitLegacy()
             {
                 _device = dev;
                 serial_no = serial_number;
-                fou_contextnd = true;
+                found = true;
                 break;
             }
             else if (port_id == usb_port_id)

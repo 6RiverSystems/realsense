@@ -33,7 +33,7 @@ void RealSenseNodeFactory::onInitLegacy()
 {
     try
     {
-        auto list = _ctx.query_devices();
+        auto list = _context.query_devices();
         if (0 == list.size())
         {
             ROS_ERROR("No RealSense devices were found! Terminating RealSense Node...");
@@ -64,7 +64,7 @@ void RealSenseNodeFactory::onInitLegacy()
             {
                 _device = dev;
                 serial_no = serial_number;
-                found = true;
+                fou_contextnd = true;
                 break;
             }
             else if (port_id == usb_port_id)
@@ -91,7 +91,7 @@ void RealSenseNodeFactory::onInitLegacy()
         ros::Duration(5).sleep();
         ROS_INFO_STREAM("Attempting to reacquire device: " << port_id << " with serial number: " << serial_no);
 
-        list = _ctx.query_devices();
+        list = _context.query_devices();
         if (0 == list.size())
         {
             ROS_ERROR("No RealSense devices were found! Terminating RealSense Node...");
@@ -117,7 +117,7 @@ void RealSenseNodeFactory::onInitLegacy()
             exit(1);
         }
 
-        _ctx.set_devices_changed_callback([this](rs2::event_information& info)
+        _context.set_devices_changed_callback([this](rs2::event_information& info)
         {
             if (info.was_removed(_device))
             {

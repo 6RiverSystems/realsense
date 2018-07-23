@@ -74,7 +74,7 @@ namespace realsense2_camera
         void resetAndShutdown();
 
         std::unique_ptr<InterfaceRealSenseNode> _realSenseNode;
-        std::mutex _deviceLock;
+        static std::recursive_mutex _subsystemCallbackLock;
         rs2::device _device;
 
         rs2::context _context;

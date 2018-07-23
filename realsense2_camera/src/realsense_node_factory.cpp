@@ -15,6 +15,10 @@ constexpr auto realsense_ros_camera_version = REALSENSE_ROS_EMBEDDED_VERSION_STR
 
 PLUGINLIB_EXPORT_CLASS(realsense2_camera::RealSenseNodeFactory, nodelet::Nodelet)
 
+
+std::recursive_mutex RealSenseNodeFactory::_subsystemCallbackLock;
+
+
 RealSenseNodeFactory::RealSenseNodeFactory()
 {
     ROS_INFO("RealSense ROS v%s", REALSENSE_ROS_VERSION_STR);
@@ -39,12 +43,12 @@ void RealSenseNodeFactory::onInit()
         privateNh.param("usb_port_id", usb_port_id, std::string(""));
 
         {
-            static std::mutex sLock;
-
-            std::lock_guard<std::mutex> scopedLock(sLock);
+            std::lock_guard<std::recursive_mutex> scopedLock(_subsystemCallbackLock);
 
             _context.set_devices_changed_callback([&](rs2::event_information& info)
             {
+                std::lock_guard<std::recursive_mutex> scopedLock(_subsystemCallbackLock);
+
                 removeDevice(info);
 
                 for (auto&& dev : info.get_new_devices())
@@ -131,7 +135,7 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
 {
     std::string serial_number(dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
 
-    std::lock_guard<std::mutex> lock(_deviceLock);
+    std::lock_guard<std::recursive_mutex> lock(_subsystemCallbackLock);
 
     // See if we already have the correct device attached
     if (_device)
@@ -206,7 +210,7 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
 
 void RealSenseNodeFactory::removeDevice(const rs2::event_information& info)
 {
-    std::lock_guard<std::mutex> lock(_deviceLock);
+    std::lock_guard<std::recursive_mutex> lock(_subsystemCallbackLock);
 
     if (info.was_removed(_device))
     {
@@ -219,7 +223,7 @@ void RealSenseNodeFactory::removeDevice(const rs2::event_information& info)
 
 void RealSenseNodeFactory::resetAndShutdown()
 {
-    std::lock_guard<std::mutex> lock(_deviceLock);
+    std::lock_guard<std::recursive_mutex> lock(_subsystemCallbackLock);
 
     _device.hardware_reset();
 

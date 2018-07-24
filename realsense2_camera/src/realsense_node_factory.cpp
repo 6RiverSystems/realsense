@@ -61,13 +61,26 @@ void RealSenseNodeFactory::onInit()
             });
 
             // Initial population of the device list
+            bool found = false;
             for (auto&& dev : _context.query_devices())
             {
                 if (deviceMatches(dev, usb_port_id))
                 {
                     dev.hardware_reset();
                     boost::this_thread::sleep(boost::posix_time::seconds(5));
+                    found = true;
                     break;
+                }
+            }
+
+            if (found) {
+                for (auto&& dev : _context.query_devices())
+                {
+                    if (deviceMatches(dev, usb_port_id))
+                    {
+                        addDevice(dev);
+                        break;
+                    }
                 }
             }
         }

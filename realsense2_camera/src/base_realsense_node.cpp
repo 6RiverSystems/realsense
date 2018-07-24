@@ -1,5 +1,7 @@
 #include "../include/base_realsense_node.h"
 #include "../include/sr300_node.h"
+#include <thread>
+#include <chrono>
 
 using namespace realsense2_camera;
 
@@ -663,6 +665,20 @@ void BaseRealSenseNode::setupStreams()
                     auto depth_sensor = sens.as<rs2::depth_sensor>();
                     _depth_scale_meters = depth_sensor.get_depth_scale();
                 }
+
+                sens.set_notifications_callback([&](const rs2::notification &n) {
+                    std::lock_guard<std::recursive_mutex> lock(RealSenseNodeFactory::_subsystemCallbackLock);
+
+                    _dev.hardware_reset();
+                    ROS_WARN("received a notification!");
+                    ROS_WARN("reset device sleeping for 5 seconds!");
+                    std::chrono::seconds delay(5);
+                    std::this_thread::sleep_for(delay);
+                    ROS_WARN("shutting ros down!");
+                    ros::shutdown();
+                    exit(1);
+                });
+
 
                 if (_sync_frames)
                 {

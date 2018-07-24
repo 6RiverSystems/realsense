@@ -63,6 +63,7 @@ namespace realsense2_camera
     public:
         RealSenseNodeFactory();
         virtual ~RealSenseNodeFactory() {}
+        static std::recursive_mutex _subsystemCallbackLock;
 
     private:
         virtual void onInit() override;
@@ -74,7 +75,6 @@ namespace realsense2_camera
         void resetAndShutdown();
 
         std::unique_ptr<InterfaceRealSenseNode> _realSenseNode;
-        static std::recursive_mutex _subsystemCallbackLock;
         rs2::device _device;
 
         rs2::context _context;

@@ -65,7 +65,9 @@ void RealSenseNodeFactory::onInit()
             {
                 if (deviceMatches(dev, usb_port_id))
                 {
-                    addDevice(dev);
+                    dev.hardware_reset();
+                    boost::this_thread::sleep(boost::posix_time::seconds(5));
+                    break;
                 }
             }
         }

@@ -63,26 +63,26 @@ void RealSenseNodeFactory::onInit()
 
             // Initial population of the device list
             bool found = false;
-            for (auto&& dev : _context.query_devices())
-            {
-                if (deviceMatches(dev, usb_port_id))
-                {
-                    dev.hardware_reset();
-                    boost::this_thread::sleep(boost::posix_time::seconds(10));
-                    found = true;
-                    break;
-                }
-            }
-
-            if (found) {
-                for (auto&& dev : _context.query_devices())
-                {
-                    if (deviceMatches(dev, usb_port_id))
-                    {
-                        addDevice(dev);
+            while (!found) {
+                for (auto &&dev : _context.query_devices()) {
+                    if (deviceMatches(dev, usb_port_id)) {
+                        dev.hardware_reset();
+                        boost::this_thread::sleep(boost::posix_time::seconds(10));
+                        found = true;
                         break;
                     }
                 }
+
+                if (found) {
+                    for (auto &&dev : _context.query_devices()) {
+                        if (deviceMatches(dev, usb_port_id)) {
+                            addDevice(dev);
+                            break;
+                        }
+                    }
+                }
+                ROS_ERROR("No devices found... sleeping for 2 seconds and polling again");
+                boost::this_thread::sleep(boost::posix_time::seconds(2));
             }
         }
     }

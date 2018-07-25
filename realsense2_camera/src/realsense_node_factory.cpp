@@ -43,7 +43,7 @@ void RealSenseNodeFactory::onInit()
         privateNh.param("usb_port_id", usb_port_id, std::string(""));
 
         {
-            std::lock_guard<std::recursive_mutex> scopedLock(_subsystemCallbackLock);
+            //std::lock_guard<std::recursive_mutex> scopedLock(_subsystemCallbackLock);
 
             /*_context.set_devices_changed_callback([&](rs2::event_information& info)
             {
@@ -69,21 +69,34 @@ void RealSenseNodeFactory::onInit()
                         dev.hardware_reset();
                         boost::this_thread::sleep(boost::posix_time::seconds(10));
                         found = true;
+                        ROS_ERROR("Device found... and was reset");
                         break;
                     }
                 }
+                if (!found) {
+                    ROS_ERROR("No devices found... sleeping for 2 seconds and polling again");
+                    boost::this_thread::sleep(boost::posix_time::seconds(2));
+                }
+            }
 
-                if (found) {
+            found = false;
+            while(!found) {
                     for (auto &&dev : _context.query_devices()) {
                         if (deviceMatches(dev, usb_port_id)) {
                             addDevice(dev);
+                            found = true;
+                            ROS_ERROR("Device found... and was added");
+
                             break;
                         }
                     }
+                    if(!found) {
+                        ROS_ERROR("No devices found... sleeping for 2 seconds and polling again");
+                        boost::this_thread::sleep(boost::posix_time::seconds(2));
+                    }
                 }
-                ROS_ERROR("No devices found... sleeping for 2 seconds and polling again");
-                boost::this_thread::sleep(boost::posix_time::seconds(2));
-            }
+
+
         }
     }
     catch(const std::exception& ex)
@@ -151,7 +164,7 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
 {
     std::string serial_number(dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
 
-    std::lock_guard<std::recursive_mutex> lock(_subsystemCallbackLock);
+    //std::lock_guard<std::recursive_mutex> lock(_subsystemCallbackLock);
 
     // See if we already have the correct device attached
     if (_device)
@@ -226,7 +239,7 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
 
 void RealSenseNodeFactory::removeDevice(const rs2::event_information& info)
 {
-    std::lock_guard<std::recursive_mutex> lock(_subsystemCallbackLock);
+    //std::lock_guard<std::recursive_mutex> lock(_subsystemCallbackLock);
 
     if (info.was_removed(_device))
     {

@@ -47,7 +47,9 @@ void RealSenseNodeFactory::onInit()
 
             _context.set_devices_changed_callback([&](rs2::event_information& info)
             {
+                ROS_ERROR("On devices changed callback called");
                 std::lock_guard<std::recursive_mutex> scopedLock(_subsystemCallbackLock);
+                ROS_ERROR("removeDevice called");
 
                 removeDevice(info);
 
@@ -55,25 +57,13 @@ void RealSenseNodeFactory::onInit()
                 {
                     if (deviceMatches(dev, usb_port_id))
                     {
+                        ROS_ERROR("addDevice called");
                         addDevice(dev);
                     }
                 }
             });
 
             // Initial population of the device list
-            bool found = false;
-            for (auto&& dev : _context.query_devices())
-            {
-                if (deviceMatches(dev, usb_port_id))
-                {
-                    dev.hardware_reset();
-                    boost::this_thread::sleep(boost::posix_time::seconds(5));
-                    found = true;
-                    break;
-                }
-            }
-
-            if (found) {
                 for (auto&& dev : _context.query_devices())
                 {
                     if (deviceMatches(dev, usb_port_id))
@@ -82,7 +72,7 @@ void RealSenseNodeFactory::onInit()
                         break;
                     }
                 }
-            }
+
         }
     }
     catch(const std::exception& ex)

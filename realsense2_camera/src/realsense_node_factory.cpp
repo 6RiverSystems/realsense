@@ -74,7 +74,7 @@ void RealSenseNodeFactory::onInit()
                     }
                 }
                 if (!found) {
-                    ROS_ERROR("No devices found... sleeping for 2 seconds and polling again");
+                    ROS_ERROR("No devices found for reset... sleeping for 2 seconds and polling again");
                     boost::this_thread::sleep(boost::posix_time::seconds(2));
                 }
             }
@@ -91,7 +91,7 @@ void RealSenseNodeFactory::onInit()
                         }
                     }
                     if(!found) {
-                        ROS_ERROR("No devices found... sleeping for 2 seconds and polling again");
+                        ROS_ERROR("No devices found for adding... sleeping for 2 seconds and polling again");
                         boost::this_thread::sleep(boost::posix_time::seconds(2));
                     }
                 }

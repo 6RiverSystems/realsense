@@ -43,7 +43,7 @@ void RealSenseNodeFactory::onInit()
         privateNh.param("usb_port_id", usb_port_id, std::string(""));
 
         {
-            std::lock_guard<std::recursive_mutex> scopedLock(_subsystemCallbackLock);
+            //std::lock_guard<std::recursive_mutex> scopedLock(_subsystemCallbackLock);
 
             /*_context.set_devices_changed_callback([&](rs2::event_information& info)
             {
@@ -69,12 +69,12 @@ void RealSenseNodeFactory::onInit()
                         dev.hardware_reset();
                         boost::this_thread::sleep(boost::posix_time::seconds(10));
                         found = true;
-                        ROS_ERROR("Device found... and was reset");
+                        ROS_ERROR_STREAM("Device " << usb_port_id << " found... and was reset");
                         break;
                     }
                 }
                 if (!found) {
-                    ROS_ERROR("No devices found for reset... sleeping for 2 seconds and polling again");
+                    ROS_ERROR_STREAM("No devices found for reset... " << usb_port_id << " sleeping for 2 seconds and polling again");
                     boost::this_thread::sleep(boost::posix_time::seconds(2));
                 }
             }
@@ -85,13 +85,13 @@ void RealSenseNodeFactory::onInit()
                         if (deviceMatches(dev, usb_port_id)) {
                             addDevice(dev);
                             found = true;
-                            ROS_ERROR("Device found... and was added");
+                            ROS_ERROR_STREAM("Device " << usb_port_id << " found... and was added");
 
                             break;
                         }
                     }
                     if(!found) {
-                        ROS_ERROR("No devices found for adding... sleeping for 2 seconds and polling again");
+                        ROS_ERROR_STREAM("No devices found for adding... " << usb_port_id << " sleeping for 2 seconds and polling again");
                         boost::this_thread::sleep(boost::posix_time::seconds(2));
                     }
                 }

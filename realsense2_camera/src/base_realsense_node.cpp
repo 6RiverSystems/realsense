@@ -667,16 +667,16 @@ void BaseRealSenseNode::setupStreams()
                 }
 
                 sens.set_notifications_callback([&](const rs2::notification &n) {
-                    //std::lock_guard<std::recursive_mutex> lock(RealSenseNodeFactory::_subsystemCallbackLock);
-                    sens.stop();
+                    std::lock_guard<std::recursive_mutex> lock(RealSenseNodeFactory::_subsystemCallbackLock);
+
                     _dev.hardware_reset();
                     ROS_ERROR("received a notification!");
                     ROS_ERROR("reset device sleeping for 5 seconds!");
-                    //std::chrono::seconds delay(5);
-                    //std::this_thread::sleep_for(delay);
-                    //ROS_ERROR("shutting ros down!");
-                    //ros::shutdown();
-                    //exit(1);
+                    std::chrono::seconds delay(5);
+                    std::this_thread::sleep_for(delay);
+                    ROS_ERROR("shutting ros down!");
+                    ros::shutdown();
+                    exit(1);
                 });
 
 

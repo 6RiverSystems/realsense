@@ -675,7 +675,7 @@ void BaseRealSenseNode::setupStreams()
                     //std::chrono::seconds delay(5);
                     //std::this_thread::sleep_for(delay);
                     ROS_ERROR("shutting ros down!");
-                    ros::shutdown();
+                    //ros::shutdown();
                     exit(1);
                 });
 

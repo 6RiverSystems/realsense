@@ -43,7 +43,7 @@ void RealSenseNodeFactory::onInit()
         privateNh.param("usb_port_id", usb_port_id, std::string(""));
 
         {
-            //std::lock_guard<std::recursive_mutex> scopedLock(_subsystemCallbackLock);
+            std::lock_guard<std::recursive_mutex> scopedLock(_subsystemCallbackLock);
 
             /*_context.set_devices_changed_callback([&](rs2::event_information& info)
             {

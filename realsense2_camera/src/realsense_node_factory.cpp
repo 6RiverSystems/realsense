@@ -45,7 +45,7 @@ void RealSenseNodeFactory::onInit()
         {
             std::lock_guard<std::recursive_mutex> scopedLock(_subsystemCallbackLock);
 
-            _context.set_devices_changed_callback([&](rs2::event_information& info)
+            /*_context.set_devices_changed_callback([&](rs2::event_information& info)
             {
                 std::lock_guard<std::recursive_mutex> scopedLock(_subsystemCallbackLock);
 
@@ -59,6 +59,7 @@ void RealSenseNodeFactory::onInit()
                     }
                 }
             });
+             */
 
             // Initial population of the device list
             bool found = false;
@@ -67,7 +68,7 @@ void RealSenseNodeFactory::onInit()
                 if (deviceMatches(dev, usb_port_id))
                 {
                     dev.hardware_reset();
-                    boost::this_thread::sleep(boost::posix_time::seconds(5));
+                    boost::this_thread::sleep(boost::posix_time::seconds(10));
                     found = true;
                     break;
                 }

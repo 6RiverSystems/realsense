@@ -76,6 +76,7 @@ void RealSenseNodeFactory::onInit()
                 if (!found) {
                     ROS_ERROR_STREAM("No devices found for reset... " << usb_port_id << " sleeping for 2 seconds and polling again");
                     boost::this_thread::sleep(boost::posix_time::seconds(2));
+                    _context = rs2::context{};
                 }
             }
 
@@ -93,6 +94,7 @@ void RealSenseNodeFactory::onInit()
                     if(!found) {
                         ROS_ERROR_STREAM("No devices found for adding... " << usb_port_id << " sleeping for 2 seconds and polling again");
                         boost::this_thread::sleep(boost::posix_time::seconds(2));
+                        _context = rs2::context{};
                     }
                 }
 

@@ -21,7 +21,7 @@ PLUGINLIB_EXPORT_CLASS(realsense2_camera::RealSenseNodeFactory, nodelet::Nodelet
 
 
 std::recursive_mutex RealSenseNodeFactory::_subsystemCallbackLock;
-
+rs2::context RealSenseNodeFactory::_context;
 
 RealSenseNodeFactory::RealSenseNodeFactory()
 {
@@ -87,7 +87,8 @@ void RealSenseNodeFactory::onInit()
                 if (count == 3) {
                     sync();
                     setuid(0);
-                    reboot(RB_AUTOBOOT);
+                    auto result = reboot(RB_AUTOBOOT);
+                    ROS_ERROR_STREAM("result of reboot: " << result);
                 }
             }
 

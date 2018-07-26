@@ -77,6 +77,6 @@ namespace realsense2_camera
         std::unique_ptr<InterfaceRealSenseNode> _realSenseNode;
         rs2::device _device;
 
-        rs2::context _context;
+        static rs2::context _context;
     };
 }//end namespace

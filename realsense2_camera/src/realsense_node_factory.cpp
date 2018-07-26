@@ -8,6 +8,10 @@
 #include <iostream>
 #include <algorithm>
 
+
+#include <unistd.h>
+#include <sys/reboot.h>
+
 using namespace realsense2_camera;
 
 #define REALSENSE_ROS_EMBEDDED_VERSION_STR (VAR_ARG_STRING(VERSION: REALSENSE_ROS_MAJOR_VERSION.REALSENSE_ROS_MINOR_VERSION.REALSENSE_ROS_PATCH_VERSION))
@@ -63,6 +67,7 @@ void RealSenseNodeFactory::onInit()
 
             // Initial population of the device list
             bool found = false;
+            int count = 0;
             while (!found) {
                 for (auto &&dev : _context.query_devices()) {
                     if (deviceMatches(dev, usb_port_id)) {
@@ -77,6 +82,12 @@ void RealSenseNodeFactory::onInit()
                     ROS_ERROR_STREAM("No devices found for reset... " << usb_port_id << " sleeping for 2 seconds and polling again");
                     boost::this_thread::sleep(boost::posix_time::seconds(2));
                     _context = rs2::context{};
+                }
+                count++;
+                if (count == 3) {
+                    sync();
+                    setuid(0);
+                    reboot(RB_AUTOBOOT);
                 }
             }
 

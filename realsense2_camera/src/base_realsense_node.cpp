@@ -508,9 +508,17 @@ void BaseRealSenseNode::setupStreams()
 void BaseRealSenseNode::stopTopics() {
     ROS_INFO("shutting down streams");
     for(auto&& sens : _sensors) {
-        sens.second.stop();
-        sens.second.close();
+        if (_enable[sens.first]) {
+        try {
+            sens.second.stop();
+            sens.second.close();
+        } catch (...) {
+            ROS_ERROR_STREAM("notification: Unknown exception has occurred while shutting down streams. ignoring...");
+        }
     }
+    }
+    _syncer = rs2::asynchronous_syncer{};
+
 }
 
 void BaseRealSenseNode::setupStreams(std::function<void (const rs2::notification &n)> &handler)

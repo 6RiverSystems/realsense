@@ -41,15 +41,23 @@ RealSenseNodeFactory::RealSenseNodeFactory()
 
 
 void RealSenseNodeFactory::notification_handler(const rs2::notification &n) {
-    std::thread([&](){
+    std::thread([this](){
         ROS_ERROR_STREAM("notification: Executing reset for device " << usb_port_id);
+        ROS_ERROR_STREAM("notification: Device " << usb_port_id << " sleeping for 1 second");
         boost::this_thread::sleep(boost::posix_time::seconds(1));
+        ROS_ERROR_STREAM("notification: Device " << usb_port_id << " stopic topics");
         _realSenseNode->stopTopics();
+        ROS_ERROR_STREAM("notification: Device " << usb_port_id << " sleeping for 1 second");
         boost::this_thread::sleep(boost::posix_time::seconds(1));
+        ROS_ERROR_STREAM("notification: Device " << usb_port_id << " resetting");
         _device.hardware_reset();
+        ROS_ERROR_STREAM("notification: Device " << usb_port_id << " sleeping for 10 seconds");
         boost::this_thread::sleep(boost::posix_time::seconds(10));
+        ROS_ERROR_STREAM("notification: Device " << usb_port_id << " deallocating realsensenode");
         _realSenseNode.reset();
+        ROS_ERROR_STREAM("notification: Device " << usb_port_id << " sleeping for 1 second");
         boost::this_thread::sleep(boost::posix_time::seconds(1));
+        ROS_ERROR_STREAM("notification: Device " << usb_port_id << " creating a new device");
         _device = rs2::device();
         bool found = false;
         while(!found){

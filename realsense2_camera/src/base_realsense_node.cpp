@@ -1,7 +1,7 @@
 #include "../include/base_realsense_node.h"
 #include "../include/sr300_node.h"
 #include <thread>
-#include <chrono>
+#include <functional>
 
 using namespace realsense2_camera;
 
@@ -83,12 +83,26 @@ BaseRealSenseNode::BaseRealSenseNode(ros::NodeHandle& nodeHandle,
     _stream_name[ACCEL] = "accel";
 }
 
+
 void BaseRealSenseNode::publishTopics()
 {
     getParameters();
     setupDevice();
     setupPublishers();
     setupStreams();
+
+    if (_enable_tf && !_enable_tf_dynamic) {
+        publishStaticTransforms();
+    }
+    ROS_INFO_STREAM("RealSense Node Is Up!");
+}
+
+void BaseRealSenseNode::publishTopics(std::function<void (const rs2::notification &n)> &handler)
+{
+    getParameters();
+    setupDevice();
+    setupPublishers();
+    setupStreams(handler);
 
     if (_enable_tf && !_enable_tf_dynamic) {
         publishStaticTransforms();
@@ -486,6 +500,21 @@ void BaseRealSenseNode::publishAlignedDepthToOthers(rs2::frame depth_frame, cons
 
 void BaseRealSenseNode::setupStreams()
 {
+
+    ROS_INFO("setupStreams... NOT IMPLEMENTED");
+
+}
+
+void BaseRealSenseNode::stopTopics() {
+    ROS_INFO("shutting down streams");
+    for(auto&& sens : _sensors) {
+        sens.second.stop();
+        sens.second.close();
+    }
+}
+
+void BaseRealSenseNode::setupStreams(std::function<void (const rs2::notification &n)> &handler)
+{
     ROS_INFO("setupStreams...");
     try{
         for (auto& streams : IMAGE_STREAMS)
@@ -666,18 +695,7 @@ void BaseRealSenseNode::setupStreams()
                     _depth_scale_meters = depth_sensor.get_depth_scale();
                 }
 
-                sens.set_notifications_callback([&](const rs2::notification &n) {
-                    //std::lock_guard<std::recursive_mutex> lock(RealSenseNodeFactory::_subsystemCallbackLock);
-
-                    //_dev.hardware_reset();
-                    ROS_ERROR("received a notification!");
-                    //ROS_ERROR("reset device sleeping for 5 seconds!");
-                    //std::chrono::seconds delay(5);
-                    //std::this_thread::sleep_for(delay);
-                    ROS_ERROR("shutting ros down!");
-                    //ros::shutdown();
-                    exit(1);
-                });
+                sens.set_notifications_callback(handler);
 
 
                 if (_sync_frames)

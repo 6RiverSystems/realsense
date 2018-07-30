@@ -54,6 +54,8 @@ namespace realsense2_camera
     {
     public:
         virtual void publishTopics() = 0;
+        virtual void publishTopics(std::function<void (const rs2::notification &n)> &handler) = 0;
+        virtual void stopTopics() = 0;
         virtual void registerDynamicReconfigCb() = 0;
         virtual ~InterfaceRealSenseNode() = default;
     };
@@ -64,6 +66,7 @@ namespace realsense2_camera
         RealSenseNodeFactory();
         virtual ~RealSenseNodeFactory() {}
         static std::recursive_mutex _subsystemCallbackLock;
+        void notification_handler(const rs2::notification &n);
 
     private:
         virtual void onInit() override;
@@ -76,7 +79,8 @@ namespace realsense2_camera
 
         std::unique_ptr<InterfaceRealSenseNode> _realSenseNode;
         rs2::device _device;
-
-        static rs2::context _context;
+        rs2::context _context;
+        std::string usb_port_id;
+        std::function<void(const rs2::notification &n)> handler;
     };
 }//end namespace

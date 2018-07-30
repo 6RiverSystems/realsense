@@ -7,6 +7,7 @@
 #include "../include/rs435_node.h"
 #include <iostream>
 #include <algorithm>
+#include <thread>
 
 
 #include <unistd.h>
@@ -21,7 +22,6 @@ PLUGINLIB_EXPORT_CLASS(realsense2_camera::RealSenseNodeFactory, nodelet::Nodelet
 
 
 std::recursive_mutex RealSenseNodeFactory::_subsystemCallbackLock;
-rs2::context RealSenseNodeFactory::_context;
 
 RealSenseNodeFactory::RealSenseNodeFactory()
 {
@@ -34,7 +34,38 @@ RealSenseNodeFactory::RealSenseNodeFactory()
     if (rs2_log_severity::RS2_LOG_SEVERITY_DEBUG == severity)
         ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
 
+
+
     rs2::log_to_console(severity);
+}
+
+
+void RealSenseNodeFactory::notification_handler(const rs2::notification &n) {
+    std::thread([&](){
+        ROS_ERROR_STREAM("notification: Executing reset for device " << usb_port_id);
+        boost::this_thread::sleep(boost::posix_time::seconds(1));
+        _realSenseNode->stopTopics();
+        boost::this_thread::sleep(boost::posix_time::seconds(1));
+        _device.hardware_reset();
+        boost::this_thread::sleep(boost::posix_time::seconds(10));
+        _realSenseNode.reset();
+        boost::this_thread::sleep(boost::posix_time::seconds(1));
+        _device = rs2::device();
+        bool found = false;
+        while(!found){
+            for (auto &&dev : _context.query_devices()) {
+                if (deviceMatches(dev, usb_port_id)) {
+                    addDevice(dev);
+                    ROS_ERROR_STREAM("notification: Device " << usb_port_id << " found... and was added");
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) {
+                ROS_ERROR_STREAM("notification: Device " << usb_port_id << " not found... and was added");
+            }
+        }
+    }).detach();
 }
 
 void RealSenseNodeFactory::onInit()
@@ -43,12 +74,9 @@ void RealSenseNodeFactory::onInit()
     {
         auto privateNh = getPrivateNodeHandle();
 
-        std::string usb_port_id;
         privateNh.param("usb_port_id", usb_port_id, std::string(""));
 
         {
-            std::lock_guard<std::recursive_mutex> scopedLock(_subsystemCallbackLock);
-
             /*_context.set_devices_changed_callback([&](rs2::event_information& info)
             {
                 std::lock_guard<std::recursive_mutex> scopedLock(_subsystemCallbackLock);
@@ -67,48 +95,24 @@ void RealSenseNodeFactory::onInit()
 
             // Initial population of the device list
             bool found = false;
-            int count = 0;
-            while (!found) {
-                for (auto &&dev : _context.query_devices()) {
-                    if (deviceMatches(dev, usb_port_id)) {
-                        dev.hardware_reset();
-                        boost::this_thread::sleep(boost::posix_time::seconds(5));
-                        found = true;
-                        ROS_ERROR_STREAM("Device " << usb_port_id << " found... and was reset");
-                        break;
-                    }
-                }
-                if (!found) {
-                    ROS_ERROR_STREAM("No devices found for reset... " << usb_port_id << " sleeping for 2 seconds and polling again");
-                    boost::this_thread::sleep(boost::posix_time::seconds(2));
-                    _context = rs2::context{};
-                }
-                count++;
-                if (count == 3) {
-                    sync();
-                    setuid(0);
-                    auto result = reboot(RB_AUTOBOOT);
-                    ROS_ERROR_STREAM("result of reboot: " << result);
-                }
-            }
-
-            found = false;
             while(!found) {
                     for (auto &&dev : _context.query_devices()) {
                         if (deviceMatches(dev, usb_port_id)) {
                             addDevice(dev);
                             found = true;
-                            ROS_ERROR_STREAM("Device " << usb_port_id << " found... and was added");
+                            ROS_ERROR_STREAM("notification: Device " << usb_port_id << " found... and was added");
 
                             break;
                         }
                     }
                     if(!found) {
-                        ROS_ERROR_STREAM("No devices found for adding... " << usb_port_id << " sleeping for 2 seconds and polling again");
+                        ROS_ERROR_STREAM("notification: No devices found for adding... " << usb_port_id << " sleeping for 2 seconds and polling again");
                         boost::this_thread::sleep(boost::posix_time::seconds(2));
                         _context = rs2::context{};
                     }
                 }
+
+            //boost::this_thread::sleep(boost::posix_time::seconds(10)); // don't release the lock until we know we don't need to shut down
 
 
         }
@@ -247,7 +251,13 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
     ROS_INFO("REALSENSE: Adding device on port %s", _device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
 
     assert(_realSenseNode);
-    _realSenseNode->publishTopics();
+    handler =
+    [this](const rs2::notification &n) {
+        ROS_ERROR_STREAM("notification: Callback for device " << usb_port_id << " received. Launching a new thread and resetting");
+        notification_handler(n);
+    };
+
+    _realSenseNode->publishTopics(handler);
     _realSenseNode->registerDynamicReconfigCb();
 }
 

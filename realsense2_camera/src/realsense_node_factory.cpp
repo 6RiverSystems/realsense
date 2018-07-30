@@ -50,16 +50,24 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n) {
             _realSenseNode->stopTopics();
         } catch(...)
         {
-            ROS_ERROR_STREAM("notification: Unknown exception has occurred while shutting down streams. ignoring...");
+            ROS_ERROR_STREAM("notification: Device " << usb_port_id << " Unknown exception has occurred while shutting down streams. ignoring...");
         }
         ROS_ERROR_STREAM("notification: Device " << usb_port_id << " sleeping for 1 second");
         boost::this_thread::sleep(boost::posix_time::seconds(1));
         ROS_ERROR_STREAM("notification: Device " << usb_port_id << " resetting");
-        _device.hardware_reset();
+        try {
+            _device.hardware_reset();
+        } catch (...) {
+            ROS_ERROR_STREAM("notification: Device " << usb_port_id << " Unknown exception has occurred while resetting hardware. ignoring...");
+        }
         ROS_ERROR_STREAM("notification: Device " << usb_port_id << " sleeping for 10 seconds");
         boost::this_thread::sleep(boost::posix_time::seconds(10));
         ROS_ERROR_STREAM("notification: Device " << usb_port_id << " deallocating realsensenode");
-        _realSenseNode.reset();
+        try {
+            _realSenseNode.reset();
+        } catch (...) {
+            ROS_ERROR_STREAM("notification: Device " << usb_port_id << " Unknown exception has occurred while resetting real sense node. ignoring...");
+        }
         ROS_ERROR_STREAM("notification: Device " << usb_port_id << " sleeping for 1 second");
         boost::this_thread::sleep(boost::posix_time::seconds(1));
         ROS_ERROR_STREAM("notification: Device " << usb_port_id << " creating a new device");

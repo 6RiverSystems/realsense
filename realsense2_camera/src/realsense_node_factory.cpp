@@ -46,7 +46,12 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n) {
         ROS_ERROR_STREAM("notification: Device " << usb_port_id << " sleeping for 1 second");
         boost::this_thread::sleep(boost::posix_time::seconds(1));
         ROS_ERROR_STREAM("notification: Device " << usb_port_id << " stopic topics");
-        _realSenseNode->stopTopics();
+        try {
+            _realSenseNode->stopTopics();
+        } catch(...)
+        {
+            ROS_ERROR_STREAM("notification: Unknown exception has occurred while shutting down streams. ignoring...");
+        }
         ROS_ERROR_STREAM("notification: Device " << usb_port_id << " sleeping for 1 second");
         boost::this_thread::sleep(boost::posix_time::seconds(1));
         ROS_ERROR_STREAM("notification: Device " << usb_port_id << " resetting");

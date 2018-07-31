@@ -1,5 +1,7 @@
 #include "../include/base_realsense_node.h"
 #include "../include/sr300_node.h"
+#include <thread>
+#include <functional>
 
 using namespace realsense2_camera;
 
@@ -81,12 +83,26 @@ BaseRealSenseNode::BaseRealSenseNode(ros::NodeHandle& nodeHandle,
     _stream_name[ACCEL] = "accel";
 }
 
+
 void BaseRealSenseNode::publishTopics()
 {
     getParameters();
     setupDevice();
     setupPublishers();
     setupStreams();
+
+    if (_enable_tf && !_enable_tf_dynamic) {
+        publishStaticTransforms();
+    }
+    ROS_INFO_STREAM("RealSense Node Is Up!");
+}
+
+void BaseRealSenseNode::publishTopics(std::function<void (const rs2::notification &n)> &handler)
+{
+    getParameters();
+    setupDevice();
+    setupPublishers();
+    setupStreams(handler);
 
     if (_enable_tf && !_enable_tf_dynamic) {
         publishStaticTransforms();
@@ -484,6 +500,33 @@ void BaseRealSenseNode::publishAlignedDepthToOthers(rs2::frame depth_frame, cons
 
 void BaseRealSenseNode::setupStreams()
 {
+    ROS_ERROR("setupStreams... NOT IMPLEMENTED");
+    exit(1);
+}
+
+void BaseRealSenseNode::stopStreams()
+{
+    ROS_INFO("shutting down streams");
+    for (auto&& sens : _sensors)
+    {
+        if (_enable[sens.first])
+        {
+            try
+            {
+                sens.second.stop();
+                sens.second.close();
+            }
+            catch (...)
+            {
+                ROS_ERROR_STREAM("notification: Unknown exception has occurred while shutting down streams. ignoring...");
+            }
+        }
+    }
+    _syncer = rs2::asynchronous_syncer{};
+}
+
+void BaseRealSenseNode::setupStreams(std::function<void (const rs2::notification &n)> &handler)
+{
     ROS_INFO("setupStreams...");
     try{
         for (auto& streams : IMAGE_STREAMS)
@@ -663,6 +706,8 @@ void BaseRealSenseNode::setupStreams()
                     auto depth_sensor = sens.as<rs2::depth_sensor>();
                     _depth_scale_meters = depth_sensor.get_depth_scale();
                 }
+
+                sens.set_notifications_callback(handler);
 
                 if (_sync_frames)
                 {

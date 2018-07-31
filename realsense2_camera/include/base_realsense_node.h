@@ -59,7 +59,9 @@ namespace realsense2_camera
                           rs2::device dev,
                           const std::string& serial_no);
 
+        virtual void publishTopics(std::function<void (const rs2::notification &n)> &handler) override;
         virtual void publishTopics() override;
+        virtual void stopStreams() override;
         virtual void registerDynamicReconfigCb() override;
         virtual ~BaseRealSenseNode() {}
 
@@ -86,6 +88,7 @@ namespace realsense2_camera
         void setupDevice();
         void setupPublishers();
         void setupStreams();
+        void setupStreams(std::function<void (const rs2::notification &n)> &handler);
         void updateStreamCalibData(const rs2::video_stream_profile& video_profile);
         Eigen::Quaternionf rotationMatrixToQuaternion(const float rotation[3]) const;
         void publish_static_tf(const ros::Time& t,

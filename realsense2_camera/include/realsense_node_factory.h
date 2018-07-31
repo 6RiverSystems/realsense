@@ -55,7 +55,7 @@ namespace realsense2_camera
     public:
         virtual void publishTopics() = 0;
         virtual void publishTopics(std::function<void (const rs2::notification &n)> &handler) = 0;
-        virtual void stopTopics() = 0;
+        virtual void stopStreams() = 0;
         virtual void registerDynamicReconfigCb() = 0;
         virtual ~InterfaceRealSenseNode() = default;
     };
@@ -75,11 +75,11 @@ namespace realsense2_camera
         bool deviceMatches(rs2::device& dev, std::string& usb_port);
         void addDevice(rs2::device dev);
         void resetAndShutdown();
-        int device_iteration = 0;
+        size_t _device_iteration = 0;
         std::unique_ptr<InterfaceRealSenseNode> _realSenseNode;
         rs2::device _device;
         rs2::context _context;
-        std::string usb_port_id;
-        std::function<void(const rs2::notification &n)> handler;
+        std::string _usb_port_id;
+        std::function<void(const rs2::notification &n)> _handler;
     };
 }//end namespace

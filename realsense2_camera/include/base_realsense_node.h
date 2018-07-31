@@ -61,7 +61,7 @@ namespace realsense2_camera
 
         virtual void publishTopics(std::function<void (const rs2::notification &n)> &handler) override;
         virtual void publishTopics() override;
-        virtual void stopTopics() override;
+        virtual void stopStreams() override;
         virtual void registerDynamicReconfigCb() override;
         virtual ~BaseRealSenseNode() {}
 

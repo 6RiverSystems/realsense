@@ -73,6 +73,9 @@ namespace realsense2_camera
         void tryGetLogSeverity(rs2_log_severity& severity) const;
         std::string parseUsbPortId(std::string usb_path) const;
         bool deviceMatches(rs2::device& dev, std::string& usb_port);
+        bool isRunningOnResin();
+        void setUpResinChuck();
+        void setUpNonResinChuck();
         void addDevice(rs2::device dev);
         void resetAndShutdown();
         size_t _device_iteration = 0;

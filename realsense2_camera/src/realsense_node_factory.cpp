@@ -33,12 +33,12 @@ RealSenseNodeFactory::RealSenseNodeFactory()
 }
 
 
-void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int iteration) {
+void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int iteration)
+{
     std::lock_guard<std::recursive_mutex> scopedLock(_device_lock);
-    if (iteration != this->_device_iteration) {
-        ROS_ERROR_STREAM(
-                "notification: device iterations don't match... ignoring duplicate notification for Device on: "
-                        << _usb_port_id);
+    if (iteration != this->_device_iteration)
+    {
+        ROS_ERROR_STREAM("notification: device iterations don't match... ignoring duplicate notification for Device on: " << _usb_port_id);
         return;
     }
     this->_device_iteration++;
@@ -47,53 +47,61 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
         ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " sleeping for 1 second");
         boost::this_thread::sleep(boost::posix_time::seconds(1));
         ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " stoping topics");
-        try {
+        try
+        {
             _realSenseNode->stopStreams();
         }
-        catch (...) {
-            ROS_ERROR_STREAM("notification: Device " << _usb_port_id
-                                                     << " Unknown exception has occurred while shutting down streams. ignoring...");
+        catch (...)
+        {
+            ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " Unknown exception has occurred while shutting down streams. ignoring...");
         }
 
 
         ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " deallocating realsensenode");
-        try {
+        try
+        {
             _realSenseNode.reset();
         }
-        catch (...) {
-            ROS_ERROR_STREAM("notification: Device " << _usb_port_id
-                                                     << " Unknown exception has occurred while resetting real sense node. ignoring...");
+        catch (...)
+        {
+            ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " Unknown exception has occurred while resetting real sense node. ignoring...");
         }
         ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " sleeping for 1 second");
         boost::this_thread::sleep(boost::posix_time::seconds(1));
         ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " creating a new device");
-        try {
+        try
+        {
             _device = rs2::device();
         }
-        catch (...) {
-            ROS_ERROR_STREAM("notification: Device " << _usb_port_id
-                                                     << " Unknown exception has occurred while creating a new device. ignoring...");
+        catch (...)
+        {
+            ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " Unknown exception has occurred while creating a new device. ignoring...");
         }
-        try {
+        try
+        {
             _context = rs2::context{};
         }
-        catch (...) {
-            ROS_ERROR_STREAM("notification: Device " << _usb_port_id
-                                                     << " Unknown exception has occurred while creating a new context. ignoring...");
+        catch (...)
+        {
+            ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " Unknown exception has occurred while creating a new context. ignoring...");
         }
         ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " sleeping for 1 second");
         boost::this_thread::sleep(boost::posix_time::seconds(1));
         bool found = false;
-        while (!found) {
-            for (auto &&dev : _context.query_devices()) {
-                if (deviceMatches(dev, _usb_port_id)) {
+        while (!found)
+        {
+            for (auto &&dev : _context.query_devices())
+            {
+                if (deviceMatches(dev, _usb_port_id))
+                {
                     ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " resetting");
-                    try {
+                    try
+                    {
                         dev.hardware_reset();
                     }
-                    catch (...) {
-                        ROS_ERROR_STREAM("notification: Device " << _usb_port_id
-                                                                 << " Unknown exception has occurred while resetting hardware. ignoring...");
+                    catch (...)
+                    {
+                        ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " Unknown exception has occurred while resetting hardware. ignoring...");
                     }
 
                     ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " found... and was reset");
@@ -101,9 +109,9 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
                     break;
                 }
             }
-            if (!found) {
-                ROS_ERROR_STREAM("notification: Device " << _usb_port_id
-                                                         << " not found... and not reset... sleeping for 2 seconds");
+            if (!found)
+            {
+                ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " not found... and not reset... sleeping for 2 seconds");
                 boost::this_thread::sleep(boost::posix_time::seconds(2));
             }
         }
@@ -112,15 +120,19 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
         boost::this_thread::sleep(boost::posix_time::seconds(10));
 
         found = false;
-        while (!found) {
-            for (auto &&dev : _context.query_devices()) {
-                if (deviceMatches(dev, _usb_port_id)) {
-                    try {
+        while (!found)
+        {
+            for (auto &&dev : _context.query_devices())
+            {
+                if (deviceMatches(dev, _usb_port_id))
+                {
+                    try
+                    {
                         addDevice(dev);
                     }
-                    catch (...) {
-                        ROS_ERROR_STREAM("notification: Device " << _usb_port_id
-                                                                 << " Unknown exception has occurred while calling addDevice on new device. exiting...");
+                    catch (...)
+                    {
+                        ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " Unknown exception has occurred while calling addDevice on new device. exiting...");
                         exit(1);
                     }
                     ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " found... and was added");
@@ -128,7 +140,8 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
                     break;
                 }
             }
-            if (!found) {
+            if (!found)
+            {
                 ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " not found... sleeping for 2 seconds");
                 boost::this_thread::sleep(boost::posix_time::seconds(2));
             }
@@ -362,13 +375,17 @@ bool RealSenseNodeFactory::isRunningOnResin()
 {
     static bool initialized = false;
     static bool running_on_resin = false;
-    if (!initialized) {
+    if (!initialized)
+    {
         char *resin_env_flag;
         resin_env_flag = getenv("RESIN");
-        if (resin_env_flag != nullptr) {
+        if (resin_env_flag != nullptr)
+        {
             ROS_INFO("RESIN environment flag is defined");
             running_on_resin = true;
-        } else {
+        }
+        else
+        {
             ROS_INFO("RESIN environment flag is not defined");
             running_on_resin = false;
         }

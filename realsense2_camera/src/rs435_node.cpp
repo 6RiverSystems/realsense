@@ -100,7 +100,9 @@ void RS435Node::setParam(rs435_paramsConfig &config, rs435_param param)
         break;
     case rs435_depth_laser_power:
     {
-        // do nothing
+        // do nothing. This should remove a warning about illegal laser power setting value in logs
+        // we do not want to parse laser power settings dynamically as they appear to override values set on
+        // command line and json file non deterministically.
         /*static const auto rs435_depth_laser_power_factor = 30;
         if(_depth_laser_power > 0)
         {

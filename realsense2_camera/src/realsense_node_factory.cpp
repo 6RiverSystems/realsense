@@ -42,6 +42,12 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
         return;
     }
     this->_device_iteration++;
+    if (n.get_category() != RS2_NOTIFICATION_CATEGORY_FRAMES_TIMEOUT)
+    {
+        ROS_ERROR_STREAM("notification: received a notification that is not RS2_NOTIFICATION_CATEGORY_FRAMES_TIMEOUT. The category was: " <<
+        rs2_notification_category_to_string(n.get_category()));
+        return;
+    }
     std::thread([this]() {
         ROS_ERROR_STREAM("notification: Executing reset for device " << _usb_port_id);
         ROS_ERROR_STREAM("notification: Device " << _usb_port_id << " sleeping for 1 second");

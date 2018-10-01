@@ -41,13 +41,13 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
         ROS_ERROR_STREAM("notification: device iterations don't match... ignoring duplicate notification for Device on: " << _usb_port_id);
         return;
     }
-    this->_device_iteration++;
     if (n.get_category() != RS2_NOTIFICATION_CATEGORY_FRAMES_TIMEOUT && n.get_category() != RS2_NOTIFICATION_CATEGORY_UNKNOWN_ERROR)
     {
         ROS_ERROR_STREAM("notification: received a notification that does not require reset. The category was: " <<
         rs2_notification_category_to_string(n.get_category()));
         return;
     }
+    this->_device_iteration++;
     std::thread([this, n]() {
         ROS_ERROR_STREAM("notification: received a notification that requires reset. The category was: " << rs2_notification_category_to_string(n.get_category()));
         ROS_ERROR_STREAM("notification: Executing reset for device " << _usb_port_id);

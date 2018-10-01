@@ -622,6 +622,10 @@ void BaseRealSenseNode::setupStreams()
                 if (frame.is<rs2::frameset>())
                 {
                     ROS_DEBUG("Frameset arrived.");
+                    if (_enable_tf && _enable_tf_dynamic)
+                    {
+                        publishDynamicTransforms();
+                    }
                     bool is_depth_arrived = false;
                     rs2::frame depth_frame;
                     auto frameset = frame.as<rs2::frameset>();
@@ -1009,6 +1013,10 @@ void BaseRealSenseNode::setupStreams(std::function<void (const rs2::notification
                 if (frame.is<rs2::frameset>())
                 {
                     ROS_DEBUG("Frameset arrived.");
+                    if (_enable_tf && _enable_tf_dynamic)
+                    {
+                        publishDynamicTransforms();
+                    }
                     bool is_depth_arrived = false;
                     rs2::frame depth_frame;
                     auto frameset = frame.as<rs2::frameset>();

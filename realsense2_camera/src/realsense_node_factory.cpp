@@ -44,7 +44,7 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
     this->_device_iteration++;
     if (n.get_category() != RS2_NOTIFICATION_CATEGORY_FRAMES_TIMEOUT && n.get_category() != RS2_NOTIFICATION_CATEGORY_UNKNOWN_ERROR)
     {
-        ROS_ERROR_STREAM("notification: received a notification that is not RS2_NOTIFICATION_CATEGORY_FRAMES_TIMEOUT. The category was: " <<
+        ROS_ERROR_STREAM("notification: received a notification that does not require reset. The category was: " <<
         rs2_notification_category_to_string(n.get_category()));
         return;
     }

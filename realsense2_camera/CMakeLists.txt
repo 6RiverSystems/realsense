@@ -81,7 +81,7 @@ generate_dynamic_reconfigure_options(
 # RealSense ROS Node
 catkin_package(
     LIBRARIES ${PROJECT_NAME}
-    CATKIN_DEPENDS message_runtime roscpp sensor_msgs std_msgs
+    CATKIN_DEPENDS message_runtime roscpp sensor_msgs std_msgs librealsense2
     nodelet
     cv_bridge
     image_transport
@@ -141,6 +141,16 @@ install(DIRECTORY cfg/
 # Install rviz files
 install(DIRECTORY rviz/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/rviz
+    )
+
+# Install meshes files
+install(DIRECTORY meshes/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/meshes
+    )
+
+# Install urdf files
+install(DIRECTORY urdf/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf
     )
 
 # Install xml files

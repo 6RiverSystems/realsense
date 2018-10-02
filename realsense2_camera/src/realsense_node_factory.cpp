@@ -383,8 +383,8 @@ void RealSenseNodeFactory::setUpNonResinChuck()
             assert(_realSenseNode);
         }
         _realSenseNode->publishTopics();
-		_realSenseNode->registerDynamicReconfigCb();
-	}
+        _realSenseNode->registerDynamicReconfigCb();
+    }
     catch(const std::exception& ex)
     {
         ROS_ERROR_STREAM("An exception has been thrown: " << ex.what());

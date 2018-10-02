@@ -946,7 +946,6 @@ void BaseRealSenseNode::setupStreams()
         ROS_ERROR_STREAM("Unknown exception has occured!");
         throw;
     }
-
 }
 
 void BaseRealSenseNode::stopStreams()
@@ -1390,8 +1389,6 @@ void BaseRealSenseNode::setupFilters()
     ROS_INFO("num_filters: %d", static_cast<int>(_filters.size()));
 }
 
-
-
 void BaseRealSenseNode::updateStreamCalibData(const rs2::video_stream_profile& video_profile)
 {
     stream_index_pair stream_index{video_profile.stream_type(), video_profile.stream_index()};
@@ -1681,7 +1678,6 @@ void BaseRealSenseNode::publishStaticTransforms()
         Q = quaternion_optical * Q * quaternion_optical.inverse();
 
         float3 trans{ex.translation[0], ex.translation[1], ex.translation[2]};
-
         quaternion q1{Q.getX(), Q.getY(), Q.getZ(), Q.getW()};
         publish_static_tf(transform_ts_, trans, q1, _frame_id[DEPTH], _frame_id[COLOR]);
 
@@ -1872,7 +1868,6 @@ void BaseRealSenseNode::publishPointCloud(rs2::points pc, const ros::Time& t, co
     }
     _pointcloud_publisher.publish(msg_pointcloud);
 }
-
 
 Extrinsics BaseRealSenseNode::rsExtrinsicsToMsg(const rs2_extrinsics& extrinsics, const std::string& frame_id) const
 {

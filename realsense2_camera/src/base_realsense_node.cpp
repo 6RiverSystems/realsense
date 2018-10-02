@@ -1487,13 +1487,9 @@ void BaseRealSenseNode::publish_static_tf(const ros::Time& t,
     msg.header.frame_id = from;
     msg.child_frame_id = to;
 
-    // TODO: change sign if the bug is fixed
-    // Currently there is a bug in either librealsense2 or realsense2 driver
-    // that it publishes negated translation (maybe rotation)
-    // https://github.com/intel-ros/realsense/issues/327
-    msg.transform.translation.x = -trans.z; // msg.transform.translation.x = trans.z;
-    msg.transform.translation.y = trans.x;  // msg.transform.translation.y = -trans.x;
-    msg.transform.translation.z = trans.y;  // msg.transform.translation.z = -trans.y;
+    msg.transform.translation.x = trans.z;
+    msg.transform.translation.y = -trans.x;
+    msg.transform.translation.z = -trans.y;
     msg.transform.rotation.x = q.x;
     msg.transform.rotation.y = q.y;
     msg.transform.rotation.z = q.z;
@@ -1530,9 +1526,9 @@ void BaseRealSenseNode::publishDynamicTransforms()
         // Transform depth to color
         const auto& ex = getRsExtrinsics(COLOR, DEPTH);
         auto Q = rotationMatrixToQuaternion(ex.rotation);
+        Q = q_optical * Q * q_optical.inverse();
 
-        // TODO: change sign if the bug is fixed
-        tr.setOrigin(tf::Vector3(-ex.translation[2], ex.translation[0], ex.translation[1]));
+        tr.setOrigin(tf::Vector3(ex.translation[2], -ex.translation[0], -ex.translation[1]));
         tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
         tr.setRotation(q);
 
@@ -1555,12 +1551,12 @@ void BaseRealSenseNode::publishDynamicTransforms()
 
     if (_enable[INFRA1])
     {
-        const auto& ex = getRsExtrinsics(COLOR, DEPTH);
+        const auto& ex = getRsExtrinsics(INFRA1, DEPTH);
         auto Q = rotationMatrixToQuaternion(ex.rotation);
+        Q = q_optical * Q * q_optical.inverse();
 
         // Transform depth to infra1
-        // TODO: change sign if the bug is fixed
-        tr.setOrigin(tf::Vector3(-ex.translation[2], ex.translation[0], ex.translation[1]));
+        tr.setOrigin(tf::Vector3(ex.translation[2], -ex.translation[0], -ex.translation[1]));
         tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
         tr.setRotation(q);
 
@@ -1583,12 +1579,12 @@ void BaseRealSenseNode::publishDynamicTransforms()
 
     if (_enable[INFRA2])
     {
-        const auto& ex = getRsExtrinsics(COLOR, DEPTH);
+        const auto& ex = getRsExtrinsics(INFRA2, DEPTH);
         auto Q = rotationMatrixToQuaternion(ex.rotation);
+        Q = q_optical * Q * q_optical.inverse();
 
         // Transform depth to infra2
-        // TODO: change sign if the bug is fixed
-        tr.setOrigin(tf::Vector3(-ex.translation[2], ex.translation[0], ex.translation[1]));
+        tr.setOrigin(tf::Vector3(ex.translation[2], -ex.translation[0], -ex.translation[1]));
         tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
         tr.setRotation(q);
 
@@ -1611,12 +1607,12 @@ void BaseRealSenseNode::publishDynamicTransforms()
 
     if (_enable[FISHEYE])
     {
-        const auto& ex = getRsExtrinsics(COLOR, DEPTH);
+        const auto& ex = getRsExtrinsics(FISHEYE, DEPTH);
         auto Q = rotationMatrixToQuaternion(ex.rotation);
+        Q = q_optical * Q * q_optical.inverse();
 
         // Transform dpeth to fisheye
-        // TODO: change sign if the bug is fixed
-        tr.setOrigin(tf::Vector3(-ex.translation[2], ex.translation[0], ex.translation[1]));
+        tr.setOrigin(tf::Vector3(ex.translation[2], -ex.translation[0], -ex.translation[1]));
         tf::Quaternion q(Q.x(), Q.y(), Q.z(), Q.w());
         tr.setRotation(q);
 

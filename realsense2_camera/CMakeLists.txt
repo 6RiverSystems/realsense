@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(realsense2_camera)
 
-option(USE_SYSTEM_LIBREALSENSE2 "Build realsense_ros_camera against system librealsense2, not the one built with catkin" OFF)
+option(USE_SYSTEM_LIBREALSENSE2 "Build realsense2_ros_camera against system librealsense2, not the one built with catkin" OFF)
 option(BUILD_WITH_OPENMP "Use OpenMP" ON)
+option(SET_USER_BREAK_AT_STARTUP "Set user wait point in startup (for debug)" OFF)
 
 set(REALSENSE2_CATKIN_BASED_DEPS
     message_generation
@@ -37,6 +38,11 @@ find_package(catkin REQUIRED COMPONENTS
   ${REALSENSE2_CATKIN_BASED_DEPS}
 )
 
+if(SET_USER_BREAK_AT_STARTUP)
+	message("GOT FLAG IN CmakeLists.txt")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBPDEBUG")
+endif()
+
 if (CMAKE_BUILD_TYPE EQUAL "RELEASE")
     message(STATUS "Create Release Build.")
     set(CMAKE_CXX_FLAGS "-O2 ${CMAKE_CXX_FLAGS}")
@@ -61,6 +67,7 @@ generate_messages(
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
+    ${realsense2_INCLUDE_DIR}
     )
 
 # Generate dynamic reconfigure options from .cfg files
@@ -100,8 +107,11 @@ add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg)
 
 
+target_include_directories(${PROJECT_NAME}
+  PRIVATE ${realsense2_INCLUDE_DIR})
+
 target_link_libraries(${PROJECT_NAME}
-    realsense2
+    ${realsense2_LIBRARY}
     ${catkin_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
     )
@@ -131,6 +141,16 @@ install(DIRECTORY cfg/
 # Install rviz files
 install(DIRECTORY rviz/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/rviz
+    )
+
+# Install meshes files
+install(DIRECTORY meshes/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/meshes
+    )
+
+# Install urdf files
+install(DIRECTORY urdf/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf
     )
 
 # Install xml files

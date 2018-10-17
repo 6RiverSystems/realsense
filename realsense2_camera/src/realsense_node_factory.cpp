@@ -48,22 +48,20 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
         return;
     }
     this->_device_iteration++;
+    ROS_ERROR_STREAM("realsense_camera: Device " << _usb_port_id << " received a notification that requires reset. The category was: " << rs2_notification_category_to_string(n.get_category()));
+    ROS_ERROR_STREAM("realsense_camera: Device " << _usb_port_id << " executing reset for device");
+    ROS_ERROR_STREAM("realsense_camera: Device " << _usb_port_id << " stoping topics");
+    try
+    {
+        _realSenseNode->stopStreams();
+    }
+    catch (...)
+    {
+        ROS_ERROR_STREAM("realsense_camera: Device " << _usb_port_id << " unknown exception has occurred while shutting down streams. ignoring...");
+    }
+
     std::thread([this, n]() {
-        ROS_ERROR_STREAM("realsense_camera: Device " << _usb_port_id << " received a notification that requires reset. The category was: " << rs2_notification_category_to_string(n.get_category()));
-        ROS_ERROR_STREAM("realsense_camera: Device " << _usb_port_id << " executing reset for device");
-        ROS_ERROR_STREAM("realsense_camera: Device " << _usb_port_id << " sleeping for 1 second");
-        boost::this_thread::sleep(boost::posix_time::seconds(1));
-        ROS_ERROR_STREAM("realsense_camera: Device " << _usb_port_id << " stoping topics");
-        try
-        {
-            _realSenseNode->stopStreams();
-        }
-        catch (...)
-        {
-            ROS_ERROR_STREAM("realsense_camera: Device " << _usb_port_id << " unknown exception has occurred while shutting down streams. ignoring...");
-        }
-
-
+        ROS_ERROR_STREAM("realsense_camera: New procesing thread started executing");
         ROS_ERROR_STREAM("realsense_camera: Device " << _usb_port_id << " deallocating realsensenode");
         try
         {

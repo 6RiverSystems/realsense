@@ -325,13 +325,8 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
     int local_copy_of_iteration = _device_iteration;
     _handler =
             [this, local_copy_of_iteration](const rs2::notification &n) {
-<<<<<<< HEAD
-                ROS_ERROR_STREAM("realsense_camera: Callback for device " << _usb_port_id
+                ROS_ERROR_STREAM("realsense_camera: callback for device " << _usb_port_id
                                                                       << " received. Invoking notification handler for processing.");
-=======
-                ROS_INFO_STREAM("realsense_camera: callback for device " << _usb_port_id
-                                    << " received. Launching a new thread and processing");
->>>>>>> feature/d435-driver
                 notification_handler(n, local_copy_of_iteration);
             };
     _realSenseNode->publishTopics(_handler);

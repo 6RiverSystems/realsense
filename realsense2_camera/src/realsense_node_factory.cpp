@@ -159,12 +159,12 @@ void RealSenseNodeFactory::onInit()
     }
     catch (const std::exception& ex)
     {
-        ROS_ERROR_STREAM("An exception has been thrown: " << ex.what());
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " An exception has been thrown: " << ex.what());
         resetAndShutdown();
     }
     catch (...)
     {
-        ROS_ERROR_STREAM("Unknown exception has occurred!");
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Unknown exception has occurred!");
         resetAndShutdown();
     }
 }

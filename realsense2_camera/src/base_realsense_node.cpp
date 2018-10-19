@@ -957,7 +957,10 @@ void BaseRealSenseNode::stopStreams()
         {
             try
             {
-                sens.second.stop();
+                if (sens.second.is_streaming())
+                {
+                    sens.second.stop();
+                }
                 sens.second.close();
             }
             catch (const std::exception& ex)

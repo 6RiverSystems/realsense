@@ -171,6 +171,7 @@ void RealSenseNodeFactory::onInit()
 
 void RealSenseNodeFactory::writeOutDevSerialNumberToFileSystem(rs2::device& dev, std::string& usb_port)
 {
+    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " attempting to write out device serial number!");
     std::string serial_number(dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
     std::string filename = std::string("/tmp/realsense_") + usb_port;
     std::ofstream file;
@@ -189,6 +190,7 @@ void RealSenseNodeFactory::writeOutDevSerialNumberToFileSystem(rs2::device& dev,
 
 std::string RealSenseNodeFactory::readDevSerialNumberFromFileSystem(std::string& usb_port)
 {
+    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " attempting to read in device serial number!");
     std::string filename = std::string("/tmp/realsense_") + usb_port;
     std::string serial_number;
     std::ifstream file;
@@ -413,7 +415,8 @@ void RealSenseNodeFactory::resetAndShutdown()
         // no device was set up... attempt to retrieve and reset it based on the serial number
         ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: no device was found for usb port: " << _usb_port_id << " attempting to find by serial number.");
         std::string serial_id = readDevSerialNumberFromFileSystem(_usb_port_id);
-        if (serial_id.empty()) {
+        if (serial_id.empty())
+        {
             ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: no serial number for device was found for usb port: " << _usb_port_id);
         }
         else
@@ -423,6 +426,7 @@ void RealSenseNodeFactory::resetAndShutdown()
             {
                 if (deviceMatchesSerialNumber(dev, serial_id))
                 {
+                    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device was found for usb port: " << _usb_port_id << " with serial number: " << serial_id);
                     dev.hardware_reset();
                     break;
                 }

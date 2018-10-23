@@ -169,6 +169,43 @@ void RealSenseNodeFactory::onInit()
     }
 }
 
+void RealSenseNodeFactory::writeOutDevSerialNumberToFileSystem(rs2::device& dev, std::string& usb_port)
+{
+    std::string serial_number(dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+    std::string filename = std::string("/tmp/realsense_") + usb_port;
+    std::ofstream file;
+    file.open(filename);
+    if (file.is_open())
+    {
+        // add error checking
+        file << serial_number << std::endl;
+        file.close();
+    }
+    else
+    {
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: error writing serial number for device " << _usb_port_id);
+    }
+}
+
+std::string RealSenseNodeFactory::readDevSerialNumberFromFileSystem(std::string& usb_port)
+{
+    std::string filename = std::string("/tmp/realsense_") + usb_port;
+    std::string serial_number;
+    std::ifstream file;
+    file.open(filename);
+    if (file.is_open())
+    {
+        std::getline(file, serial_number);
+        file.close();
+    }
+    else
+    {
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: error retrieving serial number for device " << _usb_port_id);
+    }
+    return serial_number;
+}
+
+
 void RealSenseNodeFactory::setUpResinChuck()
 {
     auto privateNh = getPrivateNodeHandle();
@@ -189,6 +226,7 @@ void RealSenseNodeFactory::setUpResinChuck()
                     addDevice(dev);
                     found = true;
                     ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " found... and was added");
+                    writeOutDevSerialNumberToFileSystem(dev, _usb_port_id);
                     break;
                 }
             }
@@ -234,6 +272,10 @@ std::string RealSenseNodeFactory::parseUsbPortId(std::string usb_path) const
 
 bool RealSenseNodeFactory::deviceMatches(rs2::device& dev, std::string& usb_port)
 {
+    if (!dev)
+    {
+        return false;
+    }
     std::string devicePhysicalPort = dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT);
 
     ROS_DEBUG("Port ID: %s", devicePhysicalPort.c_str());
@@ -241,6 +283,27 @@ bool RealSenseNodeFactory::deviceMatches(rs2::device& dev, std::string& usb_port
     std::string device_usb_port = parseUsbPortId(devicePhysicalPort);
 
     if (usb_port == device_usb_port)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool RealSenseNodeFactory::deviceMatchesSerialNumber(rs2::device& dev, std::string& serial_number)
+{
+    if (!dev)
+    {
+        return false;
+    }
+    std::string device_serial_number = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
+
+    ROS_DEBUG_STREAM("Device Serial Number: " << device_serial_number);
+
+
+    if (serial_number == device_serial_number)
     {
         return true;
     }
@@ -336,9 +399,36 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
 void RealSenseNodeFactory::resetAndShutdown()
 {
     std::lock_guard<std::recursive_mutex> lock(_device_lock);
-    _realSenseNode->stopStreams();
+    if (_realSenseNode)
+    {
+        _realSenseNode->stopStreams();
+    }
     sleep(1);
-    _device.hardware_reset();
+    if (_device)
+    {
+        _device.hardware_reset();
+    }
+    else
+    {
+        // no device was set up... attempt to retrieve and reset it based on the serial number
+        ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: no device was found for usb port: " << _usb_port_id << " attempting to find by serial number.");
+        std::string serial_id = readDevSerialNumberFromFileSystem(_usb_port_id);
+        if (serial_id.empty()) {
+            ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: no serial number for device was found for usb port: " << _usb_port_id);
+        }
+        else
+        {
+
+            for (auto &&dev : _context.query_devices())
+            {
+                if (deviceMatchesSerialNumber(dev, serial_id))
+                {
+                    dev.hardware_reset();
+                    break;
+                }
+            }
+        }
+    }
     sleep(5);
     ros::shutdown();
     exit(1);

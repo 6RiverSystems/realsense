@@ -234,8 +234,38 @@ void RealSenseNodeFactory::setUpResinChuck()
             }
             if (!found)
             {
-                ROS_ERROR_STREAM("realsense_camera: no devices found for adding... " << _usb_port_id << " sleeping for 2 seconds and polling again");
-                boost::this_thread::sleep(boost::posix_time::seconds(2));
+                ROS_ERROR_STREAM("realsense_camera: no devices found for adding using usb address... " << _usb_port_id << " attempting to find by serial number and reset");
+                std::string serial_id = readDevSerialNumberFromFileSystem(_usb_port_id);
+                bool found_by_serial = false;
+                if (serial_id.empty())
+                {
+                    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: no serial number for device was found for usb port: " << _usb_port_id);
+                }
+                else
+                {
+
+                    for (auto &&dev : _context.query_devices())
+                    {
+                        if (deviceMatchesSerialNumber(dev, serial_id))
+                        {
+                            ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device was found for usb port: " << _usb_port_id << " with serial number: " << serial_id);
+                            dev.hardware_reset();
+                            found_by_serial = true;
+                            break;
+                        }
+                    }
+                }
+                if (found_by_serial) {
+                    ROS_ERROR_STREAM("realsense_camera: device found for adding by serial number... " << _usb_port_id
+                                                                                         << " device was hardware reset... sleeping for 5 seconds and polling again");
+                    boost::this_thread::sleep(boost::posix_time::seconds(5));
+                }
+                else
+                {
+                    ROS_ERROR_STREAM("realsense_camera: no devices found for adding... " << _usb_port_id
+                                                                                         << " sleeping for 2 seconds and polling again");
+                    boost::this_thread::sleep(boost::posix_time::seconds(2));
+                }
                 _context = rs2::context{};
             }
         }

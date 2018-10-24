@@ -433,15 +433,43 @@ void RealSenseNodeFactory::resetAndShutdown()
     std::lock_guard<std::recursive_mutex> lock(_device_lock);
     if (_realSenseNode)
     {
-        _realSenseNode->stopStreams();
+        try
+        {
+            _realSenseNode->stopStreams();
+        } catch (...)
+        {
+            ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: unknown exception thrown when stopping streams: " << _usb_port_id);
+        }
     }
     sleep(1);
     if (_device)
     {
-        _device.hardware_reset();
+        try
+        {
+            _device.hardware_reset();
+        } catch (...)
+        {
+            ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: unknown exception thrown when doing hardware_reset: " << _usb_port_id);
+        }
+        try
+        {
+            _device = rs2::device();
+        }
+        catch (...)
+        {
+            ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device " << _usb_port_id << " unknown exception has occurred while creating a new device. Ignoring...");
+        }
     }
     else
     {
+        try
+        {
+            _device = rs2::device();
+        }
+        catch (...)
+        {
+            ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device " << _usb_port_id << " unknown exception has occurred while creating a new device. Ignoring...");
+        }
         // no device was set up... attempt to retrieve and reset it based on the serial number
         ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: no device was found for usb port: " << _usb_port_id << " attempting to find by serial number.");
         std::string serial_id = readDevSerialNumberFromFileSystem(_usb_port_id);
@@ -463,10 +491,15 @@ void RealSenseNodeFactory::resetAndShutdown()
             }
         }
     }
+    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down in 5s");
     sleep(5);
+    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down ROS and exiting.");
     ros::shutdown();
     exit(1);
 }
+
+
+
 
 void RealSenseNodeFactory::tryGetLogSeverity(rs2_log_severity& severity) const
 {

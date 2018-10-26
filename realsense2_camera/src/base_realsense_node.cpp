@@ -1356,8 +1356,7 @@ void BaseRealSenseNode::publishDynamicTransforms()
     // depth to ir and ir to ir_optical
 
     // add 2 times of publication interval in the future to avoid tf extrapolation error
-    float futureDate = 2.0 * (1.0 / _fps[DEPTH]);
-    ros::Time transform_ts = ros::Time::now() + ros::Duration(futureDate);
+    ros::Time transform_ts = ros::Time::now();
     tf::Transform tr;
     tf::Transform tr_optical;
 

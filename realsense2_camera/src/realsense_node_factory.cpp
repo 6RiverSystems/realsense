@@ -57,6 +57,8 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
         ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while shutting down streams. ignoring...");
     }
 
+    ROS_INFO_STREAM("realsense_camera: Device " << _usb_port_id << " creating new processing thread");
+
     std::thread([this, n]() {
         ROS_INFO_STREAM("realsense_camera: new procesing thread started executing");
         ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " deallocating realsensenode");
@@ -149,6 +151,9 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
             }
         }
     }).detach();
+
+    ROS_INFO_STREAM("realsense_camera: Device " << _usb_port_id << " exiting notification handler");
+
 }
 
 void RealSenseNodeFactory::onInit()

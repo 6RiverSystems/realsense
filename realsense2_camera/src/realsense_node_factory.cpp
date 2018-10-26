@@ -257,8 +257,8 @@ void RealSenseNodeFactory::setUpResinChuck()
                 }
                 if (found_by_serial) {
                     ROS_ERROR_STREAM("realsense_camera: device found for adding by serial number... " << _usb_port_id
-                                                                                         << " device was hardware reset... sleeping for 5 seconds and polling again");
-                    boost::this_thread::sleep(boost::posix_time::seconds(5));
+                                                                                         << " device was hardware reset... sleeping for 10 seconds and polling again");
+                    boost::this_thread::sleep(boost::posix_time::seconds(10));
                 }
                 else
                 {

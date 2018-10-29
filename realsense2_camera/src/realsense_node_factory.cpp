@@ -174,45 +174,6 @@ void RealSenseNodeFactory::onInit()
     }
 }
 
-void RealSenseNodeFactory::writeOutDevSerialNumberToFileSystem(rs2::device& dev, std::string& usb_port)
-{
-    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " attempting to write out device serial number!");
-    std::string serial_number(dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
-    std::string filename = std::string("/tmp/realsense_") + usb_port;
-    std::ofstream file;
-    file.open(filename);
-    if (file.is_open())
-    {
-        // add error checking
-        file << serial_number << std::endl;
-        file.close();
-    }
-    else
-    {
-        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: error writing serial number for device " << _usb_port_id);
-    }
-}
-
-std::string RealSenseNodeFactory::readDevSerialNumberFromFileSystem(std::string& usb_port)
-{
-    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " attempting to read in device serial number!");
-    std::string filename = std::string("/tmp/realsense_") + usb_port;
-    std::string serial_number;
-    std::ifstream file;
-    file.open(filename);
-    if (file.is_open())
-    {
-        std::getline(file, serial_number);
-        file.close();
-    }
-    else
-    {
-        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: error retrieving serial number for device " << _usb_port_id);
-    }
-    return serial_number;
-}
-
-
 void RealSenseNodeFactory::setUpResinChuck()
 {
     auto privateNh = getPrivateNodeHandle();
@@ -239,38 +200,9 @@ void RealSenseNodeFactory::setUpResinChuck()
             }
             if (!found)
             {
-                ROS_ERROR_STREAM("realsense_camera: no devices found for adding using usb address... " << _usb_port_id << " attempting to find by serial number and reset");
-                std::string serial_id = readDevSerialNumberFromFileSystem(_usb_port_id);
-                bool found_by_serial = false;
-                if (serial_id.empty())
-                {
-                    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: no serial number for device was found for usb port: " << _usb_port_id);
-                }
-                else
-                {
-
-                    for (auto &&dev : _context.query_devices())
-                    {
-                        if (deviceMatchesSerialNumber(dev, serial_id))
-                        {
-                            ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device was found for usb port: " << _usb_port_id << " with serial number: " << serial_id);
-                            dev.hardware_reset();
-                            found_by_serial = true;
-                            break;
-                        }
-                    }
-                }
-                if (found_by_serial) {
-                    ROS_ERROR_STREAM("realsense_camera: device found for adding by serial number... " << _usb_port_id
-                                                                                         << " device was hardware reset... sleeping for 10 seconds and polling again");
-                    boost::this_thread::sleep(boost::posix_time::seconds(10));
-                }
-                else
-                {
-                    ROS_ERROR_STREAM("realsense_camera: no devices found for adding... " << _usb_port_id
+                ROS_ERROR_STREAM("realsense_camera: no devices found for adding... " << _usb_port_id
                                                                                          << " sleeping for 2 seconds and polling again");
-                    boost::this_thread::sleep(boost::posix_time::seconds(2));
-                }
+                boost::this_thread::sleep(boost::posix_time::seconds(2));
                 _context = rs2::context{};
             }
         }
@@ -320,27 +252,6 @@ bool RealSenseNodeFactory::deviceMatches(rs2::device& dev, std::string& usb_port
     std::string device_usb_port = parseUsbPortId(devicePhysicalPort);
 
     if (usb_port == device_usb_port)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool RealSenseNodeFactory::deviceMatchesSerialNumber(rs2::device& dev, std::string& serial_number)
-{
-    if (!dev)
-    {
-        return false;
-    }
-    std::string device_serial_number = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
-
-    ROS_DEBUG_STREAM("Device Serial Number: " << device_serial_number);
-
-
-    if (serial_number == device_serial_number)
     {
         return true;
     }
@@ -463,37 +374,6 @@ void RealSenseNodeFactory::resetAndShutdown()
         catch (...)
         {
             ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device " << _usb_port_id << " unknown exception has occurred while creating a new device. Ignoring...");
-        }
-    }
-    else
-    {
-        try
-        {
-            _device = rs2::device();
-        }
-        catch (...)
-        {
-            ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device " << _usb_port_id << " unknown exception has occurred while creating a new device. Ignoring...");
-        }
-        // no device was set up... attempt to retrieve and reset it based on the serial number
-        ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: no device was found for usb port: " << _usb_port_id << " attempting to find by serial number.");
-        std::string serial_id = readDevSerialNumberFromFileSystem(_usb_port_id);
-        if (serial_id.empty())
-        {
-            ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: no serial number for device was found for usb port: " << _usb_port_id);
-        }
-        else
-        {
-
-            for (auto &&dev : _context.query_devices())
-            {
-                if (deviceMatchesSerialNumber(dev, serial_id))
-                {
-                    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device was found for usb port: " << _usb_port_id << " with serial number: " << serial_id);
-                    dev.hardware_reset();
-                    break;
-                }
-            }
         }
     }
     ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down in 5s");

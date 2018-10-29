@@ -194,7 +194,6 @@ void RealSenseNodeFactory::setUpResinChuck()
                     addDevice(dev);
                     found = true;
                     ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " found... and was added");
-                    writeOutDevSerialNumberToFileSystem(dev, _usb_port_id);
                     break;
                 }
             }

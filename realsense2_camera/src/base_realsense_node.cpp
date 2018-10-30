@@ -317,12 +317,12 @@ void BaseRealSenseNode::setupDevice()
     }
     catch(const std::exception& ex)
     {
-        ROS_ERROR_STREAM("An exception has been thrown: " << ex.what());
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: An exception has been thrown: " << ex.what());
         throw;
     }
     catch(...)
     {
-        ROS_ERROR_STREAM("Unknown exception has occured!");
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: Unknown exception has occured!");
         throw;
     }
 }
@@ -938,12 +938,12 @@ void BaseRealSenseNode::setupStreams()
     }
     catch(const std::exception& ex)
     {
-        ROS_ERROR_STREAM("An exception has been thrown: " << ex.what());
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: An exception has been thrown: " << ex.what());
         throw;
     }
     catch(...)
     {
-        ROS_ERROR_STREAM("Unknown exception has occured!");
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: Unknown exception has occured!");
         throw;
     }
 }
@@ -957,12 +957,19 @@ void BaseRealSenseNode::stopStreams()
         {
             try
             {
-                sens.second.stop();
+                if (sens.second.is_streaming())
+                {
+                    sens.second.stop();
+                }
                 sens.second.close();
+            }
+            catch (const std::exception& ex)
+            {
+                ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: An exception has been thrown while shutting down streams: " << ex.what());
             }
             catch (...)
             {
-                ROS_ERROR_STREAM("notification: Unknown exception has occurred while shutting down streams. ignoring...");
+                ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: Unknown exception has occurred while shutting down streams. ignoring...");
             }
         }
     }
@@ -1330,12 +1337,12 @@ void BaseRealSenseNode::setupStreams(std::function<void (const rs2::notification
     }
     catch(const std::exception& ex)
     {
-        ROS_ERROR_STREAM("An exception has been thrown: " << ex.what());
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: An exception has been thrown: " << ex.what());
         throw;
     }
     catch(...)
     {
-        ROS_ERROR_STREAM("Unknown exception has occured!");
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: Unknown exception has occured!");
         throw;
     }
 }

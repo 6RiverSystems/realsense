@@ -76,6 +76,7 @@ namespace realsense2_camera
         void setUpResinChuck();
         void addDevice(rs2::device dev);
         void resetAndShutdown();
+
         size_t _device_iteration = 0;
         std::unique_ptr<InterfaceRealSenseNode> _realSenseNode;
         rs2::device _device;

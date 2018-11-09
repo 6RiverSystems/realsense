@@ -35,6 +35,7 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
     std::lock_guard<std::recursive_mutex> scopedLock(_device_lock);
     if (ros::isShuttingDown())
     {
+        ROS_ERROR_STREAM("ROS is shutting down returning early");
         _realSenseNode->stopStreams();
         return;
     }
@@ -67,6 +68,7 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
     std::thread([this, n]() {
         if (ros::isShuttingDown())
         {
+            ROS_ERROR_STREAM("ROS is shutting down returning early");
             return;
         }
         ROS_INFO_STREAM("realsense_camera: new procesing thread started executing");
@@ -105,6 +107,7 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
         {
             if (ros::isShuttingDown())
             {
+                ROS_ERROR_STREAM("ROS is shutting down returning early");
                 return;
             }
             for (auto &&dev : _context.query_devices())
@@ -145,6 +148,7 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
         {
             if (ros::isShuttingDown())
             {
+                ROS_ERROR_STREAM("ROS is shutting down returning early");
                 return;
             }
             for (auto &&dev : _context.query_devices())
@@ -210,6 +214,7 @@ void RealSenseNodeFactory::setUpResinChuck()
         {
             if (ros::isShuttingDown())
             {
+                ROS_ERROR_STREAM("ROS is shutting down returning early");
                 return;
             }
             for (auto &&dev : _context.query_devices())

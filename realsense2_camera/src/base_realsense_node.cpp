@@ -996,6 +996,7 @@ void BaseRealSenseNode::setupStreams(std::function<void (const rs2::notification
         {
             if (ros::isShuttingDown())
             {
+                ROS_ERROR_STREAM("ROS is shutting down returning early");
                 stopStreams();
                 return;
             }

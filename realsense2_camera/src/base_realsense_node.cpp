@@ -994,6 +994,11 @@ void BaseRealSenseNode::setupStreams(std::function<void (const rs2::notification
 
         auto frame_callback = [this](rs2::frame frame)
         {
+            if (ros::isShuttingDown())
+            {
+                stopStreams();
+                return;
+            }
             try{
                 // We compute a ROS timestamp which is based on an initial ROS time at point of first frame,
                 // and the incremental timestamp from the camera.

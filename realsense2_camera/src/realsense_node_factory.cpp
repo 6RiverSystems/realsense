@@ -33,6 +33,11 @@ RealSenseNodeFactory::RealSenseNodeFactory()
 void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int iteration)
 {
     std::lock_guard<std::recursive_mutex> scopedLock(_device_lock);
+    if (ros::isShuttingDown())
+    {
+        _realSenseNode->stopStreams();
+        return;
+    }
     if (iteration != this->_device_iteration)
     {
         ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " iterations don't match... ignoring duplicate notification");
@@ -60,6 +65,10 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
     ROS_INFO_STREAM("realsense_camera: Device " << _usb_port_id << " creating new processing thread");
 
     std::thread([this, n]() {
+        if (ros::isShuttingDown())
+        {
+            return;
+        }
         ROS_INFO_STREAM("realsense_camera: new procesing thread started executing");
         ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " deallocating realsensenode");
         try
@@ -94,6 +103,10 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
         bool found = false;
         while (!found)
         {
+            if (ros::isShuttingDown())
+            {
+                return;
+            }
             for (auto &&dev : _context.query_devices())
             {
                 if (deviceMatches(dev, _usb_port_id))
@@ -120,12 +133,20 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
             }
         }
 
+        if (ros::isShuttingDown())
+        {
+            return;
+        }
         ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " sleeping for 10 seconds");
         boost::this_thread::sleep(boost::posix_time::seconds(10));
 
         found = false;
         while (!found)
         {
+            if (ros::isShuttingDown())
+            {
+                return;
+            }
             for (auto &&dev : _context.query_devices())
             {
                 if (deviceMatches(dev, _usb_port_id))
@@ -187,6 +208,10 @@ void RealSenseNodeFactory::setUpResinChuck()
         bool found = false;
         while (!found)
         {
+            if (ros::isShuttingDown())
+            {
+                return;
+            }
             for (auto &&dev : _context.query_devices())
             {
                 if (deviceMatches(dev, _usb_port_id))
@@ -378,7 +403,9 @@ void RealSenseNodeFactory::resetAndShutdown()
     ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down in 5s");
     sleep(5);
     ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down ROS and exiting.");
-    ros::shutdown();
+    ros::requestShutdown();
+    sleep(5);
+    ros::waitForShutdown();
     exit(1);
 }
 

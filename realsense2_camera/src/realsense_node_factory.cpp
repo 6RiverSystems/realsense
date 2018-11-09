@@ -21,7 +21,7 @@ RealSenseNodeFactory::RealSenseNodeFactory()
     ROS_INFO("RealSense ROS v%s", REALSENSE_ROS_VERSION_STR);
     ROS_INFO("Running with LibRealSense v%s", RS2_API_VERSION_STR);
 
-    signal(SIGINT, signalHandler);
+    //signal(SIGINT, signalHandler);
     auto severity = rs2_log_severity::RS2_LOG_SEVERITY_WARN;
     tryGetLogSeverity(severity);
     if (rs2_log_severity::RS2_LOG_SEVERITY_DEBUG == severity)

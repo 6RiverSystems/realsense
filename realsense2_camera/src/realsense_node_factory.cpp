@@ -162,7 +162,15 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
                     catch (...)
                     {
                         ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while calling addDevice on new device. Exiting...");
-                        exit(1);
+                        if (ros::isShuttingDown())
+                        {
+                            ROS_ERROR_STREAM("ROS is shutting down returning early");
+                            return;
+                        }
+                        ros::requestShutdown();
+                        ros::shutdown();
+                        sleep(5);
+                        return;
                     }
                     ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " found... and was added");
                     found = true;

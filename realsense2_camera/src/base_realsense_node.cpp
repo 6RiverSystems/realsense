@@ -294,8 +294,10 @@ void BaseRealSenseNode::setupDevice()
             else
             {
                 ROS_ERROR_STREAM("Module Name \"" << module_name << "\" isn't supported by LibRealSense! Terminating RealSense Node...");
+                ros::requestShutdown();
                 ros::shutdown();
-                exit(1);
+                sleep(5);
+                return;
             }
             ROS_INFO_STREAM(std::string(elem.get_info(RS2_CAMERA_INFO_NAME)) << " was found.");
         }
@@ -597,6 +599,12 @@ void BaseRealSenseNode::setupStreams()
 
         auto frame_callback = [this](rs2::frame frame)
         {
+            if (ros::isShuttingDown())
+            {
+                ROS_ERROR_STREAM("Exiting callback early as we are aleady shutting down.");
+                stopStreams();
+                return;
+            }
             try{
                 // We compute a ROS timestamp which is based on an initial ROS time at point of first frame,
                 // and the incremental timestamp from the camera.

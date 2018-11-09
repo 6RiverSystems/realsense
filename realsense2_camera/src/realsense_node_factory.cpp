@@ -408,9 +408,12 @@ void RealSenseNodeFactory::resetAndShutdown()
     ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down in 5s");
     sleep(5);
     ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down ROS and exiting.");
+    if (ros::isShuttingDown())
+    {
+        return; // someone else is shutting us down
+    }
     ros::requestShutdown();
     sleep(5);
-    ros::waitForShutdown();
     exit(1);
 }
 

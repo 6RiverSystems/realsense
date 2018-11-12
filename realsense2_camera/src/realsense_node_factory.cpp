@@ -441,9 +441,10 @@ void RealSenseNodeFactory::resetAndShutdown()
     {
         return; // someone else is shutting us down
     }
+    ros::requestShutdown();
     ros::shutdown();
     sleep(5);
-    exit(1);
+    return;
 }
 
 

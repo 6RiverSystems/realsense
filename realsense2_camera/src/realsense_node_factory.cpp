@@ -198,7 +198,7 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
                     }
                     catch (...)
                     {
-                        ROS_ERROR_STREAM("An uncaught exception was detected. Requesting shut down of ros.");
+                        ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " an unexpected exception was detected while attempting to reset and add device. Requesting shut down of ros.");
                         ros::requestShutdown();
                         ros::shutdown();
                         sleep(5);

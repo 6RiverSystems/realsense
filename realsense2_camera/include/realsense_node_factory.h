@@ -48,6 +48,8 @@ namespace realsense2_camera
         ROS_INFO_STREAM(strsignal(signum) << " Signal is received! Terminating RealSense Node...");
         ros::shutdown();
         sleep(5);
+        // exit(signum) is not thread safe and should not be invoked in a multithreaded environment unless all the threads had been joined.
+        // see: http://www.cplusplus.com/reference/cstdlib/exit/
         //exit(signum);
     }
 

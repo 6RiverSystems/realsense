@@ -26,6 +26,7 @@
 #include <eigen3/Eigen/Geometry>
 #include <fstream>
 #include <mutex>
+#include "ReturnOnShutdown.h"
 
 namespace realsense2_camera
 {
@@ -46,9 +47,7 @@ namespace realsense2_camera
     inline void signalHandler(int signum)
     {
         ROS_INFO_STREAM(strsignal(signum) << " Signal is received! Terminating RealSense Node...");
-        ros::requestShutdown();
-        ros::shutdown();
-        sleep(5);
+        REQUEST_SHUTDOWN();
         // exit(signum) is not thread safe and should not be invoked in a multithreaded environment unless all the threads had been joined.
         // see: http://www.cplusplus.com/reference/cstdlib/exit/
         //exit(signum);

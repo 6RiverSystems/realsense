@@ -981,6 +981,14 @@ void BaseRealSenseNode::stopStreams()
             }
         }
     }
+    try
+    {
+        _syncer = PipelineSyncer{}; // this should shut down the existing syncer
+    }
+    catch (...)
+    {
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: Unknown exception has occurred while shutting down syncer. ignoring...");
+    }
     // comment out due to new type of _syncer
     //_syncer = rs2::asynchronous_syncer{};
 }

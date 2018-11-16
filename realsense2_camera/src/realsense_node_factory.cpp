@@ -33,6 +33,12 @@ RealSenseNodeFactory::RealSenseNodeFactory()
 void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int iteration)
 {
     std::lock_guard<std::recursive_mutex> scopedLock(_device_lock);
+    if (ros::isShuttingDown())
+    {
+        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " ROS is shutting down returning early");
+        _realSenseNode->stopStreams();
+        return;
+    }
     if (iteration != this->_device_iteration)
     {
         ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " iterations don't match... ignoring duplicate notification");
@@ -40,7 +46,7 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
     }
     if (n.get_category() != RS2_NOTIFICATION_CATEGORY_FRAMES_TIMEOUT && n.get_category() != RS2_NOTIFICATION_CATEGORY_UNKNOWN_ERROR)
     {
-        ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " received a notification that does not require reset. The category was: "
+        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " received a notification that does not require reset. The category was: "
                             << rs2_notification_category_to_string(n.get_category()));
         return;
     }
@@ -54,103 +60,127 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
     }
     catch (...)
     {
-        ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while shutting down streams. ignoring...");
+        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while shutting down streams. ignoring...");
     }
 
     ROS_INFO_STREAM("realsense_camera: Device " << _usb_port_id << " creating new processing thread");
 
-    std::thread([this, n]() {
-        ROS_INFO_STREAM("realsense_camera: new procesing thread started executing");
-        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " deallocating realsensenode");
-        try
-        {
-            _realSenseNode.reset();
-        }
-        catch (...)
-        {
-            ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while resetting Realsense node. Ignoring...");
-        }
-        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " sleeping for 1 second");
-        boost::this_thread::sleep(boost::posix_time::seconds(1));
-        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " creating a new device");
-        try
-        {
-            _device = rs2::device();
-        }
-        catch (...)
-        {
-            ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while creating a new device. Ignoring...");
-        }
-        try
-        {
-            _context = rs2::context{};
-        }
-        catch (...)
-        {
-            ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while creating a new context. Ignoring...");
-        }
-        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " sleeping for 1 second");
-        boost::this_thread::sleep(boost::posix_time::seconds(1));
-        bool found = false;
-        while (!found)
-        {
-            for (auto &&dev : _context.query_devices())
-            {
-                if (deviceMatches(dev, _usb_port_id))
-                {
-                    ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " resetting");
-                    try
-                    {
-                        dev.hardware_reset();
-                    }
-                    catch (...)
-                    {
-                        ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while resetting hardware. Ignoring...");
-                    }
-
-                    ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " found... and was reset");
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " not found... and not reset... sleeping for 2 seconds");
-                boost::this_thread::sleep(boost::posix_time::seconds(2));
-            }
-        }
-
-        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " sleeping for 10 seconds");
-        boost::this_thread::sleep(boost::posix_time::seconds(10));
-
-        found = false;
-        while (!found)
-        {
-            for (auto &&dev : _context.query_devices())
-            {
-                if (deviceMatches(dev, _usb_port_id))
+    std::thread([this, n]()
                 {
                     try
                     {
-                        addDevice(dev);
+                        RETURN_ON_SHUTDOWN();
+
+                        ROS_INFO_STREAM("realsense_camera: new procesing thread started executing");
+                        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " deallocating realsensenode");
+                        try
+                        {
+                            _realSenseNode.reset();
+                        }
+                        catch (...)
+                        {
+                            ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id
+                                                                         << " unknown exception has occurred while resetting Realsense node. Ignoring...");
+                        }
+                        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " sleeping for 1 second");
+                        boost::this_thread::sleep(boost::posix_time::seconds(1));
+                        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " creating a new device");
+                        try
+                        {
+                            _device = rs2::device();
+                        }
+                        catch (...)
+                        {
+                            ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id
+                                                                         << " unknown exception has occurred while creating a new device. Ignoring...");
+                        }
+                        try
+                        {
+                            _context = rs2::context{};
+                        }
+                        catch (...)
+                        {
+                            ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id
+                                                                         << " unknown exception has occurred while creating a new context. Ignoring...");
+                        }
+                        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " sleeping for 1 second");
+                        boost::this_thread::sleep(boost::posix_time::seconds(1));
+                        bool found = false;
+                        while (!found)
+                        {
+                            RETURN_ON_SHUTDOWN();
+                            for (auto &&dev : _context.query_devices())
+                            {
+                                if (deviceMatches(dev, _usb_port_id))
+                                {
+                                    ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " resetting");
+                                    try
+                                    {
+                                        dev.hardware_reset();
+                                    }
+                                    catch (...)
+                                    {
+                                        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id
+                                                                                     << " unknown exception has occurred while resetting hardware. Ignoring...");
+                                    }
+
+                                    ROS_INFO_STREAM(
+                                            "realsense_camera: device " << _usb_port_id << " found... and was reset");
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found)
+                            {
+                                ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id
+                                                                            << " not found... and not reset... sleeping for 2 seconds");
+                                boost::this_thread::sleep(boost::posix_time::seconds(2));
+                            }
+                        }
+
+                        RETURN_ON_SHUTDOWN();
+                        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " sleeping for 10 seconds");
+                        boost::this_thread::sleep(boost::posix_time::seconds(10));
+
+                        found = false;
+                        while (!found)
+                        {
+                            RETURN_ON_SHUTDOWN();
+
+                            for (auto &&dev : _context.query_devices())
+                            {
+                                if (deviceMatches(dev, _usb_port_id))
+                                {
+                                    try
+                                    {
+                                        addDevice(dev);
+                                    }
+                                    catch (...)
+                                    {
+                                        ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id
+                                                                                     << " unknown exception has occurred while calling addDevice on new device. Exiting...");
+                                        REQUEST_SHUTDOWN();
+                                    }
+                                    ROS_INFO_STREAM(
+                                            "realsense_camera: device " << _usb_port_id << " found... and was added");
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found)
+                            {
+                                ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id
+                                                                            << " not found... sleeping for 2 seconds");
+                                boost::this_thread::sleep(boost::posix_time::seconds(2));
+                            }
+                        }
                     }
                     catch (...)
                     {
-                        ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while calling addDevice on new device. Exiting...");
-                        exit(1);
+                        ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " an unexpected exception was detected while attempting to reset and add device. Requesting shut down of ros.");
+                        REQUEST_SHUTDOWN();
                     }
-                    ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " found... and was added");
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " not found... sleeping for 2 seconds");
-                boost::this_thread::sleep(boost::posix_time::seconds(2));
-            }
-        }
-    }).detach();
+                }).detach();
 
     ROS_INFO_STREAM("realsense_camera: Device " << _usb_port_id << " exiting notification handler");
 
@@ -187,6 +217,7 @@ void RealSenseNodeFactory::setUpResinChuck()
         bool found = false;
         while (!found)
         {
+            RETURN_ON_SHUTDOWN();
             for (auto &&dev : _context.query_devices())
             {
                 if (deviceMatches(dev, _usb_port_id))
@@ -325,8 +356,7 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
         break;
     default:
         ROS_FATAL_STREAM("Unsupported device!" << " Product ID: 0x" << pid_str);
-        ros::shutdown();
-        exit(1);
+        REQUEST_SHUTDOWN();
     }
 
     ROS_INFO("REALSENSE: Adding device on port %s", _device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
@@ -378,8 +408,7 @@ void RealSenseNodeFactory::resetAndShutdown()
     ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down in 5s");
     sleep(5);
     ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down ROS and exiting.");
-    ros::shutdown();
-    exit(1);
+    REQUEST_SHUTDOWN();
 }
 
 

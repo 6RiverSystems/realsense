@@ -14,6 +14,9 @@
 #define REQUEST_SHUTDOWN()                                           \
 {                                                                    \
     RETURN_ON_SHUTDOWN();                                            \
+    std_msgs::Bool msg;                                              \
+    msg.data = true;                                                 \
+    _reset_request_publisher.publish(msg);                           \
     ros::requestShutdown();                                          \
     ros::shutdown();                                                 \
     sleep(5);                                                        \

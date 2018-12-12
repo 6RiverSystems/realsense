@@ -217,7 +217,11 @@ void RealSenseNodeFactory::setUpResinChuck()
     auto nodeHandle = getNodeHandle();
 
     _reset_request_publisher = nodeHandle.advertise<std_msgs::Bool>("reset_request", 1000);
-
+    while(_reset_request_publisher.getNumSubscribers()==0)
+    {
+        ROS_INFO("Waiting for reset_request_publisher subscribers");
+        sleep(1);
+    }
     privateNh.param("usb_port_id", _usb_port_id, std::string(""));
 
     {

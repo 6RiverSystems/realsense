@@ -1,7 +1,6 @@
 // License: Apache 2.0. See LICENSE file in root directory.
 // Copyright(c) 2017 Intel Corporation. All Rights Reserved
 
-#include <ros/callback_queue.h>
 #include "../include/realsense_node_factory.h"
 #include "../include/sr300_node.h"
 #include "../include/rs415_node.h"
@@ -202,34 +201,13 @@ void RealSenseNodeFactory::onInit()
     }
     catch (const std::exception& ex)
     {
-
-        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
-                                      << " An exception has been thrown: " << ex.what());
-        std::thread([this]()
-        {
-            while(_reset_request_publisher.getNumSubscribers()==0)
-            {
-                ROS_INFO("Waiting for reset_request_publisher subscribers");
-                ros::spinOnce();
-                sleep(1);
-            }
-            resetAndShutdown();
-        }).detach();
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " An exception has been thrown: " << ex.what());
+        resetAndShutdown();
     }
     catch (...)
     {
-        std::thread([this]()
-        {
-            ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Unknown exception has occurred!");
-            while(_reset_request_publisher.getNumSubscribers()==0)
-            {
-                ROS_INFO("Waiting for reset_request_publisher subscribers");
-                ros::spinOnce();
-                sleep(1);
-            }
-            resetAndShutdown();
-        }).detach();
-
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Unknown exception has occurred!");
+        resetAndShutdown();
     }
 }
 
@@ -238,7 +216,8 @@ void RealSenseNodeFactory::setUpResinChuck()
     auto privateNh = getPrivateNodeHandle();
     auto nodeHandle = getNodeHandle();
 
-    _reset_request_publisher = nodeHandle.advertise<std_msgs::Bool>("reset_request", 1000);
+    _reset_request_publisher = nodeHandle.advertise<std_msgs::Bool>("reset_request", 1000, true);
+
     privateNh.param("usb_port_id", _usb_port_id, std::string(""));
 
     {

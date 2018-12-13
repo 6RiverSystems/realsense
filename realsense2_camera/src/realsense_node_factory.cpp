@@ -193,7 +193,7 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
 
 }
 
-void RealSenseNodeFactory::onInit()
+void RealSenseNodeFactory::connectCb()
 {
     try
     {
@@ -209,6 +209,14 @@ void RealSenseNodeFactory::onInit()
         ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Unknown exception has occurred!");
         resetAndShutdown();
     }
+}
+
+void RealSenseNodeFactory::onInit()
+{
+    auto nodeHandle = getNodeHandle();
+    ros::SubscriberStatusCallback connect_cb = boost::bind(&RealSenseNodeFactory::connectCb, this);
+
+    _reset_request_publisher = nodeHandle.advertise<std_msgs::Bool>("reset_request", 1000, connect_cb);
 }
 
 void RealSenseNodeFactory::setUpResinChuck()

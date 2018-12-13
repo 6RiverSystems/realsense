@@ -213,18 +213,21 @@ void RealSenseNodeFactory::connectCb()
 
 void RealSenseNodeFactory::onInit()
 {
+    auto privateNh = getPrivateNodeHandle();
     auto nodeHandle = getNodeHandle();
-    ros::SubscriberStatusCallback connect_cb = boost::bind(&RealSenseNodeFactory::connectCb, this);
 
-    _reset_request_publisher = nodeHandle.advertise<std_msgs::Bool>("reset_request", 1000, connect_cb);
+    privateNh.param("usb_port_id", _usb_port_id, std::string(""));
+    ros::SubscriberStatusCallback connect_cb = boost::bind(&RealSenseNodeFactory::connectCb, this);
+    ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Advertising reset request publisher!");
+    _reset_request_publisher = nodeHandle.advertise<std_msgs::Bool>("reset_request", 10, connect_cb);
+    ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Reset request publisher advertised!");
+
 }
 
 void RealSenseNodeFactory::setUpResinChuck()
 {
     auto privateNh = getPrivateNodeHandle();
     auto nodeHandle = getNodeHandle();
-
-    _reset_request_publisher = nodeHandle.advertise<std_msgs::Bool>("reset_request", 1000, true);
 
     privateNh.param("usb_port_id", _usb_port_id, std::string(""));
 

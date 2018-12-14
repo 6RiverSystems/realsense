@@ -196,12 +196,14 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
 
 void RealSenseNodeFactory::connectCb()
 {
-    std::lock_guard<std::mutex> lock(_configurationMutex);
-    if (_initialized == true)
     {
-        return;
+        std::lock_guard<std::mutex> lock(_configurationMutex);
+        if (_initialized == true)
+        {
+            return;
+        }
+        _initialized = true;
     }
-    _initialized = true;
     try
     {
         setUpResinChuck();
@@ -228,6 +230,8 @@ void RealSenseNodeFactory::onInit()
 
     if (wait_for_usb_resetter)
     {
+        ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
+                                 << " wait_for_usb_resetter enabled!");
         ros::SubscriberStatusCallback connect_cb = boost::bind(&RealSenseNodeFactory::connectCb, this);
         ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
                                   << " Advertising reset request publisher!");
@@ -238,6 +242,8 @@ void RealSenseNodeFactory::onInit()
         _setupOneShotTimer = nodeHandle.createTimer(ros::Duration(30),
                                                     boost::bind(&RealSenseNodeFactory::connectCb, this), true);
     } else {
+        ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
+                                 << " wait_for_usb_resetter disabled!");
         ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
                                   << " Advertising reset request publisher!");
         _reset_request_publisher = nodeHandle.advertise<std_msgs::Bool>("reset_request", 10);

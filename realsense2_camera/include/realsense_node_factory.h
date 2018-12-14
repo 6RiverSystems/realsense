@@ -28,6 +28,7 @@
 #include <mutex>
 #include "ReturnOnShutdown.h"
 
+
 namespace realsense2_camera
 {
     const stream_index_pair COLOR{RS2_STREAM_COLOR, 0};
@@ -91,5 +92,8 @@ namespace realsense2_camera
         std::function<void(const rs2::notification &n)> _handler;
 
         ros::Publisher _reset_request_publisher;
+        ros::Timer _setupOneShotTimer;
+        std::mutex _configurationMutex;
+        bool _initialized;
     };
 }//end namespace

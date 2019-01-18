@@ -56,6 +56,7 @@ add_message_files(
     FILES
     IMUInfo.msg
     Extrinsics.msg
+    FailureNotification.msg
     )
 
 generate_messages(

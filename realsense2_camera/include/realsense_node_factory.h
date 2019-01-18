@@ -82,7 +82,7 @@ namespace realsense2_camera
         bool deviceMatches(rs2::device& dev, std::string& usb_port);
         void setUpResinChuck();
         void addDevice(rs2::device dev);
-        void resetAndShutdown();
+        void resetAndShutdown(std::string msg_string);
 
         size_t _device_iteration = 0;
         std::unique_ptr<InterfaceRealSenseNode> _realSenseNode;

@@ -5,7 +5,7 @@
 #include "../include/sr300_node.h"
 #include "../include/rs415_node.h"
 #include "../include/rs435_node.h"
-#include <std_msgs/Bool.h>
+#include <realsense2_camera/FailureNotification.h>
 #include <thread>
 
 
@@ -137,8 +137,9 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
                                 ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id
                                                                             << " not found... and not reset... sleeping for 2 seconds");
                                 boost::this_thread::sleep(boost::posix_time::seconds(2));
-                                std_msgs::Bool msg;
-                                msg.data = true;
+                                realsense2_camera::FailureNotification msg;
+                                msg.source = "realsense_camera: device " + _usb_port_id;
+                                msg.error_code = "NOT FOUND";
                                 _reset_request_publisher.publish(msg);
                             }
                         }
@@ -160,11 +161,17 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
                                     {
                                         addDevice(dev);
                                     }
+                                    catch (const std::exception& ex)
+                                    {
+                                        ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << ex.what() << " was detected while attempting to add device. Requesting shut down of ros.");
+                                        REQUEST_SHUTDOWN("realsense_camera: device " + _usb_port_id, std::string(ex.what()) + " DURING NOTIFICATION ADD DEVICE");
+
+                                    }
                                     catch (...)
                                     {
                                         ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id
                                                                                      << " unknown exception has occurred while calling addDevice on new device. Exiting...");
-                                        REQUEST_SHUTDOWN();
+                                        REQUEST_SHUTDOWN("realsense_camera: device " + _usb_port_id, "UNEXPECTED EXCEPTION DURING DEVICE ADD");
                                     }
                                     ROS_INFO_STREAM(
                                             "realsense_camera: device " << _usb_port_id << " found... and was added");
@@ -177,16 +184,23 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
                                 ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id
                                                                             << " not found... sleeping for 2 seconds");
                                 boost::this_thread::sleep(boost::posix_time::seconds(2));
-                                std_msgs::Bool msg;
-                                msg.data = true;
+                                realsense2_camera::FailureNotification msg;
+                                msg.source = "realsense_camera: device " + _usb_port_id;
+                                msg.error_code = "NOT FOUND";
                                 _reset_request_publisher.publish(msg);
                             }
                         }
                     }
+                    catch (const std::exception& ex)
+                    {
+                        ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << ex.what() << " was detected while attempting to reset and add device. Requesting shut down of ros.");
+                        REQUEST_SHUTDOWN("realsense_camera: device " + _usb_port_id, std::string(ex.what()) + " DURING NOTIFICATION HANDLER");
+
+                    }
                     catch (...)
                     {
                         ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " an unexpected exception was detected while attempting to reset and add device. Requesting shut down of ros.");
-                        REQUEST_SHUTDOWN();
+                        REQUEST_SHUTDOWN("realsense_camera: device " + _usb_port_id, "UNEXPECTED EXCEPTION DURING NOTIFICATION HANDLER");
                     }
                 }).detach();
 
@@ -211,12 +225,12 @@ void RealSenseNodeFactory::connectCb()
     catch (const std::exception& ex)
     {
         ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " An exception has been thrown: " << ex.what());
-        resetAndShutdown();
+        resetAndShutdown(ex.what());
     }
     catch (...)
     {
         ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Unknown exception has occurred!");
-        resetAndShutdown();
+        resetAndShutdown("UNKNOWN EXCEPTION DURING SETUP");
     }
 }
 
@@ -235,7 +249,7 @@ void RealSenseNodeFactory::onInit()
         ros::SubscriberStatusCallback connect_cb = boost::bind(&RealSenseNodeFactory::connectCb, this);
         ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
                                   << " Advertising reset request publisher!");
-        _reset_request_publisher = nodeHandle.advertise<std_msgs::Bool>("reset_request", 10, connect_cb);
+        _reset_request_publisher = nodeHandle.advertise<realsense2_camera::FailureNotification>("reset_request", 10, connect_cb);
         ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
                                   << " Reset request publisher advertised!");
 
@@ -246,7 +260,7 @@ void RealSenseNodeFactory::onInit()
                                  << " wait_for_usb_resetter disabled!");
         ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
                                   << " Advertising reset request publisher!");
-        _reset_request_publisher = nodeHandle.advertise<std_msgs::Bool>("reset_request", 10);
+        _reset_request_publisher = nodeHandle.advertise<realsense2_camera::FailureNotification>("reset_request", 10);
         ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
                                   << " Reset request publisher advertised!");
 
@@ -286,8 +300,9 @@ void RealSenseNodeFactory::setUpResinChuck()
                                                                                          << " sleeping for 2 seconds and polling again");
                 boost::this_thread::sleep(boost::posix_time::seconds(2));
                 _context = rs2::context{};
-                std_msgs::Bool msg;
-                msg.data = true;
+                realsense2_camera::FailureNotification msg;
+                msg.source = "realsense_camera: device " + _usb_port_id;
+                msg.error_code = "NOT FOUND";
                 _reset_request_publisher.publish(msg);
             }
         }
@@ -411,7 +426,9 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
         break;
     default:
         ROS_FATAL_STREAM("Unsupported device!" << " Product ID: 0x" << pid_str);
-        REQUEST_SHUTDOWN();
+        std::string error_message("Unsupported device! Product ID: 0x");
+        error_message += pid_str;
+        REQUEST_SHUTDOWN("realsense_camera: device " + _usb_port_id, error_message);
     }
 
     ROS_INFO("REALSENSE: Adding device on port %s", _device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
@@ -428,7 +445,7 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
     _realSenseNode->registerDynamicReconfigCb();
 }
 
-void RealSenseNodeFactory::resetAndShutdown()
+void RealSenseNodeFactory::resetAndShutdown(std::string msg_string)
 {
     std::lock_guard<std::recursive_mutex> lock(_device_lock);
     if (_realSenseNode)
@@ -463,7 +480,7 @@ void RealSenseNodeFactory::resetAndShutdown()
     ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down in 5s");
     sleep(5);
     ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down ROS and exiting.");
-    REQUEST_SHUTDOWN();
+    REQUEST_SHUTDOWN("realsense_camera: device " + _usb_port_id, msg_string);
 }
 
 

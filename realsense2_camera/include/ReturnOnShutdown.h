@@ -2,6 +2,8 @@
 #ifndef SRS_RETURN_ON_SHUTDOWN_H
 #define SRS_RETURN_ON_SHUTDOWN_H
 
+#include <realsense2_camera/FailureNotification.h>
+
 #define RETURN_ON_SHUTDOWN()                                         \
 {                                                                    \
     if(ros::isShuttingDown())                                        \
@@ -11,12 +13,13 @@
     }                                                                \
 }
 
-#define REQUEST_SHUTDOWN()                                           \
+#define REQUEST_SHUTDOWN(ID, CODE)                                   \
 {                                                                    \
     RETURN_ON_SHUTDOWN();                                            \
     ROS_ERROR_STREAM("Requesting USB bus reset");                    \
-    std_msgs::Bool msg;                                              \
-    msg.data = true;                                                 \
+    realsense2_camera::FailureNotification msg;                      \
+    msg.source = ID    ;                                             \
+    msg.error_code = CODE;                                           \
     _reset_request_publisher.publish(msg);                           \
     sleep(1);                                                        \
     ros::requestShutdown();                                          \

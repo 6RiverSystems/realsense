@@ -56,7 +56,7 @@ BaseRealSenseNode::BaseRealSenseNode(ros::NodeHandle& nodeHandle,
     _is_frame_arrived[COLOR] = false;
     _format[COLOR] = RS2_FORMAT_BGR8;   // libRS type
     _image_format[COLOR] = CV_8UC3;    // CVBridge type
-    _encoding[COLOR] = sensor_msgs::image_encodings::RGB8; // ROS message type
+    _encoding[COLOR] = sensor_msgs::image_encodings::BGR8; // ROS message type
     _unit_step_size[COLOR] = 3; // sensor_msgs::ImagePtr row step size
     _stream_name[COLOR] = "color";
     _depth_aligned_encoding[COLOR] = sensor_msgs::image_encodings::TYPE_16UC1;

@@ -117,30 +117,7 @@ if(USE_SYSTEM_LIBREALSENSE)
   target_link_libraries(get_debug_info PRIVATE realsense::realsense)
 endif()
 
-if (CATKIN_ENABLE_TESTING)
-  find_package(rostest REQUIRED)
-  find_package(roslint REQUIRED)
 
-  # ROS Lint the code
-  roslint_cpp()
-  roslint_python()
-  roslint_add_test()
-
-  add_executable(tests_camera_core test/camera_core.cpp)
-  target_link_libraries(tests_camera_core
-    ${GTEST_LIBRARIES}     ${catkin_LIBRARIES}
-          )
-  add_dependencies(tests_camera_core ${PROJECT_NAME}_generate_messages_cpp ${PROJECT_NAME}_gencfg)
-  add_dependencies(tests_camera_core ${catkin_EXPORTED_TARGETS})
-
-  add_executable(tests_rgbd_topics test/rgbd_topics.cpp)
-  target_link_libraries(tests_rgbd_topics
-    ${GTEST_LIBRARIES}     ${catkin_LIBRARIES}
-
-          )
-  add_dependencies(tests_rgbd_topics ${PROJECT_NAME}_generate_messages_cpp)
-  add_dependencies(tests_rgbd_topics ${catkin_EXPORTED_TARGETS})
-endif()
 
 # Install nodelet library
 install(TARGETS ${PROJECT_NAME}_nodelet get_debug_info

@@ -28,7 +28,6 @@
 #include <mutex>
 #include "ReturnOnShutdown.h"
 
-
 namespace realsense2_camera
 {
     const stream_index_pair COLOR{RS2_STREAM_COLOR, 0};
@@ -48,9 +47,7 @@ namespace realsense2_camera
     inline void signalHandler(int signum)
     {
         ROS_INFO_STREAM(strsignal(signum) << " Signal is received! Terminating RealSense Node...");
-        ros::requestShutdown();
-        ros::shutdown();
-        sleep(5);
+        REQUEST_SHUTDOWN();
         // exit(signum) is not thread safe and should not be invoked in a multithreaded environment unless all the threads had been joined.
         // see: http://www.cplusplus.com/reference/cstdlib/exit/
         //exit(signum);
@@ -76,7 +73,6 @@ namespace realsense2_camera
 
     private:
         virtual void onInit() override;
-        void connectCb();
         void tryGetLogSeverity(rs2_log_severity& severity) const;
         std::string parseUsbPortId(std::string usb_path) const;
         bool deviceMatches(rs2::device& dev, std::string& usb_port);
@@ -90,10 +86,5 @@ namespace realsense2_camera
         rs2::context _context;
         std::string _usb_port_id;
         std::function<void(const rs2::notification &n)> _handler;
-
-        ros::Publisher _reset_request_publisher;
-        ros::Timer _setupOneShotTimer;
-        std::mutex _configurationMutex;
-        bool _initialized;
     };
 }//end namespace

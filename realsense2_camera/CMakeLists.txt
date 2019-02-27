@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(realsense2_camera)
 
 option(USE_SYSTEM_LIBREALSENSE2 "Build realsense2_ros_camera against system librealsense2, not the one built with catkin" OFF)
-option(BUILD_WITH_OPENMP "Use OpenMP" ON)
+option(BUILD_WITH_OPENMP "Use OpenMP" OFF)
 option(SET_USER_BREAK_AT_STARTUP "Set user wait point in startup (for debug)" OFF)
 
 set(REALSENSE2_CATKIN_BASED_DEPS

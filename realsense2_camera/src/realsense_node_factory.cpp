@@ -5,7 +5,8 @@
 #include "../include/sr300_node.h"
 #include "../include/rs415_node.h"
 #include "../include/rs435_node.h"
-#include <std_msgs/Bool.h>
+#include <std_msgs/String.h>
+#include <srslib_framework/Event.h>
 #include <thread>
 
 
@@ -137,9 +138,15 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
                                 ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id
                                                                             << " not found... and not reset... sleeping for 2 seconds");
                                 boost::this_thread::sleep(boost::posix_time::seconds(2));
-                                std_msgs::Bool msg;
-                                msg.data = true;
+                                std_msgs::String msg;
+                                msg.data = _sensor_name + _usb_port_id;
                                 _reset_request_publisher.publish(msg);
+                                // need to add analytics messages here
+                                srslib_framework::Event data;
+                                data.entity = _sensor_entity;
+                                data.value = _sensor_value;
+                                data.attribute = _sensor_name + _usb_port_id + ".USB_BUS_RESET_REQUEST_SENT";
+                                _reset_request_analytics_publisher.publish(data);
                             }
                         }
 
@@ -177,9 +184,15 @@ void RealSenseNodeFactory::notification_handler(const rs2::notification &n, int 
                                 ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id
                                                                             << " not found... sleeping for 2 seconds");
                                 boost::this_thread::sleep(boost::posix_time::seconds(2));
-                                std_msgs::Bool msg;
-                                msg.data = true;
+                                std_msgs::String msg;
+                                msg.data = _sensor_name + _usb_port_id;
                                 _reset_request_publisher.publish(msg);
+                                // need to add analytics messages here
+                                srslib_framework::Event data;
+                                data.entity = _sensor_entity;
+                                data.value = _sensor_value;
+                                data.attribute = _sensor_name + _usb_port_id + ".USB_BUS_RESET_REQUEST_SENT";
+                                _reset_request_analytics_publisher.publish(data);
                             }
                         }
                     }
@@ -225,9 +238,9 @@ void RealSenseNodeFactory::onInit()
     auto privateNh = getPrivateNodeHandle();
     auto nodeHandle = getNodeHandle();
     bool wait_for_usb_resetter = true;
+    std::string analytics_topic;
     privateNh.param("usb_port_id", _usb_port_id, std::string(""));
     privateNh.param("wait_for_usb_resetter", wait_for_usb_resetter, true);
-
     if (wait_for_usb_resetter)
     {
         ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
@@ -235,7 +248,7 @@ void RealSenseNodeFactory::onInit()
         ros::SubscriberStatusCallback connect_cb = boost::bind(&RealSenseNodeFactory::connectCb, this);
         ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
                                   << " Advertising reset request publisher!");
-        _reset_request_publisher = nodeHandle.advertise<std_msgs::Bool>("reset_request", 10, connect_cb);
+        _reset_request_publisher = nodeHandle.advertise<std_msgs::String>("reset_request", 10, connect_cb);
         ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
                                   << " Reset request publisher advertised!");
 
@@ -246,7 +259,7 @@ void RealSenseNodeFactory::onInit()
                                  << " wait_for_usb_resetter disabled!");
         ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
                                   << " Advertising reset request publisher!");
-        _reset_request_publisher = nodeHandle.advertise<std_msgs::Bool>("reset_request", 10);
+        _reset_request_publisher = nodeHandle.advertise<std_msgs::String>("reset_request", 10);
         ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id
                                   << " Reset request publisher advertised!");
 
@@ -286,9 +299,15 @@ void RealSenseNodeFactory::setUpResinChuck()
                                                                                          << " sleeping for 2 seconds and polling again");
                 boost::this_thread::sleep(boost::posix_time::seconds(2));
                 _context = rs2::context{};
-                std_msgs::Bool msg;
-                msg.data = true;
+                std_msgs::String msg;
+                msg.data = _sensor_name + _usb_port_id;
                 _reset_request_publisher.publish(msg);
+                // need to add analytics messages here
+                srslib_framework::Event data;
+                data.entity = _sensor_entity;
+                data.value = _sensor_value;
+                data.attribute = _sensor_name + _usb_port_id + ".USB_BUS_RESET_REQUEST_SENT";
+                _reset_request_analytics_publisher.publish(data);
             }
         }
 

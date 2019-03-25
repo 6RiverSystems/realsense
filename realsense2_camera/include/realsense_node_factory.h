@@ -27,6 +27,7 @@
 #include <fstream>
 #include <mutex>
 #include "ReturnOnShutdown.h"
+#include "srslib_framework/ros/channel/ChannelEvent.hpp"
 
 
 namespace realsense2_camera
@@ -92,8 +93,12 @@ namespace realsense2_camera
         std::function<void(const rs2::notification &n)> _handler;
 
         ros::Publisher _reset_request_publisher;
+        srs::ChannelEvent _reset_request_analytics_publisher;
         ros::Timer _setupOneShotTimer;
         std::mutex _configurationMutex;
         bool _initialized;
+        std::string const _sensor_name {"RGBD_SENSOR_USB_"};
+        std::string const _sensor_entity {"USB_BUS"};
+        double const _sensor_value {1.0};
     };
 }//end namespace

@@ -16,6 +16,7 @@ set(REALSENSE2_CATKIN_BASED_DEPS
     tf
     dynamic_reconfigure
     diagnostic_updater
+    srslib_framework
     )
 
 if(USE_SYSTEM_LIBREALSENSE2)
@@ -86,6 +87,7 @@ catkin_package(
     cv_bridge
     image_transport
     dynamic_reconfigure
+    srslib_framework
     )
 
 add_library(${PROJECT_NAME}

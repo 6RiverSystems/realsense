@@ -84,6 +84,7 @@ namespace realsense2_camera
         virtual void publishTopics() override;
         virtual void stopStreams() override;
         virtual void registerDynamicReconfigCb() override;
+        virtual void toggleStreaming(std::function<void (const rs2::notification &n)> &handler) override;
         virtual ~BaseRealSenseNode() {}
 
     protected:
@@ -191,6 +192,7 @@ namespace realsense2_camera
         bool _enable_tf;
         bool _enable_tf_dynamic;
         int _tf_publication_rate;
+        bool _streaming;
 
         std::string _filters_str;
         stream_index_pair _pointcloud_texture;

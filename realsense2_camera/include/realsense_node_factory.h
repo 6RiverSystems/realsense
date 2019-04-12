@@ -62,6 +62,7 @@ namespace realsense2_camera
     public:
         virtual void publishTopics() = 0;
         virtual void publishTopics(std::function<void (const rs2::notification &n)> &handler) = 0;
+        virtual void toggleStreaming(std::function<void (const rs2::notification &n)> &handler) = 0;
         virtual void stopStreams() = 0;
         virtual void registerDynamicReconfigCb() = 0;
         virtual ~InterfaceRealSenseNode() = default;
@@ -93,6 +94,7 @@ namespace realsense2_camera
         std::function<void(const rs2::notification &n)> _handler;
 
         ros::Publisher _reset_request_publisher;
+        ros::Subscriber _stream_toggler;
         srs::ChannelEvent _reset_request_analytics_publisher;
         ros::Timer _setupOneShotTimer;
         std::mutex _configurationMutex;

@@ -445,6 +445,7 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
             };
     _realSenseNode->publishTopics(_handler);
     _realSenseNode->registerDynamicReconfigCb();
+    _realSenseNode->registerToggleTopic(_handler);
 }
 
 void RealSenseNodeFactory::resetAndShutdown()

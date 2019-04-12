@@ -23,7 +23,7 @@ BaseRealSenseNode::BaseRealSenseNode(ros::NodeHandle& nodeHandle,
     _pnh(privateNodeHandle), _json_file_path(""),
     _serial_no(serial_no), _base_frame_id(""),
     _intialize_time_base(false),
-    _namespace(getNamespaceStr())
+    _namespace(getNamespaceStr()), _streaming(false)
 {
     // Types for depth stream
     _is_frame_arrived[DEPTH] = false;
@@ -99,6 +99,7 @@ void BaseRealSenseNode::publishTopics()
         publishStaticTransforms();
     }
     ROS_INFO_STREAM("RealSense Node Is Up!");
+    _streaming = true;
 }
 
 void BaseRealSenseNode::publishTopics(std::function<void (const rs2::notification &n)> &handler)
@@ -113,6 +114,7 @@ void BaseRealSenseNode::publishTopics(std::function<void (const rs2::notificatio
         publishStaticTransforms();
     }
     ROS_INFO_STREAM("RealSense Node Is Up!");
+    _streaming = true;
 }
 
 void BaseRealSenseNode::registerDynamicReconfigCb()
@@ -2130,6 +2132,17 @@ void BaseD400Node::setParam(base_d400_paramsConfig &config, base_depth_param par
     default:
         ROS_WARN_STREAM("Unrecognized D400 param (" << param << ")");
         break;
+    }
+}
+
+void BaseRealSenseNode::toggleStreaming(std::function<void(const rs2::notification &)> &handler) override
+{
+    if (_streaming) {
+        stopStreams();
+        _streaming = false;
+    } else {
+        startStreaming(handler);
+        _streaming = true;
     }
 }
 

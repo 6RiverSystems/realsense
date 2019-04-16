@@ -83,8 +83,9 @@ namespace realsense2_camera
         virtual void publishTopics(std::function<void (const rs2::notification &n)> &handler) override;
         virtual void publishTopics() override;
         virtual void stopStreams() override;
+        virtual void startStreams(std::function<void (const rs2::notification &n)> &handler) override;
         virtual void registerDynamicReconfigCb() override;
-        virtual void toggleStreaming(std::function<void (const rs2::notification &n)> &handler) override;
+        virtual bool isStreaming() override;
         virtual ~BaseRealSenseNode() {}
 
     protected:

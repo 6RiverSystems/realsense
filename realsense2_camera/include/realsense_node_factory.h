@@ -28,6 +28,7 @@
 #include <mutex>
 #include "ReturnOnShutdown.h"
 #include "srslib_framework/ros/channel/ChannelEvent.hpp"
+#include <std_msgs/Bool.h>
 
 
 namespace realsense2_camera
@@ -62,8 +63,9 @@ namespace realsense2_camera
     public:
         virtual void publishTopics() = 0;
         virtual void publishTopics(std::function<void (const rs2::notification &n)> &handler) = 0;
-        virtual void toggleStreaming(std::function<void (const rs2::notification &n)> &handler) = 0;
         virtual void stopStreams() = 0;
+        virtual void startStreams(std::function<void (const rs2::notification &n)> &handler) = 0;
+        virtual bool isStreaming() = 0;
         virtual void registerDynamicReconfigCb() = 0;
         virtual ~InterfaceRealSenseNode() = default;
     };
@@ -85,6 +87,7 @@ namespace realsense2_camera
         void setUpResinChuck();
         void addDevice(rs2::device dev);
         void resetAndShutdown();
+        void streamEnableDisable(const std_msgs::Bool &enable);
 
         size_t _device_iteration = 0;
         std::unique_ptr<InterfaceRealSenseNode> _realSenseNode;
@@ -94,7 +97,7 @@ namespace realsense2_camera
         std::function<void(const rs2::notification &n)> _handler;
 
         ros::Publisher _reset_request_publisher;
-        ros::Subscriber _stream_toggler;
+        ros::Subscriber _stream_enable_disable;
         srs::ChannelEvent _reset_request_analytics_publisher;
         ros::Timer _setupOneShotTimer;
         std::mutex _configurationMutex;

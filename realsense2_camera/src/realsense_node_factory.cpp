@@ -6,6 +6,7 @@
 #include "../include/rs415_node.h"
 #include "../include/rs435_node.h"
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 #include <srslib_framework/Event.h>
 #include <thread>
 
@@ -266,6 +267,8 @@ void RealSenseNodeFactory::onInit()
         _setupOneShotTimer = nodeHandle.createTimer(ros::Duration(1),
                                                     boost::bind(&RealSenseNodeFactory::connectCb, this), true);
     }
+
+    _stream_enable_disable = nodeHandle.subscribe("enable", 10, &RealSenseNodeFactory::streamEnableDisable, this);
 }
 
 void RealSenseNodeFactory::setUpResinChuck()
@@ -445,7 +448,26 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
             };
     _realSenseNode->publishTopics(_handler);
     _realSenseNode->registerDynamicReconfigCb();
-    _realSenseNode->registerToggleTopic(_handler);
+}
+
+void RealSenseNodeFactory::streamEnableDisable(const std_msgs::Bool &msg)
+{
+    bool input = msg.data;
+    if (input == false && _realSenseNode->isStreaming())
+    {
+        _realSenseNode->stopStreams();
+    }
+    if (input == true && !_realSenseNode->isStreaming())
+    {
+        int local_copy_of_iteration = _device_iteration;
+        _handler =
+                [this, local_copy_of_iteration](const rs2::notification &n) {
+                    ROS_ERROR_STREAM("realsense_camera: callback for device " << _usb_port_id
+                                                                              << " received. Invoking notification handler for processing.");
+                    notification_handler(n, local_copy_of_iteration);
+                };
+        _realSenseNode->startStreams(_handler);
+    }
 }
 
 void RealSenseNodeFactory::resetAndShutdown()

@@ -993,6 +993,7 @@ void BaseRealSenseNode::stopStreams()
     }
     // comment out due to new type of _syncer
     //_syncer = rs2::asynchronous_syncer{};
+    _streaming = false;
 }
 
 void BaseRealSenseNode::setupStreams(std::function<void (const rs2::notification &n)> &handler)
@@ -2135,15 +2136,15 @@ void BaseD400Node::setParam(base_d400_paramsConfig &config, base_depth_param par
     }
 }
 
-void BaseRealSenseNode::toggleStreaming(std::function<void(const rs2::notification &)> &handler) override
+bool BaseRealSenseNode::isStreaming()
 {
-    if (_streaming) {
-        stopStreams();
-        _streaming = false;
-    } else {
-        startStreaming(handler);
-        _streaming = true;
-    }
+    return _streaming;
+}
+
+void BaseRealSenseNode::startStreams(std::function<void (const rs2::notification &n)> &handler)
+{
+    setupStreams(handler);
+    _streaming = true;
 }
 
 void BaseD400Node::registerDynamicReconfigCb()

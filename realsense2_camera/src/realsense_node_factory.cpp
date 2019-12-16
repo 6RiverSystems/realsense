@@ -12,6 +12,7 @@
 #include <thread>
 #include <sys/time.h>
 #include <regex>
+#include <algorithm>
 
 using namespace realsense2_camera;
 
@@ -112,6 +113,7 @@ void RealSenseNodeFactory::getDevice(rs2::device_list list)
 					found_device_type = std::regex_search(name, base_match, device_type_regex);
 				}
 
+				std::replace(begin(port_id), end(port_id), '.', '-');
 				if ((_serial_no.empty() || sn == _serial_no) && (_usb_port_id.empty() || port_id == _usb_port_id) && found_device_type)
 				{
 					_device = dev;

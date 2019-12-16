@@ -20,6 +20,40 @@
 #include <eigen3/Eigen/Geometry>
 #include <fstream>
 #include <thread>
+#include <mutex>
+
+
+#ifndef SRS_RETURN_ON_SHUTDOWN_H
+#define SRS_RETURN_ON_SHUTDOWN_H
+
+#define RETURN_ON_SHUTDOWN()                                         \
+{                                                                    \
+    if(ros::isShuttingDown())                                        \
+    {                                                                \
+        ROS_ERROR_STREAM("ROS is shutting down returning early");    \
+        return;                                                      \
+    }                                                                \
+}
+
+#define REQUEST_SHUTDOWN()                                           \
+{                                                                    \
+    RETURN_ON_SHUTDOWN();                                            \
+    ROS_ERROR_STREAM("Requesting USB bus reset");                    \
+    std_msgs::String msg;                                            \
+    msg.data = _sensor_name + _usb_port_id;                          \
+    _reset_request_publisher.publish(msg);                           \
+    /*srslib_framework::Event data; */                                   \
+    /*data.entity = _sensor_entity; */                                   \
+    /*data.value = _sensor_value;   */                                   \
+    /*data.attribute = _sensor_name + _usb_port_id + ".USB_BUS_RESET_REQUEST_SENT"; */\
+    sleep(1);                                                        \
+    ros::requestShutdown();                                          \
+    sleep(1);                                                        \
+    ros::shutdown();                                                 \
+    sleep(3);                                                        \
+    return;                                                          \
+}
+#endif
 
 namespace realsense2_camera
 {
@@ -42,6 +76,18 @@ namespace realsense2_camera
 
     const std::vector<stream_index_pair> HID_STREAMS = {GYRO, ACCEL, POSE};
 
+
+    inline void signalHandler(int signum)
+    {
+        ROS_INFO_STREAM(strsignal(signum) << " Signal is received! Terminating RealSense Node...");
+        ros::requestShutdown();
+        ros::shutdown();
+        sleep(5);
+        // exit(signum) is not thread safe and should not be invoked in a multithreaded environment unless all the threads had been joined.
+        // see: http://www.cplusplus.com/reference/cstdlib/exit/
+        //exit(signum);
+    }
+
     class InterfaceRealSenseNode
     {
     public:
@@ -55,6 +101,7 @@ namespace realsense2_camera
     public:
         RealSenseNodeFactory();
         virtual ~RealSenseNodeFactory();
+        std::recursive_mutex _device_lock;
 
     private:
         void closeDevice();
@@ -63,6 +110,7 @@ namespace realsense2_camera
         void getDevice(rs2::device_list list);
         virtual void onInit() override;
         void tryGetLogSeverity(rs2_log_severity& severity) const;
+        void resetAndShutdown();
 
         rs2::device _device;
         std::unique_ptr<InterfaceRealSenseNode> _realSenseNode;
@@ -72,6 +120,11 @@ namespace realsense2_camera
         std::string _device_type;
         bool _initial_reset;
         std::thread _query_thread;
+
+        ros::Publisher _reset_request_publisher;
+        std::string const _sensor_name {"RGBD_SENSOR_USB_"};
+        std::string const _sensor_entity {"USB_BUS"};
+        double const _sensor_value {1.0};
 
     };
 }//end namespace

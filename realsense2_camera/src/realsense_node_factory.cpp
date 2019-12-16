@@ -13,6 +13,8 @@
 #include <sys/time.h>
 #include <regex>
 #include <algorithm>
+#include <std_msgs/String.h>
+
 
 using namespace realsense2_camera;
 
@@ -26,7 +28,9 @@ RealSenseNodeFactory::RealSenseNodeFactory()
 	ROS_INFO("RealSense ROS v%s", REALSENSE_ROS_VERSION_STR);
 	ROS_INFO("Running with LibRealSense v%s", RS2_API_VERSION_STR);
 
-	auto severity = rs2_log_severity::RS2_LOG_SEVERITY_WARN;
+    signal(SIGINT, signalHandler);
+
+    auto severity = rs2_log_severity::RS2_LOG_SEVERITY_WARN;
 	tryGetLogSeverity(severity);
 	if (rs2_log_severity::RS2_LOG_SEVERITY_DEBUG == severity)
 		ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
@@ -218,7 +222,9 @@ void RealSenseNodeFactory::onInit()
 
 		std::string rosbag_filename("");
 		privateNh.param("rosbag_filename", rosbag_filename, std::string(""));
-		if (!rosbag_filename.empty())
+        _reset_request_publisher = nh.advertise<std_msgs::String>("reset_request", 10);
+
+        if (!rosbag_filename.empty())
 		{
 			{
 				ROS_INFO_STREAM("publish topics from rosbag file: " << rosbag_filename.c_str());
@@ -263,13 +269,13 @@ void RealSenseNodeFactory::onInit()
 	}
 	catch(const std::exception& ex)
 	{
-		ROS_ERROR_STREAM("An exception has been thrown: " << ex.what());
-		exit(1);
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " An exception has been thrown: " << ex.what());
+        resetAndShutdown();
 	}
 	catch(...)
 	{
-		ROS_ERROR_STREAM("Unknown exception has occured!");
-		exit(1);
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Unknown exception has occurred!");
+        resetAndShutdown();
 	}
 }
 
@@ -333,3 +339,42 @@ void RealSenseNodeFactory::tryGetLogSeverity(rs2_log_severity& severity) const
 		}
 	}
 }
+
+void RealSenseNodeFactory::resetAndShutdown()
+{
+    std::lock_guard<std::recursive_mutex> lock(_device_lock);
+    if (_realSenseNode)
+    {
+        try
+        {
+            //_realSenseNode->stopStreams();
+        } catch (...)
+        {
+            ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: unknown exception thrown when stopping streams: " << _usb_port_id);
+        }
+    }
+    sleep(1);
+    if (_device)
+    {
+        try
+        {
+            _device.hardware_reset();
+        } catch (...)
+        {
+            ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: unknown exception thrown when doing hardware_reset: " << _usb_port_id);
+        }
+        try
+        {
+            _device = rs2::device();
+        }
+        catch (...)
+        {
+            ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device " << _usb_port_id << " unknown exception has occurred while creating a new device. Ignoring...");
+        }
+    }
+    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down in 5s");
+    sleep(5);
+    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down ROS and exiting.");
+    REQUEST_SHUTDOWN();
+}
+

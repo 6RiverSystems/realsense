@@ -756,12 +756,12 @@ void BaseRealSenseNode::setupDevice()
     }
     catch(const std::exception& ex)
     {
-        ROS_ERROR_STREAM("An exception has been thrown: " << ex.what());
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: An exception has been thrown: " << ex.what());
         throw;
     }
     catch(...)
     {
-        ROS_ERROR_STREAM("Unknown exception has occured!");
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: Unknown exception has occured!");
         throw;
     }
 }
@@ -1601,7 +1601,7 @@ void BaseRealSenseNode::frame_callback(rs2::frame frame)
     }
     catch(const std::exception& ex)
     {
-        ROS_ERROR_STREAM("An error has occurred during frame callback: " << ex.what());
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: An error has occurred during frame callback: " << ex.what());
     }
     _synced_imu_publisher->Resume();
 }; // frame_callback
@@ -1677,12 +1677,12 @@ void BaseRealSenseNode::setupStreams()
     }
     catch(const std::exception& ex)
     {
-        ROS_ERROR_STREAM("An exception has been thrown: " << ex.what());
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: An exception has been thrown: " << ex.what());
         throw;
     }
     catch(...)
     {
-        ROS_ERROR_STREAM("Unknown exception has occured!");
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: Unknown exception has occured!");
         throw;
     }
 }

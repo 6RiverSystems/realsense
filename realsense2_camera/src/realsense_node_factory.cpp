@@ -314,7 +314,12 @@ void RealSenseNodeFactory::StartDevice()
 		exit(1);
 	}
 	assert(_realSenseNode);
-	_realSenseNode->publishTopics();
+	try
+    {
+        _realSenseNode->publishTopics();
+    } catch (...) {
+        resetAndShutdown();
+	}
 }
 
 void RealSenseNodeFactory::tryGetLogSeverity(rs2_log_severity& severity) const
@@ -348,6 +353,7 @@ void RealSenseNodeFactory::resetAndShutdown()
         try
         {
             //_realSenseNode->stopStreams();
+            // this might be handled by close device on destructor...
         } catch (...)
         {
             ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: unknown exception thrown when stopping streams: " << _usb_port_id);

@@ -159,6 +159,44 @@ void BaseRealSenseNode::toggleSensors(bool enabled)
     }
 }
 
+void BaseRealSenseNode::stopStreams()
+{
+    ROS_INFO("shutting down streams");
+    for (auto&& sens : _sensors)
+    {
+        if (_enable[sens.first])
+        {
+            try
+            {
+                if (sens.second.is_streaming())
+                {
+                    sens.second.stop();
+                }
+                sens.second.close();
+            }
+            catch (const std::exception& ex)
+            {
+                ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: An exception has been thrown while shutting down streams: " << ex.what());
+            }
+            catch (...)
+            {
+                ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: Unknown exception has occurred while shutting down streams. ignoring...");
+            }
+        }
+    }
+    try
+    {
+        _syncer = PipelineSyncer{}; // this should shut down the existing syncer
+    }
+    catch (...)
+    {
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: Unknown exception has occurred while shutting down syncer. ignoring...");
+    }
+    // comment out due to new type of _syncer
+    //_syncer = rs2::asynchronous_syncer{};
+}
+
+
 void BaseRealSenseNode::setupErrorCallback()
 {
     for (auto&& s : _dev.query_sensors())
@@ -182,16 +220,16 @@ void BaseRealSenseNode::setupErrorCallback()
     }
 }
 
-void BaseRealSenseNode::publishTopics()
+void BaseRealSenseNode::publishTopics(const std::function<void (const rs2::notification &n)> &handler)
 {
     getParameters();
     setupDevice();
     setupFilters();
     registerDynamicReconfigCb(_node_handle);
-    setupErrorCallback();
+    //setupErrorCallback(); <- handled by our own handler
     enable_devices();
     setupPublishers();
-    setupStreams();
+    setupStreams(handler);
     SetBaseStream();
     registerAutoExposureROIOptions(_node_handle);
     publishStaticTransforms();
@@ -737,8 +775,10 @@ void BaseRealSenseNode::setupDevice()
             else
             {
                 ROS_ERROR_STREAM("Module Name \"" << module_name << "\" isn't supported by LibRealSense! Terminating RealSense Node...");
+                ros::requestShutdown();
                 ros::shutdown();
-                exit(1);
+                sleep(5);
+                return;
             }
             ROS_INFO_STREAM(std::string(elem.get_info(RS2_CAMERA_INFO_NAME)) << " was found.");
         }
@@ -1432,6 +1472,13 @@ void BaseRealSenseNode::pose_callback(rs2::frame frame)
 
 void BaseRealSenseNode::frame_callback(rs2::frame frame)
 {
+    if (ros::isShuttingDown())
+    {
+        ROS_ERROR_STREAM("ROS is shutting down returning early");
+        stopStreams();
+        return;
+    }
+
     _synced_imu_publisher->Pause();
     
     try{
@@ -1632,7 +1679,7 @@ void BaseRealSenseNode::setBaseTime(double frame_time, bool warn_no_metadata)
     _camera_time_base = frame_time;
 }
 
-void BaseRealSenseNode::setupStreams()
+void BaseRealSenseNode::setupStreams(const std::function<void (const rs2::notification &n)> &handler)
 {
 	ROS_INFO("setupStreams...");
     try{
@@ -1668,6 +1715,10 @@ void BaseRealSenseNode::setupStreams()
             std::string module_name = sensor_profile.first;
             rs2::sensor sensor = active_sensors[module_name];
             sensor.open(sensor_profile.second);
+            if (handler)
+            {
+                sensor.set_notifications_callback(handler);
+            }
             sensor.start(_sensors_callback[module_name]);
             if (sensor.is<rs2::depth_sensor>())
             {

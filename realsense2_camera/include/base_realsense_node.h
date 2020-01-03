@@ -120,7 +120,8 @@ namespace realsense2_camera
                           const std::string& serial_no);
 
         void toggleSensors(bool enabled);
-        virtual void publishTopics() override;
+        void stopStreams();
+        virtual void publishTopics(const std::function<void (const rs2::notification &n)> &handler = nullptr) override;
         virtual void registerDynamicReconfigCb(ros::NodeHandle& nh) override;
         virtual ~BaseRealSenseNode();
 
@@ -193,7 +194,7 @@ namespace realsense2_camera
         void setupPublishers();
         void enable_devices();
         void setupFilters();
-        void setupStreams();
+        void setupStreams(const std::function<void (const rs2::notification &n)> &handler = nullptr);
         void setBaseTime(double frame_time, bool warn_no_metadata);
         cv::Mat& fix_depth_scale(const cv::Mat& from_image, cv::Mat& to_image);
         void clip_depth(rs2::depth_frame depth_frame, float clipping_dist);

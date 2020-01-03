@@ -91,7 +91,7 @@ namespace realsense2_camera
     class InterfaceRealSenseNode
     {
     public:
-        virtual void publishTopics() = 0;
+        virtual void publishTopics(const std::function<void (const rs2::notification &n)> &handler = nullptr) = 0;
         virtual void registerDynamicReconfigCb(ros::NodeHandle& nh) = 0;
         virtual ~InterfaceRealSenseNode() = default;
     };

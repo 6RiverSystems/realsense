@@ -41,9 +41,9 @@ void T265RealsenseNode::initializeOdometryInput()
     _use_odom_in = true;
 }
 
-void T265RealsenseNode::publishTopics()
+void T265RealsenseNode::publishTopics(const std::function<void (const rs2::notification &n)> &handler)
 {
-    BaseRealSenseNode::publishTopics();
+    BaseRealSenseNode::publishTopics(handler);
     setupSubscribers();
 }
 

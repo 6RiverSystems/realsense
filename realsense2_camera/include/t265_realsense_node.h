@@ -11,7 +11,7 @@ namespace realsense2_camera
                           ros::NodeHandle& privateNodeHandle,
                           rs2::device dev,
                           const std::string& serial_no);
-            void publishTopics();
+            void publishTopics(const std::function<void (const rs2::notification &n)> &handler = nullptr) override;
 
         protected:
             void calcAndPublishStaticTransform(const stream_index_pair& stream, const rs2::stream_profile& base_profile) override;

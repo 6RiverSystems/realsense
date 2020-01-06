@@ -21,39 +21,8 @@
 #include <fstream>
 #include <thread>
 #include <mutex>
-
-
-#ifndef SRS_RETURN_ON_SHUTDOWN_H
-#define SRS_RETURN_ON_SHUTDOWN_H
-
-#define RETURN_ON_SHUTDOWN()                                         \
-{                                                                    \
-    if(ros::isShuttingDown())                                        \
-    {                                                                \
-        ROS_ERROR_STREAM("ROS is shutting down returning early");    \
-        return;                                                      \
-    }                                                                \
-}
-
-#define REQUEST_SHUTDOWN()                                           \
-{                                                                    \
-    RETURN_ON_SHUTDOWN();                                            \
-    ROS_ERROR_STREAM("Requesting USB bus reset");                    \
-    std_msgs::String msg;                                            \
-    msg.data = _sensor_name + _usb_port_id;                          \
-    _reset_request_publisher.publish(msg);                           \
-    /*srslib_framework::Event data; */                                   \
-    /*data.entity = _sensor_entity; */                                   \
-    /*data.value = _sensor_value;   */                                   \
-    /*data.attribute = _sensor_name + _usb_port_id + ".USB_BUS_RESET_REQUEST_SENT"; */\
-    sleep(1);                                                        \
-    ros::requestShutdown();                                          \
-    sleep(1);                                                        \
-    ros::shutdown();                                                 \
-    sleep(3);                                                        \
-    return;                                                          \
-}
-#endif
+#include "ReturnOnShutdown.h"
+#include "srslib_framework/ros/channel/ChannelEvent.hpp"
 
 namespace realsense2_camera
 {
@@ -92,6 +61,7 @@ namespace realsense2_camera
     {
     public:
         virtual void publishTopics(const std::function<void (const rs2::notification &n)> &handler = nullptr) = 0;
+        virtual void stopStreams() = 0;
         virtual void registerDynamicReconfigCb(ros::NodeHandle& nh) = 0;
         virtual ~InterfaceRealSenseNode() = default;
     };
@@ -102,6 +72,9 @@ namespace realsense2_camera
         RealSenseNodeFactory();
         virtual ~RealSenseNodeFactory();
         std::recursive_mutex _device_lock;
+        void notification_handler(const rs2::notification &n, size_t iteration);
+        void connectCb();
+        void setUpChuck();
 
     private:
         void closeDevice();
@@ -109,19 +82,32 @@ namespace realsense2_camera
         void change_device_callback(rs2::event_information& info);
         void getDevice(rs2::device_list list);
         virtual void onInit() override;
+        void oldOnInit();
         void tryGetLogSeverity(rs2_log_severity& severity) const;
         void resetAndShutdown();
+
+        void addDevice(rs2::device dev);
+        std::string parseUsbPortId(std::string usb_path) const;
+        bool deviceMatches(rs2::device& dev, std::string& usb_port);
 
         rs2::device _device;
         std::unique_ptr<InterfaceRealSenseNode> _realSenseNode;
         rs2::context _ctx;
         std::string _serial_no;
         std::string _usb_port_id;
+        size_t _device_iteration = 0;
+
         std::string _device_type;
         bool _initial_reset;
         std::thread _query_thread;
 
+        std::function<void(const rs2::notification &n)> _handler;
+
         ros::Publisher _reset_request_publisher;
+        srs::ChannelEvent _reset_request_analytics_publisher;
+        ros::Timer _setupOneShotTimer;
+        std::mutex _configurationMutex;
+        bool _initialized;
         std::string const _sensor_name {"RGBD_SENSOR_USB_"};
         std::string const _sensor_entity {"USB_BUS"};
         double const _sensor_value {1.0};

@@ -120,7 +120,7 @@ namespace realsense2_camera
                           const std::string& serial_no);
 
         void toggleSensors(bool enabled);
-        void stopStreams();
+        void stopStreams() override;
         virtual void publishTopics(const std::function<void (const rs2::notification &n)> &handler = nullptr) override;
         virtual void registerDynamicReconfigCb(ros::NodeHandle& nh) override;
         virtual ~BaseRealSenseNode();

@@ -128,6 +128,7 @@ BaseRealSenseNode::BaseRealSenseNode(ros::NodeHandle& nodeHandle,
 
 BaseRealSenseNode::~BaseRealSenseNode()
 {
+    _node_shutting_down = true;
     // Kill dynamic transform thread
     if (_publish_tf && _tf_publish_rate > 0)
         _tf_t->join();
@@ -1966,7 +1967,7 @@ void BaseRealSenseNode::publishDynamicTransforms()
 
     ros::Rate loop_rate(_tf_publish_rate);
 
-    while (ros::ok())
+    while (ros::ok() && !_node_shutting_down)
     {
         // Update the time stamp for publication
         ros::Time t = ros::Time::now();

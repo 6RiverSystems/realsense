@@ -313,6 +313,7 @@ namespace realsense2_camera
         typedef std::pair<rs2_option, std::shared_ptr<TemperatureDiagnostics>> OptionTemperatureDiag;
         std::vector< OptionTemperatureDiag > _temperature_nodes;
         std::shared_ptr<std::thread> _monitoring_t;
+        mutable std::atomic<bool> _node_shutting_down = {false};
         mutable std::condition_variable _cv;
 
         stream_index_pair _base_stream;

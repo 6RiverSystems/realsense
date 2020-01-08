@@ -394,7 +394,7 @@ void RealSenseNodeFactory::resetAndShutdown()
 	{
 		try
 		{
-			//_realSenseNode->stopStreams();
+			_realSenseNode->stopStreams();
 			// this might be handled by close device on destructor...
 		}
 		catch (...)
@@ -786,5 +786,4 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
 				notification_handler(n, local_copy_of_iteration);
 			};
 	_realSenseNode->publishTopics(_handler);
-	_realSenseNode->registerDynamicReconfigCb(getNodeHandle());
 }

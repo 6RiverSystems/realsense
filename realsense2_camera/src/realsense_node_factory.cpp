@@ -347,416 +347,418 @@ void RealSenseNodeFactory::tryGetLogSeverity(rs2_log_severity &severity) const
 
 void RealSenseNodeFactory::onInit()
 {
-	auto privateNh = getPrivateNodeHandle();
-	auto nodeHandle = getNodeHandle();
-	bool wait_for_usb_resetter = true;
-	std::string analytics_topic;
-	privateNh.param("usb_port_id", _usb_port_id, std::string(""));
-	privateNh.param("wait_for_usb_resetter", wait_for_usb_resetter, true);
-	if (wait_for_usb_resetter)
-	{
-		ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " wait_for_usb_resetter enabled!");
-		ros::SubscriberStatusCallback connect_cb = boost::bind(&RealSenseNodeFactory::connectCb, this);
-		ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Advertising reset request publisher!");
-		_reset_request_publisher = nodeHandle.advertise<std_msgs::String>("reset_request", 10, connect_cb);
-		ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Reset request publisher advertised!");
+    auto privateNh = getPrivateNodeHandle();
+    auto nodeHandle = getNodeHandle();
+    bool wait_for_usb_resetter = true;
+    std::string analytics_topic;
+    privateNh.param("usb_port_id", _usb_port_id, std::string(""));
+    privateNh.param("wait_for_usb_resetter", wait_for_usb_resetter, true);
+    if (wait_for_usb_resetter)
+    {
+        ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " wait_for_usb_resetter enabled!");
+        ros::SubscriberStatusCallback connect_cb = boost::bind(&RealSenseNodeFactory::connectCb, this);
+        ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Advertising reset request publisher!");
+        _reset_request_publisher = nodeHandle.advertise<std_msgs::String>("reset_request", 10, connect_cb);
+        ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Reset request publisher advertised!");
 
-		_setupOneShotTimer = nodeHandle.createTimer(ros::Duration(30), boost::bind(&RealSenseNodeFactory::connectCb, this), true);
-	}
-	else
-	{
-		ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " wait_for_usb_resetter disabled!");
-		ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Advertising reset request publisher!");
-		_reset_request_publisher = nodeHandle.advertise<std_msgs::String>("reset_request", 10);
-		ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Reset request publisher advertised!");
+        _setupOneShotTimer = nodeHandle.createTimer(ros::Duration(30), boost::bind(&RealSenseNodeFactory::connectCb, this), true);
+    }
+    else
+    {
+        ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " wait_for_usb_resetter disabled!");
+        ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Advertising reset request publisher!");
+        _reset_request_publisher = nodeHandle.advertise<std_msgs::String>("reset_request", 10);
+        ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Reset request publisher advertised!");
 
-		_setupOneShotTimer = nodeHandle.createTimer(ros::Duration(1), boost::bind(&RealSenseNodeFactory::connectCb, this), true);
-	}
+        _setupOneShotTimer = nodeHandle.createTimer(ros::Duration(1), boost::bind(&RealSenseNodeFactory::connectCb, this), true);
+    }
 }
 
 void RealSenseNodeFactory::resetAndShutdown()
 {
-	std::lock_guard<std::recursive_mutex> lock(_device_lock);
-	if (_realSenseNode)
-	{
-		try
-		{
-			_realSenseNode->stopStreams();
-			// this might be handled by close device on destructor...
-		}
-		catch (...)
-		{
-			ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: unknown exception thrown when stopping streams: " << _usb_port_id);
-		}
-	}
-	sleep(1);
-	if (_device)
-	{
-		try
-		{
-			_device.hardware_reset();
-		}
-		catch (...)
-		{
-			ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: unknown exception thrown when doing hardware_reset: " << _usb_port_id);
-		}
-		try
-		{
-			_device = rs2::device();
-		}
-		catch (...)
-		{
-			ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device " << _usb_port_id << " unknown exception has occurred while creating a new device. Ignoring...");
-		}
-	}
-	ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down in 5s");
-	sleep(5);
-	ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down ROS and exiting.");
-	REQUEST_SHUTDOWN();
+    std::lock_guard<std::recursive_mutex> lock(_device_lock);
+    if (_realSenseNode)
+    {
+        try
+        {
+            _realSenseNode->stopStreams();
+            // this might be handled by close device on destructor...
+        }
+        catch (...)
+        {
+            ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: unknown exception thrown when stopping streams: " << _usb_port_id);
+        }
+    }
+    sleep(1);
+    if (_device)
+    {
+        try
+        {
+            _device.hardware_reset();
+        }
+        catch (...)
+        {
+            ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: unknown exception thrown when doing hardware_reset: " << _usb_port_id);
+        }
+        try
+        {
+            _device = rs2::device();
+        }
+        catch (...)
+        {
+            ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device " << _usb_port_id << " unknown exception has occurred while creating a new device. Ignoring...");
+        }
+    }
+    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down in 5s");
+    sleep(5);
+    ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << " realsense_camera: device: " << _usb_port_id << " shutting down ROS and exiting.");
+    REQUEST_SHUTDOWN();
 }
 
 void RealSenseNodeFactory::notification_handler(const rs2::notification &n, size_t iteration)
 {
-	std::lock_guard<std::recursive_mutex> scopedLock(_device_lock);
-	if (ros::isShuttingDown())
-	{
-		ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " ROS is shutting down returning early");
-		_realSenseNode->stopStreams();
-		return;
-	}
-	if (iteration != this->_device_iteration)
-	{
-		ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " iterations don't match... ignoring duplicate notification");
-		return;
-	}
-	if (n.get_category() != RS2_NOTIFICATION_CATEGORY_FRAMES_TIMEOUT && n.get_category() != RS2_NOTIFICATION_CATEGORY_UNKNOWN_ERROR)
-	{
-		ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " received a notification that does not require reset. The category was: " << rs2_notification_category_to_string(n.get_category()));
-		return;
-	}
-	this->_device_iteration++;
-	ROS_ERROR_STREAM("realsense_camera: Device " << _usb_port_id << " received a notification that requires reset. The category was: " << rs2_notification_category_to_string(n.get_category()));
-	ROS_INFO_STREAM("realsense_camera: Device " << _usb_port_id << " executing reset for device");
-	ROS_INFO_STREAM("realsense_camera: Device " << _usb_port_id << " stoping topics");
-	try
-	{
-		_realSenseNode->stopStreams();
-	}
-	catch (...)
-	{
-		ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while shutting down streams. ignoring...");
-	}
+    std::lock_guard<std::recursive_mutex> scopedLock(_device_lock);
+    if (ros::isShuttingDown())
+    {
+        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " ROS is shutting down returning early");
+        _realSenseNode->stopStreams();
+        return;
+    }
+    if (iteration != this->_device_iteration)
+    {
+        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " iterations don't match... ignoring duplicate notification");
+        return;
+    }
+    if (n.get_category() != RS2_NOTIFICATION_CATEGORY_FRAMES_TIMEOUT && n.get_category() != RS2_NOTIFICATION_CATEGORY_UNKNOWN_ERROR)
+    {
+        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " received a notification that does not require reset. The category was: " << rs2_notification_category_to_string(n.get_category()));
+        return;
+    }
+    this->_device_iteration++;
+    ROS_ERROR_STREAM("realsense_camera: Device " << _usb_port_id << " received a notification that requires reset. The category was: " << rs2_notification_category_to_string(n.get_category()));
+    ROS_INFO_STREAM("realsense_camera: Device " << _usb_port_id << " executing reset for device");
+    ROS_INFO_STREAM("realsense_camera: Device " << _usb_port_id << " stoping topics");
+    try
+    {
+        _realSenseNode->stopStreams();
+    }
+    catch (...)
+    {
+        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while shutting down streams. ignoring...");
+    }
 
-	ROS_INFO_STREAM("realsense_camera: Device " << _usb_port_id << " creating new processing thread");
+    ROS_INFO_STREAM("realsense_camera: Device " << _usb_port_id << " creating new processing thread");
 
-	std::thread([this, n]() {
-		try
-		{
-			RETURN_ON_SHUTDOWN();
+    std::thread([this, n]() {
+        try
+        {
+            RETURN_ON_SHUTDOWN();
 
-			ROS_INFO_STREAM("realsense_camera: new procesing thread started executing");
-			ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " deallocating realsensenode");
-			try
-			{
-				_realSenseNode.reset();
-			}
-			catch (...)
-			{
-				ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while resetting Realsense node. Ignoring...");
-			}
-			ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " sleeping for 1 second");
-			boost::this_thread::sleep(boost::posix_time::seconds(1));
-			ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " creating a new device");
-			try
-			{
-				_device = rs2::device();
-			}
-			catch (...)
-			{
-				ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id	<< " unknown exception has occurred while creating a new device. Ignoring...");
-			}
-			try
-			{
-				_ctx = rs2::context{};
-			}
-			catch (...)
-			{
-				ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while creating a new context. Ignoring...");
-			}
-			ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " sleeping for 1 second");
-			boost::this_thread::sleep(boost::posix_time::seconds(1));
-			bool found = false;
-			while (!found)
-			{
-				RETURN_ON_SHUTDOWN();
-				for (auto &&dev : _ctx.query_devices())
-				{
-					if (deviceMatches(dev, _usb_port_id))
-					{
-						ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " resetting");
-						try
-						{
-							dev.hardware_reset();
-						}
-						catch (...)
-						{
-							ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id	<< " unknown exception has occurred while resetting hardware. Ignoring...");
-						}
+            ROS_INFO_STREAM("realsense_camera: new procesing thread started executing");
+            ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " deallocating realsensenode");
+            try
+            {
+                _realSenseNode.reset();
+            }
+            catch (...)
+            {
+                ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while resetting Realsense node. Ignoring...");
+            }
+            ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " sleeping for 1 second");
+            boost::this_thread::sleep(boost::posix_time::seconds(1));
+            ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " creating a new device");
+            try
+            {
+                _device = rs2::device();
+            }
+            catch (...)
+            {
+                ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while creating a new device. Ignoring...");
+            }
+            try
+            {
+                _ctx = rs2::context{};
+            }
+            catch (...)
+            {
+                ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while creating a new context. Ignoring...");
+            }
+            ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " sleeping for 1 second");
+            boost::this_thread::sleep(boost::posix_time::seconds(1));
+            bool found = false;
+            while (!found)
+            {
+                RETURN_ON_SHUTDOWN();
+                for (auto &&dev : _ctx.query_devices())
+                {
+                    if (deviceMatches(dev, _usb_port_id))
+                    {
+                        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " resetting");
+                        try
+                        {
+                            dev.hardware_reset();
+                        }
+                        catch (...)
+                        {
+                            ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while resetting hardware. Ignoring...");
+                        }
 
-						ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " found... and was reset");
-						found = true;
-						break;
-					}
-				}
-				if (!found)
-				{
-					ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id	<< " not found... and not reset... sleeping for 2 seconds");
-					boost::this_thread::sleep(boost::posix_time::seconds(2));
-					std_msgs::String msg;
-					msg.data = _sensor_name + _usb_port_id;
-					_reset_request_publisher.publish(msg);
-					// need to add analytics messages here
-					srslib_framework::Event data;
-					data.entity = _sensor_entity;
-					data.value = _sensor_value;
-					data.attribute = _sensor_name + _usb_port_id + ".USB_BUS_RESET_REQUEST_SENT";
-					_reset_request_analytics_publisher.publish(data);
-				}
-			}
+                        ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " found... and was reset");
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " not found... and not reset... sleeping for 2 seconds");
+                    boost::this_thread::sleep(boost::posix_time::seconds(2));
+                    std_msgs::String msg;
+                    msg.data = _sensor_name + _usb_port_id;
+                    _reset_request_publisher.publish(msg);
+                    // need to add analytics messages here
+                    srslib_framework::Event data;
+                    data.entity = _sensor_entity;
+                    data.value = _sensor_value;
+                    data.attribute = _sensor_name + _usb_port_id + ".USB_BUS_RESET_REQUEST_SENT";
+                    _reset_request_analytics_publisher.publish(data);
+                }
+            }
 
-			RETURN_ON_SHUTDOWN();
-			ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " sleeping for 10 seconds");
-			boost::this_thread::sleep(boost::posix_time::seconds(10));
+            RETURN_ON_SHUTDOWN();
+            ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " sleeping for 10 seconds");
+            boost::this_thread::sleep(boost::posix_time::seconds(10));
 
-			found = false;
-			while (!found)
-			{
-				RETURN_ON_SHUTDOWN();
+            found = false;
+            while (!found)
+            {
+                RETURN_ON_SHUTDOWN();
 
-				for (auto &&dev : _ctx.query_devices())
-				{
-					if (deviceMatches(dev, _usb_port_id))
-					{
-						try
-						{
-							addDevice(dev);
-						}
-						catch (...)
-						{
-							ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while calling addDevice on new device. Exiting...");
-							REQUEST_SHUTDOWN();
-						}
-						ROS_INFO_STREAM(
-								"realsense_camera: device " << _usb_port_id << " found... and was added");
-						found = true;
-						break;
-					}
-				}
-				if (!found)
-				{
-					ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id	<< " not found... sleeping for 2 seconds");
-					boost::this_thread::sleep(boost::posix_time::seconds(2));
-					std_msgs::String msg;
-					msg.data = _sensor_name + _usb_port_id;
-					_reset_request_publisher.publish(msg);
-					// need to add analytics messages here
-					srslib_framework::Event data;
-					data.entity = _sensor_entity;
-					data.value = _sensor_value;
-					data.attribute = _sensor_name + _usb_port_id + ".USB_BUS_RESET_REQUEST_SENT";
-					_reset_request_analytics_publisher.publish(data);
-				}
-			}
-		}
-		catch (...)
-		{
-			ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " an unexpected exception was detected while attempting to reset and add device. Requesting shut down of ros.");
-			REQUEST_SHUTDOWN();
-		}
-	}).detach();
+                for (auto &&dev : _ctx.query_devices())
+                {
+                    if (deviceMatches(dev, _usb_port_id))
+                    {
+                        try
+                        {
+                            addDevice(dev);
+                        }
+                        catch (...)
+                        {
+                            ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " unknown exception has occurred while calling addDevice on new device. Exiting...");
+                            REQUEST_SHUTDOWN();
+                        }
+                        ROS_INFO_STREAM(
+                            "realsense_camera: device " << _usb_port_id << " found... and was added");
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " not found... sleeping for 2 seconds");
+                    boost::this_thread::sleep(boost::posix_time::seconds(2));
+                    std_msgs::String msg;
+                    msg.data = _sensor_name + _usb_port_id;
+                    _reset_request_publisher.publish(msg);
+                    // need to add analytics messages here
+                    srslib_framework::Event data;
+                    data.entity = _sensor_entity;
+                    data.value = _sensor_value;
+                    data.attribute = _sensor_name + _usb_port_id + ".USB_BUS_RESET_REQUEST_SENT";
+                    _reset_request_analytics_publisher.publish(data);
+                }
+            }
+        }
+        catch (...)
+        {
+            ROS_ERROR_STREAM("realsense_camera: device " << _usb_port_id << " an unexpected exception was detected while attempting to reset and add device. Requesting shut down of ros.");
+            REQUEST_SHUTDOWN();
+        }
+    })
+        .detach();
 
-	ROS_INFO_STREAM("realsense_camera: Device " << _usb_port_id << " exiting notification handler");
+    ROS_INFO_STREAM("realsense_camera: Device " << _usb_port_id << " exiting notification handler");
 }
 
 void RealSenseNodeFactory::connectCb()
 {
-	{
-		std::lock_guard<std::mutex> lock(_configurationMutex);
-		if (_initialized == true)
-		{
-			return;
-		}
-		_initialized = true;
-	}
-	try
-	{
-		setUpChuck();
-	}
-	catch (const std::exception &ex)
-	{
-		ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " An exception has been thrown: " << ex.what());
-		resetAndShutdown();
-	}
-	catch (...)
-	{
-		ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Unknown exception has occurred!");
-		resetAndShutdown();
-	}
+    {
+        std::lock_guard<std::mutex> lock(_configurationMutex);
+        if (_initialized == true)
+        {
+            return;
+        }
+        _initialized = true;
+    }
+    try
+    {
+        setUpChuck();
+    }
+    catch (const std::exception &ex)
+    {
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " An exception has been thrown: " << ex.what());
+        resetAndShutdown();
+    }
+    catch (...)
+    {
+        ROS_ERROR_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Unknown exception has occurred!");
+        resetAndShutdown();
+    }
 }
 
 void RealSenseNodeFactory::setUpChuck()
 {
-	auto privateNh = getPrivateNodeHandle();
-	auto nodeHandle = getNodeHandle();
+    auto privateNh = getPrivateNodeHandle();
+    auto nodeHandle = getNodeHandle();
 
-	privateNh.param("usb_port_id", _usb_port_id, std::string(""));
+    privateNh.param("usb_port_id", _usb_port_id, std::string(""));
 
-	{
-		std::lock_guard<std::recursive_mutex> scopedLock(_device_lock);
+    {
+        std::lock_guard<std::recursive_mutex> scopedLock(_device_lock);
 
-		// Initial population of the device list
-		bool found = false;
-		while (!found)
-		{
-			RETURN_ON_SHUTDOWN();
-			for (auto &&dev : _ctx.query_devices())
-			{
-				if (deviceMatches(dev, _usb_port_id))
-				{
-					addDevice(dev);
-					found = true;
-					ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " found... and was added");
-					break;
-				}
-			}
-			if (!found)
-			{
-				ROS_ERROR_STREAM("realsense_camera: no devices found for adding... " << _usb_port_id << " sleeping for 2 seconds and polling again");
-				boost::this_thread::sleep(boost::posix_time::seconds(2));
-				_ctx = rs2::context{};
-				std_msgs::String msg;
-				msg.data = _sensor_name + _usb_port_id;
-				_reset_request_publisher.publish(msg);
-				// need to add analytics messages here
-				srslib_framework::Event data;
-				data.entity = _sensor_entity;
-				data.value = _sensor_value;
-				data.attribute = _sensor_name + _usb_port_id + ".USB_BUS_RESET_REQUEST_SENT";
-				_reset_request_analytics_publisher.publish(data);
-			}
-		}
-	}
+        // Initial population of the device list
+        bool found = false;
+        while (!found)
+        {
+            RETURN_ON_SHUTDOWN();
+            for (auto &&dev : _ctx.query_devices())
+            {
+                if (deviceMatches(dev, _usb_port_id))
+                {
+                    addDevice(dev);
+                    found = true;
+                    ROS_INFO_STREAM("realsense_camera: device " << _usb_port_id << " found... and was added");
+                    break;
+                }
+            }
+            if (!found)
+            {
+                ROS_ERROR_STREAM("realsense_camera: no devices found for adding... " << _usb_port_id << " sleeping for 2 seconds and polling again");
+                boost::this_thread::sleep(boost::posix_time::seconds(2));
+                _ctx = rs2::context{};
+                std_msgs::String msg;
+                msg.data = _sensor_name + _usb_port_id;
+                _reset_request_publisher.publish(msg);
+                // need to add analytics messages here
+                srslib_framework::Event data;
+                data.entity = _sensor_entity;
+                data.value = _sensor_value;
+                data.attribute = _sensor_name + _usb_port_id + ".USB_BUS_RESET_REQUEST_SENT";
+                _reset_request_analytics_publisher.publish(data);
+            }
+        }
+    }
 }
 
 std::string RealSenseNodeFactory::parseUsbPortId(std::string usb_path) const
 {
-	// split the string
-	std::string delimiter = "/";
-	std::string temp;
-	std::vector<std::string> split;
-	size_t pos = 0;
+    // split the string
+    std::string delimiter = "/";
+    std::string temp;
+    std::vector<std::string> split;
+    size_t pos = 0;
 
-	// store split substring in a vector
-	while ((pos = usb_path.find(delimiter)) != std::string::npos)
-	{
-		temp = usb_path.substr(0, pos);
-		split.push_back(temp);
-		usb_path.erase(0, pos + delimiter.length());
-	}
+    // store split substring in a vector
+    while ((pos = usb_path.find(delimiter)) != std::string::npos)
+    {
+        temp = usb_path.substr(0, pos);
+        split.push_back(temp);
+        usb_path.erase(0, pos + delimiter.length());
+    }
 
-	if (split.size() < 3)
-	{
-		ROS_ERROR("The USB port path is incorrect, return a empty string");
-		return std::string();
-	}
+    if (split.size() < 3)
+    {
+        ROS_ERROR("The USB port path is incorrect, return a empty string");
+        return std::string();
+    }
 
-	// port id is the thrid element from last
-	size_t port_id_index = split.size() - 3;
+    // port id is the thrid element from last
+    size_t port_id_index = split.size() - 3;
 
-	// replace all '.' with '-' for consistency
-	std::replace(split[port_id_index].begin(), split[port_id_index].end(), '.', '-');
-	return split[port_id_index];
+    // replace all '.' with '-' for consistency
+    std::replace(split[port_id_index].begin(), split[port_id_index].end(), '.', '-');
+    return split[port_id_index];
 }
 
 bool RealSenseNodeFactory::deviceMatches(rs2::device &dev, std::string &usb_port)
 {
-	if (!dev)
-	{
-		return false;
-	}
-	std::string devicePhysicalPort = dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT);
+    if (!dev)
+    {
+        return false;
+    }
+    std::string devicePhysicalPort = dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT);
 
-	ROS_DEBUG("Port ID: %s", devicePhysicalPort.c_str());
+    ROS_DEBUG("Port ID: %s", devicePhysicalPort.c_str());
 
-	std::string device_usb_port = parseUsbPortId(devicePhysicalPort);
+    std::string device_usb_port = parseUsbPortId(devicePhysicalPort);
 
-	if (usb_port == device_usb_port)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+    if (usb_port == device_usb_port)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void RealSenseNodeFactory::addDevice(rs2::device dev)
 {
-	std::string serial_number(dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+    std::string serial_number(dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
 
-	std::lock_guard<std::recursive_mutex> lock(_device_lock);
+    std::lock_guard<std::recursive_mutex> lock(_device_lock);
 
-	// See if we already have the correct device attached
-	if (_device)
-	{
-		ROS_INFO("REALSENSE: Device already added %s", _device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
-		return;
-	}
+    // See if we already have the correct device attached
+    if (_device)
+    {
+        ROS_INFO("REALSENSE: Device already added %s", _device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
+        return;
+    }
 
-	_device = dev;
+    _device = dev;
 
-	auto privateNh = getPrivateNodeHandle();
-	auto nh = getNodeHandle();
+    auto privateNh = getPrivateNodeHandle();
+    auto nh = getNodeHandle();
 
-	auto pid_str = _device.get_info(RS2_CAMERA_INFO_PRODUCT_ID);
-	uint16_t pid;
-	std::stringstream ss;
-	ss << std::hex << pid_str;
-	ss >> pid;
+    auto pid_str = _device.get_info(RS2_CAMERA_INFO_PRODUCT_ID);
+    uint16_t pid;
+    std::stringstream ss;
+    ss << std::hex << pid_str;
+    ss >> pid;
 
-	switch (pid)
-	{
-	case SR300_PID:
-	case SR300v2_PID:
-	case RS400_PID:
-	case RS405_PID:
-	case RS410_PID:
-	case RS460_PID:
-	case RS415_PID:
-	case RS420_PID:
-	case RS420_MM_PID:
-	case RS430_PID:
-	case RS430_MM_PID:
-	case RS430_MM_RGB_PID:
-	case RS435_RGB_PID:
-	case RS435i_RGB_PID:
-	case RS_USB2_PID:
-		_realSenseNode = std::unique_ptr<BaseRealSenseNode>(new BaseRealSenseNode(nh, privateNh, _device, _serial_no));
-		break;
-	case RS_T265_PID:
-		_realSenseNode = std::unique_ptr<T265RealsenseNode>(new T265RealsenseNode(nh, privateNh, _device, _serial_no));
-	default:
-		ROS_FATAL_STREAM("Unsupported device!" << " Product ID: 0x" << pid_str);
-		REQUEST_SHUTDOWN();
-	}
+    switch (pid)
+    {
+    case SR300_PID:
+    case SR300v2_PID:
+    case RS400_PID:
+    case RS405_PID:
+    case RS410_PID:
+    case RS460_PID:
+    case RS415_PID:
+    case RS420_PID:
+    case RS420_MM_PID:
+    case RS430_PID:
+    case RS430_MM_PID:
+    case RS430_MM_RGB_PID:
+    case RS435_RGB_PID:
+    case RS435i_RGB_PID:
+    case RS_USB2_PID:
+        _realSenseNode = std::unique_ptr<BaseRealSenseNode>(new BaseRealSenseNode(nh, privateNh, _device, _serial_no));
+        break;
+    case RS_T265_PID:
+        _realSenseNode = std::unique_ptr<T265RealsenseNode>(new T265RealsenseNode(nh, privateNh, _device, _serial_no));
+    default:
+        ROS_FATAL_STREAM("Unsupported device!"
+                         << " Product ID: 0x" << pid_str);
+        REQUEST_SHUTDOWN();
+    }
 
-	ROS_INFO("REALSENSE: Adding device on port %s", _device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
+    ROS_INFO("REALSENSE: Adding device on port %s", _device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
 
-	assert(_realSenseNode);
-	size_t local_copy_of_iteration = _device_iteration;
-	_handler = [this, local_copy_of_iteration](const rs2::notification &n) {
-		ROS_ERROR_STREAM("realsense_camera: callback for device " << _usb_port_id << " received. Invoking notification handler for processing.");
-		notification_handler(n, local_copy_of_iteration);
-	};
-	_realSenseNode->publishTopics(_handler);
+    assert(_realSenseNode);
+    size_t local_copy_of_iteration = _device_iteration;
+    _handler = [this, local_copy_of_iteration](const rs2::notification &n) {
+        ROS_ERROR_STREAM("realsense_camera: callback for device " << _usb_port_id << " received. Invoking notification handler for processing.");
+        notification_handler(n, local_copy_of_iteration);
+    };
+    _realSenseNode->publishTopics(_handler);
 }

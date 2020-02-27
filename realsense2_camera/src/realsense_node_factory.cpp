@@ -265,12 +265,12 @@ void RealSenseNodeFactory::oldOnInit()
 	}
 	catch (const std::exception &ex)
 	{
-		ROS_ERROR_STREAM(" An exception has been thrown: " << ex.what());
+		ROS_ERROR_STREAM("An exception has been thrown: " << ex.what());
 		exit(1);
 	}
 	catch (...)
 	{
-		ROS_ERROR_STREAM(" Unknown exception has occurred!");
+		ROS_ERROR_STREAM("Unknown exception has occured!");
 		exit(1);
 	}
 }
@@ -305,8 +305,7 @@ void RealSenseNodeFactory::StartDevice()
 		_realSenseNode = std::unique_ptr<T265RealsenseNode>(new T265RealsenseNode(nh, privateNh, _device, _serial_no));
 		break;
 	default:
-		ROS_FATAL_STREAM("Unsupported device!"
-										 << " Product ID: 0x" << pid_str);
+		ROS_FATAL_STREAM("Unsupported device!" << " Product ID: 0x" << pid_str);
 		ros::shutdown();
 		exit(1);
 	}
@@ -318,6 +317,29 @@ void RealSenseNodeFactory::StartDevice()
 	catch (...)
 	{
 		resetAndShutdown();
+	}
+}
+
+void RealSenseNodeFactory::tryGetLogSeverity(rs2_log_severity &severity) const
+{
+	static const char *severity_var_name = "LRS_LOG_LEVEL";
+	auto content = getenv(severity_var_name);
+
+	if (content)
+	{
+		std::string content_str(content);
+		std::transform(content_str.begin(), content_str.end(), content_str.begin(), ::toupper);
+
+		for (uint32_t i = 0; i < RS2_LOG_SEVERITY_COUNT; i++)
+		{
+			auto current = std::string(rs2_log_severity_to_string((rs2_log_severity)i));
+			std::transform(current.begin(), current.end(), current.begin(), ::toupper);
+			if (content_str == current)
+			{
+				severity = (rs2_log_severity)i;
+				break;
+			}
+		}
 	}
 }
 
@@ -349,29 +371,6 @@ void RealSenseNodeFactory::onInit()
 		ROS_INFO_STREAM(__FILE__ << " " << __LINE__ << "realsense_camera: device " << _usb_port_id << " Reset request publisher advertised!");
 
 		_setupOneShotTimer = nodeHandle.createTimer(ros::Duration(1), boost::bind(&RealSenseNodeFactory::connectCb, this), true);
-	}
-}
-
-void RealSenseNodeFactory::tryGetLogSeverity(rs2_log_severity &severity) const
-{
-	static const char *severity_var_name = "LRS_LOG_LEVEL";
-	auto content = getenv(severity_var_name);
-
-	if (content)
-	{
-		std::string content_str(content);
-		std::transform(content_str.begin(), content_str.end(), content_str.begin(), ::toupper);
-
-		for (uint32_t i = 0; i < RS2_LOG_SEVERITY_COUNT; i++)
-		{
-			auto current = std::string(rs2_log_severity_to_string((rs2_log_severity)i));
-			std::transform(current.begin(), current.end(), current.begin(), ::toupper);
-			if (content_str == current)
-			{
-				severity = (rs2_log_severity)i;
-				break;
-			}
-		}
 	}
 }
 

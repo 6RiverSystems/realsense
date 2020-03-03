@@ -428,6 +428,7 @@ void BaseRealSenseNode::registerDynamicOption(ros::NodeHandle& nh, rs2::options 
     {
         rs2_option option = static_cast<rs2_option>(i);
         const std::string option_name(create_graph_resource_name(rs2_option_to_string(option)));
+        ROS_WARN_STREAM("option_name = " << option_name);
         if (!sensor.supports(option) || sensor.is_option_read_only(option))
         {
             continue;
@@ -532,7 +533,7 @@ void BaseRealSenseNode::registerDynamicReconfigCb(ros::NodeHandle& nh)
     for(rs2::sensor sensor : _dev_sensors)
     {
         std::string module_name = create_graph_resource_name(sensor.get_info(RS2_CAMERA_INFO_NAME));
-        ROS_DEBUG_STREAM("module_name:" << module_name);
+        ROS_WARN_STREAM("module_name:" << module_name);
         registerDynamicOption(nh, sensor, module_name);
     }
 
@@ -540,7 +541,7 @@ void BaseRealSenseNode::registerDynamicReconfigCb(ros::NodeHandle& nh)
     {
         std::string module_name = nfilter._name;
         auto sensor = *(nfilter._filter);
-        ROS_DEBUG_STREAM("module_name:" << module_name);
+        ROS_WARN_STREAM("module_name:" << module_name);
         registerDynamicOption(nh, sensor, module_name);
     }
     ROS_INFO("Done Setting Dynamic reconfig parameters.");

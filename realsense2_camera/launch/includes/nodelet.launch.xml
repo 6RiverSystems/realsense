@@ -100,12 +100,12 @@
   <arg name="initial_reset"            default="false"/>
   <arg name="unite_imu_method"         default="none"/> <!-- Options are: [none, copy, linear_interpolation] -->
   <arg name="allow_no_texture_points"  default="false"/>
-  <arg name="camera"		           default="camera"/>
-  <arg name="depth_laser_power"	       default="100"/>
+  <arg name="camera"		               default="camera"/>
+  <arg name="depth_laser_power"	       default="90"/>
   <arg name="enable_tf_dynamic"        default="true"/>
-  <arg name="depth_exposure"           default="100"/>
+  <arg name="depth_exposure"           default="2000"/>
   <arg name="enable_imu"               default="true"/>
-  <arg name="depth_preset"             default="1"/>
+  <arg name="depth_preset"             default="0"/>
 
   <node pkg="nodelet" type="nodelet" name="realsense2_camera" args="load realsense2_camera/RealSenseNodeFactory $(arg manager)" respawn="true">
     <param name="serial_no"                type="str"  value="$(arg serial_no)"/>
@@ -182,6 +182,10 @@
     <param name="initial_reset"            type="bool"   value="$(arg initial_reset)"/>
     <param name="unite_imu_method"         type="str"    value="$(arg unite_imu_method)"/>
     <param name="allow_no_texture_points"  type="bool"   value="$(arg allow_no_texture_points)"/>
+
+    <param name="stereo_module/exposure"      type="double"  value="$(arg depth_exposure)"/>
+    <param name="stereo_module/laser_power"   type="double"  value="$(arg depth_laser_power)"/>
+    <param name="stereo_module/visual_preset" type="int"     value="$(arg depth_preset)"/>
 
   </node>
 </launch>

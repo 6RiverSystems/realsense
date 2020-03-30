@@ -1,4 +1,7 @@
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-private-field"
 #include "../include/rs435_node.h"
+#pragma clang diagnostic pop
 
 using namespace realsense2_camera;
 

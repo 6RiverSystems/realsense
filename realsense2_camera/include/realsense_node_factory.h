@@ -89,6 +89,7 @@ namespace realsense2_camera
         void addDevice(rs2::device dev);
         std::string parseUsbPortId(std::string usb_path) const;
         bool deviceMatches(rs2::device& dev, std::string& usb_port);
+        static std::string parse_usb_port(std::string line);
 
         rs2::device _device;
         std::unique_ptr<InterfaceRealSenseNode> _realSenseNode;
@@ -100,6 +101,7 @@ namespace realsense2_camera
         std::string _device_type;
         bool _initial_reset;
         std::thread _query_thread;
+        bool _is_alive;
 
         std::function<void(const rs2::notification &n)> _handler;
 

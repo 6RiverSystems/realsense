@@ -22,7 +22,8 @@ constexpr auto realsense_ros_camera_version = REALSENSE_ROS_EMBEDDED_VERSION_STR
 
 PLUGINLIB_EXPORT_CLASS(realsense2_camera::RealSenseNodeFactory, nodelet::Nodelet)
 
-RealSenseNodeFactory::RealSenseNodeFactory()
+RealSenseNodeFactory::RealSenseNodeFactory():
+	_is_alive(true)
 {
 	ROS_INFO("RealSense ROS v%s", REALSENSE_ROS_VERSION_STR);
 	ROS_INFO("Running with LibRealSense v%s", RS2_API_VERSION_STR);
@@ -38,18 +39,34 @@ RealSenseNodeFactory::RealSenseNodeFactory()
 	_initialized = false;
 }
 
-void RealSenseNodeFactory::closeDevice()
+RealSenseNodeFactory::~RealSenseNodeFactory()
 {
 	for (rs2::sensor sensor : _device.query_sensors())
 	{
-		sensor.stop();
-		sensor.close();
+		_query_thread.join();
 	}
 }
 
-RealSenseNodeFactory::~RealSenseNodeFactory()
+std::string RealSenseNodeFactory::parse_usb_port(std::string line)
 {
-	closeDevice();
+    std::string port_id;
+    std::regex self_regex("(?:[^ ]+/usb[0-9]+[0-9./-]*/){0,1}([0-9.-]+)(:){0,1}[^ ]*", std::regex_constants::ECMAScript);
+    std::smatch base_match;
+    bool found = std::regex_match(line, base_match, self_regex);
+    if (found)
+    {
+        port_id = base_match[1].str();
+        if (base_match[2].str().size() == 0)    //This is libuvc string. Remove counter is exists.
+        {
+            std::regex end_regex = std::regex(".+(-[0-9]+$)", std::regex_constants::ECMAScript);
+            bool found_end = std::regex_match(port_id, base_match, end_regex);
+            if (found_end)
+            {
+                port_id = port_id.substr(0, port_id.size() - base_match[1].str().size());
+            }
+        }
+    }
+    return port_id;
 }
 
 void RealSenseNodeFactory::getDevice(rs2::device_list list)
@@ -66,12 +83,21 @@ void RealSenseNodeFactory::getDevice(rs2::device_list list)
 			ROS_INFO_STREAM(" ");
 			for (auto &&dev : list)
 			{
+				rs2::device dev;
+				try
+				{
+					dev = list[count];
+				}
+				catch(const std::exception& ex)
+				{
+					ROS_WARN_STREAM("Device " << count+1 << "/" << list.size() << " failed with exception: " << ex.what());
+					continue;
+				}
 				auto sn = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
 				ROS_INFO_STREAM("Device with serial number " << sn << " was found." << std::endl);
 				std::string pn = dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT);
 				std::string name = dev.get_info(RS2_CAMERA_INFO_NAME);
 				ROS_INFO_STREAM("Device with physical ID " << pn << " was found.");
-				std::string port_id;
 				std::vector<std::string> results;
 				ROS_INFO_STREAM("Device with name " << name << " was found.");
 				std::regex self_regex;
@@ -110,11 +136,16 @@ void RealSenseNodeFactory::getDevice(rs2::device_list list)
 						ROS_ERROR_STREAM("Please use serial number instead of usb port.");
 					}
 				}
+				else
+				{
+					ROS_INFO_STREAM("Device with port number " << port_id << " was found.");					
+				}
 				bool found_device_type(true);
 				if (!_device_type.empty())
 				{
+					std::smatch match_results;
 					std::regex device_type_regex(_device_type.c_str(), std::regex::icase);
-					found_device_type = std::regex_search(name, base_match, device_type_regex);
+					found_device_type = std::regex_search(name, match_results, device_type_regex);
 				}
 
 				if ((_serial_no.empty() || sn == _serial_no) && (_usb_port_id.empty() || port_id == _usb_port_id) && found_device_type)
@@ -232,7 +263,6 @@ void RealSenseNodeFactory::oldOnInit()
 				pipe->start(cfg); //File will be opened in read mode at this point
 				_device = pipe->get_active_profile().get_device();
 				_serial_no = _device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
-				_realSenseNode = std::unique_ptr<BaseRealSenseNode>(new BaseRealSenseNode(nh, privateNh, _device, _serial_no));
 			}
 			if (_device)
 			{
@@ -277,6 +307,7 @@ void RealSenseNodeFactory::oldOnInit()
 
 void RealSenseNodeFactory::StartDevice()
 {
+	if (_realSenseNode) _realSenseNode.reset();
 	ros::NodeHandle nh = getNodeHandle();
 	ros::NodeHandle privateNh = getPrivateNodeHandle();
 	// TODO
@@ -299,6 +330,7 @@ void RealSenseNodeFactory::StartDevice()
 	case RS435_RGB_PID:
 	case RS435i_RGB_PID:
 	case RS_USB2_PID:
+	case RS_L515_PID:
 		_realSenseNode = std::unique_ptr<BaseRealSenseNode>(new BaseRealSenseNode(nh, privateNh, _device, _serial_no));
 		break;
 	case RS_T265_PID:

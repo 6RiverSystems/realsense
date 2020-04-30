@@ -41,10 +41,7 @@ RealSenseNodeFactory::RealSenseNodeFactory():
 
 RealSenseNodeFactory::~RealSenseNodeFactory()
 {
-	for (rs2::sensor sensor : _device.query_sensors())
-	{
-		_query_thread.join();
-	}
+	closeDevice();
 }
 
 std::string RealSenseNodeFactory::parse_usb_port(std::string line)
@@ -793,4 +790,13 @@ void RealSenseNodeFactory::addDevice(rs2::device dev)
         notification_handler(n, local_copy_of_iteration);
     };
     _realSenseNode->publishTopics(_handler);
+}
+
+void RealSenseNodeFactory::closeDevice()
+{
+    for (rs2::sensor sensor : _device.query_sensors())
+    {
+        sensor.stop();
+        sensor.close();
+    }
 }

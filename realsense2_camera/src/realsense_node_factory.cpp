@@ -80,21 +80,12 @@ void RealSenseNodeFactory::getDevice(rs2::device_list list)
 			ROS_INFO_STREAM(" ");
 			for (auto &&dev : list)
 			{
-				rs2::device dev;
-				try
-				{
-					dev = list[count];
-				}
-				catch(const std::exception& ex)
-				{
-					ROS_WARN_STREAM("Device " << count+1 << "/" << list.size() << " failed with exception: " << ex.what());
-					continue;
-				}
 				auto sn = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
 				ROS_INFO_STREAM("Device with serial number " << sn << " was found." << std::endl);
 				std::string pn = dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT);
 				std::string name = dev.get_info(RS2_CAMERA_INFO_NAME);
 				ROS_INFO_STREAM("Device with physical ID " << pn << " was found.");
+                std::string port_id;
 				std::vector<std::string> results;
 				ROS_INFO_STREAM("Device with name " << name << " was found.");
 				std::regex self_regex;
@@ -132,10 +123,6 @@ void RealSenseNodeFactory::getDevice(rs2::device_list list)
 						ROS_ERROR_STREAM(msg.str());
 						ROS_ERROR_STREAM("Please use serial number instead of usb port.");
 					}
-				}
-				else
-				{
-					ROS_INFO_STREAM("Device with port number " << port_id << " was found.");					
 				}
 				bool found_device_type(true);
 				if (!_device_type.empty())

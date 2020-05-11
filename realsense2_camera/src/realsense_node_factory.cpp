@@ -626,8 +626,6 @@ void RealSenseNodeFactory::setUpChuck()
     auto privateNh = getPrivateNodeHandle();
     auto nodeHandle = getNodeHandle();
 
-    privateNh.param("usb_port_id", _usb_port_id, std::string(""));
-
     {
         std::lock_guard<std::recursive_mutex> scopedLock(_device_lock);
 
@@ -703,7 +701,7 @@ bool RealSenseNodeFactory::deviceMatches(rs2::device &dev, std::string &usb_port
     }
     std::string devicePhysicalPort = dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT);
 
-    ROS_DEBUG("Port ID: %s", devicePhysicalPort.c_str());
+    ROS_WARN("Port ID: %s", devicePhysicalPort.c_str());
 
     std::string device_usb_port = parseUsbPortId(devicePhysicalPort);
 

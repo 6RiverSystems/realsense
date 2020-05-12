@@ -704,6 +704,17 @@ bool RealSenseNodeFactory::deviceMatches(rs2::device &dev, std::string &usb_port
     ROS_WARN("Port ID: %s", devicePhysicalPort.c_str());
 
     std::string device_usb_port = parseUsbPortId(devicePhysicalPort);
+    if (device_usb_port.empty()) {
+        std::string devicePhysicalPortWorkingCopy = devicePhysicalPort;
+        // replace all '.' with '-' for consistency
+        std::replace(begin(devicePhysicalPortWorkingCopy), end(devicePhysicalPortWorkingCopy), '.', '-');
+
+        // does the string contain the usb_port
+        if (usb_port.size() <= devicePhysicalPortWorkingCopy.size())
+        {
+            device_usb_port = devicePhysicalPortWorkingCopy.substr(0, usb_port.size());
+        }
+    }
 
     if (usb_port == device_usb_port)
     {
